@@ -345,11 +345,11 @@
                                     <td>{{ $row->note }}</td>
                                     <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td class="center-align">{{ $row->unit->code }}</td>
-                                    <td class="right-align">{{ $data->currency->name.' '.number_format($row->price,2,',','.') }}</td>
-                                    <td class="right-align">{{ $data->currency->name.' '.number_format($row->total,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'. '.number_format($row->price,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'. '.number_format($row->total,2,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                                     <td class="right-align">{{ number_format($row->wtax,2,',','.') }}</td>
-                                    <td class="right-align">{{ $data->currency->name.' '.number_format($row->grandtotal,2,',','.') }}</td>
+                                    <td class="right-align">{{ $data->currency->code.'. '.number_format($row->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -375,19 +375,19 @@
                                 <table style="border-collapse:collapse;right:0;" width="95%" class="table-bot" style="font-size:1.1rem !important;">
                                     <tr class="break-row">
                                         <td class="right-align" width="50%">Total</td>
-                                        <td class="right-align" width="50%" style="border:0.6px solid black;">{{ $data->currency->name.' '.number_format($data->total,2,',','.') }}</td>
+                                        <td class="right-align" width="50%" style="border:0.6px solid black;">{{ $data->currency->code.'. '.number_format($data->total,2,',','.') }}</td>
                                     </tr>
                                     <tr class="break-row">
                                         <td class="right-align">PPN</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->name.' '.number_format($data->tax,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'. '.number_format($data->tax,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr class="break-row">
                                         <td class="right-align">PPh</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->name.' '.number_format($data->wtax,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'. '.number_format($data->wtax,2,',','.') }}</td>
                                     </tr class="break-row">
                                     <tr>
                                         <td class="right-align">Grandtotal</td>
-                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->name.' '.number_format($data->grandtotal,2,',','.') }}</td>
+                                        <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'. '.number_format($data->grandtotal,2,',','.') }}</td>
                                     </tr class="break-row">                          
                                 </table>
                             </div>

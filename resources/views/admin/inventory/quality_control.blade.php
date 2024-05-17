@@ -40,6 +40,10 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
+
+    #table-detail input[type=text]:not(.browser-default) {
+        height:1.5rem;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -201,6 +205,18 @@
                                 </div>
                                 <label class="active" for="post_date">Tgl.Post</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <div id="delivery_no" class="mt-2">
+
+                                </div>
+                                <label class="active" for="delivery_no">Nomor SJ</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="vehicle_no" class="mt-2">
+
+                                </div>
+                                <label class="active" for="vehicle_no">Nomor Kendaraan</label>
+                            </div>
                             <div class="input-field col m6 s12">
                                 <div id="account_id" class="mt-2">
 
@@ -242,8 +258,8 @@
                             <div class="col m12 s12">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" id="table-detail">
+                                    <div style="overflow:auto;width:100% !important;">
+                                        <table class="bordered" style="min-width:800px;" id="table-detail">
                                             <thead>
                                                 <tr>
                                                     <th class="center">Item</th>
@@ -476,7 +492,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#code,#post_date,#account_id').text('');
+                $('#code,#post_date,#account_id,#vehicle_no,#delivery_no').text('');
                 clearButton.click();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -632,6 +648,8 @@
                     $('#code').text(response.code);
                     $('#post_date').text(response.post_date);
                     $('#account_id').text(response.account_name);
+                    $('#delivery_no').text(response.delivery_no);
+                    $('#vehicle_no').text(response.vehicle_no);
                     $('#list-used-data').append(`
                         <div class="chip purple darken-4 gradient-shadow white-text">
                             ` + response.code + `
@@ -647,16 +665,21 @@
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
                             var count = makeid(10);
-                            let parameter = '<table class="bordered"><tr><th>Parameter</th><th>Nilai</th><th>Satuan</th></tr>';
-                            $.each(val.parameters, function(i, value) {
-                                parameter += `<tr>
-                                    <input type="hidden" name="arr_parameter_detail[]" value="` + val.id + `">
-                                    <td><input type="text" name="arr_parameter_name[]" value="` + value.name + `" readonly></td>
-                                    <td><input type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value=""></td>
-                                    <td><input type="text" name="arr_parameter_unit[]" value="` + value.unit + `" readonly></td>
-                                </tr>`;
-                            });
-                            parameter += '</table>';
+                            let parameter = '';
+                            if(val.parameters.length > 0){
+                                parameter = '<div class="row"><div class="col m5 s12"><table class="bordered"><tr><th>Parameter</th><th>Nilai</th><th>Satuan</th></tr>';
+                                $.each(val.parameters, function(i, value) {
+                                    parameter += `<tr>
+                                        <input type="hidden" name="arr_parameter_detail[]" value="` + val.id + `">
+                                        <td><input type="text" name="arr_parameter_name[]" value="` + value.name + `" readonly></td>
+                                        <td><input type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value="0,000"></td>
+                                        <td><input type="text" name="arr_parameter_unit[]" value="` + value.unit + `" readonly></td>
+                                    </tr>`;
+                                });
+                                parameter += '</table></div></div>';
+                            }else{
+                                parameter = '<span class="red white-text">Data parameter QC untuk item ini tidak tersedia, silahkan tambahkan di Master Data - Item</span>';
+                            }
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + response.id + `">
                                     <input type="hidden" name="arr_detail[]" value="` + val.id + `">
@@ -677,8 +700,11 @@
                                     </td>
                                 </tr>
                                 <tr class="row_item" data-id="` + response.id + `">
-                                    <td colspan="5">
-                                        Hasil inspeksi : 
+                                    <td>
+                                        Hasil inspeksi :
+                                    </td>
+                                    <td colspan="4">
+                                        ` + parameter + `
                                     </td>
                                 </tr>
                             `);

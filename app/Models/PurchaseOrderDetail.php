@@ -35,6 +35,7 @@ class PurchaseOrderDetail extends Model
         'grandtotal',
         'note',
         'note2',
+        'note3',
         'is_tax',
         'is_include_tax',
         'percent_tax',

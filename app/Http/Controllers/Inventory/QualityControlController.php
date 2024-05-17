@@ -231,7 +231,7 @@ class QualityControlController extends Controller
                     'place_name'                => $row->place->code,
                     'warehouse_name'            => $row->warehouse->name,
                     'note'                      => $row->note,
-                    'parameters'                => $parameter,    
+                    'parameters'                => $parameter,
                 ];
             }
 

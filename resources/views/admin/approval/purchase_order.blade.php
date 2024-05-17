@@ -288,6 +288,9 @@
                         <td colspan="10">Keterangan 2: {{ $row->note2 }}</td>
                     </tr>
                     <tr>
+                        <td colspan="10">Keterangan 3: {{ $row->note3 }}</td>
+                    </tr>
+                    <tr>
                         <td colspan="10">Referensi: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
                     </tr>
                     @endforeach

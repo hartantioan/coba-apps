@@ -495,6 +495,7 @@ class PurchaseOrderController extends Controller
                                 'qty'                           => CustomHelper::formatConditionalQty($row->qtyBalance()),
                                 'note'                          => $row->note ? $row->note : '',
                                 'note2'                         => $row->note2 ? $row->note2 : '',
+                                'note3'                         => '',
                                 'warehouse_name'                => $row->warehouse->code.' - '.$row->warehouse->name,
                                 'warehouse_id'                  => $row->warehouse_id,
                                 'place_id'                      => $row->place_id,
@@ -520,6 +521,7 @@ class PurchaseOrderController extends Controller
                             'qty'                           => CustomHelper::formatConditionalQty($row->qty),
                             'note'                          => $row->note ? $row->note : '',
                             'note2'                         => '',
+                            'note3'                         => '',
                             'warehouse_name'                => $row->itemStock->warehouse->code.' - '.$row->itemStock->warehouse->name,
                             'warehouse_id'                  => $row->itemStock->warehouse_id,
                             'place_id'                      => $row->itemStock->place_id,
@@ -942,6 +944,7 @@ class PurchaseOrderController extends Controller
                                     'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_grandtotal[$key])),
                                     'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
+                                    'note3'                         => $request->arr_note3[$key] ? $request->arr_note3[$key] : NULL,
                                     'is_tax'                        => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                     'is_include_tax'                => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                     'percent_tax'                   => $request->arr_tax[$key],
@@ -1004,6 +1007,7 @@ class PurchaseOrderController extends Controller
                                     'grandtotal'                            => str_replace(',','.',str_replace('.','',$request->arr_nominal_grandtotal[$key])),
                                     'note'                                  => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                                     'note2'                                 => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
+                                    'note3'                                 => $request->arr_note3[$key] ? $request->arr_note3[$key] : NULL,
                                     'is_tax'                                => $request->arr_tax[$key] > 0 ? '1' : NULL,
                                     'is_include_tax'                        => $request->arr_is_include_tax[$key] == '1' ? '1' : '0',
                                     'percent_tax'                           => $request->arr_tax[$key],
@@ -1069,7 +1073,7 @@ class PurchaseOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.' - '.$data->account->name.$x.'</div><div class="col s12" style="overflow:auto;"><table style="min-width:2500px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="22">Daftar Item</th>
+                                <th class="center-align" colspan="23">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -1085,8 +1089,9 @@ class PurchaseOrderController extends Controller
                                 <th class="center-align">PPN</th>
                                 <th class="center-align">PPh</th>
                                 <th class="center-align">Grandtotal</th>
-                                <th class="center-align">Keterangan 1</th>
-                                <th class="center-align">Keterangan 2</th>
+                                <th class="center-align">Ket. 1</th>
+                                <th class="center-align">Ket. 2</th>
+                                <th class="center-align">Ket. 3</th>
                                 <th class="center-align">Plant</th>
                                 <th class="center-align">Line</th>
                                 <th class="center-align">Mesin</th>
@@ -1131,6 +1136,7 @@ class PurchaseOrderController extends Controller
                 <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
+                <td class="">'.$row->note3.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
                 <td class="center-align">'.($row->line()->exists() ? $row->line->name : '-').'</td>
                 <td class="center-align">'.($row->machine()->exists() ? $row->machine->name : '-').'</td>
@@ -1256,8 +1262,9 @@ class PurchaseOrderController extends Controller
                 'item_unit_name'                    => $row->itemUnit()->exists() ? $row->itemUnit->unit->code.' - '.$row->itemUnit->unit->name : '',
                 'coa_unit_id'                       => $row->coaUnit()->exists() ? $row->coa_unit_id : '',
                 'coa_unit_name'                     => $row->coaUnit()->exists() ? $row->coaUnit->code.' - '.$row->coaUnit->name : '',
-                'note'                              => $row->note ? $row->note : '',
-                'note2'                             => $row->note2 ? $row->note2 : '',
+                'note'                              => $row->note ?? '',
+                'note2'                             => $row->note2 ?? '',
+                'note3'                             => $row->note3 ?? '',
                 'price'                             => CustomHelper::formatConditionalQty($row->price),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),

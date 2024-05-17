@@ -418,7 +418,7 @@
                             <div class="col m12 s12 step22" style="overflow:auto;width:100% !important;">
                                 <p class="mt-2 mb-2">
                                     <h4>Detail Produk</h4>
-                                    <table class="bordered" style="width:3800px;font-size:0.9rem !important;" id="table-detail">
+                                    <table class="bordered" style="width:4000px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
                                                 <th>No.</th>
@@ -426,6 +426,7 @@
                                                 <th>Item / Coa Jasa</th>
                                                 <th>Keterangan 1</th>
                                                 <th>Keterangan 2</th>
+                                                <th>Keterangan 3</th>
                                                 <th width="100px">Qty PO</th>
                                                 <th width="100px">Satuan PO</th>
                                                 <th width="100px">Qty Stok</th>
@@ -468,7 +469,7 @@
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="last-row-item">
-                                                <td colspan="28">
+                                                <td colspan="29">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" id="button-add-item" onclick="addItem()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> New Item
                                                     </a>
@@ -1452,6 +1453,9 @@
                                                 <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                                             </td>
                                             <td>
+                                                <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3...">
+                                            </td>
+                                            <td>
                                                 <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                             </td>
                                             <td class="center">
@@ -1577,6 +1581,9 @@
                                             </td>
                                             <td>
                                                 <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                            </td>
+                                            <td>
+                                                <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3..." value="` + val.note3 + `">
                                             </td>
                                             <td>
                                                 <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" data-qty="` + val.qty + `" data-stockqty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
@@ -1807,6 +1814,9 @@
                         <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
                     </td>
                     <td>
+                        <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3...">
+                    </td>
+                    <td>
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                     </td>
                     <td class="center">
@@ -1938,6 +1948,9 @@
                     </td>
                     <td>
                         <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
+                    </td>
+                    <td>
+                        <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3...">
                     </td>
                     <td>
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
@@ -2585,6 +2598,9 @@
                                         <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
                                     </td>
                                     <td>
+                                        <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3..." value="` + val.note3 + `">
+                                    </td>
+                                    <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
@@ -2737,6 +2753,9 @@
                                     </td>
                                     <td>
                                         <input name="arr_note2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2..." value="` + val.note2 + `">
+                                    </td>
+                                    <td>
+                                        <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3..." value="` + val.note3 + `">
                                     </td>
                                     <td>
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">

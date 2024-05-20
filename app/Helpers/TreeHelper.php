@@ -247,6 +247,28 @@ class TreeHelper {
                             }
                         }
 
+                        /* if($good_receipt_detail->goodScaleDetail()->exists()){
+                            $name = $good_receipt_detail->goodScaleDetail->goodScale->supplier->name ?? null;
+                            $data_gscale = [
+                                    'properties'=> [
+                                        ['name'=> "Tanggal: ".$good_receipt_detail->goodScaleDetail->goodScale->post_date],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                        ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScaleDetail->goodScale).number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
+                                    ],
+                                    'key'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'name'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($good_receipt_detail->goodScaleDetail->goodScale->code),
+                                ];
+                                $data_go_chart[]=$data_gscale;
+                                $data_link[]=[
+                                    'from'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'to'=>$query_gr->code,
+                                    'string_link'=>$good_receipt_detail->goodScaleDetail->goodScale->code.$query_gr->code
+                                ];
+                                $data_id_good_scale[]= $good_receipt_detail->goodScaleDetail->goodScale->id; 
+                            
+                        } */
+
                     }
                 }
                 

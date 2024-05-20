@@ -135,6 +135,6 @@ class LandedCostDetail extends Model
     public function priceFinalCogs(){
         $item_cogs = ItemCogs::where('lookable_type',$this->landedCost->getTable())->where('lookable_id',$this->landedCost->id)->where('item_id',$this->item_id)->first();
 
-        return $item_cogs->price_final;
+        return $item_cogs ? $item_cogs->price_final : 0;
     }
 }

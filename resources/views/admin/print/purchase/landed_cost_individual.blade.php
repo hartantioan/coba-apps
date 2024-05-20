@@ -310,9 +310,11 @@
                             <table style="width:100%" class="table-bot">
                                 <tr class="break-row">
                                     <td>
+                                        <div class="mt-3">
+                                            Catatan : {{ $data->note }}
+                                        </div>
                                         Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}
                                     </td>
-                                    
                                 </tr>
                             </table>
                         </div>

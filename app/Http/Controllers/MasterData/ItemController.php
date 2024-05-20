@@ -334,7 +334,8 @@ class ItemController extends Controller
                     $query->is_production       = $request->is_production ? $request->is_production : NULL;
                     $query->note                = $request->note;
                     $query->status              = $request->status ? $request->status : '2';
-                    $query->is_quality_check    = $request->is_quality_check ? $request->is_quality_check : NULL;
+                    $query->is_quality_check    = $request->is_quality_check ?? NULL;
+                    $query->is_hide_supplier    = $request->is_hide_supplier ?? NULL;
                     $query->type_id             = $request->type_id ? $request->type_id : NULL;
                     $query->size_id             = $request->size_id ? $request->size_id : NULL;
                     $query->variety_id          = $request->variety_id ? $request->variety_id : NULL;
@@ -372,6 +373,7 @@ class ItemController extends Controller
                         'note'              => $request->note,
                         'status'            => $request->status ? $request->status : '2',
                         'is_quality_check'  => $request->is_quality_check ?? NULL,
+                        'is_hide_supplier'  => $request->is_hide_supplier ?? NULL,
                         'type_id'           => $request->type_id ? $request->type_id : NULL,
                         'size_id'           => $request->size_id ? $request->size_id : NULL,
                         'variety_id'        => $request->variety_id ? $request->variety_id : NULL,
@@ -626,6 +628,10 @@ class ItemController extends Controller
                             <tr>
                                 <th>Pengecekan QC</th>
                                 <th>'.($data->is_quality_check ? '&#10003;' : '&#10005;').'</th>
+                            </tr>
+                            <tr>
+                                <th>Item Top Secret</th>
+                                <th>'.($data->is_hide_supplier ? '&#10003;' : '&#10005;').'</th>
                             </tr>
                             <tr>
                                 <th>Gudang</th>

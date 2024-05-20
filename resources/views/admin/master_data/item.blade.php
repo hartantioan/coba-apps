@@ -404,6 +404,17 @@
                             </div>
                             <div class="input-field col s12 m4">
                                 <div class="switch mb-1">
+                                    <label for="is_hide_supplier">Item Top Secret</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_hide_supplier" name="is_hide_supplier" value="1">
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="input-field col s12 m4">
+                                <div class="switch mb-1">
                                     <label for="status">Status</label>
                                     <label class="right">
                                         Non-Active
@@ -1613,6 +1624,12 @@
                     $('#is_quality_check').prop( "checked", true);
                 }else{
                     $('#is_quality_check').prop( "checked", false);
+                }
+
+                if(response.is_hide_supplier == '1'){
+                    $('#is_hide_supplier').prop( "checked", true);
+                }else{
+                    $('#is_hide_supplier').prop( "checked", false);
                 }
 
                 if(response.is_sales_item == '1'){

@@ -67,6 +67,7 @@ use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodIssueRequest;
 use App\Models\GoodReceiptDetailSerial;
+use App\Models\GoodScale;
 use App\Models\InventoryCoa;
 use App\Models\ItemSerial;
 use App\Models\Journal;
@@ -712,6 +713,36 @@ class Select2Controller extends Controller {
                 'list_warehouse'    => $d->warehouseList(),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'buy_units'         => $d->arrBuyUnits(),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function purchaseItemScale(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
+                        ->orWhere('other_name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->where(function($query) use($search){
+                    $query->whereNotNull('is_purchase_item');
+                })->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'list_warehouse'    => $d->warehouseList(),
+                'buy_units'         => $d->arrBuyUnits(),
+                'is_hide'           => $d->is_hide_supplier ?? '',
             ];
         }
 
@@ -2387,8 +2418,11 @@ class Select2Controller extends Controller {
 
         $data = PurchaseOrderDetail::where(function($query) use($search,$request){
                     $query->where('item_id',$request->item_id)
-                    ->whereHas('purchaseOrder',function($query) use($request){
-                        $query->where('account_id',$request->account_id);  
+                    ->whereHas('purchaseOrder',function($query) use($search,$request){
+                        if($request->account_id){
+                            $query->where('account_id',$request->account_id);
+                        }
+                        $query->where('code','like',"%$search%");
                     });
                 })
                 ->whereIn('place_id',$this->dataplaces)
@@ -2399,8 +2433,9 @@ class Select2Controller extends Controller {
             if($d->getBalanceReceipt() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->purchaseOrder->supplier->name.' - '.$d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->code.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceReceipt()).' '.$d->item->uomUnit->code,
+                    'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceReceipt()).' '.$d->itemUnit->unit->code,
                     'qty'               => CustomHelper::formatConditionalQty($d->getBalanceReceipt()),
+                    'item_unit_id'      => $d->item_unit_id,
                 ];
             }
         }
@@ -2408,10 +2443,10 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
-    public function goodScaleItem(Request $request){
+    public function goodScale(Request $request){
         $response   = [];
 
-        $data = GoodScaleDetail::where(function($query) use($request){
+        $data = GoodScale::where(function($query) use($request){
                     $query->where(function($query)use($request){
                         $query->whereHas('item',function($query) use($request){
                             $query->where('code', 'like', "%$request->search%")
@@ -2421,20 +2456,16 @@ class Select2Controller extends Controller {
                         ->where('place_id',$request->place)
                         ->where('warehouse_id',$request->warehouse);
                     })
-                    ->orWhereHas('goodScale',function($query)use($request){
-                        $query->where('code','like',"%$request->search%");
-                    });
+                    ->where('code','like',"%$request->search%");
                 })
-                ->whereHas('goodScale',function($query){
-                    $query->whereIn('status',['2','3']);
-                })
+                ->whereIn('status',['2','3'])
                 ->whereDoesntHave('goodReceiptDetail')
                 ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->goodScale->code.' '.$d->item->name.' '.$d->qty_balance.' '.$d->item->uomUnit->code,
+                'text' 			    => $d->code.' '.$d->item->name.' '.$d->qty_final.' '.$d->itemUnit->unit->code,
             ];
         }
 

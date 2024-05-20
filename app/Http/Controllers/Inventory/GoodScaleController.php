@@ -7,7 +7,6 @@ use App\Exports\ExportGoodScaleTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodScale;
-use App\Models\GoodScaleDetail;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderDetail;
 use App\Models\Warehouse;
@@ -76,13 +75,13 @@ class GoodScaleController extends Controller
             'id',
             'code',
             'user_id',
-            'account_id',
             'company_id',
             'post_date',
             'delivery_no',
             'vehicle_no',
             'driver',
             'note',
+            'note2',
         ];
 
         $start  = $request->start;
@@ -102,12 +101,6 @@ class GoodScaleController extends Controller
                             ->orWhere('vehicle_no', 'like', "%$search%")
                             ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -142,12 +135,6 @@ class GoodScaleController extends Controller
                             ->orWhere('vehicle_no', 'like', "%$search%")
                             ->orWhere('driver', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
-                            })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -175,7 +162,7 @@ class GoodScaleController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $updateBtn = '';
-                if(!$val->alreadyHome()){
+                if($val->alreadyChecked()){
                     $updateBtn = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small disable" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>';
                 }
                 $response['data'][] = [
@@ -183,16 +170,20 @@ class GoodScaleController extends Controller
                     $val->code,
                     $val->referencePO(),
                     $val->user->name,
-                    $val->account->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->delivery_no,
                     $val->vehicle_no,
                     $val->driver,
                     $val->note,
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->note2,
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
+                    date('d/m/Y H:i:s',strtotime($val->time_scale_in)),
+                    $val->image_qc ? '<a href="'.$val->imageQc().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
+                    $val->time_scale_qc ? date('d/m/Y H:i:s',strtotime($val->time_scale_qc)) : '',
                     $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
+                    $val->time_scale_out ? date('d/m/Y H:i:s',strtotime($val->time_scale_out)) : '',
                     $val->status(),
                     $val->statusQc(),
                     $val->note_qc,
@@ -211,6 +202,16 @@ class GoodScaleController extends Controller
                             )
                         )
                     ),
+                    $val->place->code,
+                    $val->warehouse->name,
+                    $val->item->code.' - '.$val->item->name,
+                    CustomHelper::formatConditionalQty($val->purchaseOrderDetail->qty),
+                    CustomHelper::formatConditionalQty($val->qty_in),
+                    CustomHelper::formatConditionalQty($val->qty_out),
+                    CustomHelper::formatConditionalQty($val->qty_balance),
+                    CustomHelper::formatConditionalQty($val->qty_qc),
+                    CustomHelper::formatConditionalQty($val->qty_final),
+                    $val->itemUnit->unit->code,
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -326,31 +327,33 @@ class GoodScaleController extends Controller
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
-            /* 'code'			            => $request->temp ? ['required', Rule::unique('good_scales', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_scales,code',
-             */'account_id'                => 'required',
             'company_id'                => 'required',
             'vehicle_no'                => 'required',
             'driver'                    => 'required',
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
-            'arr_item'                  => 'required|array',
-            /* 'document'                  => 'required|mimes:jpg,jpeg,png,pdf', */
+            'item_id'                   => 'required',
+            'warehouse_id'              => 'required',
+            'purchase_order_detail_id'  => 'required',
+            'qty_po'                    => 'required',
+            'qty_in'                    => 'required',
+            'qty_out'                   => 'required',
+            'item_unit_id'              => 'required',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai.',
-             */'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
             'driver.required'                   => 'Nama supir tidak boleh kosong.',
             'place_id.required'                 => 'Plant tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong',
-            'arr_item.array'                    => 'Item harus dalam bentuk array.',
-            /* 'document.required'                 => 'Bukti tidak boleh kosong.',
-            'document.mimes'                    => 'Bukti harus dalam bentuk gambar JPG, JPEG, PNG atau dokumen PDF.', */
+            'item_id.required'                  => 'Item tidak boleh kosong.',
+            'warehouse_id.required'             => 'Gudang tidak boleh kosong.',
+            'purchase_order_detail_id.required' => 'PO tidak boleh kosong.',
+            'qty_po.required'                   => 'Qty PO tidak boleh kosong.',
+            'qty_in.required'                   => 'Qty timbang masuk tidak boleh kosong.',
+            'qty_out.required'                  => 'Qty timbang keluar tidak boleh kosong.',
+            'item_unit_id.required'             => 'Satuan item tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -372,6 +375,9 @@ class GoodScaleController extends Controller
                     $newFile = 'public/good_scales/'.$imageName;
                     Storage::put($newFile,base64_decode($image));
                 }
+
+                $itemUnit = ItemUnit::find($request->item_unit_id);
+                $pod = PurchaseOrderDetail::find($request->purchase_order_detail_id);
 
                 if($request->temp){
                 
@@ -407,7 +413,7 @@ class GoodScaleController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','6'])){
-                        if($request->has('file')) {
+                        if($request->has('document')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
@@ -424,23 +430,31 @@ class GoodScaleController extends Controller
                         
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
+                        $query->account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
+                        $query->warehouse_id = $request->warehouse_id;
                         $query->post_date = $request->post_date;
                         $query->delivery_no = $request->delivery_no;
                         $query->vehicle_no = $request->vehicle_no;
                         $query->driver = $request->driver;
                         $query->document = $document;
                         $query->image_in = $newFile ? $newFile : NULL;
+                        $query->time_scale_in = date('Y-m-d H:i:s');
                         $query->note = $request->note;
+                        $query->note2 = $request->note2;
+                        $query->purchase_order_detail_id = $request->purchase_order_detail_id;
+                        $query->item_id = $request->item_id;
+                        $query->qty_in = str_replace(',','.',str_replace('.','',$request->qty_in));
+                        $query->qty_out = str_replace(',','.',str_replace('.','',$request->qty_out));
+                        $query->qty_balance = 0;
+                        $query->qty_qc = 0;
+                        $query->qty_final = 0;
+                        $query->item_unit_id = $request->item_unit_id;
+                        $query->qty_conversion = $itemUnit->conversion;
                         $query->status = '1';
 
                         $query->save();
-
-                        foreach($query->goodScaleDetail as $row){
-                            $row->delete();
-                        }
                         
                     }else{
                         return response()->json([
@@ -455,43 +469,36 @@ class GoodScaleController extends Controller
                     $newCode=GoodScale::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
                     $query = GoodScale::create([
-                        'code'			        => $newCode,
-                        'user_id'		        => session('bo_id'),
-                        'account_id'            => $request->account_id,
-                        'company_id'            => $request->company_id,
-                        'place_id'              => $request->place_id,
-                        'post_date'             => $request->post_date,
-                        'delivery_no'           => $request->delivery_no,
-                        'vehicle_no'            => $request->vehicle_no,
-                        'driver'                => $request->driver,
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
-                        'image_in'              => $newFile ? $newFile : NULL,
-                        'note'                  => $request->note,
-                        'status'                => '1',
+                        'code'			            => $newCode,
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id ?? $pod->purchaseOrder->account_id,
+                        'company_id'                => $request->company_id,
+                        'place_id'                  => $request->place_id,
+                        'warehouse_id'              => $request->warehouse_id,
+                        'post_date'                 => $request->post_date,
+                        'delivery_no'               => $request->delivery_no,
+                        'vehicle_no'                => $request->vehicle_no,
+                        'driver'                    => $request->driver,
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
+                        'image_in'                  => $newFile ? $newFile : NULL,
+                        'time_scale_in'             => date('Y-m-d H:i:s'),
+                        'note'                      => $request->note,
+                        'note2'                     => $request->note2,
+                        'purchase_order_detail_id'  => $request->purchase_order_detail_id,
+                        'item_id'                   => $request->item_id,
+                        'qty_in'                    => str_replace(',','.',str_replace('.','',$request->qty_in)),
+                        'qty_out'                   => str_replace(',','.',str_replace('.','',$request->qty_out)),
+                        'qty_balance'               => 0,
+                        'qty_qc'                    => 0,
+                        'qty_final'                 => 0,
+                        'item_unit_id'              => $request->item_unit_id,
+                        'qty_conversion'            => $itemUnit->conversion,
+                        'status'                    => '1',
                     ]);
                         
                 }
                 
                 if($query) {
-
-                    foreach($request->arr_purchase as $key => $row){
-                        $itemUnit = ItemUnit::find(intval($request->arr_satuan[$key]));
-                        $balance = str_replace(',','.',str_replace('.','',$request->arr_qty_in[$key])) - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
-                        GoodScaleDetail::create([
-                            'good_scale_id'             => $query->id,
-                            'purchase_order_detail_id'  => $row ? $row : NULL,
-                            'item_id'                   => $request->arr_item[$key],
-                            'qty_in'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_in[$key])),
-                            'qty_out'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key])),
-                            'qty_balance'               => $balance,
-                            'item_unit_id'              => $request->arr_satuan[$key],
-                            'qty_conversion'            => $itemUnit->conversion,
-                            'note'                      => $request->arr_note[$key],
-                            'note2'                     => $request->arr_note2[$key],
-                            'place_id'                  => $request->arr_place[$key],
-                            'warehouse_id'              => $request->arr_warehouse[$key]
-                        ]);
-                    }
 
                     CustomHelper::sendApproval('good_scales',$query->id,$query->note);
                     CustomHelper::sendNotification('good_scales',$query->id,'Pengajuan Timbangan Truk No. '.$query->code,$query->note,session('bo_id'));
@@ -532,63 +539,9 @@ class GoodScaleController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
+
         $string = '<div class="row pt-1 pb-1 lighten-4">
-                    <div class="col s12">'.$data->code.$x.'</div>
-                        <div class="col s12">
-                            <table class="bordered" style="min-width:100%;max-width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th class="center-align" colspan="12">Daftar Item</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="center-align">No.</th>
-                                        <th class="center-align">Ref.PO</th>
-                                        <th class="center-align">Item</th>
-                                        <th class="center-align">Timbang Masuk</th>
-                                        <th class="center-align">Timbang Keluar</th>
-                                        <th class="center-align">Qty Netto</th>
-                                        <th class="center-align">Satuan</th>
-                                        <th class="center-align">Keterangan 1</th>
-                                        <th class="center-align">Keterangan 2</th>
-                                        <th class="center-align">Plant</th>
-                                        <th class="center-align">Gudang</th>
-                                    </tr>
-                                </thead>
-                                <tbody>';
-        $totalqtyin=0;
-        $totalqtyout=0;
-        $totalqtybalance=0;
-        foreach($data->goodScaleDetail as $key => $rowdetail){
-            $totalqtyin+=$rowdetail->qty_in;
-            $totalqtyout+=$rowdetail->qty_out;
-            $totalqtybalance+=$rowdetail->qty_balance;
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.($rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-').'</td>
-                <td class="center-align">'.$rowdetail->item->code.' - '.$rowdetail->item->name.'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_in).'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_out).'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($rowdetail->qty_balance).'</td>
-                <td class="center-align">'.$rowdetail->itemUnit->unit->code.'</td>
-                <td class="center-align">'.$rowdetail->note.'</td>
-                <td class="center-align">'.$rowdetail->note2.'</td>
-                <td class="center-align">'.$rowdetail->place->code.'</td>
-                <td class="center-align">'.$rowdetail->warehouse->name.'</td>
-            </tr>';
-        }
-        $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyin, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyout, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtybalance, 3, ',', '.') . '</td>
-            </tr>  
-        ';
-        
-        $string .= '</tbody></table>';
-
-        $string .= '</td></tr>';
-
-        $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                    <div class="col s12">'.$data->code.$x.'</div><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>
@@ -657,30 +610,16 @@ class GoodScaleController extends Controller
 
     public function update(Request $request){
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
-        $data['supplier_name'] = $data->account->employee_no.' - '.$data->account->name;
+        $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
         $data['image_in'] = $data->imageIn();
-
-        $details = [];
-        foreach($data->goodScaleDetail as $row){
-            $details[] = [
-                'id'                        => $row->id,
-                'purchase_order_detail_id'  => $row->purchase_order_detail_id ? $row->purchase_order_detail_id : '',
-                'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->getBalanceReceipt()) : '-',
-                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
-                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
-                'unit'                      => $row->itemUnit->unit->code,
-                'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->code.' - '.$row->place->code,
-                'warehouse_id'              => $row->warehouse_id,
-                'warehouse_name'            => $row->warehouse->name,
-                'note'                      => $row->note,
-                'note2'                     => $row->note2,
-            ];
-        }
-
-        $data['details'] = $details;
+        $data['item_name'] = $data->item->code.' - '.$data->item->name;
+        $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code;
+        $data['qty_po'] = CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty);
+        $data['qty_in'] = CustomHelper::formatConditionalQty($data->qty_in);
+        $data['place_code'] = $data->place->code;
+        $data['warehouse_name'] = $data->warehouse->name;
+        $data['buy_units'] = $data->item->arrBuyUnits();
+        $data['is_hide'] = $data->item->is_hide_supplier ?? '';
 
         return response()->json($data);
     }
@@ -769,31 +708,14 @@ class GoodScaleController extends Controller
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
         $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
         $data['code_place_id'] = substr($data->code,7,2);
-
-        $details = [];
-        foreach($data->goodScaleDetail as $row){
-            $details[] = [
-                'id'                        => $row->id,
-                'purchase_order_detail_id'  => $row->purchase_order_detail_id,
-                'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->code.' - '.$row->item->name,
-                'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
-                'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
-                'qty_out'                   => CustomHelper::formatConditionalQty($row->qty_out),
-                'qty_balance'               => CustomHelper::formatConditionalQty($row->qty_balance),
-                'item_unit_id'              => $row->item_unit_id,
-                'place_id'                  => $row->place_id,
-                'place_name'                => $row->place->code,
-                'warehouse_id'              => $row->warehouse_id,
-                'warehouse_name'            => $row->warehouse->name,
-                'list_warehouse'            => $row->item->warehouseList(),
-                'note'                      => $row->note,
-                'note2'                     => $row->note2,
-                'buy_units'                 => $row->item->arrBuyUnits(),
-            ];
-        }
-
-        $data['details'] = $details;
+        $data['item_name'] = $data->item->code.' - '.$data->item->name;
+        $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code.' - '.$data->purchaseOrderDetail->place->code.' - '.$data->purchaseOrderDetail->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($data->purchaseOrderDetail->getBalanceReceipt()).' '.$data->purchaseOrderDetail->itemUnit->unit->code;
+        $data['qty_po'] = CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty);
+        $data['qty_in'] = CustomHelper::formatConditionalQty($data->qty_in);
+        $data['qty_out'] = CustomHelper::formatConditionalQty($data->qty_out);
+        $data['list_warehouse'] = $data->item->warehouseList();
+        $data['buy_units'] = $data->item->arrBuyUnits();
+        $data['is_hide'] = $data->item->is_hide_supplier ?? '';
 
         return response()->json($data);
     }

@@ -41,6 +41,7 @@ class Item extends Model
         'max_stock',
         'status',
         'is_quality_check',
+        'is_hide_supplier',
         'type_id',
         'size_id',
         'variety_id',
@@ -153,6 +154,15 @@ class Item extends Model
         };
 
         return $check;
+    }
+
+    public function hideSupplier(){
+        $hide = match ($this->is_hide_supplier) {
+          '1' => 'Ya',
+          default => 'Tidak',
+        };
+
+        return $hide;
     }
 
     public function currentCogs($dataplaces){

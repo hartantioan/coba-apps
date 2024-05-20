@@ -38,7 +38,7 @@
     }
 
     .select-wrapper, .select2-container {
-        height:3.7rem !important;
+        height:3.6rem !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -151,20 +151,34 @@
                                                         <th>Code</th>
                                                         <th>Ref.PO</th>
                                                         <th>Pengguna</th>
-                                                        <th>Supplier</th>
                                                         <th>Perusahaan</th>
                                                         <th>Tanggal</th>
                                                         <th>No.SJ</th>
                                                         <th>No.Kendaraan</th>
                                                         <th>Supir</th>
-                                                        <th>Keterangan</th>
+                                                        <th>Ket.1</th>
+                                                        <th>Ket.2</th>
                                                         <th>Dokumen</th>
                                                         <th>Foto Masuk</th>
+                                                        <th>Waktu Masuk</th>
+                                                        <th>Foto QC</th>
+                                                        <th>Waktu QC</th>
                                                         <th>Foto Keluar</th>
+                                                        <th>Waktu Keluar</th>
                                                         <th>Status Dokumen</th>
                                                         <th>Status QC</th>
                                                         <th>Catatan QC</th>
                                                         <th>By</th>
+                                                        <th>Plant</th>
+                                                        <th>Gudang</th>
+                                                        <th>Item</th>
+                                                        <th>Qty PO</th>
+                                                        <th>Qty Masuk</th>
+                                                        <th>Qty Keluar</th>
+                                                        <th>Qty Selisih</th>
+                                                        <th>Qty QC</th>
+                                                        <th>Qty Final</th>
+                                                        <th>Satuan</th>
                                                         <th>Operasi</th>
                                                     </tr>
                                                 </thead>
@@ -207,27 +221,67 @@
                                 </select>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Supplier</label>
-                            </div>
-                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="company_id">Perusahaan</label>
+                                <label class="ac" for="company_id">Perusahaan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>
+                                <label class="active" for="item_id">Item</label>
+                            </div>
+                            <div class="input-field col m3 s12" id="div-account">
+                                <input type="hidden" id="temp" name="temp">
+                                <select class="browser-default" id="account_id" name="account_id"></select>
+                                <label class="active" for="account_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="place_id" name="place_id">
                                     @foreach ($place as $rowplace)
-                                        <option value="{{ $rowplace->id }}">{{ $rowplace->name }}</option>
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>
                                 <label class="" for="place_id">Plant</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="warehouse_id" name="warehouse_id">
+                                    <option value="">--Silahkan pilih item--</option>
+                                </select>
+                                <label class="active" for="warehouse_id">Gudang</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="purchase_order_detail_id" name="purchase_order_detail_id" onchange="getPurchaseOrderQty();"></select>
+                                <label class="active" for="purchase_order_detail_id">Purchase Order</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
+                                <label class="active" for="qty_po">Qty PO</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <label class="active" for="qty_in">Qty Timbang Masuk</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
+                                <label class="active" for="qty_out">Qty Timbang Keluar</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <select class="browser-default" id="item_unit_id" name="item_unit_id" required>
+                                    <option value="">--Silahkan pilih item--</option>    
+                                </select>
+                                <label class="active" for="item_unit_id">Satuan</label>
+                            </div>
                             <div class="col m12 s12 l12"></div>
+                            <div class="input-field col m3 s12">
+                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note">Keterangan 1</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <textarea class="materialize-textarea" id="note2" name="note2" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="note2">Keterangan 2</label>
+                            </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
@@ -248,7 +302,7 @@
                             <div class="col m4 s12 step6">
                                 <label class="">Bukti Upload</label>
                                 <br>
-                                <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                <input type="file" name="document" id="fileInput" accept="image/*" style="display: none;">
                                 <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                     Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                     <br>
@@ -262,38 +316,6 @@
                                 <div id="fileName"></div>
                                 <img src="" alt="Preview" id="imagePreview" style="display: none;">
                             </div>
-                            {{-- <div class="col m12 s12">
-                                <div class="col m6 s6">
-                                    <p class="mt-2 mb-2">
-                                        <h6>Dari Purchase Order (Jika ada informasi)</h6>
-                                        <div class="row">
-                                            <div class="input-field col m6 s7">
-                                                <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
-                                            </div>
-                                            <div class="col m6 s6 mt-4">
-                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseOrder();" href="javascript:void(0);">
-                                                    <i class="material-icons left">add</i> Tambah PO
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </p>
-                                </div>
-                                <div class="col m6 s6">
-                                    <p class="mt-2 mb-2">
-                                        <h6>Dari AI</h6>
-                                        <div class="row">
-                                            <div class="input-field col m6 s7">
-                                                <b>Untuk mencari PO terkait sesuai dengan <i>Supplier</i> dan <i>Plant</i> yang dipilih diurutkan berdasarkan qty gantungan PO terbesar, dan kode PO.</b>
-                                            </div>
-                                            <div class="col m6 s6 mt-4">
-                                                <a class="waves-effect waves-light pink darken-1 btn-small mb-1 mr-1" onclick="getPurchaseOrderAi();" href="javascript:void(0);">
-                                                    <i class="material-icons left">find_replace</i> Proses dengan AI
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </p>
-                                </div>                                
-                            </div> --}}
                             <div class="col m12 s12">
                                 <div class="input-field col m4 s12 select">
                                     <select id="videoSource" name="videoSource" class="browser-default"></select>
@@ -314,46 +336,7 @@
                             <div class="col m12 s12">
                                 <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1800px;" id="table-detail">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Qty PO</th>
-                                                    <th class="center">Timbang Datang</th>
-                                                    <th class="center">Timbang Pulang</th>
-                                                    <th class="center">Qty Netto</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Keterangan 1</th>
-                                                    <th class="center">Keterangan 2</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Gudang</th>
-                                                    <th class="center">Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item">
-                                                <tr id="last-row-item">
-                                                    <td colspan="11" class="center">
-                                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
-                                                            <i class="material-icons left">add</i> Item Manual
-                                                        </a>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </p>
-                            </div>
-                            <div class="input-field col m4 s12">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-                            </div>
+                            
                         </div>
                     </div>
                 </form>
@@ -361,6 +344,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -381,10 +365,58 @@
                             <div class="col m3 s12" id="codeUpdate">
 
                             </div>
-                            <div class="col m1 s12">
+                            <div class="col m1 s12 supplier-class">
                                 Supplier
                             </div>
-                            <div class="col m3 s12" id="supplierUpdate">
+                            <div class="col m3 s12 supplier-class" id="supplierUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Plant
+                            </div>
+                            <div class="col m3 s12" id="plantUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Gudang
+                            </div>
+                            <div class="col m3 s12" id="warehouseUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Purchase Order
+                            </div>
+                            <div class="col m3 s12" id="purchaseOrderUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Qty PO
+                            </div>
+                            <div class="col m3 s12" id="qtyPoUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Qty Timbang Masuk
+                            </div>
+                            <div class="col m3 s12" id="qtyInUpdate">
+
+                            </div>
+                            <div class="col m1 s12">
+                                Qty Timbang Keluar
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);count();" value="0,000">
+                            </div>
+                            <div class="col m1 s12">
+                                Qty Netto
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="qty_balance" name="qty_balance" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
+                            </div>
+                            <div class="col m1 s12">
+                                Satuan
+                            </div>
+                            <div class="col m3 s12" id="unitUpdate">
 
                             </div>
                             <div class="col m1 s12">
@@ -408,35 +440,8 @@
                                     <img id="previewImage1" src="">
                                 </div>
                             </div>
-                            <div class="col m12 s12">
-                                <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;">
-                                        <table class="bordered" style="width:1800px;">
-                                            <thead>
-                                                <tr>
-                                                    {{-- <th class="center" style="width:250px !important;">Link PO</th> --}}
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Qty PO</th>
-                                                    <th class="center">Timbang Datang</th>
-                                                    <th class="center">Timbang Pulang</th>
-                                                    <th class="center">Qty Nett</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Keterangan 1</th>
-                                                    <th class="center">Keterangan 2</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Gudang</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item-update">
-                                                
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </p>
-                            </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="saveUpdate();">Simpan <i class="material-icons right">send</i></button>
+                                
                             </div>
                         </div>
                     </div>
@@ -445,6 +450,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1 submit" onclick="saveUpdate();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -792,7 +798,7 @@
             onOpenStart: function(modal,trigger) {
             },
             onOpenEnd: function(modal, trigger) { 
-                getWeight();
+                /* getWeight(); */
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -802,7 +808,7 @@
                 $('#tempPlace').val('');
                 $('#tempGoodScale').val('');
                 $('#previewImageIn').attr('src','');
-                clearGetWeight();
+                /* clearGetWeight(); */
                 $('#videoSource1').empty();
                 $('#previewImage1').attr('src','');
                 if (window.stream) {
@@ -830,7 +836,7 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
-                getWeight();
+                /* getWeight(); */
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -845,7 +851,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                clearGetWeight();
+                /* clearGetWeight(); */
                 $('.row_item').remove();
                 $('#videoSource').empty();
                 $('#previewImage').attr('src','');
@@ -854,6 +860,7 @@
                         track.stop();
                     });
                 }
+                $('#div-account').removeClass('hide');
             }
         });
 
@@ -943,7 +950,34 @@
         });
 
         select2ServerSide('#purchase_order_id', '{{ url("admin/select2/purchase_order") }}');
+        /* select2ServerSide('#purchase_order_detail_id', '{{ url("admin/select2/purchase_order_detail") }}'); */
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
+
+        $('#purchase_order_detail_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/purchase_order_detail") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search : params.term,
+                        account_id : $('#account_id').val(),
+                        item_id : $('#item_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
@@ -952,6 +986,8 @@
         $("#table-detail th").resizable({
             minWidth: 100,
         });
+
+        select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item_scale") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1027,11 +1063,15 @@
             "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
-                type: 'GET',
+                type: 'POST',
+                dataType: 'JSON',
                 data: {
                     'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -1053,20 +1093,34 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'other', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'delivery_no', className: 'center-align' },
                 { name: 'vehicle_no', className: 'center-align' },
                 { name: 'driver', className: 'center-align' },
                 { name: 'note', className: '' },
+                { name: 'note2', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'time_scale_in', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'image_qc', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'time_scale_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'time_scale_out', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_po', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_in', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_out', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_balance', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_qc', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'qty_final', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -1176,65 +1230,13 @@
         }
     }
 
-    function addItem(){
-        if($('.row_item[data-po!=""]').length > 0){
-            $('#account_id,#purchase_order_id').empty();
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
+    function getPurchaseOrderQty(){
+        if($('#purchase_order_detail_id').val()){
+            $("#qty_po").val($('#purchase_order_detail_id').select2('data')[0].qty);
+            $('#item_unit_id').val($('#purchase_order_detail_id').select2('data')[0].item_unit_id);
+        }else{
+            $("#qty_po").val('0,000');
         }
-        var count = makeid(10);
-        $('#last-row-item').before(`
-            <tr class="row_item" data-po="">
-                <input type="hidden" name="arr_purchase[]" value="">
-                <td>
-                    <select class="browser-default" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                </td>
-                <td class="right-align">
-                    0
-                </td>
-                <td class="center-align">
-                    <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
-                </td>
-                <td class="center-align">
-                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
-                </td>
-                <td class="right-align">
-                    <span id="qtyBalance` + count + `">0,000</span>
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
-                        <option value="">--Silahkan pilih item--</option>    
-                    </select>
-                </td>
-                <td>
-                    <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;">
-                </td>
-                <td>
-                    <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan 2..." style="width:100%;">
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        @foreach ($warehouse as $rowwarehouse)
-                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
     }
 
     function getWeight(){
@@ -1262,16 +1264,14 @@
                 success: function(response) {
                     if($('#modal1').hasClass('open')){
                         if(!$('#temp').val()){
-                            $('input[name^="arr_qty_in"]').each(function(){
-                                $(this).val(response);
-                                countBalance(this);
-                            });
+                            $('#qty_in').val(response);
+                            /* countBalance(this); */
                         }
                     }
                     if($('#modal6').hasClass('open')){
                         $('input[name^="arr_qty_out"]').each(function(){
                             $(this).val(response);
-                            countBalance(this);
+                            /* countBalance(this); */
                         });
                     }
                 }
@@ -1285,42 +1285,49 @@
         }
     }
 
-    function getRowUnit(val){
-        $("#arr_warehouse" + val).empty();
-        if($("#arr_item" + val).val()){
-            $('#arr_satuan' + val).text($("#arr_item" + val).select2('data')[0].buy_unit);
-            if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + val).append(`
+    function getRowUnit(){
+        $("#warehouse_id").empty();
+        $('#account_id').empty();
+        $("#purchase_order_detail_id").empty().trigger('change');
+        if($("#item_id").val()){
+            if($("#item_id").select2('data')[0].list_warehouse.length > 0){
+                $.each($("#item_id").select2('data')[0].list_warehouse, function(i, value) {
+                    $('#warehouse_id').append(`
                         <option value="` + value.id + `">` + value.name + `</option>
                     `);
                 });
             }else{
-                $("#arr_warehouse" + val).append(`
+                $("#warehouse_id").append(`
                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                 `);
             }
-            $('#arr_satuan' + val).empty();
-            if($("#arr_item" + val).select2('data')[0].buy_units.length > 0){
-                $.each($("#arr_item" + val).select2('data')[0].buy_units, function(i, value) {
-                    $('#arr_satuan' + val).append(`
+            $('#item_unit_id').empty();
+            if($("#item_id").select2('data')[0].buy_units.length > 0){
+                $.each($("#item_id").select2('data')[0].buy_units, function(i, value) {
+                    $('#item_unit_id').append(`
                         <option value="` + value.id + `">` + value.code + `</option>
                     `);
                 });
             }else{
-                $("#arr_satuan" + val).append(`
+                $("#item_unit_id").append(`
                     <option value="">--Satuan tidak diatur di master data Item--</option>
                 `);
             }
+            if($("#item_id").select2('data')[0].is_hide){
+                $('#div-account').addClass('hide');
+            }else{
+                $('#div-account').removeClass('hide');
+            }
         }else{
-            $("#arr_item" + val).empty();
-            $("#arr_satuan" + val).empty().append(`
+            $("#item_id").empty();
+            $("#item_unit_id").empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
-            $("#arr_warehouse" + val).append(`
+            $("#warehouse_id").append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
         }
+        $('#item')
     }
 
     function getPurchaseOrder(){
@@ -1634,39 +1641,16 @@
 
                 var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
 
-                $('select[name^="arr_satuan[]"]').each(function(index){
-                    if(!$(this).val()){
-                        passedUnit = false;
-                    }
-                });
-
                 if(passedUnit){
                     if(s){
-                        formData.delete("arr_item[]");
-                        formData.delete("arr_purchase[]");
-                        formData.delete("arr_qty_in[]");
-                        formData.delete("arr_qty_out[]");
-                        formData.delete("arr_note[]");
-                        formData.delete("arr_note2[]");
-
-                        formData.append('image_in', s);
-
-                        $('[name^="arr_item"]').each(function(index){
-                            formData.append('arr_item[]',($(this).val() ? $(this).val() : ''));
-                            formData.append('arr_purchase[]',($('[name^="arr_purchase"]').eq(index).val() ? $('[name^="arr_purchase"]').eq(index).val() : ''));
-                            formData.append('arr_qty_in[]',($('[name^="arr_qty_in"]').eq(index).val() ? $('[name^="arr_qty_in"]').eq(index).val() : ''));
-                            formData.append('arr_qty_out[]',($('[name^="arr_qty_out"]').eq(index).val() ? $('[name^="arr_qty_out"]').eq(index).val() : ''));
-                            formData.append('arr_note[]',($('[name^="arr_note"]').eq(index).val() ? $('[name^="arr_note"]').eq(index).val() : ''));
-                            formData.append('arr_note2[]',($('[name^="arr_note2"]').eq(index).val() ? $('[name^="arr_note2"]').eq(index).val() : ''));
-                        });
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
                     formData.append('lastsegment',lastSegment);
+                    formData.append('image_in', s);
                     
                         $.ajax({
                             url: '{{ Request::url() }}/create',
@@ -1675,7 +1659,7 @@
                             data: formData,
                             contentType: false,
                             processData: false,
-                            cache: false,
+                            cache: true,
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
@@ -1845,53 +1829,13 @@
                 $('#tempGoodScale').val(response.id);
                 $('#previewImageIn').attr('src',response.image_in);
                 $('#codeUpdate').text(response.code);
-                $('#supplierUpdate').text(response.supplier_name);
-
-                if(response.details.length > 0){
-                    $('#body-item-update').empty();
-
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-item-update').append(`
-                            <tr class="row_item_update">
-                                ` + (val.purchase_order_detail_id ? `<input type="hidden" name="arr_pod[]" value=` + val.purchase_order_detail_id + `>` : `` ) + `
-                                <input type="hidden" name="arr_good_scale_detail[]" value="` + val.id + `">
-                                <input type="hidden" name="arr_qty_in[]" value="` + val.qty_in + `" id="arr_qty_in` + count + `">
-                                <input type="hidden" name="arr_pod[]" value="" id="arr_pod` + count + `">
-                                <td>
-                                    ` + val.item_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.qty_po + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.qty_in + `
-                                </td>
-                                <td class="center-align">
-                                    <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
-                                </td>
-                                <td class="right-align">
-                                    <span id="qtyBalance` + count + `">0,000</span>
-                                </td>
-                                <td class="center">
-                                    <span id="arr_satuan` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td>
-                                    ` + val.note + `
-                                </td>
-                                <td>
-                                    ` + val.note2 + `
-                                </td>
-                                <td>
-                                    ` + val.place_name + `
-                                </td>
-                                <td>
-                                    ` + val.warehouse_name + `
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
+                $('#supplierUpdate').text(response.account_name);
+                $('#plantUpdate').text(response.place_code);
+                $('#warehouseUpdate').text(response.warehouse_update);
+                $('#purchaseOrderUpdate').text(response.purchase_code);
+                $('#qtyPoUpdate').text(response.qty_po);
+                $('#qtyInUpdate').text(response.qty_in);
+                $('#unitUpdate').text(response.unit);
                 
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
@@ -1964,149 +1908,51 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
+                $('#note2').val(response.note2);
                 $('#delivery_no').val(response.delivery_no);
                 $('#vehicle_no').val(response.vehicle_no);
                 $('#driver').val(response.driver);
                 $('#post_date').val(response.post_date);
+                $('#qty_po').val(response.qty_po);
+                $('#qty_in').val(response.qty_in);
+                $('#qty_out').val(response.qty_out);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
+                if(response.is_hide){
+                    $('#div-account').addClass('hide');
+                }else{
+                    $('#div-account').removeClass('hide');
+                }
+                $('#purchase_order_detail_id').empty().append(`
+                    <option value="` + response.purchase_order_detail_id + `">` + response.purchase_code + `</option>
+                `);
+                $('#warehouse_id').empty();
+                $.each(response.list_warehouse, function(i, val) {
+                    $('#warehouse_id').append(`
+                        <option value="` + val.id + `">` + val.name + `</option>
+                    `);
+                });
+                $('#item_unit_id').empty();
+                $.each(response.buy_units, function(i, val) {
+                    $('#item_unit_id').append(`
+                        <option value="` + val.id + `">` + val.code + `</option>
+                    `);
+                });
+                $('#item_id').append(`
+                    <option value="` + response.item_id + `">` + response.item_name + `</option>
+                `);
+
+                $('#warehouse_id').val(response.warehouse_id);
+                $('#item_unit_id').val(response.item_unit_id);
+
                 if(response.document){
                     const baseUrl = 'http://127.0.0.1:8000/storage/';
                     const filePath = response.document.replace('public/', '');
                     const fileUrl = baseUrl + filePath;
                     displayFile(fileUrl);
-                }
-                if(response.details.length > 0){
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        
-                        if(val.purchase_order_detail_id){
-                            $('#last-row-item').before(`
-                                <tr class="row_item" data-po="` + response.id + `">
-                                    <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                    <input type="hidden" name="arr_purchase[]" value="` + val.purchase_order_detail_id + `">
-                                    <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
-                                    <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
-                                    <td>
-                                        ` + val.item_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.qty_po + `
-                                    </td>
-                                    <td class="center-align">
-                                        <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
-                                    </td>
-                                    <td class="center-align">
-                                        <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
-                                    </td>
-                                    <td class="right-align">
-                                        <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
-                                            <option value="">--Silahkan pilih item--</option>    
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
-                                    </td>
-                                    <td>
-                                        <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan 2..." style="width:100%;" value="` + val.note2 + `">
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.place_name + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.warehouse_name + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                        }else{
-                            $('#last-row-item').before(`
-                                <tr class="row_item" data-po="">
-                                    <input type="hidden" name="arr_purchase[]" value="">
-                                    <td>
-                                        <select class="browser-default" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                                    </td>
-                                    <td class="right-align">
-                                        0
-                                    </td>
-                                    <td class="center-align">
-                                        <input name="arr_qty_in[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_in + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_in` + count + `" data-id="` + count + `" readonly>
-                                    </td>
-                                    <td class="center-align">
-                                        <input name="arr_qty_out[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_out + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;" id="arr_qty_out` + count + `" data-id="` + count + `" readonly>
-                                    </td>
-                                    <td class="right-align">
-                                        <span id="qtyBalance` + count + `">` + val.qty_balance + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_satuan` + count + `" name="arr_satuan[]" required>
-                                            <option value="">--Silahkan pilih item--</option>    
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input name="arr_note[]" class="browser-default" type="text" placeholder="Keterangan 1..." style="width:100%;" value="` + val.note + `">
-                                    </td>
-                                    <td>
-                                        <input name="arr_note2[]" class="browser-default" type="text" placeholder="Keterangan 2..." style="width:100%;" value="` + val.note2 + `">
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>    
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]"></select>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-
-                            $('#arr_place' + count).val(val.place_id);
-
-                            $.each(val.list_warehouse, function(i, value) {
-                                $('#arr_warehouse' + count).append(`
-                                    <option value="` + value.id + `">` + value.name + `</option>
-                                `);
-                            });
-
-                            $('#arr_item' + count).empty().append(`
-                                <option value="` + val.item_id + `">` + val.item_name + `</option>
-                            `);
-
-                            $('#arr_warehouse' + count).val(val.warehouse_id);
-
-                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
-                        }
-
-                        if(val.buy_units.length > 0){
-                            $('#arr_satuan' + count).empty();
-                            $.each(val.buy_units, function(i, value) {
-                                $('#arr_satuan' + count).append(`
-                                    <option value="` + value.id + `" ` + (value.id == val.item_unit_id ? 'selected' : '') + `>` + value.code + `</option>
-                                `);
-                            });
-                        }
-                    });
                 }
                 
                 $('.modal-content').scrollTop(0);

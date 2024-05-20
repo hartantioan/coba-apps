@@ -43,6 +43,11 @@
 
     #table-detail input[type=text]:not(.browser-default) {
         height:1.5rem;
+        border-bottom: none;
+    }
+
+    .data-input {
+        border-bottom: 1px solid #9e9e9e !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -217,15 +222,38 @@
                                 </div>
                                 <label class="active" for="vehicle_no">Nomor Kendaraan</label>
                             </div>
-                            <div class="input-field col m6 s12">
+                            <div class="input-field col m6 s12" id="div-hide">
                                 <div id="account_id" class="mt-2">
 
                                 </div>
                                 <label class="active" for="account_id">Partner Bisnis</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <div id="item_name" class="mt-2">
+
+                                </div>
+                                <label class="active" for="item_name">Nama Item</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="purchase_order" class="mt-2">
+
+                                </div>
+                                <label class="active" for="purchase_order">Purchase Order</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="qty_in" class="mt-2">
+
+                                </div>
+                                <label class="active" for="qty_in">Qty Masuk</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="qty_out" class="mt-2">
+
+                                </div>
+                                <label class="active" for="qty_out">Qty Keluar</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <select class="form-control" id="status_qc" name="status_qc">
-                                    <option value="">Menunggu</option>
                                     <option value="1">Disetujui</option>
                                     <option value="2">Ditolak</option>
                                 </select>
@@ -235,10 +263,11 @@
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
                             </div>
+                            <div class="col m12 s12"></div>
                             <div class="col m6 s12 step6">
                                 <label class="">Bukti Upload</label>
                                 <br>
-                                <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
+                                <input type="file" name="document" id="fileInput" accept="image/*" style="display: none;">
                                 <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                     Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                     <br>
@@ -255,27 +284,22 @@
                             <div class="col m12 s12">
                                 <h6><b>Timbangan Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m6 s12">
                                 <p class="mt-2 mb-2">
-                                    <h4>Detail Produk</h4>
-                                    <div style="overflow:auto;width:100% !important;">
-                                        <table class="bordered" style="min-width:800px;" id="table-detail">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">Item</th>
-                                                    <th class="center">Qty</th>
-                                                    <th class="center">Satuan</th>
-                                                    <th class="center">Plant</th>
-                                                    <th class="center">Gudang</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="body-item"></tbody>
-                                        </table>
-                                    </div>
+                                    <h5>Detail Pemeriksaan Barang</h5>
+                                    <table class="bordered" id="table-detail">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">No</th>
+                                                <th class="center">Parameter</th>
+                                                <th class="center">Nominal</th>
+                                                <th class="center">Satuan</th>
+                                                <th class="center">Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item"></tbody>
+                                    </table>
                                 </p>
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -284,6 +308,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
@@ -498,6 +523,7 @@
                     $('.data-used').trigger('click');
                 }
                 $('#body-item').empty();
+                $('#div-hide').removeClass('hide');
             }
         });
     });
@@ -647,65 +673,36 @@
                     $('#temp').val(id);
                     $('#code').text(response.code);
                     $('#post_date').text(response.post_date);
-                    $('#account_id').text(response.account_name);
+                    if(response.is_hide_supplier){
+                        $('#div-hide').addClass('hide');
+                        $('#account_id').text('-');
+                    }else{
+                        $('#account_id').text(response.account_name);
+                    }
                     $('#delivery_no').text(response.delivery_no);
                     $('#vehicle_no').text(response.vehicle_no);
+                    $('#item_name').text(response.item_name);
+                    $('#purchase_order').text(response.purchase_order);
+                    $('#qty_in').text(response.qty_in);
+                    $('#qty_out').text(response.qty_out);
                     $('#list-used-data').append(`
                         <div class="chip purple darken-4 gradient-shadow white-text">
                             ` + response.code + `
                             <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                         </div>
                     `);
-                    if(response.document){
-                        const baseUrl = 'http://127.0.0.1:8000/storage/';
-                        const filePath = response.document.replace('public/', '');
-                        const fileUrl = baseUrl + filePath;
-                        displayFile(fileUrl);
-                    }
-                    if(response.details.length > 0){
-                        $.each(response.details, function(i, val) {
+                    if(response.parameters.length > 0){
+                        $.each(response.parameters, function(i, val) {
                             var count = makeid(10);
-                            let parameter = '';
-                            if(val.parameters.length > 0){
-                                parameter = '<div class="row"><div class="col m5 s12"><table class="bordered"><tr><th>Parameter</th><th>Nilai</th><th>Satuan</th></tr>';
-                                $.each(val.parameters, function(i, value) {
-                                    parameter += `<tr>
-                                        <input type="hidden" name="arr_parameter_detail[]" value="` + val.id + `">
-                                        <td><input type="text" name="arr_parameter_name[]" value="` + value.name + `" readonly></td>
-                                        <td><input type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value="0,000"></td>
-                                        <td><input type="text" name="arr_parameter_unit[]" value="` + value.unit + `" readonly></td>
-                                    </tr>`;
-                                });
-                                parameter += '</table></div></div>';
-                            }else{
-                                parameter = '<span class="red white-text">Data parameter QC untuk item ini tidak tersedia, silahkan tambahkan di Master Data - Item</span>';
-                            }
                             $('#body-item').append(`
                                 <tr class="row_item" data-id="` + response.id + `">
-                                    <input type="hidden" name="arr_detail[]" value="` + val.id + `">
-                                    <td>
-                                        ` + val.item_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.qty_in + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.unit + `
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.place_name + `</span>
-                                    </td>
-                                    <td class="center">
-                                        <span>` + val.warehouse_name + `</span>
-                                    </td>
-                                </tr>
-                                <tr class="row_item" data-id="` + response.id + `">
-                                    <td>
-                                        Hasil inspeksi :
-                                    </td>
-                                    <td colspan="4">
-                                        ` + parameter + `
-                                    </td>
+                                    <input type="hidden" name="arr_detail[]" value="` + response.id + `">
+                                    <input type="hidden" name="arr_is_affect_qty[]" value="` + val.is_affect_qty + `">
+                                    <td>` + (i+1) + `</td>
+                                    <td><input type="text" name="arr_parameter_name[]" value="` + val.name + `" readonly></td>
+                                    <td><input class="data-input" type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value="0,000"></td>
+                                    <td><input type="text" name="arr_parameter_unit[]" value="` + val.unit + `" readonly></td>
+                                    <td><input class="data-input" type="text" name="arr_parameter_note[]" value="-"></td>
                                 </tr>
                             `);
                         });
@@ -726,5 +723,92 @@
                 });
             }
         });
+    }
+    
+    function save(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_data')[0]);
+                    
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('#modal1');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal1');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#modal1');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+    
+    function success(){
+        loadDataTable();
+        $('#modal1').modal('close');
     }
 </script>

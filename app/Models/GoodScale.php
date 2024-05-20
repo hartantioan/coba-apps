@@ -26,18 +26,33 @@ class GoodScale extends Model
         'account_id',
         'company_id',
         'place_id',
+        'warehouse_id',
         'post_date',
         'delivery_no',
         'vehicle_no',
         'driver',
         'document',
         'image_in',
+        'time_scale_in',
         'image_out',
+        'time_scale_out',
         'image_qc',
+        'time_scale_qc',
         'note',
+        'note2',
         'status',
+        'user_qc',
         'status_qc',
         'note_qc',
+        'purchase_order_detail_id',
+        'item_id',
+        'qty_in',
+        'qty_out',
+        'qty_balance',
+        'qty_qc',
+        'qty_final',
+        'item_unit_id',
+        'qty_conversion',
         'void_id',
         'void_note',
         'void_date',
@@ -47,6 +62,36 @@ class GoodScale extends Model
         'done_date',
         'done_note',
     ];
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function purchaseOrderDetail()
+    {
+        return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
+    }
+
+    public function goodReceiptDetail(){
+        return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_detail_id','id')->whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function qualityControl(){
+        return $this->hasMany('App\Models\QualityControl');
+    }
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
 
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
@@ -67,9 +112,9 @@ class GoodScale extends Model
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();
     }
 
-    public function goodScaleDetail()
+    public function userQc()
     {
-        return $this->hasMany('App\Models\GoodScaleDetail');
+        return $this->belongsTo('App\Models\User', 'user_qc', 'id')->withTrashed();
     }
 
     public static function generateCode($prefix)
@@ -230,20 +275,7 @@ class GoodScale extends Model
     }
 
     public function referencePO(){
-        $arr = [];
-
-        foreach($this->goodScaleDetail as $row){
-            if($row->purchase_order_detail_id){
-                if(!in_array($row->purchaseOrderDetail->purchaseOrder->code,$arr)){
-                    $arr[] = $row->purchaseOrderDetail->purchaseOrder->code;
-                }
-            }
-        }
-        if(count($arr) > 0){
-            return implode(', ',$arr);
-        }else{
-            return '-';
-        }
+        return $this->purchaseOrderDetail->purchaseOrder->code;
     }
     
     public function journal(){
@@ -366,14 +398,11 @@ class GoodScale extends Model
         }
     }
 
-    public function alreadyHome(){
+    public function alreadyChecked(){
         $status = false;
-        foreach($this->goodScaleDetail as $row){
-            if($row->qty_out > 0){
-                $status = true;
-            }
+        if($this->time_scale_in && $this->time_scale_qc){
+            $status = true;
         }
-
         return $status;
     }
 

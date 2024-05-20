@@ -22,6 +22,7 @@ use App\Helpers\CustomHelper;
 use App\Models\ItemUnit;
 use App\Models\Menu;
 use App\Models\MenuUser;
+use App\Models\QualityControl;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -174,7 +175,7 @@ class QualityControlController extends Controller
                             )
                         )
                     ),
-                    '
+                    $val->status_qc ? 'Telah di-cek QC' : '
                         <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Isi hasil pemeriksaan." onclick="inspect(`' . CustomHelper::encrypt($val->code) . '`);"><i class="material-icons dp48">done_all</i></button>
 					',
                 ];
@@ -209,33 +210,27 @@ class QualityControlController extends Controller
 
             $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
             $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
+            $parameter = [];
 
-            $details = [];
-            foreach($data->goodScaleDetail as $row){
-                $parameter = [];
-
-                foreach($row->item->itemQcParameter as $rowparam){
-                    $parameter[] = [
-                        'name'          => $rowparam->name,
-                        'unit'          => $rowparam->unit,
-                        'is_affect_qty' => $rowparam->is_affect_qty ?? '',
-                    ];
-                }
-
-                $details[] = [
-                    'id'                        => $row->id,
-                    'item_name'                 => $row->item->code.' - '.$row->item->name,
-                    'qty_po'                    => $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '-',
-                    'qty_in'                    => CustomHelper::formatConditionalQty($row->qty_in),
-                    'unit'                      => $row->itemUnit->unit->code,
-                    'place_name'                => $row->place->code,
-                    'warehouse_name'            => $row->warehouse->name,
-                    'note'                      => $row->note,
-                    'parameters'                => $parameter,
+            foreach($data->item->itemQcParameter as $rowparam){
+                $parameter[] = [
+                    'name'          => $rowparam->name,
+                    'unit'          => $rowparam->unit,
+                    'is_affect_qty' => $rowparam->is_affect_qty ?? '',
                 ];
             }
 
-            $data['details'] = $details;
+            $data['purchase_order']     = $data->purchaseOrderDetail->purchaseOrder->code;
+            $data['item_name']          = $data->item->code.' - '.$data->item->name;
+            $data['qty_po']             = CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty).' '.$data->purchaseOrderDetail->itemUnit->unit->code;
+            $data['qty_in']             = CustomHelper::formatConditionalQty($data->qty_in).' - '.$data->itemUnit->unit->code;
+            $data['qty_out']             = CustomHelper::formatConditionalQty($data->qty_out).' - '.$data->itemUnit->unit->code;
+            $data['unit']               = $data->itemUnit->unit->code;
+            $data['place_name']         = $data->place->code;
+            $data['warehouse_name']     = $data->warehouse->name;
+            $data['note']               = $data->note;
+            $data['parameters']         = $parameter;
+            $data['is_hide_supplier']   = $data->item->is_hide_supplier ?? '';
 
             return response()->json($data);
         }
@@ -247,5 +242,89 @@ class QualityControlController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+            'status_qc'                 => 'required',
+            'note'                      => 'required',
+            'arr_detail'                => 'required|array',
+            'arr_parameter_name'        => 'required|array',
+            'arr_parameter_nominal'     => 'required|array',
+            'arr_parameter_unit'        => 'required|array',
+            'arr_parameter_note'        => 'required|array',
+		], [
+            'status_qc.required' 	            => 'Status tidak boleh kosong.',
+            'note.required'                     => 'Keterangan tidak boleh kosong.',
+            'arr_detail.required'               => 'Detail id tidak boleh kosong.',
+            'arr_detail.array'                  => 'Detail id harus array.',
+            'arr_parameter_name.required'       => 'Nama tidak boleh kosong.',
+            'arr_parameter_name.array'          => 'Nama harus array.',
+            'arr_parameter_nominal.required'    => 'Nominal tidak boleh kosong.',
+            'arr_parameter_nominal.array'       => 'Nominal harus array.',
+            'arr_parameter_unit.required'       => 'Satuan tidak boleh kosong.',
+            'arr_parameter_unit.array'          => 'Satuan harus array.',
+            'arr_parameter_note.required'       => 'Keterangan detail tidak boleh kosong.',
+            'arr_parameter_note.array'          => 'Keterangan detail harus array.',
+		]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            /* DB::beginTransaction();
+            try { */
+                
+                $goodScale = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
+                
+                if($goodScale){
+
+                    $goodScale->update([
+                        'status_qc'     => $request->status_qc,
+                        'note_qc'       => $request->note,
+                        'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
+                        'user_qc'       => session('bo_id'),
+                        'time_scale_qc' => date('Y-m-d H:i:s'),
+                    ]);
+
+                    foreach($request->arr_detail as $key => $row){
+                        QualityControl::create([
+                            'good_scale_id'     => $row,
+                            'name'              => $request->arr_parameter_name[$key],
+                            'nominal'           => str_replace(',','.',str_replace('.','',$request->arr_parameter_nominal[$key])),
+                            'unit'              => $request->arr_parameter_unit[$key],
+                            'is_affect_qty'     => $request->arr_is_affect_qty[$key],
+                            'note'              => $request->arr_parameter_note[$key],
+                        ]);
+                    }
+    
+                    CustomHelper::sendNotification('good_scales',$goodScale->id,'Pengajuan Timbangan Truk No. '.$goodScale->code.' telah di-cek kualitas (QC) oleh '.session('bo_name'),$request->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new GoodScale())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($goodScale)
+                        ->log('Add / edit timbangan truk quality control.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                    
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+                /* DB::commit();
+            }catch(\Exception $e){
+                DB::rollback();
+            } */
+		}
+		
+		return response()->json($response);
     }
 }

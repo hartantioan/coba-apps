@@ -665,6 +665,7 @@ class PurchaseOrderController extends Controller
 
             $passedZero = true;
             $passedMustPr = true;
+            $passedSecretItem = true;
             if($request->arr_price){
                 foreach($request->arr_price as $row){
                     if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
@@ -682,6 +683,8 @@ class PurchaseOrderController extends Controller
 
             if($request->inventory_type == '1'){
                 $arrGroupItem = [];
+                $hasSecret = false;
+                $hasNonSecret = false;
                 foreach($request->arr_item as $key => $row){
                     $item = Item::find(intval($row));
                     $topGroupId = $item->itemGroup->getTopParent($item->itemGroup);
@@ -701,6 +704,11 @@ class PurchaseOrderController extends Controller
                             'group_id'      => $topGroupId,
                         ];
                     }
+                    if($item->is_hide_supplier){
+                        $hasSecret = true;
+                    }else{
+                        $hasNonSecret = true;
+                    }
                 }
                 if(count($arrGroupItem) > 1){
                     $arrError = [];
@@ -717,6 +725,17 @@ class PurchaseOrderController extends Controller
                         $passedMustPr = false;
                     }
                 }
+
+                if($hasSecret && $hasNonSecret){
+                    $passedSecretItem = false;
+                }
+            }
+
+            if(!$passedSecretItem){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf PO tipe Persediaan terdapat item rahasia tercampur dengan item biasa. 1 PO tidak bisa dicampur antara item rahasia dan item umum.',
+                ]);
             }
 
             if(!$passedMustPr){

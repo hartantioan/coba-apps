@@ -266,6 +266,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_issue', [Select2Controller::class, 'itemIssue']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_item', [Select2Controller::class, 'purchaseItem']);
+                Route::get('purchase_item_scale', [Select2Controller::class, 'purchaseItemScale']);
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
@@ -331,7 +332,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
-                Route::get('good_scale_item', [Select2Controller::class, 'goodScaleItem']);
+                Route::get('good_scale', [Select2Controller::class, 'goodScale']);
                 Route::get('shift', [Select2Controller::class, 'shift']);
                 Route::get('shift_production', [Select2Controller::class, 'shiftProduction']);
                 Route::get('place', [Select2Controller::class, 'place']);
@@ -1670,7 +1671,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('good_scale')->middleware(['operation.access:good_scale,view','lockacc'])->group(function () {
                     Route::get('/',[GoodScaleController::class, 'index']);
-                    Route::get('datatable',[GoodScaleController::class, 'datatable']);
+                    Route::post('datatable',[GoodScaleController::class, 'datatable']);
                     Route::post('done',[GoodScaleController::class, 'done'])->middleware('operation.access:good_scale,update');
                     Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
                     Route::post('show', [GoodScaleController::class, 'show']);
@@ -1698,6 +1699,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[QualityControlController::class, 'index']);
                     Route::get('datatable',[QualityControlController::class, 'datatable']);
                     Route::post('inspect', [QualityControlController::class, 'inspect']);
+                    Route::post('create',[QualityControlController::class, 'create'])->middleware('operation.access:quality_control,update');
                     Route::post('remove_used_data', [QualityControlController::class, 'removeUsedData']);
                 });
 

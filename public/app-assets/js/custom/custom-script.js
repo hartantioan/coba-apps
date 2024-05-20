@@ -1,9 +1,9 @@
 $(function() {
 	$('#loader').fadeOut();
 	initializeMasking();
-	$('.select2-hidden-accessible').on('select2:unselect',function(){
+	/* $('.select2-hidden-accessible').on('select2:unselect',function(){
 		$(this).html(null);
-	});
+	}); */
 });
 
 function emptyThis(element){

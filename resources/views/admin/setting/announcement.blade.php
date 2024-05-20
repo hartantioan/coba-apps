@@ -320,11 +320,7 @@
                     var options = [];
                     console.log('masid');
                     $.each(response.menu, function(i, val) {
-                        
                         options.push(new Option(val.name, val.id, true, true));
-                        // $('#menu_id').append(`
-                        //     <option value="` + val.id + `">` + val.name + `</option>
-                        // `);
                     });
                     $('#menu_id').append(options).trigger('change');
                     

@@ -303,45 +303,6 @@
                         </tr>
                     </table>
                     <!-- product details table-->
-                    
-                    <div class="invoice-product-details mt-2">
-                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
-                            <thead>
-                                <tr>
-                                    <th class="center">Ref.PO</th>
-                                    <th class="center">Item</th>
-                                    <th class="center">Qty.PO</th>
-                                    <th class="center">Qty.Datang</th>
-                                    <th class="center">Qty.Pulang</th>
-                                    <th class="center">Qty.Netto</th>
-                                    <th class="center">Sat.</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Gudang</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($data->goodScaleDetail as $row)
-                                <tr>
-                                    <td class="center-align">{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
-                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                    <td align="right">{{ $row->purchase_order_detail_id ? CustomHelper::formatConditionalQty($row->purchaseOrderDetail->qty) : '0,000' }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_in) }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_out) }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_balance) }}</td>
-                                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                                    <td class="center-align">{{ $row->place->code }}</td>
-                                    <td class="center-align">{{ $row->warehouse->name }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9">{{ $row->note }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="9">{{ $row->note2 }}</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">

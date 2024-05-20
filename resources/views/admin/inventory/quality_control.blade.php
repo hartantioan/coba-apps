@@ -244,13 +244,13 @@
                                 <div id="qty_in" class="mt-2">
 
                                 </div>
-                                <label class="active" for="qty_in">Qty Masuk</label>
+                                <label class="active" for="qty_in">Qty Bruto</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <div id="qty_out" class="mt-2">
 
                                 </div>
-                                <label class="active" for="qty_out">Qty Keluar</label>
+                                <label class="active" for="qty_out">Qty Tara</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="status_qc" name="status_qc">

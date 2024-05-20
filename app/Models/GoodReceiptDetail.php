@@ -80,10 +80,10 @@ class GoodReceiptDetail extends Model
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
     }
 
-    public function goodScaleDetail()
+    /* public function goodScaleDetail()
     {
         return $this->belongsTo('App\Models\GoodScaleDetail', 'good_scale_detail_id', 'id')->withTrashed();
-    }
+    } */
 
     public function goodReturnPODetail(){
         return $this->hasMany('App\Models\GoodReturnPODetail','good_receipt_detail_id','id')->whereHas('goodReturnPO',function($query){

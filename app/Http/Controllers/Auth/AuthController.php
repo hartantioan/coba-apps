@@ -189,8 +189,9 @@ class AuthController extends Controller
                 ->log('Logout dari aplikasi.');
         }
         session()->flush();
+        $script = "<script>window.localStorage.clear();</script>";
         Auth::logout();
-        return redirect('admin/login');
+        return redirect('admin/login')->with('script', $script);
     }
     public function enable(){
         session([

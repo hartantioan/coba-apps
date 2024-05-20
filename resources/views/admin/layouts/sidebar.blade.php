@@ -1,5 +1,17 @@
 	<!-- BEGIN: SideNav-->
-    <aside class="sidenav-main nav-expanded nav-lock nav-collapsible sidenav-light sidenav-active-square">
+    <style>
+        #announcement_div {
+            position: fixed;
+            bottom: 50px;
+            left: calc(300px + 19px); /* Adjust the 300px to match the expanded width of the aside */
+            transition: left 0.01s;
+        }
+
+        .sidenav-collapsed #announcement_div {
+            left: calc(64px + 19px); /* Adjust the 80px to match the collapsed width of the aside */
+        }
+    </style>
+    <aside id="sidenav" class="sidenav-main nav-expanded nav-lock nav-collapsible sidenav-light sidenav-active-square">
         <div class="brand-sidebar">
             <h1 class="logo-wrapper">
                 <a class="brand-logo darken-1" href="{{ url('admin/dashboard') }}">
@@ -135,4 +147,7 @@
         </ul>
         <div class="navigation-background"></div><a class="sidenav-trigger btn-sidenav-toggle btn-floating btn-medium waves-effect waves-light hide-on-large-only" href="#" data-target="slide-out"><i class="material-icons">menu</i></a>
     </aside>
+    <div style="bottom: 50px; left: 19px;" class="fixed-action-btn direction-top" id="announcement_div">
+        
+    </div>
     <!-- END: SideNav-->

@@ -188,4 +188,23 @@ function destroy_one_time(id){
         }
     });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    const sidenav = document.getElementById('sidenav');
+    const fixedActionBtn = document.getElementById('announcement_div');
+
+    function adjustButtonPosition() {
+        const sidenavWidth = sidenav.offsetWidth;
+        fixedActionBtn.style.left = `calc(${sidenavWidth}px + 19px)`;
+    }
+
+    
+    adjustButtonPosition();
+
+   
+    window.addEventListener('resize', adjustButtonPosition);
+
+
+    document.querySelector('.sidenav-main').addEventListener('transitionend', adjustButtonPosition);
+});
+
 </script>

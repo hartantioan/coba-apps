@@ -45,6 +45,7 @@ use App\Http\Controllers\Purchase\PriceHistoryPOController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Setting\ChangeLogController;
+use App\Http\Controllers\Setting\AnnouncementController;
 use App\Http\Controllers\Setting\UsedDataController;
 use App\Http\Controllers\Usage\ReceptionHardwareItemUsageController;
 use App\Http\Controllers\Usage\ReturnHardwareItemUsageController;
@@ -1246,6 +1247,16 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[ChangeLogController::class, 'create']);
                     Route::post('show',[ChangeLogController::class, 'show']);
                     Route::post('destroy', [ChangeLogController::class, 'destroy'])->middleware('operation.access:change_log,delete');
+                });
+
+                Route::prefix('announcement')->middleware('operation.access:change_log,view')->group(function () {
+                    Route::get('/',[AnnouncementController::class, 'index']);
+                    Route::get('datatable', [AnnouncementController::class, 'datatable']);
+                    Route::post('timeline',[AnnouncementController::class, 'timeline']);
+                    Route::post('create',[AnnouncementController::class, 'create']);
+                    Route::post('show',[AnnouncementController::class, 'show']);
+                    Route::post('refresh', [AnnouncementController::class, 'refresh'])->withoutMiddleware('lock');
+                    Route::post('destroy', [AnnouncementController::class, 'destroy'])->middleware('operation.access:change_log,delete');
                 });
 
                 Route::prefix('user_activity')->middleware('operation.access:user_activity,view')->group(function () {

@@ -246,6 +246,57 @@ function cekNotif(url){
 			});
 		}
 	});
+	let currentUrl = window.location.href;
+	let segments = currentUrl.split('/');
+    let lastSegment = segments.pop() || segments.pop();
+	$.ajax({
+		url: url + '/admin/setting/announcement/refresh',
+		type: 'POST',
+		dataType: 'JSON',
+		data: {lastSegment: lastSegment,},
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		},
+		beforeSend: function() {
+			
+		},
+		success: function(response) {
+			if(response.status == '200'){
+				if(response.announcement_list.length > 0){
+					
+					$('#announcement_div').empty();
+
+					$.each(response.announcement_list, function(i, val) {
+						
+						var bannerId = 'banner_' + val.id;  
+
+						
+						if (!localStorage.getItem(bannerId)) {
+							var bannerHtml = `
+								<div class="maintenance-banner" style="width:fit-content; background: #ffcc00; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 9999;" data-banner-id="${bannerId}">
+									<span>${val.description}</span>
+									<button class="close-banner" style="background: none; border: none; font-size: 16px; float: right; cursor: pointer;">&times;</button>
+								</div>
+							`;
+							$('#announcement_div').append(bannerHtml);
+						}
+					});
+
+					$('#announcement_div').on('click', '.close-banner', function() {
+						var banner = $(this).closest('.maintenance-banner');
+						var bannerId = banner.data('banner-id');
+						banner.remove();
+						localStorage.setItem(bannerId, 'true');
+					});
+				}
+			}
+		},
+		error: function() {
+			M.toast({
+				html: 'Anda tidak terhubung dengan aplikasi.'
+			});
+		}
+	});
 }
 
 function seeNotif(url){

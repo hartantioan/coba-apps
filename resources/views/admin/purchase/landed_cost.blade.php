@@ -1968,8 +1968,7 @@
                     rowtotal = parseFloat($('#arr_temp_nominal' + val).val().replaceAll(".", "").replaceAll(",","."));
                 }
             }
-            /* rowtax = Math.floor(rowtotal * (rowpercenttax / 100)); */
-            rowtax = rowtotal * (rowpercenttax / 100);
+            rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
         }else{
             $('#arr_fee_nominal' + val).val(
                 (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
@@ -1977,8 +1976,8 @@
         }
 
         if(rowpercentwtax !== 0){
-            /* rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100)); */
-            rowwtax = rowtotal * (rowpercentwtax / 100);
+            rowwtax = Math.floor(rowtotal * (rowpercentwtax / 100));
+            /* rowwtax = rowtotal * (rowpercentwtax / 100); */
         }
 
         rowgrandtotal = rowtotal + rowtax - rowwtax;

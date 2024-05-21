@@ -1601,6 +1601,9 @@ class PaymentRequestController extends Controller
                                 }
                             }
                         }
+                        if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                            CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                        }
                     }
                 }
     
@@ -1685,6 +1688,9 @@ class PaymentRequestController extends Controller
                             CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'2');
                         }
                     }
+                }
+                if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                    CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
                 }
                 $row->delete();
             }

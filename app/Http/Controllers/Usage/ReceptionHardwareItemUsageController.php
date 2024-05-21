@@ -250,7 +250,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $nomor,
                     $val->code,
                     $val->user->name ?? '-',
-                    $val->hardwareItem->item->name ?? '',
+                    $val->hardwareItem->item ?? '',
                     $val->location,
                     date('d/m/Y',strtotime($val->date)),
                     date('d/m/Y',strtotime($val->reception_date)),

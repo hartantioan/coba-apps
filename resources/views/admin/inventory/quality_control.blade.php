@@ -148,6 +148,8 @@
                                                         <th>Supplier</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
+                                                        <th>Driver</th>
+                                                        <th>No.Kendaraan</th>
                                                         <th>Foto QC</th>
                                                         <th>Status Dokumen</th>
                                                         <th>Status QC</th>
@@ -576,6 +578,8 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
+                { name: 'driver', className: 'center-align' },
+                { name: 'vehicle_no', className: 'center-align' },
                 { name: 'image_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },

@@ -63,6 +63,8 @@ class QualityControlController extends Controller
             'account_id',
             'post_date',
             'note',
+            'driver',
+            'vehicle_no',
         ];
 
         $start  = $request->start;
@@ -156,6 +158,8 @@ class QualityControlController extends Controller
                     $val->account->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
+                    $val->driver,
+                    $val->vehicle_no,
                     $val->image_qc ? '<a href="'.$val->imageQc().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->status(),
                     $val->statusQc(),

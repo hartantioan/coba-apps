@@ -139,11 +139,11 @@ class GoodReceiptPOController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
+                            })/* 
                             ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            });
+                            }) */;
                     });
                 }
                 if($request->start_date && $request->finish_date) {
@@ -197,11 +197,11 @@ class GoodReceiptPOController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            })
+                            })/* 
                             ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
-                            });
+                            }) */;
                     });
                 }
                 if($request->start_date && $request->finish_date) {
@@ -248,7 +248,7 @@ class GoodReceiptPOController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name ?? '',
-                    $val->account->name ?? '',
+                    /* $val->account->name ?? '', */
                     $val->company->name,
                     $val->receiver_name ?? '',
                     date('d/m/Y',strtotime($val->post_date)),
@@ -304,6 +304,7 @@ class GoodReceiptPOController extends Controller
     public function getPurchaseOrder(Request $request){
         $data = PurchaseOrder::where('id',$request->id)->whereIn('status',['2','3'])->first();
         $data['account_name'] = $data->supplier->employee_no.' - '.$data->supplier->name;
+        $data['secret_po'] = $data->isSecretPo() ? '1' : '';
 
         if($data->used()->exists()){
             $data['status'] = '500';
@@ -878,6 +879,7 @@ class GoodReceiptPOController extends Controller
                 'warehouse_name'            => $row->warehouse->name,
                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
                 'qty_conversion'            => $row->qty_conversion,
+                'secret_po'                 => $row->purchaseOrderDetail->purchaseOrder->isSecretPo() ? '1' : '',
             ];
         }
 

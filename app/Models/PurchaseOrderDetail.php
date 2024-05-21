@@ -214,8 +214,13 @@ class PurchaseOrderDetail extends Model
 
     public function getBalanceReceipt()
     {
-        $received = $this->goodReceiptDetail()->sum('qty');
-        $balance = $this->qty - $received;
+        if($this->goodScale()->exists()){
+            $balance = $this->goodScale->qty_final;
+        }else{
+            $received = $this->goodReceiptDetail()->sum('qty');
+            $balance = $this->qty - $received;
+        }
+        
         return $balance;
     }
 
@@ -244,6 +249,11 @@ class PurchaseOrderDetail extends Model
         return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
             $query->whereIn('status',['1','2','3']);
         });
+    }
+
+    public function goodScale()
+    {
+        return $this->hasOne('App\Models\GoodScale','purchase_order_detail_id','id')->whereIn('status',['3']);
     }
 
     public function balanceInvoice(){

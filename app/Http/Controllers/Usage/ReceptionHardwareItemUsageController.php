@@ -302,7 +302,7 @@ class ReceptionHardwareItemUsageController extends Controller
     public function show(Request $request){
         $reception = ReceptionHardwareItemsUsage::find($request->id);
         $reception['item']=$reception->hardwareItem;
-        $reception['name']=$reception->hardwareItem->item->name;
+        $reception['name']=$reception->hardwareItem->item;
         $reception['detail1']=$reception->hardwareItem->detail1;
         $reception['detail2']=$reception->hardwareItem->detail2;
         $reception['user']=$reception->user;

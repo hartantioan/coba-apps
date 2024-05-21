@@ -122,7 +122,7 @@
                                                         <th rowspan="2">#</th>
                                                         <th rowspan="2">Code</th>
                                                         <th rowspan="2">Pengguna</th>
-                                                        <th rowspan="2">Supplier/Vendor</th>
+                                                        {{-- <th rowspan="2">Supplier/Vendor</th> --}}
                                                         <th rowspan="2">Perusahaan</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
@@ -176,11 +176,6 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="input-field col m3 s12 step3">
-                                <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
-                                <label class="active" for="account_id">Supplier</label>
-                            </div>
                             <div class="input-field col m3 s12 step4">
                                 <select class="form-control" id="company_id" name="company_id">
                                     @foreach ($company as $rowcompany)
@@ -193,16 +188,15 @@
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
-                            <div class="col m12 s12 l12"></div>
-                            <div class="input-field col m4 s12 step6">
+                            <div class="input-field col m3 s12 step6">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
-                            <div class="input-field col m4 s12 step8">
+                            <div class="input-field col m3 s12 step8">
                                 <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
                                 <label class="active" for="document_date">Tgl. Dokumen</label>
                             </div>
-                            <div class="input-field col m4 s12 step9">
+                            <div class="input-field col m3 s12 step9">
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Surat Jalan">
                                 <label class="active" for="delivery_no">No. Surat Jalan</label>
                             </div>
@@ -226,12 +220,21 @@
                             <div class="col m12 s12 step11">
                                 <div class="col m6 s6">
                                     <p class="mt-2 mb-2">
-                                        <h5>Purchase Order</h5>
                                         <div class="row">
-                                            <div class="input-field col m6 s7">
-                                                <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
+                                            <div class="input-field col m6 s6">
+                                                <select class="browser-default" id="purchase_item_id" name="purchase_item_id" onchange="applyFilter();">&nbsp;</select>
+                                                <label class="active" for="purchase_item_id">Item</label>
                                             </div>
-                                            <div class="col m6 s6 mt-4">
+                                            <div class="input-field col m4 s6 step3 div-account">
+                                                <input type="hidden" id="temp" name="temp">
+                                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
+                                                <label class="active" for="account_id">Supplier</label>
+                                            </div>
+                                            <div class="input-field col m6 s6">
+                                                <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
+                                                <label class="active" for="purchase_order_id">Purchase Order</label>
+                                            </div>
+                                            <div class="input-field col m6 s6 mt-4">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="getPurchaseOrder();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah PO
                                                 </a>
@@ -239,7 +242,7 @@
                                         </div>
                                     </p>
                                 </div>
-                                <div class="col m6 s6">
+                                <div class="col m6 s6 pt-1">
                                     <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                 </div>
                             </div>
@@ -751,6 +754,7 @@
                     `);
                 }
                 $('#purchase_order_id').empty();
+                $('#purchase_item_id').empty();
                 $('#account_id').empty();
                 M.updateTextFields();
                 if($('.data-used').length > 0){
@@ -825,6 +829,7 @@
         });
 
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
+        select2ServerSide('#purchase_item_id', '{{ url("admin/select2/purchase_item_scale") }}');
 
         $('#purchase_order_id').select2({
             placeholder: '-- Kosong --',
@@ -841,6 +846,7 @@
                     return {
                         search: params.term,
                         account_id: $('#account_id').val(),
+                        item_id: $('#purchase_item_id').val(),
                     };
                 },
                 processResults: function(data) {
@@ -867,36 +873,59 @@
         });
     });
 
-    function resetDetails(){
-        if($('#account_id').val()){
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
+    function applyFilter(){
+        $('#purchase_order_id').empty();
+        if($('#purchase_item_id').val()){
+            if($("#purchase_item_id").select2('data')[0].is_hide){
+                $('#account_id').empty();
+                $('.div-account').addClass('hide');
             }else{
-                $('.row_item').each(function(){
-                    $(this).remove();
-                });
-                $('.row_item_serial').each(function(){
-                    $(this).remove();
-                });
-                if($('#empty-item').length == 0){
-                    $('#body-item').append(`
-                        <tr id="empty-item">
-                            <td colspan="15" class="center">
-                                Pilih purchase order untuk memulai...
-                            </td>
-                        </tr>
-                    `);
-                }
-                if($('#empty-item-serial').length == 0){
-                    $('#body-item-serial').append(`
-                        <tr id="empty-item-serial">
-                            <td class="center">
-                                Pilih purchase order untuk memulai...
-                            </td>
-                        </tr>
-                    `);
+                $('.div-account').removeClass('hide');
+            }
+        }else{
+            $('.div-account').removeClass('hide');
+        }
+    }
+
+    function resetDetails(){
+        if($('#purchase_item_id').val()){
+            if($('#account_id').val()){
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }else{
+                    $('.row_item').each(function(){
+                        $(this).remove();
+                    });
+                    $('.row_item_serial').each(function(){
+                        $(this).remove();
+                    });
+                    if($('#empty-item').length == 0){
+                        $('#body-item').append(`
+                            <tr id="empty-item">
+                                <td colspan="15" class="center">
+                                    Pilih purchase order untuk memulai...
+                                </td>
+                            </tr>
+                        `);
+                    }
+                    if($('#empty-item-serial').length == 0){
+                        $('#body-item-serial').append(`
+                            <tr id="empty-item-serial">
+                                <td class="center">
+                                    Pilih purchase order untuk memulai...
+                                </td>
+                            </tr>
+                        `);
+                    }
                 }
             }
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih item terlebih dahulu.',
+                icon: 'error'
+            });
+            $('#account_id').empty();
         }
     }
 
@@ -1288,7 +1317,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
+                /* { name: 'account_id', className: 'center-align' }, */
                 { name: 'company_id', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
@@ -1551,6 +1580,9 @@
                             $('#account_id').empty().append(`
                                 <option value="` + response.account_id + `">` + response.account_name + `</option>
                             `);
+                            if(response.secret_po){
+                                $('.div-account').addClass('hide');
+                            }
                             $('#empty-item').remove();
 
                             $('#list-used-data').append(`
@@ -1840,6 +1872,9 @@
                                 </td>
                             </tr>
                         `);
+                        if(val.secret_po){
+                            $('.div-account').addClass('hide');
+                        }
                         if(val.good_scale_detail_id){
                             $('#arr_scale' + count).append(`
                                 <option value="` + val.good_scale_detail_id + `">` + val.good_scale_detail_name + `</option>

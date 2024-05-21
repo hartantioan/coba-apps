@@ -142,7 +142,7 @@ class TreeHelper {
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : ". ($name !== null ? $name : ' ')],
+                                ['name'=> "Vendor  : "/* . ($name !== null ? $name : ' ') */],
                                 ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
                             ],
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
@@ -521,7 +521,7 @@ class TreeHelper {
                                     "key" => $row_po->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
-                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                        ['name'=> "Vendor  : "/* .($name !== null ? $name : ' ') */],
                                         ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
                                     ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
@@ -1128,7 +1128,7 @@ class TreeHelper {
                                 "key" => $row->purchaseOrder->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
-                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                    ['name'=> "Vendor  : "/* .($name !== null ? $name : ' ') */],
                                     ['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),

@@ -409,4 +409,15 @@ class PurchaseOrder extends Model
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function isSecretPo(){
+        $secret = false;
+        $cek = $this->purchaseOrderDetail()->whereHas('item',function($query){
+            $query->whereNotNull('is_hide_supplier');
+        })->count();
+        if($cek > 0){
+            $secret = true;
+        }
+        return $secret;
+    }
 }

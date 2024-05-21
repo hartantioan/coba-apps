@@ -1100,8 +1100,11 @@ class Select2Controller extends Controller {
                         $query->where('account_id',$request->account_id);
                     }
                 })
-                ->whereHas('purchaseOrderDetail',function($query){
+                ->whereHas('purchaseOrderDetail',function($query) use($search, $request){
                     $query->whereIn('place_id',$this->dataplaces);
+                    if($request->item_id){
+                        $query->where('item_id',$request->item_id);
+                    }
                 })
                 ->whereDoesntHave('used')
                 ->whereIn('status',['2','3'])

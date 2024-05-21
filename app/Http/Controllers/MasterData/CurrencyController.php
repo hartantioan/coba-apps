@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use App\Models\CurrencyDate;
 
@@ -216,9 +217,14 @@ class CurrencyController extends Controller
 
     public function currencyGet(Request $request){
         $dateString = now()->toDateString();
+        if (Carbon::parse($request->date)->toDateString() === $dateString) {
+            $adjustedDate = Carbon::parse($request->date)->subDay()->toDateString();
+        } else {
+            $adjustedDate = $request->date;
+        }
         $find_currency = Currency::where('code',$request->code)->first();
         $find = CurrencyDate::where('currency_id',$find_currency->id)
-        ->where('currency_date',$request->date)
+        ->where('currency_date',$adjustedDate)
         ->first();
        
         if(!$find){

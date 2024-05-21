@@ -62,7 +62,10 @@ class LeaveQuotaRenew extends Command
                     ]);
                 }
             } else {
-                $monthDifference = $row_transfer->post_date->monthDiff($row_transfer->post_date->copy()->endOfYear());
+                $postDate = Carbon::parse($row_transfer->post_date);
+                $endOfYear = $postDate->copy()->endOfYear();
+                $monthDifference = $postDate->diffInMonths($endOfYear);
+                // $monthDifference = $row_transfer->post_date->monthDiff($row_transfer->post_date->copy()->endOfYear());
 
                 // Adjust the difference based on the day of the month
                 if ($row_transfer->post_date->day < 16) {

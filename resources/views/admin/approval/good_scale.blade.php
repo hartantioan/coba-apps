@@ -217,44 +217,6 @@
         </div>
         <div class="divider mb-3 mt-3"></div>
         <!-- product details table-->
-        <div class="invoice-product-details">
-        <table class="bordered">
-            <thead>
-                <tr>
-                    <th class="center">Ref.PO</th>
-                    <th class="center">Item</th>
-                    <th class="center">Qty.PO</th>
-                    <th class="center">Qty.Datang</th>
-                    <th class="center">Qty.Pulang</th>
-                    <th class="center">Qty.Netto</th>
-                    <th class="center">Sat.</th>
-                    <th class="center">Plant</th>
-                    <th class="center">Gudang</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($data->goodScaleDetail as $row)
-                <tr>
-                    <td class="center-align">{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
-                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                    <td class="center-align">{{ $row->purchase_order_detail_id ? number_format($row->purchaseOrderDetail->qty) : '0,000' }}</td>
-                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_in) }}</td>
-                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_out) }}</td>
-                    <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty_balance) }}</td>
-                    <td class="center-align">{{ $row->item->uomUnit->code }}</td>
-                    <td class="center-align">{{ $row->place->code.' - '.$row->place->company->name }}</td>
-                    <td class="center-align">{{ $row->warehouse->name }}</td>
-                </tr>
-                <tr>
-                    <td colspan="9">{{ $row->note }}</td>
-                </tr>
-                <tr>
-                    <td colspan="9">{{ $row->note2 }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
     <!-- invoice subtotal -->
     <div class="divider mt-3 mb-3"></div>
         <div class="invoice-subtotal">

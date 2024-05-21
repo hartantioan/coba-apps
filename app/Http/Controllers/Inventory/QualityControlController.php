@@ -274,8 +274,8 @@ class QualityControlController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            /* DB::beginTransaction();
-            try { */
+            DB::beginTransaction();
+            try {
                 
                 $goodScale = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
                 
@@ -287,6 +287,9 @@ class QualityControlController extends Controller
                         'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
                         'user_qc'       => session('bo_id'),
                         'time_scale_qc' => date('Y-m-d H:i:s'),
+                        'status'        => $request->status_qc == '1' ? $goodScale->status : '5',
+                        'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
+                        'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL,
                     ]);
 
                     foreach($request->arr_detail as $key => $row){
@@ -319,12 +322,62 @@ class QualityControlController extends Controller
                         'message' => 'Data failed to save.'
                     ];
                 }
-                /* DB::commit();
+                DB::commit();
             }catch(\Exception $e){
                 DB::rollback();
-            } */
+            }
 		}
 		
 		return response()->json($response);
+    }
+    
+    public function rowDetail(Request $request)
+    {
+        $data   = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
+        $x="";
+        if (isset($data->void_date)) {
+            $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
+            $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
+        }if($data->status == 3){
+            $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
+           $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
+        }
+        $string = '<div class="row pt-1 pb-1 lighten-4">
+                        <div class="col s12">'.$data->code.$x.'</div>
+                        <div class="col s12">
+                            <table class="bordered" style="min-width:100%;max-width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="center-align" colspan="13">Daftar Hasil Pemeriksaan</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center-align">No.</th>
+                                        <th class="center-align">Nama</th>
+                                        <th class="center-align">Nominal</th>
+                                        <th class="center-align">Satuan</th>
+                                        <th class="center-align">Mempengaruhi Qty</th>
+                                        <th class="center-align">Keterangan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>';
+        $totalqty=0;
+        foreach($data->qualityControl as $key => $rowdetail){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$rowdetail->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->nominal).'</td>
+                <td class="center-align">'.$rowdetail->unit.'</td>
+                <td class="center-align">'.($rowdetail->is_affect_qty ? 'Ya' : 'Tidak').'</td>
+                <td class="">'.$rowdetail->note.'</td>
+            </tr>';
+        }
+        
+        $string .= '</tbody></table>';
+
+        $string .= '</td></tr>';
+
+        $string .= '</tbody></table></div></div>';
+		
+        return response()->json($string);
     }
 }

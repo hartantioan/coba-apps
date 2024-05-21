@@ -246,9 +246,19 @@ class GoodScale extends Model
 
     public function statusQc(){
         $status_qc = match ($this->status_qc) {
-          '1' => 'Disetujui',
-          '2' => 'Ditolak',
+          '1' => '<span class="green medium-small white-text padding-3">DISETUJUI QC</span>',
+          '2' => '<span class="red darken-4 medium-small white-text padding-3">DITOLAK QC</span>',
           default => 'Menunggu',
+        };
+
+        return $status_qc;
+    }
+
+    public function statusQcRaw(){
+        $status_qc = match ($this->status_qc) {
+          '1' => 'DISETUJUI QC',
+          '2' => 'DITOLAK QC',
+          default => 'MENUNGGU',
         };
 
         return $status_qc;
@@ -284,7 +294,7 @@ class GoodScale extends Model
 
     public function createGoodReceipt(){
 
-        DB::beginTransaction();
+        /* DB::beginTransaction();
         try {
             $totalall = 0;
             $taxall = 0;
@@ -395,12 +405,12 @@ class GoodScale extends Model
             DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
     }
 
     public function alreadyChecked(){
         $status = false;
-        if($this->time_scale_in && $this->time_scale_qc){
+        if($this->time_scale_in && $this->time_scale_qc && !$this->time_scale_out){
             $status = true;
         }
         return $status;

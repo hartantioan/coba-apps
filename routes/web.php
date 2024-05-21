@@ -1712,6 +1712,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('inspect', [QualityControlController::class, 'inspect']);
                     Route::post('create',[QualityControlController::class, 'create'])->middleware('operation.access:quality_control,update');
                     Route::post('remove_used_data', [QualityControlController::class, 'removeUsedData']);
+                    Route::get('row_detail',[QualityControlController::class, 'rowDetail']);
                 });
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {

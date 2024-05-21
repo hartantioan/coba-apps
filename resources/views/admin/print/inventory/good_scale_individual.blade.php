@@ -44,13 +44,13 @@
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
-                    zoom:0.4;
+                    zoom:0.6;
                 }
             }
         
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
-                    zoom:0.6;
+                    zoom:0.8;
                     font-size:11px !important;
                 }
 
@@ -59,25 +59,25 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
                 }
                 .table-data-item td{
-                    font-size:0.6em !important;
+                    font-size:1em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.6em !important;
+                    font-size:0.8em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.7em !important;
+                    font-size:0.9em !important;
                 }
             }
         
@@ -156,10 +156,12 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            @page { margin: 6em 3em 6em 3em; }
+            header { position: fixed; top: -95px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
-        
+            td {
+                vertical-align: top !important;
+            }
            
         </style>
     </head>
@@ -167,39 +169,20 @@
         <header>
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
-                    <td width="83%" class="left-align" >
-                        <tr>
-                            <td>
-                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small>Diajukan:</small>
-                                <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 class="indigo-text">Timbangan Truk</h5>
-                            </td>
-                        </tr>
-                                
-                        
+                    <td width="33%" class="left-align" >
+                        <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                        <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
+                        <h2 class="indigo-text">Penerimaan Barang</h2>
                     </td>
                     <td width="33%" class="right-align">
-                        
                     </td>
-                    
                     <td width="34%" class="right-align">
-                        
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                       
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 1px solid black; margin-top:-10px">
         </header>
         <main>
             <div class="card">
@@ -240,18 +223,18 @@
                                             {{ $data->user->phone }}
                                         </td>
                                     </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%" class="tbl-info">
-                                    <tr>
-                                        <td width="25%">
-                                            Supplier
-                                         </td>
-                                         <td width="50%">
-                                            {{ $data->account->name }}
-                                         </td>
-                                    </tr>
+                                    @if($data->item->is_hide_supplier)
+
+                                    @else
+                                        <tr>
+                                            <td width="25%">
+                                                Supplier
+                                            </td>
+                                            <td width="50%">
+                                                {{ $data->account->name }}
+                                            </td>
+                                        </tr>
+                                    @endif
                                     <tr>
                                         <td>
                                            Plant
@@ -287,6 +270,74 @@
                                 </table>
                             </td>
                             <td width="33%" class="left-align">
+                                <table border="0" width="100%" class="tbl-info">
+                                    <tr>
+                                        <td>
+                                            Berat Bruto
+                                        </td>
+                                        <td>
+                                             {{ CustomHelper::formatConditionalQty($data->qty_in) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Waktu Timbang Masuk
+                                        </td>
+                                        <td>
+                                             {{ date('d/m/Y H:i:s',strtotime($data->time_scale_in)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Berat Tara
+                                        </td>
+                                        <td>
+                                             {{ CustomHelper::formatConditionalQty($data->qty_out) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Waktu Timbang Keluar
+                                        </td>
+                                        <td>
+                                             {{ date('d/m/Y H:i:s',strtotime($data->time_scale_out)) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Berat Netto
+                                        </td>
+                                        <td>
+                                             {{ CustomHelper::formatConditionalQty($data->qty_balance) }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Satuan
+                                        </td>
+                                        <td>
+                                             {{ $data->itemUnit->unit->code }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Status QC
+                                        </td>
+                                        <td>
+                                             {{ $data->statusQcRaw() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Keterangan QC
+                                        </td>
+                                        <td>
+                                             {{ $data->note_qc }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="33%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
@@ -303,6 +354,37 @@
                         </tr>
                     </table>
                     <!-- product details table-->
+                    {{-- <div class="invoice-subtotal break-row">
+                        HASIL PEMERIKSAAN QC
+                        <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;font-size:9px !important;" width="75%">
+                            <thead>
+                                <tr>
+                                    <th class="center">No</th>
+                                    <th class="center">Nama</th>
+                                    <th class="center">Nominal</th>
+                                    <th class="center">Satuan</th>
+                                    <th class="center">Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if($data->qualityControl()->exists())
+                                    @foreach($data->qualityControl as $keydetail => $rowdetail)
+                                    <tr>
+                                        <td align="center">{{ ($keydetail + 1) }}</td>
+                                        <td>{{ $rowdetail->name }}</td>
+                                        <td align="right">{{ CustomHelper::formatConditionalQty($rowdetail->nominal) }}</td>
+                                        <td align="center">{{ $rowdetail->unit }}</td>
+                                        <td>{{ $rowdetail->note }}</td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="5">DATA TIDAK DITEMUKAN</td>
+                                    </tr>
+                                @endif
+                            </tbody>
+                        </table>
+                    </div> --}}
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">

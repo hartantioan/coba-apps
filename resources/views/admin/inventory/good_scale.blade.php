@@ -40,6 +40,14 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    #form_data_update input[type=text]:not(.browser-default) {
+        border-bottom: none;
+    }
+
+    .data-input {
+        border-bottom: 1px solid #9e9e9e !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -83,7 +91,7 @@
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m3 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                                <label for="filter_status" style="font-size:1rem;">Status Dokumen :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
@@ -92,6 +100,16 @@
                                                         <option value="4">Ditolak</option>
                                                         <option value="5">Ditutup</option>
                                                         <option value="6">Direvisi</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_status" style="font-size:1rem;">Status QC :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_status_qc" onchange="loadDataTable()">
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Disetujui</option>
+                                                        <option value="2">Ditolak</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -173,9 +191,9 @@
                                                         <th>Gudang</th>
                                                         <th>Item</th>
                                                         <th>Qty PO</th>
-                                                        <th>Qty Masuk</th>
-                                                        <th>Qty Keluar</th>
-                                                        <th>Qty Selisih</th>
+                                                        <th>Qty Bruto</th>
+                                                        <th>Qty Tara</th>
+                                                        <th>Qty Netto</th>
                                                         <th>Qty QC</th>
                                                         <th>Qty Final</th>
                                                         <th>Satuan</th>
@@ -261,11 +279,11 @@
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
-                                <label class="active" for="qty_in">Qty Timbang Masuk</label>
+                                <label class="active" for="qty_in">Qty Bruto</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                                <label class="active" for="qty_out">Qty Timbang Keluar</label>
+                                <label class="active" for="qty_out">Qty Tara</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="browser-default" id="item_unit_id" name="item_unit_id" required>
@@ -359,66 +377,58 @@
                         <div class="row">
                             <input type="hidden" id="tempPlace">
                             <input type="hidden" id="tempGoodScale" name="tempGoodScale">
-                            <div class="col m1 s12">
-                                Kode
-                            </div>
-                            <div class="col m3 s12" id="codeUpdate">
+                            <div class="input-field col m4 s12">
+                                <div id="codeUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="codeUpdate">Kode</label>
                             </div>
-                            <div class="col m1 s12 supplier-class">
-                                Supplier
-                            </div>
-                            <div class="col m3 s12 supplier-class" id="supplierUpdate">
+                            <div class="input-field col m4 s12 supplier-class">
+                                <div id="supplierUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="supplierUpdate">Supplier</label>
                             </div>
-                            <div class="col m1 s12">
-                                Plant
-                            </div>
-                            <div class="col m3 s12" id="plantUpdate">
+                            <div class="input-field col m2 s12">
+                                <div id="plantUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="plantUpdate">Plant</label>
                             </div>
-                            <div class="col m1 s12">
-                                Gudang
-                            </div>
-                            <div class="col m3 s12" id="warehouseUpdate">
+                            <div class="input-field col m2 s12">
+                                <div id="warehouseUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="warehouseUpdate">Gudang</label>
                             </div>
-                            <div class="col m1 s12">
-                                Purchase Order
-                            </div>
-                            <div class="col m3 s12" id="purchaseOrderUpdate">
+                            <div class="col m12 s12"></div>
+                            <div class="input-field col m2 s12">
+                                <div id="purchaseOrderUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="purchaseOrderUpdate">Purchase Order</label>
                             </div>
-                            <div class="col m1 s12">
-                                Qty PO
-                            </div>
-                            <div class="col m3 s12" id="qtyPoUpdate">
+                            <div class="input-field col m2 s12">
+                                <div id="qtyInUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="qtyInUpdate">Qty Bruto</label>
                             </div>
-                            <div class="col m1 s12">
-                                Qty Timbang Masuk
+                            <div class="input-field col m2 s12">
+                                <input id="qtyOutUpdate" class="data-input" name="qtyOutUpdate" type="text" onkeyup="formatRupiahNoMinus(this);count();" value="0,000">
+                                <label class="active" for="qtyOutUpdate">Qty Tara</label>
                             </div>
-                            <div class="col m3 s12" id="qtyInUpdate">
+                            <div class="input-field col m2 s12">
+                                <input id="qtyBalanceUpdate" name="qtyBalanceUpdate" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
+                                <label class="active" for="qtyBalanceUpdate">Qty Netto</label>
+                            </div>
+                            <div class="input-field col m2 s12">
+                                <div id="unitUpdate" class="mt-2">
 
+                                </div>
+                                <label class="active" for="unitUpdate">Satuan</label>
                             </div>
-                            <div class="col m1 s12">
-                                Qty Timbang Keluar
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);count();" value="0,000">
-                            </div>
-                            <div class="col m1 s12">
-                                Qty Netto
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <input id="qty_balance" name="qty_balance" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
-                            </div>
-                            <div class="col m1 s12">
-                                Satuan
-                            </div>
-                            <div class="col m3 s12" id="unitUpdate">
-
-                            </div>
+                            <div class="col m12 s12"></div>
                             <div class="col m1 s12">
                                 Kamera:
                             </div>
@@ -804,7 +814,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#body-item-update').empty();
                 $('#supplierUpdate').text('');
-                $('#codeUpdate').text('');
+                $('#codeUpdate,#plantUpdate,#warehouseUpdate,#purchaseOrderUpdate,#qtyInUpdate,#unitUpdate').text('');
+                $('#qtyOutUpdate,#qtyBalanceUpdate').val('0,000');
                 $('#tempPlace').val('');
                 $('#tempGoodScale').val('');
                 $('#previewImageIn').attr('src','');
@@ -816,6 +827,7 @@
                         track.stop();
                     });
                 }
+                $('.supplier-class').removeClass('hide');
             },
             dismissible:false,
         });
@@ -994,6 +1006,13 @@
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
 
+    function count(){
+        let qtyin = parseFloat($('#qtyInUpdate').text().replaceAll(".", "").replaceAll(",","."));
+        let qtyout = parseFloat($('#qtyOutUpdate').val().replaceAll(".", "").replaceAll(",","."));
+        let balance = qtyin - qtyout;
+        $('#qtyBalanceUpdate').val(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
+    }
+
     function getCode(val){
         if(val){
             if($('#temp').val()){
@@ -1067,6 +1086,7 @@
                 dataType: 'JSON',
                 data: {
                     'status' : $('#filter_status').val(),
+                    status_qc : $('#filter_status_qc').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -1269,10 +1289,8 @@
                         }
                     }
                     if($('#modal6').hasClass('open')){
-                        $('input[name^="arr_qty_out"]').each(function(){
-                            $(this).val(response);
-                            /* countBalance(this); */
-                        });
+                        $('#qty_in').val(response);
+                        /* countBalance(this); */
                     }
                 }
             });
@@ -1752,13 +1770,7 @@
 
                 if(s){
 
-                    formData.delete("arr_pod[]");
-
                     formData.append('image_out', s);
-
-                    $('[name^="arr_pod"]').each(function(index){
-                        formData.append('arr_pod[]',($('[name^="arr_pod"]').eq(index).val() ? $('[name^="arr_pod"]').eq(index).val() : ''));
-                    });
 
                     $.ajax({
                         url: '{{ Request::url() }}/save_update',
@@ -1772,10 +1784,10 @@
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         beforeSend: function() {
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal6');
                         },
                         success: function(response) {
-                            loadingClose('.modal-content');
+                            loadingClose('#modal6');
                             if(response.status == 200) {
                                 successUpdate();
                                 M.toast({
@@ -1789,7 +1801,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            loadingClose('#modal6');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',
@@ -1831,11 +1843,16 @@
                 $('#codeUpdate').text(response.code);
                 $('#supplierUpdate').text(response.account_name);
                 $('#plantUpdate').text(response.place_code);
-                $('#warehouseUpdate').text(response.warehouse_update);
+                $('#warehouseUpdate').text(response.warehouse_name);
                 $('#purchaseOrderUpdate').text(response.purchase_code);
-                $('#qtyPoUpdate').text(response.qty_po);
                 $('#qtyInUpdate').text(response.qty_in);
                 $('#unitUpdate').text(response.unit);
+
+                if(response.is_hide){
+                    $('.supplier-class').addClass('hide');
+                }else{
+                    $('.supplier-class').removeClass('hide');
+                }
                 
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
@@ -2229,6 +2246,23 @@
             }
         });
         
+    }
+
+    function whatPrinting(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
     }
 
     function done(id){

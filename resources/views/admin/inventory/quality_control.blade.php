@@ -126,33 +126,18 @@
                                         List Data
                                     </h4>
                                     <div class="row mt-2">
-                                        <div class="col s12">
-                                            <div class="card-alert card green">
-                                                <div class="card-content white-text">
-                                                    <p>Info : Ada 2 tahapan penimbangan, yakni ketika truk timbang datang, dan truk timbang pulang.</p>
-                                                </div>
-                                            </div>
-                                            {{-- <div class="card-alert card purple">
-                                                <div class="card-content white-text">
-                                                    <p>Info 2 : Timbangan truk bisa ditambahkan dengan 2 cara, cara yang pertama tarik data dari Purchase Order. Sedangkan cara yang kedua, dengan menambahkan secara manual item / barangnya, namun kemudian setelah tahap 2 penimbangan bisa di linkkan dengan PO agar dokumen bisa ditarik ke GRPO.</p>
-                                                </div>
-                                            </div>
-                                            <div class="card-alert card blue">
-                                                <div class="card-content white-text">
-                                                    <p>Info 3 : Pada saat timbangan pulang, jika PO sudah ditentukan maka, GRPO akan otomatis terbuat berdasarkan informasi dokumen Timbangan.</p>
-                                                </div>
-                                            </div> --}}
+                                        <div class="col s12 row">
                                             <div id="datatable_buttons"></div>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
-                                                <i class="material-icons right">refresh</i>
-                                            </a>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
-                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
-                                                <span class="hide-on-small-onl">Export</span>
-                                                <i class="material-icons right">view_headline</i>
-                                            </a>
+                                            <div class="col s12 m6">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-2" href="javascript:void(0);" onclick="loadDataTable();">
+                                                    <span class="hide-on-small-onl">Refresh</span>
+                                                    <i class="material-icons right">refresh</i>
+                                                </a>
+                                                {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
+                                                    <span class="hide-on-small-onl">Export</span>
+                                                    <i class="material-icons right">view_headline</i>
+                                                </a> --}}
+                                            </div>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
@@ -244,13 +229,13 @@
                                 <div id="qty_in" class="mt-2">
 
                                 </div>
-                                <label class="active" for="qty_in">Qty Masuk</label>
+                                <label class="active" for="qty_in">Qty Bruto</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <div id="qty_out" class="mt-2">
 
                                 </div>
-                                <label class="active" for="qty_out">Qty Keluar</label>
+                                <label class="active" for="qty_out">Qty Tara</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="status_qc" name="status_qc">
@@ -492,6 +477,18 @@
         });
 
         loadDataTable();
+
+        $('#modal4').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#show_detail').empty();
+            },
+            dismissible:false,
+        });
         
         $('#modal1').modal({
             dismissible: false,
@@ -811,4 +808,29 @@
         loadDataTable();
         $('#modal1').modal('close');
     }
+
+    function rowDetail(data) {
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            data: {
+                id: data
+            },
+            success: function(response) {
+                $('#modal4').modal('open');
+                $('#show_detail').html(response);
+                loadingClose('.modal-content');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+	}
 </script>

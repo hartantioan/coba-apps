@@ -247,7 +247,7 @@ class TreeHelper {
                             }
                         }
 
-                        if($good_receipt_detail->goodScaleDetail()->exists()){
+                        /* if($good_receipt_detail->goodScaleDetail()->exists()){
                             $name = $good_receipt_detail->goodScaleDetail->goodScale->supplier->name ?? null;
                             $data_gscale = [
                                     'properties'=> [
@@ -267,7 +267,7 @@ class TreeHelper {
                                 ];
                                 $data_id_good_scale[]= $good_receipt_detail->goodScaleDetail->goodScale->id; 
                             
-                        }
+                        } */
 
                     }
                 }

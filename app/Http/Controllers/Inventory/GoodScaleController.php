@@ -119,6 +119,10 @@ class GoodScaleController extends Controller
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
+
+                if($request->status_qc){
+                    $query->where('status_qc', $request->status_qc);
+                }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
@@ -152,6 +156,10 @@ class GoodScaleController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if($request->status_qc){
+                    $query->where('status_qc', $request->status_qc);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -213,7 +221,6 @@ class GoodScaleController extends Controller
                     CustomHelper::formatConditionalQty($val->qty_final),
                     $val->itemUnit->unit->code,
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         '.$updateBtn.'
@@ -541,7 +548,42 @@ class GoodScaleController extends Controller
         }
 
         $string = '<div class="row pt-1 pb-1 lighten-4">
-                    <div class="col s12">'.$data->code.$x.'</div><div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
+                    <div class="col s12">'.$data->code.$x.'</div><div class="col s12">
+                    <table class="bordered">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">Hasil Pemeriksaan QC</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Nama</th>
+                                <th class="center-align">Nominal</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">Memotong Qty</th>
+                            </tr>
+                        </thead><tbody>';
+
+        if($data->qualityControl()->exists()){
+            foreach($data->qualityControl as $key => $row){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td class="">'.$row->name.'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->nominal).'</td>
+                    <td class="center-align">'.$row->unit.'</td>
+                    <td class="">'.$row->note.'</td>
+                    <td class="">'.($row->is_affect_qty ? 'Ya' : 'Tidak').'</td>
+                </tr>';
+            }
+        }else{
+            $string .= '<tr>
+                <td class="center-align" colspan="6">Data tidak ditemukan.</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
+                    
+        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>
@@ -620,6 +662,7 @@ class GoodScaleController extends Controller
         $data['warehouse_name'] = $data->warehouse->name;
         $data['buy_units'] = $data->item->arrBuyUnits();
         $data['is_hide'] = $data->item->is_hide_supplier ?? '';
+        $data['unit'] = $data->itemUnit->unit->code;
 
         return response()->json($data);
     }
@@ -628,40 +671,37 @@ class GoodScaleController extends Controller
 
         $overtolerance = false;
 
-        foreach($request->arr_good_scale_detail as $key => $row){
-            if($row){
-                $pod = GoodScaleDetail::find($row);
-                if($pod){
-                    if($pod->purchase_order_detail_id){
-                        $balanceweight = $pod->qty_in - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
-
-                        $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
-
-                        $balance = $balanceweight - $pod->purchaseOrderDetail->getBalanceReceipt();
-
-                        $percent_balance = round(($balance / $pod->qty_balance) * 100,2);
-
-                        if($percent_balance > $tolerance_gr){
-                            $overtolerance = true;
-                        }
-                    }
-                }
-            }
-        }
-
-        if($overtolerance){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
-            ]);
-        }
-
-        $adapo = false;
-        $idgs = 0;
-
         $gs = GoodScale::find($request->tempGoodScale);
 
         if($gs){
+            $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
+            $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
+            $balancegrpo = $gs->purchaseOrderDetail->getBalanceReceipt();
+            $balance = $balanceweight - $balancegrpo;
+            $percent_balance = round(($balance / $balancegrpo) * 100,2);
+            if($percent_balance > $tolerance_gr){
+                $overtolerance = true;
+            }
+
+            if($overtolerance){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                ]);
+            }
+
+            $qty_qc = 0;
+            $qty_final = $balanceweight;
+
+            foreach($gs->qualityControl()->whereNotNull('is_affect_qty')->get() as $row){
+                $qty_qc += round((($row->nominal / 100) * $balanceweight),2);
+            }
+
+            $qty_final -= $qty_qc;
+    
+            $adapo = false;
+            $idgs = 0;
+    
             $imageName = '';
             $newFile = '';
             if($request->image_out){
@@ -672,34 +712,25 @@ class GoodScaleController extends Controller
                 $newFile = 'public/good_scales/'.$imageName;
                 Storage::put($newFile,base64_decode($image));
             }
+            $gs->qty_out = str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
+            $gs->qty_balance = $balanceweight;
+            $gs->qty_qc = $qty_qc;
+            $gs->qty_final = $qty_final;
+            $gs->time_scale_out = date('Y-m-d H:i:s');
             $gs->image_out = $newFile ? $newFile : NULL;
             $gs->save();
+    
+            /* if($adapo){
+                if($idgs > 0){
+                    GoodScale::find($idgs)->createGoodReceipt();
+                }
+            } */
+    
+            $response = [
+                'status'    => 200,
+                'message'   => 'Data successfully updated.',
+            ];
         }
-
-        foreach($request->arr_good_scale_detail as $key => $row){
-            $query = GoodScaleDetail::find($row);
-            if($query->qty_out == 0){
-                $query->qty_out = str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
-                $query->qty_balance = $query->qty_in - str_replace(',','.',str_replace('.','',$request->arr_qty_out[$key]));
-                $query->purchase_order_detail_id = $request->arr_pod[$key] ? $request->arr_pod[$key] : NULL;
-                $query->save();
-            }
-            if($request->arr_pod[$key]){
-                $adapo = true;
-                $idgs = $query->good_scale_id;
-            }
-        }
-
-        if($adapo){
-            if($idgs > 0){
-                GoodScale::find($idgs)->createGoodReceipt();
-            }
-        }
-
-        $response = [
-            'status'    => 200,
-            'message'   => 'Data successfully updated.',
-        ];
 
         return response()->json($response);
     }
@@ -736,6 +767,11 @@ class GoodScaleController extends Controller
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada dokumen lain.'
                 ];
             }else{
                 $query->update([
@@ -809,8 +845,6 @@ class GoodScaleController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-
-            $query->goodScaleDetail()->delete();
 
             CustomHelper::removeApproval('good_scales',$query->id);
 

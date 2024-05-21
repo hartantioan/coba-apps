@@ -281,6 +281,10 @@ class GoodScale extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        if($this->qualityControl()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 

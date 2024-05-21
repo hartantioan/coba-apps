@@ -172,12 +172,13 @@
                     <td width="33%" class="left-align" >
                         <span class="invoice-number mr-1"># {{ $data->code }}</span>
                         <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
-                        <h2 class="indigo-text">Penerimaan Barang</h2>
+                        <h2 class="indigo-text">Tiket Timbangan</h2>
                     </td>
                     <td width="33%" class="right-align">
                     </td>
                     <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
+                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:30%;right:0;" height="20%" />
                     </td>
                 </tr>
                 
@@ -189,7 +190,7 @@
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
                         <tr>
-                            <td width="33%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%" class="tbl-info">
                                     <tr>
                                         <td width="25%">
@@ -269,8 +270,16 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="33%" class="left-align">
+                            <td width="40%" class="left-align">
                                 <table border="0" width="100%" class="tbl-info">
+                                    <tr>
+                                        <td>
+                                            Item
+                                        </td>
+                                        <td>
+                                             {{ $data->item->code.' - '.$data->item->name }}
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td>
                                             Berat Bruto
@@ -284,7 +293,7 @@
                                             Waktu Timbang Masuk
                                         </td>
                                         <td>
-                                             {{ date('d/m/Y H:i:s',strtotime($data->time_scale_in)) }}
+                                             {{ $data->time_scale_in ? date('d/m/Y H:i:s',strtotime($data->time_scale_in)) : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -300,7 +309,7 @@
                                             Waktu Timbang Keluar
                                         </td>
                                         <td>
-                                             {{ date('d/m/Y H:i:s',strtotime($data->time_scale_out)) }}
+                                             {{ $data->time_scale_out ? date('d/m/Y H:i:s',strtotime($data->time_scale_out)) : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -333,20 +342,6 @@
                                         </td>
                                         <td>
                                              {{ $data->note_qc }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td align="center">
-                                            <h3>{{ $data->code }}</h3>
                                         </td>
                                     </tr>
                                 </table>

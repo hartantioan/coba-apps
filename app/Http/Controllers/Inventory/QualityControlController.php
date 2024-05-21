@@ -288,8 +288,9 @@ class QualityControlController extends Controller
                         'user_qc'       => session('bo_id'),
                         'time_scale_qc' => date('Y-m-d H:i:s'),
                         'status'        => $request->status_qc == '1' ? $goodScale->status : '5',
-                        'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
-                        'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL,
+                        'note'          => $request->status_qc == '2' ? $goodScale->note.' - Ditutup oleh bagian QC.' : $goodScale->note,
+                        /* 'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
+                        'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL, */
                     ]);
 
                     foreach($request->arr_detail as $key => $row){

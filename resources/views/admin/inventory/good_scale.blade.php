@@ -1307,6 +1307,7 @@
         $("#warehouse_id").empty();
         $('#account_id').empty();
         $("#purchase_order_detail_id").empty().trigger('change');
+        $('#div-account').removeClass('hide');
         if($("#item_id").val()){
             if($("#item_id").select2('data')[0].list_warehouse.length > 0){
                 $.each($("#item_id").select2('data')[0].list_warehouse, function(i, value) {

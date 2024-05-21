@@ -133,10 +133,10 @@
                                                     <span class="hide-on-small-onl">Refresh</span>
                                                     <i class="material-icons right">refresh</i>
                                                 </a>
-                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
+                                                {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
                                                     <span class="hide-on-small-onl">Export</span>
                                                     <i class="material-icons right">view_headline</i>
-                                                </a>
+                                                </a> --}}
                                             </div>
                                             <table id="datatable_serverside" >
                                                 <thead>

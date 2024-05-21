@@ -768,6 +768,11 @@ class GoodScaleController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada dokumen lain.'
+                ];
             }else{
                 $query->update([
                     'status'    => '5',
@@ -840,8 +845,6 @@ class GoodScaleController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
-
-            $query->goodScaleDetail()->delete();
 
             CustomHelper::removeApproval('good_scales',$query->id);
 

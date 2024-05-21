@@ -273,9 +273,9 @@ function cekNotif(url){
 						
 						if (!localStorage.getItem(bannerId)) {
 							var bannerHtml = `
-								<div class="maintenance-banner" style="width:fit-content; background: #ffcc00; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 9999;" data-banner-id="${bannerId}">
-									<span>${val.description}</span>
-									<button class="close-banner" style="background: none; border: none; font-size: 16px; float: right; cursor: pointer;">&times;</button>
+								<div class="maintenance-banner" style="display: flex; align-items: center; width: fit-content; background: #ffcc00; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 9999;" data-banner-id="${bannerId}">
+									<span style="margin-right: 10px;">${val.description}</span>
+									<button class="close-banner" style="background: none; border: none; font-size: 16px; cursor: pointer;">&times;</button>
 								</div>
 							`;
 							$('#announcement_div').append(bannerHtml);

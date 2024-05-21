@@ -888,7 +888,7 @@
     }
 
     function resetDetails(){
-        if($('#purchase_item_id').val()){
+        /* if($('#purchase_item_id').val()){ */
             if($('#account_id').val()){
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -919,14 +919,14 @@
                     }
                 }
             }
-        }else{
+        /* }else{
             swal({
                 title: 'Ups!',
                 text: 'Silahkan pilih item terlebih dahulu.',
                 icon: 'error'
             });
             $('#account_id').empty();
-        }
+        } */
     }
 
     String.prototype.replaceAt = function(index, replacement) {

@@ -247,6 +247,7 @@ Route::prefix('admin')->group(function () {
             Route::get('dashboard', [DashboardController::class, 'index']);
 
             Route::get('application_update', [ChangeLogController::class, 'index_log_update']);
+            Route::get('currency_get', [CurrencyController::class, 'currencyGet']);
 
             Route::post('pages', [MenuController::class, 'getMenus']);
 

@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
                 ->everyMinute()->withoutOverlapping();
         $schedule->command('customscript:run')
                 ->everyMinute()->withoutOverlapping();
+        $schedule->command('app:fetch-currency-rates')->dailyAt('06:00');
         // $schedule->command('inspire')->hourly();
         /* $schedule->command('queue:work')->everyMinute()->withoutOverlapping()->runInBackground(); */
         $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();

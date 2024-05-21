@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Currency;
+use Illuminate\Support\Facades\Http;
+use App\Models\CurrencyDate;
 
 class CurrencyController extends Controller
 {
@@ -210,5 +212,42 @@ class CurrencyController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function currencyGet(Request $request){
+        $dateString = now()->toDateString();
+        $find_currency = Currency::where('code',$request->code)->first();
+        $find = CurrencyDate::where('currency_id',$find_currency->id)
+        ->where('currency_date',$request->date)
+        ->first();
+       
+        if(!$find){
+            $response = Http::get("https://api.vatcomply.com/rates", [
+                'base' => $request->code,
+                'date' => $request->date,
+            ]);
+            $data = $response->json();
+            $query_currency_ada = CurrencyDate::where('id',$find_currency->id)
+                ->where('currency_date',$data['date'])
+                ->first();
+            if(!$query_currency_ada){
+                $m = [
+                    'currency_id'   => $find_currency->id,
+                    'currency_date' => $data['date'],
+                    'currency_rate' => $data['rates']['IDR'],
+                    'taken_from'    => 'https://api.vatcomply.com/rates',
+                ];
+                CurrencyDate::create($m);
+                $find = $m; 
+              
+            }else{
+                $find = $query_currency_ada;
+               
+            }
+            
+           
+        }
+
+        return $find;
     }
 }

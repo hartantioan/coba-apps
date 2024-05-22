@@ -1833,7 +1833,7 @@
                                     </a>
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
+                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `');"></select>
                                 </td>
                                 <td>
                                     ` + val.item_name + `

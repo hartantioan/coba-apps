@@ -1609,7 +1609,7 @@
                                             </a>
                                         </td>
                                         <td class="center">
-                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `');"></select>
+                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `','` + val.qty + `');"></select>
                                         </td>
                                         <td>
                                             ` + val.item_name + `
@@ -1731,8 +1731,13 @@
         }
     }
 
-    function applyScale(){
-
+    function applyScale(code,oldQty){
+        if($('#arr_scale' + code).val()){
+            let newQty = $('#arr_scale' + code).select2('data')[0].qty;
+            $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
+        }else{
+            $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
+        }
     }
 
     function removeUsedData(id){

@@ -650,14 +650,6 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [PatternController::class, 'destroy'])->middleware('operation.access:pattern,delete');
                     });
 
-                    Route::prefix('color')->middleware('operation.access:color,view')->group(function () {
-                        Route::get('/',[ColorController::class, 'index']);
-                        Route::get('datatable',[ColorController::class, 'datatable']);
-                        Route::post('show', [ColorController::class, 'show']);
-                        Route::post('create',[ColorController::class, 'create'])->middleware('operation.access:color,update');
-                        Route::post('destroy', [ColorController::class, 'destroy'])->middleware('operation.access:color,delete');
-                    });
-
                     Route::prefix('grade')->middleware('operation.access:grade,view')->group(function () {
                         Route::get('/',[GradeController::class, 'index']);
                         Route::get('datatable',[GradeController::class, 'datatable']);

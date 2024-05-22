@@ -1502,28 +1502,6 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
-    public function color(Request $request)
-    {
-        $response = [];
-        $search   = $request->search;
-        $data = Color::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
-                })
-                ->where('status','1')->get();
-
-        foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
-                'name'          => $d->name,
-            ];
-        }
-
-        return response()->json(['items' => $response]);
-    }
-
     public function grade(Request $request)
     {
         $response = [];

@@ -2462,13 +2462,13 @@ class Select2Controller extends Controller {
                     ->where('code','like',"%$request->search%");
                 })
                 ->whereIn('status',['2','3'])
-                ->whereDoesntHave('goodReceiptDetail')
                 ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->code.' '.$d->item->name.' '.$d->qty_final.' '.$d->itemUnit->unit->code,
+                'text' 			    => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code,
+                'qty'               => CustomHelper::formatConditionalQty($d->qty_final),
             ];
         }
 

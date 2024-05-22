@@ -335,6 +335,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
                 Route::get('good_scale', [Select2Controller::class, 'goodScale']);
+                Route::get('good_scale_item', [Select2Controller::class, 'goodScale']);
                 Route::get('shift', [Select2Controller::class, 'shift']);
                 Route::get('shift_production', [Select2Controller::class, 'shiftProduction']);
                 Route::get('place', [Select2Controller::class, 'place']);

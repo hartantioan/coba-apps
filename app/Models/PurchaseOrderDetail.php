@@ -214,12 +214,12 @@ class PurchaseOrderDetail extends Model
 
     public function getBalanceReceipt()
     {
-        if($this->goodScale()->exists()){
+        /* if($this->goodScale()->exists()){
             $balance = $this->goodScale->qty_final;
-        }else{
+        }else{ */
             $received = $this->goodReceiptDetail()->sum('qty');
             $balance = $this->qty - $received;
-        }
+        /* } */
         
         return $balance;
     }

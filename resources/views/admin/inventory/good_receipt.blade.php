@@ -254,6 +254,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Hapus</th>
+                                                    <th class="center">Timbangan</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Satuan PO</th>
@@ -267,7 +268,6 @@
                                                     <th class="center">Mesin</th>
                                                     <th class="center">Divisi</th>
                                                     <th class="center">Gudang</th>
-                                                    <th class="center">Timbangan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
@@ -1608,6 +1608,9 @@
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `');"></select>
+                                        </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
@@ -1646,9 +1649,6 @@
                                         </td>
                                         <td class="center">
                                             <span>` + val.warehouse_name + `</span>
-                                        </td>
-                                        <td class="center">
-                                            <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
                                         </td>
                                     </tr>
                                 `);

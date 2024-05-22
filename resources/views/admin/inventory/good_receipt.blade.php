@@ -254,7 +254,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Hapus</th>
-                                                    <th class="center">Timbangan</th>
+                                                    <th class="center">Timbangan & QC</th>
                                                     <th class="center">Item</th>
                                                     <th class="center">Qty PO</th>
                                                     <th class="center">Satuan PO</th>
@@ -1670,6 +1670,7 @@
                                                 item: $('#arr_item' + count).val(),
                                                 place: $('#arr_place' + count).val(),
                                                 warehouse: $('#arr_warehouse' + count).val(),
+                                                pod: val.purchase_order_detail_id
                                             };
                                         },
                                         processResults: function(data) {
@@ -1838,7 +1839,7 @@
                                     </a>
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `');"></select>
+                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]" onchange="applyScale('` + count + `','` + val.qty + `');"></select>
                                 </td>
                                 <td>
                                     ` + val.item_name + `
@@ -1906,6 +1907,7 @@
                                         item: $('#arr_item' + count).val(),
                                         place: $('#arr_place' + count).val(),
                                         warehouse: $('#arr_warehouse' + count).val(),
+                                        pod: val.purchase_order_detail_id,
                                     };
                                 },
                                 processResults: function(data) {

@@ -445,6 +445,8 @@ class GoodReceiptPOController extends Controller
             $arrDetail = [];
             $passedSerial = true;
             $arrErrorSerial = [];
+            $passedScale = true;
+            $arrMustScaleItem = [];
 
             if(!$request->temp){
                 if($request->arr_serial){
@@ -474,6 +476,13 @@ class GoodReceiptPOController extends Controller
                 $pod = PurchaseOrderDetail::find(intval($row));
 
                 if($pod){
+
+                    if($pod->item->is_quality_check){
+                        if(!$request->arr_scale[$key]){
+                            $passedScale = false;
+                            $arrMustScaleItem[] = $pod->item->code.' - '.$pod->item->name;
+                        }
+                    }
 
                     $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
 
@@ -525,6 +534,13 @@ class GoodReceiptPOController extends Controller
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                ]);
+            }
+
+            if(!$passedScale){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Ups. Barang : '.implode(', ',$arrMustScaleItem).' harus memilih data timbangan / QC karena termasuk item wajib QC.',
                 ]);
             }
 
@@ -646,7 +662,7 @@ class GoodReceiptPOController extends Controller
                         $grd = GoodReceiptDetail::create([
                             'good_receipt_id'           => $query->id,
                             'purchase_order_detail_id'  => $row,
-                            'good_scale_detail_id'      => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
+                            'good_scale_id'             => $request->arr_scale[$key] ? $request->arr_scale[$key] : NULL,
                             'item_id'                   => $request->arr_item[$key],
                             'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'item_unit_id'              => $pod->item_unit_id,
@@ -759,7 +775,7 @@ class GoodReceiptPOController extends Controller
                 <td class="center-align">'.($rowdetail->machine()->exists() ? $rowdetail->machine->name : '-').'</td>
                 <td class="center-align">'.($rowdetail->department_id ? $rowdetail->department->name : '-').'</td>
                 <td class="center-align">'.$rowdetail->warehouse->name.'</td>
-                <td class="center-align">'.($rowdetail->good_scale_detail_id ? $rowdetail->goodScaleDetail->goodScale->code : '-').'</td>
+                <td class="center-align">'.($rowdetail->goodScale()->exists() ? $rowdetail->goodScale->code : '-').'</td>
             </tr>
             <tr>
                 <td colspan="13">Serial No : '.$rowdetail->listSerial().'</td>
@@ -856,8 +872,8 @@ class GoodReceiptPOController extends Controller
         foreach($grm->goodReceiptDetail as $row){
             $arr[] = [
                 'purchase_order_detail_id'  => $row->purchase_order_detail_id,
-                'good_scale_detail_id'      => $row->good_scale_detail_id ? $row->good_scale_detail_id : '',
-                'good_scale_detail_name'    => $row->good_scale_detail_id ? $row->goodScaleDetail->goodScale->code.' '.$row->goodScaleDetail->item->name.' '.$row->goodScaleDetail->qty_balance.' '.$row->goodScaleDetail->item->uomUnit->code : '',
+                'good_scale_id'             => $row->goodScale()->exists() ? $row->good_scale_id : '',
+                'good_scale_name'           => $row->goodScale()->exists() ? $row->goodScale->code.' '.$row->goodScale->item->name.' '.$row->goodScale->qty_final.' '.$row->goodScale->itemUnit->unit->code : '',
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->name,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),

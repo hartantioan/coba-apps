@@ -13,7 +13,7 @@ class PatternController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Motif',
+            'title'     => 'Motif & Warna',
             'content'   => 'admin.master_data.pattern',
         ];
 

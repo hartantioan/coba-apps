@@ -85,6 +85,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
 
     public function collection()
     {
+        $arr = [];
         $data = PurchaseOrderDetail::whereHas('purchaseOrder', function($query) {
             // Apply the search conditions within the 'purchaseOrder' relationship
             $query->where(function($query){

@@ -1731,6 +1731,10 @@
         }
     }
 
+    function applyScale(){
+
+    }
+
     function removeUsedData(id){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
@@ -1828,6 +1832,9 @@
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
+                                </td>
                                 <td>
                                     ` + val.item_name + `
                                 </td>
@@ -1866,9 +1873,6 @@
                                 </td>
                                 <td class="center">
                                     <span>` + val.warehouse_name + `</span>
-                                </td>
-                                <td class="center">
-                                    <select class="browser-default" id="arr_scale` + count + `" name="arr_scale[]"></select>
                                 </td>
                             </tr>
                         `);

@@ -14,7 +14,7 @@ class ExportOutstandingLC implements FromView,ShouldAutoSize
     */
     public function view(): View
     {
-        $data = LandedCost::whereIn('status',['2','3'])->whereNull('status')->get();
+        $data = LandedCost::whereIn('status',['2'])->whereNull('status')->get();
         
         $array=[];
         foreach($data as $row){

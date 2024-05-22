@@ -14,7 +14,7 @@ class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
     public function view(): View
     {
         $data = MaterialRequestDetail::whereHas('materialRequest',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['2']);
         })->get();
         $array=[];
         foreach($data as $row){

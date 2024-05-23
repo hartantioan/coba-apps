@@ -16,7 +16,7 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
-        $this->status   = $status ? $status : '';
+        $this->status   = $status ? explode(',',$status) : '';
         $this->modedata = $modedata ? $modedata : '';
     }
 

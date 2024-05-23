@@ -1304,7 +1304,7 @@ class GoodReceiptPOController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata), 'good_receipt_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

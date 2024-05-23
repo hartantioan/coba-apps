@@ -262,7 +262,7 @@
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td>{{ $row->place->code  }}</td>
                                     <td>{{ $row->warehouse->name }}</td>
-                                    <td align="right">{{ $row->qty }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->item->uomUnit->code }}</td>
                                     <td>{{ $row->goodReceiptDetail() ? $row->lookable->goodReceipt->delivery_no : '-' }}</td>
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>

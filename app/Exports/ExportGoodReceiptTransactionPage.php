@@ -25,15 +25,14 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
         return view('admin.exports.good_receipt', [
             'data' => GoodReceipt::where(function ($query) {
                 if($this->search) {
-                    $query->where(function($query) {
+                    $query->where(function($query){
                         $query->where('code', 'like', "%$this->search%")
                             ->orWhere('post_date', 'like', "%$this->search%")
-                            ->orWhere('delivery_no', 'like', "%$this->search%")
-                            ->orWhere('vehicle_no', 'like', "%$this->search%")
-                            ->orWhere('driver', 'like', "%$this->search%")
+                            ->orWhere('document_date', 'like', "%$this->search%")
+                            ->orWhere('receiver_name', 'like', "%$this->search%")
                             ->orWhere('note', 'like', "%$this->search%")
-                            ->orWhereHas('goodReceiptDetail',function($query) {
-                                $query->whereHas('item',function($query){
+                            ->orWhereHas('goodReceiptDetail',function($query){
+                                $query->whereHas('item',function($query) {
                                     $query->where('code', 'like', "%$this->search%")
                                         ->orWhere('name','like',"%$this->search%");
                                 });
@@ -52,9 +51,11 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
                 } else if($this->end_date) {
                     $query->whereDate('post_date','<=', $this->end_date);
                 }
+
                 if($this->status){
                     $query->whereIn('status', $this->status);
                 }
+
                 if(!$this->modedata){
                     $query->where('user_id',session('bo_id'));
                 }

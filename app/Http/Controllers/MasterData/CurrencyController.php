@@ -90,6 +90,7 @@ class CurrencyController extends Controller
                     $val->type(),
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="History" onclick="history(' . $val->id . ')"><i class="material-icons dp48">format_list_numbered</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
@@ -189,6 +190,40 @@ class CurrencyController extends Controller
         $currency = Currency::find($request->id);
         				
 		return response()->json($currency);
+    }
+
+    public function history(Request $request){
+        $currency = CurrencyDate::where('currency_id',$request->id)
+        ->orderBy('id', 'asc')->get();
+        info($currency);
+        $c = Currency::find($request->id);
+        $string = '<div class="row pt-1 pb-1 lighten-4">
+                    <div class="col s12"></div><div class="col s12">
+                    <table class="bordered">
+                        <thead>
+                            <tr>
+                                <th class="center-align" colspan="6">History Rates '.$c->code.'</th>
+                            </tr>
+                            <tr>
+                                <th class="center-align">No.</th>
+                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">Rates</th>
+                            </tr>
+                        </thead><tbody>';
+
+        
+        foreach($currency as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="">'.$row->currency_date.'</td>
+                <td class="right-align">'.$row->currency_rate.'</td>
+            </tr>';
+        }
+        
+
+        $string .= '</tbody></table></div>';
+        				
+		return $string;
     }
 
     public function destroy(Request $request){

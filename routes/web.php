@@ -1059,6 +1059,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('currency')->middleware('operation.access:currency,view')->group(function () {
                         Route::get('/',[CurrencyController::class, 'index']);
                         Route::get('datatable',[CurrencyController::class, 'datatable']);
+                        Route::get('history',[CurrencyController::class, 'history']);
                         Route::get('row_detail',[CurrencyController::class, 'rowDetail']);
                         Route::post('show', [CurrencyController::class, 'show']);
                         Route::post('create',[CurrencyController::class, 'create'])->middleware('operation.access:currency,update');

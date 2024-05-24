@@ -20,7 +20,7 @@ class CurrencyDate extends Model
         'taken_from',
     ];
 
-    public function currency(){
+    public function currencies(){
         return $this->hasMany('App\Models\Currency','currency_id','id');
     }
 }

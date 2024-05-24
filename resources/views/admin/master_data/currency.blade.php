@@ -152,6 +152,19 @@
     </div>
 </div>
 
+<div id="modal_history" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="body_history">
+                
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -203,6 +216,21 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
+            }
+        });
+
+        $('#modal_history').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body_history').empty();
+               
             }
         });
 
@@ -320,6 +348,31 @@
             error: function() {
                 $('.modal-content').scrollTop(0);
                 loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function history(id){
+        $.ajax({
+            url: '{{ Request::url() }}/history',
+            type: 'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            data: {
+                id: id
+            },
+            success: function(response) {
+                $('#modal_history').modal('open');
+                $('#body_history').html(response);
+                loadingClose('.modal-content');
+            },
+            error: function() {
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

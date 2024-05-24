@@ -159,9 +159,11 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
             }
         })
         ->where(function($query){
-            if($query->whereHas('item')){
-                $query->whereIn('warehouse_id',$this->warehouses);
-            }
+            $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->warehouses);
+                    });
         })
         ->get();
     

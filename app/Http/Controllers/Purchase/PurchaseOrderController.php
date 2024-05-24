@@ -172,9 +172,11 @@ class PurchaseOrderController extends Controller
             }
         })
         ->whereHas('purchaseOrderDetail',function($query){
-            /* if($query->whereHas('item')){
-                $query->whereIn('warehouse_id',$this->datawarehouses);
-            } */
+            $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->datawarehouses);
+                    });
         })
         ->count();
         
@@ -276,9 +278,11 @@ class PurchaseOrderController extends Controller
                 // }
             })
             ->whereHas('purchaseOrderDetail',function($query){
-                /* if($query->whereHas('item')){
-                    $query->whereIn('warehouse_id',$this->datawarehouses);
-                } */
+                $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->datawarehouses);
+                    });
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
@@ -383,9 +387,11 @@ class PurchaseOrderController extends Controller
                 // }
             })
             ->whereHas('purchaseOrderDetail',function($query){
-                /* if($query->whereHas('item')){
-                    $query->whereIn('warehouse_id',$this->datawarehouses);
-                } */
+                $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->datawarehouses);
+                    });
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();

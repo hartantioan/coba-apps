@@ -92,9 +92,11 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     }
             })
             ->where(function($query){
-                if($query->whereHas('item')){
-                    $query->whereIn('warehouse_id',$this->warehouses);
-                }
+                $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->warehouses);
+                    });
             })
             ->get();
         }elseif($this->mode == '2'){
@@ -107,9 +109,11 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     }
             })
             ->where(function($query){
-                if($query->whereHas('item')){
-                    $query->whereIn('warehouse_id',$this->warehouses);
-                }
+                $query->whereNotNull('coa_id')
+                    ->orWhere(function($query){
+                        $query->whereNotNull('item_id')
+                            ->whereIn('warehouse_id',$this->warehouses);
+                    });
             })
             ->get();
         }

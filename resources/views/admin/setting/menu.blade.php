@@ -1,4 +1,15 @@
 <!-- BEGIN: Page Main-->
+
+<link rel="stylesheet" type="text/css" href="{{ url('app-assets/vendors/jquery.nestable/nestable.css') }}">
+<style>
+        .button-container {
+        position: sticky;
+        top: 0;
+        z-index: 1000; /* Ensure it stays above other content */
+        background-color: white; /* Match modal background */
+        padding: 10px 0; /* Add padding if needed */
+    }
+</style>
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
@@ -38,6 +49,11 @@
                                                 <option value="2">Non-Aktif</option>
                                             </select>
                                         </div>
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right modal-trigger"  href="#modal_urutan">
+                                            <i class="material-icons hide-on-med-and-up">clear_all</i>
+                                            <span class="hide-on-small-onl">Urut Menu</span>
+                                            <i class="material-icons right">clear_all</i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -122,7 +138,7 @@
                         <div class="input-field col s6">
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
                                 <option value="">Parent (Utama)</option>
-                                @foreach($menus as $m)
+                                @foreach($menu as $m)
                                     <option value="{{ $m->id }}">{{ $m->name.' '.$m->url }}</option>
                                     @foreach($m->sub as $m2)
                                         <option value="{{ $m2->id }}"> - {{ $m2->name.' '.$m2->url }}</option>
@@ -198,6 +214,70 @@
     </div>
 </div>
 
+<div id="modal_urutan" class="modal modal-fixed-footer" style="min-height: 80%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <div class="button-container">
+                    <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="saveOrder();">
+                        <i class="material-icons hide-on-med-and-up">refresh</i>
+                        <span class="hide-on-small-onl">Save</span>
+                        <i class="material-icons right">refresh</i>
+                    </a>
+                </div>
+                <div class="dd" id="nestable">
+                    <ol class="dd-list">
+                        @foreach($menu as $m)
+                            @if($m->sub()->exists())
+                                <li class="dd-item" data-id="{{$m->id}}">
+                                    <div class="dd-handle">{{ $m->name }}</div>
+                                    <ol class="dd-list" style="">
+                                
+                                    
+                                
+                                
+                                    @foreach($m->sub()->where('status','1')->oldest('order')->get() as $msub)
+                                        @if($msub->sub()->exists())
+                                            <li class="dd-item" data-id="{{$msub->id}}">
+                                                <div class="dd-handle">{{ $msub->name }}</div>
+                                                <ol class="dd-list" style="">
+                                            @foreach($msub->sub()->where('status','1')->oldest('order')->get() as $msub2)
+                                                @if($msub2->sub()->exists())
+
+                                                @else
+                                                    <li class="dd-item" data-id="{{$msub2->id}}">
+                                                        <div class="dd-handle">{{ $msub2->name }}</div>
+                                                    </li>
+                                                @endif
+                                            @endforeach
+                                                </ol>
+                                            </li>
+                                        @else
+                                            <li class="dd-item" data-id="{{$msub->id}}">
+                                                <div class="dd-handle">{{ $msub->name }}</div>
+                                            </li>
+                                        @endif
+                                    @endforeach
+                                    </ol>
+                                </li>
+                            @else
+                            <li class="dd-item" data-id="{{$m->id}}">
+                                <div class="dd-handle">{{ $m->name }}</div>
+                            </li>
+                            @endif
+                        @endforeach
+                        
+                    </ol>
+                </div>
+                <textarea id="nestable-output"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -206,12 +286,14 @@
 
 <!-- END: Page Main-->
 <script>
+    var serializedData;
     $(function() {
         $(".select2").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
         loadDataTable();
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -235,11 +317,58 @@
                 M.updateTextFields();
             }
         });
+
+        $('#modal_urutan').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+              
+                M.updateTextFields();
+             
+            },
+            onCloseEnd: function(modal, trigger){
+              
+                M.updateTextFields();
+            }
+        });
         $('#maintenance').click(function(){
             if($(this).is(':checked')){
                 $('#whitelist').show();
             }else{
                 $('#whitelist').hide();
+            }
+        });
+
+
+        var updateOutput = function(e) {
+            var list = e.length ? e : $(e.target),
+            output = list.data('output');
+            if (window.JSON) {
+                serializedData = window.JSON.stringify(list.nestable('serialize')); // Store serialized data
+                output.val(serializedData);
+            } else {
+            output.val('JSON browser support required for this demo.');
+            }
+        };
+
+        // activate Nestable for list 1
+        $('#nestable').nestable({
+        group: 1
+        })
+        .on('change', updateOutput);
+
+        updateOutput($('#nestable').data('output', $('#nestable-output')));
+      
+        $('#nestable-menu').on('click', function(e) {
+            var target = $(e.target),
+            action = target.data('action');
+            if (action === 'expand-all') {
+            $('.dd').nestable('expandAll');
+            }
+            if (action === 'collapse-all') {
+            $('.dd').nestable('collapseAll');
             }
         });
     });
@@ -372,6 +501,41 @@
             error: function() {
                 $('.modal-content').scrollTop(0);
                 loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+    }
+
+    function saveOrder(){
+       
+        var data = JSON.parse(serializedData);
+        $.ajax({
+            url: '{{ Request::url() }}/save_order_menu',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                data: data
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                
+                location.reload();
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
                 swal({
                     title: 'Ups!',
                     text: 'Check your internet connection.',

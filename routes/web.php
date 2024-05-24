@@ -1218,6 +1218,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[MenuController::class, 'index']);
                     Route::get('datatable',[MenuController::class, 'datatable']);
                     Route::post('create',[MenuController::class, 'create'])->middleware('operation.access:menu,update');
+                    Route::post('save_order_menu',[MenuController::class, 'saveOrderMenu'])->middleware('operation.access:menu,update');
                     Route::post('show', [MenuController::class, 'show']);
                     Route::post('get_page_status_maintenance', [MenuController::class, 'getPageStatusMaintenance'])->withoutMiddleware('operation.access');
                     Route::post('destroy', [MenuController::class, 'destroy'])->middleware('operation.access:menu,delete');

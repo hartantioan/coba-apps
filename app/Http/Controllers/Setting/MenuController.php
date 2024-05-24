@@ -59,7 +59,7 @@ class MenuController extends Controller
 
         $data = [
             'title'     => 'Menu',
-            'menus'     => Menu::whereNull('parent_id')->get(),
+            'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
@@ -871,6 +871,43 @@ class MenuController extends Controller
             ];
         }
 
+        return response()->json($response);
+    }
+    
+
+    public function saveOrderMenu(Request $request){
+        function processNode($node, $parentId = null, $order = 0) {
+            $id = $node['id'];
+            
+            // info("Processing node: ID = $id, Parent ID = $parentId, Order = $order\n");
+            $query = Menu::find($id);
+            $query->parent_id = $parentId;
+            $query->order = $order;
+
+            $query->save();
+            // Perform any operation such as inserting into the database
+            // Node::create(['id' => $id, 'parent_id' => $parentId, 'order' => $order]);
+        
+            if (isset($node['children']) && is_array($node['children'])) {
+                foreach ($node['children'] as $index => $child) {
+                    processNode($child, $id, $index);
+                }
+            }
+        }
+        
+        $data = $request->data; 
+
+        foreach ($data as $index => $row) {
+            processNode($row, null, $index);
+        }
+        
+        
+		$response = [
+            'status'    => 200,
+            'title'     => '',
+            'message'   => ''
+        ];
+        
         return response()->json($response);
     }
 }

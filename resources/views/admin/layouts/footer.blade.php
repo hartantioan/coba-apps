@@ -7,7 +7,8 @@
     </footer>
 
     <!-- END: Footer-->
-    
+    {{-- <script src="{{ url('app-assets/js/scripts/extra-components-nestable.js') }}"></script> --}}
+    <script src="{{ url('app-assets/vendors/jquery.nestable/jquery.nestable.js') }}"></script>
 	<script src="{{ url('app-assets/vendors/data-tables/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/extensions/responsive/js/dataTables.responsive.min.js') }}"></script>
     <script src="{{ url('app-assets/vendors/data-tables/js/dataTables.select.min.js') }}"></script>

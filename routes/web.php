@@ -1731,7 +1731,6 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReceiptPOController::class, 'index']);
-                    Route::get('get_outstanding', [GoodReceiptPOController::class, 'getOutstanding']);
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReceiptPOController::class, 'show']);
@@ -1740,7 +1739,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[GoodReceiptPOController::class, 'print']);
                     Route::post('print_by_range',[GoodReceiptPOController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[GoodReceiptPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodReceiptPOController::class, 'export']);
                     Route::get('view_journal/{id}',[GoodReceiptPOController::class, 'viewJournal'])->middleware('operation.access:good_receipt_po,journal');
                     Route::get('viewstructuretree',[GoodReceiptPOController::class, 'viewStructureTree']);
                     Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
@@ -1751,6 +1749,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
                     Route::get('export_from_page',[GoodReceiptPOController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodReceiptPOController::class, 'export']);
+                    Route::get('get_outstanding', [GoodReceiptPOController::class, 'getOutstanding']);
                 });
 
                 Route::prefix('good_return_po')->middleware(['operation.access:good_return_po,view','lockacc'])->group(function () {

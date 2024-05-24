@@ -15,9 +15,9 @@ use App\Helpers\PrintHelper;
 
 class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-    protected $status, $type_buy,$type_deliv, $company, $type_pay,$supplier, $currency, $end_date, $start_date , $search , $modedata;
+    protected $status, $type_buy,$type_deliv, $company, $type_pay,$supplier, $currency, $end_date, $start_date , $search , $modedata, $warehouses;
 
-    public function __construct(string $search,string $status, string $type_buy,string $type_deliv, string $company, string $type_pay,string $supplier, string $currency, string $end_date, string $start_date,  string $modedata )
+    public function __construct(string $search,string $status, string $type_buy,string $type_deliv, string $company, string $type_pay,string $supplier, string $currency, string $end_date, string $start_date,  string $modedata, array $warehouses)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
@@ -31,7 +31,7 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
         $this->supplier = $supplier ? $supplier : '';
         $this->currency = $currency ? $currency : '';
         $this->modedata = $modedata ? $modedata : '';
-        
+        $this->warehouses = $warehouses;
     }
     private $headings = [
         'No',
@@ -157,7 +157,13 @@ class ExportPurchaseOrderTransactionPage implements FromCollection, WithTitle, W
             if(!$this->modedata){
                 $query->where('user_id',session('bo_id'));
             }
-        })->get();
+        })
+        ->where(function($query){
+            if($query->whereHas('item')){
+                $query->whereIn('warehouse_id',$this->warehouses);
+            }
+        })
+        ->get();
     
 
         foreach($data as $key => $row){

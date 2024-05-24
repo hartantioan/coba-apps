@@ -273,9 +273,10 @@ class UserController extends Controller
 		
 		foreach(MenuUser::where('user_id',$request->id)->get() as $row){
 			$menus[] = [
-				'menu_id'	=> $row->menu_id,
-				'type'	    => ucfirst($row->type),
-                'mode'      => $row->mode ? $row->mode : '',
+				'menu_id'	    => $row->menu_id,
+				'type'	        => ucfirst($row->type),
+                'mode'          => $row->mode ?? '',
+                'show_nominal'  => $row->show_nominal ?? '',
 			];
 		}
 
@@ -1058,6 +1059,112 @@ class UserController extends Controller
                     if($request->arr_user){
                         foreach($request->arr_user as $rowuser){
                             MenuUser::where('user_id',$rowuser)->where('type','journal')->delete();
+                        }
+                    }
+                }
+
+                if($request->checkboxReport){
+                    MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxReport)->where('type','report')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->whereNotIn('menu_id',$request->checkboxReport)->where('type','report')->delete();
+                        }
+                    }
+
+                    foreach($request->checkboxReport as $row){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','report');
+                        if($cek->count() == 0){
+                            MenuUser::create([
+                                'user_id'   => $request->tempuseraccess,
+                                'menu_id'   => $row,
+                                'type'      => 'report'
+                            ]);
+                        }else{
+                            foreach($cek->get() as $rowcek){
+                                $rowcek->update([
+                                    'mode'          => NULL,
+                                    'show_nominal'  => NULL,
+                                ]);
+                            }
+                        }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','report');
+                                if($cek2->count() == 0){
+                                    MenuUser::create([
+                                        'user_id'   => $rowuser,
+                                        'menu_id'   => $row,
+                                        'type'      => 'report'
+                                    ]);
+                                }else{
+                                    foreach($cek2->get() as $rowcek){
+                                        $rowcek->update([
+                                            'mode'          => NULL,
+                                            'show_nominal'  => NULL,
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else{
+                    MenuUser::where('user_id',$request->tempuseraccess)->where('type','report')->delete();
+                    if($request->arr_user){
+                        foreach($request->arr_user as $rowuser){
+                            MenuUser::where('user_id',$rowuser)->where('type','report')->delete();
+                        }
+                    }
+                }
+
+                if($request->checkboxReportData){
+                    foreach($request->checkboxReportData as $row){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','report');
+                        if($cek->count() > 0){
+                            foreach($cek->get() as $rowcek){
+                                $rowcek->update([
+                                    'mode'  => 'all'
+                                ]);
+                            }
+                        }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','report');
+                                if($cek2->count() > 0){
+                                    foreach($cek2->get() as $rowcek){
+                                        $rowcek->update([
+                                            'mode'  => 'all'
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if($request->checkboxShowNominal){
+                    foreach($request->checkboxShowNominal as $row){
+                        $cek = MenuUser::where('user_id',$request->tempuseraccess)->where('menu_id',$row)->where('type','report');
+                        if($cek->count() > 0){
+                            foreach($cek->get() as $rowcek){
+                                $rowcek->update([
+                                    'show_nominal'  => '1'
+                                ]);
+                            }
+                        }
+
+                        if($request->arr_user){
+                            foreach($request->arr_user as $rowuser){
+                                $cek2 = MenuUser::where('user_id',$rowuser)->where('menu_id',$row)->where('type','report');
+                                if($cek2->count() > 0){
+                                    foreach($cek2->get() as $rowcek){
+                                        $rowcek->update([
+                                            'show_nominal'  => '1'
+                                        ]);
+                                    }
+                                }
+                            }
                         }
                     }
                 }

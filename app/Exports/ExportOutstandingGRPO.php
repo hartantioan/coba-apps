@@ -13,11 +13,19 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $warehouses;
+
+    public function __construct(array $warehouses)
+    {
+        $this->warehouses = $warehouses;
+    }
+
     public function view(): View
     {
         $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2']);
-        })->get();
+        })->whereIn('warehouse_id',$this->warehouses)->get();
         $array=[];
         foreach($data as $row){
             $entry = [];

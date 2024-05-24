@@ -23,7 +23,7 @@ class PurchaseReportController extends Controller
             'menus'     => Menu::where('parent_id',$menu->id)
                             ->whereHas('menuUser', function ($query) {
                                 $query->where('user_id', session('bo_id'))
-                                    ->where('type','view');
+                                    ->where('type','report');
                             })
                             ->orderBy('order')->get()
         ];

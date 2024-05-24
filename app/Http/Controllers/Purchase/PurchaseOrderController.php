@@ -62,7 +62,7 @@ use Milon\Barcode\Facades\DNS2DFacade;
 
 class PurchaseOrderController extends Controller
 {
-    protected $dataplaces, $dataplacecode, $subordinate, $array_subordinate_id;
+    protected $dataplaces, $dataplacecode, $subordinate, $array_subordinate_id, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
@@ -75,6 +75,7 @@ class PurchaseOrderController extends Controller
             $this->array_subordinate_id[]=$user->id;
             $this->dataplaces = $user ? $user->userPlaceArray() : [];
             $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+            $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
         }
     }
     public function index(Request $request)
@@ -169,7 +170,13 @@ class PurchaseOrderController extends Controller
                 }*/
                 $query->where('user_id',session('bo_id'));
             }
-        })->count();
+        })
+        ->whereHas('purchaseOrderDetail',function($query){
+            if($query->whereHas('item')){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
+            }
+        })
+        ->count();
         
         $query_data = PurchaseOrder::where(function($query) use ($search, $request) {
                 if($search) {
@@ -267,6 +274,11 @@ class PurchaseOrderController extends Controller
                 // else{
                 //     $query->whereIn('user_id',$this->array_subordinate_id);
                 // }
+            })
+            ->whereHas('purchaseOrderDetail',function($query){
+                if($query->whereHas('item')){
+                    $query->whereIn('warehouse_id',$this->datawarehouses);
+                }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
@@ -369,6 +381,11 @@ class PurchaseOrderController extends Controller
                 // else{
                 //     $query->whereIn('user_id',$this->array_subordinate_id);
                 // }
+            })
+            ->whereHas('purchaseOrderDetail',function($query){
+                if($query->whereHas('item')){
+                    $query->whereIn('warehouse_id',$this->datawarehouses);
+                }
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
@@ -1831,11 +1848,14 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
+        $menu = Menu::where('url','material_request')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		
-		return Excel::download(new ExportPurchaseOrder($post_date,$end_date,$mode), 'purchase_order_'.uniqid().'.xlsx');
+		$modedata = $menuUser->mode ?? '';
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportPurchaseOrder($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){
@@ -1851,7 +1871,7 @@ class PurchaseOrderController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
 		$modedata = $request->modedata? $request->modedata : '';
       
-		return Excel::download(new ExportPurchaseOrderTransactionPage($search,$status,$type_buy,$type_deliv,$company,$type_pay,$supplier,$currency,$end_date,$start_date,$modedata), 'purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportPurchaseOrderTransactionPage($search,$status,$type_buy,$type_deliv,$company,$type_pay,$supplier,$currency,$end_date,$start_date,$modedata,$this->datawarehouses), 'purchase_order_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){
@@ -2009,7 +2029,7 @@ class PurchaseOrderController extends Controller
     // }
 
     public function getOutstanding(Request $request){
-		return Excel::download(new ExportOutstandingPO(), 'outstanding_purchase_order_'.uniqid().'.xlsx');
+		return Excel::download(new ExportOutstandingPO($this->datawarehouses), 'outstanding_purchase_order_'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){

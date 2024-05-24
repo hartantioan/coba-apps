@@ -16,14 +16,17 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
     * @return \Illuminate\Support\Collection
     */
 
-    protected $start_date, $end_date, $dataplaces, $mode;
+    protected $start_date, $end_date, $dataplaces, $mode, $modedata, $nominal, $warehouses;
 
-    public function __construct(string $start_date, string $end_date, array $dataplaces, string $mode)
+    public function __construct(string $start_date, string $end_date, array $dataplaces, string $mode, string $modedata, string $nominal, array $warehouses)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->dataplaces = $dataplaces ? $dataplaces : [];
         $this->mode = $mode ? $mode : '';
+        $this->modedata = $modedata ?? '';
+        $this->nominal = $nominal ?? '';
+        $this->warehouses = $warehouses;
     }
 
     private $headings = [
@@ -68,12 +71,22 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
             $data = PurchaseRequestDetail::whereHas('purchaseRequest', function($query) {
                 $query->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
-            })->get();
+                    if(!$this->modedata){
+                        $query->where('user_id',session('bo_id'));
+                    }
+            })
+            ->whereIn('warehouse_id',$this->warehouses)
+            ->get();
         }elseif($this->mode == '2'){
             $data = PurchaseRequestDetail::withTrashed()->whereHas('purchaseRequest', function($query) {
                 $query->withTrashed()->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
-            })->get();
+                    if(!$this->modedata){
+                        $query->where('user_id',session('bo_id'));
+                    }
+            })
+            ->whereIn('warehouse_id',$this->warehouses)
+            ->get();
         }
 
         $arr = [];

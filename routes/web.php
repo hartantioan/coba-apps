@@ -1392,10 +1392,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [MaterialRequestController::class, 'show']);
                     Route::post('get_items', [MaterialRequestController::class, 'getItems']);
                     Route::post('get_code', [MaterialRequestController::class, 'getCode']);
-                    Route::get('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
                     Route::post('get_items_from_stock', [MaterialRequestController::class, 'getItemFromStock']);
                     Route::post('print',[MaterialRequestController::class, 'print']);
-                    Route::get('export',[MaterialRequestController::class, 'export']);
                     Route::post('print_by_range',[MaterialRequestController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[MaterialRequestController::class, 'viewStructureTree']);
@@ -1407,6 +1405,11 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page',[MaterialRequestController::class, 'exportFromTransactionPage']);
                 });
 
+                Route::prefix('material_request')->middleware(['operation.access:material_request,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[MaterialRequestController::class, 'export']);
+                    Route::get('get_outstanding', [MaterialRequestController::class, 'getOutstanding']);
+                });
+
                 Route::prefix('purchase_request')->middleware(['operation.access:purchase_request,view','lockacc'])->group(function () {
                     Route::get('/',[PurchaseRequestController::class, 'index']);
                     Route::post('done',[PurchaseRequestController::class, 'done'])->middleware('operation.access:purchase_request,update');
@@ -1415,10 +1418,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [PurchaseRequestController::class, 'show']);
                     Route::post('get_items', [PurchaseRequestController::class, 'getItems']);
                     Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
-                    Route::get('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
                     Route::post('get_items_from_stock', [PurchaseRequestController::class, 'getItemFromStock']);
                     Route::post('print',[PurchaseRequestController::class, 'print']);
-                    Route::get('export',[PurchaseRequestController::class, 'export']);
                     Route::get('export_from_page',[PurchaseRequestController::class, 'exportFromTransactionPage']);
                     Route::post('print_by_range',[PurchaseRequestController::class, 'printByRange']);
                     Route::post('send_used_data',[PurchaseRequestController::class, 'sendUsedData']);
@@ -1430,6 +1431,12 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseRequestController::class, 'voidStatus'])->middleware('operation.access:purchase_request,void');
                     Route::get('approval/{id}',[PurchaseRequestController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseRequestController::class, 'destroy'])->middleware('operation.access:purchase_request,delete');
+                });
+
+                #report
+                Route::prefix('purchase_request')->middleware(['operation.access:purchase_request,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[PurchaseRequestController::class, 'export']);
+                    Route::get('get_outstanding', [PurchaseRequestController::class, 'getOutstanding']);
                 });
 
                 Route::prefix('purchase_report')->middleware('direct.access')->group(function () {
@@ -1480,10 +1487,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[PurchaseOrderController::class, 'done'])->middleware('operation.access:purchase_order,update');
                     Route::post('get_items', [PurchaseOrderController::class, 'getItems']);
                     Route::post('get_code', [PurchaseOrderController::class, 'getCode']);
-                    Route::get('get_outstanding', [PurchaseOrderController::class, 'getOutstanding']);
                     Route::post('print',[PurchaseOrderController::class, 'print']);
                     Route::post('print_by_range',[PurchaseOrderController::class, 'printByRange']);
-                    Route::get('export',[PurchaseOrderController::class, 'export']);
                     Route::get('export_from_page',[PurchaseOrderController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[PurchaseOrderController::class, 'viewStructureTree']);
                     Route::post('get_details', [PurchaseOrderController::class, 'getDetails']);
@@ -1494,6 +1499,12 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[PurchaseOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
+                });
+
+                #report
+                Route::prefix('purchase_order')->middleware(['operation.access:purchase_order,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[PurchaseOrderController::class, 'export']);
+                    Route::get('get_outstanding', [PurchaseOrderController::class, 'getOutstanding']);
                 });
 
                 Route::prefix('landed_cost')->middleware(['operation.access:landed_cost,view','lockacc'])->group(function () {
@@ -1720,7 +1731,6 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,view','lockacc'])->group(function () {
                     Route::get('/',[GoodReceiptPOController::class, 'index']);
-                    Route::get('get_outstanding', [GoodReceiptPOController::class, 'getOutstanding']);
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReceiptPOController::class, 'show']);
@@ -1729,7 +1739,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[GoodReceiptPOController::class, 'print']);
                     Route::post('print_by_range',[GoodReceiptPOController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[GoodReceiptPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodReceiptPOController::class, 'export']);
                     Route::get('view_journal/{id}',[GoodReceiptPOController::class, 'viewJournal'])->middleware('operation.access:good_receipt_po,journal');
                     Route::get('viewstructuretree',[GoodReceiptPOController::class, 'viewStructureTree']);
                     Route::post('get_purchase_order', [GoodReceiptPOController::class, 'getPurchaseOrder']);
@@ -1740,6 +1749,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodReceiptPOController::class, 'voidStatus'])->middleware('operation.access:good_receipt_po,void');
                     Route::post('destroy', [GoodReceiptPOController::class, 'destroy'])->middleware('operation.access:good_receipt_po,delete');
                     Route::get('export_from_page',[GoodReceiptPOController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_receipt_po')->middleware(['operation.access:good_receipt_po,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodReceiptPOController::class, 'export']);
+                    Route::get('get_outstanding', [GoodReceiptPOController::class, 'getOutstanding']);
                 });
 
                 Route::prefix('good_return_po')->middleware(['operation.access:good_return_po,view','lockacc'])->group(function () {

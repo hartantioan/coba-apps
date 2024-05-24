@@ -59,13 +59,14 @@ use App\Models\MenuUser;
 
 class GoodReceiptPOController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -120,7 +121,11 @@ class GoodReceiptPOController extends Controller
             if(!$request->modedata){
                 $query->where('user_id',session('bo_id'));
             }
-        })->count();
+        })
+        ->whereHas('goodReceiptDetail',function($query){
+            $query->whereIn('warehouse_id',$this->datawarehouses);
+        })
+        ->count();
         
         $query_data = GoodReceipt::where(function($query) use ($search, $request) {
                 if($search) {
@@ -173,6 +178,9 @@ class GoodReceiptPOController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+            })
+            ->whereHas('goodReceiptDetail',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->offset($start)
@@ -231,6 +239,9 @@ class GoodReceiptPOController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+            })
+            ->whereHas('goodReceiptDetail',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
             })
             /* ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')") */
             ->count();
@@ -1290,12 +1301,13 @@ class GoodReceiptPOController extends Controller
 
     public function export(Request $request){
         $menu = Menu::where('url','good_receipt_po')->first();
-        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-        $modedata = $menuUser->mode ? $menuUser->mode : '';
-		return Excel::download(new ExportGoodReceipt($post_date,$end_date,$mode,$modedata), 'good_receipt_'.uniqid().'.xlsx');
+        $modedata = $menuUser->mode ?? '';
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportGoodReceipt($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){
@@ -1304,7 +1316,7 @@ class GoodReceiptPOController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata), 'good_receipt_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){
@@ -1457,7 +1469,7 @@ class GoodReceiptPOController extends Controller
     public function getOutstanding(Request $request){
        
 		
-		return Excel::download(new ExportOutstandingGRPO(), 'outstanding_grpo_'.uniqid().'.xlsx');
+		return Excel::download(new ExportOutstandingGRPO($this->datawarehouses), 'outstanding_grpo_'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){

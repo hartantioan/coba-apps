@@ -20,13 +20,16 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
     * @return \Illuminate\Support\Collection
     */
 
-    protected $start_date, $end_date, $mode;
+    protected $start_date, $end_date, $mode, $modedata, $nominal, $warehouses;
 
-    public function __construct(string $start_date, string $end_date, string $mode)
+    public function __construct(string $start_date, string $end_date, string $mode, string $modedata, string $nominal, array $warehouses)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->mode = $mode ? $mode : '';
+        $this->modedata = $modedata ?? '';
+        $this->nominal = $nominal ?? '';
+        $this->warehouses = $warehouses;
     }
 
     private $headings = [
@@ -83,12 +86,32 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
             $data = PurchaseOrderDetail::whereHas('purchaseOrder', function($query) {
                 $query->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
-            })->get();
+                    if(!$this->modedata){
+                        $query->where('user_id',session('bo_id'));
+                        
+                    }
+            })
+            ->where(function($query){
+                if($query->whereHas('item')){
+                    $query->whereIn('warehouse_id',$this->warehouses);
+                }
+            })
+            ->get();
         }elseif($this->mode == '2'){
             $data = PurchaseOrderDetail::withTrashed()->whereHas('purchaseOrder', function($query) {
                 $query->withTrashed()->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
-            })->get();
+                    if(!$this->modedata){
+                        $query->where('user_id',session('bo_id'));
+                        
+                    }
+            })
+            ->where(function($query){
+                if($query->whereHas('item')){
+                    $query->whereIn('warehouse_id',$this->warehouses);
+                }
+            })
+            ->get();
         }
 
         $arr = [];
@@ -183,14 +206,14 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
                     'warehouse'         => $row->warehouse()->exists() ? $row->warehouse->name : '',
                     'requester'         => $row->requester,
                     'project'           => $row->project()->exists() ? $row->project->name : '',
-                    'price'             => $row->price,
-                    'conversion'        => number_format($row->purchaseOrder->currency_rate,2,',','.'),
-                    'disc1'             => number_format($row->percent_discount_1,2,',','.'),
-                    'disc2'             => number_format($row->percent_discount_2,2,',','.'),
-                    'disc3'             => number_format($row->discount_3 * $row->purchaseOrder->currency_rate,2,',','.'),
-                    'subtotal'          => number_format($subtotal,2,',','.'),
-                    'discount'          => number_format($discount,2,',','.'),
-                    'total'             => number_format($total,2,',','.'),
+                    'price'             => $this->nominal ? $row->price : '-',
+                    'conversion'        => $this->nominal ? number_format($row->purchaseOrder->currency_rate,2,',','.') : '',
+                    'disc1'             => $this->nominal ? number_format($row->percent_discount_1,2,',','.') : '',
+                    'disc2'             => $this->nominal ? number_format($row->percent_discount_2,2,',','.') : '',
+                    'disc3'             => $this->nominal ? number_format($row->discount_3 * $row->purchaseOrder->currency_rate,2,',','.') : '',
+                    'subtotal'          => $this->nominal ? number_format($subtotal,2,',','.') : '',
+                    'discount'          => $this->nominal ? number_format($discount,2,',','.') : '',
+                    'total'             => $this->nominal ? number_format($total,2,',','.') : '',
                     'based_on'          => $row->getReference(),
                 ];
             }

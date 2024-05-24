@@ -140,7 +140,7 @@
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
                 <h5 class="indigo-text">Payment Request</h5>
-                <p>Total Bayar {{$data->currency->symbol.'.'.number_format($data->balance,2,',','.')}}</p>
+                <p style="font-size: 1.5rem;font-weight:bold">Total Bayar {{$data->currency->symbol.'.'.number_format($data->balance,2,',','.')}}</p>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">

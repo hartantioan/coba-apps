@@ -1311,12 +1311,15 @@ class GoodReceiptPOController extends Controller
     }
 
     public function exportFromTransactionPage(Request $request){
+        $menu = Menu::where('url','good_receipt_po')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $search = $request->search? $request->search : '';
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportGoodReceiptTransactionPage($search,$post_date,$end_date,$status,$modedata,$nominal,$this->datawarehouses), 'good_receipt_'.uniqid().'.xlsx');
     }
     
     public function viewStructureTree(Request $request){

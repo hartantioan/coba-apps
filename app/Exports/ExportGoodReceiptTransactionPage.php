@@ -10,8 +10,8 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
 {
-    protected $search,$start_date, $end_date, $status, $modedata, $warehouses;
-    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata, array $warehouses)
+    protected $search,$start_date, $end_date, $status, $modedata, $warehouses, $nominal;
+    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata, string $nominal, array $warehouses)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
@@ -19,6 +19,7 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
         $this->status   = $status ? explode(',',$status) : '';
         $this->modedata = $modedata ? $modedata : '';
         $this->warehouses = $warehouses;
+        $this->nominal = $nominal ?? '';
     }
 
     public function view(): View
@@ -66,6 +67,7 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
             })
             ->get(),
             'modedata'  => $this->modedata,
+            'nominal'   => $this->nominal,
         ]);
     }
 }

@@ -41,6 +41,7 @@ class ExportGoodReceipt implements FromView,ShouldAutoSize
                 })
                 ->get(),
                 'modedata'  => $this->modedata,
+                'nominal'   => $this->nominal,
             ]);
         }elseif($this->mode == '2'){
             return view('admin.exports.good_receipt', [
@@ -56,6 +57,7 @@ class ExportGoodReceipt implements FromView,ShouldAutoSize
                 })
                 ->get(),
                 'modedata'  => $this->modedata,
+                'nominal'   => $this->nominal,
             ]);
         }
     }

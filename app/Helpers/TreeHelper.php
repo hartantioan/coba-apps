@@ -247,27 +247,27 @@ class TreeHelper {
                             }
                         }
 
-                        /* if($good_receipt_detail->goodScaleDetail()->exists()){
-                            $name = $good_receipt_detail->goodScaleDetail->goodScale->supplier->name ?? null;
+                        if($good_receipt_detail->goodScale()->exists()){
+                            $name = $good_receipt_detail->goodScale->supplier->name ?? null;
                             $data_gscale = [
                                     'properties'=> [
-                                        ['name'=> "Tanggal: ".$good_receipt_detail->goodScaleDetail->goodScale->post_date],
+                                        ['name'=> "Tanggal: ".$good_receipt_detail->goodScale->post_date],
                                         ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
-                                        ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScaleDetail->goodScale).number_format($good_receipt_detail->goodScaleDetail->goodScale->grandtotal,2,',','.')]
+                                        ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScale).number_format($good_receipt_detail->goodScale->grandtotal,2,',','.')]
                                     ],
-                                    'key'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
-                                    'name'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
-                                    'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($good_receipt_detail->goodScaleDetail->goodScale->code),
+                                    'key'=>$good_receipt_detail->goodScale->code,
+                                    'name'=>$good_receipt_detail->goodScale->code,
+                                    'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($good_receipt_detail->goodScale->code),
                                 ];
                                 $data_go_chart[]=$data_gscale;
                                 $data_link[]=[
-                                    'from'=>$good_receipt_detail->goodScaleDetail->goodScale->code,
+                                    'from'=>$good_receipt_detail->goodScale->code,
                                     'to'=>$query_gr->code,
-                                    'string_link'=>$good_receipt_detail->goodScaleDetail->goodScale->code.$query_gr->code
+                                    'string_link'=>$good_receipt_detail->goodScale->code.$query_gr->code
                                 ];
-                                $data_id_good_scale[]= $good_receipt_detail->goodScaleDetail->goodScale->id; 
+                                $data_id_good_scale[]= $good_receipt_detail->goodScale->id; 
                             
-                        } */
+                        }
 
                     }
                 }
@@ -443,34 +443,58 @@ class TreeHelper {
                     $finished_data_id_gscale[]=$gs_id;
                     $query_gs = GoodScale::where('id',$gs_id)->first();
                     
-                    foreach($query_gs->goodScaleDetail as $data_gs){
-                        if($data_gs->goodReceiptDetail->exists()){
-                            $name = $data_gs->goodReceiptDetail->goodReceipt->supplier->name ?? null;
-                            $gr = [
-                                'properties'=> [
-                                    ['name'=> "Tanggal: ".$data_gs->goodReceiptDetail->goodReceipt->post_date],
-                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
-                                    
-                                ],
-                                'key'=>$data_gs->goodReceiptDetail->goodReceipt->code,
-                                'name'=>$data_gs->goodReceiptDetail->goodReceipt->code,
-                                'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($data_gs->goodReceiptDetail->goodReceipt->code),
-                            ];
-    
-                            $data_go_chart[]=$gr;
-                            $data_link[]=[
-                                'from'=>$data_gs->goodReceiptDetail->goodReceipt->code,
-                                'to'=>$query_gs->code,
-                                'string_link'=>$data_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
-                            ];
-                            if(!in_array($data_gs->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
-                                $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
-                                $added = true; 
-                            }
-                            // $data_id_gr[]= $data_gs->goodReceiptDetail->goodReceipt->id; 
-    
+                    if($query_gs->goodReceiptDetail()->exists()){
+                        $name = $query_gs->goodReceiptDetail->goodReceipt->supplier->name ?? null;
+                        $gr = [
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$query_gs->goodReceiptDetail->goodReceipt->post_date],
+                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                
+                            ],
+                            'key'=>$query_gs->goodReceiptDetail->goodReceipt->code,
+                            'name'=>$query_gs->goodReceiptDetail->goodReceipt->code,
+                            'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($query_gs->goodReceiptDetail->goodReceipt->code),
+                        ];
+
+                        $data_go_chart[]=$gr;
+                        $data_link[]=[
+                            'from'=>$query_gs->goodReceiptDetail->goodReceipt->code,
+                            'to'=>$query_gs->code,
+                            'string_link'=>$query_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
+                        ];
+                        if(!in_array($query_gs->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
+                            $data_id_gr[]= $query_gs->goodReceiptDetail->goodReceipt->id; 
+                            $added = true; 
                         }
+                        $data_id_gr[]= $query_gs->goodReceiptDetail->goodReceipt->id; 
+    
                     }
+
+                    if($query_gs->purchaseOrderDetail()->exists()){
+                        $po = [
+                            'properties'=> [
+                                ['name'=> "Tanggal: ".$query_gs->purchaseOrderDetail->purchaseOrder->post_date],
+                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                
+                            ],
+                            'key'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                            'name'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                            'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($query_gs->purchaseOrderDetail->purchaseOrder->code),
+                        ];
+
+                        $data_go_chart[]=$po;
+                        $data_link[]=[
+                            'from'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                            'to'=>$query_gs->code,
+                            'string_link'=>$query_gs->purchaseOrderDetail->purchaseOrder->code.$query_gs->code
+                        ];
+                        if(!in_array($query_gs->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
+                            $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
+                            $added = true; 
+                        }
+                        $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
+                    }
+
                 }
             }
 

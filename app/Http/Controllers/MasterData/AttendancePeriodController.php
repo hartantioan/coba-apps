@@ -169,7 +169,8 @@ class AttendancePeriodController extends Controller
             $query->where('employee_type','2');
             // $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
             // ,'312403008','312403012']);
-            // $query->whereIn('employee_no',['312402007']);    
+            // $query->whereIn('employee_no',['312402007']);
+            // $query->whereIn('employee_no',['312402038']);        
             })->get();
         
         $query_salary_report = SalaryReport::create([
@@ -622,9 +623,13 @@ class AttendancePeriodController extends Controller
                                 }
                                 
                                 //perhitungan pulang
-                                // //info('tanggal '.$date);
-                                // //info($dateAttd);
-                                // //info('real time out '.$real_time_out.'&&'.'Max Time Out'.$real_max_time_out);
+                               
+                                // if($date == '2024-05-07 00:00:00'){
+                                //     info('tanggal '.$date);
+                                //     info($dateAttd);
+                                //     info('real time out '.$real_time_out.'&&'.'Max Time Out'.$real_max_time_out);
+                                // }
+                                
                                 if($dateAttd >= $real_time_out && $dateAttd <= $real_max_time_out){
                                     $date1 = date('d', strtotime($date));
                                     $date2 = date('d', strtotime($dateAttd));
@@ -657,7 +662,6 @@ class AttendancePeriodController extends Controller
                                     }
                                     
                                 }
-                                
                                 
                                
                                 if ($dateAttd <= $real_time_out && $dateAttd <= $real_max_time_out && $date->toDateString() == $dateAttd->toDateString()&&count($query_data)==1) {

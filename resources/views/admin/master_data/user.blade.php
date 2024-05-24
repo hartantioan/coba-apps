@@ -571,14 +571,15 @@
                                         <thead style="position:sticky;top: 40px !important;background-color:rgb(176, 212, 212) !important;">
                                             <tr>
                                                 <th width="20%" class="center" rowspan="3">Menu</th>
-                                                <th width="80%" class="center" colspan="5">Akses</th>
+                                                <th width="80%" class="center" colspan="6">Akses</th>
                                             </tr>
                                             <tr>
-                                                <th width="16%" class="center">View</th>
-                                                <th width="16%" class="center">Create/Update/Duplicate</th>
-                                                <th width="16%" class="center">Delete</th>
-                                                <th width="16%" class="center">Void</th>
-                                                <th width="16%" class="center">Journal</th>
+                                                <th width="13%" class="center">View</th>
+                                                <th width="13%" class="center">Create/Update/Duplicate</th>
+                                                <th width="13%" class="center">Delete</th>
+                                                <th width="13%" class="center">Void</th>
+                                                <th width="13%" class="center">Journal</th>
+                                                <th width="13%" class="center">Laporan</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-menu">
@@ -628,6 +629,14 @@
                                                             </label>
                                                             @endif
                                                         </td>
+                                                        <td>
+                                                            @if (!$m->childHasChild())
+                                                            <label>
+                                                                <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'report')"/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                            @endif
+                                                        </td>
                                                     </tr>
                                                     @foreach($m->sub()->where('status','1')->oldest('order')->get() as $msub)
                                                         @if($msub->sub()->exists())
@@ -662,6 +671,12 @@
                                                                 <td>
                                                                     <label>
                                                                         <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
+                                                                        <span>Pilih</span>
+                                                                    </label>
+                                                                </td>
+                                                                <td>
+                                                                    <label>
+                                                                        <input type="checkbox" class="checkboxReport" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
@@ -714,6 +729,30 @@
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                         </td>
+                                                                        <td class="center">
+                                                                            <label>
+                                                                                <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataReport(this);"/>
+                                                                                <span>Pilih</span>
+                                                                            </label>
+                                                                            @if ($msub2->type == '1')
+                                                                                <div class="switch">
+                                                                                    <label>
+                                                                                        Tidak
+                                                                                        <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                        <span class="lever"></span>
+                                                                                        Semua Data
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div class="switch">
+                                                                                    <label>
+                                                                                        Tidak
+                                                                                        <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                        <span class="lever"></span>
+                                                                                        Nominal
+                                                                                    </label>
+                                                                                </div>
+                                                                            @endif
+                                                                        </td>
                                                                     </tr>
                                                                 @endif
                                                             @endforeach
@@ -762,6 +801,30 @@
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
+                                                                <td class="center">
+                                                                    <label>
+                                                                        <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataReport(this);"/>
+                                                                        <span>Pilih</span>
+                                                                    </label>
+                                                                    @if ($msub->type == '1')
+                                                                        <div class="switch">
+                                                                            <label>
+                                                                                Tidak
+                                                                                <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
+                                                                                <span class="lever"></span>
+                                                                                Semua Data
+                                                                            </label>
+                                                                        </div>
+                                                                        <div class="switch">
+                                                                            <label>
+                                                                                Tidak
+                                                                                <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
+                                                                                <span class="lever"></span>
+                                                                                Nominal
+                                                                            </label>
+                                                                        </div>
+                                                                    @endif
+                                                                </td>
                                                             </tr>
                                                         @endif
                                                     @endforeach
@@ -797,6 +860,12 @@
                                                         <td class="center">
                                                             <label>
                                                                 <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <span>Pilih</span>
+                                                            </label>
+                                                        </td>
+                                                        <td class="center">
+                                                            <label>
+                                                                <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
@@ -1220,6 +1289,20 @@
         }
     }
 
+    function showDataReport(element){
+        if($(element).is(':checked')){
+            $(element).parent().parent().find('input[name="checkboxReportData[]"]').prop('disabled',false);
+            $(element).parent().parent().find('input[name="checkboxShowNominal[]"]').prop('disabled',false);
+        }else{
+            if($(element).parent().parent().find('input[name="checkboxReportData[]"]').is(':checked')){
+                $(element).parent().parent().find('input[name="checkboxReportData[]"]').prop('checked',false);
+                $(element).parent().parent().find('input[name="checkboxShowNominal[]"]').prop('checked',false);
+            }
+            $(element).parent().parent().find('input[name="checkboxReportData[]"]').prop('disabled',true);
+            $(element).parent().parent().find('input[name="checkboxShowNominal[]"]').prop('disabled',true);
+        }
+    }
+
     function access(id,name){
         $('#modal3').modal('open');
         $('#tempuseraccess').val(id);
@@ -1248,6 +1331,16 @@
                             $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "disabled", false);
                             if(val.mode == 'all'){
                                 $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "checked", true);
+                            }
+                        }
+                        if(val.type == 'Report'){
+                            $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "disabled", false);
+                            if(val.mode == 'all'){
+                                $('#checkbox' + val.type + 'Data' + val.menu_id).prop( "checked", true);
+                            }
+                            $('#checkboxShowNominal' + val.menu_id).prop( "disabled", false);
+                            if(val.show_nominal == '1'){
+                                $('#checkboxShowNominal' + val.menu_id).prop( "checked", true);
                             }
                         }
                     });

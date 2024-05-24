@@ -10,14 +10,15 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class ExportPurchaseRequestTransactionPage implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-    protected $search,$start_date, $end_date, $status, $modedata;
-    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata)
+    protected $search,$start_date, $end_date, $status, $modedata, $warehouses;
+    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata, array $warehouses)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status   = $status ? $status : '';
         $this->modedata = $modedata ? $modedata : '';
+        $this->warehouses = $warehouses;
     }
     private $headings = [
         'No',
@@ -99,7 +100,9 @@ class ExportPurchaseRequestTransactionPage implements FromCollection, WithTitle,
                 $query->where('user_id',session('bo_id'));
                 
             }
-        })->get();
+        })
+        ->whereIn('warehouse_id',$this->warehouses)
+        ->get();
 
         $arr = [];
 

@@ -14,11 +14,19 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
     /**
     * @return \Illuminate\Support\Collection
     */
+
+    protected $warehouses;
+
+    public function __construct(array $warehouses)
+    {
+        $this->warehouses = $warehouses;
+    }
+
     public function view(): View
     {
         $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query){
             $query->whereIn('status',['2'])->where('inventory_type','1');
-        })->whereNull('status')->get();
+        })->whereIn('warehouse_id',$this->warehouses)->whereNull('status')->get();
         $array=[];
         foreach($data as $row){
             $entry = [];

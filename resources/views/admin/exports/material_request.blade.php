@@ -40,48 +40,46 @@
             $no = 1;
         @endphp
         @foreach($data as $row)
-            @foreach($row->materialRequestDetail()->withTrashed()->get() as $key => $rowdetail)
-                <tr align="center">
-                    <td>{{ $no }}</td>
-                    <td>{{ $rowdetail->materialRequest->code }}</td>
-                    <td>{!! $rowdetail->materialRequest->statusRaw() !!}</td>
-                    <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->voidUser->name : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? date('d/m/Y',strtotime($rowdetail->materialRequest->void_date)) : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->voidUser()->exists() ? $rowdetail->materialRequest->void_note : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? $rowdetail->materialRequest->deleteUser->name : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? date('d/m/Y',strtotime($rowdetail->materialRequest->deleted_at)) : '' }}</td>
-                    <td>{{ $rowdetail->materialRequest->deleteUser()->exists() ? $rowdetail->materialRequest->delete_note : '' }}</td>
-                    <td>{{($rowdetail->materialRequest->status == 3 && is_null($rowdetail->materialRequest->done_id)) ? 'sistem' : (($rowdetail->materialRequest->status == 3 && !is_null($rowdetail->materialRequest->done_id)) ? $rowdetail->materialRequest->doneUser->name : null)}}</td>
-                    <td>{{$rowdetail->materialRequest->doneUser()->exists() ? $rowdetail->materialRequest->done_date}} </td> 
-                    <td>{{ $rowdetail->materialRequest->doneUser()->exists() ? $rowdetail->materialRequest->done_note }}</td> 
-                    <td>{{ $rowdetail->materialRequest->user->employee_no }}</td>
-                    <td>{{ $rowdetail->materialRequest->user->name }}</td>
-                    <td>{{ date('d/m/Y',strtotime($rowdetail->materialRequest->post_date)) }}</td>
-                    <td>{{ $rowdetail->materialRequest->note }}</td>
-                    <td>{{ $rowdetail->item->code}}</td>
-                    
-                    <td>{{ $rowdetail->item->name }}</td>
-                    <td>{{ $rowdetail->place->code }}</td>
-                    <td>{{ $rowdetail->note }}</td>
-                    <td>{{ $rowdetail->note2 }}</td>
-                    <td>{{ $rowdetail->qty }}</td>
-                  
-                    <td>{{ $rowdetail->itemUnit->unit->code }}</td>
-                 
-                    <td>{{ date('d/m/Y',strtotime($rowdetail->required_date)) }}</td>
-                    
-                    <td>{{ $rowdetail->warehouse->name }}</td>
-                    <td>{{ ($rowdetail->line()->exists() ? $rowdetail->line->code : '-') }}</td>
-                    <td>{{ ($rowdetail->machine()->exists() ? $rowdetail->machine->name : '-') }}</td>
-                    <td>{{ ($rowdetail->department()->exists() ? $rowdetail->department->name : '-') }}</td>
-                    <td>{{ ($rowdetail->project()->exists() ? $rowdetail->project->name : '-') }}</td>
-                    <td>{{ $rowdetail->requester }}</td>
-                    <td>{!! $rowdetail->statusConvert() !!}</td>
-                </tr>
-                @php
-                    $no++;
-                @endphp
-            @endforeach
+            <tr align="center">
+                <td>{{ $no }}</td>
+                <td>{{ $row->materialRequest->code }}</td>
+                <td>{!! $row->materialRequest->statusRaw() !!}</td>
+                <td>{{ $row->materialRequest->voidUser()->exists() ? $row->materialRequest->voidUser->name : '' }}</td>
+                <td>{{ $row->materialRequest->voidUser()->exists() ? date('d/m/Y',strtotime($row->materialRequest->void_date)) : '' }}</td>
+                <td>{{ $row->materialRequest->voidUser()->exists() ? $row->materialRequest->void_note : '' }}</td>
+                <td>{{ $row->materialRequest->deleteUser()->exists() ? $row->materialRequest->deleteUser->name : '' }}</td>
+                <td>{{ $row->materialRequest->deleteUser()->exists() ? date('d/m/Y',strtotime($row->materialRequest->deleted_at)) : '' }}</td>
+                <td>{{ $row->materialRequest->deleteUser()->exists() ? $row->materialRequest->delete_note : '' }}</td>
+                <td>{{($row->materialRequest->status == 3 && is_null($row->materialRequest->done_id)) ? 'sistem' : (($row->materialRequest->status == 3 && !is_null($row->materialRequest->done_id)) ? $row->materialRequest->doneUser->name : null)}}</td>
+                <td>{{$row->materialRequest->doneUser()->exists() ? $row->materialRequest->done_date}} </td> 
+                <td>{{ $row->materialRequest->doneUser()->exists() ? $row->materialRequest->done_note }}</td> 
+                <td>{{ $row->materialRequest->user->employee_no }}</td>
+                <td>{{ $row->materialRequest->user->name }}</td>
+                <td>{{ date('d/m/Y',strtotime($row->materialRequest->post_date)) }}</td>
+                <td>{{ $row->materialRequest->note }}</td>
+                <td>{{ $row->item->code}}</td>
+                
+                <td>{{ $row->item->name }}</td>
+                <td>{{ $row->place->code }}</td>
+                <td>{{ $row->note }}</td>
+                <td>{{ $row->note2 }}</td>
+                <td>{{ $row->qty }}</td>
+                
+                <td>{{ $row->itemUnit->unit->code }}</td>
+                
+                <td>{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
+                
+                <td>{{ $row->warehouse->name }}</td>
+                <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
+                <td>{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>
+                <td>{{ ($row->department()->exists() ? $row->department->name : '-') }}</td>
+                <td>{{ ($row->project()->exists() ? $row->project->name : '-') }}</td>
+                <td>{{ $row->requester }}</td>
+                <td>{!! $row->statusConvert() !!}</td>
+            </tr>
+            @php
+                $no++;
+            @endphp
         @endforeach
     </tbody>
 </table>

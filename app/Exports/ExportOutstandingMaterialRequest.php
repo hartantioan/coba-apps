@@ -10,12 +10,19 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
 {
+
+    protected $warehouses;
+
+    public function __construct(array $warehouses)
+    {
+        $this->warehouses = $warehouses;
+    }
     
     public function view(): View
     {
         $data = MaterialRequestDetail::whereHas('materialRequest',function($query){
             $query->whereIn('status',['2']);
-        })->get();
+        })->whereIn('warehouse_id',$this->warehouses)->get();
         $array=[];
         foreach($data as $row){
             $entry = [];

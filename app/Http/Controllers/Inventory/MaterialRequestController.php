@@ -112,7 +112,11 @@ class MaterialRequestController extends Controller
             if(!$request->modedata){
                 $query->where('user_id',session('bo_id'));
             }
-        })->count();
+        })
+        ->whereHas('materialRequestDetail',function($query){
+            $query->whereIn('warehouse_id',$this->datawarehouses);
+        })
+        ->count();
         
         $query_data = MaterialRequest::where(function($query) use ($search, $request) {
                 if($search) {
@@ -160,6 +164,9 @@ class MaterialRequestController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+            })
+            ->whereHas('materialRequestDetail',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
@@ -213,6 +220,9 @@ class MaterialRequestController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+            })
+            ->whereHas('materialRequestDetail',function($query){
+                $query->whereIn('warehouse_id',$this->datawarehouses);
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
@@ -1030,10 +1040,14 @@ class MaterialRequestController extends Controller
     }
 
     public function export(Request $request){
+        $menu = Menu::where('url','material_request')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode), 'item_request_'.uniqid().'.xlsx');
+        $modedata = $menuUser->mode ?? '';
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportMaterialRequest($post_date,$end_date,$mode,$modedata,$nominal,$this->datawarehouses), 'item_request_'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){
@@ -1042,12 +1056,12 @@ class MaterialRequestController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportMaterialRequestTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportMaterialRequestTransactionPage($search,$post_date,$end_date,$status,$modedata,$this->datawarehouses), 'purchase_request_'.uniqid().'.xlsx');
     }
 
     public function getOutstanding(Request $request){
        
-		return Excel::download(new ExportOutstandingMaterialRequest(), 'item_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportOutstandingMaterialRequest($this->datawarehouses), 'item_request_'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){

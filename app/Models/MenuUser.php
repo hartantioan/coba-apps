@@ -19,6 +19,7 @@ class MenuUser extends Model
         'user_id',
         'type',
         'mode',
+        'show_nominal',
     ];
 
     public function menu(){

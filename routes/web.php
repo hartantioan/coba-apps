@@ -1768,7 +1768,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[GoodReturnPOController::class, 'print']);
                     Route::post('print_by_range',[GoodReturnPOController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[GoodReturnPOController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodReturnPOController::class, 'export']);
                     Route::get('viewstructuretree',[GoodReturnPOController::class, 'viewStructureTree']);
                     Route::post('get_good_receipt', [GoodReturnPOController::class, 'getGoodReceipt']);
                     Route::post('remove_used_data', [GoodReturnPOController::class, 'removeUsedData']);
@@ -1777,6 +1776,10 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodReturnPOController::class, 'voidStatus'])->middleware('operation.access:good_return_po,void');
                     Route::post('destroy', [GoodReturnPOController::class, 'destroy'])->middleware('operation.access:good_return_po,delete');
                     Route::get('export_from_page',[GoodReturnPOController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_return_po')->middleware(['operation.access:good_return_po,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodReturnPOController::class, 'export']);
                 });
 
                 Route::prefix('transfer_out')->middleware(['operation.access:transfer_out,view','lockacc'])->group(function () {
@@ -1789,13 +1792,16 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[InventoryTransferOutController::class, 'print']);
                     Route::post('print_by_range',[InventoryTransferOutController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[InventoryTransferOutController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[InventoryTransferOutController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferOutController::class, 'viewJournal'])->middleware('operation.access:transfer_out,journal');
                     Route::post('create',[InventoryTransferOutController::class, 'create'])->middleware('operation.access:transfer_out,update');
                     Route::get('approval/{id}',[InventoryTransferOutController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryTransferOutController::class, 'voidStatus'])->middleware('operation.access:transfer_out,void');
                     Route::post('destroy', [InventoryTransferOutController::class, 'destroy'])->middleware('operation.access:transfer_out,delete');
                     Route::get('export_from_page',[InventoryTransferOutController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('transfer_out')->middleware(['operation.access:transfer_out,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[InventoryTransferOutController::class, 'export']);
                 });
 
                 Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,view','lockacc'])->group(function () {
@@ -1809,7 +1815,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[InventoryTransferInController::class, 'print']);
                     Route::post('print_by_range',[InventoryTransferInController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[InventoryTransferInController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[InventoryTransferInController::class, 'export']);
                     Route::get('view_journal/{id}',[InventoryTransferInController::class, 'viewJournal'])->middleware('operation.access:transfer_in,journal');
                     Route::post('send_used_data',[InventoryTransferInController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [InventoryTransferInController::class, 'removeUsedData']);
@@ -1818,6 +1823,10 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [InventoryTransferInController::class, 'voidStatus'])->middleware('operation.access:transfer_in,void');
                     Route::post('destroy', [InventoryTransferInController::class, 'destroy'])->middleware('operation.access:transfer_in,delete');
                     Route::get('export_from_page',[InventoryTransferInController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('transfer_in')->middleware(['operation.access:transfer_in,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[InventoryTransferInController::class, 'export']);
                 });
 
                 Route::prefix('good_receive')->middleware(['operation.access:good_receive,view','lockacc'])->group(function () {
@@ -1831,12 +1840,15 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[GoodReceiveController::class, 'print']);
                     Route::post('print_by_range',[GoodReceiveController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[GoodReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodReceiveController::class, 'export']);
                     Route::post('create',[GoodReceiveController::class, 'create'])->middleware('operation.access:good_receive,update');
                     Route::get('approval/{id}',[GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [GoodReceiveController::class, 'voidStatus'])->middleware('operation.access:good_receive,void');
                     Route::post('destroy', [GoodReceiveController::class, 'destroy'])->middleware('operation.access:good_receive,delete');
                     Route::get('export_from_page',[GoodReceiveController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_receive')->middleware(['operation.access:good_receive,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodReceiveController::class, 'export']);
                 });
 
                 Route::prefix('good_issue_request')->middleware(['operation.access:good_issue_request,view','lockacc'])->group(function () {
@@ -1849,9 +1861,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[GoodIssueRequestController::class, 'printByRange']);
                     Route::post('send_used_data',[GoodIssueRequestController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [GoodIssueRequestController::class, 'removeUsedData']);
-                    Route::get('get_outstanding', [GoodIssueRequestController::class, 'getOutstanding']);
+                    
                     Route::get('print_individual/{id}',[GoodIssueRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodIssueRequestController::class, 'export']);
                     Route::get('viewstructuretree',[GoodIssueRequestController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[GoodIssueRequestController::class, 'viewJournal'])->middleware('operation.access:good_issue_request,journal');
                     Route::post('create',[GoodIssueRequestController::class, 'create'])->middleware('operation.access:good_issue_request,update');
@@ -1860,6 +1871,11 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodIssueRequestController::class, 'voidStatus'])->middleware('operation.access:good_issue_request,void');
                     Route::post('destroy', [GoodIssueRequestController::class, 'destroy'])->middleware('operation.access:good_issue_request,delete');
                     Route::get('export_from_page',[GoodIssueRequestController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_issue_request')->middleware(['operation.access:good_issue_request,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodIssueRequestController::class, 'export']);
+                    Route::get('get_outstanding', [GoodIssueRequestController::class, 'getOutstanding']);
                 });
 
                 Route::prefix('good_issue')->middleware(['operation.access:good_issue,view','lockacc'])->group(function () {
@@ -1874,7 +1890,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('send_used_data',[GoodIssueController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [GoodIssueController::class, 'removeUsedData']);
                     Route::get('print_individual/{id}',[GoodIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::get('export',[GoodIssueController::class, 'export']);
                     Route::get('viewstructuretree',[GoodIssueController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[GoodIssueController::class, 'viewJournal'])->middleware('operation.access:good_issue,journal');
                     Route::post('create',[GoodIssueController::class, 'create'])->middleware('operation.access:good_issue,update');
@@ -1882,6 +1897,10 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [GoodIssueController::class, 'voidStatus'])->middleware('operation.access:good_issue,void');
                     Route::post('destroy', [GoodIssueController::class, 'destroy'])->middleware('operation.access:good_issue,delete');
                     Route::get('export_from_page',[GoodIssueController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('good_issue')->middleware(['operation.access:good_issue,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodIssueController::class, 'export']);
                 });
 
                 Route::prefix('good_return_issue')->middleware(['operation.access:good_return_issue,view','lockacc'])->group(function () {
@@ -1905,6 +1924,10 @@ Route::prefix('admin')->group(function () {
                     Route::get('export_from_page',[GoodReturnIssueController::class, 'exportFromTransactionPage']);
                 });
 
+                Route::prefix('good_return_issue')->middleware(['operation.access:good_return_issue,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[GoodReturnIssueController::class, 'export']);
+                });
+
                 Route::prefix('revaluation')->middleware(['operation.access:revaluation,view','lockacc'])->group(function () {
                     Route::get('/',[InventoryRevaluationController::class, 'index']);
                     Route::get('datatable',[InventoryRevaluationController::class, 'datatable']);
@@ -1921,6 +1944,10 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[InventoryRevaluationController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [InventoryRevaluationController::class, 'voidStatus'])->middleware('operation.access:revaluation,void');
                     Route::post('destroy', [InventoryRevaluationController::class, 'destroy'])->middleware('operation.access:revaluation,delete');
+                });
+
+                Route::prefix('revaluation')->middleware(['operation.access:revaluation,report'])->withoutMiddleware('direct.access')->group(function () {
+                    Route::get('export',[InventoryRevaluationController::class, 'export']);
                 });
 
                 Route::prefix('inventory_report')->middleware('direct.access')->group(function () {

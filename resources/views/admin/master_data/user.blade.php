@@ -690,19 +690,19 @@
                                                                             {!! '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$msub2->name !!}
                                                                         </td>
                                                                         <td class="center">
+                                                                            @if ($msub2->type == '1')
                                                                             <label>
                                                                                 <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataView(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
-                                                                            @if ($msub2->type == '1')
-                                                                                <div class="switch">
-                                                                                    <label>
-                                                                                        Tidak
-                                                                                        <input type="checkbox" name="checkboxViewData[]" id="checkboxViewData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
-                                                                                        <span class="lever"></span>
-                                                                                        Semua Data
-                                                                                    </label>
-                                                                                </div>
+                                                                            <div class="switch">
+                                                                                <label>
+                                                                                    Tidak
+                                                                                    <input type="checkbox" name="checkboxViewData[]" id="checkboxViewData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                    <span class="lever"></span>
+                                                                                    Semua Data
+                                                                                </label>
+                                                                            </div>
                                                                             @endif
                                                                         </td>
                                                                         <td class="center">
@@ -730,27 +730,27 @@
                                                                             </label>
                                                                         </td>
                                                                         <td class="center">
+                                                                            @if ($msub2->type == '1')
                                                                             <label>
                                                                                 <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataReport(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
-                                                                            @if ($msub2->type == '1')
-                                                                                <div class="switch">
-                                                                                    <label>
-                                                                                        Tidak
-                                                                                        <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
-                                                                                        <span class="lever"></span>
-                                                                                        Semua Data
-                                                                                    </label>
-                                                                                </div>
-                                                                                <div class="switch">
-                                                                                    <label>
-                                                                                        Tidak
-                                                                                        <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
-                                                                                        <span class="lever"></span>
-                                                                                        Nominal
-                                                                                    </label>
-                                                                                </div>
+                                                                            <div class="switch">
+                                                                                <label>
+                                                                                    Tidak
+                                                                                    <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                    <span class="lever"></span>
+                                                                                    Semua Data
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="switch">
+                                                                                <label>
+                                                                                    Tidak
+                                                                                    <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" disabled>
+                                                                                    <span class="lever"></span>
+                                                                                    Nominal
+                                                                                </label>
+                                                                            </div>
                                                                             @endif
                                                                         </td>
                                                                     </tr>
@@ -802,27 +802,27 @@
                                                                     </label>
                                                                 </td>
                                                                 <td class="center">
+                                                                    @if ($msub->type == '1')
                                                                     <label>
                                                                         <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataReport(this);"/>
                                                                         <span>Pilih</span>
                                                                     </label>
-                                                                    @if ($msub->type == '1')
-                                                                        <div class="switch">
-                                                                            <label>
-                                                                                Tidak
-                                                                                <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
-                                                                                <span class="lever"></span>
-                                                                                Semua Data
-                                                                            </label>
-                                                                        </div>
-                                                                        <div class="switch">
-                                                                            <label>
-                                                                                Tidak
-                                                                                <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
-                                                                                <span class="lever"></span>
-                                                                                Nominal
-                                                                            </label>
-                                                                        </div>
+                                                                    <div class="switch">
+                                                                        <label>
+                                                                            Tidak
+                                                                            <input type="checkbox" name="checkboxReportData[]" id="checkboxReportData{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
+                                                                            <span class="lever"></span>
+                                                                            Semua Data
+                                                                        </label>
+                                                                    </div>
+                                                                    <div class="switch">
+                                                                        <label>
+                                                                            Tidak
+                                                                            <input type="checkbox" name="checkboxShowNominal[]" id="checkboxShowNominal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" disabled>
+                                                                            <span class="lever"></span>
+                                                                            Nominal
+                                                                        </label>
+                                                                    </div>
                                                                     @endif
                                                                 </td>
                                                             </tr>

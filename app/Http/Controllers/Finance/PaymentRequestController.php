@@ -1051,7 +1051,29 @@ class PaymentRequestController extends Controller
 
                         $query->save();
 
-                        $query->paymentRequestDetail()->delete();
+                        foreach($query->paymentRequestDetail as $row){
+                            if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                                CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                            }
+                            if($row->lookable_type == 'purchase_down_payments'){
+                                foreach($row->lookable->purchaseDownPaymentDetail as $rowapdp){
+                                    if($rowapdp->fundRequestDetail()->exists()){
+                                        CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'2');
+                                    }
+                                }
+                            }elseif($row->lookable_type == 'purchase_invoices'){
+                                foreach($row->lookable->purchaseInvoiceDetail as $rowapin){
+                                    if($rowapin->fundRequestDetail()->exists()){
+                                        CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'2');
+                                    }
+                                }
+                            }
+                            if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                                CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                            }
+                            $row->delete();
+                        }
+                        
                         $query->paymentRequestCross()->delete();
                         $query->paymentRequestCost()->delete();
 

@@ -672,10 +672,6 @@ class ItemController extends Controller
                                 <th>'.($data->pattern()->exists() ? $data->pattern->code.'-'.$data->pattern->name : '-').'</th>
                             </tr>
                             <tr>
-                                <th>Warna</th>
-                                <th>'.($data->color()->exists() ? $data->color->code.'-'.$data->color->name : '-').'</th>
-                            </tr>
-                            <tr>
                                 <th>Grade</th>
                                 <th>'.($data->grade()->exists() ? $data->grade->code.'-'.$data->grade->name : '-').'</th>
                             </tr>

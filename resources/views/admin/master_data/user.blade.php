@@ -690,11 +690,11 @@
                                                                             {!! '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'.$msub2->name !!}
                                                                         </td>
                                                                         <td class="center">
-                                                                            @if ($msub2->type == '1')
                                                                             <label>
                                                                                 <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataView(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
+                                                                            @if ($msub2->type == '1')
                                                                             <div class="switch">
                                                                                 <label>
                                                                                     Tidak

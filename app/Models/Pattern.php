@@ -15,6 +15,7 @@ class Pattern extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'brand_id',
         'code',
         'name',
         'status'
@@ -34,5 +35,10 @@ class Pattern extends Model
         }
 
         return $status;
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo('App\Models\Brand', 'brand_id', 'id')->withTrashed();
     }
 }

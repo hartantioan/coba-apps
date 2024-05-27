@@ -30,6 +30,11 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right modal-trigger" href="#modal2">
+                            <i class="material-icons hide-on-med-and-up">file_download</i>
+                            <span class="hide-on-small-onl">Import</span>
+                            <i class="material-icons right">file_download</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -69,6 +74,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
+                                                        <th>Brand</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
                                                         <th>Status</th>
@@ -100,16 +106,25 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col m3 s12 ">
+                            <select class="select2 browser-default" id="brand_id" name="brand_id" onchange="applyCode(this);">
+                                <option value="">--Pilih ya-</option>
+                                @foreach($brand as $m)
+                                    <option value="{{ $m->id }}" data-code="{{ $m->code }}">{{ $m->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="parent_id">Brand</label>
+                        </div>
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode (Akan jadi Komponen Kode Item)</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="order">Status</label>
                                 <label>
@@ -123,6 +138,40 @@
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Import Excel</h4>
+                <div class="col s12">
+                    <div id="validation_alertImport" style="display:none;"></div>
+                </div>
+                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
+                    @csrf
+                    <div class="file-field input-field col m6 s12">
+                        <div class="btn">
+                            <span>Dokumen</span>
+                            <input type="file" class="form-control-file" id="fileExcel" name="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                    <div class="input-field col m6 s12">
+                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
+                    </div>
+                    <div class="input-field col m12 s12">
+                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
                     </div>
                 </form>
             </div>
@@ -168,6 +217,114 @@
     });
     $(function() {
         loadDataTable();
+
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    if(response.status == 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
+                                            <p> `+val.errors[0]+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                        });
+                    }else if(response.status == 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>` +val+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                        });
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                    loadingClose('.modal-content');
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    var errorMessage = '';
+                    if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        $.each(errors, function(index, error) {
+                        var message = '';
+
+                        $.each(error.errors, function(index, value) {
+                            message += value + '\n';
+                        });
+
+                        errorMessage += errors.file;
+                    });
+
+                    $('#validation_alertImport').html(`
+                        <div class="card-alert card red">
+                            <div class="card-content white-text">
+                                <p>` + errorMessage + `</p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    `).show();
+
+                    }
+                    
+                   
+                }
+            });
+
+        });
         
         $('#modal1').modal({
             dismissible: false,
@@ -184,10 +341,49 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
+                $('.select2').val('').trigger('change');
             }
         });
 
+        $('#modal2').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+                $('#validation_alertImport').hide();
+                $('#validation_alertImport').html('');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_dataimport')[0].reset();
+            }
+        });
+
+        $(".select2").select2({
+            width: '100%',
+        });
     });
+
+    function successImport(){
+        loadDataTable();
+        $('#modal2').modal('close');
+    }
+    
+    function applyCode(element){
+        if($(element).val()){
+            let code = $(element).select2().find(":selected").data("code") + '.';
+            if($('#temp').val()){
+                if($('#code').val().length > 0){
+                    code = $('#code').val().replaceAt(0,code);
+                }
+            }
+            $('#code').val(code);
+        }else{
+            if(!$('#temp').val()){
+                $('#code').val('');
+            }
+        }
+    }
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -223,8 +419,9 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
+                { name: 'brand_id', className: '' },
+                { name: 'code', className: '' },
+                { name: 'name', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -240,7 +437,8 @@
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
-        
+        let nameWithoutSpace = $('#name').val().replace(/\s/g, '');
+        formData.append('nameWithoutSpace',nameWithoutSpace);
         $.ajax({
             url: '{{ Request::url() }}/create',
             type: 'POST',
@@ -329,6 +527,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#brand_id').val(response.brand_id).trigger('change');
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 if(response.status == '1'){

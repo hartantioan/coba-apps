@@ -26,13 +26,13 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
     }
     public function onRow(Row $row)
     {
-        
+        $row = $row->toArray();
         $place = Place::where('code',$row['place_id'])->first();
         $resource_group_code= explode('#',$row['resource_group_id'])[0];
         $resource_group = ResourceGroup::where('code',$resource_group_code)->first();
         $uom = explode('#', $row['uom_unit'])[0];
         $uom_unit = Unit::where('code',$uom)->first();
-        $row = $row->toArray();
+        
         $query = Resource::create([
             'code'              => $row['code'],
             'name'              => $row['name'],

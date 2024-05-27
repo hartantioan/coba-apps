@@ -53,6 +53,16 @@ class PurchaseInvoiceDetail extends Model
 
     public function getGoodReceiptQty(){
         if($this->lookable_type == 'good_receipt_details'){
+            return CustomHelper::formatConditionalQty($this->lookable->qty).' ' . $this->lookable->itemUnit->unit->name;
+        }elseif($this->lookable_type == 'coas'){
+            return CustomHelper::formatConditionalQty($this->qty);
+        }else{
+            return '-';
+        }
+    }
+
+    public function getQty(){
+        if($this->lookable_type == 'good_receipt_details'){
             return CustomHelper::formatConditionalQty($this->qty).' ' . $this->lookable->itemUnit->unit->name;
         }elseif($this->lookable_type == 'coas'){
             return CustomHelper::formatConditionalQty($this->qty);

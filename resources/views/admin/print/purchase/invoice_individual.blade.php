@@ -335,7 +335,7 @@
                                     $row->getCode().'<br>'.$row->getNote()
                                 !!}</td>
                                 <td class="right-align" style="text-align: right;">
-                                    {{ $row->getGoodReceiptQty() }}
+                                    {{ $row->getQty() }}
                                 </td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->total,2,',','.') }}</td>
                                 <td class="right-align" style="text-align: right;">{{ number_format($row->tax,2,',','.') }}</td>

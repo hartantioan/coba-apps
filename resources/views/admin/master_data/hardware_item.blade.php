@@ -370,6 +370,17 @@
         }
     });
     $(function() {
+        $(document).keydown(function(e) {
+            if (e.ctrlKey && e.keyCode == 13) {
+                if($('#modalEdit').length > 0){
+                    $('#modalEdit').modal('open');
+                    $('#modal1').modal('close');
+                }
+                if($('#modal1').length > 0){
+                    $('#modal1').modal('close');
+                }
+            }
+        });
         loadDataTable();
         
         $('#modal1').modal({
@@ -763,6 +774,8 @@
             }
         });
     }
+
+   
 
     function itemChanged(){
         itemStock = 0;

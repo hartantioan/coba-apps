@@ -126,11 +126,10 @@
                         </div>
                         <div class="input-field col s6">
                             <select class="form-control" id="type" name="type" onchange="needCode()">
-                                
                                 <option value="1">Transaksi</option>
                                 <option value="2">Master Data</option>
                                 <option value="3">Kosong</option>
-                                
+                                <option value="4">Laporan</option>
                             </select>
                             <label class="" for="type">Tipe Menu</label>
                         </div>

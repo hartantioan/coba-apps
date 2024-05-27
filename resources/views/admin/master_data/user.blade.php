@@ -718,16 +718,20 @@
                                                                             </label>
                                                                         </td>
                                                                         <td class="center">
+                                                                            @if ($msub2->type == '1')
                                                                             <label>
                                                                                 <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
+                                                                            @endif
                                                                         </td>
                                                                         <td class="center">
+                                                                            @if ($msub2->type == '1')
                                                                             <label>
                                                                                 <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
+                                                                            @endif
                                                                         </td>
                                                                         <td class="center">
                                                                             @if ($msub2->type == '1')
@@ -790,16 +794,20 @@
                                                                     </label>
                                                                 </td>
                                                                 <td class="center">
+                                                                    @if ($msub->type == '1')
                                                                     <label>
                                                                         <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
+                                                                    @endif
                                                                 </td>
                                                                 <td class="center">
+                                                                    @if ($msub->type == '1')
                                                                     <label>
                                                                         <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
+                                                                    @endif
                                                                 </td>
                                                                 <td class="center">
                                                                     @if ($msub->type == '1')

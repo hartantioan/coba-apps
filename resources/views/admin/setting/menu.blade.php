@@ -345,14 +345,13 @@
             var list = e.length ? e : $(e.target),
             output = list.data('output');
             if (window.JSON) {
-                serializedData = window.JSON.stringify(list.nestable('serialize')); // Store serialized data
+                serializedData = window.JSON.stringify(list.nestable('serialize'));
                 output.val(serializedData);
             } else {
             output.val('JSON browser support required for this demo.');
             }
         };
 
-        // activate Nestable for list 1
         $('#nestable').nestable({
         group: 1
         })

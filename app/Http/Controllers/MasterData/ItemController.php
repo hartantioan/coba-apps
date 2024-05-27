@@ -340,7 +340,6 @@ class ItemController extends Controller
                     $query->size_id             = $request->size_id ? $request->size_id : NULL;
                     $query->variety_id          = $request->variety_id ? $request->variety_id : NULL;
                     $query->pattern_id          = $request->pattern_id ? $request->pattern_id : NULL;
-                    $query->color_id            = $request->color_id ? $request->color_id : NULL;
                     $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->save();
@@ -378,7 +377,6 @@ class ItemController extends Controller
                         'size_id'           => $request->size_id ? $request->size_id : NULL,
                         'variety_id'        => $request->variety_id ? $request->variety_id : NULL,
                         'pattern_id'        => $request->pattern_id ? $request->pattern_id : NULL,
-                        'color_id'          => $request->color_id ? $request->color_id : NULL,
                         'grade_id'          => $request->grade_id ? $request->grade_id : NULL,
                         'brand_id'          => $request->brand_id ? $request->brand_id : NULL,
                     ]);
@@ -708,9 +706,6 @@ class ItemController extends Controller
         $item['pattern_name'] = $item->pattern()->exists() ? $item->pattern->code.' - '.$item->pattern->name : '';
         $item['pattern_code'] = $item->pattern()->exists() ? $item->pattern->code : '';
         $item['pattern_name_real'] = $item->pattern()->exists() ? $item->pattern->name : '';
-        $item['color_name'] = $item->color()->exists() ? $item->color->code.' - '.$item->color->name : '';
-        $item['color_code'] = $item->color()->exists() ? $item->color->code : '';
-        $item['color_name_real'] = $item->color()->exists() ? $item->color->name : '';
         $item['grade_name'] = $item->grade()->exists() ? $item->grade->code.' - '.$item->grade->name : '';
         $item['grade_code'] = $item->grade()->exists() ? $item->grade->code : '';
         $item['grade_name_real'] = $item->grade()->exists() ? $item->grade->name : '';

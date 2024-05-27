@@ -76,6 +76,7 @@ use App\Http\Controllers\MasterData\WarehouseController;
 use App\Http\Controllers\MasterData\LineController;
 use App\Http\Controllers\MasterData\MachineController;
 use App\Http\Controllers\MasterData\BomController;
+use App\Http\Controllers\MasterData\MenuUserController;
 use App\Http\Controllers\MasterData\ShiftController;
 use App\Http\Controllers\MasterData\ActivityController;
 use App\Http\Controllers\MasterData\AreaController;
@@ -1015,8 +1016,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[HardwareItemGroupController::class, 'index']);
                         Route::get('datatable',[HardwareItemGroupController::class, 'datatable']);
                         Route::post('show', [HardwareItemGroupController::class, 'show']);
-                        Route::post('create',[HardwareItemGroupController::class, 'create'])->middleware('operation.access:allowance,update');
-                        Route::post('destroy', [HardwareItemGroupController::class, 'destroy'])->middleware('operation.access:allowance,delete');
+                        Route::post('create',[HardwareItemGroupController::class, 'create'])->middleware('operation.access:hardware_item_group,update');
+                        Route::post('destroy', [HardwareItemGroupController::class, 'destroy'])->middleware('operation.access:hardware_item_group,delete');
                     });
 
 
@@ -1110,6 +1111,18 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[ProjectController::class, 'export']);
                         Route::post('create',[ProjectController::class, 'create'])->middleware('operation.access:project,update');
                         Route::post('destroy', [ProjectController::class, 'destroy'])->middleware('operation.access:project,delete');
+                    });
+
+                    Route::prefix('menu_user')->middleware('operation.access:menu_user,view')->group(function () {
+                        Route::get('/',[MenuUserController::class, 'index']);
+                        Route::post('get_access', [MenuUserController::class, 'getAccess']);
+                        Route::post('create_access',[MenuUserController::class, 'createAccess'])->middleware('operation.access:menu_user,update');
+                        Route::get('datatable',[MenuUserController::class, 'datatable']);
+                        Route::post('show', [MenuUserController::class, 'show']);
+                        Route::post('print',[MenuUserController::class, 'print']);
+                        Route::get('export',[MenuUserController::class, 'export']);
+                        Route::post('create',[MenuUserController::class, 'create'])->middleware('operation.access:menu_user,update');
+                        Route::post('destroy', [MenuUserController::class, 'destroy'])->middleware('operation.access:menu_user,delete');
                     });
 
                     Route::prefix('cost_distribution')->middleware('operation.access:cost_distribution,view')->group(function () {

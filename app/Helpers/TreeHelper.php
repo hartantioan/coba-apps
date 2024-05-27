@@ -1918,6 +1918,28 @@ class TreeHelper {
                             
                             
                         }
+                        if($purchase_order_detail->goodScale()->exists()){
+                            $data_good_scale_tempura = [
+                                'key'   => $purchase_order_detail->goodScale->code,
+                                "name"  => $purchase_order_detail->goodScale->code,
+                            
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$purchase_order_detail->goodScale->post_date],
+                                
+                                ],
+                                'url'   =>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($purchase_order_detail->goodScale->code),
+                            ];
+                            $data_go_chart[]=$data_good_scale_tempura;
+                            $data_link[]=[
+                                'from'  =>   $query_po->code,
+                                'to'    =>   $purchase_order_detail->goodScale->code,
+                                'string_link'=>$query_po->code.$purchase_order_detail->goodScale->code,
+                            ];
+                            if(!in_array($purchase_order_detail->goodScale->id,$data_id_good_scale)){
+                                $data_id_good_scale[]=$purchase_order_detail->goodScale->id;
+                                $added = true;
+                            }
+                        }
                         
                     }
 

@@ -647,6 +647,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[PatternController::class, 'index']);
                         Route::get('datatable',[PatternController::class, 'datatable']);
                         Route::post('show', [PatternController::class, 'show']);
+                        Route::get('get_import_excel',[PatternController::class, 'getImportExcel']);
+                        Route::post('import',[PatternController::class, 'import'])->middleware('operation.access:pattern,update');
                         Route::post('create',[PatternController::class, 'create'])->middleware('operation.access:pattern,update');
                         Route::post('destroy', [PatternController::class, 'destroy'])->middleware('operation.access:pattern,delete');
                     });

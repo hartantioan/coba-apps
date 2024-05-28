@@ -1952,9 +1952,9 @@
 
                                     if(val.document_status == '2'){
                                         $('#cost-tab').removeClass('hide');
-                                        if($('#last-row-detail-cost').length > 0){
+                                        /* if($('#last-row-detail-cost').length > 0){
                                             $('#last-row-detail-cost').remove();
-                                        }
+                                        } */
                                         $.each(val.list_details, function(i, value) {
                                             var countdetail = makeid(10);
                                             $('#body-detail-cost').append(`

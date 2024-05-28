@@ -1952,9 +1952,9 @@
 
                                     if(val.document_status == '2'){
                                         $('#cost-tab').removeClass('hide');
-                                        /* if($('#last-row-detail-cost').length > 0){
+                                        if($('#last-row-detail-cost').length > 0){
                                             $('#last-row-detail-cost').remove();
-                                        } */
+                                        }
                                         $.each(val.list_details, function(i, value) {
                                             var countdetail = makeid(10);
                                             $('#body-detail-cost').append(`
@@ -2882,7 +2882,7 @@
                     $.each(response.costs, function(i, val) {
                         var countdetail = makeid(10);
                         $('#body-detail-cost').append(`
-                            <tr class="row_detail">
+                            <tr class="row_detail_cost">
                                 <td class="">
                                     <select class="browser-default" id="arr_coa_cost` + countdetail + `" name="arr_coa_cost[]"></select>
                                 </td>

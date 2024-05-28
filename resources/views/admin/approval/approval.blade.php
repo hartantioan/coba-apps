@@ -131,7 +131,7 @@
 <div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;width:100%;top:0px !important;">
     <div class="modal-content">
         <div class="row">
-            <div class="col m12 xl3 center-align">
+            <div class="col m12 xl3 center-align" id="button-happiness">
                 <h6>Form persetujuan</h6>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
@@ -156,7 +156,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col m12 xl9">
+            <div class="col m12 xl9" id="preview-happiness">
                 <h6 align="center">Preview Dokumen</h6>
                 <div class="row">
                     <div class="col m12 s12" id="body_show" style="border-style: solid;border-color: coral;min-height:80vh;max-height:80vh;overflow:auto;width:100%;">
@@ -379,7 +379,7 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
-    function show(destination,code){
+    function show(destination,code,status){
         $.ajax({
             url:destination,
             type:'GET',
@@ -391,6 +391,15 @@
             },
             success: function(data){
                 loadingClose('#main');
+                if(status == 2){
+                    $('#button-happiness').addClass('hide');
+                    $('#preview-happiness').removeClass('xl9');
+                    $('#preview-happiness').addClass('xl12');
+                }else{
+                    $('#button-happiness').removeClass('hide');
+                    $('#preview-happiness').addClass('xl9');
+                    $('#preview-happiness').removeClass('xl12');
+                }
                 $('#temp').val(code);
                 $('#modal1').modal('open');
                 $('#body_show').html(data);

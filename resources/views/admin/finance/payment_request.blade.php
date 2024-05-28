@@ -1885,11 +1885,11 @@
                         success: function(response) {
                             loadingClose('.modal-content');
 
-                            if(!$('#temp').val()){
+                            /* if(!$('#temp').val()){
                                 $('#empty-detail').remove();
                                 $('.row_detail_cost').remove();
                                 $('#body-detail').empty();
-                            }
+                            } */
                             if(response.details.length > 0){
                                 $.each(response.details, function(i, val) {
                                     $('.row_detail[data-account!="' + val.account_code + '"]').remove();

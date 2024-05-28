@@ -1053,7 +1053,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true;
+                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1095,6 +1095,21 @@
                     }
                 });
 
+                $('select[name^="arr_department[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedDepartment = false;
+                    }
+                });
+
+                if(!passedDepartment){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Divisi wajib diiisi.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
                 if(passedUnit){
                     if(passedPlaceWarehouse){
                         var path = window.location.pathname;
@@ -1120,10 +1135,10 @@
                             beforeSend: function() {
                                 $('#validation_alert').hide();
                                 $('#validation_alert').html('');
-                                loadingOpen('.modal-content');
+                                loadingOpen('#modal1');
                             },
                             success: function(response) {
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 if(response.status == 200) {
                                     success();
                                     M.toast({
@@ -1161,7 +1176,7 @@
                             },
                             error: function() {
                                 $('.modal-content').scrollTop(0);
-                                loadingClose('.modal-content');
+                                loadingClose('#modal1');
                                 swal({
                                     title: 'Ups!',
                                     text: 'Check your internet connection.',

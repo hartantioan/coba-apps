@@ -340,6 +340,7 @@ class ItemController extends Controller
                     $query->size_id             = $request->size_id ? $request->size_id : NULL;
                     $query->variety_id          = $request->variety_id ? $request->variety_id : NULL;
                     $query->pattern_id          = $request->pattern_id ? $request->pattern_id : NULL;
+                    $query->pallet_id           = $request->pallet_id ?? NULL;
                     $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
                     $query->save();
@@ -373,12 +374,13 @@ class ItemController extends Controller
                         'status'            => $request->status ? $request->status : '2',
                         'is_quality_check'  => $request->is_quality_check ?? NULL,
                         'is_hide_supplier'  => $request->is_hide_supplier ?? NULL,
-                        'type_id'           => $request->type_id ? $request->type_id : NULL,
-                        'size_id'           => $request->size_id ? $request->size_id : NULL,
-                        'variety_id'        => $request->variety_id ? $request->variety_id : NULL,
-                        'pattern_id'        => $request->pattern_id ? $request->pattern_id : NULL,
-                        'grade_id'          => $request->grade_id ? $request->grade_id : NULL,
-                        'brand_id'          => $request->brand_id ? $request->brand_id : NULL,
+                        'type_id'           => $request->type_id ?? NULL,
+                        'size_id'           => $request->size_id ?? NULL,
+                        'variety_id'        => $request->variety_id ?? NULL,
+                        'pattern_id'        => $request->pattern_id ?? NULL,
+                        'pallet_id'         => $request->pallet_id ?? NULL,
+                        'grade_id'          => $request->grade_id ?? NULL,
+                        'brand_id'          => $request->brand_id ?? NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -702,6 +704,9 @@ class ItemController extends Controller
         $item['pattern_name'] = $item->pattern()->exists() ? $item->pattern->code.' - '.$item->pattern->name : '';
         $item['pattern_code'] = $item->pattern()->exists() ? $item->pattern->code : '';
         $item['pattern_name_real'] = $item->pattern()->exists() ? $item->pattern->name : '';
+        $item['pallet_name'] = $item->pallet()->exists() ? $item->pallet->code.' - '.$item->pallet->name : '';
+        $item['pallet_code'] = $item->pallet()->exists() ? $item->pallet->code : '';
+        $item['pallet_name_real'] = $item->pallet()->exists() ? $item->pallet->name : '';
         $item['grade_name'] = $item->grade()->exists() ? $item->grade->code.' - '.$item->grade->name : '';
         $item['grade_code'] = $item->grade()->exists() ? $item->grade->code : '';
         $item['grade_name_real'] = $item->grade()->exists() ? $item->grade->name : '';

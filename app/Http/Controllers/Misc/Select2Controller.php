@@ -71,6 +71,7 @@ use App\Models\GoodScale;
 use App\Models\InventoryCoa;
 use App\Models\ItemSerial;
 use App\Models\Journal;
+use App\Models\Pallet;
 use App\Models\Pattern;
 use App\Models\ProductionOrder;
 use App\Models\Resource;
@@ -1485,6 +1486,28 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $data = Pattern::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+                'code'          => $d->code,
+                'name'          => $d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function pallet(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Pallet::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
                 })

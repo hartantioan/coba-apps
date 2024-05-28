@@ -46,6 +46,7 @@ class Item extends Model
         'size_id',
         'variety_id',
         'pattern_id',
+        'pallet_id',
         'grade_id',
         'brand_id',
     ];
@@ -70,6 +71,9 @@ class Item extends Model
         return $this->belongsTo('App\Models\Pattern', 'pattern_id', 'id')->withTrashed();
     }
 
+    public function pallet(){
+        return $this->belongsTo('App\Models\Pallet', 'pallet_id', 'id')->withTrashed();
+    }
 
     public function grade(){
         return $this->belongsTo('App\Models\Grade', 'grade_id', 'id')->withTrashed();

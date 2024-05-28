@@ -338,6 +338,43 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12 row">
+                        <div class="input-field col s12 m12" id="item-sale-show" style="display:none;border:solid red 3px;border-radius:30px;">
+                            <div class="card-alert card green">
+                                <div class="card-content white-text">
+                                    <p>Info : Kode & nama item akan otomatis terbuat dari gabungan komposisi kode & nama master data dibawah ini.</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="type_id" name="type_id" onchange="generateCode();"></select>
+                                    <label class="active" for="type_id">Tipe</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="size_id" name="size_id" onchange="generateCode();"></select>
+                                    <label class="active" for="size_id">Ukuran</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="variety_id" name="variety_id" onchange="generateCode();"></select>
+                                    <label class="active" for="variety_id">Jenis</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
+                                    <label class="active" for="pattern_id">Motif</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="pallet_id" name="pallet_id" onchange="generateCode();"></select>
+                                    <label class="active" for="pallet_id">Palet</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="grade_id" name="grade_id" onchange="generateCode();"></select>
+                                    <label class="active" for="grade_id">Grade</label>
+                                </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
+                                    <label class="active" for="brand_id">Brand</label>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col s12 m8 row">
                             <div class="input-field col s12 m4">
                                 <input type="hidden" id="temp" name="temp">
@@ -598,43 +635,6 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-field col s12 m8" id="item-sale-show" style="display:none;">
-                            <div class="card-alert card green">
-                                <div class="card-content white-text">
-                                    <p>Info : Kode & nama item akan otomatis terbuat dari gabungan komposisi kode & nama master data dibawah ini.</p>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="type_id" name="type_id" onchange="generateCode();"></select>
-                                    <label class="active" for="type_id">Tipe</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="size_id" name="size_id" onchange="generateCode();"></select>
-                                    <label class="active" for="size_id">Ukuran</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="variety_id" name="variety_id" onchange="generateCode();"></select>
-                                    <label class="active" for="variety_id">Jenis</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
-                                    <label class="active" for="pattern_id">Motif</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="color_id" name="color_id" onchange="generateCode();"></select>
-                                    <label class="active" for="color_id">Warna</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="grade_id" name="grade_id" onchange="generateCode();"></select>
-                                    <label class="active" for="grade_id">Grade</label>
-                                </div>
-                                <div class="input-field col m4 s12">
-                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
-                                    <label class="active" for="brand_id">Brand</label>
-                                </div>
-                            </div>
-                        </div>
                         <div class="col s12 mt-3">
                             
                         </div>
@@ -884,8 +884,8 @@
                 $('#uom_unit').val('').trigger('change');
                 M.updateTextFields();
                 $('.stock-unit').text('-');
-                $('#type_id,#size_id,#variety_id,#pattern_id,#color_id,#grade_id,#brand_id').empty();
-                /* $('#item-sale-show').hide(); */
+                $('#type_id,#size_id,#variety_id,#pattern_id,#pallet_id,#grade_id,#brand_id').empty();
+                $('#item-sale-show').hide();
                 arrCode = [];
                 arrName = [];
                 $('#body-unit').empty().append(`
@@ -950,15 +950,15 @@
         select2ServerSide('#size_id', '{{ url("admin/select2/size") }}');
         select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
         select2ServerSide('#pattern_id', '{{ url("admin/select2/pattern") }}');
-        select2ServerSide('#color_id', '{{ url("admin/select2/color") }}');
+        select2ServerSide('#pallet_id', '{{ url("admin/select2/pallet") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
         select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
 
-        $('.select2').each(function () {
+        /* $('.select2').each(function () {
             $(this).select2({
                 dropdownParent: $(this).parent(),
             });
-        });
+        }); */
         
         $(document).on('select2:close', '.select2', function (e) {
             var evt = "scroll.select2";
@@ -1071,8 +1071,7 @@
                 </td>
             </tr>
         `);
-        $(".select2").select2({
-            dropdownParent: $('#modal1'),
+        $('select[name="arr_unit[]"]').select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
@@ -1154,29 +1153,31 @@
     }
 
     function showSalesComposition(){
-        /* if($('#is_sales_item').is(':checked')){
+        if($('#is_sales_item').is(':checked')){
             $('#item-sale-show').show();
         }else{
             $('#item-sale-show').hide();
-        } */
+            $('#type_id,#size_id,#variety_id,#pattern_id,#pallet_id,#grade_id,#brand_id').empty();
+        }
     }
 
     function generateCode(){
         arrCode = [];
         arrName = [];
-        if($('#type_id').val() && $('#size_id').val() && $('#variety_id').val() && $('#pattern_id').val() && $('#color_id').val() && $('#grade_id').val() && $('#brand_id').val()){
+        if($('#type_id').val() && $('#size_id').val() && $('#variety_id').val() && $('#pattern_id').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#brand_id').val()){
+            let pattern_code = $('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code.split('.') : $('#pattern_id').find(":selected").data("code").split('.');
             arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code")); 
             arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));
             arrCode.push($('#variety_id').select2('data')[0].code ? $('#variety_id').select2('data')[0].code : $('#variety_id').find(":selected").data("code")); 
-            arrCode.push($('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code : $('#pattern_id').find(":selected").data("code")); 
-            arrCode.push($('#color_id').select2('data')[0].code ? $('#color_id').select2('data')[0].code : $('#color_id').find(":selected").data("code")); 
+            arrCode.push(pattern_code[1]);
+            arrCode.push($('#pallet_id').select2('data')[0].code ? $('#pallet_id').select2('data')[0].code : $('#pallet_id').find(":selected").data("code"));
             arrCode.push($('#grade_id').select2('data')[0].code ? $('#grade_id').select2('data')[0].code : $('#grade_id').find(":selected").data("code")); 
             arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
             arrName.push($('#type_id').select2('data')[0].name ? $('#type_id').select2('data')[0].name : $('#type_id').find(":selected").data("name"));
             arrName.push($('#size_id').select2('data')[0].name ? $('#size_id').select2('data')[0].name : $('#size_id').find(":selected").data("name")),
             arrName.push($('#variety_id').select2('data')[0].name ? $('#variety_id').select2('data')[0].name : $('#variety_id').find(":selected").data("name"));
             arrName.push($('#pattern_id').select2('data')[0].name ? $('#pattern_id').select2('data')[0].name : $('#pattern_id').find(":selected").data("name"));
-            arrName.push($('#color_id').select2('data')[0].name ? $('#color_id').select2('data')[0].name : $('#color_id').find(":selected").data("name"));
+            arrName.push($('#pallet_id').select2('data')[0].name ? $('#pallet_id').select2('data')[0].name : $('#pallet_id').find(":selected").data("name"));
             arrName.push($('#grade_id').select2('data')[0].name ? $('#grade_id').select2('data')[0].name : $('#grade_id').find(":selected").data("name"));
             arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
             let newCode = arrCode.join('.');
@@ -1654,9 +1655,9 @@
                             <option value="` + response.pattern_id + `" data-code="` + response.pattern_code + `" data-name="` + response.pattern_name_real + `">` + response.pattern_name + `</option>
                         `);
                     }
-                    if(response.color_name){
-                        $('#color_id').empty().append(`
-                            <option value="` + response.color_id + `" data-code="` + response.color_code + `" data-name="` + response.color_name_real + `">` + response.color_name + `</option>
+                    if(response.pallet_name){
+                        $('#pallet_id').empty().append(`
+                            <option value="` + response.pallet_id + `" data-code="` + response.pallet_code + `" data-name="` + response.pallet_name_real + `">` + response.pallet_name + `</option>
                         `);
                     }
                     if(response.grade_name){
@@ -1750,7 +1751,7 @@
                                 </td>
                             </tr>
                         `);
-                        $(".select2").select2({
+                        $('select[name="arr_unit[]"]').select2({
                             dropdownAutoWidth: true,
                             width: '100%',
                         });

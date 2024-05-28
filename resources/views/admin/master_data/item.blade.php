@@ -347,7 +347,7 @@
                             <div class="row">
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="type_id" name="type_id" onchange="generateCode();"></select>
-                                    <label class="active" for="type_id">Tipe</label>
+                                    <label class="active" for="type_id">Group</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="size_id" name="size_id" onchange="generateCode();"></select>
@@ -359,7 +359,7 @@
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
-                                    <label class="active" for="pattern_id">Motif</label>
+                                    <label class="active" for="pattern_id">Motif & Warna</label>
                                 </div>
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="pallet_id" name="pallet_id" onchange="generateCode();"></select>

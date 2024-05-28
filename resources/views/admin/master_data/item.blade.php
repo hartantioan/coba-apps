@@ -1164,22 +1164,36 @@
     function generateCode(){
         arrCode = [];
         arrName = [];
-        if($('#type_id').val() && $('#size_id').val() && $('#variety_id').val() && $('#pattern_id').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#brand_id').val()){
-            let pattern_code = $('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code.split('.') : $('#pattern_id').find(":selected").data("code").split('.');
-            arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code")); 
-            arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));
-            arrCode.push($('#variety_id').select2('data')[0].code ? $('#variety_id').select2('data')[0].code : $('#variety_id').find(":selected").data("code")); 
-            arrCode.push(pattern_code[1]);
-            arrCode.push($('#pallet_id').select2('data')[0].code ? $('#pallet_id').select2('data')[0].code : $('#pallet_id').find(":selected").data("code"));
-            arrCode.push($('#grade_id').select2('data')[0].code ? $('#grade_id').select2('data')[0].code : $('#grade_id').find(":selected").data("code")); 
-            arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
-            arrName.push($('#type_id').select2('data')[0].name ? $('#type_id').select2('data')[0].name : $('#type_id').find(":selected").data("name"));
-            arrName.push($('#size_id').select2('data')[0].name ? $('#size_id').select2('data')[0].name : $('#size_id').find(":selected").data("name")),
-            arrName.push($('#variety_id').select2('data')[0].name ? $('#variety_id').select2('data')[0].name : $('#variety_id').find(":selected").data("name"));
-            arrName.push($('#pattern_id').select2('data')[0].name ? $('#pattern_id').select2('data')[0].name : $('#pattern_id').find(":selected").data("name"));
-            arrName.push($('#pallet_id').select2('data')[0].name ? $('#pallet_id').select2('data')[0].name : $('#pallet_id').find(":selected").data("name"));
-            arrName.push($('#grade_id').select2('data')[0].name ? $('#grade_id').select2('data')[0].name : $('#grade_id').find(":selected").data("name"));
-            arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
+        if($('#type_id').val() || $('#size_id').val() || $('#variety_id').val() || $('#pattern_id').val() || $('#pallet_id').val() || $('#grade_id').val() || $('#brand_id').val()){
+            if($('#type_id').val()){
+                arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code"));
+                arrName.push($('#type_id').select2('data')[0].name ? $('#type_id').select2('data')[0].name : $('#type_id').find(":selected").data("name"));
+            }
+            if($('#size_id').val()){
+                arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));
+                arrName.push($('#size_id').select2('data')[0].name ? $('#size_id').select2('data')[0].name : $('#size_id').find(":selected").data("name"));
+            }
+            if($('#variety_id').val()){
+                arrCode.push($('#variety_id').select2('data')[0].code ? $('#variety_id').select2('data')[0].code : $('#variety_id').find(":selected").data("code"));
+                arrName.push($('#variety_id').select2('data')[0].name ? $('#variety_id').select2('data')[0].name : $('#variety_id').find(":selected").data("name"));
+            }
+            if($('#pattern_id').val()){
+                let pattern_code = $('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code.split('.') : $('#pattern_id').find(":selected").data("code").split('.');
+                arrCode.push(pattern_code[1]);
+                arrName.push($('#pattern_id').select2('data')[0].name ? $('#pattern_id').select2('data')[0].name : $('#pattern_id').find(":selected").data("name"));
+            }
+            if($('#pallet_id').val()){
+                arrCode.push($('#pallet_id').select2('data')[0].code ? $('#pallet_id').select2('data')[0].code : $('#pallet_id').find(":selected").data("code"));
+                arrName.push($('#pallet_id').select2('data')[0].name ? $('#pallet_id').select2('data')[0].name : $('#pallet_id').find(":selected").data("name"));
+            }
+            if($('#grade_id').val()){
+                arrCode.push($('#grade_id').select2('data')[0].code ? $('#grade_id').select2('data')[0].code : $('#grade_id').find(":selected").data("code"));
+                arrName.push($('#grade_id').select2('data')[0].name ? $('#grade_id').select2('data')[0].name : $('#grade_id').find(":selected").data("name"));
+            }
+            if($('#brand_id').val()){
+                arrCode.push($('#brand_id').select2('data')[0].code ? $('#brand_id').select2('data')[0].code : $('#brand_id').find(":selected").data("code"));
+                arrName.push($('#brand_id').select2('data')[0].name ? $('#brand_id').select2('data')[0].name : $('#brand_id').find(":selected").data("name"));
+            }            
             let newCode = arrCode.join('.');
             let newName = arrName.join(' ');
             $('#code').val(newCode);

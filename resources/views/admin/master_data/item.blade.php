@@ -1164,7 +1164,7 @@
     function generateCode(){
         arrCode = [];
         arrName = [];
-        if($('#type_id').val() || $('#size_id').val() || $('#variety_id').val() || $('#pattern_id').val() || $('#pallet_id').val() || $('#grade_id').val() || $('#brand_id').val()){
+        if($('#type_id').val() && $('#size_id').val() && $('#variety_id').val() && $('#pattern_id').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#brand_id').val()){
             let pattern_code = $('#pattern_id').select2('data')[0].code ? $('#pattern_id').select2('data')[0].code.split('.') : $('#pattern_id').find(":selected").data("code").split('.');
             arrCode.push($('#type_id').select2('data')[0].code ? $('#type_id').select2('data')[0].code : $('#type_id').find(":selected").data("code")); 
             arrCode.push($('#size_id').select2('data')[0].code ? $('#size_id').select2('data')[0].code : $('#size_id').find(":selected").data("code"));

@@ -166,12 +166,6 @@
                 <div class="col s8">
                     {{ $data->place->code }}
                 </div>
-                <div class="col s4">
-                    Line
-                </div>
-                <div class="col s8">
-                    {{ $data->line->code }}
-                </div>
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
@@ -207,7 +201,7 @@
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Tgl.Request</th>
-                        <th class="center-align">Urgent</th>
+                        <th class="center-align">Line</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -216,12 +210,15 @@
                         <td class="center-align">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->item->sellUnit->code }}</td>
+                        <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
-                        <td class="center-align">{{ $row->isUrgent() }}</td>
+                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan: {{ $row->note }}</td>
+                        <td colspan="6">Keterangan 1: {{ $row->note }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">Keterangan 2: {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                 </tbody>

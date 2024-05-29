@@ -21,7 +21,8 @@ class MarketingOrderPlanDetail extends Model
         'qty',
         'request_date',
         'note',
-        'priority',
+        'note2',
+        'line_id',
     ];
 
     public function marketingOrderPlan()
@@ -36,6 +37,10 @@ class MarketingOrderPlanDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
     }
 
     public function totalScheduled()

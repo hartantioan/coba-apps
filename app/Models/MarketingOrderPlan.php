@@ -20,7 +20,6 @@ class MarketingOrderPlan extends Model
         'user_id',
         'company_id',
         'place_id',
-        'line_id',
         'post_date',
         'type',
         'start_date',
@@ -81,11 +80,6 @@ class MarketingOrderPlan extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function line()
-    {
-        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function marketingOrderPlanDetail()

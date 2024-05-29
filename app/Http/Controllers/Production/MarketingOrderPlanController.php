@@ -203,7 +203,6 @@ class MarketingOrderPlanController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->code,
-                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),
                     date('d/m/Y',strtotime($val->start_date)),
@@ -261,7 +260,6 @@ class MarketingOrderPlanController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'line_id'                   => 'required',
             'post_date'		            => 'required',
             'type'                      => 'required',
             'start_date'                => 'required',
@@ -270,12 +268,12 @@ class MarketingOrderPlanController extends Controller
             'arr_qty'                   => 'required|array',
             'arr_request_date'          => 'required|array',
             'arr_note'                  => 'required|array',
+            'arr_line'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'line_id.required' 			        => 'Line tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'type.required'		                => 'Tipe tidak boleh kosong.',
             'start_date.required'               => 'Tgl. mulai tidak boleh kosong.',
@@ -288,6 +286,8 @@ class MarketingOrderPlanController extends Controller
             'arr_request_date.array'            => 'Tgl request harus array.',
             'arr_note.required'                 => 'Catatan item tidak boleh kosong.',
             'arr_note.array'                    => 'Catatan item harus array.',
+            'arr_line.required'                 => 'Line tidak boleh kosong.',
+            'arr_line.array'                    => 'Line harus array.',
         ]);
 
         if($validation->fails()) {
@@ -348,7 +348,6 @@ class MarketingOrderPlanController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->type = $request->type;
                         $query->start_date = $request->start_date;
@@ -384,7 +383,6 @@ class MarketingOrderPlanController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'line_id'                   => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'type'                      => $request->type,
                         'start_date'                => $request->start_date,
@@ -412,7 +410,8 @@ class MarketingOrderPlanController extends Controller
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'request_date'                  => $request->arr_request_date[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
-                            'priority'                      => $request->arr_priority[$key] ?? NULL,
+                            'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
+                            'line_id'                       => $request->arr_line[$key] ?? NULL,
                         ]);
                     }
 
@@ -460,8 +459,9 @@ class MarketingOrderPlanController extends Controller
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                  => $row->item->uomUnit->code,
                 'request_date'          => $row->request_date,
-                'note'                  => $row->note,
-                'priority'              => $row->priority,
+                'note'                  => $row->note ?? '',
+                'note2'                 => $row->note2 ?? '',
+                'line_id'               => $row->line_id ?? '',
             ];
         }
 
@@ -511,8 +511,9 @@ class MarketingOrderPlanController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Tgl.Request</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Prioritas</th>
+                                <th class="center-align">Ket 1</th>
+                                <th class="center-align">Ket 2</th>
+                                <th class="center-align">Line</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
@@ -526,7 +527,8 @@ class MarketingOrderPlanController extends Controller
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->request_date)).'</td>
                 <td class="">'.$row->note.'</td>
-                <td class="center-align">'.$row->priority.'</td>
+                <td class="">'.$row->note2.'</td>
+                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
             </tr>';
         }
         $string .= '<tr>

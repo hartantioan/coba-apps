@@ -249,17 +249,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="29%" style="vertical-align: top;">
-                                            Line
-                                        </td>
-                                        <td width="1%" style="vertical-align: top;">
-                                            :
-                                        </td>
-                                        <td width="70%" style="vertical-align: top;">
-                                            {{ $data->line->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td style="vertical-align: top;">
                                             Tipe
                                         </td>
@@ -299,8 +288,7 @@
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
                                 <th class="center">Tgl.Request</th>
-                                <th class="center">Catatan</th>
-                                <th class="center">Prioritas</th>
+                                <th class="center">Line</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -311,8 +299,13 @@
                                 <td align="center">{{ $row->qty }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
-                                <td>{{ $row->note }}</td>
-                                <td align="center">{{ $row->priority }}</td>
+                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">Keterangan 1 : {{ $row->note }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">Keterangan 2 : {{ $row->note2 }}</td>
                             </tr>
                             @endforeach
                         </tbody>

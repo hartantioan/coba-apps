@@ -207,7 +207,7 @@
                                 <tr>
                                     <td style="font-size: 0.9rem !important;">
                                         Hal	:	Pengembalian Inventaris <br>
-                                        No. Pencatatan	:	                                      
+                                        No. Pencatatan	:	   {{$data->code}}                                   
                                     </td>
                                 </tr>
                                 <tr>
@@ -289,7 +289,7 @@
                                 :
                             </td>
                             <td>
-                                {{ $data->code}}
+                                {{ $data->hardwareItem->code}}
                             </td>
                         </tr>
                         <tr>
@@ -310,8 +310,8 @@
                             <td>
                                 :
                             </td>
-                            <td>
-                                {{$data->hardwareItem->item->name}}||{{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
+                            <td style="font-weight: bold">
+                                {{$data->hardwareItem->item}}||{{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
                                
                             </td>
                         </tr>

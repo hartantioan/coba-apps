@@ -1117,6 +1117,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[MenuUserController::class, 'index']);
                         Route::post('get_access', [MenuUserController::class, 'getAccess']);
                         Route::post('create_access',[MenuUserController::class, 'createAccess'])->middleware('operation.access:menu_user,update');
+                        Route::post('save_access_batch',[MenuUserController::class, 'saveAccessBatch'])->middleware('operation.access:menu_user,update');
                         Route::get('datatable',[MenuUserController::class, 'datatable']);
                         Route::post('show', [MenuUserController::class, 'show']);
                         Route::post('print',[MenuUserController::class, 'print']);

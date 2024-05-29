@@ -207,7 +207,7 @@
                                 <tr>
                                     <td style="font-size: 0.9rem !important;">
                                         Hal	:	Serah Terima Inventaris <br>
-                                        No. Pencatatan	:	                                      
+                                        No. Pencatatan	:{{$data->code}}                                     
                                     </td>
                                 </tr>
                                 <tr>
@@ -283,13 +283,13 @@
                     <table border="0" width="51%" style="font-size:1.2rem;margin-left:4rem">
                         <tr>
                             <td>
-                                Nama Inventaris
+                                No Inventaris
                             </td>
                             <td>
                                 :
                             </td>
                             <td>
-                                {{ $data->code}}
+                                {{ $data->hardwareItem->code}}
                             </td>
                         </tr>
                         <tr>
@@ -310,8 +310,8 @@
                             <td>
                                 :
                             </td>
-                            <td>
-                                {{$data->hardwareItem->item->name}}
+                            <td style="font-weight: bold">
+                                {{$data->hardwareItem->item}}
                                 @if($data->hardwareItem->hardwareItemDetail()->exists())
                                     ||
                                     @foreach($data->hardwareItem->hardwareItemDetail as $key => $row)

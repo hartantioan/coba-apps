@@ -16,13 +16,25 @@ class BomDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'bom_id',
+        'bom_alternative_id',
         'lookable_type',
         'lookable_id',
+        'cost_distribution_id',
         'qty',
         'nominal',
         'total',
         'description'
     ];
+
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
+
+    public function bomAlternative()
+    {
+        return $this->belongsTo('App\Models\BomAlternative', 'bom_alternative_id', 'id')->withTrashed();
+    }
 
     public function bom(){
         return $this->belongsTo('App\Models\Bom', 'bom_id', 'id');

@@ -16,6 +16,7 @@ use App\Models\Place;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
+use App\Models\BomAlternative;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Warehouse;
@@ -44,13 +45,7 @@ class BomController extends Controller
             'item_id',
             'place_id',
             'warehouse_id',
-            'line_id',
-            'machine_id',
             'qty_output',
-            'qty_planned',
-            'type',
-            'valid_from',
-            'valid_to',
             'status'
         ];
 
@@ -79,10 +74,6 @@ class BomController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                if($request->type){
-                    $query->where('type', $request->type);
-                }
-
             })
             ->offset($start)
             ->limit($length)
@@ -106,10 +97,6 @@ class BomController extends Controller
                     $query->where('status', $request->status);
                 }
 
-                if($request->type){
-                    $query->where('type', $request->type);
-                }
-
             })
             ->count();
 
@@ -125,13 +112,7 @@ class BomController extends Controller
                     $val->item->name,
                     $val->place->code,
                     $val->warehouse->name,
-                    $val->line->code,
-                    $val->machine->name,
                     CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
-                    CustomHelper::formatConditionalQty($val->qty_planned).' Satuan '.$val->item->uomUnit->code,
-                    $val->type(),
-                    date('d/m/Y',strtotime($val->valid_from)),
-                    date('d/m/Y',strtotime($val->valid_to)),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -163,34 +144,23 @@ class BomController extends Controller
             'item_id'                   => 'required',
             'name'                      => 'required',
             'qty_output'                => 'required',
-            'qty_planned'               => 'required',
-            'type'                      => 'required',
             'place_id'                  => 'required',
-            'line_id'                   => 'required',
-            'machine_id'                => 'required',
             'warehouse_id'              => 'required',
-            'valid_from'                => 'required',
-            'valid_to'                  => 'required',
             'arr_type'                  => 'required|array',
             'arr_detail'                => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_description'           => 'required|array',
             'arr_nominal'               => 'required|array',
-            'arr_total'                 => 'required|array'
+            'arr_total'                 => 'required|array',
+            'arr_alternative'           => 'required|array',
         ], [
             'code.required'                 => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai',
             'item_id.required'              => 'Item tidak boleh kosong.',
             'name.required'                 => 'Nama resep tidak boleh kosong.',
             'qty_output.required'           => 'Jumlah output produksi tidak boleh kosong',
-            'qty_planned.required'          => 'Jumlah rata-rata produksi tidak boleh kosong',
-            'type.required'                 => 'Tipe bill of material tidak boleh kosong',
             'place_id.required'             => 'Plant tidak boleh kosong',
-            'line_id.required'              => 'Line tidak boleh kosong',
-            'machine_id.required'           => 'Mesin tidak boleh kosong',
             'warehouse_id.required'         => 'Gudang tidak boleh kosong',
-            'valid_from.required'           => 'Tanggal valid mulai tidak boleh kosong',
-            'valid_to.required'             => 'Tanggal valid hingga tidak boleh kosong',
             'arr_type.required'             => 'Tipe tidak boleh kosong',
             'arr_type.array'                => 'Tipe haruslah dalam bentuk array',
             'arr_detail.required'           => 'Detail item/biaya tidak boleh kosong',
@@ -203,6 +173,8 @@ class BomController extends Controller
             'arr_nominal.array'             => 'Nominal biaya haruslah dalam bentuk array',
             'arr_total.required'            => 'Total tidak boleh kosong',
             'arr_total.array'               => 'Total haruslah dalam bentuk array',
+            'arr_alternative.required'      => 'Alternatif tidak boleh kosong',
+            'arr_alternative.array'         => 'Alternatif haruslah dalam bentuk array',
         ]);
 
         if($validation->fails()) {
@@ -220,14 +192,8 @@ class BomController extends Controller
                     $query->user_id             = session('bo_id');
                     $query->item_id             = $request->item_id;
                     $query->place_id            = $request->place_id;
-                    $query->line_id             = $request->line_id;
-                    $query->machine_id          = $request->machine_id;
                     $query->warehouse_id        = $request->warehouse_id;
-                    $query->valid_from          = $request->valid_from;
-                    $query->valid_to            = $request->valid_to;
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
-                    $query->qty_planned         = str_replace(',','.',str_replace('.','',$request->qty_planned));
-                    $query->type                = $request->type;
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
 
@@ -246,14 +212,8 @@ class BomController extends Controller
                         'user_id'           => session('bo_id'),
                         'item_id'           => $request->item_id,
                         'place_id'          => $request->place_id,
-                        'line_id'           => $request->line_id,
-                        'machine_id'        => $request->machine_id,
                         'warehouse_id'      => $request->warehouse_id,
-                        'valid_from'        => $request->valid_from,
-                        'valid_to'          => $request->valid_to,
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
-                        'qty_planned'       => str_replace(',','.',str_replace('.','',$request->qty_planned)),
-                        'type'              => $request->type,
                         'status'            => $request->status ? $request->status : '2',
                     ]);
 
@@ -264,17 +224,28 @@ class BomController extends Controller
 			}
 			
 			if($query) {               
-
-                foreach($request->arr_type as $key => $row){
-                    BomDetail::create([
+                $temp = '';
+                foreach($request->arr_main_alternative as $key => $row){
+                    $queryA = BomAlternative::create([
                         'bom_id'        => $query->id,
-                        'lookable_type' => $row,
-                        'lookable_id'   => $request->arr_detail[$key],
-                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'nominal'       => str_replace(',','.',str_replace('.','',$request->arr_nominal[$key])),
-                        'total'         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                        'description'   => $request->arr_description[$key]
+                        'name'          => $request->arr_alternative_name[$key] ?? '',
+                        'is_default'    => $request->arr_alternative_default[$key] ?? NULL,
                     ]);
+                    foreach($request->arr_type as $keydetail => $rowdetail){
+                        if($request->arr_alternative[$keydetail] == $row){
+                            BomDetail::create([
+                                'bom_id'                => $query->id,
+                                'bom_alternative_id'    => $queryA->id,
+                                'lookable_type'         => $rowdetail,
+                                'lookable_id'           => $request->arr_detail[$keydetail],
+                                'cost_distribution_id'  => $request->arr_cost_distribution[$keydetail] ?? NULL,
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$keydetail])),
+                                'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$keydetail])),
+                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$keydetail])),
+                                'description'           => $request->arr_description[$keydetail]
+                            ]);
+                        }
+                    }
                 }
 
                 activity()
@@ -345,7 +316,6 @@ class BomController extends Controller
         $bom = Bom::find($request->id);
         $bom['item_name'] = $bom->item->name;
         $bom['qty_output'] = CustomHelper::formatConditionalQty($bom->qty_output);
-        $bom['qty_planned'] = CustomHelper::formatConditionalQty($bom->qty_planned);
 
         $arr = [];
 

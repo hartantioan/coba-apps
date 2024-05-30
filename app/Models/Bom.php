@@ -23,13 +23,7 @@ class Bom extends Model
         'item_id',
         'place_id',
         'warehouse_id',
-        'line_id',
-        'machine_id',
         'qty_output',
-        'qty_planned',
-        'type',
-        'valid_from',
-        'valid_to',
         'status'
     ];
 

@@ -314,6 +314,28 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function bomItem(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function itemHasBom(Request $request)
     {
         $response = [];

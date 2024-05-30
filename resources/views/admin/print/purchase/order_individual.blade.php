@@ -305,7 +305,7 @@ use App\Helpers\PrintHelper;
                                     <th class="center-align">Harga</th>
                                     <th class="center-align">Disc.1 (%)</th>
                                     <th class="center-align">Disc.2 (%)</th>
-                                    <th class="center-align">Disc.3 (Rp)</th>
+                                    <th class="center-align">Disc.3 ({{ $data->currency->code }})</th>
                                     <th class="center-align">Subtotal</th>
                                 </tr>
                             </thead>

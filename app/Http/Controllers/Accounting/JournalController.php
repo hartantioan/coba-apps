@@ -434,7 +434,7 @@ class JournalController extends Controller
                     
                     if($request->arr_coa){
                         foreach($request->arr_coa as $key => $row){
-                            if(str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) < 0){
+                            /* if(str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])) < 0){ */
                                 JournalDetail::create([
                                     'journal_id'                    => $query->id,
                                     'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
@@ -451,9 +451,9 @@ class JournalController extends Controller
                                     'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
                                     'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
                                 ]);
-                            }
+                            /* } */
 
-                            if(str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) < 0){
+                            /* if(str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) > 0 || str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])) < 0){ */
                                 JournalDetail::create([
                                     'journal_id'                    => $query->id,
                                     'cost_distribution_detail_id'   => $request->arr_cost_distribution_detail[$key] == 'NULL' ? NULL : $request->arr_cost_distribution_detail[$key],
@@ -470,7 +470,7 @@ class JournalController extends Controller
                                     'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
                                     'nominal_fc'                    => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
                                 ]);
-                            }
+                            /* } */
                         }
                     }
 

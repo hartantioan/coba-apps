@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Usage;
 
 use App\Http\Controllers\Controller;
 use App\Models\HardwareItem;
+use App\Helpers\CustomHelper;
 use App\Models\ReceptionHardwareItemsUsage;
 use App\Models\ReturnHardwareItemsUsage;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -238,6 +239,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $button = '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="returnItem(' . $val->id . ')"><i class="material-icons dp48">call_missed_outgoing</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' .  $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }if($val->status == 2 ){
@@ -306,6 +308,7 @@ class ReceptionHardwareItemUsageController extends Controller
         $reception['detail1']=$reception->hardwareItem->detail1;
         $reception['detail2']=$reception->hardwareItem->detail2;
         $reception['user']=$reception->user;
+        $reception['division']=$reception->user->position->division->name;
 		return response()->json($reception);
     }
     public function showItem(Request $request){
@@ -388,10 +391,9 @@ class ReceptionHardwareItemUsageController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = ReceptionHardwareItemsUsage::find($request->temp);
-                    $query->hardware_item_id	= $request->hardware_item_id;
                     $query->date	            = $request->date;
                     $query->location	        = $request->location;
-                    $query->status              = $request->status ? $request->status : '2';
+                    // $query->status              = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){

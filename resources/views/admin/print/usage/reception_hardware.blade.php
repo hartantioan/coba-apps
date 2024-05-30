@@ -263,7 +263,7 @@
                                 :
                             </td>
                             <td>
-                                {{$data->user->name ?? '-'}}
+                                {{$data->account->name ?? '-'}}
                             </td>
                         </tr>
                         <tr>
@@ -274,7 +274,7 @@
                                 :
                             </td>
                             <td>
-                                {{$data->user->position->division->name}}
+                                {{$data->account->position->division->name}}
                             </td>
                         </tr>
                     </table>
@@ -321,13 +321,14 @@
                             </td>
                         </tr>
                     </table>
-                
-                    <br>        
-                    Dan dengan surat pernyataan ini pula, 
-                    menyatakan bertanggung jawab atas inventaris yang telah diserah terimakan kepada Saya, dan mempergunakannya hanya untuk mendukung tugas dan kewajiban Saya sebagai seorang staff PT. SUPERIOR PORCELAIN SUKSES.
-                    <br>
-                    <br>
-                    Demikian surat pernyataan ini dibuat dan ditanda tangani dengan penuh tanggung jawab dan kesadaran Saya.
+                    <div style="text-align: justify">
+                        <br>        
+                        Dan dengan surat pernyataan ini pula, 
+                        menyatakan bertanggung jawab atas inventaris yang telah diserah terimakan kepada Saya, dan mempergunakannya hanya untuk mendukung tugas dan kewajiban Saya sebagai seorang staff PT. SUPERIOR PORCELAIN SUKSES.
+                        <br>
+                        <br>
+                        Demikian surat pernyataan ini dibuat dan ditanda tangani dengan penuh tanggung jawab dan kesadaran Saya.
+                    </div>
                 </div>
                 <!-- invoice subtotal -->
                 <div class="invoice-subtotal break-row"  style="margin-top: 2rem">

@@ -123,11 +123,16 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6 step1">
+                        <div class="input-field col s12 m6 step1" id="tab_hardware">
                             <select class="browser-default" id="hardware_item_id" name="hardware_item_id"  onchange="getDetail();">&nbsp;</select>
                             <label class="active" for="hardware_item_id">Pilih Item dari inventory</label>
                         </div>
+                        <div class="input-field col s12 m6 step1" id="tab_hardware_edit" style="display: none">
+                            <input id="item_edit" name="item_edit" disabled></input>
+                            <label class="active" for="item_edit">Item dari inventory</label>
+                        </div>
                         <div class="input-field col s12 m3 ">
+                            <input type="hidden" id="tempe" name="tempe"> 
                             <input id="detail1" name="detail1" disabled></input>
                             <label class="active" for="detail1">Detail 1</label>
                         </div>
@@ -135,9 +140,13 @@
                             <input id="detail2" name="detail2" disabled></input>
                             <label class="active" for="detail2">Detail 2</label>
                         </div>
-                        <div class="input-field col s12 m6 step2">
+                        <div class="input-field col s12 m6 step2" id="tab_user">
                             <select class="browser-default" id="user_id" name="user_id" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
+                        </div>
+                        <div class="input-field col s12 m6 step2" id="tab_user_edit" style="display: none">
+                            <input id="user_edit" name="user_edit" disabled></input>
+                            <label class="active" for="user_edit">User</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="division" name="division" disabled></input>
@@ -258,7 +267,7 @@
                             <label class="active" for="location1">Lokasi</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <input type="hidden" id="tempe" name="tempe"> 
+                          
                             <input type="date" id="date1" name="date1"  onchange="loadDataTable()">
                             <label class="active" for="date1">Date(tanggal)</label>
                         </div>
@@ -357,6 +366,10 @@
                 $('#form_data')[0].reset();
                 $('#hardware_item_id').empty();
                 $('#user_id').empty();
+                $('#tab_user').show();
+                $('#tab_hardware').show();
+                $('#tab_user_edit').hide();
+                $('#tab_hardware_edit').hide();
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -772,8 +785,22 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal3').modal('open');
+                $('#modal1').modal('open');
                 $('#tempe').val(id);
+                $('#detail1').val(response.detail1);
+                $('#detail2').val(response.detail2);
+                $('#info').val(response.info);
+                $('#date').val(response.date);
+                $('#location').val(response.location);
+                $('#tab_user').hide();
+                $('#tab_hardware').hide();
+                $('#tab_user_edit').show();
+                $('#tab_hardware_edit').show();
+                $('#item_edit').val(response.name);
+                $('#user_edit').val(response.user.name);
+                $('#division').val(response.division);
+             
+                
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
             },

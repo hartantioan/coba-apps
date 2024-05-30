@@ -251,7 +251,7 @@
                     </tr>
                 </table>
                 
-                <div class="invoice-product-details mt-2" style="font-size:0.8rem;">
+                <div class="invoice-product-details mt-2" style="font-size:0.8rem;text-align:justify">
                     Dengan hormat,<br>
                     Saya yang bertanda tangan di bawah ini, selaku Pihak I :<br>
                     <table border="0" width="40%" style="font-size:1.2rem;margin-left:4rem">
@@ -316,7 +316,7 @@
                             </td>
                         </tr>
                     </table>
-                
+                    
                     <br>        
                     Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> dalam hal ini diwakili oleh Departemen EDP/MIS sebagai kontroler inventaris 
                     perangkat Hardware Komputer, selanjutnya sebagai Pihak II:
@@ -345,8 +345,6 @@
                             </td>
                         </tr>
                     </table>
-                    <br>
-                    <br>
                     Demikian surat pernyataan ini dibuat dan ditandatangani oleh yang mengembalikan dan menerima kembali inventaris tersebut.
                 </div>
                 <!-- invoice subtotal -->

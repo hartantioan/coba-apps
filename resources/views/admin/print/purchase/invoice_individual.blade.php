@@ -328,7 +328,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            @php
+                                $uniquePphArray = [];
+                            @endphp
                             @foreach($data->purchaseInvoiceDetail as $key => $row)
+                            @php
+                                if (!in_array( CustomHelper::formatConditionalQty($row->percent_wtax).'%', $uniquePphArray)) {
+                                    $uniquePphArray[] = CustomHelper::formatConditionalQty($row->percent_wtax).'%';
+                                }
+                            @endphp
                             <tr>
                                 <td class="center-align" style="text-align: center;">{{ ($key + 1) }}</td>
                                 <td class="center-align">{!! 
@@ -347,6 +355,9 @@
                         
                     </table>
                 </div>
+                @php
+                    $uniquePphString = implode(', ', $uniquePphArray);
+                @endphp
                 @if($data->downpayment > 0)
                     <div class="invoice-product-details mt-2" style="margin-top:10px;">
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
@@ -397,30 +408,37 @@
                     <div class="column2">
                         <table style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
                             <tr>
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px" >Total</td>
                                 <td class="right-align" style="border:0.6px solid black;padding-left:20px;" width="31.5%">{{ $data->currency->code.'.'.number_format($data->total,2,',','.') }}</td>
                             </tr class="break-row">
                             <tr class="break-row">
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px">PPN</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->tax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
+                                <td class="right-align">PPh(%): {{ $uniquePphString }}</td>
                                 <td class="right-align" style="padding-right:15px">PPh</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->wtax,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px">Pembulatan</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->rounding,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px">Grandtotal</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->grandtotal,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px">Downpayment</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->downpayment,2,',','.') }}</td>
                             </tr>
                             <tr class="break-row">
+                                <td></td>
                                 <td class="right-align" style="padding-right:15px">Sisa Tagihan</td>
                                 <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->balance,2,',','.') }}</td>
                             </tr>

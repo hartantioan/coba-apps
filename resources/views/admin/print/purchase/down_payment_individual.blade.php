@@ -365,31 +365,31 @@
                             <table style="border-collapse:collapse;text-align: right; padding-right:6%;" width="100%">
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Subtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->subtotal,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->subtotal,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Diskon</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->discount,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->discount,2,',','.') }}</td>
                                 </tr>
                                 <tr>
                                     <td class="right-align" style="padding-right:15px">Total</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->total,2,',','.') }}</td>
                                 </tr>
                                 @if($data->tax > 0)
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">PPN</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->tax,2,',','.') }}</td>
                                 </tr>
                                 @endif
                                 @if($data->wtax > 0)
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">PPh</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->wtax,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->wtax,2,',','.') }}</td>
                                 </tr>
                                 @endif
                                 <tr class="break-row">
                                     <td class="right-align" style="padding-right:15px">Grandtotal</td>
-                                    <td class="right-align" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    <td class="right-align" style="border:0.6px solid black;">{{ $data->currency->code.'.'.number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>
                             </table>
                         </div>

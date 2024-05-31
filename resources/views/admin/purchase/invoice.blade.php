@@ -2099,7 +2099,7 @@
                             success: function(response) {
                                 loadingClose('.modal-content');
                                 if(type == 'main'){
-                                    $('.row_detail').remove();
+                                    /* $('.row_detail').remove(); */
                                     if(response.details.length > 0){
                                         $.each(response.details, function(i, val) {
                                             var count = makeid(10);
@@ -2417,7 +2417,7 @@
                                 }
 
                                 if(type == 'dp'){
-                                    $('#body-detail-dp').empty();
+                                    /* $('#body-detail-dp').empty(); */
                                     if(response.downpayments.length > 0){
                                         $.each(response.downpayments, function(i, val) {
                                             var count = makeid(10);

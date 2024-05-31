@@ -263,10 +263,14 @@
                                     </select>
                                     <label class="" for="type_detail">Tipe Detail</label>
                                 </div>
-                                <div class="input-field col m3 s12 step4">
+                                <div class="input-field col m2 s12 step4">
                                     <input type="hidden" id="temp" name="temp">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountData('1');"></select>
                                     <label class="active" for="account_id">Supplier / Vendor</label>
+                                </div>
+                                <div class="input-field col m1 s12 center-align">
+                                    <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text" onclick="getAccountData('1');" id="btn-show"><i class="material-icons right">receipt</i></a>
+                                    <label class="active">&nbsp;</label>
                                 </div>
                                 <div class="input-field col m3 s12 step5">
                                     <select class="form-control" id="type" name="type">

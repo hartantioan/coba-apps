@@ -55,6 +55,10 @@ class Bom extends Model
         return $this->hasMany('App\Models\BomDetail');
     }
 
+    public function bomAlternative(){
+        return $this->hasMany('App\Models\BomAlternative');
+    }
+
     public function status(){
         switch($this->status) {
             case '1':

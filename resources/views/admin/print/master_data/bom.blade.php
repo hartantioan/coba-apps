@@ -209,14 +209,8 @@
 								<th>Nama</th>
 								<th>Item</th>
 								<th>Plant</th>
-                                <th>Line</th>
-                                <th>Mesin</th>
                                 <th>Gudang</th>
 								<th>Qty Output</th>
-								<th>Qty Rencana</th>
-								<th>Tipe</th>
-                                <th>Tgl.Berlaku Mulai</th>
-                                <th>Tgl.Berlaku Akhir</th>
 								<th>Status</th>
                             </tr>
                         </thead>
@@ -228,14 +222,8 @@
 									<td>{{ $row->name }}</td>
 									<td>{{ $row->item->code.' - '.$row->item->name }}</td>
 									<td>{{ $row->place->code }}</td>
-                                    <td>{{ $row->line->code }}</td>
-                                    <td>{{ $row->machine->name }}</td>
                                     <td>{{ $row->warehouse->name }}</td>
 									<td>{{ CustomHelper::formatConditionalQty($row->qty_output) }}</td>
-									<td>{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
-									<td>{{ $row->type() }}</td>
-                                    <th>{{ date('d/m/Y',strtotime($row->valid_from)) }}</th>
-                                    <th>{{ date('d/m/Y',strtotime($row->valid_to)) }}</th>
 									<td>{!! $row->status() !!}</td>
 								</tr>
 								<tr align="center">

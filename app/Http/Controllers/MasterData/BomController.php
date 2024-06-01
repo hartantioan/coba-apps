@@ -198,6 +198,7 @@ class BomController extends Controller
                     $query->save();
 
                     $query->bomDetail()->delete();
+                    $query->bomAlternative()->delete();
 
                     DB::commit();
                 }catch(\Exception $e){
@@ -275,11 +276,13 @@ class BomController extends Controller
         
         $string = '<div class="row pt-1 pb-1 lighten-4">';
 
-        $string .= '<div class="col s12">
+        foreach($data->bomAlternative as $rowalt){
+            $string .= '<div class="col s12">
+                        <h5>'.$rowalt->name.($rowalt->is_default ? '(*)' : '').'</h5>
                         <table class="bordered" style="min-width:100%;max-width:100%;">
                             <thead>
                                 <tr>
-                                    <th colspan="8" class="center">MATERIAL</th>
+                                    <th colspan="9" class="center">MATERIAL</th>
                                 </tr>
                                 <tr>
                                     <th class="center">No</th>
@@ -290,24 +293,29 @@ class BomController extends Controller
                                     <th class="center">Satuan</th>
                                     <th class="center">Nominal</th>
                                     <th class="center">Total</th>
+                                    <th class="center">Dist.Biaya</th>
                                 </tr>
                             </thead>
                             <tbody>';
 
-        foreach($data->bomDetail as $key => $m){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td>'.$m->type().'</td>
-                <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
-                <td>'.$m->description.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
-                <td class="center-align">'.$m->lookable->uomUnit->code.'</td>
-                <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
-                <td class="right-align">'.number_format($m->total,2,',','.').'</td>
-            </tr>';
-        }
+            foreach($rowalt->bomDetail as $key => $m){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$m->type().'</td>
+                    <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
+                    <td>'.$m->description.'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
+                    <td class="center-align">'.$m->lookable->uomUnit->code.'</td>
+                    <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
+                    <td class="right-align">'.number_format($m->total,2,',','.').'</td>
+                    <td>'.($m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '').'</td>
+                </tr>';
+            }
 
-        $string .= '</tbody></table></div></div>';
+            $string .= '</tbody></table></div>';
+        }
+        
+        $string .= '</div>';
 
         return response()->json($string);
     }
@@ -317,22 +325,30 @@ class BomController extends Controller
         $bom['item_name'] = $bom->item->name;
         $bom['qty_output'] = CustomHelper::formatConditionalQty($bom->qty_output);
 
-        $arr = [];
+        $details = [];
 
-        foreach($bom->bomDetail as $m){
-            $arr[] = [
-                'lookable_type' => $m->lookable_type,
-                'lookable_id'   => $m->lookable_id,
-                'detail_text'   => $m->lookable->code.' - '.$m->lookable->name,    
-                'qty'           => CustomHelper::formatConditionalQty($m->qty),
-                'uom_unit'      => $m->lookable->uomUnit->code,
-                'nominal'       => number_format($m->nominal,2,',','.'),
-                'total'         => number_format($m->total,2,',','.'),
-                'description'   => $m->description,
-            ];
+        foreach($bom->bomAlternative as $row){
+            $arr = [];
+            foreach($row->bomDetail as $m){
+                $arr[] = [
+                    'lookable_type'             => $m->lookable_type,
+                    'lookable_id'               => $m->lookable_id,
+                    'detail_text'               => $m->lookable->code.' - '.$m->lookable->name,    
+                    'qty'                       => CustomHelper::formatConditionalQty($m->qty),
+                    'uom_unit'                  => $m->lookable->uomUnit->code,
+                    'nominal'                   => number_format($m->nominal,2,',','.'),
+                    'total'                     => number_format($m->total,2,',','.'),
+                    'description'               => $m->description,
+                    'cost_distribution_id'      => $m->cost_distribution_id ?? '',
+                    'cost_distribution_name'    => $m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '',
+                ];
+            }
+            $row['code'] = strtoupper(Str::random(10));
+            $row['details'] = $arr;
+            $details[] = $row;
         }
 
-        $bom['details'] = $arr;
+        $bom['details'] = $details;
         				
 		return response()->json($bom);
     }
@@ -418,8 +434,7 @@ class BomController extends Controller
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
-        $type = $request->type ? $request->type : '';
 		
-		return Excel::download(new ExportBom($search,$status,$type), 'bom_'.uniqid().'.xlsx');
+		return Excel::download(new ExportBom($search,$status), 'bom_'.uniqid().'.xlsx');
     }
 }

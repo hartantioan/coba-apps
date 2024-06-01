@@ -191,6 +191,7 @@ use App\Http\Controllers\Misc\NotificationController;
 
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
+use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
@@ -799,6 +800,13 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[BomController::class, 'export']);
                         Route::post('create',[BomController::class, 'create'])->middleware('operation.access:bom,update');
                         Route::post('destroy', [BomController::class, 'destroy'])->middleware('operation.access:bom,delete');
+                    });
+
+                    Route::prefix('bom_map')->middleware('operation.access:bom_map,view')->group(function () {
+                        Route::get('/',[BomMapController::class, 'index']);
+                        Route::get('datatable',[BomMapController::class, 'datatable']);
+                        Route::post('import',[BomMapController::class, 'import'])->middleware('operation.access:bom_map,update');
+                        Route::post('destroy', [BomMapController::class, 'destroy'])->middleware('operation.access:bom_map,delete');
                     });
 
                     Route::prefix('fg_group')->middleware('operation.access:fg_group,view')->group(function () {

@@ -17,6 +17,10 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+
+    table.bordered td {
+        padding: 5px !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -279,11 +283,9 @@
             document.body.classList.add('tab-active');
         }
         
-        
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
-
         
         if (select2Container) {
             select2Container.classList.add('tab-active');
@@ -381,7 +383,7 @@
             </tr>
             <tr class="row_alternative" id="detail-alternative` + count + `">
                 <td colspan="3">
-                    <table class="bordered">
+                    <table class="bordered table-composition">
                         <thead>
                             <tr>
                                 <th class="center">Tipe</th>
@@ -417,7 +419,7 @@
                     </table>
                 </td>
             </tr>
-        `)
+        `);
     }
 
     function removeAlternative(id){
@@ -432,15 +434,11 @@
     }
 
     function resetDetailForm(){
-        $('.row_detail').each(function(){
-            $(this).remove();
-        });
-        if($('.row_detail').length == 0 && $('#empty-row-detail').length == 0){
-            $('#body-detail').append(`
-                <tr id="empty-row-detail">
-                    <td colspan="9" class="center">
-                        <i>Silahkan tambahkan item / resource...</i>
-                    </td>
+        $('.row_alternative').remove();
+        if($('#body-alternative').children().length == 0){
+            $('#body-alternative').append(`
+                <tr id="empty-alternative">
+                    <td class="center-align" colspan="3">Data alternatif tidak ditemukan, silahkaan tambah manual alternatif menggunakan tombol hijau.</td>
                 </tr>
             `);
         }
@@ -683,7 +681,7 @@
                     success: function(response) {
                         loadingClose('#modal1');
                         if(response.status == 200) {
-                            /* success(); */
+                            success();
                             M.toast({
                                 html: response.message
                             });
@@ -774,50 +772,116 @@
 
                 resetDetailForm();
 
+                $('#empty-alternative').remove();
+
                 $.each(response.details, function(i, val) {
-                    if($('#empty-row-detail').length > 0){
-                        $('#empty-row-detail').remove();
-                    }
-                    var count = makeid(10);
-                    $('#body-detail').append(`
-                        <tr class="row_detail">
-                            <input name="arr_type[]" value="` + val.lookable_type + `" type="hidden">
+                    $('#body-alternative').append(`
+                        <tr class="row_alternative" id="main-alternative` + val.code + `">
+                            <input name="arr_main_alternative[]" value="` + val.code + `" type="hidden">
                             <td>
-                                ` + (val.lookable_type == 'items' ? 'Item' : 'Resource') + `
+                                <input id="arr_alternative_name` + val.code + `" name="arr_alternative_name[]" type="text" placeholder="Nama Alternatif" value="` + val.name + `">
                             </td>
-                            <td>
-                                <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `','` + val.lookable_type + `')"></select>
-                            </td>
-                            <td>
-                                <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countAll();">
-                            </td>
-                            <td class="center">
-                                <span id="arr_satuan` + count + `">` + val.uom_unit + `</span>
+                            <td class="center-align">
+                                <label>
+                                    <input type="radio" id="arr_alternative_default` + val.code + `" name="arr_alternative_default" value="1" ` + (val.is_default ? 'checked' : '') + `>
+                                    <span>Default Alternatif</span>
+                                </label>
                             </td>
                             <td>
-                                <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + val.nominal + `">
-                            </td>
-                            <td>
-                                <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + val.total + `" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + val.description + `">
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeAlternative('` + val.code + `')">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
                         </tr>
+                        <tr class="row_alternative" id="detail-alternative` + val.code + `">
+                            <td colspan="3">
+                                <table class="bordered table-composition">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Tipe</th>
+                                            <th class="center">Item/Resource</th>
+                                            <th class="center">Qty</th>
+                                            <th class="center">Satuan (Produksi)</th>
+                                            <th class="center">Nominal</th>
+                                            <th class="center">Total</th>
+                                            <th class="center">Dist.Biaya</th>
+                                            <th class="center">Deskripsi</th>
+                                            <th class="center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-detail` + val.code + `">
+                                        <tr id="empty-row-detail` + val.code + `">
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="9" class="center-align">
+                                                <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + val.code + `')" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Bahan
+                                                </a>
+                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','` + val.code + `')" href="javascript:void(0);">
+                                                    <i class="material-icons left">add</i> Resource
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </td>
+                        </tr>
                     `);
-                    $('#arr_detail' + count).append(`
-                        <option value="` + val.lookable_id + `">` + val.detail_text + `</option>
-                    `);
-                    if(val.lookable_type == 'items'){
-                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/bom_item") }}');
-                    }else if(val.lookable_type == 'resources'){
-                        select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
-                    }
+
+                    $.each(val.details, function(i, value) {
+                        var count = makeid(10);
+                        $('#body-detail' + val.code).append(`
+                            <tr class="row_detail" id="row_detail` + count + `">
+                                <input name="arr_alternative[]" value="` + val.code + `" type="hidden">
+                                <input name="arr_type[]" value="` + value.lookable_type + `" type="hidden">
+                                <td>
+                                    ` + (value.lookable_type == 'items' ? 'Item' : 'Resource') + `
+                                </td>
+                                <td>
+                                    <select class="browser-default" name="arr_detail[]" id="arr_detail` + count + `" onchange="getRowUnit('` + count + `','` + value.lookable_type + `')"></select>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiah(this);countAll();">
+                                </td>
+                                <td class="center">
+                                    <span id="arr_satuan` + count + `">` + value.uom_unit + `</span>
+                                </td>
+                                <td>
+                                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + value.nominal + `">
+                                </td>
+                                <td>
+                                    <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + value.total + `" readonly>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                </td>
+                                <td>
+                                    <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + value.description + `">
+                                </td>
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);" onclick="deleteDetail('` + count + `','` + val.code + `')">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        $('#arr_detail' + count).append(`
+                            <option value="` + value.lookable_id + `">` + value.detail_text + `</option>
+                        `);
+                        if(value.lookable_type == 'items'){
+                            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/bom_item") }}');
+                        }else if(value.lookable_type == 'resources'){
+                            select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
+                        }
+                        if(value.cost_distribution_id){
+                            $('#arr_cost_distribution' + count).append(`
+                                <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+                    });
                 });
 
                 $('.modal-content').scrollTop(0);
@@ -938,8 +1002,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var type = $('#filter_type').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&type=" + type;
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

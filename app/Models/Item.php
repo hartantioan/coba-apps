@@ -371,6 +371,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemQcParameter','item_id','id');
     }
 
+    public function fgGroup()
+    {
+        return $this->hasMany('App\Models\FgGroup','parent_id','id');
+    }
+
     public function benchmarkPrice()
     {
         return $this->hasMany('App\Models\BenchmarkPrice','item_id','id')->where('status','1');

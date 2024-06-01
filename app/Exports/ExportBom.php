@@ -12,13 +12,12 @@ class ExportBom implements FromView
     * @return \Illuminate\Support\Collection
     */
 
-    protected $search, $status, $type;
+    protected $search, $status;
 
-    public function __construct(string $search, string $status, string $type)
+    public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';
 		$this->status = $status ? $status : '';
-        $this->type = $type ? $type : '';
     }
 
     public function view(): View
@@ -39,10 +38,6 @@ class ExportBom implements FromView
     
                 if($this->status){
                     $query->where('status', $this->status);
-                }
-    
-                if($this->type){
-                    $query->where('type', $this->type);
                 }
             })->get()
         ]);

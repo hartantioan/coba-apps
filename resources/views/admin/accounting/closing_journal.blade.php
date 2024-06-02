@@ -110,7 +110,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card purple">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Tutup Periode akan menghasilkan membalik biaya dan penjualan. Dimana selisihnya akan menjadi Laba Periode Berjalan.</p>
+                                                    <p>Info : Tutup Periode akan membalik biaya dan penjualan. Dimana selisihnya akan menjadi Laba Periode Berjalan.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>

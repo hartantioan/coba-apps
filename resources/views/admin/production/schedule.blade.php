@@ -381,6 +381,21 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col s12">
+                                <fieldset style="min-width: 100%;">
+                                    <legend>5. Peta Kebutuhan Produksi</legend>
+                                    <div class="card-alert card gradient-45deg-yellow-green">
+                                        <div class="card-content">
+                                            <p>Info : Peta kebutuhan produksi diambil dari relasi BOM yang diatur pada master data. Jika ada lebih dari 1 bom yang ter-set, maka bom terbaru yang akan digunakan, dan jika ada lebih dari 1 alternatif, maka alternatif default yang akan dipakai.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col m12 s12" style="overflow:auto;width:100% !important;">
+
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="input-field col s12 m6 l4">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>

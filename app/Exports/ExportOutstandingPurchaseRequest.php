@@ -40,6 +40,8 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
             $entry["note1"] = $row->note;
             $entry["note2"] = $row->note2;
             $entry["satuan"] =$row->itemUnit->unit->code;
+            $entry["plant"] =$row->place->code;
+            $entry["warehouse"] =$row->warehouse->name;
             $entry["qty"] = $row->qty;
             $entry["qty_po"] = $row->qtyPO();
             $entry["qty_balance"] = $row->qtyBalance();

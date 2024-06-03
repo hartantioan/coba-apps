@@ -45,6 +45,8 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
             $entry["satuan"] =$row->itemUnit->unit->code;
             $entry["qty"] = $row->qty;
             $entry["qty_gr"] = $row->qtyGR();
+            $entry["plant"] =$row->place->code;
+            $entry["warehouse"] =$row->warehouse->name;
             $entry["qty_balance"] = $row->getBalanceReceipt();
             if($row->getBalanceReceipt()> 0){
                 $array[] = $entry;

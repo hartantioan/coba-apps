@@ -473,6 +473,10 @@ class Item extends Model
         return $this->hasMany('App\Models\Bom','item_id','id')->where('status','1');
     }
 
+    public function listBom(){
+        $firstBom = $this->bom()->latest()->first();
+    }
+
     public function bomDetail()
     {
         return $this->hasMany('App\Models\BomDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('bom',function($query){

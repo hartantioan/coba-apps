@@ -12,6 +12,8 @@
             <th class="center-align">Keterangan</th>
             <th class="center-align">Tipe Pengiriman</th>
             <th class="center-align">Status</th>
+            <th class="center-align">Plant</th>
+            <th class="center-align">Gudang</th>
             <th class="center-align">Grup Item</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
@@ -35,6 +37,8 @@
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['shipping_type'] }}</td>
                 <td>{{ $row['status'] }}</td>
+                <td>{{ $row['plant'] }}</td>
+                <td>{{ $row['warehouse'] }}</td>
                 <td>{{ $row['group_item'] }}</td>
                 <td>{{ $row['item_code'] }}</td>
                 <td>{{ $row['item_name'] }}</td>

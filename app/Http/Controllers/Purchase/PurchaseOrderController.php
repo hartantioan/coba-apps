@@ -1854,7 +1854,7 @@ class PurchaseOrderController extends Controller
     }
 
     public function export(Request $request){
-        $menu = Menu::where('url','material_request')->first();
+        $menu = Menu::where('url','purchase_order')->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';

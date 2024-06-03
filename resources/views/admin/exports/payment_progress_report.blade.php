@@ -52,31 +52,25 @@
                     @foreach ($inv['pyr'] as $pyrIndex => $pyr)
                         @if($masuk == 1)
                             <tr>
-                                @if ($grinvIndex === 0 && $invIndex === 0 && $pyrIndex === 0)
-                                    @php $no++; @endphp
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $no }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['item_code'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['item'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['po_code'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['po_date'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['po_qty'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['nominal'] }}</td>
-                                    <td rowspan="{{ $row['rowspan'] }}">{{ $row['status'] }}</td>
-                                @endif
-                                @if ($invIndex === 0 && $pyrIndex === 0)
-                                    <td rowspan="{{ $grpo['rowspan'] }}">{{ $grpo['grpo_code'] }}</td>
-                                    <td rowspan="{{ $grpo['rowspan'] }}">{{ $grpo['grpo_date'] }}</td>
-                                    <td rowspan="{{ $grpo['rowspan'] }}">{{ $grpo['grpo_qty'] }}</td>
-                                    <td rowspan="{{ $grpo['rowspan'] }}">{{ $grpo['nominal'] }}</td>
-                                    <td rowspan="{{ $grpo['rowspan'] }}">{{ $grpo['status'] }}</td>
-                                @endif
-                                @if ($pyrIndex === 0)
-                                    <td rowspan="{{ $grpoCount }}">{{ $inv['inv_code'] }}</td>
-                                    <td rowspan="{{ $grpoCount }}">{{ $inv['inv_date'] }}</td>
-                                    <td rowspan="{{ $grpoCount }}">{{ $inv['inv_qty'] }}</td>
-                                    <td rowspan="{{ $grpoCount }}">{{ $inv['nominal'] }}</td>
-                                    <td rowspan="{{ $grpoCount }}">{{ $inv['status'] }}</td>
-                                @endif
+                                @php $no++; @endphp
+                                <td >{{ $no }}</td>
+                                <td >{{ $row['item_code'] }}</td>
+                                <td >{{ $row['item'] }}</td>
+                                <td >{{ $row['po_code'] }}</td>
+                                <td >{{ $row['po_date'] }}</td>
+                                <td >{{ $row['po_qty'] }}</td>
+                                <td >{{ $row['nominal'] }}</td>
+                                <td >{{ $row['status'] }}</td>
+                                <td >{{ $grpo['grpo_code'] }}</td>
+                                <td >{{ $grpo['grpo_date'] }}</td>
+                                <td >{{ $grpo['grpo_qty'] }}</td>
+                                <td >{{ $grpo['nominal'] }}</td>
+                                <td >{{ $grpo['status'] }}</td>
+                                <td >{{ $inv['inv_code'] }}</td>
+                                <td >{{ $inv['inv_date'] }}</td>
+                                <td >{{ $inv['inv_qty'] }}</td>
+                                <td >{{ $inv['nominal'] }}</td>
+                                <td >{{ $inv['status'] }}</td>
                                 <td>{{ $pyr['pyr_code'] }}</td>
                                 <td>{{ $pyr['pyr_date'] }}</td>
                                 <td>{{ $pyr['pyr_qty'] }}</td>
@@ -91,3 +85,4 @@
         @endforeach
     </tbody>
 </table>
+

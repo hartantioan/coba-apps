@@ -2601,7 +2601,7 @@
                                         <input name="arr_note3[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 3..." value="` + val.note3 + `">
                                     </td>
                                     <td>
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty_limit + `" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                     </td>
                                     <td class="center">
                                         <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" required onchange="countRow('` + count + `')">

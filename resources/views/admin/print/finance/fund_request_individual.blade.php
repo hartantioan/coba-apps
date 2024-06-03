@@ -307,10 +307,10 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Status
+                                            Status Dokumen
                                         </td>
                                         <td width="60%">
-                                            : {{ $data->statusRaw() }}
+                                            : {{ $data->documentStatus() }}
                                         </td>
                                     </tr>
                                 </table>

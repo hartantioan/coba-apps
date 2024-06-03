@@ -279,10 +279,17 @@
                                             <p>Info : Item yang muncul pada jadwal produksi dibawah adalah, daftar item yang hanya memiliki BOM yang aktif.</p>
                                         </div>
                                     </div>
-                                    <div class="col m12 s12 step11" style="overflow:auto;width:100% !important;">
+                                    <ul class="tabs step11">
+                                        <li class="tab col m6 s12 l6"><a class="active" href="#normal">Normal</a></li>
+                                        <li class="tab col m6 s12 l6"><a href="#powder">Powder</a></li>
+                                    </ul>
+                                    <div id="normal" class="col m12 s12 active" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="min-width:2500px;">
                                                 <thead>
+                                                    <tr>
+                                                        <th class="center" colspan="11">NORMAL BOM</th>
+                                                    </tr>
                                                     <tr>
                                                         <th class="center">Item</th>
                                                         <th class="center">Qty</th>
@@ -297,24 +304,71 @@
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="body-item-detail" id="body-item-detail">
-                                                    <tr class="last-row-item-detail">
+                                                <tbody class="body-item-detail-normal" id="body-item-detail-normal">
+                                                    <tr class="last-row-item-detail-normal">
                                                         <td colspan="11">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
-                                                    <tr id="total-row-detail">
+                                                    <tr id="total-row-detail-normal">
                                                         <td class="right-align">
                                                             TOTAL :
                                                         </td>
-                                                        <td class="right-align" id="data-foot-detail">
+                                                        <td class="right-align" id="data-foot-detail-normal">
                                                             0,000
                                                         </td>
                                                         <td colspan="9"></td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="11">
-                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem('normal')" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                    <div id="powder" class="col s12" style="overflow:auto;min-width:100%;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="min-width:2500px;">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center" colspan="11">POWDER BOM</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="center">Item</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Satuan UoM</th>
+                                                        <th class="center">BOM</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">Tgl.Mulai</th>
+                                                        <th class="center">Tgl.Selesai</th>
+                                                        <th class="center">Shift</th>
+                                                        <th class="center">Group</th>
+                                                        <th class="center">Remark</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-item-detail-powder" id="body-item-detail-powder">
+                                                    <tr class="last-row-item-detail-powder">
+                                                        <td colspan="11">
+                                                            Silahkan tambahkan Marketing Order Produksi...
+                                                        </td>
+                                                    </tr>
+                                                    <tr id="total-row-detail-powder">
+                                                        <td class="right-align">
+                                                            TOTAL :
+                                                        </td>
+                                                        <td class="right-align" id="data-foot-detail-powder">
+                                                            0,000
+                                                        </td>
+                                                        <td colspan="9"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="11">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem('powder');" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
                                                         </td>
@@ -604,6 +658,11 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                $('.tabs').tabs({
+                    onShow: function () {
+                        
+                    }
+                });
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -659,7 +718,12 @@
             countTarget();
         });
 
-        $('.body-item-detail').on('click', '.delete-data-item-detail', function() {
+        $('.body-item-detail-normal').on('click', '.delete-data-item-detail-normal', function() {
+            $(this).closest('tr').remove();
+            countDetail();
+        });
+
+        $('.body-item-detail-powder').on('click', '.delete-data-item-detail-powder', function() {
             $(this).closest('tr').remove();
             countDetail();
         });
@@ -701,12 +765,12 @@
     }
 
     function countDetail(){
-        let total = 0;
-        $('input[name^="arr_detail_qty[]"]').each(function(){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        let totalNormal = 0;
+        $('#body-item-detail-normal > input[name^="arr_detail_qty[]"]').each(function(){
+            totalNormal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
-        $('#data-foot-detail').text(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toString().replace('.',','))
+        $('#data-foot-detail-normal').text(
+            (totalNormal >= 0 ? '' : '-') + formatRupiahIni(totalNormal.toString().replace('.',','))
         );
     }
 
@@ -895,13 +959,14 @@
         }
     }
 
-    function addItem(){
-        if($('.last-row-item-detail').length > 0){
-            $('.last-row-item-detail').remove();
+    function addItem(type){
+        if($('.last-row-item-detail-' + type).length > 0){
+            $('.last-row-item-detail-' + type).remove();
         }
         var count = makeid(10);
-        $('#total-row-detail').before(`
+        $('#total-row-detail-' + type).before(`
             <tr class="row_item_detail">
+                <input type="hidden" name="arr_type[]" value="` + type + `">
                 <td>
                     <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
                 </td>
@@ -935,7 +1000,7 @@
                     <input name="arr_note[]" type="text" required>
                 </td>
                 <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>

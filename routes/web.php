@@ -195,6 +195,7 @@ use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
+use App\Http\Controllers\MasterData\TankController;
 
 /*
 |--------------------------------------------------------------------------
@@ -814,6 +815,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable',[FgGroupController::class, 'datatable']);
                         Route::post('import',[FgGroupController::class, 'import'])->middleware('operation.access:fg_group,update');
                         Route::post('destroy', [FgGroupController::class, 'destroy'])->middleware('operation.access:fg_group,delete');
+                    });
+
+                    Route::prefix('tank')->middleware('operation.access:tank,view')->group(function () {
+                        Route::get('/',[TankController::class, 'index']);
+                        Route::get('datatable',[TankController::class, 'datatable']);
+                        Route::post('show', [TankController::class, 'show']);
+                        Route::post('create',[TankController::class, 'create'])->middleware('operation.access:tank,update');
+                        Route::post('destroy', [TankController::class, 'destroy'])->middleware('operation.access:tank,delete');
                     });
                 });
 

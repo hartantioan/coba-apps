@@ -282,7 +282,7 @@ class BomController extends Controller
                         <table class="bordered" style="min-width:100%;max-width:100%;">
                             <thead>
                                 <tr>
-                                    <th colspan="9" class="center">MATERIAL</th>
+                                    <th colspan="10" class="center">MATERIAL</th>
                                 </tr>
                                 <tr>
                                     <th class="center">No</th>
@@ -294,6 +294,7 @@ class BomController extends Controller
                                     <th class="center">Nominal</th>
                                     <th class="center">Total</th>
                                     <th class="center">Dist.Biaya</th>
+                                    <th class="center">Issue Method</th>
                                 </tr>
                             </thead>
                             <tbody>';
@@ -309,6 +310,7 @@ class BomController extends Controller
                     <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
                     <td class="right-align">'.number_format($m->total,2,',','.').'</td>
                     <td>'.($m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '').'</td>
+                    <td class="center-align">'.$m->issueMethod().'</td>
                 </tr>';
             }
 

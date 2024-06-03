@@ -23,7 +23,8 @@ class BomDetail extends Model
         'qty',
         'nominal',
         'total',
-        'description'
+        'description',
+        'issue_method',
     ];
 
     public function costDistribution()
@@ -49,6 +50,16 @@ class BomDetail extends Model
             'items'     => 'ITEM',
             'resources' => 'RESOURCE',
             default     => 'INVALID',
+        };
+  
+        return $type;
+    }
+
+    public function issueMethod(){
+        $type = match ($this->issue_method) {
+            '1'     => 'MANUAL',
+            '2'     => 'BACKFLUSH',
+            default => 'INVALID',
         };
   
         return $type;

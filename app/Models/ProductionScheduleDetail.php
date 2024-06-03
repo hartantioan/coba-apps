@@ -26,6 +26,8 @@ class ProductionScheduleDetail extends Model
         'end_date',
         'note',
         'status',
+        'type',
+        'status_process',
     ];
 
     public function productionSchedule()
@@ -62,5 +64,27 @@ class ProductionScheduleDetail extends Model
         };
 
         return $status;
+    }
+
+    public function statusProcess(){
+        $status = match ($this->status) {
+            NULL    => 'Menunggu',
+            '1'     => 'Proses',
+            '2'     => 'Selesai',
+            '3'     => 'Ditunda',
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+            '1'     => 'Normal',
+            '2'     => 'Powder',
+            default => 'Invalid',
+        };
+
+        return $type;
     }
 }

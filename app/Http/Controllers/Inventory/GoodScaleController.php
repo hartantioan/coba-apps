@@ -170,9 +170,9 @@ class GoodScaleController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $updateBtn = '';
-                if($val->alreadyChecked()){
+                /* if($val->alreadyChecked()){ */
                     $updateBtn = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small disable" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>';
-                }
+                /* } */
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,

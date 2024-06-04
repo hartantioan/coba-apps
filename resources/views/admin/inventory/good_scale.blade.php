@@ -1285,12 +1285,12 @@
                     if($('#modal1').hasClass('open')){
                         if(!$('#temp').val()){
                             $('#qty_in').val(response);
-                            countBalance(this);
+                            /* countBalance(); */
                         }
                     }
                     if($('#modal6').hasClass('open')){
-                        $('#qty_in').val(response);
-                        countBalance(this);
+                        $('#qtyOutUpdate').val(response);
+                        countBalance();
                     }
                 }
             });
@@ -1469,10 +1469,12 @@
     }
 
     function countBalance(element){
-        let balance = parseFloat($('#arr_qty_in' + $(element).data('id')).val().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('#arr_qty_out' + $(element).data('id')).val().replaceAll(".", "").replaceAll(",","."));
-        $('#qtyBalance' + $(element).data('id')).text(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(3).toString().replace('.',','))
-        );
+        if($('#modal6').hasClass('open')){
+            let balance = parseFloat($('#qtyInUpdate').text().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('#qtyOutUpdate').val().replaceAll(".", "").replaceAll(",","."));
+            $('#qtyBalanceUpdate').text(
+                (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(3).toString().replace('.',','))
+            );
+        }
     }
 
     function applyDocuments(){

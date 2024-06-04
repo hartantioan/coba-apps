@@ -138,7 +138,7 @@
                                         <div class="col s12">
                                             <div class="card-alert card green">
                                                 <div class="card-content white-text">
-                                                    <p>Info : Ada 2 tahapan penimbangan, yakni ketika truk timbang datang, dan truk timbang pulang.</p>
+                                                    <p>Info : Ada 3 tahapan penimbangan, yakni ketika truk timbang datang, pengecekan QC dan truk timbang pulang (jika lolos pengecekan QC).</p>
                                                 </div>
                                             </div>
                                             {{-- <div class="card-alert card purple">

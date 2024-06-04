@@ -1471,7 +1471,7 @@
     function countBalance(){
         if($('#modal6').hasClass('open')){
             let balance = parseFloat($('#qtyInUpdate').text().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('#qtyOutUpdate').val().replaceAll(".", "").replaceAll(",","."));
-            $('#qtyBalanceUpdate').text(
+            $('#qtyBalanceUpdate').val(
                 (balance >= 0 ? '' : '-') + formatRupiahIni(balance.toFixed(3).toString().replace('.',','))
             );
         }

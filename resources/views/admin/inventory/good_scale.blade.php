@@ -808,7 +808,7 @@
             onOpenStart: function(modal,trigger) {
             },
             onOpenEnd: function(modal, trigger) { 
-                /* getWeight(); */
+                getWeight();
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -819,7 +819,7 @@
                 $('#tempPlace').val('');
                 $('#tempGoodScale').val('');
                 $('#previewImageIn').attr('src','');
-                /* clearGetWeight(); */
+                clearGetWeight();
                 $('#videoSource1').empty();
                 $('#previewImage1').attr('src','');
                 if (window.stream) {
@@ -848,7 +848,7 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
-                /* getWeight(); */
+                getWeight();
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -863,7 +863,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                /* clearGetWeight(); */
+                clearGetWeight();
                 $('.row_item').remove();
                 $('#videoSource').empty();
                 $('#previewImage').attr('src','');
@@ -1285,12 +1285,12 @@
                     if($('#modal1').hasClass('open')){
                         if(!$('#temp').val()){
                             $('#qty_in').val(response);
-                            /* countBalance(this); */
+                            countBalance(this);
                         }
                     }
                     if($('#modal6').hasClass('open')){
                         $('#qty_in').val(response);
-                        /* countBalance(this); */
+                        countBalance(this);
                     }
                 }
             });

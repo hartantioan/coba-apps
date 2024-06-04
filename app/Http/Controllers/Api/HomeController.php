@@ -42,15 +42,15 @@ class HomeController extends Controller
             if($weight){
                 $weight->update([
                     'code'      => Str::random(25),
-                    'place_id'  => $request->place_id,
-                    'nominal'   => $request->nominal,
+                    'place_id'  => intval($request->place_id),
+                    'nominal'   => intval($request->nominal),
                     'rawdata'   => $request->rawdata,
                 ]);
             }else{
                 $weight = Weight::create([
                     'code'      => Str::random(25),
-                    'place_id'  => $request->place_id,
-                    'nominal'   => $request->nominal,
+                    'place_id'  => intval($request->place_id),
+                    'nominal'   => intval($request->nominal),
                     'rawdata'   => $request->rawdata,
                 ]);
             }

@@ -1468,7 +1468,7 @@
         }
     }
 
-    function countBalance(element){
+    function countBalance(){
         if($('#modal6').hasClass('open')){
             let balance = parseFloat($('#qtyInUpdate').text().replaceAll(".", "").replaceAll(",",".")) - parseFloat($('#qtyOutUpdate').val().replaceAll(".", "").replaceAll(",","."));
             $('#qtyBalanceUpdate').text(

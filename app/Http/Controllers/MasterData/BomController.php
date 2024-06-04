@@ -46,6 +46,7 @@ class BomController extends Controller
             'place_id',
             'warehouse_id',
             'qty_output',
+            'is_powder',
             'status'
         ];
 
@@ -113,6 +114,7 @@ class BomController extends Controller
                     $val->place->code,
                     $val->warehouse->name,
                     CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
+                    $val->isPowder(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -195,6 +197,7 @@ class BomController extends Controller
                     $query->warehouse_id        = $request->warehouse_id;
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
                     $query->status              = $request->status ? $request->status : '2';
+                    $query->is_powder           = $request->is_powder ?? NULL;
                     $query->save();
 
                     $query->bomDetail()->delete();
@@ -216,6 +219,7 @@ class BomController extends Controller
                         'warehouse_id'      => $request->warehouse_id,
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
                         'status'            => $request->status ? $request->status : '2',
+                        'is_powder'         => $request->is_powder ?? NULL,
                     ]);
 
                     DB::commit();

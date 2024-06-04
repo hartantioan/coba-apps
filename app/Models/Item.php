@@ -366,11 +366,6 @@ class Item extends Model
         return $this->hasMany('App\Models\ItemBuffer','item_id','id');
     }
 
-    public function itemQcParameter()
-    {
-        return $this->hasMany('App\Models\ItemQcParameter','item_id','id');
-    }
-
     public function fgGroup()
     {
         return $this->hasMany('App\Models\FgGroup','parent_id','id');
@@ -474,7 +469,136 @@ class Item extends Model
     }
 
     public function listBom(){
+        $arr = [];
         $firstBom = $this->bom()->latest()->first();
+        if($firstBom){
+            $data1 = [
+                'name'          => $firstBom->code.' - '.$firstBom->name,
+                'qty'           => $firstBom->qty_output,
+                'unit'          => $firstBom->item->uomUnit->code,
+                'details'       => [],
+            ];
+            if(!$firstBom->bomParentMap()->exists()){
+                $details = [];
+                foreach($firstBom->bomDetail()->whereHas('bomAlternative',function($query){
+                    $query->whereNotNull('is_default');
+                })->where('lookable_type','items')->get() as $row){
+                    $details[] = [
+                        'name'      => $row->item->code.' - '.$row->item->name,
+                        'qty'       => $row->qty,
+                        'unit'      => $row->item->uomUnit->code,
+                    ];
+                }
+                $data1['details'] = $details;
+            }else{
+                $secondBom = $firstBom->bomParentMap()->latest()->first();
+                if($secondBom){
+                    $data2 = [
+                        'name'          => $secondBom->child->code.' - '.$secondBom->child->name,
+                        'qty'           => $secondBom->child->qty_output,
+                        'unit'          => $secondBom->child->item->uomUnit->code,
+                        'details'       => [],
+                    ];
+                    if(!$secondBom->child->bomParentMap()->exists()){
+                        $details = [];
+                        foreach($secondBom->child->bomDetail()->whereHas('bomAlternative',function($query){
+                            $query->whereNotNull('is_default');
+                        })->where('lookable_type','items')->get() as $row){
+                            $details[] = [
+                                'name'      => $row->item->code.' - '.$row->item->name,
+                                'qty'       => $row->qty,
+                                'unit'      => $row->item->uomUnit->code,
+                            ];
+                        }
+                        $data2['details'] = $details;
+                    }else{
+                        $thirdBom = $secondBom->child->bomParentMap()->latest()->first();
+                        if($thirdBom){
+                            $data3 = [
+                                'name'          => $thirdBom->child->code.' - '.$thirdBom->child->name,
+                                'qty'           => $thirdBom->child->qty_output,
+                                'unit'          => $thirdBom->child->item->uomUnit->code,
+                                'details'       => [],
+                            ];
+                            if(!$thirdBom->child->bomParentMap()->exists()){
+                                $details = [];
+                                foreach($thirdBom->child->bomDetail()->whereHas('bomAlternative',function($query){
+                                    $query->whereNotNull('is_default');
+                                })->where('lookable_type','items')->get() as $row){
+                                    $details[] = [
+                                        'name'      => $row->item->code.' - '.$row->item->name,
+                                        'qty'       => $row->qty,
+                                        'unit'      => $row->item->uomUnit->code,
+                                    ];
+                                }
+                                $data3['details'] = $details;
+                            }else{
+                                $fourthBom = $thirdBom->child->bomParentMap()->latest()->first();
+                                if($fourthBom){
+                                    $data4 = [
+                                        'name'          => $fourthBom->child->code.' - '.$fourthBom->child->name,
+                                        'qty'           => $fourthBom->child->qty_output,
+                                        'unit'          => $fourthBom->child->item->uomUnit->code,
+                                    ];
+                                    if(!$fourthBom->child->bomParentMap()->exists()){
+                                        $details = [];
+                                        foreach($fourthBom->child->bomDetail()->whereHas('bomAlternative',function($query){
+                                            $query->whereNotNull('is_default');
+                                        })->where('lookable_type','items')->get() as $row){
+                                            $details[] = [
+                                                'name'      => $row->item->code.' - '.$row->item->name,
+                                                'qty'       => $row->qty,
+                                                'unit'      => $row->item->uomUnit->code,
+                                            ];
+                                        }
+                                        $data4['details'] = $details;
+                                    }else{
+                                        $fifthBom = $fourthBom->child->bomParentMap()->latest()->first();
+                                        if($fifthBom){
+                                            $data5 = [
+                                                'name'          => $fifthBom->child->code.' - '.$fifthBom->child->name,
+                                                'qty'           => $fifthBom->child->qty_output,
+                                                'unit'          => $fifthBom->child->item->uomUnit->code,
+                                                'details'       => [],
+                                            ];
+                                            if(!$fifthBom->child->bomParentMap()->exists()){
+                                                $details = [];
+                                                foreach($fifthBom->child->bomDetail()->whereHas('bomAlternative',function($query){
+                                                    $query->whereNotNull('is_default');
+                                                })->where('lookable_type','items')->get() as $row){
+                                                    $details[] = [
+                                                        'name'      => $row->item->code.' - '.$row->item->name,
+                                                        'qty'       => $row->qty,
+                                                        'unit'      => $row->item->uomUnit->code, 
+                                                    ];
+                                                }
+                                                $data5['details'] = $details;
+                                            }else{
+                                                $sixthBom = $fifthBom->child->bomParentMap()->latest()->first();
+                                                if($sixthBom){
+                                                    $arr[] = [
+                                                        'name'          => $sixthBom->child->code.' - '.$sixthBom->child->name,
+                                                        'qty'           => $sixthBom->child->qty_output,
+                                                        'unit'          => $sixthBom->child->item->uomUnit->code,
+                                                        'details'       => [],
+                                                    ];
+                                                }
+                                            }
+                                            $arr[] = $data5;
+                                        }
+                                    }
+                                    $arr[] = $data4;
+                                }
+                            }
+                            $arr[] = $data3;
+                        }
+                    }
+                    $arr[] = $data2;
+                }
+            }
+            $arr[] = $data1;
+        }
+        return $arr;
     }
 
     public function bomDetail()

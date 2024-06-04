@@ -98,6 +98,7 @@
                                                         <th>Plant</th>
                                                         <th>Gudang</th>
                                                         <th>Qty Output</th>
+                                                        <th>Bom Powder</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -159,6 +160,17 @@
                                 @endforeach
                             </select>
                             <label class="" for="warehouse_id">Gudang</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <div class="switch mb-1">
+                                <label for="status">BOM Powder</label>
+                                <label class="right">
+                                    Tidak
+                                    <input checked type="checkbox" id="is_powder" name="is_powder" value="1">
+                                    <span class="lever"></span>
+                                    Ya
+                                </label>
+                            </div>
                         </div>
                         <div class="input-field col s12 m3">
                             <div class="switch mb-1">
@@ -599,6 +611,7 @@
                 { name: 'place', className: 'center-align' },
                 { name: 'warehouse', className: 'center-align' },
                 { name: 'qty_output', className: 'center-align' },
+                { name: 'is_powder', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -768,6 +781,12 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
+                }
+
+                if(response.is_powder == '1'){
+                    $('#is_powder').prop( "checked", true);
+                }else{
+                    $('#is_powder').prop( "checked", false);
                 }
 
                 resetDetailForm();

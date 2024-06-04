@@ -145,7 +145,6 @@
                                                         <th>Code</th>
                                                         <th>Ref.PO</th>
                                                         <th>Pengguna</th>
-                                                        <th>Supplier</th>
                                                         <th>Tanggal</th>
                                                         <th>Keterangan</th>
                                                         <th>Driver</th>
@@ -154,6 +153,7 @@
                                                         <th>Status Dokumen</th>
                                                         <th>Status QC</th>
                                                         <th>Catatan QC</th>
+                                                        <th>Kadar Air (%)</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -227,24 +227,17 @@
                                 </div>
                                 <label class="active" for="purchase_order">Purchase Order</label>
                             </div>
-                            <div class="input-field col m3 s12">
-                                <div id="qty_in" class="mt-2">
-
-                                </div>
-                                <label class="active" for="qty_in">Qty Bruto</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <div id="qty_out" class="mt-2">
-
-                                </div>
-                                <label class="active" for="qty_out">Qty Tara</label>
-                            </div>
+                            <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="status_qc" name="status_qc">
                                     <option value="1">Disetujui</option>
                                     <option value="2">Ditolak</option>
                                 </select>
                                 <label class="" for="status_qc">Status QC</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="water_content" name="water_content" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <label class="active" for="water_content">Kadar Air (%)</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -270,23 +263,6 @@
                             </div>
                             <div class="col m12 s12">
                                 <h6><b>Timbangan Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
-                            </div>
-                            <div class="col m6 s12">
-                                <p class="mt-2 mb-2">
-                                    <h5>Detail Pemeriksaan Barang</h5>
-                                    <table class="bordered" id="table-detail">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">No</th>
-                                                <th class="center">Parameter</th>
-                                                <th class="center">Nominal</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item"></tbody>
-                                    </table>
-                                </p>
                             </div>
                         </div>
                     </div>
@@ -575,7 +551,6 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'other', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'driver', className: 'center-align' },
@@ -584,6 +559,7 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'water_content', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -684,31 +660,12 @@
                     $('#vehicle_no').text(response.vehicle_no);
                     $('#item_name').text(response.item_name);
                     $('#purchase_order').text(response.purchase_order);
-                    $('#qty_in').text(response.qty_in);
-                    $('#qty_out').text(response.qty_out);
                     $('#list-used-data').append(`
                         <div class="chip purple darken-4 gradient-shadow white-text">
                             ` + response.code + `
                             <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                         </div>
                     `);
-                    if(response.parameters.length > 0){
-                        $.each(response.parameters, function(i, val) {
-                            var count = makeid(10);
-                            $('#body-item').append(`
-                                <tr class="row_item" data-id="` + response.id + `">
-                                    <input type="hidden" name="arr_detail[]" value="` + response.id + `">
-                                    <input type="hidden" name="arr_is_affect_qty[]" value="` + val.is_affect_qty + `">
-                                    <td>` + (i+1) + `</td>
-                                    <td><input type="text" name="arr_parameter_name[]" value="` + val.name + `" readonly></td>
-                                    <td><input class="data-input" type="text" onkeyup="formatRupiahNoMinus(this);" name="arr_parameter_nominal[]" value="0,000"></td>
-                                    <td><input type="text" name="arr_parameter_unit[]" value="` + val.unit + `" readonly></td>
-                                    <td><input class="data-input" type="text" name="arr_parameter_note[]" value="-"></td>
-                                </tr>
-                            `);
-                        });
-                    }
-                    
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();

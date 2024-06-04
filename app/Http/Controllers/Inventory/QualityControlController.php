@@ -60,7 +60,6 @@ class QualityControlController extends Controller
             'id',
             'code',
             'user_id',
-            'account_id',
             'post_date',
             'note',
             'driver',
@@ -73,7 +72,7 @@ class QualityControlController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = GoodScale::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = GoodScale::whereNotNull('is_quality_check')->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
         $query_data = GoodScale::where(function($query) use ($search, $request) {
                 if($search) {
@@ -106,6 +105,7 @@ class QualityControlController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
+            ->whereNotNull('is_quality_check')
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
             ->limit($length)
@@ -143,6 +143,7 @@ class QualityControlController extends Controller
                     $query->whereIn('status', $request->status);
                 }
             })
+            ->whereNotNull('is_quality_check')
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->count();
 
@@ -155,7 +156,6 @@ class QualityControlController extends Controller
                     $val->code,
                     $val->referencePO(),
                     $val->user->name,
-                    $val->account->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->driver,
@@ -164,6 +164,7 @@ class QualityControlController extends Controller
                     $val->status(),
                     $val->statusQc(),
                     $val->note_qc,
+                    CustomHelper::formatConditionalQty($val->water_content),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (
@@ -214,26 +215,12 @@ class QualityControlController extends Controller
 
             $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
             $data['post_date'] = date('d/m/Y',strtotime($data->post_date));
-            $parameter = [];
-
-            foreach($data->item->itemQcParameter as $rowparam){
-                $parameter[] = [
-                    'name'          => $rowparam->name,
-                    'unit'          => $rowparam->unit,
-                    'is_affect_qty' => $rowparam->is_affect_qty ?? '',
-                ];
-            }
 
             $data['purchase_order']     = $data->purchaseOrderDetail->purchaseOrder->code;
             $data['item_name']          = $data->item->code.' - '.$data->item->name;
-            $data['qty_po']             = CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty).' '.$data->purchaseOrderDetail->itemUnit->unit->code;
-            $data['qty_in']             = CustomHelper::formatConditionalQty($data->qty_in).' - '.$data->itemUnit->unit->code;
-            $data['qty_out']             = CustomHelper::formatConditionalQty($data->qty_out).' - '.$data->itemUnit->unit->code;
-            $data['unit']               = $data->itemUnit->unit->code;
             $data['place_name']         = $data->place->code;
             $data['warehouse_name']     = $data->warehouse->name;
             $data['note']               = $data->note;
-            $data['parameters']         = $parameter;
             $data['is_hide_supplier']   = $data->item->is_hide_supplier ?? '';
 
             return response()->json($data);
@@ -252,24 +239,11 @@ class QualityControlController extends Controller
         $validation = Validator::make($request->all(), [
             'status_qc'                 => 'required',
             'note'                      => 'required',
-            'arr_detail'                => 'required|array',
-            'arr_parameter_name'        => 'required|array',
-            'arr_parameter_nominal'     => 'required|array',
-            'arr_parameter_unit'        => 'required|array',
-            'arr_parameter_note'        => 'required|array',
+            'water_content'             => 'required',
 		], [
             'status_qc.required' 	            => 'Status tidak boleh kosong.',
             'note.required'                     => 'Keterangan tidak boleh kosong.',
-            'arr_detail.required'               => 'Detail id tidak boleh kosong.',
-            'arr_detail.array'                  => 'Detail id harus array.',
-            'arr_parameter_name.required'       => 'Nama tidak boleh kosong.',
-            'arr_parameter_name.array'          => 'Nama harus array.',
-            'arr_parameter_nominal.required'    => 'Nominal tidak boleh kosong.',
-            'arr_parameter_nominal.array'       => 'Nominal harus array.',
-            'arr_parameter_unit.required'       => 'Satuan tidak boleh kosong.',
-            'arr_parameter_unit.array'          => 'Satuan harus array.',
-            'arr_parameter_note.required'       => 'Keterangan detail tidak boleh kosong.',
-            'arr_parameter_note.array'          => 'Keterangan detail harus array.',
+            'water_content.required'            => 'Kadar air tidak boleh kosong.',
 		]);
 
         if($validation->fails()) {
@@ -286,6 +260,7 @@ class QualityControlController extends Controller
                 if($goodScale){
 
                     $goodScale->update([
+                        'water_content' => str_replace(',','.',str_replace('.','',$request->water_content)),
                         'status_qc'     => $request->status_qc,
                         'note_qc'       => $request->note,
                         'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
@@ -296,17 +271,6 @@ class QualityControlController extends Controller
                         /* 'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
                         'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL, */
                     ]);
-
-                    foreach($request->arr_detail as $key => $row){
-                        QualityControl::create([
-                            'good_scale_id'     => $row,
-                            'name'              => $request->arr_parameter_name[$key],
-                            'nominal'           => str_replace(',','.',str_replace('.','',$request->arr_parameter_nominal[$key])),
-                            'unit'              => $request->arr_parameter_unit[$key],
-                            'is_affect_qty'     => $request->arr_is_affect_qty[$key],
-                            'note'              => $request->arr_parameter_note[$key],
-                        ]);
-                    }
     
                     CustomHelper::sendNotification('good_scales',$goodScale->id,'Pengajuan Timbangan Truk No. '.$goodScale->code.' telah di-cek kualitas (QC) oleh '.session('bo_name'),$request->note,session('bo_id'));
 

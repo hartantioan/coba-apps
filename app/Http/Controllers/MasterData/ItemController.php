@@ -349,8 +349,6 @@ class ItemController extends Controller
                         $query->itemUnit()->whereNotIn('unit_id',$request->arr_unit)->delete();
                     }
 
-                    $query->itemQcParameter()->delete();
-
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
@@ -449,17 +447,6 @@ class ItemController extends Controller
                                 ]);
                             }
                         }
-                    }
-                }
-
-                if($request->arr_name_parameter){
-                    foreach($request->arr_name_parameter as $key => $row){
-                        ItemQcParameter::create([
-                            'name'          => $row,
-                            'unit'          => $request->arr_unit_parameter[$key],
-                            'is_affect_qty' => $request->arr_is_affect_qty[$key] ?? NULL,
-                            'item_id'       => $query->id,
-                        ]);
                     }
                 }
 
@@ -736,17 +723,8 @@ class ItemController extends Controller
             ];
         }
 
-        foreach($item->itemQcParameter as $row){
-            $parameter[] = [
-                'name'          => $row->name,
-                'unit'          => $row->unit,
-                'is_affect_qty' => $row->is_affect_qty ?? '',
-            ];
-        }
-
         $item['units'] = $units;
         $item['buffers'] = $buffer;
-        $item['parameters'] = $parameter;
 
 		return response()->json($item);
     }

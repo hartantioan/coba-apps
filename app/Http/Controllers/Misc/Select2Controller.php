@@ -353,6 +353,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'list_warehouse'    => $d->warehouseList(),
+                'list_bom'          => $d->listBom(),
             ];
         }
 
@@ -3185,8 +3186,6 @@ class Select2Controller extends Controller {
         ->where('place_id',$place_id)
         ->where('item_id',$item_id)
         ->where('status','1')
-        ->whereDate('valid_from','<=',date('Y-m-d'))
-        ->whereDate('valid_to','>=',date('Y-m-d'))
         ->orderByDesc('id')
         ->get();
 

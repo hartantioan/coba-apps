@@ -174,11 +174,11 @@
                                                         <th>No.SJ</th>
                                                         <th>No.Kendaraan</th>
                                                         <th>Supir</th>
-                                                        <th>Ket.1</th>
-                                                        <th>Ket.2</th>
+                                                        <th>Keterangan</th>
                                                         <th>Dokumen</th>
                                                         <th>Foto Masuk</th>
                                                         <th>Waktu Masuk</th>
+                                                        <th>Pengecekan QC?</th>
                                                         <th>Foto QC</th>
                                                         <th>Waktu QC</th>
                                                         <th>Foto Keluar</th>
@@ -291,14 +291,21 @@
                                 </select>
                                 <label class="active" for="item_unit_id">Satuan</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <div class="switch mb-1">
+                                    <label for="status">Pengecekan QC</label>
+                                    <label class="right">
+                                        Tidak
+                                        <input type="checkbox" id="is_quality_check" name="is_quality_check" value="1" checked>
+                                        <span class="lever"></span>
+                                        Ya
+                                    </label>
+                                </div>
+                            </div>
                             <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan 1</label>
-                            </div>
-                            <div class="input-field col m3 s12">
-                                <textarea class="materialize-textarea" id="note2" name="note2" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note2">Keterangan 2</label>
+                                <label class="active" for="note">Keterangan</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
@@ -1119,10 +1126,10 @@
                 { name: 'vehicle_no', className: 'center-align' },
                 { name: 'driver', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'note2', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_in', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'time_scale_in', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'is_quality_check', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'time_scale_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'image_out', searchable: false, orderable: false, className: 'center-align' },
@@ -1928,7 +1935,6 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
-                $('#note2').val(response.note2);
                 $('#delivery_no').val(response.delivery_no);
                 $('#vehicle_no').val(response.vehicle_no);
                 $('#driver').val(response.driver);
@@ -1967,6 +1973,12 @@
 
                 $('#warehouse_id').val(response.warehouse_id);
                 $('#item_unit_id').val(response.item_unit_id);
+
+                if(response.is_quality_check == '1'){
+                    $('#is_quality_check').prop( "checked", true);
+                }else{
+                    $('#is_quality_check').prop( "checked", false);
+                }
 
                 if(response.document){
                     const baseUrl = 'http://127.0.0.1:8000/storage/';

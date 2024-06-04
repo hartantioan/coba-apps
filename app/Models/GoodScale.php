@@ -31,6 +31,7 @@ class GoodScale extends Model
         'delivery_no',
         'vehicle_no',
         'driver',
+        'is_quality_check',
         'document',
         'image_in',
         'time_scale_in',
@@ -39,11 +40,11 @@ class GoodScale extends Model
         'image_qc',
         'time_scale_qc',
         'note',
-        'note2',
         'status',
         'user_qc',
         'status_qc',
         'note_qc',
+        'water_content',
         'purchase_order_detail_id',
         'item_id',
         'qty_in',
@@ -82,10 +83,6 @@ class GoodScale extends Model
         return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_detail_id','id')->whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2','3']);
         });
-    }
-
-    public function qualityControl(){
-        return $this->hasMany('App\Models\QualityControl');
     }
 
     public function item()
@@ -244,22 +241,39 @@ class GoodScale extends Model
         return $status;
     }
 
-    public function statusQc(){
-        $status_qc = match ($this->status_qc) {
-          '1' => '<span class="green medium-small white-text padding-3">DISETUJUI QC</span>',
-          '2' => '<span class="red darken-4 medium-small white-text padding-3">DITOLAK QC</span>',
-          default => 'Menunggu',
+    public function qualityCheck(){
+        $status = match ($this->is_quality_check) {
+          '1' => 'Ya',
+          default => 'Tidak',
         };
+
+        return $status;
+    }
+
+    public function statusQc(){
+        if($this->is_quality_check){
+            $status_qc = match ($this->status_qc) {
+            '1' => '<span class="green medium-small white-text padding-3">DISETUJUI QC</span>',
+            '2' => '<span class="red darken-4 medium-small white-text padding-3">DITOLAK QC</span>',
+            default => 'Menunggu',
+            };
+        }else{
+            $status_qc = '<span class="green medium-small white-text padding-3">TIDAK QC</span>';
+        }
 
         return $status_qc;
     }
 
     public function statusQcRaw(){
-        $status_qc = match ($this->status_qc) {
-          '1' => 'DISETUJUI QC',
-          '2' => 'DITOLAK QC',
-          default => 'MENUNGGU',
-        };
+        if($this->is_quality_check){
+            $status_qc = match ($this->status_qc) {
+                '1' => 'DISETUJUI QC',
+                '2' => 'DITOLAK QC',
+                default => 'MENUNGGU',
+            };
+        }else{
+            $status_qc = 'TIDAK QC';
+        }
 
         return $status_qc;
     }
@@ -414,8 +428,14 @@ class GoodScale extends Model
 
     public function alreadyChecked(){
         $status = false;
-        if($this->time_scale_in && $this->time_scale_qc && !$this->time_scale_out){
-            $status = true;
+        if($this->is_quality_check){
+            if($this->time_scale_in && $this->time_scale_qc && !$this->time_scale_out){
+                $status = true;
+            }
+        }else{
+            if(!$this->time_scale_out){
+                $status = true;
+            }
         }
         return $status;
     }

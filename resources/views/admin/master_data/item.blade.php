@@ -607,32 +607,6 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="col s12 hide" id="quality_parameters">
-                                    <table class="bordered">
-                                        <thead>
-                                            <tr>
-                                                <th class="center">Nama/Keterangan</th>
-                                                <th class="center">Satuan</th>
-                                                <th class="center">Mengurangi Qty?</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-parameter">
-                                            <tr id="empty-parameter">
-                                                <td colspan="4" class="center">Silahkan tambahkan parameter</td>
-                                            </tr>
-                                        </tbody>
-                                        <tfoot>
-                                            <tr>
-                                                <th colspan="4" class="center">
-                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addParameter();" href="javascript:void(0);">
-                                                        <i class="material-icons left">add</i> Tambah
-                                                    </a>
-                                                </th>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -1770,36 +1744,6 @@
                             width: '100%',
                         });
                         $('#arr_unit' + count).val(val.unit_id).trigger('change');
-                    });
-                }
-
-                if(response.parameters.length > 0){
-                    $('#quality_parameters').removeClass('hide');
-
-                    $('#body-parameter').empty();
-
-                    $.each(response.parameters, function(i, val) {
-                        $('#body-parameter').append(`
-                            <tr class="row_parameter">
-                                <td>
-                                    <input name="arr_name_parameter[]" type="text" value="` + val.name + `">
-                                </td>
-                                <td>
-                                    <input name="arr_unit_parameter[]" type="text" value="` + val.unit + `">
-                                </td>
-                                <td class="center-align">
-                                    <label>
-                                        <input ` + (val.is_affect_qty ? 'checked' : '') + ` type="checkbox" name="arr_is_affect_qty[]" value="1">
-                                        <span>&nbsp;</span>
-                                    </label>
-                                </td>
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-parameter" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
                     });
                 }
 

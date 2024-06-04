@@ -19,6 +19,7 @@ use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\Item;
 use App\Models\ItemUnit;
 use App\Models\Menu;
 use App\Models\MenuUser;
@@ -81,7 +82,6 @@ class GoodScaleController extends Controller
             'vehicle_no',
             'driver',
             'note',
-            'note2',
         ];
 
         $start  = $request->start;
@@ -184,10 +184,10 @@ class GoodScaleController extends Controller
                     $val->vehicle_no,
                     $val->driver,
                     $val->note,
-                    $val->note2,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->image_in ? '<a href="'.$val->imageIn().'" target="_blank"><i class="material-icons">camera_front</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     date('d/m/Y H:i:s',strtotime($val->time_scale_in)),
+                    $val->qualityCheck(),
                     $val->image_qc ? '<a href="'.$val->imageQc().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
                     $val->time_scale_qc ? date('d/m/Y H:i:s',strtotime($val->time_scale_qc)) : '',
                     $val->image_out ? '<a href="'.$val->imageOut().'" target="_blank"><i class="material-icons">camera_rear</i></a>' : '<i class="material-icons">hourglass_empty</i>',
@@ -385,6 +385,14 @@ class GoodScaleController extends Controller
 
                 $itemUnit = ItemUnit::find($request->item_unit_id);
                 $pod = PurchaseOrderDetail::find($request->purchase_order_detail_id);
+                $item = Item::find($request->item_id);
+
+                if($item->is_quality_check && !$request->is_quality_check){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Item terpilih masuk ke dalam kategori wajib dicek QC, silahkan centang PENGECEKAN QC.'
+                    ]);
+                }
 
                 if($request->temp){
                 
@@ -449,7 +457,6 @@ class GoodScaleController extends Controller
                         $query->image_in = $newFile ? $newFile : NULL;
                         $query->time_scale_in = date('Y-m-d H:i:s');
                         $query->note = $request->note;
-                        $query->note2 = $request->note2;
                         $query->purchase_order_detail_id = $request->purchase_order_detail_id;
                         $query->item_id = $request->item_id;
                         $query->qty_in = str_replace(',','.',str_replace('.','',$request->qty_in));
@@ -459,6 +466,7 @@ class GoodScaleController extends Controller
                         $query->qty_final = 0;
                         $query->item_unit_id = $request->item_unit_id;
                         $query->qty_conversion = $itemUnit->conversion;
+                        $query->is_quality_check = $request->is_quality_check ?? NULL;
                         $query->status = '1';
 
                         $query->save();
@@ -490,7 +498,6 @@ class GoodScaleController extends Controller
                         'image_in'                  => $newFile ? $newFile : NULL,
                         'time_scale_in'             => date('Y-m-d H:i:s'),
                         'note'                      => $request->note,
-                        'note2'                     => $request->note2,
                         'purchase_order_detail_id'  => $request->purchase_order_detail_id,
                         'item_id'                   => $request->item_id,
                         'qty_in'                    => str_replace(',','.',str_replace('.','',$request->qty_in)),
@@ -500,6 +507,7 @@ class GoodScaleController extends Controller
                         'qty_final'                 => 0,
                         'item_unit_id'              => $request->item_unit_id,
                         'qty_conversion'            => $itemUnit->conversion,
+                        'is_quality_check'          => $request->is_quality_check ?? NULL,
                         'status'                    => '1',
                     ]);
                         
@@ -644,7 +652,7 @@ class GoodScaleController extends Controller
         if($weight){
             $nominal = number_format($weight->nominal,3,',','.');
         }else{
-            $nominal = '500';
+            $nominal = '0';
         }
 
         return response()->json($nominal);

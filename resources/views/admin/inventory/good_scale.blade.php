@@ -278,7 +278,7 @@
                                 <label class="active" for="qty_po">Qty PO</label>
                             </div>
                             <div class="input-field col m3 s12">
-                                <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_in">Qty Bruto</label>
                             </div>
                             <div class="input-field col m3 s12">

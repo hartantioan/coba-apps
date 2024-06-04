@@ -437,6 +437,12 @@
                                         @endforeach
                                     @endforeach
                                 @endif
+                                <td class="center-align">
+                                    <br>
+                                    <br>
+                                    Supir,
+                                    <div class="mt-5">{{ $data->driver }}</div>
+                                </td>
                             </tr>
                         </table>  
                     </div>

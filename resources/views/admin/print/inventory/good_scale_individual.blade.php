@@ -163,6 +163,9 @@
                 vertical-align: top !important;
             }
            
+            .mt-5 {
+                margin-top:50px;
+            }
         </style>
     </head>
     <body>
@@ -266,6 +269,14 @@
                                          </td>
                                          <td>
                                              {{ $data->driver }}
+                                          </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Nomor PO
+                                         </td>
+                                         <td>
+                                             {{ $data->purchaseOrderDetail->purchaseOrder->code }}
                                           </td>
                                     </tr>
                                 </table>

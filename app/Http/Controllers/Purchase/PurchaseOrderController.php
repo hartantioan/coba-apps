@@ -402,6 +402,7 @@ class PurchaseOrderController extends Controller
             foreach($query_data as $val) {
                 $btn_close = /* $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' :  */'';
                 $btn_print = in_array($val->status,['2','3']) ? ' <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) .'`,`'.$val->code.'`)"><i class="material-icons dp48">local_printshop</i></button>' : ' ';
 				
                 $response['data'][] = [
@@ -1366,6 +1367,29 @@ class PurchaseOrderController extends Controller
         if($pr){
             
             $pdf = PrintHelper::print($pr,'Purchase Order','a4','portrait','admin.print.purchase.order_individual');
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+    
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
+
+    public function printIndividualChi(Request $request,$id){
+        
+        $pr = PurchaseOrder::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            
+            $pdf = PrintHelper::print($pr,'Purchase Order','a4','portrait','admin.print.purchase.order_individual_chi');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

@@ -6,8 +6,9 @@
 <html lang="en">
     <head>
         <style>
-            @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
-            body { font-family: 'china', Tahoma, Arial, sans-serif;}
+
+           @font-face { font-family: 'chinas'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
+            body { font-family: 'chinas', Tahoma, Arial, sans-serif;}
             .break-row {
                 margin-top: 2%;
                 page-break-inside: avoid;
@@ -146,8 +147,8 @@
                 min-height: auto;
             }
 
-            @page { margin: 5em 3em 6em 3em; }
-            header { position: fixed; top: -64px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
+            @page { margin: 10em 3em 7em 3em; }
+            header { position: fixed; top: -144px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
 
         
@@ -163,16 +164,14 @@
                                 <span class="invoice-number mr-1" style="font-size:1em"># {{ $data->code }}</span>
                             </td>
                         </tr>
-                        <tr>
+                        {{-- <tr>
                             <td style="margin-top: -2px;">
-                                <small>Date Valid:</small>
-                                <small style="font-size:1em"> {{ date('d/m/Y',strtotime($data->post_date)) }} -</small>
-                                <small style="font-size:1em"> {{ date('d/m/Y',strtotime($data->due_date)) }}</small>
+                                <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                             </td>
-                        </tr>
+                        </tr> --}}
                         <tr>
                             <td>
-                                <h3 style="margin-top: -2px">Purchase Request</h3>
+                                <h2 style="margin-top: -2px">{{ $title }}</h2>
                             </td>
                         </tr>
                                 
@@ -192,92 +191,101 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 4px solid black; margin-top:-2%">
+            <table border="0" width="100%" class="tbl-info" style="margin-top:-15px">
+                <tr>
+                    <td width="33%" class="left-align">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td >
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Name:  {{ $data->user->name }}<br> 姓名</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Position: {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}<br> 位置</span>
+                                </td>
+                                
+                            </tr>
+                            <tr>
+                                <td >
+                                    <span class="invoice-number mr-1" style="font-size:0.6em !important">Depart. {{ $data->user->position()->exists() ? $data->user->position->division->name : ''}}<br>部门</span>
+                                </td>
+                                
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="33%" class="left-align">
+
+                    </td>
+                    <td width="33%" class="left-align">
+                        <table border="0" width="100%">
+                            <tr>
+                                <td align="center">
+                                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="15%" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <span class="invoice-number mr-1" style="font-size:0.8em !important">{{ $data->code }}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <hr style="border-top: 3px solid black; margin-top:-0.5%">
         </header>
         <main>
-            <div class="card">
+            <div class="card" style="margin-top: 3em">
                 <div class="card-content invoice-print-area">
-                    <table border="0" width="100%" class="tbl-info">
-                        <tr>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td>
-                                            Name: {{ $data->user->name }}<br>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Posisi: {{ $data->user->position()->exists() ? $data->user->position->name : '-' }}
-                                        </td>
-                                        
-                                    </tr>
-                                    <tr>
-                                        <td >
-                                            Depart. {{ $data->user->position()->exists() ? $data->user->position->division->name : ''}}
-                                        </td>
-                                        
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="33%" class="left-align">
- 
-                            </td>
-                            <td width="33%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td align="center">
-                                            <h3>{{ $data->code }}</h3>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
+                    
                 
                     <!-- product details table-->
                     <div class="invoice-product-details">
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th class="center">No</th>
-                                <th class="center">Item</th>
-                                <th class="center">Jum.</th>
-                                <th class="center">Sat.</th>
-                                <th class="center">Ket. 1</th>
-                                <th class="center">Ket. 2</th>
-                                <th class="center">Tgl.Dipakai</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Gudang</th>
-                                <th class="center">Divisi</th>
+                                <th align="center">No <div style="font-weight:normal !important">数字</div></th>
+                                <th align="center">Item <div style="font-weight:normal !important">项目</div></th>
+                                <th align="center">Qty.<div style="font-weight:normal !important">数量</div></th>
+                                <th align="center">Stock<div style="font-weight:normal !important">库存</div></th>
+                                <th align="center">Unit.<div style="font-weight:normal !important">单元</div></th>
+                                <th align="center">Used Date<div style="font-weight:normal !important">使用日期</div></th>
+                                <th align="center">Plant<div style="font-weight:normal !important">工厂</div></th>
+                                <th align="center">Warehouse<div style="font-weight:normal !important">古当</div></th>
+                                <th align="center">Line<div style="font-weight:normal !important">机器链条</div></th>
+                                <th align="center">Machine<div style="font-weight:normal !important">引擎</div></th>
+                                <th align="center">Divisi<div style="font-weight:normal !important">分配</div></th>
+                                <th align="center">Proyek<div style="font-weight:normal !important">项目</div></th>
+                                <th align="center-">Requester<div style="font-weight:normal !important">请求者</div></th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->purchaseRequestDetail as $key => $row)
+                            @foreach($data->materialRequestDetail as $key => $row)
                             <tr>
-                                <td align="center" rowspan="2">{{ $key+1 }}.</td>
-                                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                <td align="right">{{ $row->qty }}</td>
+                                <td>{{ $key + 1 }}</td>
+                                <td>{{ $row->item->code.' - '.$row->item->name }}
+                                    @if($row->item->other_name)
+                                        || {{ $row->item->other_name }}
+                                    @endif
+                                </td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->getStockNow($row->qty_conversion)) }}</td>
                                 <td align="center">{{ $row->itemUnit->unit->code }}</td>
-                                <td>{{ $row->note }}</td>
-                                <td>{{ $row->note2 }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->required_date)) }}</td>
                                 <td align="center">{{ $row->place->code }}</td>
                                 <td align="center">{{ $row->warehouse->name }}</td>
+                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
+                                <td align="center">{{ $row->machine()->exists() ? $row->machine->name : '-' }}</td>
                                 <td align="center">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
+                                <td align="center">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
+                                <td align="">{{ $row->requester }}</td>
                             </tr>
                             <tr>
-                                <td colspan="9">
-                                    <b>Line</b> : {{ $row->line()->exists() ? $row->line->code : '-' }},  
-                                    <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
-                                    <b>Requester</b> : {{ $row->requester }},
-                                    <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
-                                </td>
+                                <td colspan="13">Note || 笔记 1 : {{ $row->note }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="13">Note || 笔记 2 : {{ $row->note2 }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -294,7 +302,7 @@
                             </tr>
                             <tr>
                                 <td class="center-align">
-                                    Catatan : {{ $data->note }}
+                                    Note|笔记 : {{ $data->note }}
                                 </td>
                             </tr>
                         </table>
@@ -302,6 +310,7 @@
                             <tr>
                                 <td class="center-align">
                                     Dibuat oleh,
+                                    <br>由...制作
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>
                                     @endif
@@ -313,13 +322,20 @@
                                         @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
                                             <td class="center-align">
                                                 {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                                @if ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Dicek oleh,')
+                                                <br>
+                                                    通过检查
+                                                @elseif ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Disetujui oleh,')
+                                                <br>
+                                                    由...批准,
+                                                @endif
                                                 @if($row->user->signature)
                                                     <div>{!! $row->user->signature() !!}</div>
                                                 @endif
                                                 <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
                                                 @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
+                                                    <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
+                                                @endif
                                             </td>
                                         @endforeach
                                     @endforeach

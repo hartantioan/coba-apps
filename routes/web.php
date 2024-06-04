@@ -9,7 +9,7 @@ use App\Http\Controllers\HR\EmployeeLeaveQuotasController;
 use App\Http\Controllers\HR\EmployeeTransferController;
 use App\Http\Controllers\HR\EmployeeRewardPunishmentController;
 use App\Http\Controllers\HR\OvertimeRequestController;
-
+use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\AdjustRateController;
 use App\Http\Controllers\Finance\FinanceReportController;
@@ -212,6 +212,13 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
+Route::get('locale/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'es', 'chi', 'ind'])) {
+        App::setLocale($locale);
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+});
 Route::prefix('admin')->group(function () {
     Route::prefix('login')->group(function () {
         Route::get('/', [AuthController::class, 'login']);
@@ -240,7 +247,7 @@ Route::prefix('admin')->group(function () {
     });
 
     Route::middleware('login')->group(function () {
-
+       
         Route::prefix('lock')->group(function () {
             Route::get('/', [AuthController::class, 'lock']);
             Route::get('enable', [AuthController::class, 'enable']);
@@ -1431,6 +1438,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[MaterialRequestController::class, 'print']);
                     Route::post('print_by_range',[MaterialRequestController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[MaterialRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}',[MaterialRequestController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[MaterialRequestController::class, 'viewStructureTree']);
                     Route::post('create',[MaterialRequestController::class, 'create'])->middleware('operation.access:material_request,update');
                     Route::post('create_done',[MaterialRequestController::class, 'createDone'])->middleware('operation.access:material_request,update');
@@ -1460,6 +1468,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('send_used_data',[PurchaseRequestController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [PurchaseRequestController::class, 'removeUsedData']);
                     Route::get('print_individual/{id}',[PurchaseRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}',[PurchaseRequestController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[PurchaseRequestController::class, 'viewStructureTree']);
                     Route::post('create',[PurchaseRequestController::class, 'create'])->middleware('operation.access:purchase_request,update');
                     Route::post('create_done',[PurchaseRequestController::class, 'createDone'])->middleware('operation.access:purchase_request,update');
@@ -1532,6 +1541,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('create_done',[PurchaseOrderController::class, 'createDone'])->middleware('operation.access:purchase_order,update');
                     Route::get('approval/{id}',[PurchaseOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[PurchaseOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual_chi/{id}',[PurchaseOrderController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [PurchaseOrderController::class, 'voidStatus'])->middleware('operation.access:purchase_order,void');
                     Route::post('destroy', [PurchaseOrderController::class, 'destroy'])->middleware('operation.access:purchase_order,delete');
                 });
@@ -1895,7 +1905,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[GoodIssueRequestController::class, 'printByRange']);
                     Route::post('send_used_data',[GoodIssueRequestController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [GoodIssueRequestController::class, 'removeUsedData']);
-                    
+                    Route::get('print_individual_chi/{id}',[GoodIssueRequestController::class, 'printIndividualChi'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[GoodIssueRequestController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('viewstructuretree',[GoodIssueRequestController::class, 'viewStructureTree']);
                     Route::get('view_journal/{id}',[GoodIssueRequestController::class, 'viewJournal'])->middleware('operation.access:good_issue_request,journal');

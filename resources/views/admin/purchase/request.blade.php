@@ -51,8 +51,11 @@
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
             <div class="container">
+                <a href="{{ url('locale/en') }}">English</a> | <a href="{{ url('locale/chi') }}">Chinese</a>
                 <div class="row">
                     <div class="col s8 m6 l6">
+                        {{ __('translations.email') }}
+                        <p>Current locale: {{ App::getLocale() }}</p>
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
                         <ol class="breadcrumbs mb-0">
                             <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
@@ -81,6 +84,7 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
+
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
@@ -2851,6 +2855,23 @@
     function whatPrinting(code){
         $.ajax({
             url: '{{ Request::url() }}/print_individual/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
+    }
+
+    function whatPrintingChi(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual_chi/' + code,
             type:'GET',
             beforeSend: function() {
                 loadingOpen('.modal-content');

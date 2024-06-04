@@ -234,7 +234,7 @@ class MaterialRequestController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->user->name,
+                    $val->user->name ?? '',
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
@@ -258,6 +258,7 @@ class MaterialRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
@@ -896,6 +897,29 @@ class MaterialRequestController extends Controller
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+        
+            $document_po = PrintHelper::savePrint($content);
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
+
+    public function printIndividualChi(Request $request,$id){
+        
+        $pr = MaterialRequest::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $pdf = PrintHelper::print($pr,'Item Request','a4','portrait','admin.print.inventory.request_individual_chi');
+            
+    
+            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             
             $content = $pdf->download()->getOriginalContent();

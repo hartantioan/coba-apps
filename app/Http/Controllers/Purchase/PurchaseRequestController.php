@@ -240,7 +240,7 @@ class PurchaseRequestController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->user->name,
+                    $val->user->name ?? "",
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->due_date)),
@@ -266,6 +266,7 @@ class PurchaseRequestController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat indigo accent-2 white-text btn-small" data-popup="tooltip" title="Salin" onclick="duplicate(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">content_copy</i></button>
@@ -517,11 +518,11 @@ class PurchaseRequestController extends Controller
                 
                 if($pr){
                    
-                    $pdf = PrintHelper::print($pr,'Purchase Request','a5','landscape','admin.print.purchase.request_individual');
+                    $pdf = PrintHelper::print($pr,'Purchase Request','a4','portrait','admin.print.purchase.request_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                    $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -979,14 +980,60 @@ class PurchaseRequestController extends Controller
             $img_base_64 = base64_encode($image_temp);
             $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
             $data["image"]=$path_img;
-            // $pdf = Pdf::setPaper('a5', 'landscape');
+            // $pdf = Pdf::setPaper('a4','portrait');
           
             // $pdf->loadView('admin.print.purchase.request_individual', $data);
-            $pdf = Pdf::loadView('admin.print.purchase.request_individual', $data)->setPaper('a5', 'landscape');
+            $pdf = Pdf::loadView('admin.print.purchase.request_individual', $data)->setPaper('a4','portrait');
             $pdf->render();
     
    
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}",'', 10, array(0,0,0));
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}",'', 10, array(0,0,0));
+            
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+    
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
+
+    public function printIndividualChi(Request $request,$id){
+        
+        $pr = PurchaseRequest::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $data = [
+                'title'     => 'Print Purchase Request',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            $options = PDF::getDomPDF()->getOptions();
+            $options->set('isFontSubsettingEnabled', true);
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+            // $pdf = Pdf::setPaper('a4','portrait');
+          
+            // $pdf->loadView('admin.print.purchase.request_individual', $data);
+            $pdf = Pdf::loadView('admin.print.purchase.request_individual_chi', $data)->setPaper('a4','portrait');
+            $pdf->render();
+    
+   
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}",'', 10, array(0,0,0));
             
             
             $content = $pdf->download()->getOriginalContent();
@@ -1048,11 +1095,11 @@ class PurchaseRequestController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = PurchaseRequest::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Purchase Request','a5','landscape','admin.print.purchase.request_individual');
+                            $pdf = PrintHelper::print($query,'Purchase Request','a4','portrait','admin.print.purchase.request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -1104,11 +1151,11 @@ class PurchaseRequestController extends Controller
                     foreach($merged as $code){
                         $query = PurchaseRequest::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Purchase Request','a5','landscape','admin.print.purchase.request_individual');
+                            $pdf = PrintHelper::print($query,'Purchase Request','a4','portrait','admin.print.purchase.request_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+                            $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            

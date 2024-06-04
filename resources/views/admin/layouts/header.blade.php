@@ -17,6 +17,7 @@
                         <li class="hide-on-med-and-down tooltipped" data-position="bottom" data-tooltip="Full screen">
                             <a class="waves-effect waves-block waves-light toggle-fullscreen" href="javascript:void(0);"><i class="material-icons">settings_overscan</i>
                             </a>
+
                         </li>
                         <li class="hide-on-large-only search-input-wrapper">
                             <a class="waves-effect waves-block waves-light search-button" href="javascript:void(0);"><i class="material-icons">search</i></a>

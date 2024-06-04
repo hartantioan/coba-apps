@@ -116,6 +116,7 @@
 							</tr>
                             <tr>
 								<td style="text-align:center;">
+									{{ __('translations.email') }}
 									<h3>{{ $title }}</h3>
 								</td>
 							</tr>
@@ -126,7 +127,7 @@
 			<table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
 				<thead>
 					<tr align="center">
-						<th rowspan="2">No</th>
+						<th rowspan="2">No  {{ __('translations.email') }}</th>
                         <th rowspan="2">Pengguna</th>
 						<th rowspan="2">Kode</th>
 						<th colspan="3">Tanggal</th>

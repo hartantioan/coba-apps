@@ -2035,6 +2035,22 @@
             }
         });
     }
+    function whatPrintingChi(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_individual_chi/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
+    }
 
     function done(id){
         var msg = '';

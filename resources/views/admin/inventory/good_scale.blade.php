@@ -1663,7 +1663,7 @@
                 var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
 
                 if(passedUnit){
-                    if(s){
+                    /* if(s){ */
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
@@ -1736,13 +1736,13 @@
                                 });
                             }
                         });
-                    }else{
+                    /* }else{
                         swal({
                             title: 'Ups!',
                             text: 'Foto cctv timbang masuk tidak boleh kosong.',
                             icon: 'warning'
                         });
-                    }
+                    } */
                 }else{
                     swal({
                         title: 'Ups!',

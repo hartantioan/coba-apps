@@ -3,6 +3,7 @@
         <tr align="center">
             <th>No.</th>
             <th>No. Dokumen</th>
+            <th>Tipe</th>
             <th>Status</th>
             <th>Deleter</th>
             <th>Tgl. Delete</th>
@@ -28,6 +29,7 @@
             <th>Satuan</th>
             <th>Qty. Konversi</th>
             <th>Satuan</th>
+            <th>Kadar Air (%)</th>
             <th>Kurs</th>
             <th>Total</th>
             <th>Line</th>
@@ -46,6 +48,7 @@
             <tr align="center" style="background-color:#d9d9d9;">
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
+                <td>{{ $row->type() }}</td>
                 <td>{!! $row->statusRaw() !!}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
@@ -72,6 +75,7 @@
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
+                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->water_content) }}</td>
                 <td align="center">{{ $nominal ? $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate : '' }}</td>
                 <td align="center">{{ $nominal ? round($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total,2) : '' }}</td>
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>

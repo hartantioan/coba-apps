@@ -29,6 +29,7 @@ class GoodReceiptDetail extends Model
         'note',
         'note2',
         'remark',
+        'water_content',
         'place_id',
         'line_id',
         'machine_id',

@@ -196,6 +196,7 @@
                                                         <th>Qty Netto</th>
                                                         <th>Qty QC</th>
                                                         <th>Qty Final</th>
+                                                        <th>Kadar Air (%)</th>
                                                         <th>Satuan</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -1147,6 +1148,7 @@
                 { name: 'qty_balance', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_final', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'water_content', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

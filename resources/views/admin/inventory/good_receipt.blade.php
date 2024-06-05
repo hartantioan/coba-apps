@@ -124,6 +124,7 @@
                                                         <th rowspan="2">Pengguna</th>
                                                         {{-- <th rowspan="2">Supplier/Vendor</th> --}}
                                                         <th rowspan="2">Perusahaan</th>
+                                                        <th rowspan="2">Tipe</th>
                                                         <th rowspan="2">Penerima</th>
                                                         <th colspan="2" class="center-align">Tanggal</th>
                                                         <th rowspan="2">Keterangan</th>
@@ -184,7 +185,20 @@
                                 </select>
                                 <label class="" for="company_id">Perusahaan</label>
                             </div>
-                            <div class="input-field col m3 s12 step5">
+                            <div class="input-field col m3 s12">
+                                <select class="form-control" id="type" name="type" onchange="applyFilter();">
+                                    <option value="1">Purchase Order</option>
+                                    <option value="2">Timbangan</option>
+                                </select>
+                                <label class="" for="type">Tipe Dokumen</label>
+                            </div>
+                            <div class="input-field col m3 s12 div-account">
+                                <input type="hidden" id="temp" name="temp">
+                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
+                                <label class="active" for="account_id">Supplier</label>
+                            </div>
+                            <div class="col m12 s12"></div>
+                            <div class="input-field col m3 s12">
                                 <input id="receiver_name" name="receiver_name" type="text" placeholder="Nama Penerima">
                                 <label class="active" for="receiver_name">Nama Penerima</label>
                             </div>
@@ -222,15 +236,6 @@
                                     <p class="mt-2 mb-2">
                                         <div class="row">
                                             <div class="input-field col m6 s6">
-                                                <select class="browser-default" id="purchase_item_id" name="purchase_item_id" onchange="applyFilter();">&nbsp;</select>
-                                                <label class="active" for="purchase_item_id">Item</label>
-                                            </div>
-                                            <div class="input-field col m4 s6 step3 div-account">
-                                                <input type="hidden" id="temp" name="temp">
-                                                <select class="browser-default" id="account_id" name="account_id" onchange="resetDetails();"></select>
-                                                <label class="active" for="account_id">Supplier</label>
-                                            </div>
-                                            <div class="input-field col m6 s6">
                                                 <select class="browser-default" id="purchase_order_id" name="purchase_order_id">&nbsp;</select>
                                                 <label class="active" for="purchase_order_id">Purchase Order</label>
                                             </div>
@@ -263,6 +268,7 @@
                                                     <th class="center">Keterangan 1</th>
                                                     <th class="center">Keterangan 2</th>
                                                     <th class="center">Remark</th>
+                                                    <th class="center">Kadar Air (%)</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
@@ -272,7 +278,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="15" class="center">
+                                                    <td colspan="16" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -738,7 +744,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="15" class="center">
+                            <td colspan="16" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -754,7 +760,6 @@
                     `);
                 }
                 $('#purchase_order_id').empty();
-                $('#purchase_item_id').empty();
                 $('#account_id').empty();
                 M.updateTextFields();
                 if($('.data-used').length > 0){
@@ -829,7 +834,6 @@
         });
 
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
-        select2ServerSide('#purchase_item_id', '{{ url("admin/select2/purchase_item_scale") }}');
 
         $('#purchase_order_id').select2({
             placeholder: '-- Kosong --',
@@ -846,7 +850,7 @@
                     return {
                         search: params.term,
                         account_id: $('#account_id').val(),
-                        item_id: $('#purchase_item_id').val(),
+                        type: $('#type').val(),
                     };
                 },
                 processResults: function(data) {
@@ -863,7 +867,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="15" class="center">
+                        <td colspan="16" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -875,58 +879,46 @@
 
     function applyFilter(){
         $('#purchase_order_id').empty();
-        if($('#purchase_item_id').val()){
-            if($("#purchase_item_id").select2('data')[0].is_hide){
-                $('#account_id').empty();
-                $('.div-account').addClass('hide');
-            }else{
-                $('.div-account').removeClass('hide');
-            }
+        $('#account_id').empty();
+        if($('#type').val() == '2'){
+            $('.div-account').addClass('hide');
         }else{
             $('.div-account').removeClass('hide');
         }
+        resetDetails();
     }
 
     function resetDetails(){
-        if($('#purchase_item_id').val()){
-            if($('#account_id').val()){
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }else{
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-                    $('.row_item_serial').each(function(){
-                        $(this).remove();
-                    });
-                    if($('#empty-item').length == 0){
-                        $('#body-item').append(`
-                            <tr id="empty-item">
-                                <td colspan="15" class="center">
-                                    Pilih purchase order untuk memulai...
-                                </td>
-                            </tr>
-                        `);
-                    }
-                    if($('#empty-item-serial').length == 0){
-                        $('#body-item-serial').append(`
-                            <tr id="empty-item-serial">
-                                <td class="center">
-                                    Pilih purchase order untuk memulai...
-                                </td>
-                            </tr>
-                        `);
-                    }
+        /* if($('#account_id').val()){ */
+            if($('.data-used').length > 0){
+                $('.data-used').trigger('click');
+            }else{
+                $('.row_item').each(function(){
+                    $(this).remove();
+                });
+                $('.row_item_serial').each(function(){
+                    $(this).remove();
+                });
+                if($('#empty-item').length == 0){
+                    $('#body-item').append(`
+                        <tr id="empty-item">
+                            <td colspan="16" class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
+                }
+                if($('#empty-item-serial').length == 0){
+                    $('#body-item-serial').append(`
+                        <tr id="empty-item-serial">
+                            <td class="center">
+                                Pilih purchase order untuk memulai...
+                            </td>
+                        </tr>
+                    `);
                 }
             }
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih item terlebih dahulu.',
-                icon: 'error'
-            });
-            $('#account_id').empty();
-        }
+        /* } */
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1109,7 +1101,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="15" class="center">
+                        <td colspan="16" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1319,6 +1311,7 @@
                 { name: 'name', className: 'center-align' },
                 /* { name: 'account_id', className: 'center-align' }, */
                 { name: 'company_id', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'receiver', className: 'center-align' },
                 { name: 'date_post', className: 'center-align' },
                 { name: 'date_doc', className: 'center-align' },
@@ -1567,13 +1560,13 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
+                    $('#purchase_order_id').empty();
                     if(response.status == 500){
                         swal({
                             title: 'Ups!',
                             text: response.message,
                             icon: 'warning'
                         });
-                        $('#purchase_order_id').empty();
                     }else{
                         if(response.details.length > 0){
                             $('#receiver_name').val(response.receiver_name);
@@ -1634,6 +1627,9 @@
                                         </td>
                                         <td>
                                             <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="-" style="width:100%;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
@@ -1723,7 +1719,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="15" class="center">
+                        <td colspan="16" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1736,8 +1732,10 @@
         if($('#arr_scale' + code).val()){
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
+            $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
+            $('#arr_water_content' + code).val('0,000');
         }
     }
 
@@ -1761,7 +1759,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="15" class="center">
+                            <td colspan="16" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1814,7 +1812,13 @@
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
+                if(response.type == '2'){
+                    $('.div-account').addClass('hide');
+                }else{
+                    $('.div-account').removeClass('hide');
+                }
                 $('#company_id').val(response.company_id).formSelect();
+                $('#type').val(response.type).formSelect();
                 $('#note').val(response.note);
                 $('#receiver_name').val(response.receiver_name);
                 $('#post_date').val(response.post_date);
@@ -1865,6 +1869,9 @@
                                 <td>
                                     <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
                                 </td>
+                                <td>
+                                    <input name="arr_water_content[]" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>
                                 </td>
@@ -1882,12 +1889,9 @@
                                 </td>
                             </tr>
                         `);
-                        if(val.secret_po){
-                            $('.div-account').addClass('hide');
-                        }
-                        if(val.good_scale_detail_id){
+                        if(val.good_scale_id){
                             $('#arr_scale' + count).append(`
-                                <option value="` + val.good_scale_detail_id + `">` + val.good_scale_detail_name + `</option>
+                                <option value="` + val.good_scale_id + `">` + val.good_scale_name + `</option>
                             `);
                         }
                         $('#arr_scale' + count).select2({

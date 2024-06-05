@@ -1108,7 +1108,8 @@ class Select2Controller extends Controller {
 
         $response = [];
         $search   = $request->search;
-        $data = PurchaseOrder::where(function($query) use($search, $request){
+        $typegrpo = $request->type ?? '';
+        $data = PurchaseOrder::where(function($query) use($search, $request, $typegrpo){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
@@ -1124,10 +1125,17 @@ class Select2Controller extends Controller {
                         $query->where('account_id',$request->account_id);
                     }
                 })
-                ->whereHas('purchaseOrderDetail',function($query) use($search, $request){
+                ->whereHas('purchaseOrderDetail',function($query) use($search, $request, $typegrpo){
                     $query->whereIn('place_id',$this->dataplaces);
                     if($request->item_id){
                         $query->where('item_id',$request->item_id);
+                    }
+                    if($typegrpo){
+                        if($typegrpo == '2'){
+                            $query->whereHas('goodScale');
+                        }elseif($typegrpo == '1'){
+                            $query->whereDoesntHave('goodScale');
+                        }
                     }
                 })
                 ->whereDoesntHave('used')
@@ -2495,6 +2503,7 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code,
                 'qty'               => CustomHelper::formatConditionalQty($d->qty_final),
+                'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
             ];
         }
 

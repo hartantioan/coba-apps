@@ -219,6 +219,7 @@ class GoodScaleController extends Controller
                     CustomHelper::formatConditionalQty($val->qty_balance),
                     CustomHelper::formatConditionalQty($val->qty_qc),
                     CustomHelper::formatConditionalQty($val->qty_final),
+                    CustomHelper::formatConditionalQty($val->water_content),
                     $val->itemUnit->unit->code,
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -467,6 +468,7 @@ class GoodScaleController extends Controller
                         $query->item_unit_id = $request->item_unit_id;
                         $query->qty_conversion = $itemUnit->conversion;
                         $query->is_quality_check = $request->is_quality_check ?? NULL;
+                        $query->water_content = 0;
                         $query->status = '1';
 
                         $query->save();
@@ -508,6 +510,7 @@ class GoodScaleController extends Controller
                         'item_unit_id'              => $request->item_unit_id,
                         'qty_conversion'            => $itemUnit->conversion,
                         'is_quality_check'          => $request->is_quality_check ?? NULL,
+                        'water_content'             => 0,
                         'status'                    => '1',
                     ]);
                         
@@ -701,9 +704,7 @@ class GoodScaleController extends Controller
             $qty_qc = 0;
             $qty_final = $balanceweight;
 
-            foreach($gs->qualityControl()->whereNotNull('is_affect_qty')->get() as $row){
-                $qty_qc += round((($row->nominal / 100) * $balanceweight),2);
-            }
+            $qty_qc = round((($gs->water_content / 100) * $balanceweight),2);
 
             $qty_final -= $qty_qc;
     

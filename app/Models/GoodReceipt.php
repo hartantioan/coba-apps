@@ -21,6 +21,7 @@ class GoodReceipt extends Model
         'code',
         'user_id',
         'company_id',
+        'type',
         'account_id',
         'receiver_name',
         'post_date',
@@ -178,6 +179,16 @@ class GoodReceipt extends Model
         };
 
         return $status;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+            '1' => 'Purchase Order',
+            '2' => 'Timbangan',
+            default => 'Invalid',
+        };
+
+        return $type;
     }
 
     public function getPurchaseCode(){
@@ -361,6 +372,11 @@ class GoodReceipt extends Model
             $row->purchaseOrderDetail->purchaseOrder->update([
                 'status'	=> '2'
             ]);
+            if($row->goodScale()->exists()){
+                $row->goodScale->update([
+                    '2'
+                ]);
+            }
         }
     }
 
@@ -369,6 +385,11 @@ class GoodReceipt extends Model
             if(!$row->purchaseOrderDetail->purchaseOrder->hasBalance()){
                 $row->purchaseOrderDetail->purchaseOrder->update([
                     'status'	=> '3'
+                ]);
+            }
+            if($row->goodScale()->exists()){
+                $row->goodScale->update([
+                    '3'
                 ]);
             }
         }

@@ -261,6 +261,7 @@ class GoodReceiptPOController extends Controller
                     $val->user->name ?? '',
                     /* $val->account->name ?? '', */
                     $val->company->name,
+                    $val->type(),
                     $val->receiver_name ?? '',
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->document_date)),
@@ -429,7 +430,8 @@ class GoodReceiptPOController extends Controller
             'arr_qty'                   => 'required|array',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code_place_id.required'            => 'Plant Tidak boleh kosong','account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+            'account_id.required'               => 'Supplier/vendor tidak boleh kosong.',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'receiver_name.required'            => 'Nama penerima tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -615,6 +617,7 @@ class GoodReceiptPOController extends Controller
                         $query->tax = $taxall;
                         $query->wtax = $wtaxall;
                         $query->grandtotal = $grandtotalall;
+                        $query->type = $request->type;
                         $query->status = '1';
 
                         $query->save();
@@ -656,7 +659,8 @@ class GoodReceiptPOController extends Controller
                         'total'                 => $totalall,
                         'tax'                   => $taxall,
                         'wtax'                  => $wtaxall,
-                        'grandtotal'            => $grandtotalall
+                        'grandtotal'            => $grandtotalall,
+                        'type'                  => $request->type,
                     ]);
 
                     DB::commit();
@@ -685,6 +689,7 @@ class GoodReceiptPOController extends Controller
                             'note'                      => $request->arr_note[$key],
                             'note2'                     => $request->arr_note2[$key],
                             'remark'                    => $request->arr_remark[$key],
+                            'water_content'             => str_replace(',','.',str_replace('.','',$request->arr_water_content[$key])),
                             'place_id'                  => $request->arr_place[$key],
                             'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
@@ -894,6 +899,7 @@ class GoodReceiptPOController extends Controller
                 'note'                      => $row->note ? $row->note : '',
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'remark'                    => $row->remark,
+                'water_content'             => CustomHelper::formatConditionalQty($row->water_content),
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
                 'line_id'                   => $row->line_id ? $row->line_id : '',

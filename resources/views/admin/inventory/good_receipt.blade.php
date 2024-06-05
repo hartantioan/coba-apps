@@ -190,7 +190,7 @@
                                     <option value="1">Purchase Order</option>
                                     <option value="2">Timbangan</option>
                                 </select>
-                                <label class="" for="type">Tipe Dokumen</label>
+                                <label class="" for="type">Tipe Dokumen Asal</label>
                             </div>
                             <div class="input-field col m3 s12 div-account">
                                 <input type="hidden" id="temp" name="temp">
@@ -1521,7 +1521,7 @@
 
     function adjustSerial(element,podid,itemid){
         let countSerialPo = $('input[name^="arr_serial[]"][data-po="' + podid + '"]').length,
-        conversion = parseFloat($(element).data('conversion').toString().replaceAll(".", "").replaceAll(",",".")),
+        conversion = parseFloat($(element).data('conversion')),
         qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")),
         code = $(element).data('code');
 

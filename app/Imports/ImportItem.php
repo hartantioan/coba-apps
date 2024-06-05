@@ -59,6 +59,7 @@ class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMult
                 $query = Item::create([
                     'code' => $row['code'],
                     'name' => $row['name'],
+                    'other_name' => $row['other_name'],
                     'item_group_id' =>$item_group_id->id,
                     'uom_unit' => $item_unit_id->id,
                     'tolerance_gr' => $row['toleransi_gr'],

@@ -263,8 +263,10 @@
                                 :
                             </td>
                             <td>
-                                {{$user->name}}
+                                {{$data->account->name}}
                             </td>
+                        </tr>
+                        <tr>
                         </tr>
                         <tr>
                             <td>
@@ -274,7 +276,7 @@
                                 :
                             </td>
                             <td>
-                                {{$user->position->code}}
+                                {{$data->account->position->code}}
                             </td>
                         </tr>
                     </table>
@@ -331,6 +333,7 @@
                     Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> dalam hal ini diwakili oleh Departemen EDP/MIS sebagai kontroler inventaris 
                     perangkat Hardware Komputer.
                     <br>
+                    <br>
                     Demikian surat pernyataan ini dibuat dan ditandatangani oleh yang mengembalikan dan menerima kembali inventaris tersebut.
                 </div>
                 <!-- invoice subtotal -->
@@ -354,8 +357,8 @@
                                         <br>
                                         Yang Menyerahkan,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$user->name}}</div>
-                                        <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
+                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$data->account->name}}</div>
+                                        <div class="mt-1">{{ $data->account->position->name.' - '.$data->account->position->division->code }}</div>
                                     </td>
                                     
                                 </tr>
@@ -369,8 +372,7 @@
                                         <br>
                                         Yang Menerima,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$data->account->name}}</div>
-                                        <div class="mt-1">{{ $data->account->position->name.' - '.$data->account->position->division->code }}</div>
+                                        
                                     </td>
                                 </tr>
                             </table>

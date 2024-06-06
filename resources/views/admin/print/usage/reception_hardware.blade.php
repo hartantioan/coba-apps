@@ -328,7 +328,7 @@
                                 :
                             </td>
                             <td style="font-weight: bold">
-                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail}} 
+                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
                             </td>
                         </tr>
                     </table>

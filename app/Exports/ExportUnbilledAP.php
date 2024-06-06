@@ -155,7 +155,7 @@ class ExportUnbilledAP implements FromView , WithEvents
                     'total_received'=> number_format($total_received_after_adjust,2,',','.'),
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
                     'total_balance' => number_format($balance_after_adjust,2,',','.'),
-                    'kurs'          => number_format($balance_after_adjust / $balance,2,',','.'),
+                    'kurs'          => $balance > 0 || $balance < 0 ? number_format($balance_after_adjust / $balance,2,',','.') : 0,
                     'real'          => number_format($balance,2,',','.'),
                 ];
                 $totalUnbilled += round($balance_after_adjust,2);

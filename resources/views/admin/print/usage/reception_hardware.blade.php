@@ -367,7 +367,7 @@
                                 <br><br><br><br><br>
                                 @endif
                                 <div class="{{ $data->account->signature ? '' : 'mt-5' }}">{{ $data->account->name }}</div>
-                                <div class="mt-1">{{ $data->account->position()->exists() ? $data->account->position->Level->name.' - '.$data->account->position->division->name : '-' }}</div>
+                                
                             </td>
                         </tr>
                     </table>  

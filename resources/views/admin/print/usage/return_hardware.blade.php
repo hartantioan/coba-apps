@@ -270,13 +270,13 @@
                         </tr>
                         <tr>
                             <td>
-                                Position	
+                                Departemen	
                             </td>
                             <td>
                                 :
                             </td>
                             <td>
-                                {{$data->account->position->code}}
+                                {{$data->account->position->division->name}}
                             </td>
                         </tr>
                     </table>
@@ -358,7 +358,7 @@
                                         Yang Menyerahkan,
                                         <br><br><br><br><br>
                                         <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$data->account->name}}</div>
-                                        <div class="mt-1">{{ $data->account->position->name.' - '.$data->account->position->division->code }}</div>
+                                       
                                     </td>
                                     
                                 </tr>

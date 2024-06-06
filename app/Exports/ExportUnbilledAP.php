@@ -144,7 +144,7 @@ class ExportUnbilledAP implements FromView , WithEvents
             $total_received_after_adjust = ($row->total * $currency_rate) + round($row->adjust_nominal,2);
             $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
-            if($balance_after_adjust > 0){
+            if(round($balance_after_adjust,2) > 0){
                 $array_filter[] = [
                     'no'            => ($key + 1),
                     'code'          => $row->code,

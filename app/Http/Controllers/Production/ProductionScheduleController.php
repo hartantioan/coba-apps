@@ -456,7 +456,6 @@ class ProductionScheduleController extends Controller
                 'uom'               => $row->marketingOrderPlanDetail->item->uomUnit->code,
                 'request_date'      => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
                 'note'              => $row->marketingOrderPlanDetail->note ? $row->marketingOrderPlanDetail->note : '',
-                'priority'          => $row->marketingOrderPlanDetail->priority,
                 'has_bom'           => $cekBom->exists() ? '1' : '',
                 'place_id'          => $po->place_id,
             ];
@@ -481,6 +480,7 @@ class ProductionScheduleController extends Controller
                 'place_id'          => $po->place_id,
                 'list_warehouse'    => $row->item->warehouseList(),
                 'line_id'           => $row->line_id,
+                'type'              => $row->type == '1' ? 'normal' : 'powder',
             ];
         }
 
@@ -533,7 +533,6 @@ class ProductionScheduleController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan UoM</th>
                                 <th class="center-align">Tgl.Request</th>
-                                <th class="center-align">Prioritas</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
@@ -547,7 +546,6 @@ class ProductionScheduleController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->uomUnit->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->priority.'</td>
                 <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
             </tr>';
         }
@@ -586,7 +584,7 @@ class ProductionScheduleController extends Controller
                 <option value="" '.($row->status_process == NULL || $row->status_process == '' ? 'selected' : '').'>MENUNGGU</option>
                 <option value="1" '.($row->status_process == '1' ? 'selected' : '').'>PROSES</option>
                 <option value="2" '.($row->status_process == '2' ? 'selected' : '').' disabled>SELESAI</option>
-                <option value="3" '.($row->status_process == '3' ? 'selected' : '').'>DITUNDA</option>
+                <option value="3" '.($row->status_process == '3' ? 'selected' : '').' disabled>DITUNDA</option>
             </select>';
             }
             $string .= '<tr>
@@ -605,8 +603,8 @@ class ProductionScheduleController extends Controller
                 <td class="center-align">'.$row->group.'</td>
                 <td class="center-align">'.$row->line->code.'</td>
                 <td class="center-align">'.$row->warehouse->code.'</td>
-                <td class="center-align">'.date('d/m/Y',strtotime($row->start_date)).'</td>
-                <td class="center-align">'.date('d/m/Y',strtotime($row->end_date)).'</td>
+                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->start_date)).'</td>
+                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->end_date)).'</td>
                 <td class="center-align">'.$row->type().'</td>
             </tr>
             <tr>
@@ -1142,6 +1140,10 @@ class ProductionScheduleController extends Controller
                 'total_additional_time'         => 0,
                 'total_run_time'                => 0,
                 'status'                        => '2',
+            ]);
+
+            $data->update([
+                'status_process'    => $request->status,
             ]);
 
             CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,$data->productionSchedule->user_id);

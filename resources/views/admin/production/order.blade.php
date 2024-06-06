@@ -274,7 +274,7 @@
     <div class="modal-content" style="overflow:auto !important;">
         <div class="row">
             <div class="col s12">
-                <h4>Tutup & Hitung Varian {{ $title }}</h4>
+                <h4>Rekapitulasi {{ $title }} <b id="close-form-code"></b></h4>
                 <form class="row" id="form_data_calculate" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -283,22 +283,84 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. Informasi Utama</legend>
-                                    
+                                    <legend align="left">1. Biaya-biaya / Costs</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input type="hidden" id="tempClose" name="tempClose">
+                                        <input id="actual_item_cost" name="actual_item_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback">IDR</div>
+                                        <label class="active" for="actual_item_cost">Total Aktual Biaya Komponen Item</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="actual_resource_cost" name="actual_resource_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback">IDR</div>
+                                        <label class="active" for="actual_resource_cost">Total Aktual Biaya Komponen Resource</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="total_product_cost" name="total_product_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback">IDR</div>
+                                        <label class="active" for="total_product_cost">Total Aktual Biaya Produk</label>
+                                    </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Detail Item</legend>
-                                    
+                                    <legend align="left">2. Penerimaan Hasil Produksi / Quantities</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input id="plan_qty" name="plan_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback stock-unit">-</div>
+                                        <label class="active" for="plan_qty">Jumlah Perencanaan</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="complete_qty" name="complete_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback stock-unit">-</div>
+                                        <label class="active" for="complete_qty">Jumlah Selesai</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="reject_qty" name="reject_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback stock-unit">-</div>
+                                        <label class="active" for="reject_qty">Jumlah Rusak</label>
+                                    </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step10" onclick="saveCalculate();">Simpan <i class="material-icons right">send</i></button>
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend align="left">3. Waktu Produksi / Times</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input id="schedule_time_start" name="schedule_time_start" type="datetime-local" placeholder="Jadwal Tgl. Mulai Produksi" readonly>
+                                        <label class="active" for="schedule_time_start">Tgl. Mulai Produksi (Jadwal)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="schedule_time_end" name="schedule_time_end" type="datetime-local" placeholder="Jadwal Tgl. Akhir Produksi" readonly>
+                                        <label class="active" for="schedule_time_end">Tgl. Berakhir Produksi (Jadwal)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="real_time_start" name="real_time_start" type="datetime-local" placeholder="Aktual Tgl. Mulai Produksi">
+                                        <label class="active" for="real_time_start">Tgl. Mulai Produksi (Aktual)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="real_time_end" name="real_time_end" type="datetime-local" placeholder="Aktual Tgl. Akhir Produksi">
+                                        <label class="active" for="real_time_end">Tgl. Berakhir Produksi (Aktual)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="total_production_time" name="total_production_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback">Jam</div>
+                                        <label class="active" for="total_production_time">Total Aktual Waktu Produksi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="total_additional_time" name="total_additional_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);">
+                                        <div class="form-control-feedback">Jam</div>
+                                        <label class="active" for="total_additional_time">Total Waktu Tambahan Produksi</label>
+                                    </div>
+                                    <div class="input-field col m6 s12">
+                                        <input id="total_run_time" name="total_run_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <div class="form-control-feedback">Jam</div>
+                                        <label class="active" for="total_run_time">Total Waktu Jalan Produksi (Aktual + Tambahan)</label>
+                                    </div>
+                                </fieldset>
                             </div>
                         </div>
                     </div>
@@ -307,7 +369,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
+        <button class="btn waves-effect red waves-light mr-1 right submit" onclick="saveCalculate();">TUTUP <i class="material-icons right">highlight_off</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">BATAL</a>
     </div>
 </div>
 
@@ -558,10 +621,14 @@
                 
             },
             onOpenEnd: function(modal, trigger) {
-
+                M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-                
+                $('#form_data_calculate')[0].reset();
+                $('#tempClose').val('');
+                $('#close-form-code').text('');
+                $('.stock-unit').text('-');
+                M.updateTextFields();
             }
         });
 
@@ -625,7 +692,45 @@
     });
 
     function calculate(id){
-        $('#modal6').modal('open');
+        $.ajax({
+            url: '{{ Request::url() }}/get_close_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            },
+            success: function(response) {
+                if(response.status == 200){
+                    $('#modal6').modal('open');
+                    $('#close-form-code').text(response.data.code);
+                    $('#tempClose').val(response.data.encrypt_code);
+                    $('#actual_item_cost').val(response.data.actual_item_cost);
+                    $('#actual_resource_cost').val(response.data.actual_resource_cost);
+                    $('#total_product_cost').val(response.data.total_product_cost);
+                    $('#plan_qty').val(response.data.plan_qty);
+                    $('#complete_qty').val(response.data.complete_qty);
+                    $('#reject_qty').val(response.data.reject_qty);
+                    $('#schedule_time_start').val(response.data.schedule_time_start);
+                    $('#schedule_time_end').val(response.data.schedule_time_end);
+                    $('.stock-unit').text(response.data.unit);
+                }
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function makeTreeOrg(data,link){

@@ -1016,10 +1016,10 @@
                     </select>
                 </td>
                 <td class="">
-                    <input name="arr_start_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                    <input name="arr_start_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
                 </td>
                 <td class="">
-                    <input name="arr_end_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                    <input name="arr_end_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
                 </td>
                 <td class="">
                     <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
@@ -1769,10 +1769,20 @@
                     });
 
                     $.each(response.details, function(i, val) {
+                        if($('.last-row-item-detail-' + val.type).length > 0){
+                            $('.last-row-item-detail-' + val.type).remove();
+                        }
+
                         var count = makeid(10);
 
-                        $('#total-row-detail').before(`
+                        $('#total-row-detail-' + val.type).before(`
                             <tr class="row_item_detail">
+                                <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + val.type + `" data-id="` + count + `" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
                                 </td>
@@ -1799,10 +1809,10 @@
                                     </select>
                                 </td>
                                 <td class="">
-                                    <input name="arr_start_date[]" type="date" value="`+ val.start_date +`" required>
+                                    <input name="arr_start_date[]" type="datetime-local" value="`+ val.start_date +`" required>
                                 </td>
                                 <td class="">
-                                    <input name="arr_end_date[]" type="date" value="` + val.end_date + `" required>
+                                    <input name="arr_end_date[]" type="datetime-local" value="` + val.end_date + `" required>
                                 </td>
                                 <td class="">
                                     <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
@@ -1812,11 +1822,6 @@
                                 </td>
                                 <td class="">
                                     <input name="arr_note[]" type="text" value="` + val.note + `" required>
-                                </td>
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
                                 </td>
                             </tr>
                         `);
@@ -2193,54 +2198,58 @@
 
     function updateDocumentStatus(code,element){
         var status = $(element).val();
-        swal({
-            title: "Apakah anda yakin ingin update status?",
-            text: "Untuk status PROSES, maka akan otomatis membuat PDO.",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-                cancel: 'Tidak, jangan!',
-                delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    type : "POST",
-                    url  : '{{ Request::url() }}/update_document_status',
-                    data : {
-                        code : code,
-                        status : status,
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    cache: false,
-                    beforeSend: function() {
-                        loadingOpen('#datatable_serverside');
-                    },
-                    success: function(data){
-                        loadingClose('#datatable_serverside');
-                        if(data.status == '200'){
-                            M.toast({
-                                html: data.message
-                            });
-                            $('#pod-' + code).text(data.value);
-                        }else{
-                            if(data.status == '422'){
-                                $(element).val(data.value);
+        if($(element).val()){
+            swal({
+                title: "Apakah anda yakin ingin update status?",
+                text: "Untuk status PROSES, maka akan otomatis membuat PDO.",
+                icon: 'warning',
+                dangerMode: true,
+                buttons: {
+                    cancel: 'Tidak, jangan!',
+                    delete: 'Ya, lanjutkan!'
+                }
+            }).then(function (willDelete) {
+                if (willDelete) {
+                    $.ajax({
+                        type : "POST",
+                        url  : '{{ Request::url() }}/update_document_status',
+                        data : {
+                            code : code,
+                            status : status,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        cache: false,
+                        beforeSend: function() {
+                            loadingOpen('#datatable_serverside');
+                        },
+                        success: function(data){
+                            loadingClose('#datatable_serverside');
+                            if(data.status == '200'){
+                                M.toast({
+                                    html: data.message
+                                });
+                                $('#pod-' + code).text(data.value);
+                            }else{
+                                if(data.status == '422'){
+                                    $(element).val(data.value);
+                                }
+                                swal({
+                                    title: 'Ups!',
+                                    text: data.message,
+                                    icon: 'warning'
+                                });
+                                $(element).val(previous);
                             }
-                            swal({
-                                title: 'Ups!',
-                                text: data.message,
-                                icon: 'warning'
-                            });
-                            $(element).val(previous);
                         }
-                    }
-                });
-            }else{
-                $(element).val(previous);
-            }
-        });
+                    });
+                }else{
+                    $(element).val(previous);
+                }
+            });
+        }else{
+            $(element).val(previous);
+        }
     }
 </script>

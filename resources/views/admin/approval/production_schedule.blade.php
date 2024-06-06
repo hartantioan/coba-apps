@@ -267,8 +267,8 @@
                         <td class="center-align">{{ $row->line->code }}</td>
                         <td class="center-align">{{ $row->group }}</td>
                         <td class="center-align">{{ $row->warehouse->code }}</td>
-                        <td class="center-align">{{ date('d/m/Y',strtotime($row->start_date)) }}</td>
-                        <td class="center-align">{{ date('d/m/Y',strtotime($row->end_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->start_date)) }}</td>
+                        <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->end_date)) }}</td>
                         <td class="center-align">{{ $row->status() }}</td>           
                         <td class="center-align">{{ ($row->productionOrder()->exists() ? $row->productionOrder->code : '-') }}</td>
                         <td class="center-align">{{ $row->type() }}</td>

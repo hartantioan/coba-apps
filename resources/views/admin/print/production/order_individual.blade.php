@@ -319,7 +319,7 @@
                                             :
                                         </td>
                                         <td style="vertical-align: top;">
-                                            {{ $data->productionScheduleDetail->productionSchedule->line->code }}
+                                            {{ $data->productionScheduleDetail->line->code }}
                                         </td>
                                     </tr>
                                 </table>

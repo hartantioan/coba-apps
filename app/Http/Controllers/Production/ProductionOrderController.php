@@ -190,7 +190,7 @@ class ProductionOrderController extends Controller
                     CustomHelper::formatConditionalQty($val->productionScheduleDetail->qty),
                     $val->productionScheduleDetail->item->uomUnit->code,
                     $val->productionScheduleDetail->shift->code.' - '.$val->productionScheduleDetail->shift->name,
-                    $val->productionScheduleDetail->productionSchedule->line->code,
+                    $val->productionScheduleDetail->line->code,
                     $val->productionScheduleDetail->group,
                     $val->productionScheduleDetail->warehouse->name,
                     $val->status(),
@@ -231,6 +231,37 @@ class ProductionOrderController extends Controller
         $response['recordsFiltered'] = 0;
         if($total_filtered <> FALSE) {
             $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
+    }
+
+    public function getCloseData(Request $request){
+        $data = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        if($data){
+            $query = [
+                'code'                      => $data->code,
+                'encrypt_code'              => CustomHelper::encrypt($data->code),
+                'actual_item_cost'          => '0,00',
+                'actual_resource_cost'      => '0,00',
+                'total_product_cost'        => '0,00',
+                'plan_qty'                  => CustomHelper::formatConditionalQty($data->planned_qty),
+                'complete_qty'              => '0,000',
+                'reject_qty'                => '0,000',
+                'schedule_time_start'       => $data->productionScheduleDetail->start_date,
+                'schedule_time_end'         => $data->productionScheduleDetail->end_date,
+                'unit'                      => $data->productionScheduleDetail->item->uomUnit->code,
+            ];
+            $response = [
+                'status'    => 200,
+                'message'   => 'Data berhasil dimuat!',
+                'data'      => $query,
+            ];
+        }else{
+            $response = [
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.'
+            ];
         }
 
         return response()->json($response);
@@ -536,6 +567,10 @@ class ProductionOrderController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                $query->productionScheduleDetail->update([
+                    'status_process'    => NULL,
+                ]);
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),

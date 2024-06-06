@@ -325,8 +325,8 @@
                                 <td align="center">{{ $row->line->code }}</td>
                                 <td align="center">'.$row->group.'</td>
                                 <td align="center">'.$row->warehouse->code.'</td>
-                                <td align="center">'.date('d/m/Y',strtotime($row->start_date)).'</td>
-                                <td align="center">'.date('d/m/Y',strtotime($row->end_date)).'</td>
+                                <td align="center">'.date('d/m/Y H:i:s',strtotime($row->start_date)).'</td>
+                                <td align="center">'.date('d/m/Y H:i:s',strtotime($row->end_date)).'</td>
                             </tr>
                             <tr>
                                 <td colspan="9">Keterangan : {{ $row->note }}</td>

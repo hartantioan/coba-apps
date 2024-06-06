@@ -196,6 +196,7 @@ use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\MasterData\TankController;
+use App\Http\Controllers\Production\ProductionIssueController;
 
 /*
 |--------------------------------------------------------------------------
@@ -2082,6 +2083,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('viewstructuretree',[ProductionOrderController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [ProductionOrderController::class, 'removeUsedData']);
                     Route::post('create',[ProductionOrderController::class, 'create'])->middleware('operation.access:production_order,update');
+                    Route::post('get_close_data',[ProductionOrderController::class, 'getCloseData'])->middleware('operation.access:production_order,update');
                     Route::post('send_used_data',[ProductionOrderController::class, 'sendUsedData'])->middleware('operation.access:production_order,update');
                     Route::get('approval/{id}',[ProductionOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[ProductionOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -2090,25 +2092,25 @@ Route::prefix('admin')->group(function () {
                 });
 
                 Route::prefix('production_issue')->middleware(['operation.access:production_issue,view','lockacc'])->group(function () {
-                    Route::get('/',[ProductionIssueReceiveController::class, 'index']);
-                    Route::get('datatable',[ProductionIssueReceiveController::class, 'datatable']);
-                    Route::get('row_detail',[ProductionIssueReceiveController::class, 'rowDetail']);
-                    Route::post('show', [ProductionIssueReceiveController::class, 'show']);
-                    Route::post('get_code', [ProductionIssueReceiveController::class, 'getCode']);
-                    Route::post('print',[ProductionIssueReceiveController::class, 'print']);
-                    Route::post('done',[ProductionIssueReceiveController::class, 'done'])->middleware('operation.access:production_issue,update');
-                    Route::post('print_by_range',[ProductionIssueReceiveController::class, 'printByRange']);
-                    Route::get('export',[ProductionIssueReceiveController::class, 'export']);
-                    Route::get('viewstructuretree',[ProductionIssueReceiveController::class, 'viewStructureTree']);
-                    Route::post('send_used_data',[ProductionIssueReceiveController::class, 'sendUsedData']);
-                    Route::post('remove_used_data', [ProductionIssueReceiveController::class, 'removeUsedData']);
-                    Route::post('create',[ProductionIssueReceiveController::class, 'create'])->middleware('operation.access:production_issue,update');
-                    Route::post('send_used_data',[ProductionIssueReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_issue,update');
-                    Route::get('view_journal/{id}',[ProductionIssueReceiveController::class, 'viewJournal'])->middleware('operation.access:production_issue,journal');
-                    Route::get('approval/{id}',[ProductionIssueReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
-                    Route::get('print_individual/{id}',[ProductionIssueReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::post('void_status', [ProductionIssueReceiveController::class, 'voidStatus'])->middleware('operation.access:production_issue,void');
-                    Route::post('destroy', [ProductionIssueReceiveController::class, 'destroy'])->middleware('operation.access:production_issue,delete');
+                    Route::get('/',[ProductionIssueController::class, 'index']);
+                    Route::get('datatable',[ProductionIssueController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionIssueController::class, 'rowDetail']);
+                    Route::post('show', [ProductionIssueController::class, 'show']);
+                    Route::post('get_code', [ProductionIssueController::class, 'getCode']);
+                    Route::post('print',[ProductionIssueController::class, 'print']);
+                    Route::post('done',[ProductionIssueController::class, 'done'])->middleware('operation.access:production_issue,update');
+                    Route::post('print_by_range',[ProductionIssueController::class, 'printByRange']);
+                    Route::get('export',[ProductionIssueController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionIssueController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionIssueController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [ProductionIssueController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionIssueController::class, 'create'])->middleware('operation.access:production_issue,update');
+                    Route::post('send_used_data',[ProductionIssueController::class, 'sendUsedData'])->middleware('operation.access:production_issue,update');
+                    Route::get('view_journal/{id}',[ProductionIssueController::class, 'viewJournal'])->middleware('operation.access:production_issue,journal');
+                    Route::get('approval/{id}',[ProductionIssueController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionIssueController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionIssueController::class, 'voidStatus'])->middleware('operation.access:production_issue,void');
+                    Route::post('destroy', [ProductionIssueController::class, 'destroy'])->middleware('operation.access:production_issue,delete');
                 });
             });
 

@@ -94,7 +94,7 @@ class PurchaseOrderController extends Controller
             'tax'           => Tax::where('status','1')->where('type','+')->orderByDesc('is_default_ppn')->get(),
             'wtax'          => Tax::where('status','1')->where('type','-')->orderByDesc('is_default_pph')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'line'          => Line::where('status','1')->get(),
+            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'machine'       => Machine::where('status','1')->get(),
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),

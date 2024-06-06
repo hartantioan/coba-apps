@@ -21,6 +21,7 @@ class ProductionScheduleDetail extends Model
         'bom_id',
         'qty',
         'group',
+        'line_id',
         'warehouse_id',
         'start_date',
         'end_date',
@@ -45,6 +46,11 @@ class ProductionScheduleDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function warehouse(){

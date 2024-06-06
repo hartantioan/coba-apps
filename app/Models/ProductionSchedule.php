@@ -22,7 +22,6 @@ class ProductionSchedule extends Model
         'user_id',
         'company_id',
         'place_id',
-        'line_id',
         'post_date',
         'document',
         'status',
@@ -65,11 +64,6 @@ class ProductionSchedule extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function line()
-    {
-        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
     public function productionScheduleDetail()
@@ -197,7 +191,7 @@ class ProductionSchedule extends Model
         $lastSegment = 'production_order';
         foreach($this->productionScheduleDetail()->where('status','1')->get() as $row){
             $menu = Menu::where('url', $lastSegment)->first();
-            $newCode=ProductionOrder::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
+            $newCode = ProductionOrder::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
             
             $query = ProductionOrder::create([
                 'code'			                => $newCode,

@@ -61,7 +61,7 @@ class InventoryRevaluationController extends Controller
             'maxDate'   => $request->get('maxDate'),
             'newcode'   => $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
-            'line'      => Line::where('status','1')->get(),
+            'line'      => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'department'=> Division::where('status','1')->orderBy('name')->get(),
             'modedata'  => $menuUser->mode ? $menuUser->mode : '',

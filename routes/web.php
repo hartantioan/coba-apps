@@ -2065,6 +2065,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[ProductionScheduleController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[ProductionScheduleController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionScheduleController::class, 'voidStatus'])->middleware('operation.access:production_schedule,void');
+                    Route::post('update_document_status',[ProductionScheduleController::class, 'updateDocumentStatus'])->middleware('operation.access:production_schedule,update');
                     Route::post('destroy', [ProductionScheduleController::class, 'destroy'])->middleware('operation.access:production_schedule,delete');
                 });
 

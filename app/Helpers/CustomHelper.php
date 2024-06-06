@@ -4382,9 +4382,9 @@ class CustomHelper {
 			$je = Journal::find($table_id)->update(['status' => '3']);
 		}elseif($table_name == 'production_schedules'){
 			$ps = ProductionSchedule::find($table_id);
-			if($ps){
+			/* if($ps){
 				$ps->createProductionOrder();
-			}
+			} */
 		}
 		/* else{
 

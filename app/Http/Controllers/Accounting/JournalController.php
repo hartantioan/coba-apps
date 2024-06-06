@@ -56,7 +56,7 @@ class JournalController extends Controller
             'currency'  => Currency::where('status','1')->get(),
             'place'     => Place::whereIn('id',$this->dataplaces)->where('status','1')->get(),
             'department'=> Division::where('status','1')->orderBy('name')->get(),
-            'line'      => Line::where('status','1')->get(),
+            'line'      => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),

@@ -172,12 +172,6 @@
                     LAIN-LAIN
                 </div>
                 <div class="col s4">
-                    Line
-                </div>
-                <div class="col s8">
-                    {{ $data->line->code }}
-                </div>
-                <div class="col s4">
                     Tgl.Post
                 </div>
                 <div class="col s8">
@@ -205,7 +199,6 @@
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Tgl.Request</th>
-                        <th class="center-align">Prioritas</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,10 +210,9 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderPlanDetail->item->uomUnit->code }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)) }}</td>
-                        <td class="center-align">{{ $row->marketingOrderPlanDetail->priority }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
+                        <td colspan="5">Keterangan: {{ $row->marketingOrderPlanDetail->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -231,7 +223,7 @@
             <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="14" class="center-align">Daftar Jadwal Produksi</th>
+                        <th colspan="16" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">Proses</th>
@@ -243,11 +235,13 @@
                         <th class="center-align" style="min-width:150px !important;">Qty</th>
                         <th class="center-align" style="min-width:150px !important;">Satuan UoM</th>
                         <th class="center-align" style="min-width:150px !important;">Grup</th>
+                        <th class="center-align" style="min-width:150px !important;">Line</th>
                         <th class="center-align" style="min-width:150px !important;">Gudang</th>
                         <th class="center-align" style="min-width:150px !important;">Tgl.Mulai</th>
                         <th class="center-align" style="min-width:150px !important;">Tgl.Selesai</th>
                         <th class="center-align" style="min-width:150px !important;">Status</th>
                         <th class="center-align" style="min-width:150px !important;">NO PDO</th>
+                        <th class="center-align" style="min-width:150px !important;">Tipe</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -270,15 +264,17 @@
                         <td>{{ $row->bom->code.' - '.$row->bom->name }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                        <td class="center-align">{{ $row->line->code }}</td>
                         <td class="center-align">{{ $row->group }}</td>
                         <td class="center-align">{{ $row->warehouse->code }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->start_date)) }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->end_date)) }}</td>
                         <td class="center-align">{{ $row->status() }}</td>           
                         <td class="center-align">{{ ($row->productionOrder()->exists() ? $row->productionOrder->code : '-') }}</td>
+                        <td class="center-align">{{ $row->type() }}</td>
                     </tr>
                     <tr>
-                        <td colspan="12">Keterangan : {{ $row->note }}</td>
+                        <td colspan="14">Keterangan : {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

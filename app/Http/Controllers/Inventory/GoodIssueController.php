@@ -93,7 +93,7 @@ class GoodIssueController extends Controller
             'newcode'   => $menu->document_code.date('y'),
             'menucode'  => $menu->document_code,
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
-            'line'      => Line::where('status','1')->get(),
+            'line'      => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'coa_cost'  => InventoryCoa::where('status','1')->where('type','1')->get(),
             'modedata'  => $menuUser->mode ? $menuUser->mode : '',

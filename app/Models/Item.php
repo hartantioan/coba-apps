@@ -601,6 +601,26 @@ class Item extends Model
         return $arr;
     }
 
+    public function bomRelation(){
+        $arr = $this->listBom();
+        $result = '';
+        if(count($arr) > 0){
+            foreach($arr as $key => $row){
+                if($key == 0){
+                    $result .= '<a class="waves-effect waves-light btn gradient-45deg-red-pink box-shadow-none border-round mb-1">'.$row['name'].'</a>';
+                }else{
+                    $color = 'gradient-45deg-amber-amber';
+                    if(($key + 1) == count($arr)){
+                        $color = 'gradient-45deg-green-teal';
+                    }
+                    $result .= '<i class="material-icons">arrow_forward</i><a class="waves-effect waves-light btn '.$color.' box-shadow-none border-round mb-1">'.$row['name'].'</a>';
+                }
+            }
+            
+        }
+        return $result;
+    }
+
     public function bomDetail()
     {
         return $this->hasMany('App\Models\BomDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('bom',function($query){

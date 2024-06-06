@@ -77,7 +77,7 @@ class MaterialRequestController extends Controller
             'company'   => Company::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'department'=> Division::where('status','1')->orderBy('name')->get(),
-            'line'      => Line::where('status','1')->get(),
+            'line'      => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'machine'   => Machine::where('status','1')->orderBy('name')->get(),
             'code'      => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'   => $request->get('minDate'),

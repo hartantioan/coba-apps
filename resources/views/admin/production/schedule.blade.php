@@ -117,7 +117,6 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
-                                                        <th>Line</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Keterangan</th>
                                                         <th>Dokumen</th>
@@ -184,15 +183,6 @@
                                         </select>
                                         <label class="" for="place_id">Plant</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="line_id" name="line_id">
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($line as $rowline)
-                                                <option value="{{ $rowline->id }}">{{ $rowline->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="line_id">Line</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
@@ -237,6 +227,7 @@
                                             <table class="bordered" id="table-detail" style="min-width:100%;">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center" style="min-width:75px;">Hapus</th>
                                                         <th class="center" style="min-width:150px;">MOP</th>
                                                         <th class="center" style="min-width:150px;">Item</th>
                                                         <th class="center" style="min-width:150px;">Qty MOP</th>
@@ -244,13 +235,11 @@
                                                         <th class="center" style="min-width:150px;">Satuan UoM</th>
                                                         <th class="center" style="min-width:150px;">Remark</th>
                                                         <th class="center" style="min-width:150px;">Tgl.Request</th>
-                                                        <th class="center" style="min-width:150px;">Prioritas</th>
-                                                        <th class="center" style="min-width:75px;">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="9">
+                                                        <td colspan="8">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
@@ -261,7 +250,7 @@
                                                         <td class="right-align" id="data-foot">
                                                             0,000
                                                         </td>
-                                                        <td colspan="6"></td>
+                                                        <td colspan="5"></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -288,30 +277,31 @@
                                             <table class="bordered" style="min-width:2500px;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" colspan="11">NORMAL BOM</th>
+                                                        <th class="center" colspan="12">NORMAL BOM</th>
                                                     </tr>
                                                     <tr>
+                                                        <th class="center">Hapus</th>
                                                         <th class="center">Item</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan UoM</th>
                                                         <th class="center">BOM</th>
+                                                        <th class="center">Line</th>
                                                         <th class="center">Gudang</th>
                                                         <th class="center">Tgl.Mulai</th>
                                                         <th class="center">Tgl.Selesai</th>
                                                         <th class="center">Shift</th>
                                                         <th class="center">Group</th>
                                                         <th class="center">Remark</th>
-                                                        <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-item-detail-normal" id="body-item-detail-normal">
                                                     <tr class="last-row-item-detail-normal">
-                                                        <td colspan="11">
+                                                        <td colspan="12">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
                                                     <tr id="total-row-detail-normal">
-                                                        <td class="right-align">
+                                                        <td class="right-align" colspan="2">
                                                             TOTAL :
                                                         </td>
                                                         <td class="right-align" id="data-foot-detail-normal">
@@ -320,7 +310,7 @@
                                                         <td colspan="9"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="11">
+                                                        <td colspan="12">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem('normal')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -335,30 +325,31 @@
                                             <table class="bordered" style="min-width:2500px;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" colspan="11">POWDER BOM</th>
+                                                        <th class="center" colspan="12">POWDER BOM</th>
                                                     </tr>
                                                     <tr>
+                                                        <th class="center">Hapus</th>
                                                         <th class="center">Item</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan UoM</th>
                                                         <th class="center">BOM</th>
+                                                        <th class="center">Line</th>
                                                         <th class="center">Gudang</th>
                                                         <th class="center">Tgl.Mulai</th>
                                                         <th class="center">Tgl.Selesai</th>
                                                         <th class="center">Shift</th>
                                                         <th class="center">Group</th>
                                                         <th class="center">Remark</th>
-                                                        <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-item-detail-powder" id="body-item-detail-powder">
                                                     <tr class="last-row-item-detail-powder">
-                                                        <td colspan="11">
+                                                        <td colspan="12">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
                                                     <tr id="total-row-detail-powder">
-                                                        <td class="right-align">
+                                                        <td class="right-align" colspan="2">
                                                             TOTAL :
                                                         </td>
                                                         <td class="right-align" id="data-foot-detail-powder">
@@ -367,7 +358,7 @@
                                                         <td colspan="9"></td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="11">
+                                                        <td colspan="12">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem('powder');" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -383,14 +374,16 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>5. Peta Kebutuhan Produksi</legend>
+                                    <legend>5. Peta BOM</legend>
                                     <div class="card-alert card gradient-45deg-yellow-green">
                                         <div class="card-content">
-                                            <p>Info : Peta kebutuhan produksi diambil dari relasi BOM yang diatur pada master data. Jika ada lebih dari 1 bom yang ter-set, maka bom terbaru yang akan digunakan, dan jika ada lebih dari 1 alternatif, maka alternatif default yang akan dipakai.</p>
+                                            <p>Info : Peta BOM diambil dari relasi BOM yang diatur pada master data. Jika ada lebih dari 1 bom yang ter-set, maka bom terbaru yang akan digunakan, dan jika ada lebih dari 1 alternatif, maka alternatif default yang akan dipakai.</p>
                                         </div>
                                     </div>
-                                    <div class="col m12 s12" style="overflow:auto;width:100% !important;">
-
+                                    <div class="col m12 s12">
+                                        <ol id="list-bom-relation">
+                                            
+                                        </ol>
                                     </div>
                                 </fieldset>
                             </div>
@@ -589,6 +582,8 @@
 
     $(function() {
 
+        var previous = '';
+
         $("#table-detail th,#table-detail2 th,#table-detail3 th,#table-detail4 th,#table-detail5 th").resizable({
             minWidth: 100,
         });
@@ -701,10 +696,12 @@
                     $(this).remove();
                 });
 
+                $('#list-bom-relation').empty();
+
                 if($('#last-row-item').length == 0){
                     $('#total-row-target').before(`
                         <tr id="last-row-item">
-                            <td colspan="9">
+                            <td colspan="8">
                                 Silahkan tambahkan Marketing Order Produksi...
                             </td>
                         </tr>
@@ -734,11 +731,13 @@
         });
 
         $('.body-item-detail-normal').on('click', '.delete-data-item-detail-normal', function() {
+            $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
             countDetail();
         });
 
         $('.body-item-detail-powder').on('click', '.delete-data-item-detail-powder', function() {
+            $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
             countDetail();
         });
@@ -931,7 +930,7 @@
                     if($('#last-row-item').length == 0){
                         $('#total-row-target').before(`
                             <tr id="last-row-item">
-                                <td colspan="9">
+                                <td colspan="8">
                                     Silahkan tambahkan Marketing Order Produksi...
                                 </td>
                             </tr>
@@ -949,9 +948,10 @@
         });
     }
 
-    function getRowUnit(val){
+    function getRowUnit(val,type){
         $("#arr_warehouse" + val).empty();
         $('#arr_unit' + val).empty();
+        $('#list-bom-' + val).remove();
         if($("#arr_item_detail_id" + val).val()){
             if($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse, function(i, value) {
@@ -965,6 +965,9 @@
                 `);
             }
             $('#arr_unit' + val).text($("#arr_item_detail_id" + val).select2('data')[0].uom);
+            $('#list-bom-relation').append(
+                `<li id="list-bom-` + val + `">(` + type + `) ` + $("#arr_item_detail_id" + val).select2('data')[0].list_bom + `</li>`
+            );
         }else{
             $("#arr_item_detail_id" + val).empty();
             $("#arr_warehouse" + val).append(`
@@ -982,8 +985,13 @@
         $('#total-row-detail-' + type).before(`
             <tr class="row_item_detail">
                 <input type="hidden" name="arr_type[]" value="` + type + `">
+                <td class="center-align">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" data-id="` + count +`" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
                 <td>
-                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `')" required></select>
+                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
                 </td>
                 <td class="right-align">
                     <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countDetail();" required style="width:100%;text-align:right;">
@@ -993,6 +1001,14 @@
                 </td>
                 <td class="">
                     <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                        <option value="">--Kosong--</option>
+                        @foreach ($line as $rowline)
+                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                        @endforeach
+                    </select>    
                 </td>
                 <td>
                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
@@ -1013,11 +1029,6 @@
                 </td>
                 <td class="">
                     <input name="arr_note[]" type="text" required>
-                </td>
-                <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
                 </td>
             </tr>
         `);
@@ -1098,6 +1109,11 @@
                             $('#total-row-target').before(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + mop.id + `" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
                                     <td>
                                         ` + mop.code + `
                                     </td>
@@ -1120,19 +1136,11 @@
                                     <td class="center-align">
                                         ` + val.request_date + `
                                     </td>
-                                    <td class="center-align">
-                                        ` + val.priority + `
-                                    </td>
-                                    <td class="center-align">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + mop.id + `" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
                                 </tr>
                             `);
                         });
 
-                        $.each(mop.details, function(i, val) {
+                        /* $.each(mop.details, function(i, val) {
                             var count = makeid(10);
 
                             $('#total-row-detail').before(`
@@ -1223,10 +1231,10 @@
                                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                                 `);
                             }
-                        });
+                        }); */
 
                         countTarget();
-                        countDetail();
+                        /* countDetail(); */
 
                         $('#marketing_order_plan_id').empty();
                     }
@@ -1471,7 +1479,6 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'plant_id', className: 'center-align' },
-                { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -1583,6 +1590,9 @@
                     if(!$('select[name^="arr_shift[]"]').eq(index).val()){
                         passed = false;
                     }
+                    if(!$('select[name^="arr_line[]"]').eq(index).val()){
+                        passed = false;
+                    }
                 });
 
                 if(passed){
@@ -1666,7 +1676,7 @@
                 }else{
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty target produksi, qty jadwal produksi, bom, tanggal mulai produksi, tanggal selesai produksi, item, gudang, dan shift tidak boleh kosong.',
+                        text: 'Qty target produksi, qty jadwal produksi, bom, tanggal mulai produksi, tanggal selesai produksi, item, line, gudang, dan shift tidak boleh kosong.',
                         icon: 'error'
                     });
                 }
@@ -1702,7 +1712,6 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
-                $('#line_id').val(response.line_id).formSelect();
                 $('#note').val(response.note);
 
                 if(response.targets.length > 0){
@@ -1751,9 +1760,6 @@
                                     ` + val.request_date + `
                                 </td>
                                 <td class="center-align">
-                                    ` + val.priority + `
-                                </td>
-                                <td class="center-align">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
                                     </a>
@@ -1778,6 +1784,14 @@
                                 </td>
                                 <td class="">
                                     <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                                </td>
+                                <td>
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                        <option value="">--Kosong--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                        @endforeach
+                                    </select>    
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
@@ -1806,6 +1820,8 @@
                                 </td>
                             </tr>
                         `);
+
+                        $('#arr_line' + count).val(val.line_id);
 
                         if(val.shift_id){
                             $('#arr_shift' + count).append(`
@@ -2167,6 +2183,63 @@
                         });
                     }
                 });
+            }
+        });
+    }
+
+    function updatePrevious(element){
+        previous = $(element).val();
+    }
+
+    function updateDocumentStatus(code,element){
+        var status = $(element).val();
+        swal({
+            title: "Apakah anda yakin ingin update status?",
+            text: "Untuk status PROSES, maka akan otomatis membuat PDO.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    type : "POST",
+                    url  : '{{ Request::url() }}/update_document_status',
+                    data : {
+                        code : code,
+                        status : status,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    cache: false,
+                    beforeSend: function() {
+                        loadingOpen('#datatable_serverside');
+                    },
+                    success: function(data){
+                        loadingClose('#datatable_serverside');
+                        if(data.status == '200'){
+                            M.toast({
+                                html: data.message
+                            });
+                            $('#pod-' + code).text(data.value);
+                        }else{
+                            if(data.status == '422'){
+                                $(element).val(data.value);
+                            }
+                            swal({
+                                title: 'Ups!',
+                                text: data.message,
+                                icon: 'warning'
+                            });
+                            $(element).val(previous);
+                        }
+                    }
+                });
+            }else{
+                $(element).val(previous);
             }
         });
     }

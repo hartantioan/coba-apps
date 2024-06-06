@@ -30,6 +30,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportProductionScheduleTransactionPage;
+use App\Models\ProductionOrder;
 use Illuminate\Support\Facades\Date;
 
 class ProductionScheduleController extends Controller
@@ -81,7 +82,6 @@ class ProductionScheduleController extends Controller
             'user_id',
             'company_id',
             'place_id',
-            'line_id',
             'post_date',
             'note',
         ];
@@ -183,7 +183,6 @@ class ProductionScheduleController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->code,
-                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
@@ -238,7 +237,6 @@ class ProductionScheduleController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'line_id'                   => 'required',
             'post_date'		            => 'required',
             'arr_id'                    => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -328,7 +326,6 @@ class ProductionScheduleController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
@@ -366,7 +363,6 @@ class ProductionScheduleController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'line_id'                   => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_schedules') : NULL,
                         'note'                      => $request->note,
@@ -400,10 +396,12 @@ class ProductionScheduleController extends Controller
                             'bom_id'                        => $request->arr_bom[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_detail_qty[$key])),
                             'group'                         => $request->arr_group[$key],
+                            'line_id'                       => $request->arr_line[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
                             'start_date'                    => $request->arr_start_date[$key],
                             'end_date'                      => $request->arr_end_date[$key],
                             'note'                          => $request->arr_note[$key],
+                            'type'                          => $request->arr_type[$key] == 'normal' ? '1' : '2',
                         ]);
                     }
 
@@ -482,6 +480,7 @@ class ProductionScheduleController extends Controller
                 'note'              => $row->note ?? '',
                 'place_id'          => $po->place_id,
                 'list_warehouse'    => $row->item->warehouseList(),
+                'line_id'           => $row->line_id,
             ];
         }
 
@@ -543,7 +542,7 @@ class ProductionScheduleController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->marketingOrderPlan->code.'</td>
-                <td class="center-align">'.$row->marketingOrderPlanDetail->item->code.'</td>\
+                <td class="center-align">'.$row->marketingOrderPlanDetail->item->code.'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderPlanDetail->item->uomUnit->code.'</td>
@@ -555,13 +554,16 @@ class ProductionScheduleController extends Controller
         
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+        $string .= '<div class="col s12 mt-1" style="overflow:auto;width:100% !important;"><table style="min-width:1800px;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="13">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
+                                <th class="center-align">Status Proses</th>
+                                <th class="center-align">Status Approval</th>
+                                <th class="center-align">NO PDO</th>
                                 <th class="center-align">Shift</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
@@ -569,17 +571,31 @@ class ProductionScheduleController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan UoM</th>
                                 <th class="center-align">Grup</th>
+                                <th class="center-align">Line</th>
                                 <th class="center-align">Gudang</th>
                                 <th class="center-align">Tgl.Mulai</th>
                                 <th class="center-align">Tgl.Selesai</th>
-                                <th class="center-align">Status</th>
-                                <th class="center-align">NO PDO</th>
+                                <th class="center-align">Tipe</th>
                             </tr>
                         </thead><tbody>';
 
         foreach($data->productionScheduleDetail as $key => $row){
+            $option = '-';
+            if($row->status == '1'){
+                $option = '<select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($row->id).'`,this)" style="width:150px;">
+                <option value="" '.($row->status_process == NULL || $row->status_process == '' ? 'selected' : '').'>MENUNGGU</option>
+                <option value="1" '.($row->status_process == '1' ? 'selected' : '').'>PROSES</option>
+                <option value="2" '.($row->status_process == '2' ? 'selected' : '').' disabled>SELESAI</option>
+                <option value="3" '.($row->status_process == '3' ? 'selected' : '').'>DITUNDA</option>
+            </select>';
+            }
             $string .= '<tr>
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
+                <td class="center-align">
+                    '.$option.'
+                </td>
+                <td class="center-align">'.$row->status().'</td>           
+                <td class="center-align" id="pod-'.CustomHelper::encrypt($row->id).'">'.($row->productionOrder()->exists() ? $row->productionOrder->code : '-').'</td>
                 <td>'.$row->shift->code.' - '.$row->shift->name.'</td>
                 <td>'.$row->item->code.'</td>
                 <td>'.$row->item->name.'</td>
@@ -587,14 +603,14 @@ class ProductionScheduleController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="center-align">'.$row->group.'</td>
+                <td class="center-align">'.$row->line->code.'</td>
                 <td class="center-align">'.$row->warehouse->code.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->start_date)).'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->end_date)).'</td>
-                <td class="center-align">'.$row->status().'</td>           
-                <td class="center-align">'.($row->productionOrder()->exists() ? $row->productionOrder->code : '-').'</td>
+                <td class="center-align">'.$row->type().'</td>
             </tr>
             <tr>
-                <td colspan="12">Keterangan : '.$row->note.'</td>
+                <td colspan="13">Keterangan : '.$row->note.'</td>
             </tr>';
         }
 
@@ -1097,5 +1113,59 @@ class ProductionScheduleController extends Controller
 		return Excel::download(new ExportProductionScheduleTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
     }
 
+    public function updateDocumentStatus(Request $request){
+        $data = ProductionScheduleDetail::find(CustomHelper::decrypt($request->code));
+        if($data){
+            $lastSegment = 'production_order';
+            $menu = Menu::where('url', $lastSegment)->first();
+            $newCode = ProductionOrder::generateCode($menu->document_code.date('y').substr($data->productionSchedule->code,7,2));
+            
+            $query = ProductionOrder::create([
+                'code'			                => $newCode,
+                'user_id'		                => session('bo_id'),
+                'company_id'                    => $data->productionSchedule->company_id,
+                'production_schedule_id'	    => $data->production_schedule_id,
+                'production_schedule_detail_id'	=> $data->id,
+                'warehouse_id'                  => $data->warehouse_id,
+                'post_date'                     => date('Y-m-d'),
+                'note'                          => $data->note,
+                'standard_item_cost'            => 0,
+                'standard_resource_cost'        => 0,
+                'standard_product_cost'         => 0,
+                'actual_item_cost'              => 0,
+                'actual_resource_cost'          => 0,
+                'total_product_cost'            => 0,
+                'planned_qty'                   => $data->qty,
+                'completed_qty'                 => 0,
+                'rejected_qty'                  => 0,
+                'total_production_time'         => 0,
+                'total_additional_time'         => 0,
+                'total_run_time'                => 0,
+                'status'                        => '2',
+            ]);
 
+            CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,$data->productionSchedule->user_id);
+            CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Order Produksi No. '.$query->code,'Pengajuan Order Produksi No. '.$query->code,session('bo_id'));
+
+            activity()
+                    ->performedOn(new ProductionOrder())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit production order from production schedule.');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data berhasil diupdate',
+                'value'   => $query->code,
+            ];
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Maaf, data tidak ditemukan.',
+                'value'   => '',
+            ];
+        }
+
+        return response()->json($response);
+    }
 }

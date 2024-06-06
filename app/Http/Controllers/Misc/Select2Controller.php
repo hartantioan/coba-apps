@@ -353,7 +353,7 @@ class Select2Controller extends Controller {
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
                 'list_warehouse'    => $d->warehouseList(),
-                'list_bom'          => $d->listBom(),
+                'list_bom'          => $d->bomRelation(),
             ];
         }
 

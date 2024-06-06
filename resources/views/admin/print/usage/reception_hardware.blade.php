@@ -349,12 +349,12 @@
                             <td align="right" style="font-size: 0.8rem !important">
                                
                                 <br>
-                                Dibuat oleh,
-                                @if($data->user->signature)
-                                    <div>{!! $data->user->signature() !!}</div>
+                                Diterima oleh,
+                                @if($data->account->signature)
+                                    <div>{!! $data->account->signature() !!}</div>
                                 @endif
-                                <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
+                                <div class="{{ $data->account->signature ? '' : 'mt-5' }}">{{ $data->account->name }}</div>
+                                <div class="mt-1">{{ $data->account->position()->exists() ? $data->account->position->Level->name.' - '.$data->account->position->division->name : '-' }}</div>
                             </td>
                         </tr>
                     </table>  

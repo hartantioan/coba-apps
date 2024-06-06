@@ -365,11 +365,10 @@
                             <table style="width:100%">
                                 <tr>
                                     <td align="left" style="font-size: 0.8rem !important">
-                                       
                                         <br>
-                                        Dibuat oleh,
+                                        Yang Menyerahkan,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{ $user->name }}</div>
+                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">Pihak I</div>
                                         <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
                                     </td>
                                     
@@ -382,10 +381,10 @@
                                     <td align="right" style="font-size: 0.8rem !important">
                                 
                                         <br>
-                                        Dibuat oleh,
+                                        Yang Menerima,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{ $user->name }}</div>
-                                        <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
+                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">Pihak II</div>
+                                        <div class="mt-1">{{ $data->account->position->name.' - '.$data->account->position->division->code }}</div>
                                     </td>
                                 </tr>
                             </table>

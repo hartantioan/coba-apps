@@ -253,7 +253,7 @@
                 
                 <div class="invoice-product-details mt-2" style="font-size:0.8rem;text-align:justify">
                     Dengan hormat,<br>
-                    Saya yang bertanda tangan di bawah ini, selaku Pihak I :<br>
+                    Saya yang bertanda tangan di bawah ini:<br>
                     <table border="0" width="40%" style="font-size:1.2rem;margin-left:4rem">
                         <tr>
                             <td>
@@ -305,46 +305,32 @@
                         </tr>
                         <tr>
                             <td>
-                                Deskripsi Detail	:	
+                                Deskripsi
                             </td>
                             <td>
                                 :
                             </td>
                             <td style="font-weight: bold">
-                                {{$data->hardwareItem->item}}||{{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
-                               
+                                {{$data->hardwareItem->item}}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Detail
+                            </td>
+                            <td>
+                                :
+                            </td>
+                            <td>
+                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
                             </td>
                         </tr>
                     </table>
                     
                     <br>        
                     Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> dalam hal ini diwakili oleh Departemen EDP/MIS sebagai kontroler inventaris 
-                    perangkat Hardware Komputer, selanjutnya sebagai Pihak II:
+                    perangkat Hardware Komputer.
                     <br>
-                    <table border="0" width="40%" style="font-size:1.2rem;margin-left:4rem">
-                        <tr>
-                            <td>
-                                Nama Lengkap
-                            </td>
-                            <td>
-                                :
-                            </td>
-                            <td>
-                                {{$data->account->name}}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                Position	
-                            </td>
-                            <td>
-                                :
-                            </td>
-                            <td>
-                                {{$data->account->position->code}}
-                            </td>
-                        </tr>
-                    </table>
                     Demikian surat pernyataan ini dibuat dan ditandatangani oleh yang mengembalikan dan menerima kembali inventaris tersebut.
                 </div>
                 <!-- invoice subtotal -->
@@ -368,7 +354,7 @@
                                         <br>
                                         Yang Menyerahkan,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">Pihak I</div>
+                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$user->name}}</div>
                                         <div class="mt-1">{{ $user->position->name.' - '.$user->position->division->code }}</div>
                                     </td>
                                     
@@ -383,7 +369,7 @@
                                         <br>
                                         Yang Menerima,
                                         <br><br><br><br><br>
-                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">Pihak II</div>
+                                        <div class="{{ $user->signature ? '' : 'mt-5' }}">{{$data->account->name}}</div>
                                         <div class="mt-1">{{ $data->account->position->name.' - '.$data->account->position->division->code }}</div>
                                     </td>
                                 </tr>

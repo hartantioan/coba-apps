@@ -305,7 +305,7 @@
                         </tr>
                         <tr>
                             <td>
-                                Deskripsi Detail	:	
+                                Deskripsi	
                             </td>
                             <td>
                                 :
@@ -318,6 +318,17 @@
                                         {{$row->specification}}
                                     @endforeach
                                 @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Detail	
+                            </td>
+                            <td>
+                                :
+                            </td>
+                            <td style="font-weight: bold">
+                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail}} 
                             </td>
                         </tr>
                     </table>
@@ -352,6 +363,8 @@
                                 Diterima oleh,
                                 @if($data->account->signature)
                                     <div>{!! $data->account->signature() !!}</div>
+                                @else
+                                <br><br><br><br><br>
                                 @endif
                                 <div class="{{ $data->account->signature ? '' : 'mt-5' }}">{{ $data->account->name }}</div>
                                 <div class="mt-1">{{ $data->account->position()->exists() ? $data->account->position->Level->name.' - '.$data->account->position->division->name : '-' }}</div>

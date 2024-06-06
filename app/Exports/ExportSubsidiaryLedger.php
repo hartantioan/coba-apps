@@ -72,11 +72,11 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                     $data_tempura['j_postdate'][]=date('d/m/Y',strtotime($detail['data']->journal->post_date));
                     $data_tempura['j_code'][]=$detail['data']->journal->code;
                     $data_tempura['j_lookable'][]=($detail['data']->journal->lookable_id ? $detail['data']->journal->lookable->code : '-');
-                    $data_tempura['j_detail1'][] = ($detail['data']->type == '1' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-');
-                    $data_tempura['j_detail2'][] = ($detail['data']->type == '2' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-');
-                    $data_tempura['j_detail3'][] = ($detail['data']->type == '1' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc, 2, ',', '.') : '-') : '-');
-                    $data_tempura['j_detail4'][] = ($detail['data']->type == '2' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc, 2, ',', '.') : '-') : '-');
-                    $data_tempura['j_balance'][] = ($balance != 0 ? number_format($balance, 2, ',', '.') : '-');
+                    $data_tempura['j_detail1'][] = ($detail['data']->type == '1' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '0');
+                    $data_tempura['j_detail2'][] = ($detail['data']->type == '2' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '0');
+                    $data_tempura['j_detail3'][] = ($detail['data']->type == '1' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc, 2, ',', '.') : '0') : '0');
+                    $data_tempura['j_detail4'][] = ($detail['data']->type == '2' && $detail['data']->nominal_fc != 0 ? ($nominalCurrency ? $currencySymbol.number_format($detail['data']->nominal_fc, 2, ',', '.') : '0') : '0');
+                    $data_tempura['j_balance'][] = ($balance != 0 ? number_format($balance, 2, ',', '.') : '0');
                     $data_tempura['j_note'][]=$detail['data']->journal->note;
                     $data_tempura['j_note1'][]=$detail['data']->note.$additional_ref;
                     $data_tempura['j_note2'][]=$detail['data']->note2;

@@ -372,7 +372,10 @@
                                         <br>
                                         Yang Menerima,
                                         <br><br><br><br><br>
-                                        
+                                        <span class="left-paren">(</span>
+        <span class="space" style=" display: inline-block;
+        width: 100px;"></span>
+        <span class="right-paren">)</span>
                                     </td>
                                 </tr>
                             </table>

@@ -243,6 +243,7 @@
                     </div>
                     <div class="col s12">
                         <div class="input-field col s12 m6">
+                            <input type="hidden" id="tempes" name="tempes"> 
                             <input id="items" name="items" disabled></input>
                             <label class="active" for="items">Item</label>
                         </div>
@@ -438,7 +439,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data2')[0].reset();
                 $('#user_id1').empty();
-                $('#temp').val('');
+                $('#tempes').val('');
                 M.updateTextFields();
             }
         });
@@ -765,7 +766,7 @@
         });
         $('#name_item').empty();
         $('#modal3').modal('open');
-        $('#tempe').val(id);
+        $('#tempes').val(id);
         $('#name_item').append(atob(name));
     }
 

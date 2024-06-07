@@ -133,7 +133,7 @@ class ReceptionHardwareItemUsageController extends Controller
                 'code'              => ReceptionHardwareItemsUsage::generateCode(),
                 'user_id'           => session('bo_id'),
                 'account_id'        => $request->user_id1,
-                'hardware_item_id'  => $request->tempe,
+                'hardware_item_id'  => $request->tempes,
                 'info'              => $request->info1,
                 'date'              => now(),
                 'reception_date'    => $request->date1,

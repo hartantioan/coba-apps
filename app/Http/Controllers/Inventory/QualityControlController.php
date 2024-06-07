@@ -46,7 +46,7 @@ class QualityControlController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'     => 'Timbangan Truk',
+            'title'     => 'Quality Control',
             'content'   => 'admin.inventory.quality_control',
             'minDate'   => $request->get('minDate'),
             'maxDate'   => $request->get('maxDate'),

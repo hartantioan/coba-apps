@@ -169,7 +169,7 @@
         </style>
     </head>
     <body>
-        <header style="margin-top:35px;">
+        <header style="margin-top:20px;">
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
                     <td width="33%" class="left-align" >
@@ -180,14 +180,14 @@
                     <td width="33%" class="right-align">
                     </td>
                     <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:15px; width:20%;right:0;">
                     </td>
                 </tr>
                 
             </table>
             <hr style="border-top: 1px solid black; margin-top:-10px">
         </header>
-        <main style="margin-top:35px;">
+        <main style="margin-top:20px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

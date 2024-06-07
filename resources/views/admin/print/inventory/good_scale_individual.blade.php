@@ -164,7 +164,7 @@
             }
            
             .mt-5 {
-                margin-top:35px;
+                margin-top:25px;
             }
         </style>
     </head>
@@ -200,30 +200,6 @@
                                         </td>
                                         <td width="50%">
                                             {{ $data->user->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="25%">
-                                            Posisi
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="25%">
-                                            Depart.
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="25%">
-                                            HP
-                                        </td>
-                                        <td width="50%">
-                                            {{ $data->user->phone }}
                                         </td>
                                     </tr>
                                     @if($data->item->is_hide_supplier)
@@ -278,6 +254,22 @@
                                              {{ $data->purchaseOrderDetail->purchaseOrder->code }}
                                           </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Status QC
+                                        </td>
+                                        <td>
+                                             {{ $data->statusQcRaw() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Keterangan QC
+                                        </td>
+                                        <td>
+                                             {{ $data->note_qc }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="40%" class="left-align">
@@ -288,6 +280,14 @@
                                         </td>
                                         <td>
                                              {{ $data->item->code.' - '.$data->item->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Satuan
+                                        </td>
+                                        <td>
+                                             {{ $data->itemUnit->unit->code }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -328,30 +328,6 @@
                                         </td>
                                         <td>
                                              {{ CustomHelper::formatConditionalQty($data->qty_balance) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Satuan
-                                        </td>
-                                        <td>
-                                             {{ $data->itemUnit->unit->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Status QC
-                                        </td>
-                                        <td>
-                                             {{ $data->statusQcRaw() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Keterangan QC
-                                        </td>
-                                        <td>
-                                             {{ $data->note_qc }}
                                         </td>
                                     </tr>
                                 </table>
@@ -418,7 +394,6 @@
                                         <div>{!! $data->user->signature() !!}</div>
                                     @endif
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
@@ -429,9 +404,6 @@
                                                     <div>{!! $row->user->signature() !!}</div>
                                                 @endif
                                                 <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                                @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
                                             </td>
                                         @endforeach
                                     @endforeach

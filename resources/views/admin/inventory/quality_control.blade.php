@@ -154,6 +154,8 @@
                                                         <th>Status QC</th>
                                                         <th>Catatan QC</th>
                                                         <th>Kadar Air (%)</th>
+                                                        <th>Viskositas (detik)</th>
+                                                        <th>Residu (gr)</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -239,6 +241,15 @@
                                 <input id="water_content" name="water_content" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
                                 <label class="active" for="water_content">Kadar Air (%)</label>
                             </div>
+                            <div class="input-field col m3 s12">
+                                <input id="viscosity" name="viscosity" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <label class="active" for="viscosity">Viskositas (detik)</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="residue" name="residue" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000">
+                                <label class="active" for="residue">Residu (gr)</label>
+                            </div>
+                            <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">Keterangan</label>
@@ -560,6 +571,8 @@
                 { name: 'status_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'water_content', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'viscosity', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'residue', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

@@ -165,6 +165,8 @@ class QualityControlController extends Controller
                     $val->statusQc(),
                     $val->note_qc,
                     CustomHelper::formatConditionalQty($val->water_content),
+                    CustomHelper::formatConditionalQty($val->viscosity),
+                    CustomHelper::formatConditionalQty($val->residue),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (
@@ -261,6 +263,8 @@ class QualityControlController extends Controller
 
                     $goodScale->update([
                         'water_content' => str_replace(',','.',str_replace('.','',$request->water_content)),
+                        'viscosity'     => str_replace(',','.',str_replace('.','',$request->viscosity)),
+                        'residue'       => str_replace(',','.',str_replace('.','',$request->residue)),
                         'status_qc'     => $request->status_qc,
                         'note_qc'       => $request->note,
                         'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,

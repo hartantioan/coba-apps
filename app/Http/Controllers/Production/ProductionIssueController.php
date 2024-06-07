@@ -48,7 +48,7 @@ class ProductionIssueController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Issue Receive',
+            'title'         => 'Issue',
             'content'       => 'admin.production.issue',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),

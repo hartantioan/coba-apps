@@ -254,7 +254,7 @@
                                              {{ $data->purchaseOrderDetail->purchaseOrder->code }}
                                           </td>
                                     </tr>
-                                    <tr>
+                                    {{-- <tr>
                                         <td>
                                             Status QC
                                         </td>
@@ -269,7 +269,7 @@
                                         <td>
                                              {{ $data->note_qc }}
                                         </td>
-                                    </tr>
+                                    </tr> --}}
                                 </table>
                             </td>
                             <td width="40%" class="left-align">

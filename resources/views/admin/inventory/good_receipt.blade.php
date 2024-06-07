@@ -269,6 +269,8 @@
                                                     <th class="center">Keterangan 2</th>
                                                     <th class="center">Remark</th>
                                                     <th class="center">Kadar Air (%)</th>
+                                                    <th class="center">Viskositas (detik)</th>
+                                                    <th class="center">Residu (gr)</th>
                                                     <th class="center">Plant</th>
                                                     <th class="center">Line</th>
                                                     <th class="center">Mesin</th>
@@ -278,7 +280,7 @@
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="empty-item">
-                                                    <td colspan="16" class="center">
+                                                    <td colspan="18" class="center">
                                                         Pilih purchase order untuk memulai...
                                                     </td>
                                                 </tr>
@@ -744,7 +746,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="16" class="center">
+                            <td colspan="18" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -867,7 +869,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="16" class="center">
+                        <td colspan="18" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -902,7 +904,7 @@
                 if($('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="16" class="center">
+                            <td colspan="18" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>
@@ -1101,7 +1103,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="16" class="center">
+                        <td colspan="18" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1631,6 +1633,12 @@
                                         <td>
                                             <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                         </td>
+                                        <td>
+                                            <input name="arr_viscosity[]" id="arr_viscosity` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
+                                        <td>
+                                            <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                        </td>
                                         <td class="center">
                                             <span>` + val.place_name + `</span>
                                         </td>
@@ -1719,7 +1727,7 @@
             if($('.row_item').length == 0 && $('#empty-item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
-                        <td colspan="16" class="center">
+                        <td colspan="18" class="center">
                             Pilih purchase order untuk memulai...
                         </td>
                     </tr>
@@ -1733,9 +1741,13 @@
             let newQty = $('#arr_scale' + code).select2('data')[0].qty;
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
+            $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
+            $('#arr_residue' + code).val($('#arr_residue' + code).select2('data')[0].residue);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
             $('#arr_water_content' + code).val('0,000');
+            $('#arr_viscosity' + code).val('0,000');
+            $('#arr_residue' + code).val('0,000');
         }
     }
 
@@ -1759,7 +1771,7 @@
                 if($('.row_item').length == 0 && $('#empty-item').length == 0){
                     $('#body-item').append(`
                         <tr id="empty-item">
-                            <td colspan="16" class="center">
+                            <td colspan="18" class="center">
                                 Pilih purchase order untuk memulai...
                             </td>
                         </tr>

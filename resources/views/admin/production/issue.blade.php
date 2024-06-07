@@ -303,12 +303,12 @@
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
-                                                <p>Info : Item/Resource pada tab <b>ISSUE</b> akan diambil otomatis dari BOM item <b>RECEIVE</b>. Anda tetap bisa menambahkan manual item/resource malalui tombol yang disediakan.</p>
+                                                <p>Info : Item/Resource akan diambil otomatis dari BOM item Production Order. Anda tetap bisa menambahkan manual item/resource malalui tombol yang disediakan.</p>
                                             </div>
                                         </div>
                                         <div class="card-alert card gradient-45deg-deep-orange-orange">
                                             <div class="card-content white-text">
-                                                <p>Info : Nominal item pada tab <b>ISSUE</b> adalah 0. Karena harga didapatkan dari rata-rata cogs item terbaru ketika disimpan.</p>
+                                                <p>Info : Nominal item adalah 0. Karena harga didapatkan dari rata-rata cogs item terbaru ketika disimpan.</p>
                                             </div>
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
@@ -1156,80 +1156,6 @@
                         `);
 
                         var count = makeid(10);
-
-                        let datalist = `<datalist id="list-shading` + count + `">`;
-                        if(datakuy.list_shading.length > 0){
-                            $.each(datakuy.list_shading, function(i, valkuy) {
-                                datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
-                            });
-                        }
-                        datalist += `</datalist>`;
-
-                        let no_receive = $('.row_item_receive').length + 1;
-                        
-                        $('#body-item-receive').append(`
-                            <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
-                                <input type="hidden" name="arr_type[]" value="2">
-                                <input type="hidden" name="arr_lookable_type[]" value="items">
-                                <input type="hidden" name="arr_lookable_id[]" value="` + datakuy.item_receive_id + `">
-                                <input type="hidden" name="arr_production_order_id[]" value="` + datakuy.id + `">
-                                <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
-                                <input type="hidden" name="arr_qty_bom[]" value="` + datakuy.qty_bom_output + `">
-                                <input type="hidden" name="arr_nominal_bom[]" value="0,00">
-                                <input type="hidden" name="arr_total_bom[]" value="0,00">
-                                <input type="hidden" name="arr_nominal[]" value="0,00">
-                                <input type="hidden" name="arr_total[]" value="0,00">
-                                <input type="hidden" name="arr_place[]" value="` + datakuy.place_id + `">
-                                <input type="hidden" name="arr_line[]" value="` + datakuy.line_id + `">
-                                <input type="hidden" name="arr_warehouse[]" value="` + datakuy.warehouse_id + `">
-                                <input type="hidden" name="arr_is_fg[]" value="` + (datakuy.is_fg ? '1' : '0') + `">
-                                <input type="hidden" name="arr_item_stock_id[]" value="0">
-                                <td class="center-align">
-                                    ` + no_receive + `
-                                </td>
-                                <td>
-                                    ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + datakuy.item_receive_qty + `
-                                </td>
-                                <td class="center">
-                                    <div class="input-field col s10">
-                                        <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiah(this);checkQty();" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
-                                    </div>
-                                </td>
-                                <td class="center-align">
-                                    ` + datakuy.item_receive_unit_uom + `
-                                </td>
-                                <td class="center-align">
-                                    ` + datakuy.place_code + `
-                                </td>
-                                <td class="center-align">
-                                    ` + datakuy.line_code + `
-                                </td>
-                                <td class="center-align">
-                                    ` + datakuy.warehouse_name + `
-                                </td>
-                                <td>
-                                    ` + (datakuy.is_fg ? `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                                        <option value="0">--Kosong--</option>
-                                        @foreach ($area as $rowarea)
-                                            <option value="{{ $rowarea->id }}">{{ $rowarea->name }}</option>
-                                        @endforeach
-                                    </select>` : `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                                        <option value="0">--Kosong--</option>
-                                    </select>`) + `
-                                </td>
-                                <td class="center">
-                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required ` + (datakuy.is_fg ? '' : 'readonly') + `>
-                                    ` + datalist + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
-                                </td>
-
-                            </tr>
-                        `);
 
                         let no_issue = $('.row_item_issue').length + 1;
 

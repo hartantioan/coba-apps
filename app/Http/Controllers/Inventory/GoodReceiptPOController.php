@@ -690,6 +690,8 @@ class GoodReceiptPOController extends Controller
                             'note2'                     => $request->arr_note2[$key],
                             'remark'                    => $request->arr_remark[$key],
                             'water_content'             => str_replace(',','.',str_replace('.','',$request->arr_water_content[$key])),
+                            'viscosity'                 => str_replace(',','.',str_replace('.','',$request->arr_viscosity[$key])),
+                            'residue'                   => str_replace(',','.',str_replace('.','',$request->arr_residue[$key])),
                             'place_id'                  => $request->arr_place[$key],
                             'line_id'                   => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
                             'machine_id'                => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,

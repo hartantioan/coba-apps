@@ -2504,6 +2504,8 @@ class Select2Controller extends Controller {
                 'text' 			    => $d->code.' '.$d->item->name.' '.CustomHelper::formatConditionalQty($d->qty_final).' '.$d->itemUnit->unit->code,
                 'qty'               => CustomHelper::formatConditionalQty($d->qty_final),
                 'water_content'     => CustomHelper::formatConditionalQty($d->water_content),
+                'viscosity'         => CustomHelper::formatConditionalQty($d->viscosity),
+                'residue'           => CustomHelper::formatConditionalQty($d->residue),
             ];
         }
 
@@ -3896,7 +3898,9 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $bomdetail = [];
             $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
-            foreach($d->productionScheduleDetail->bom->bomDetail as $row){
+            foreach($d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
+                $query->whereNotNull('is_default');
+            })->get() as $row){
                 $qty_planned = $row->qty * $qtyBobotOutput;
                 $bomdetail[] = [
                     'bom_id'            => $row->bom->id,
@@ -3918,7 +3922,7 @@ class Select2Controller extends Controller {
 
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'table'                         => $d->getTable(),
                 'code'                          => $d->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
@@ -3928,12 +3932,12 @@ class Select2Controller extends Controller {
                 'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
                 'shift'                         => 'Tgl.Produksi : '.date('d/m/Y',strtotime($d->productionScheduleDetail->start_date)).' - '.date('d/m/Y',strtotime($d->productionScheduleDetail->end_date)).', Shift : '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
                 'group'                         => $d->productionScheduleDetail->group,
-                'line'                          => $d->productionScheduleDetail->productionSchedule->line->code,
+                'line'                          => $d->productionScheduleDetail->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
                 'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
                 'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
-                'line_id'                       => $d->productionScheduleDetail->productionSchedule->line_id,
-                'line_code'                     => $d->productionScheduleDetail->productionSchedule->line->code,
+                'line_id'                       => $d->productionScheduleDetail->line_id,
+                'line_code'                     => $d->productionScheduleDetail->line->code,
                 'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
                 'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
                 'bom_id'                        => $d->productionScheduleDetail->bom_id,

@@ -45,6 +45,8 @@ class GoodScale extends Model
         'status_qc',
         'note_qc',
         'water_content',
+        'viscosity',
+        'residue',
         'purchase_order_detail_id',
         'item_id',
         'qty_in',

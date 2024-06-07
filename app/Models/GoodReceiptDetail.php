@@ -30,6 +30,8 @@ class GoodReceiptDetail extends Model
         'note2',
         'remark',
         'water_content',
+        'viscosity',
+        'residue',
         'place_id',
         'line_id',
         'machine_id',

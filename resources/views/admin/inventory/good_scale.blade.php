@@ -197,6 +197,8 @@
                                                         <th>Qty QC</th>
                                                         <th>Qty Final</th>
                                                         <th>Kadar Air (%)</th>
+                                                        <th>Viskositas (detik)</th>
+                                                        <th>Residu (gr)</th>
                                                         <th>Satuan</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -1149,6 +1151,8 @@
                 { name: 'qty_qc', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_final', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'water_content', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'viscosity', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'residue', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

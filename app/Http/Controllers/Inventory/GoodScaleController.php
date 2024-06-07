@@ -220,6 +220,8 @@ class GoodScaleController extends Controller
                     CustomHelper::formatConditionalQty($val->qty_qc),
                     CustomHelper::formatConditionalQty($val->qty_final),
                     CustomHelper::formatConditionalQty($val->water_content),
+                    CustomHelper::formatConditionalQty($val->viscosity),
+                    CustomHelper::formatConditionalQty($val->residue),
                     $val->itemUnit->unit->code,
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>

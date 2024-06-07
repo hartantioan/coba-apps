@@ -1882,7 +1882,13 @@
                                     <input name="arr_remark[]" class="browser-default" type="text" placeholder="Keterangan..." value="` + val.remark + `"  style="width:100%;">
                                 </td>
                                 <td>
-                                    <input name="arr_water_content[]" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                    <input name="arr_water_content[]" id="arr_water_content` + count + `" class="browser-default" type="text" value="` + val.water_content + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                </td>
+                                <td>
+                                    <input name="arr_viscosity[]" id="arr_viscosity` + count + `" class="browser-default" type="text" value="` + val.viscosity + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
+                                </td>
+                                <td>
+                                    <input name="arr_residue[]" id="arr_residue` + count + `" class="browser-default" type="text" value="` + val.residue + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100px;">
                                 </td>
                                 <td class="center">
                                     <span>` + val.place_name + `</span>

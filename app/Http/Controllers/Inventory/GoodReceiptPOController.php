@@ -902,6 +902,8 @@ class GoodReceiptPOController extends Controller
                 'note2'                     => $row->note2 ? $row->note2 : '',
                 'remark'                    => $row->remark,
                 'water_content'             => CustomHelper::formatConditionalQty($row->water_content),
+                'viscosity'                 => CustomHelper::formatConditionalQty($row->viscosity),
+                'residue'                   => CustomHelper::formatConditionalQty($row->residue),
                 'place_id'                  => $row->place_id,
                 'place_name'                => $row->place->code,
                 'line_id'                   => $row->line_id ? $row->line_id : '',

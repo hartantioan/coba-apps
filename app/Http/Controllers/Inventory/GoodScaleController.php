@@ -561,40 +561,7 @@ class GoodScaleController extends Controller
         }
 
         $string = '<div class="row pt-1 pb-1 lighten-4">
-                    <div class="col s12">'.$data->code.$x.'</div><div class="col s12">
-                    <table class="bordered">
-                        <thead>
-                            <tr>
-                                <th class="center-align" colspan="6">Hasil Pemeriksaan QC</th>
-                            </tr>
-                            <tr>
-                                <th class="center-align">No.</th>
-                                <th class="center-align">Nama</th>
-                                <th class="center-align">Nominal</th>
-                                <th class="center-align">Satuan</th>
-                                <th class="center-align">Keterangan</th>
-                                <th class="center-align">Memotong Qty</th>
-                            </tr>
-                        </thead><tbody>';
-
-        if($data->qualityControl()->exists()){
-            foreach($data->qualityControl as $key => $row){
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td class="">'.$row->name.'</td>
-                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->nominal).'</td>
-                    <td class="center-align">'.$row->unit.'</td>
-                    <td class="">'.$row->note.'</td>
-                    <td class="">'.($row->is_affect_qty ? 'Ya' : 'Tidak').'</td>
-                </tr>';
-            }
-        }else{
-            $string .= '<tr>
-                <td class="center-align" colspan="6">Data tidak ditemukan.</td>
-            </tr>';
-        }
-
-        $string .= '</tbody></table></div>';
+                    <div class="col s12">'.$data->code.$x.'</div>';
                     
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>

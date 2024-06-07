@@ -164,7 +164,10 @@
             }
            
             .mt-5 {
-                margin-top:25px;
+                margin-top:50px;
+            }
+            .mt-2 {
+                margin-top:20px;
             }
         </style>
     </head>
@@ -393,7 +396,7 @@
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>
                                     @endif
-                                    <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
+                                    <div class="{{ $data->user->signature ? 'mt-2' : 'mt-5' }}">{{ $data->user->name }}</div>
                                 </td>
                                 @if($data->approval())
                                     @foreach ($data->approval() as $detail)
@@ -403,7 +406,7 @@
                                                 @if($row->user->signature)
                                                     <div>{!! $row->user->signature() !!}</div>
                                                 @endif
-                                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
+                                                <div class="{{ $row->user->signature ? 'mt-2' : 'mt-5' }}">{{ $row->user->name }}</div>
                                             </td>
                                         @endforeach
                                     @endforeach

@@ -169,7 +169,7 @@
         </style>
     </head>
     <body>
-        <header>
+        <header style="margin-top:35px;">
             <table border="0" width="100%" style="font-size:1em" class="tb-header">
                 <tr>
                     <td width="33%" class="left-align" >
@@ -181,14 +181,13 @@
                     </td>
                     <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:30%;right:0;" height="20%" />
                     </td>
                 </tr>
                 
             </table>
             <hr style="border-top: 1px solid black; margin-top:-10px">
         </header>
-        <main>
+        <main style="margin-top:35px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

@@ -121,7 +121,7 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">{{ $title }} # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.' . $title) }}# {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">

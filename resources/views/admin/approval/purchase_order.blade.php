@@ -125,12 +125,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Order # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.order') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Order</h5>
+                <h5 class="indigo-text">{{ __('translations.purchase_order') }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -153,7 +153,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="50%">
-                                Supplier
+                                {{ __('translations.supplier') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->name }}
@@ -161,7 +161,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Alamat
+                                {{ __('translations.address') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->address }}
@@ -169,7 +169,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Telepon
+                                {{ __('translations.phone_number') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
@@ -181,7 +181,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="50%">
-                                Penerima
+                                {{ __('translations.receiver') }}
                             </td>
                             <td width="50%">
                                 {{ $data->receiver_name }}
@@ -189,7 +189,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Alamat
+                                {{ __('translations.address') }}
                             </td>
                             <td width="50%">
                                 {{ $data->receiver_address }}
@@ -197,7 +197,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Kontak
+                                {{ __('translations.contact') }}
                             </td>
                             <td width="50%">
                                 {{ $data->receiver_phone }}
@@ -205,7 +205,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Lampiran
+                                {{ __('translations.attachment') }}
                             </td>
                             <td width="50%">
                                 {!! $data->attachments() !!}
@@ -217,7 +217,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="50%">
-                                Tipe Pembayaran
+                                {{ __('translations.payment_type') }}
                             </td>
                             <td width="50%">
                                 {{ $data->paymentType() }}
@@ -225,7 +225,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Termin
+                                {{ __('translations.term') }}
                             </td>
                             <td width="50%">
                                 {{ $data->payment_term }} hari
@@ -233,7 +233,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Tgl. Kirim
+                                {{ __('translations.sent_date') }}
                             </td>
                             <td width="50%">
                                 {{ date('d/m/Y',strtotime($data->delivery_date)) }}
@@ -241,7 +241,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Pengiriman
+                                {{ __('translations.shipping_type') }}
                             </td>
                             <td width="50%">
                                 {{ $data->shippingType() }}
@@ -255,16 +255,16 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">No.</th>
-                        <th class="center-align">Item/Jasa</th>
-                        <th class="center-align">Grup Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">Satuan</th>
-                        <th class="center-align">Harga</th>
-                        <th class="center-align">Disc.1 (%)</th>
-                        <th class="center-align">Disc.2 (%)</th>
-                        <th class="center-align">Disc.3 (Rp)</th>
-                        <th class="center-align">Subtotal</th>
+                        <th class="center-align">  {{ __('translations.No') }}.</th>
+                        <th class="center-align">  {{ __('translations.item/service') }}</th>
+                        <th class="center-align">  {{ __('translations.item_group') }}</th>
+                        <th class="center-align">  {{ __('translations.qty') }}</th>
+                        <th class="center-align">  {{ __('translations.unit') }}</th>
+                        <th class="center-align">  {{ __('translations.price') }}</th>
+                        <th class="center-align">  {{ __('translations.disc') }}.1 (%)</th>
+                        <th class="center-align">  {{ __('translations.disc') }}.2 (%)</th>
+                        <th class="center-align">  {{ __('translations.disc') }}.3 (Rp)</th>
+                        <th class="center-align">  {{ __('translations.subtotal') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -282,62 +282,62 @@
                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">Keterangan 1: {{ $row->note }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">Keterangan 2: {{ $row->note2 }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">Keterangan 3: {{ $row->note3 }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 3: {{ $row->note3 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">Referensi: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
+                        <td colspan="10">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
                     </tr>
                     @endforeach
                     <tr>
                         <td colspan="7" rowspan="8">
-                            Rekening :
+                            {{ __('translations.bank_account') }} :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
-                                Catatan : {{ $data->note }}
+                                {{ __('translations.note') }} : {{ $data->note }}
                             </div>
                             <div class="preserveLines mt-2" style="text-align:left !important;">
-                                Catatan Eksternal : {{ $data->note_external }}
+                                {{ __('translations.external_notes') }} : {{ $data->note_external }}
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Subtotal</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.subtotal') }}</td>
                         <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Diskon</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.disc') }}</td>
                         <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Total</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.total') }}</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">PPN</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.tax') }}</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">PPh</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.wtax') }}</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Pembulatan</td>
+                        <td class="right-align" colspan="2">  {{ __('translations.rounding') }}</td>
                         <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
+                        <td class="right-align" colspan="2"><h6>  {{ __('translations.wtax') }}</h6></td>
                         <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="9">  {{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>
@@ -355,7 +355,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >  {{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                     @if($data->approval())
@@ -366,6 +366,13 @@
                                         
                                         
                                         <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                            @if ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Dicek oleh,' &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                通过检查
+                                            @elseif ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Disetujui oleh,'  &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                由...批准,
+                                            @endif
                                             {{ $row->user->name }} 
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}

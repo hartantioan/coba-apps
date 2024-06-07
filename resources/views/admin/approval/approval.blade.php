@@ -63,21 +63,21 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> {{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <label for="filter_status" style="font-size:1rem;">{{ __('translations.filter') }} {{ __('translations.status') }}:</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Menunggu</option>
-                                                        <option value="2">Selesai</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">{{ __('translations.waiting') }}</option>
+                                                        <option value="2">{{ __('translations.done') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_form" style="font-size:1rem;">Filter Form :</label>
+                                                <label for="filter_form" style="font-size:1rem;">{{ __('translations.filter') }} {{ __('translations.form') }} :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_form" onchange="loadDataTable()"></select>
                                                 </div>
@@ -88,30 +88,30 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data
-                                        <button class="waves-effect waves-light btn mb-1 mr-1 cyan right hide btn-multi" onclick="multiApprove()">Proses</button>
-                                        <button class="waves-effect waves-light btn mb-1 mr-1 right" onclick="selectAllRow()">BARIS TERPILIH : <b id="countSelected">0</b></button>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}
+                                        <button class="waves-effect waves-light btn mb-1 mr-1 cyan right hide btn-multi" onclick="multiApprove()">{{ __('translations.process') }}</button>
+                                        <button class="waves-effect waves-light btn mb-1 mr-1 right" onclick="selectAllRow()">{{ __('translations.selected_row') }} : <b id="countSelected">0</b></button>
                                     </h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Akun BP</th>
-                                                        <th>Tgl.Request</th>
-                                                        <th>Dari</th>
-                                                        <th>Kode Ref.</th>
-                                                        <th>Keterangan</th>
-                                                        <th>Status</th>
-                                                        <th>Catatan</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.user_account') }}</th>
+                                                        <th>{{ __('translations.request_date') }}</th>
+                                                        <th>{{ __('translations.from') }}</th>
+                                                        <th>{{ __('translations.reference') }} {{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.information') }}</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.note') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -132,7 +132,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col m12 xl3 center-align" id="button-happiness">
-                <h6>Form persetujuan</h6>
+                <h6>{{ __('translations.approval_form') }}</h6>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -140,24 +140,24 @@
                     <div class="col s12 center">
                         <div class="input-field col s12">
                             <select class="browser-default" id="approve_reject_revision" name="approve_reject_revision">
-                                <option value="1">Setuju</option>
-                                <option value="2">Tolak</option>
-                                <option value="3">Revisi</option>
+                                <option value="1">{{ __('translations.approve') }}</option>
+                                <option value="2">{{ __('translations.disapprove') }}</option>
+                                <option value="3">{{ __('translations.revision') }}</option>
                             </select>
                         </div>
                         <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
                             <textarea id="note" name="note" placeholder="Keterangan" class="materialize-textarea"></textarea>
-                            <label class="active" for="note">Keterangan</label>
+                            <label class="active" for="note">{{ __('translations.information') }}</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="approve();">Kirim <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="approve();">{{ __('translations.send') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
             </div>
             <div class="col m12 xl9" id="preview-happiness">
-                <h6 align="center">Preview Dokumen</h6>
+                <h6 align="center">{{ __('translations.preview') }} {{ __('translations.document') }}</h6>
                 <div class="row">
                     <div class="col m12 s12" id="body_show" style="border-style: solid;border-color: coral;min-height:80vh;max-height:80vh;overflow:auto;width:100%;">
 
@@ -167,7 +167,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -175,7 +175,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col m12 xl12 center-align">
-                <h6>Form persetujuan (multi)</h6>
+                <h6>{{ __('translations.approval_form') }} ({{ __('translations.multi') }})</h6>
                 <form class="row" id="form_data_multi" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_multi" style="display:none;"></div>
@@ -183,18 +183,18 @@
                     <div class="col s12 center">
                         <div class="input-field col s12" style="zoom:1.5;">
                             <select class="browser-default" id="approve_reject_revision_multi" name="approve_reject_revision_multi">
-                                <option value="1">Setuju</option>
-                                <option value="2">Tolak</option>
-                                <option value="3">Revisi</option>
+                                <option value="1">{{ __('translations.approve') }}</option>
+                                <option value="2">{{ __('translations.disapprove') }}</option>
+                                <option value="3">{{ __('translations.revision') }}</option>
                             </select>
                         </div>
                         <div class="input-field col s12">
                             <input type="hidden" name="tempMulti" id="tempMulti">
                             <textarea id="note_multi" name="note_multi" placeholder="Keterangan" class="materialize-textarea"></textarea>
-                            <label class="active" for="note_multi">Keterangan</label>
+                            <label class="active" for="note_multi">{{ __('translations.information') }}</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="approveMulti();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="approveMulti();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -202,7 +202,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

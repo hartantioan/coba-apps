@@ -119,18 +119,19 @@
 <div class="card">
     <div class="card-content invoice-print-area">
         <!-- header section -->
+        
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Dana # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.payment_request') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div>
-                        <small>Dibayar:</small>
+                        <small>{{ __('translations.paid') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->pay_date)) }}</span>
                     </div>
                 </div>
@@ -139,7 +140,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Payment Request</h5>
+                <h5 class="indigo-text">{{ __('translations.payment_request') }}</h5>
                 <p style="font-size: 1.5rem;font-weight:bold">Total Bayar {{$data->currency->code.number_format($data->balance,2,',','.')}}</p>
             </div>
             <div class="col m6 s12">
@@ -150,34 +151,34 @@
         <!-- invoice address and contact -->
         <div class="row invoice-info">
             <div class="col m6 s6">
-                <h6 class="invoice-from">Dari</h6>
+                <h6 class="invoice-from">{{ __('translations.from') }}</h6>
                 <div class="row">
                     <div class="col s3">
-                        Name
+                        {{ __('translations.name') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->name }}
                     </div>
                     <div class="col s3">
-                        Posisi
+                        {{ __('translations.position') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                     </div>
                     <div class="col s3">
-                        Depart.
+                        {{ __('translations.department') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                     </div>
                     <div class="col s3">
-                        HP
+                        {{ __('translations.phone_number') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->phone }}
                     </div>
                     <div class="col s3">
-                        Kas / Bank
+                        {{ __('translations.bank') }}
                     </div>
                     <div class="col s9">
                         {{ $data->coa_source_id ? $data->coaSource->name : '-' }}
@@ -185,36 +186,36 @@
                 </div>
             </div>
             <div class="col m6 s6">
-                <h6 class="invoice-from">Lain-lain</h6>
+                <h6 class="invoice-from">{{ __('translations.others') }}</h6>
                 <div class="row">
                     <div class="col s3">
-                        Partner Bisnis
+                        {{ __('translations.bussiness_partner') }}
                     </div>
                     <div class="col s9">
                         {{ $data->account->name }}
                     </div>
                     @if($data->payment_type == '2')
                     <div class="col s3">
-                        Rek. Tujuan
+                        {{ __('translations.dest_account') }}
                     </div>
                     <div class="col s9">
                         {{ $data->account_bank.' - '.$data->account_no.' - '.$data->account_name }}
                     </div>
                     @endif
                     <div class="col s3">
-                        Tipe Pembayaran
+                        {{ __('translations.payment_type') }}
                     </div>
                     <div class="col s9">
                         {{ $data->paymentType() }}
                     </div>
                     <div class="col s3">
-                        Lampiran
+                        {{ __('translations.attachment') }}
                     </div>
                     <div class="col s9">
                         <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
                     </div>
                     <div class="col s3">
-                        Status
+                        {{ __('translations.status') }}
                     </div>
                     <div class="col s9">
                         {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -228,18 +229,18 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th colspan="9" align="center">Daftar Biaya</th>
+                        <th colspan="9" align="center">{{ __('translations.fee_list') }}</th>
                     </tr>
                     <tr>
-                        <th class="center-align">No.</th>
-                        <th class="center-align">Coa</th>
-                        <th class="center-align">Plant</th>
-                        <th class="center-align">Line</th>
-                        <th class="center-align">Mesin</th>
-                        <th class="center-align">Divisi</th>
-                        <th class="center-align">Proyek</th>
-                        <th class="center-align">Debit</th>
-                        <th class="center-align">Kredit</th>
+                        <th class="center-align">{{ __('translations.no') }}.</th>
+                        <th class="center-align">{{ __('translations.coa') }}</th>
+                        <th class="center-align">{{ __('translations.plant') }}</th>
+                        <th class="center-align">{{ __('translations.line') }}</th>
+                        <th class="center-align">{{ __('translations.engine') }}</th>
+                        <th class="center-align">{{ __('translations.division') }}</th>
+                        <th class="center-align">{{ __('translations.project') }}</th>
+                        <th class="center-align">{{ __('translations.debit') }}</th>
+                        <th class="center-align">{{ __('translations.credit') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -256,10 +257,10 @@
                         <td class="right-align">{{ number_format($row->nominal_credit_fc,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9">Ket.1 : {{ $row->note }}</td>
+                        <td colspan="9">{{ __('translations.note_1') }}: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="9">Ket.2 : {{ $row->note2 }}</td>
+                        <td colspan="9">{{ __('translations.note_2') }} : {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -270,10 +271,10 @@
                         <th class="center" colspan="4">Dokumen Terpakai</th>
                     </tr>
                     <tr>
-                        <th class="center">Referensi</th>
-                        <th class="center">Tipe</th>
-                        <th class="center">Keterangan</th>
-                        <th class="center">Bayar</th>
+                        <th class="center">{{ __('translations.reference') }}</th>
+                        <th class="center">{{ __('translations.type') }}</th>
+                        <th class="center">{{ __('translations.information') }}</th>
+                        <th class="center">{{ __('translations.paid') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -292,25 +293,25 @@
                     @endphp
                     @endforeach
                     <tr>
-                        <td colspan="3" class="right-align">Total</td>
+                        <td colspan="3" class="right-align">{{ __('translations.total') }}</td>
                         <td class="right-align">{{ $data->currency->code.number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="right-align">Pembulatan</td>
+                        <td colspan="3" class="right-align">{{ __('translations.rounding') }}</td>
                         <td class="right-align">{{ $data->currency->code.number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="right-align">Admin</td>
+                        <td colspan="3" class="right-align">{{ __('translations.admin') }}</td>
                         <td class="right-align">{{ $data->currency->code.number_format($data->admin,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="3" class="right-align">Grandtotal</td>
+                        <td colspan="3" class="right-align">{{ __('translations.grandtotal') }}</td>
                         <td class="right-align">{{ $data->currency->code.number_format($data->grandtotal,2,',','.') }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="4">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="4">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>
@@ -323,7 +324,7 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -331,7 +332,7 @@
                     <td class="">
                         
                         
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                        
                     </td>
                 </tr>
@@ -343,6 +344,13 @@
                                         
                                         
                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                            @if ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Dicek oleh,' &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                通过检查
+                                            @elseif ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Disetujui oleh,'  &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                由...批准,
+                                            @endif
                                             {{ $row->user->name }} 
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}

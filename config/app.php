@@ -82,8 +82,8 @@ return [
     |
     */
 
-    'locale' => 'en',
-    'fallback_locale' => 'en',
+    'locale' => 'ind',
+    'fallback_locale' => 'ind',
     'locales' => [
         'en' => 'English',
         'es' => 'Spanish',

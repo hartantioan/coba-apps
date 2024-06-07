@@ -121,20 +121,20 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Permohonan Pembelian # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.purchase_request') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                     <div class="mr-2">
-                        <small>Hingga:</small>
+                        <small>{{ __('translations.due_date') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->due_date)) }}</span>
                     </div>
                     <div>
-                        <small>Dipakai:</small>
+                        <small>{{ __('translations.used') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->required_date)) }}</span>
                     </div>
                 </div>
@@ -143,7 +143,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Request</h5>
+                <h5 class="indigo-text">{{ __('translations.purchase_request') }}</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -153,28 +153,28 @@
         <!-- invoice address and contact -->
         <div class="row invoice-info">
             <div class="col m6 s6">
-                <h6 class="invoice-from">Dari</h6>
+                <h6 class="invoice-from">{{ __('translations.from') }}</h6>
                 <div class="row">
                     <div class="col s3">
-                        Name
+                        {{ __('translations.name') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->name }}
                     </div>
                     <div class="col s3">
-                        Posisi
+                        {{ __('translations.position') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                     </div>
                     <div class="col s3">
-                        Depart.
+                        {{ __('translations.department') }}.
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                     </div>
                     <div class="col s3">
-                        HP
+                        {{ __('translations.phone_number') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->phone }}
@@ -182,16 +182,16 @@
                 </div>
             </div>
             <div class="col m6 s6">
-                <h6 class="invoice-from">Lain-lain</h6>
+                <h6 class="invoice-from">{{ __('translations.others') }}</h6>
                 <div class="row">
                     <div class="col s3">
-                        Lampiran
+                        {{ __('translations.attachment') }}
                     </div>
                     <div class="col s9">
                         <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
                     </div>
                     <div class="col s3">
-                        Status
+                        {{ __('translations.status') }}
                     </div>
                     <div class="col s9">
                         {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -205,17 +205,17 @@
             <table class="bordered" style="min-width:1600px !important;">
                 <thead>
                     <tr>
-                        <th class="center">No</th>
-                        <th class="center">Item</th>
-                        <th class="center">Jum.</th>
-                        <th class="center">Sat.</th>
-                        <th class="center">Catatan 1</th>
-                        <th class="center">Catatan 2</th>
-                        <th class="center">Tgl.Dipakai</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Line</th>
-                        <th class="center">Gudang</th>
-                        <th class="center">Divisi</th>
+                        <th class="center">{{ __('translations.no') }}</th>
+                        <th class="center">{{ __('translations.item') }}</th>
+                        <th class="center">{{ __('translations.qty') }}.</th>
+                        <th class="center">{{ __('translations.unit') }}.</th>
+                        <th class="center">{{ __('translations.note') }} 1</th>
+                        <th class="center">{{ __('translations.note') }} 2</th>
+                        <th class="center">{{ __('translations.used_date') }}</th>
+                        <th class="center">{{ __('translations.plant') }}</th>
+                        <th class="center">{{ __('translations.line') }}</th>
+                        <th class="center">{{ __('translations.warehouse') }}</th>
+                        <th class="center">{{ __('translations.division') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -235,14 +235,14 @@
                     </tr>
                     <tr>
                         <td colspan="11">
-                            <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
-                            <b>Requester</b> : {{ $row->requester }},
-                            <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
+                            <b>{{ __('translations.engine') }}</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                            <b>{{ __('translations.requester') }}</b> : {{ $row->requester }},
+                            <b>{{ __('translations.project') }}</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
                         </td>
                     </tr>
                     <tr>
                         <td colspan="11">
-                            Based on : {{ $row->getBaseDocument() }}
+                            {{ __('translations.based_on') }} : {{ $row->getBaseDocument() }}
                         </td>
                     </tr>
                     @endforeach
@@ -257,7 +257,7 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -265,7 +265,7 @@
                     <td class="">
                         
                         
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                        
                     </td>
                 </tr>
@@ -277,6 +277,13 @@
                                         
                                         
                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
+                                            @if ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Dicek oleh,' &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                通过检查
+                                            @elseif ($row->approvalTemplateStage->approvalStage->approval->document_text == 'Disetujui oleh,'  &&  app()->getLocale() == 'chi')
+                                            <br>
+                                                由...批准,
+                                            @endif    
                                             {{ $row->user->name }} 
                                             @if ($row->user->position()->exists())
                                             {{ $row->user->position->name }}

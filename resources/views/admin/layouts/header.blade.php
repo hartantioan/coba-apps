@@ -9,10 +9,32 @@
                         <ul class="search-list collection display-none"></ul>
                     </div>
                     <ul class="navbar-list right">
-                        <li class="tooltipped" data-position="bottom" data-tooltip="Menu">
-                            <a class="waves-effect waves-block waves-light" href="{{ url('admin/menu') }}" style="line-height: 1;">
-                                <i class="material-icons approve-icon">dashboard</i>
+                        @php
+                            $currentLocale = app()->getLocale();
+                            $flagClass = 'flag-icon-gb'; // default to English
+
+                            switch ($currentLocale) {
+                                case 'ind':
+                                    $flagClass = 'flag-icon-id';
+                                    break;
+                                case 'chi':
+                                    $flagClass = 'flag-icon-cn';
+                                    break;
+                                case 'en':
+                                default:
+                                    $flagClass = 'flag-icon-gb';
+                                    break;
+                            }
+                        @endphp
+                        <li class="dropdown-language"  class="tooltipped" data-position="bottom" data-tooltip="Menu">
+                            <a class="waves-effect waves-block waves-light translation-button" href="#" data-target="translation-dropdown">
+                                <span class="flag-icon {{ $flagClass }}"></span>
                             </a>
+                            <ul class="dropdown-content" id="translation-dropdown" tabindex="0" style="">
+                            <li class="dropdown-item" tabindex="0"><a class="grey-text text-darken-1" href="{{ url('locale/ind') }}" data-language="ind"><i class="flag-icon flag-icon-id"></i> Indonesia</a></li>
+                            <li class="dropdown-item" tabindex="0"><a class="grey-text text-darken-1" href="{{ url('locale/en') }}" data-language="en"><i class="flag-icon flag-icon-gb"></i> English</a></li>
+                            <li class="dropdown-item" tabindex="0"><a class="grey-text text-darken-1" href="{{ url('locale/chi') }}" data-language="chi"><i class="flag-icon flag-icon-cn"></i> Chinese</a></li>
+                          </ul>
                         </li>
                         <li class="hide-on-med-and-down tooltipped" data-position="bottom" data-tooltip="Full screen">
                             <a class="waves-effect waves-block waves-light toggle-fullscreen" href="javascript:void(0);"><i class="material-icons">settings_overscan</i>

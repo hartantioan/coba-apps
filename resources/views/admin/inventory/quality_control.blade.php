@@ -128,8 +128,8 @@
                                     <div class="row mt-2">
                                         <div class="col s12 row">
                                             <div id="datatable_buttons"></div>
-                                            <div class="col s12 m6">
-                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-2" href="javascript:void(0);" onclick="loadDataTable();">
+                                            <div class="col s12 m12">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-2 right" href="javascript:void(0);" onclick="loadDataTable();">
                                                     <span class="hide-on-small-onl">Refresh</span>
                                                     <i class="material-icons right">refresh</i>
                                                 </a>

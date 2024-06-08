@@ -679,6 +679,13 @@
                             <i class="material-icons close data-used" onclick="removeUsedData('` + response.id + `')">close</i>
                         </div>
                     `);
+                    $('#water_content').val(response.water_content);
+                    $('#viscosity').val(response.viscosity);
+                    $('#residue').val(response.residue);
+                    $('#note').val(response.note_qc);
+                    if(response.status_qc){
+                        $('#status_qc').val(response.status_qc).formSelect();
+                    }
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();

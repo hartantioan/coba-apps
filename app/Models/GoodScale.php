@@ -82,7 +82,7 @@ class GoodScale extends Model
     }
 
     public function goodReceiptDetail(){
-        return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_detail_id','id')->whereHas('goodReceipt',function($query){
+        return $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2','3']);
         });
     }
@@ -206,6 +206,12 @@ class GoodScale extends Model
     public function deleteFile(){
 		if(Storage::exists($this->document)) {
             Storage::delete($this->document);
+        }
+	}
+
+    public function deleteImageQc(){
+		if(Storage::exists($this->image_qc)) {
+            Storage::delete($this->image_qc);
         }
 	}
 

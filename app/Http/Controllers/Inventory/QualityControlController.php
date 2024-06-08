@@ -151,6 +151,7 @@ class QualityControlController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $btnUpdate = $val->goodReceiptDetail()->exists() ? '' : '<button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Isi hasil pemeriksaan." onclick="inspect(`' . CustomHelper::encrypt($val->code) . '`);"><i class="material-icons dp48">done_all</i></button><br>';
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -182,9 +183,7 @@ class QualityControlController extends Controller
                             )
                         )
                     ),
-                    $val->status_qc ? 'Telah di-cek QC' : '
-                        <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Isi hasil pemeriksaan." onclick="inspect(`' . CustomHelper::encrypt($val->code) . '`);"><i class="material-icons dp48">done_all</i></button>
-					',
+                    $btnUpdate.($val->status_qc ? 'Telah di-cek QC' : ''),
                 ];
 
                 $nomor++;
@@ -224,6 +223,10 @@ class QualityControlController extends Controller
             $data['warehouse_name']     = $data->warehouse->name;
             $data['note']               = $data->note;
             $data['is_hide_supplier']   = $data->item->is_hide_supplier ?? '';
+            $data['water_content']      = CustomHelper::formatConditionalQty($data->water_content);
+            $data['viscosity']          = CustomHelper::formatConditionalQty($data->viscosity);
+            $data['residue']            = CustomHelper::formatConditionalQty($data->residue);
+            $data['note_qc']            = $data->note_qc ?? '';
 
             return response()->json($data);
         }
@@ -261,17 +264,21 @@ class QualityControlController extends Controller
                 
                 if($goodScale){
 
+                    if($request->file('document') && $goodScale->image_qc){
+                        $goodScale->deleteImageQc();
+                    }
+
                     $goodScale->update([
-                        'water_content' => str_replace(',','.',str_replace('.','',$request->water_content)),
+                        'water_content' => $goodScale->water_content == 0 ? str_replace(',','.',str_replace('.','',$request->water_content)) : $goodScale->water_content,
                         'viscosity'     => str_replace(',','.',str_replace('.','',$request->viscosity)),
                         'residue'       => str_replace(',','.',str_replace('.','',$request->residue)),
-                        'status_qc'     => $request->status_qc,
+                        'status_qc'     => $goodScale->water_content == 0 ? $request->status_qc : $goodScale->status_qc,
                         'note_qc'       => $request->note,
-                        'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
+                        'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : ($goodScale->image_qc ? $goodScale->image_qc : NULL),
                         'user_qc'       => session('bo_id'),
                         'time_scale_qc' => date('Y-m-d H:i:s'),
-                        'status'        => $request->status_qc == '1' ? $goodScale->status : '5',
-                        'note'          => $request->status_qc == '2' ? $goodScale->note.' - Ditutup oleh bagian QC.' : $goodScale->note,
+                        'status'        => $goodScale->water_content == 0 ? ($request->status_qc == '1' ? $goodScale->status : '5') : $goodScale->status,
+                        'note'          => $goodScale->water_content == 0 ? ($request->status_qc == '2' ? $goodScale->note.' - Ditutup oleh bagian QC.' : $goodScale->note) : $goodScale->note,
                         /* 'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
                         'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL, */
                     ]);

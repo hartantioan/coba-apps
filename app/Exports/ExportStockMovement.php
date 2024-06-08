@@ -58,9 +58,9 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 }
     
                 if($this->group){
-                   
-                    $query->whereHas('item',function($query){
-                        $query->whereIn('item_group_id', $this->group);
+                    $groupIds = explode(',', $this->group);
+                    $query->whereHas('item',function($query)use($groupIds){
+                        $query->whereIn('item_group_id', $groupIds);
                     });
                 }
             })
@@ -213,9 +213,10 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 }
     
                 if($this->group){
-                   
-                    $query->whereHas('item',function($query) {
-                        $query->whereIn('item_group_id', $this->group);
+                    $groupIds = explode(',', $this->group);
+    
+                    $query->whereHas('item',function($query) use($groupIds){
+                        $query->whereIn('item_group_id', $groupIds);
                     });
                 }
                 $array_last_item = collect($array_last_item);

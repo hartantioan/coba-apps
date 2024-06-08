@@ -1742,7 +1742,7 @@
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(newQty);
             $('#arr_water_content' + code).val($('#arr_scale' + code).select2('data')[0].water_content);
             $('#arr_viscosity' + code).val($('#arr_scale' + code).select2('data')[0].viscosity);
-            $('#arr_residue' + code).val($('#arr_residue' + code).select2('data')[0].residue);
+            $('#arr_residue' + code).val($('#arr_scale' + code).select2('data')[0].residue);
         }else{
             $('input[name^="arr_qty[]"][data-code="' + code + '"]').val(oldQty);
             $('#arr_water_content' + code).val('0,000');

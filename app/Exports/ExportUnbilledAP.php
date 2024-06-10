@@ -99,7 +99,7 @@ class ExportUnbilledAP implements FromView , WithEvents
                     AND j.deleted_at IS NULL
             ) AS currency_rate,
             IFNULL((SELECT
-                SUM(ard.nominal)
+                SUM(ROUND(ard.nominal,2))
                 FROM adjust_rate_details ard
                 JOIN adjust_rates ar
                     ON ar.id = ard.adjust_rate_id

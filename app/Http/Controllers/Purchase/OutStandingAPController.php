@@ -111,7 +111,7 @@ class OutStandingAPController extends Controller
                             AND jd.deleted_at IS NULL
                     ),0) AS total_journal,
                     IFNULL((SELECT
-                        SUM(ard.nominal)
+                        SUM(ROUND(ard.nominal,2))
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
@@ -214,7 +214,7 @@ class OutStandingAPController extends Controller
                             AND prd.deleted_at IS NULL
                     ),0) AS total_reconcile,
                     IFNULL((SELECT
-                        SUM(ard.nominal)
+                        SUM(ROUND(ard.nominal,2))
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id

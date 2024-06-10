@@ -92,7 +92,6 @@ class TrialBalanceController extends Controller
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];
-                    info($val['totalBalanceBefore']);
                 }
 
                 $html .= '</tr>';

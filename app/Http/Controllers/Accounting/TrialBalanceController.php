@@ -96,7 +96,7 @@ class TrialBalanceController extends Controller
 
                 $html .= '</tr>';
             }
-        }elseif($level == '2'){
+        }/* elseif($level == '2'){
             $tempParent = 0;
             foreach($coas as $keymain => $row){
                 if($tempParent !== $row->parent_id){
@@ -416,7 +416,7 @@ class TrialBalanceController extends Controller
                 $tempParent3 = $row->parentSub->parentSub->parent_id;
                 $tempParent4 = $row->parentSub->parentSub->parentSub->parent_id;
             }
-        }
+        } */
 
         $html .= '</tbody><tfoot><tr><th class="right-align" style="left: 0px;position: sticky;background-color:white;">TOTAL</th>';
 

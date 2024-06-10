@@ -136,9 +136,6 @@ class Coa extends Model
             foreach($dataCredit as $rownow2){
                 $totalCredit += round($rownow2->nominal,2);
             }
-
-            info($totalBalanceBeforeDebit);
-            info($totalBalanceBeforeCredit);
         }
 
         $arr = [

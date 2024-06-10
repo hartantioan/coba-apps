@@ -52,7 +52,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                             AND pm.status IN ('2','3','7')
                     ),0) AS total_memo,
                     IFNULL((SELECT
-                        ar.currency_rate
+                        SUM(ROUND(ard.nominal,2))
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
@@ -61,8 +61,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_down_payments'
                             AND ard.lookable_id = pdp.id
-                        ORDER BY ar.post_date DESC LIMIT 1
-                    ),0) AS currency_rate_adjust,
+                    ),0) AS adjust_nominal,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     uvoid.name AS void_name,
@@ -86,8 +85,9 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                 ));
 
             foreach($query_data as $row_invoice){
-                $balance = $row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo;
-                $currency_rate = $row_invoice->currency_rate_adjust > 0 ? $row_invoice->currency_rate_adjust : $row_invoice->currency_rate;
+                $balance = round($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo,2);
+                $currency_rate = $row_invoice->currency_rate;
+                $balance_rp = round($balance * $currency_rate,2) + $row_invoice->adjust_nominal;
                 if($balance > 0){
                     $pdp = PurchaseDownPayment::where('code',$row_invoice->code)->first();
                     $array_filter[] = [
@@ -104,7 +104,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         'total_fc'      => number_format($row_invoice->total,2,',','.'),
                         'used'          => number_format($row_invoice->total_used * $currency_rate,2,',','.'),
                         'memo'          => number_format($row_invoice->total_memo * $currency_rate,2,',','.'),
-                        'balance'       => number_format($balance * $currency_rate,2,',','.'),
+                        'balance'       => number_format($balance_rp,2,',','.'),
                         'balance_fc'    => number_format($balance,2,',','.'),
                         'status'        => $this->getStatus($row_invoice->status),
                         'void_name'     => $row_invoice->void_name,
@@ -118,7 +118,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         'opym_code'     => $pdp->listOutgoingPayment(),
                         'pay_date'      => $pdp->listPayDate(),
                     ];
-                    $totalbalance += round($balance * $currency_rate,2);
+                    $totalbalance += round($balance_rp,2);
                 }
             }  
         return view('admin.exports.down_payment', [

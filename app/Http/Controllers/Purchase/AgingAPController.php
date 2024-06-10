@@ -241,12 +241,12 @@ class AgingAPController extends Controller
         $newData = []; 
 
         foreach($results as $row){
-            $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
+            $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal,2);
             $balance = $row->balance - $totalPayed;
             $currency_rate = $row->currency_rate;
-            $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
-            $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
-            $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+            $total_received_after_adjust = round(($row->balance * $currency_rate) + $row->adjust_nominal,2);
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
@@ -293,12 +293,12 @@ class AgingAPController extends Controller
 
         foreach($results2 as $row){
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
-            $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
+            $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
-            $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
-            $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
-            $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+            $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
@@ -620,12 +620,12 @@ class AgingAPController extends Controller
         $newData = []; 
 
         foreach($results as $row){
-            $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
+            $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal,2);
             $balance = $row->balance - $totalPayed;
             $currency_rate = $row->currency_rate;
-            $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
-            $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
-            $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+            $total_received_after_adjust = round(($row->balance * $currency_rate) + $row->adjust_nominal,2);
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($row->due_date,$date);
                 $arrDetail = [];
@@ -659,12 +659,12 @@ class AgingAPController extends Controller
 
         foreach($results2 as $row){
             $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
-            $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
+            $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
-            $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
-            $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
-            $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+            $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $arrDetail = [];
@@ -813,7 +813,7 @@ class AgingAPController extends Controller
                         'paid'          => number_format($paid * $currency_rate,2,',','.'),
                         'balance'       => number_format($balance * $currency_rate,2,',','.'),
                     ];
-                    $grandtotal += ($balance * $currency_rate);
+                    $grandtotal += round($balance * $currency_rate,2);
                 }
             }
         }

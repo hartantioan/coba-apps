@@ -237,12 +237,12 @@ class ExportAgingAP implements FromView, ShouldAutoSize
 
         if($this->type == 1){
             foreach($results as $row){
-                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
+                $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal,2);
                 $balance = $row->balance - $totalPayed;
                 $currency_rate = $row->currency_rate;
-                $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
-                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
-                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+                $total_received_after_adjust = round(($row->balance * $currency_rate) + $row->adjust_nominal,2);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0){
                     $totalAll += $balance_after_adjust;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
@@ -289,12 +289,12 @@ class ExportAgingAP implements FromView, ShouldAutoSize
             }
     
             foreach($results2 as $row){
-                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
+                $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
                 $balance = $row->grandtotal - $totalPayed;
                 $currency_rate = $row->currency_rate;
-                $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
-                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
-                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+                $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0){
                     $totalAll += $balance_after_adjust;
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
@@ -348,12 +348,12 @@ class ExportAgingAP implements FromView, ShouldAutoSize
             ]);
         }else{
             foreach($results as $row){
-                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal;
+                $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal,2);
                 $balance = $row->balance - $totalPayed;
                 $currency_rate = $row->currency_rate;
-                $total_received_after_adjust = ($row->balance * $currency_rate) + $row->adjust_nominal;
-                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate;
-                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+                $total_received_after_adjust = round(($row->balance * $currency_rate) + $row->adjust_nominal,2);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];
@@ -387,12 +387,12 @@ class ExportAgingAP implements FromView, ShouldAutoSize
             }
     
             foreach($results2 as $row){
-                $totalPayed = $row->total_payment + $row->total_memo + $row->total_reconcile;
+                $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
                 $balance = $row->grandtotal - $totalPayed;
                 $currency_rate = $row->currency_rate;
-                $total_received_after_adjust = ($row->grandtotal * $currency_rate) + $row->adjust_nominal;
-                $total_invoice_after_adjust = ($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate;
-                $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
+                $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
+                $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0){
                     $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
                     $arrDetail = [];

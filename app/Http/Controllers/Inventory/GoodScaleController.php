@@ -684,7 +684,7 @@ class GoodScaleController extends Controller
             $qty_qc = 0;
             $qty_final = $balanceweight;
 
-            $qty_qc = round((($gs->water_content / 100) * $balanceweight),2);
+            $qty_qc = round((($gs->water_content / 100) * $balanceweight),3);
 
             $qty_final -= $qty_qc;
     

@@ -173,6 +173,20 @@ class IncomingPayment extends Model
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
     }
+    public function isOpenPeriod(){
+        $monthYear = substr($this->post_date, 0, 7); // '2023-02'
+
+        // Query the LockPeriod model
+        $see = LockPeriod::where('month', $monthYear)
+                        ->whereIn('status_closing', [3, 2])
+                        ->get();
+       
+        if(count($see)>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 
     public function adjustRateDetail(){
         return $this->hasMany('App\Models\AdjustRateDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('adjustRate',function($query){

@@ -274,6 +274,21 @@ class PaymentRequest extends Model
         }
     }
 
+    public function isOpenPeriod(){
+        $monthYear = substr($this->post_date, 0, 7); // '2023-02'
+
+        // Query the LockPeriod model
+        $see = LockPeriod::where('month', $monthYear)
+                        ->whereIn('status_closing', [3, 2])
+                        ->get();
+       
+        if(count($see)>0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function updateStatusSchedule(){
         foreach($this->paymentRequestDetail as $row){
             if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){

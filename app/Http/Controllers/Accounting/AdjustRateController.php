@@ -502,7 +502,7 @@ class AdjustRateController extends Controller
                         </thead><tbody>';
         
         foreach($data->adjustRateDetail as $key => $row){
-            $total += round($row->nominal);
+            $total += round($row->nominal,2);
             $string .= '<tr>
 
                 <td class="center-align">'.($key + 1).'</td>

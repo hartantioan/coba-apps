@@ -73,17 +73,16 @@ class DownPaymentController extends Controller
                         AND pm.status IN ('2','3','7')
                 ),0) AS total_memo,
                 IFNULL((SELECT
-                    ar.currency_rate
+                    SUM(ROUND(ard.nominal,2))
                     FROM adjust_rate_details ard
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
                     WHERE 
-                        ar.post_date <= :date3
+                        ar.post_date <= :date4
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
-                    ORDER BY ar.post_date DESC LIMIT 1
-                ),0) AS currency_rate_adjust,
+                ),0) AS adjust_nominal,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pdp
@@ -106,7 +105,8 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
-            $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
+            $currency_rate = $row->currency_rate;
+            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
@@ -120,10 +120,10 @@ class DownPaymentController extends Controller
                     'total'         => number_format($row->total * $currency_rate,2,',','.'),
                     'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
                     'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
-                    'balance'       => number_format($balance * $currency_rate,2,',','.'),
+                    'balance'       => number_format($balance_rp,2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
-                $totalbalance += round($balance * $currency_rate,2);
+                $totalbalance += round($balance_rp,2);
             }
         }
 

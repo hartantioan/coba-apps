@@ -78,7 +78,7 @@ class DownPaymentController extends Controller
                     JOIN adjust_rates ar
                         ON ar.id = ard.adjust_rate_id
                     WHERE 
-                        ar.post_date <= :date4
+                        ar.post_date <= :date3
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id

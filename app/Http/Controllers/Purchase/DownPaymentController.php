@@ -105,7 +105,7 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
-            $balance = $row->grandtotal - $row->total_used - $row->total_memo;
+            $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->currency_rate_adjust > 0 ? $row->currency_rate_adjust : $row->currency_rate;
             if($balance > 0){
                 $results[] = [

@@ -88,7 +88,7 @@ class TrialBalanceController extends Controller
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';
-                    $arrMonth[$key]['totalBalanceBefore'] += 1;
+                    $arrMonth[$key]['totalBalanceBefore'] += $val['totalBalanceBefore'];
                     $arrMonth[$key]['totalDebit'] += $val['totalDebit'];
                     $arrMonth[$key]['totalCredit'] += $val['totalCredit'];
                     $arrMonth[$key]['totalBalance'] += $val['totalBalanceBefore'] + $val['totalDebit'] - $val['totalCredit'];

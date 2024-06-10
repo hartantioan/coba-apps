@@ -84,7 +84,7 @@ class TrialBalanceController extends Controller
                 foreach($arrMonth as $key => $rowMonth) {
                     $val = $row->getTotalMonthFromParent($rowMonth['raw_month'],$level);
                     $html .= '
-                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],2,',','.').'</td>
+                        <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'],5,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalDebit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalCredit'],2,',','.').'</td>
                         <td style="min-width:150px !important;" class="right-align">'.number_format($val['totalBalanceBefore'] + $val['totalBalance'],2,',','.').'</td>';

@@ -104,6 +104,8 @@ class Coa extends Model
         foreach($child as $row){
             $dataBalanceBeforeDebit = NULL;
             $dataBalanceBeforeCredit = NULL;
+            $dataDebit = NULL;
+            $dataCredit = NULL;
 
             $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
@@ -113,8 +115,8 @@ class Coa extends Model
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
             })->get();
 
-            foreach($dataBalanceBeforeDebit as $rowbefore){
-                $totalBalanceBeforeDebit += round($rowbefore->nominal,2);
+            foreach($dataBalanceBeforeDebit as $rowbefore1){
+                $totalBalanceBeforeDebit += round($rowbefore1->nominal,2);
             }
 
             foreach($dataBalanceBeforeCredit as $rowbefore2){

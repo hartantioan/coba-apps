@@ -189,6 +189,12 @@
                 <h6 class="invoice-from">{{ __('translations.others') }}</h6>
                 <div class="row">
                     <div class="col s3">
+                        {{ __('translations.reimburse') }}
+                    </div>
+                    <div class="col s9">
+                        {{ $data->isReimburse() }}
+                    </div>
+                    <div class="col s3">
                         {{ __('translations.bussiness_partner') }}
                     </div>
                     <div class="col s9">

@@ -389,7 +389,7 @@ class GoodReceipt extends Model
             }
             if($row->goodScale()->exists()){
                 $row->goodScale->update([
-                    '3'
+                    'status'    => '3'
                 ]);
             }
         }

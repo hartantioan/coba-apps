@@ -152,7 +152,7 @@ class UnbilledAPController extends Controller
             $total_received_after_adjust = round(($row->total * $currency_rate) + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round(($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
-            if(round($balance_after_adjust,2) > 0){
+            if(round($balance,2) > 0){
                 $array_filter[] = [
                     'no'            => ($key + 1),
                     'code'          => $row->code,

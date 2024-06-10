@@ -97,13 +97,13 @@ class Coa extends Model
             $child = $this->getFifthChildFromFifth();
         }
         
+        $totalBalanceBeforeDebit = 0;
+        $totalBalanceBeforeCredit = 0;
         $totalDebit = 0;
         $totalCredit = 0;
         foreach($child as $row){
             $dataBalanceBeforeDebit = NULL;
             $dataBalanceBeforeCredit = NULL;
-            $totalBalanceBeforeDebit = 0;
-            $totalBalanceBeforeCredit = 0;
 
             $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
@@ -136,9 +136,10 @@ class Coa extends Model
             foreach($dataCredit as $rownow2){
                 $totalCredit += round($rownow2->nominal,2);
             }
-        }
 
-        info($totalBalanceBeforeDebit - $totalBalanceBeforeCredit);
+            info($totalBalanceBeforeDebit);
+            info($totalBalanceBeforeCredit);
+        }
 
         $arr = [
             'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,

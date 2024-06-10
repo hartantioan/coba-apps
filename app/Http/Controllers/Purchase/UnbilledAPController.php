@@ -144,13 +144,12 @@ class UnbilledAPController extends Controller
                         $query->where('code','200.01.03.01.02');
                     })->whereHas('journal',function($query)use($date){
                         $query->where('post_date','<=',$date)->whereIn('status',['2','3']);
-                    })->sum('nominal_fc');
+                    })->sum('nominal');
                 }
             }
-            $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return,2);
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round(($row->total * $currency_rate) + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round($row->total_invoice - $total_reconcile + $row->total_return,2);
+            $total_invoice_after_adjust = round($row->total_invoice - $total_reconcile + round($row->total_return * $currency_rate,2),2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if(round($balance_after_adjust,2) > 0){
                 $array_filter[] = [

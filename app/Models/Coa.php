@@ -140,6 +140,9 @@ class Coa extends Model
             }
         }
 
+        info($totalBalanceBeforeCredit);
+        info($totalBalanceBeforeDebit);
+
         $arr = [
             'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,
             'totalDebit'            => $totalDebit,

@@ -307,7 +307,7 @@ class Coa extends Model
     public function getFifthChildFromFirst(){
         $arr = [];
 
-        foreach($this->childSub()->where('status','1')->get() as $row2){
+        foreach($this->childSub as $row2){
             foreach($row2->childSub as $row3){
                 foreach($row3->childSub as $row4){
                     foreach($row4->childSub as $row5){

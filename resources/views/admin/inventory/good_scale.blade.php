@@ -280,9 +280,13 @@
                                 <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_po">Qty PO</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m2 s9">
                                 <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_in">Qty Bruto</label>
+                            </div>
+                            <div class="input-field col m1 s12 center-align">
+                                <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" onclick="stopStart();" id="btn-stop-start"><i class="material-icons right icon-stop-start">stop</i></a>
+                                <label class="active">&nbsp;</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
@@ -412,13 +416,13 @@
                                 <label class="active" for="warehouseUpdate">Gudang</label>
                             </div>
                             <div class="col m12 s12"></div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="purchaseOrderUpdate" class="mt-2">
 
                                 </div>
                                 <label class="active" for="purchaseOrderUpdate">Purchase Order</label>
                             </div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="qtyInUpdate" class="mt-2">
 
                                 </div>
@@ -428,11 +432,15 @@
                                 <input id="qtyOutUpdate" class="data-input" name="qtyOutUpdate" type="text" onkeyup="formatRupiahNoMinus(this);count();" value="0,000">
                                 <label class="active" for="qtyOutUpdate">Qty Tara</label>
                             </div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m1 s12 center-align">
+                                <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text" onclick="stopStartOut();"><i class="material-icons right icon-stop-start-out">stop</i></a>
+                                <label class="active">&nbsp;</label>
+                            </div>
+                            <div class="input-field col m3 s12">
                                 <input id="qtyBalanceUpdate" name="qtyBalanceUpdate" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qtyBalanceUpdate">Qty Netto</label>
                             </div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="unitUpdate" class="mt-2">
 
                                 </div>
@@ -819,6 +827,10 @@
             },
             onOpenEnd: function(modal, trigger) { 
                 getWeight();
+                $('.icon-stop-start-out').text('stop');
+                if($('.icon-stop-start-out').parent().hasClass('green')){
+                    $('.icon-stop-start-out').parent().removeClass('green').addClass('red');
+                }
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -830,6 +842,10 @@
                 $('#tempGoodScale').val('');
                 $('#previewImageIn').attr('src','');
                 clearGetWeight();
+                $('.icon-stop-start-out').text('play_arrow');
+                if($('.icon-stop-start-out').parent().hasClass('red')){
+                    $('.icon-stop-start-out').parent().removeClass('red').addClass('green');
+                }
                 $('#videoSource1').empty();
                 $('#previewImage1').attr('src','');
                 if (window.stream) {
@@ -859,6 +875,10 @@
                     return 'You will lose all changes made since your last save';
                 };
                 getWeight();
+                $('.icon-stop-start').text('stop');
+                if($('.icon-stop-start').parent().hasClass('green')){
+                    $('.icon-stop-start').parent().removeClass('green').addClass('red');
+                }
                 getStream().then(getDevices).then(gotDevices);
             },
             onCloseEnd: function(modal, trigger){
@@ -874,6 +894,10 @@
                     return null;
                 };
                 clearGetWeight();
+                $('.icon-stop-start').text('play_arrow');
+                if($('.icon-stop-start').parent().hasClass('red')){
+                    $('.icon-stop-start').parent().removeClass('red').addClass('green');
+                }
                 $('.row_item').remove();
                 $('#videoSource').empty();
                 $('#previewImage').attr('src','');
@@ -1011,6 +1035,38 @@
 
         select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item_scale") }}');
     });
+
+    function stopStart(){
+        if($('.icon-stop-start').text() == 'stop'){
+            $('.icon-stop-start').text('play_arrow');
+            if($('.icon-stop-start').parent().hasClass('red')){
+                $('.icon-stop-start').parent().removeClass('red').addClass('green');
+            }
+            clearGetWeight();
+        }else{
+            $('.icon-stop-start').text('stop');
+            if($('.icon-stop-start').parent().hasClass('green')){
+                $('.icon-stop-start').parent().removeClass('green').addClass('red');
+            }
+            getWeight();
+        }
+    }
+
+    function stopStartOut(){
+        if($('.icon-stop-start-out').text() == 'stop'){
+            $('.icon-stop-start-out').text('play_arrow');
+            if($('.icon-stop-start-out').parent().hasClass('red')){
+                $('.icon-stop-start-out').parent().removeClass('red').addClass('green');
+            }
+            clearGetWeight();
+        }else{
+            $('.icon-stop-start-out').text('stop');
+            if($('.icon-stop-start-out').parent().hasClass('green')){
+                $('.icon-stop-start-out').parent().removeClass('green').addClass('red');
+            }
+            getWeight();
+        }
+    }
 
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);

@@ -150,7 +150,7 @@ class UnbilledAPController extends Controller
             $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return,2);
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round(($row->total * $currency_rate),2) + $row->adjust_nominal;
-            $total_invoice_after_adjust = round(($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate,2);
+            $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate;
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if(round($balance,2) > 0){
                 $array_filter[] = [

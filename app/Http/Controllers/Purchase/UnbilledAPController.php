@@ -41,6 +41,12 @@ class UnbilledAPController extends Controller
             gr.*,
             u.name AS account_name,
             IFNULL((SELECT 
+                SUM(ROUND(grd.total * (SELECT currency_rate FROM journals WHERE lookable_type = 'good_receipts' AND lookable_id = gr.id),2))
+                FROM good_receipt_details grd
+                WHERE grd.good_receipt_id = gr.id 
+                grd.deleted_at IS NULL
+            ),0) AS total_detail,
+            IFNULL((SELECT 
                 SUM(pid.total)
                 FROM purchase_invoice_details pid
                 JOIN purchase_invoices pi
@@ -149,7 +155,7 @@ class UnbilledAPController extends Controller
             }
             $balance = round($row->total - ($row->total_invoice - $total_reconcile) - $row->total_return,2);
             $currency_rate = $row->currency_rate;
-            $total_received_after_adjust = round((round($row->total,2) * $currency_rate),2) + $row->adjust_nominal;
+            $total_received_after_adjust = round($row->total_detail + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round(($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if(round($balance,2) > 0){

@@ -63,16 +63,10 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                             AND ard.lookable_id = pdp.id
                     ),0) AS adjust_nominal,
                     u.name AS account_name,
-                    u.employee_no AS account_code,
-                    uvoid.name AS void_name,
-                    udelete.name AS delete_name
+                    u.employee_no AS account_code
                     FROM purchase_down_payments pdp
                     LEFT JOIN users u
                         ON u.id = pdp.account_id
-                    LEFT JOIN users uvoid
-                        ON uvoid.id = pdp.void_id
-                    LEFT JOIN users udelete
-                        ON udelete.id = pdp.void_id
                     WHERE 
                         pdp.post_date <= :date4
                         AND pdp.grandtotal > 0

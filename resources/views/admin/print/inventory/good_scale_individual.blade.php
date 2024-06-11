@@ -173,12 +173,12 @@
     </head>
     <body>
         <header style="margin-top:20px;">
-            <table border="0" width="100%" style="font-size:1em" class="tb-header">
+            <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
                     <td width="33%" class="left-align" style="padding-top:15px;">
                         <span class="invoice-number mr-1"># {{ $data->code }}</span>
                         <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
-                        <h3 class="indigo-text">Tiket Timbangan</h3>
+                        <h4 class="indigo-text">Tiket Timbangan</h4>
                     </td>
                     <td width="33%" class="right-align">
                     </td>
@@ -190,7 +190,7 @@
             </table>
             <hr style="border-top: 1px solid black; margin-top:-15px">
         </header>
-        <main style="margin-top:38px;">
+        <main style="margin-top:20px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

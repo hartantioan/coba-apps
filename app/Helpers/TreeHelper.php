@@ -444,30 +444,31 @@ class TreeHelper {
                     $query_gs = GoodScale::where('id',$gs_id)->first();
                     
                     if($query_gs->goodReceiptDetail()->exists()){
-                        $name = $query_gs->goodReceiptDetail->goodReceipt->supplier->name ?? null;
-                        $gr = [
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$query_gs->goodReceiptDetail->goodReceipt->post_date],
-                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
-                                
-                            ],
-                            'key'=>$query_gs->goodReceiptDetail->goodReceipt->code,
-                            'name'=>$query_gs->goodReceiptDetail->goodReceipt->code,
-                            'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($query_gs->goodReceiptDetail->goodReceipt->code),
-                        ];
+                        foreach($query_gs->goodReceiptDetail as $row){
+                            $name = $row->goodReceipt->supplier->name ?? null;
+                            $gr = [
+                                'properties'=> [
+                                    ['name'=> "Tanggal: ".$row->goodReceipt->post_date],
+                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                    
+                                ],
+                                'key'=>$row->goodReceipt->code,
+                                'name'=>$row->goodReceipt->code,
+                                'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($row->goodReceipt->code),
+                            ];
 
-                        $data_go_chart[]=$gr;
-                        $data_link[]=[
-                            'from'=>$query_gs->goodReceiptDetail->goodReceipt->code,
-                            'to'=>$query_gs->code,
-                            'string_link'=>$query_gs->goodReceiptDetail->goodReceipt->code.$query_gs->code
-                        ];
-                        if(!in_array($query_gs->goodReceiptDetail->goodReceipt->id, $data_id_gr)){
-                            $data_id_gr[]= $query_gs->goodReceiptDetail->goodReceipt->id; 
-                            $added = true; 
+                            $data_go_chart[]=$gr;
+                            $data_link[]=[
+                                'from'=>$row->goodReceipt->code,
+                                'to'=>$query_gs->code,
+                                'string_link'=>$row->goodReceipt->code.$query_gs->code
+                            ];
+                            if(!in_array($row->goodReceipt->id, $data_id_gr)){
+                                $data_id_gr[]= $row->goodReceipt->id; 
+                                $added = true; 
+                            }
+                            $data_id_gr[]= $row->goodReceipt->id; 
                         }
-                        $data_id_gr[]= $query_gs->goodReceiptDetail->goodReceipt->id; 
-    
                     }
 
                     if($query_gs->purchaseOrderDetail()->exists()){

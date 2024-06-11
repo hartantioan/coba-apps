@@ -140,7 +140,7 @@ class PurchaseProgressController extends Controller
                                             'grpo_code'    => $row_grpo_detail->goodReceipt->code,
                                             'grpo_date'    => $row_grpo_detail->goodReceipt->post_date,
                                             'grpo_qty'     => CustomHelper::formatConditionalQty($row_grpo_detail->qty),
-                                            'outstanding'  => $row_po_detail->getBalanceReceipt(),
+                                            'outstanding'  => CustomHelper::formatConditionalQty($row_po_detail->getBalanceReceipt()),
                                             'status'       => $row_grpo_detail->goodReceipt->status(),
                                             'done_user'    => ($row_grpo_detail->goodReceipt->status == 3 && is_null($row_grpo_detail->goodReceipt->done_id)) ? 'sistem' : (($row_grpo_detail->goodReceipt->status == 3 && !is_null($row_grpo_detail->goodReceipt->done_id)) ? $row_grpo_detail->goodReceipt->doneUser->name : ''),
                                             'done_date'    => $row_grpo_detail->goodReceipt->done_date,

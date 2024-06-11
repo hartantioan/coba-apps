@@ -510,7 +510,7 @@ class GoodReceiptPOController extends Controller
 
                     $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
 
-                    $balance = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) - $pod->getBalanceReceipt();
+                    $balance = round(floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR() - $pod->qty,2);
                     $percent_balance = round(($balance / $pod->qty) * 100,2);
                     if($percent_balance > $tolerance_gr){
                         $overtolerance = true;

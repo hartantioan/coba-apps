@@ -1919,7 +1919,7 @@ class TreeHelper {
                             
                             
                         }
-                        if($purchase_order_detail->goodScale()->exists()){
+                        /* if($purchase_order_detail->goodScale()->exists()){
                             foreach($purchase_order_detail->goodScale as $row_scale){
                                 $data_good_scale_tempura = [
                                     'key'   => $row_scale->code,
@@ -1942,7 +1942,7 @@ class TreeHelper {
                                     $added = true;
                                 }
                             }
-                        }
+                        } */
                         
                     }
 

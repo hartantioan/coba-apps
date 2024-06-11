@@ -59,10 +59,10 @@
                     font-weight: 800 !important;
                 }
                 td{
-                    font-size:0.9em !important;
+                    font-size:1em !important;
                 }
                 .tb-header td{
-                    font-size:0.8em !important;
+                    font-size:1em !important;
                 }
                 .tbl-info td{
                     font-size:1em !important;
@@ -74,10 +74,10 @@
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:0.8em !important;
+                    font-size:1em !important;
                 }
                 .table-bot1 td{
-                    font-size:0.9em !important;
+                    font-size:1em !important;
                 }
             }
         
@@ -188,9 +188,9 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 1px solid black; margin-top:-10px">
+            <hr style="border-top: 1px solid black; margin-top:-15px">
         </header>
-        <main style="margin-top:20px;">
+        <main style="margin-top:38px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

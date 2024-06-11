@@ -667,9 +667,9 @@ class GoodScaleController extends Controller
         if($gs){
             $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
             $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
-            $balancegrpo = $gs->purchaseOrderDetail->getBalanceReceipt();
-            $balance = $balanceweight - $balancegrpo;
-            $percent_balance = round(($balance / $balancegrpo) * 100,2);
+            $balancegrpo = $gs->purchaseOrderDetail->qtyGR();
+            $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
+            $percent_balance = round(($balance / $gs->purchaseOrderDetail->qty) * 100,2);
             if($percent_balance > $tolerance_gr){
                 $overtolerance = true;
             }

@@ -223,10 +223,10 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
-                                            Telp.
+                                            NIK
                                         </td>
                                         <td width="60%">
-                                            : {{ $data->user->phone }}
+                                            : {{ $data->user->employee_no }}
                                         </td>
                                     </tr>
                                     <tr>

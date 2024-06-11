@@ -491,6 +491,8 @@ class GoodReceiptPOController extends Controller
                 ]);
             }
 
+            $arrToleranceMessage = [];
+
             foreach($request->arr_purchase as $key => $row){
                 $wtax = 0;
                 $total = 0;
@@ -510,10 +512,13 @@ class GoodReceiptPOController extends Controller
 
                     $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
 
-                    $balance = round(floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR() - $pod->qty,2);
+                    $balanceqtygr = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR();
+
+                    $balance = round($balanceqtygr - $pod->qty,2);
                     $percent_balance = round(($balance / $pod->qty) * 100,2);
                     if($percent_balance > $tolerance_gr){
                         $overtolerance = true;
+                        $arrToleranceMessage[] = 'Item '.$pod->item->name.' toleransi terima '.$tolerance_gr.'% sedangkan kelebihan qty '.$percent_balance.'% dari '.CustomHelper::formatConditionalQty($balance).'/'.CustomHelper::formatConditionalQty($pod->qty).'. Qty sudah diterima dan akan diterima sebesar '.CustomHelper::formatConditionalQty($balanceqtygr).', Qty PO sebesar '.CustomHelper::formatConditionalQty($pod->qty);
                     }
 
                     $discount = $pod->purchaseOrder->discount;
@@ -557,7 +562,7 @@ class GoodReceiptPOController extends Controller
             if($overtolerance){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                    'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur. Dengan keterangan sbb : '.implode(', ',$arrToleranceMessage)
                 ]);
             }
 

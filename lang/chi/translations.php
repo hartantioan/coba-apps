@@ -33,6 +33,7 @@ return [
     'warehouse' => '仓库',
     'division'  => '部门',
     'requester' => '请求者',
+    'qty_request' => '数量要求',
     'project'   => '项目',
     'total'     => '总计',
     'approval'  => '审批',

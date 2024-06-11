@@ -33,6 +33,7 @@ return [
     'warehouse' => 'Gudang',
     'division'  => 'Divisi',
     'requester' => 'Pemohon',
+    'qty_request' => 'Qty Request',
     'project'   => 'Proyek',
     'total'     => 'Total',
     'approval'  => 'Persetujuan',
@@ -160,5 +161,11 @@ return [
     'qty_return'       => 'Qty Return',
     'good_return_po'       => 'Good Return PO',
     'reimburse'       => 'Reimburse',
+    'good_scale'       => 'Good Scale',
+    'license_plate'    => 'License Plate',
+    'driver'           => 'Driver',
+    'inventory_revaluation'=>'Inventory Revaluation',
+    'incoming_payment' => 'Incoming Payment',
+    'nominal'          => 'Nominal'
 ];
 

@@ -199,7 +199,7 @@
                     <tr>
                         <th class="center-align">{{ __('translations.process') }}</th>
                         <th class="center-align">{{ __('translations.item') }}</th>
-                        <th class="center-align">{{ __('translations.request') }}.</th>
+                        <th class="center-align">{{ __('translations.qty_request') }}.</th>
                         <th class="center-align">{{ __('translations.stock') }}</th>
                         <th class="center-align">{{ __('translations.unit') }}.</th>
                         <th class="center-align">{{ __('translations.used_date') }}</th>

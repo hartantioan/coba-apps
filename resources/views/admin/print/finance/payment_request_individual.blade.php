@@ -260,6 +260,7 @@
                             </td>
                             <td width="33%" class="left-align" class="tbl-info" valign="top">
                                 <table border="0" width="100%">
+                                    
                                     <tr>
                                         <td width="40%">
                                            Sumber Dana
@@ -281,7 +282,15 @@
                                             {{ $data->paymentType() }}
                                         </td>
                                     </tr>
-                                   
+                                    <tr>
+                                        <td width="40%">
+                                            Reimburse
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->isReimburse() }}
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td width="40%">
                                             Vendor Bank

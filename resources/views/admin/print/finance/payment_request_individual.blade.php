@@ -215,6 +215,15 @@
                                     </tr>
                                     <tr>
                                         <td width="40%">
+                                            NIK
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->account->employee_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="40%">
                                             Tgl. Posting
                                         </td>
                                         <td width="1%">:</td>

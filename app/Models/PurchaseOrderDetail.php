@@ -253,7 +253,7 @@ class PurchaseOrderDetail extends Model
 
     public function goodScale()
     {
-        return $this->hasMany('App\Models\GoodScale','purchase_order_detail_id','id')->where('status_qc','1')->whereIn('status',['2']);
+        return $this->hasMany('App\Models\GoodScale','purchase_order_detail_id','id')->where('status_qc','1')->whereIn('status',['2','3']);
     }
 
     public function balanceInvoice(){

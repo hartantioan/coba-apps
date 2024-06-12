@@ -1890,6 +1890,7 @@
                                 $('.row_detail_cost').remove();
                                 $('#body-detail').empty();
                             } */
+                            $('#empty-detail').remove();
                             if(response.details.length > 0){
                                 $.each(response.details, function(i, val) {
                                     $('.row_detail[data-account!="' + val.account_code + '"]').remove();

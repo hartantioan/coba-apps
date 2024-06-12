@@ -233,7 +233,11 @@ class ApprovalController extends Controller
         $column = [
             'id',
             'code',
-            'date_request'            
+            'date_request',
+            'user_id',
+            'coderef',
+            'note_ref',
+            'status',
         ];
 
         $start  = $request->start;

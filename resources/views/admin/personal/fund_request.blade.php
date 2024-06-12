@@ -197,6 +197,7 @@
                                 </div>
                                 <div class="input-field col m3 s12 step5">
                                     <select class="form-control" id="document_status" name="document_status">
+                                        <option value="">~Kosong~</option>
                                         <option value="2">Lengkap</option>
                                         <option value="3">Tidak Lengkap</option>
                                     </select>
@@ -262,10 +263,7 @@
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice (Opsional)</label>
                                 </div>
-                                <div class="input-field col m3 s12 step18">
-                                    <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
-                                    <label class="active" for="note">Keterangan</label>
-                                </div>
+                                
                                 <div class="input-field col m3 s12 right-align step19">
                                     <h6>Limit BS : <b><span id="limit">0,00</span></b></h6>
                                 </div>
@@ -370,6 +368,10 @@
                             <legend>4. Konfirmasi</legend>
                             <div class="row">
                                 <div class="col m12 s12 row">
+                                    <div class="input-field col m9 s12 step18">
+                                        <textarea id="note" name="note" class="materialize-textarea" placeholder="Ulasan singkat produk..."></textarea>
+                                        <label class="active" for="note">Keterangan</label>
+                                    </div>
                                     <div class="input-field col m9 s12 step28">
                                         <p class="mt-2 mb-2">
                                             <h6>Checklist Lampiran</h6>

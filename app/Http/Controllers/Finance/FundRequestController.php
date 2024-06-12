@@ -1009,6 +1009,7 @@ class FundRequestController extends Controller
     }
 
     public function userCreate(Request $request){
+        
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',

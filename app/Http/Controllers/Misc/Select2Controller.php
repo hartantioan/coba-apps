@@ -73,6 +73,7 @@ use App\Models\ItemSerial;
 use App\Models\Journal;
 use App\Models\Pallet;
 use App\Models\Pattern;
+use App\Models\ProductionBatch;
 use App\Models\ProductionOrder;
 use App\Models\Resource;
 use App\Models\Size;
@@ -3170,6 +3171,7 @@ class Select2Controller extends Controller {
                     'has_bom'           => $cekBom->exists() ? '1' : '',
                     'place_id'          => $request->place_id,
                     'list_warehouse'    => $row->item->warehouseList(),
+                    'list_bom'          => $row->item->listBom(),
                 ];
             }
             $response[] = [
@@ -3197,6 +3199,36 @@ class Select2Controller extends Controller {
         ->where('place_id',$place_id)
         ->where('item_id',$item_id)
         ->where('status','1')
+        ->whereNull('is_powder')
+        ->orderByDesc('id')
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' '.$d->name,
+                'warehouse_id'  => $d->warehouse_id,
+                'warehouse'     => $d->warehouse->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomByItemPowder(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+        $item_id    = $request->item_id;
+        $place_id   = $request->place_id;
+        $data = Bom::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('name','like',"%$search%");
+        })
+        ->where('place_id',$place_id)
+        ->where('item_id',$item_id)
+        ->where('status','1')
+        ->whereNotNull('is_powder')
         ->orderByDesc('id')
         ->get();
 
@@ -3930,8 +3962,6 @@ class Select2Controller extends Controller {
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
                 'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
-                'shift'                         => 'Tgl.Produksi : '.date('d/m/Y',strtotime($d->productionScheduleDetail->start_date)).' - '.date('d/m/Y',strtotime($d->productionScheduleDetail->end_date)).', Shift : '.$d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name,
-                'group'                         => $d->productionScheduleDetail->group,
                 'line'                          => $d->productionScheduleDetail->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
                 'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
@@ -3944,8 +3974,6 @@ class Select2Controller extends Controller {
                 'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
-                'shift_id'                      => $d->productionScheduleDetail->shift_id,
-                'shift_name'                    => $d->productionScheduleDetail->shift->code.' - '.$d->productionScheduleDetail->shift->name .'|'. $d->productionScheduleDetail->shift->time_in.' - '.$d->productionScheduleDetail->shift->time_out
             ];
         }
 
@@ -3990,6 +4018,29 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->serial_number,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionBatch(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionBatch::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%");
+                })
+                ->where('item_id',$request->item_id)
+                ->whereHas('lookable',function($query)use($search){
+                    $query->where('code', 'like', "%$search%");
+                })
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
             ];
         }
 

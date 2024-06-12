@@ -35,6 +35,7 @@ class ProductionIssueDetail extends Model
         'line_id',
         'warehouse_id',
         'area_id',
+        'production_batch_id',
     ];
 
     public function productionIssueReceive()
@@ -48,6 +49,10 @@ class ProductionIssueDetail extends Model
 
     public function itemStock(){
         return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id');
+    }
+
+    public function productionBatch(){
+        return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id');
     }
 
     public function place(){

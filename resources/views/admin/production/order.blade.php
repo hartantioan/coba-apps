@@ -122,9 +122,7 @@
                                                         <th>Item Output</th>
                                                         <th>Qty Output</th>
                                                         <th>Satuan</th>
-                                                        <th>Shift</th>
                                                         <th>Line</th>
-                                                        <th>Grup</th>
                                                         <th>Gudang</th>
                                                         <th>Status</th>
                                                         <th>By</th>
@@ -1171,11 +1169,9 @@
                 { name: 'production_schedule_detail_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'qty_output', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'unit_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'shift_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],

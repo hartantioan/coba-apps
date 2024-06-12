@@ -272,19 +272,9 @@
                                     </div>
                                     <div class="col m12">
                                         <div class="row">
-                                            <div class="col m6 s12">
-                                                Shift : <b id="output-shift">-</b>
-                                            </div>
-                                            <div class="col m3 s12">
-                                                Grup : <b id="output-group">-</b>
-                                            </div>
-                                            <div class="col m3 s12">
+                                            <div class="col m4 s12">
                                                 Line : <b id="output-line">-</b>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col m12 mt-1">
-                                        <div class="row">
                                             <div class="col m4 s12">
                                                 Target Item SFG/FG : <b id="output-fg">-</b>
                                             </div>
@@ -324,19 +314,20 @@
                                                             <th class="center">Nominal Real</th>
                                                             <th class="center">Total Real</th>
                                                             <th class="center">Plant & Gudang</th>
+                                                            <th class="center">Batch</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="9">
+                                                            <td class="center-align" colspan="10">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="9">
+                                                            <th colspan="10">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -722,11 +713,11 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#output-shift,#output-line,#output-group,#output-fg,#output-qty').text('-');
+                $('#output-line,#output-fg,#output-qty').text('-');
                 $('#production_order_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="10">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1074,7 +1065,7 @@
                 $('.row_item_issue[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="10">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1221,8 +1212,6 @@
                             $('#rowQty' + count).trigger('keyup');
                             no_issue++;
                         });
-                        $('#output-shift').empty().text(datakuy.shift);
-                        $('#output-group').empty().text(datakuy.group);
                         $('#output-line').empty().text(datakuy.line);
                         $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
                         $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
@@ -1240,10 +1229,10 @@
                 }
             });
         }else{
-            $('#output-shift,#output-line,#output-group,#output-fg,#output-qty').text('-');
+            $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item-issue').empty().append(`
                 <tr id="last-row-item-issue">
-                    <td class="center-align" colspan="9">
+                    <td class="center-align" colspan="10">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>

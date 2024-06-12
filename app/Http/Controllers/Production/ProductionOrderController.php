@@ -198,9 +198,7 @@ class ProductionOrderController extends Controller
                     $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
                     CustomHelper::formatConditionalQty($val->productionScheduleDetail->qty),
                     $val->productionScheduleDetail->item->uomUnit->code,
-                    $val->productionScheduleDetail->shift->code.' - '.$val->productionScheduleDetail->shift->name,
                     $val->productionScheduleDetail->line->code,
-                    $val->productionScheduleDetail->group,
                     $val->productionScheduleDetail->warehouse->name,
                     $val->status(),
                     (

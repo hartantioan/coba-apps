@@ -389,6 +389,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_serial', [Select2Controller::class, 'itemSerial']);
                 Route::get('item_serial_return_po', [Select2Controller::class, 'itemSerialReturnPo']);
                 Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
+                Route::get('bom_by_item_powder', [Select2Controller::class, 'bomByItemPowder']);
+                Route::get('production_batch', [Select2Controller::class, 'productionBatch']);
             });
 
             Route::prefix('dashboard')->group(function () {

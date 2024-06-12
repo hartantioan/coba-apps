@@ -217,19 +217,20 @@
                                                         <th class="center">Total</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">Deskripsi</th>
+                                                        <th class="center">Issue Method</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-detail0">
                                                     <tr id="empty-row-detail0">
-                                                        <td colspan="9" class="center">
+                                                        <td colspan="10" class="center">
                                                             <i>Silahkan tambahkan item / resource...</i>
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colspan="9" class="center-align">
+                                                        <td colspan="10" class="center-align">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','0')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Bahan
                                                             </a>
@@ -364,7 +365,7 @@
         if($('#body-detail' + head).children().length == 0){
             $('#body-detail' + head).append(`
                 <tr id="empty-row-detail` + head + `">
-                    <td colspan="9" class="center">
+                    <td colspan="10" class="center">
                         <i>Silahkan tambahkan item / resource...</i>
                     </td>
                 </tr>
@@ -406,19 +407,20 @@
                                 <th class="center">Total</th>
                                 <th class="center">Dist.Biaya</th>
                                 <th class="center">Deskripsi</th>
+                                <th class="center">Issue Method</th>
                                 <th class="center">Hapus</th>
                             </tr>
                         </thead>
                         <tbody id="body-detail` + count + `">
                             <tr id="empty-row-detail` + count + `">
-                                <td colspan="9" class="center">
+                                <td colspan="10" class="center">
                                     <i>Silahkan tambahkan item / resource...</i>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="9" class="center-align">
+                                <td colspan="10" class="center-align">
                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + count + `')" href="javascript:void(0);">
                                         <i class="material-icons left">add</i> Bahan
                                     </a>
@@ -500,6 +502,12 @@
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_issue_method` + count + `" name="arr_issue_method[]">
+                        <option value="1">MANUAL</option>
+                        <option value="2">BACKFLUSH</option>
+                    </select>    
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);" onclick="deleteDetail('` + count + `','` + id + `')">
@@ -825,6 +833,7 @@
                                             <th class="center">Total</th>
                                             <th class="center">Dist.Biaya</th>
                                             <th class="center">Deskripsi</th>
+                                            <th class="center">Issue Method</th>
                                             <th class="center">Hapus</th>
                                         </tr>
                                     </thead>
@@ -834,7 +843,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="9" class="center-align">
+                                            <td colspan="10" class="center-align">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + val.code + `')" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Bahan
                                                 </a>
@@ -879,6 +888,12 @@
                                 <td>
                                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + value.description + `">
                                 </td>
+                                <td>
+                                    <select class="browser-default" id="arr_issue_method` + count + `" name="arr_issue_method[]">
+                                        <option value="1">MANUAL</option>
+                                        <option value="2">BACKFLUSH</option>
+                                    </select>    
+                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);" onclick="deleteDetail('` + count + `','` + val.code + `')">
                                         <i class="material-icons">delete</i>
@@ -899,6 +914,7 @@
                                 <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
                             `);
                         }
+                        $('#arr_issue_method' + count).val(value.issue_method);
                         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                     });
                 });

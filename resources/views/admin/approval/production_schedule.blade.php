@@ -223,18 +223,16 @@
             <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="16" class="center-align">Daftar Jadwal Produksi</th>
+                        <th colspan="14" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">Proses</th>
                         <th class="center-align">No.</th>
-                        <th class="center-align" style="min-width:150px !important;">Shift</th>
                         <th class="center-align" style="min-width:150px !important;">Kode Item</th>
                         <th class="center-align" style="min-width:150px !important;">Nama Item</th>
                         <th class="center-align" style="min-width:150px !important;">Kode BOM</th>
                         <th class="center-align" style="min-width:150px !important;">Qty</th>
                         <th class="center-align" style="min-width:150px !important;">Satuan UoM</th>
-                        <th class="center-align" style="min-width:150px !important;">Grup</th>
                         <th class="center-align" style="min-width:150px !important;">Line</th>
                         <th class="center-align" style="min-width:150px !important;">Gudang</th>
                         <th class="center-align" style="min-width:150px !important;">Tgl.Mulai</th>
@@ -245,7 +243,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->productionScheduleDetail as $key => $row)
+                    @foreach($data->productionScheduleDetail()->orderBy('id')->get() as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">
                             @if ($row->status == '2')
@@ -258,14 +256,12 @@
                             @endif
                         </td>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td>{{ $row->shift->code.' - '.$row->shift->name }}</td>
                         <td>{{ $row->item->code }}</td>
                         <td>{{ $row->item->name }}</td>
                         <td>{{ $row->bom->code.' - '.$row->bom->name }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ $row->line->code }}</td>
-                        <td class="center-align">{{ $row->group }}</td>
                         <td class="center-align">{{ $row->warehouse->code }}</td>
                         <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->start_date)) }}</td>
                         <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->end_date)) }}</td>
@@ -274,7 +270,7 @@
                         <td class="center-align">{{ $row->type() }}</td>
                     </tr>
                     <tr>
-                        <td colspan="14">Keterangan : {{ $row->note }}</td>
+                        <td colspan="12">Keterangan : {{ $row->note }}</td>
                     </tr>
                     @endforeach
                 </tbody>

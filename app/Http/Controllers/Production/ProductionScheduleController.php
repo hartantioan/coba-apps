@@ -255,7 +255,7 @@ class ProductionScheduleController extends Controller
             'arr_bom'                   => 'required|array',
             'arr_start_date'            => 'required|array',
             'arr_end_date'              => 'required|array',
-            'arr_shift'                 => 'required|array',
+            'arr_detail_id'             => 'required|array',
         ], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -274,8 +274,8 @@ class ProductionScheduleController extends Controller
             'arr_start_date.array'              => 'Tgl mulai harus array.',
             'arr_end_date.required'             => 'Tgl selesai tidak boleh kosong.',
             'arr_end_date.array'                => 'Tgl selesai harus array.',
-            'arr_shift.required'                => 'Shift tidak boleh kosong.',
-            'arr_shift.array'                   => 'Shift harus array.',
+            'arr_detail_id.required'            => 'Detail id tidak boleh kosong.',
+            'arr_detail_id.array'               => 'Detail id harus array.',
         ]);
 
         if($validation->fails()) {
@@ -398,14 +398,13 @@ class ProductionScheduleController extends Controller
                         ]);
                     }
 
-                    foreach($request->arr_shift as $key => $row){
+                    foreach($request->arr_detail_id as $key => $row){
                         ProductionScheduleDetail::create([
                             'production_schedule_id'        => $query->id,
-                            'shift_id'                      => $row,
+                            'marketing_order_plan_detail_id'=> $row,
                             'item_id'                       => $request->arr_item_detail_id[$key],
                             'bom_id'                        => $request->arr_bom[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_detail_qty[$key])),
-                            'group'                         => $request->arr_group[$key],
                             'line_id'                       => $request->arr_line[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
                             'start_date'                    => $request->arr_start_date[$key],
@@ -449,12 +448,34 @@ class ProductionScheduleController extends Controller
         $po['code_place_id'] = substr($po->code,7,2);
 
         $arr = [];
-        $arrDetail = [];
-        
+
         $composition = [];
 
         foreach($po->productionScheduleTarget as $row){
             $cekBom = $row->marketingOrderPlanDetail->item->bomPlace($po->place_id);
+
+            $arrDetail = [];
+
+            foreach($po->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row->marketing_order_plan_detail_id)->orderBy('id')->get() as $rowdetail){
+                $arrDetail[] = [
+                    'mopd_id'           => $rowdetail->marketing_order_plan_detail_id,
+                    'start_date'        => $rowdetail->start_date,
+                    'end_date'          => $rowdetail->end_date,
+                    'bom_id'            => $rowdetail->bom_id ?? '',
+                    'bom_code'          => $rowdetail->bom->code.' - '.$rowdetail->bom->name,
+                    'item_id'           => $rowdetail->item_id,
+                    'item_code'         => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                    'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
+                    'uom'               => $rowdetail->item->uomUnit->code,
+                    'warehouse_id'      => $rowdetail->warehouse_id,
+                    'warehouse_name'    => $rowdetail->warehouse->name,
+                    'note'              => $rowdetail->note ?? '',
+                    'list_warehouse'    => $rowdetail->item->warehouseList(),
+                    'line_id'           => $rowdetail->line_id,
+                    'type'              => $rowdetail->type == '1' ? 'normal' : 'powder',
+                ];
+            }
+
             $arr[] = [
                 'id'                => $row->marketingOrderPlanDetail->marketing_order_plan_id,
                 'mop_code'          => $row->marketingOrderPlanDetail->marketingOrderPlan->code,
@@ -468,34 +489,11 @@ class ProductionScheduleController extends Controller
                 'note'              => $row->marketingOrderPlanDetail->note ? $row->marketingOrderPlanDetail->note : '',
                 'has_bom'           => $cekBom->exists() ? '1' : '',
                 'place_id'          => $po->place_id,
-            ];
-        }
-
-        foreach($po->productionScheduleDetail as $row){
-            $arrDetail[] = [
-                'start_date'        => $row->start_date,
-                'end_date'          => $row->end_date,
-                'bom_id'            => $row->bom_id ?? '',
-                'bom_code'          => $row->bom->code.' - '.$row->bom->name,
-                'shift_id'          => $row->shift_id ?? '',
-                'shift_code'        => $row->shift->code.' - '.$row->shift->name,
-                'item_id'           => $row->item_id,
-                'item_code'         => $row->item->code.' - '.$row->item->name,
-                'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                'uom'               => $row->item->uomUnit->code,
-                'group'             => $row->group,
-                'warehouse_id'      => $row->warehouse_id,
-                'warehouse_name'    => $row->warehouse->name,
-                'note'              => $row->note ?? '',
-                'place_id'          => $po->place_id,
-                'list_warehouse'    => $row->item->warehouseList(),
-                'line_id'           => $row->line_id,
-                'type'              => $row->type == '1' ? 'normal' : 'powder',
+                'details'           => $arrDetail,
             ];
         }
 
         $po['targets'] = $arr;
-        $po['details'] = $arrDetail;
         $po['compositions'] = $composition;
         				
 		return response()->json($po);
@@ -546,6 +544,8 @@ class ProductionScheduleController extends Controller
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
+
+        $arrMop = [];
         
         foreach($data->productionScheduleTarget as $key => $row){
             $string .= '<tr>
@@ -558,6 +558,10 @@ class ProductionScheduleController extends Controller
                 <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)).'</td>
                 <td class="">'.$row->marketingOrderPlanDetail->note.'</td>
             </tr>';
+            $arrMop[] = [
+                'item_name' => $row->marketingOrderPlanDetail->item->code.' - '.$row->marketingOrderPlanDetail->item->name,
+                'mopd_id'   => $row->marketing_order_plan_detail_id,
+            ];
         }
         
         $string .= '</tbody></table></div>';
@@ -565,60 +569,78 @@ class ProductionScheduleController extends Controller
         $string .= '<div class="col s12 mt-1" style="overflow:auto;width:100% !important;"><table style="min-width:1800px;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="13">Daftar Shift & Target Produksi</th>
+                                <th colspan="3">Daftar BOM & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Status Proses</th>
-                                <th class="center-align">Status Approval</th>
-                                <th class="center-align">NO PDO</th>
-                                <th class="center-align">Shift</th>
-                                <th class="center-align">Kode Item</th>
-                                <th class="center-align">Nama Item</th>
-                                <th class="center-align">Kode BOM</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan UoM</th>
-                                <th class="center-align">Grup</th>
-                                <th class="center-align">Line</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Tgl.Mulai</th>
-                                <th class="center-align">Tgl.Selesai</th>
-                                <th class="center-align">Tipe</th>
+                                <th style="min-width:300px !important;">Item Target</th>
+                                <th style="min-width:150px !important;">Informasi Jadwal & BOM</th>
                             </tr>
                         </thead><tbody>';
 
-        foreach($data->productionScheduleDetail as $key => $row){
-            $option = '-';
-            if($row->status == '1'){
-                $option = '<select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($row->id).'`,this)" style="width:150px;">
-                <option value="" '.($row->status_process == NULL || $row->status_process == '' ? 'selected' : '').'>MENUNGGU</option>
-                <option value="1" '.($row->status_process == '1' ? 'selected' : '').'>PROSES</option>
-                <option value="2" '.($row->status_process == '2' ? 'selected' : '').' disabled>SELESAI</option>
-                <option value="3" '.($row->status_process == '3' ? 'selected' : '').' disabled>DITUNDA</option>
-            </select>';
+        foreach($arrMop as $key => $row){
+            $htmlDetail = '<table class="bordered"><thead><tr>';
+            
+            foreach($data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row['mopd_id'])->get() as $keydetail => $rowdetail){
+                $htmlDetail .= '<th class="center-align">Status Proses</th>
+                    <th class="center-align">Status Approval</th>
+                    <th class="center-align">No. PDO</th>
+                    <th class="center-align">Kode Item</th>
+                    <th class="center-align">Nama Item</th>
+                    <th class="center-align">Kode BOM</th>
+                    <th class="center-align">Qty</th>
+                    <th class="center-align">Satuan UoM</th>
+                    <th class="center-align">Line</th>
+                    <th class="center-align">Gudang</th>
+                    <th class="center-align">Tgl.Mulai</th>
+                    <th class="center-align">Tgl.Selesai</th>
+                    <th class="center-align">Tipe</th>
+                    <th class="center-align">Keterangan</th>
+                ';
             }
+            
+            $htmlDetail .= '</tr></thead><tbody><tr>';
+
+            foreach($data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row['mopd_id'])->orderBy('id')->get() as $keydetail => $rowdetail){
+                $option = '-';
+                if($rowdetail->status == '1'){
+                    $option = '<select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($rowdetail->id).'`,this)" style="width:150px;">
+                    <option value="" '.($rowdetail->status_process == NULL || $rowdetail->status_process == '' ? 'selected' : '').'>MENUNGGU</option>
+                    <option value="1" '.($rowdetail->status_process == '1' ? 'selected' : '').'>PROSES</option>
+                    <option value="2" '.($rowdetail->status_process == '2' ? 'selected' : '').' disabled>SELESAI</option>
+                    <option value="3" '.($rowdetail->status_process == '3' ? 'selected' : '').' disabled>DITUNDA</option>
+                </select>';
+                }
+
+                $randomColor = CustomHelper::randomColor(150,255);
+                
+                $htmlDetail .= '
+                    <td class="center-align" style="min-width:150px !important;background-color:'.$randomColor.';">
+                        '.$option.'
+                    </td>
+                    <td class="center-align" style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->status().'</td>           
+                    <td class="center-align" style="min-width:150px !important;background-color:'.$randomColor.';" id="pod-'.CustomHelper::encrypt($rowdetail->id).'">'.($rowdetail->productionOrder()->exists() ? $rowdetail->productionOrder->code : '-').'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->code.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->name.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->bom->code.' - '.$rowdetail->bom->name.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->line->code.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->warehouse->code.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.date('d/m/Y H:i:s',strtotime($rowdetail->start_date)).'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.date('d/m/Y H:i:s',strtotime($rowdetail->end_date)).'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->type().'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->note.'</td>';
+            }
+
+            $htmlDetail .= '</tr></tbody></table>';
+
             $string .= '<tr>
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
-                <td class="center-align">
-                    '.$option.'
+                <td class="">
+                    '.$row['item_name'].'
                 </td>
-                <td class="center-align">'.$row->status().'</td>           
-                <td class="center-align" id="pod-'.CustomHelper::encrypt($row->id).'">'.($row->productionOrder()->exists() ? $row->productionOrder->code : '-').'</td>
-                <td>'.$row->shift->code.' - '.$row->shift->name.'</td>
-                <td>'.$row->item->code.'</td>
-                <td>'.$row->item->name.'</td>
-                <td>'.$row->bom->code.' - '.$row->bom->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td class="center-align">'.$row->group.'</td>
-                <td class="center-align">'.$row->line->code.'</td>
-                <td class="center-align">'.$row->warehouse->code.'</td>
-                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->start_date)).'</td>
-                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->end_date)).'</td>
-                <td class="center-align">'.$row->type().'</td>
-            </tr>
-            <tr>
-                <td colspan="13">Keterangan : '.$row->note.'</td>
+                <td>'.$htmlDetail.'</td>
             </tr>';
         }
 
@@ -684,7 +706,7 @@ class ProductionScheduleController extends Controller
                 
         if($pr){
             
-            $pdf = PrintHelper::print($pr,'Jadwal Produksi','a5','landscape','admin.print.production.schedule_individual');
+            $pdf = PrintHelper::print($pr,'Jadwal Produksi','a4','landscape','admin.print.production.schedule_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             

@@ -111,7 +111,7 @@
                 }
 
                 .invoice-info {
-                    font-size:12px !important;
+                    font-size:14px !important;
                 }
 
                 .modal {
@@ -179,15 +179,15 @@
                         
                     </td>
                     
-                    <td width="34%" class="right-align">
+                    <td width="34%" align="right">
                         
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0px;">
                        
                     </td>
                 </tr>
                 
             </table>
-            <hr style="border-top: 3px solid black; margin-top:-2%">
+            <hr style="border-top: 3px solid black; margin-top:-1.5%">
         </header>
         <main>
             <div class="card">
@@ -219,17 +219,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Depart.
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->user->position()->exists() ? $data->user->position->division->department->name : '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td width="29%" style="vertical-align: top;">
                                             Plant
                                         </td>
@@ -245,12 +234,12 @@
                             <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:80%;" height="5%" />
+                                        <td align="right">
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:50%;" height="5%" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td align="center">
+                                        <td align="right">
                                             <h3>{{ $data->code }}</h3>
                                         </td>
                                     </tr>
@@ -299,16 +288,14 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="9" class="center-align">Daftar Shift & Target Produksi</th>
+                                <th colspan="8" class="center-align">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Shift</th>
                                 <th align="center">Item</th>
                                 <th align="center">Qty</th>
                                 <th align="center">Satuan</th>
                                 <th align="center">Line</th>
-                                <th align="center">Grup</th>
                                 <th align="center">Gudang</th>
                                 <th align="center">Tgl.Mulai</th>
                                 <th align="center">Tgl.Selesai</th>
@@ -318,18 +305,16 @@
                             @foreach($data->productionScheduleDetail as $key => $row)
                             <tr>
                                 <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                <td align="center">{{ $row->shift->code }}</td>
                                 <td align="center">{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->line->code }}</td>
-                                <td align="center">'.$row->group.'</td>
-                                <td align="center">'.$row->warehouse->code.'</td>
-                                <td align="center">'.date('d/m/Y H:i:s',strtotime($row->start_date)).'</td>
-                                <td align="center">'.date('d/m/Y H:i:s',strtotime($row->end_date)).'</td>
+                                <td align="center">{{ $row->warehouse->code }}</td>
+                                <td align="center">{{ date('d/m/Y H:i:s',strtotime($row->start_date)) }}</td>
+                                <td align="center">{{ date('d/m/Y H:i:s',strtotime($row->end_date)) }}</td>
                             </tr>
                             <tr>
-                                <td colspan="9">Keterangan : {{ $row->note }}</td>
+                                <td colspan="7">Keterangan : {{ $row->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

@@ -155,6 +155,7 @@ class BomController extends Controller
             'arr_nominal'               => 'required|array',
             'arr_total'                 => 'required|array',
             'arr_alternative'           => 'required|array',
+            'arr_issue_method'          => 'required|array',
         ], [
             'code.required'                 => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai',
@@ -177,6 +178,8 @@ class BomController extends Controller
             'arr_total.array'               => 'Total haruslah dalam bentuk array',
             'arr_alternative.required'      => 'Alternatif tidak boleh kosong',
             'arr_alternative.array'         => 'Alternatif haruslah dalam bentuk array',
+            'arr_issue_method.required'     => 'Issue method tidak boleh kosong',
+            'arr_issue_method.array'        => 'Issue method haruslah dalam bentuk array',
         ]);
 
         if($validation->fails()) {
@@ -247,7 +250,8 @@ class BomController extends Controller
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$keydetail])),
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$keydetail])),
                                 'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$keydetail])),
-                                'description'           => $request->arr_description[$keydetail]
+                                'description'           => $request->arr_description[$keydetail],
+                                'issue_method'          => $request->arr_issue_method[$keydetail],
                             ]);
                         }
                     }
@@ -347,6 +351,7 @@ class BomController extends Controller
                     'description'               => $m->description,
                     'cost_distribution_id'      => $m->cost_distribution_id ?? '',
                     'cost_distribution_name'    => $m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '',
+                    'issue_method'              => $m->issue_method ?? '',
                 ];
             }
             $row['code'] = strtoupper(Str::random(10));

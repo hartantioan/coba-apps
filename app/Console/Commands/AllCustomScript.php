@@ -78,8 +78,8 @@ class AllCustomScript extends Command
                     ->withProperties($query)
                     ->log('Add lock period by system.');
             }else{
-                $dataspecial = User::whereNotNull('is_special_lock_user')->pluck('id');
-                $dataLock->lockPeriodDetail()->whereNotIn('user_id',$dataspecial)->where('type','1')->delete();
+                $dataspecial = User::whereNotNull('is_special_lock_user')->where('type','1')->pluck('id');
+                $dataLock->lockPeriodDetail()->whereNotIn('user_id',$dataspecial)->delete();
                 foreach($dataspecial as $row){
                     $cekAvailable = $dataLock->lockPeriodDetail()->where('user_id',$row)->first();
                     if(!$cekAvailable){

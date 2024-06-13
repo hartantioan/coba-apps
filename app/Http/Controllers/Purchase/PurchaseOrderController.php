@@ -702,10 +702,12 @@ class PurchaseOrderController extends Controller
             $passedMustPr = true;
             $passedSecretItem = true;
             if($request->arr_price){
+                $total = 0;
                 foreach($request->arr_price as $row){
-                    if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
-                        $passedZero = false;
-                    }
+                    $total += floatval(str_replace(',','.',str_replace('.','',$row)));
+                }
+                if($total == 0){
+                    $passedZero = false;
                 }
 
                 if(!$passedZero){

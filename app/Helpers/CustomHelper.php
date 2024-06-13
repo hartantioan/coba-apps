@@ -68,6 +68,7 @@ use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\MaterialRequest;
+use App\Models\ProductionIssue;
 use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
@@ -4063,8 +4064,8 @@ class CustomHelper {
 
 			self::updateEmployeeTransfer($transfer);
 
-		}elseif($table_name == 'production_issue_receives'){
-			$pir = ProductionIssueReceive::find($table_id);
+		}elseif($table_name == 'production_issues'){
+			$pir = ProductionIssue::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -4077,7 +4078,7 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
-			foreach($pir->productionIssueReceiveDetail()->where('type','2')->get() as $row){
+			foreach($pir->productionIssueDetail()->get() as $row){
 				if($row->bom_id){
 					$total = 0;
 
@@ -4191,6 +4192,8 @@ class CustomHelper {
 			$pir->update([
 				'status'	=> '3'
 			]);
+		}elseif($table_name == 'production_receives'){
+
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 
@@ -4221,6 +4224,7 @@ class CustomHelper {
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
+							'note'			=> $ar->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4228,6 +4232,7 @@ class CustomHelper {
 							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
+							'note'			=> $ar->code,
 						]);
 					}
 					if($row->type == '2'){
@@ -4239,6 +4244,7 @@ class CustomHelper {
 								'account_id'	=> $coauangmukapembelian->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 								'nominal'		=> $nominal,
 								'nominal_fc'	=> 0,
+								'note'			=> $ar->code,
 							]);
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
@@ -4246,6 +4252,7 @@ class CustomHelper {
 								'type'			=> $row->nominal > 0 ? '2' : '1',
 								'nominal'		=> $nominal,
 								'nominal_fc'	=> 0,
+								'note'			=> $ar->code,
 							]);
 						}
 						JournalDetail::create([
@@ -4255,6 +4262,7 @@ class CustomHelper {
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
+							'note'			=> $ar->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4262,6 +4270,7 @@ class CustomHelper {
 							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
+							'note'			=> $ar->code,
 						]);
 					}
 				}

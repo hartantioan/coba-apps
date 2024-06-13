@@ -199,7 +199,7 @@
                                     <select class="form-control" id="document_status" name="document_status">
                                         <option value="">~Kosong~</option>
                                         <option value="2">Lengkap</option>
-                                        <option value="3">Tidak Lengkap</option>
+                                        <option value="3">Tidak Lengkap(BS)</option>
                                     </select>
                                     <label class="" for="type">Status Dokumen</label>
                                 </div>

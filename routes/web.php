@@ -169,6 +169,7 @@ use App\Http\Controllers\Accounting\JournalController;
 use App\Http\Controllers\Accounting\CapitalizationController;
 use App\Http\Controllers\Accounting\RetirementController;
 use App\Http\Controllers\Accounting\DocumentTaxController;
+use App\Http\Controllers\Accounting\DocumentTaxHandoverController;
 use App\Http\Controllers\Accounting\DepreciationController;
 use App\Http\Controllers\Accounting\LedgerController;
 use App\Http\Controllers\Accounting\CashBankController;
@@ -391,6 +392,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
                 Route::get('bom_by_item_powder', [Select2Controller::class, 'bomByItemPowder']);
                 Route::get('production_batch', [Select2Controller::class, 'productionBatch']);
+                Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -2542,7 +2544,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[OutgoingPaymentController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[OutgoingPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::get('export',[OutgoingPaymentController::class, 'export']);
-                    Route::post('done',[OutgoingPaymentController::class, 'done'])->middleware('operation.access:outgoing_payment,update');
+                   
                     Route::get('view_journal/{id}',[OutgoingPaymentController::class, 'viewJournal'])->middleware('operation.access:outgoing_payment,journal');
                     Route::get('viewstructuretree',[OutgoingPaymentController::class, 'viewStructureTree']);
                     Route::post('send_used_data',[OutgoingPaymentController::class, 'sendUsedData']);
@@ -2687,6 +2689,23 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[DocumentTaxController::class, 'rowDetail']);
                     Route::post('store_w_barcode', [DocumentTaxController::class, 'store_w_barcode'])->middleware('operation.access:document_tax,update');
                     Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');
+                });
+
+                Route::prefix('document_tax_handover')->middleware('operation.access:document_tax_handover,view')->group(function () {
+                    Route::get('/', [DocumentTaxHandoverController::class, 'index']);
+                    Route::get('datatable', [DocumentTaxHandoverController::class, 'datatable']);
+                    Route::post('show', [DocumentTaxHandoverController::class, 'show']);
+                    Route::post('print', [DocumentTaxHandoverController::class, 'print']);
+                    Route::get('export', [DocumentTaxHandoverController::class, 'export']);
+                    Route::get('export_data_table', [DocumentTaxHandoverController::class, 'exportDataTable']);
+                    Route::get('row_detail',[DocumentTaxHandoverController::class, 'rowDetail']);
+                    Route::post('get_code', [DocumentTaxHandoverController::class, 'getCode']);
+                    Route::post('create',[DocumentTaxHandoverController::class, 'create'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('confirm_scan',[DocumentTaxHandoverController::class, 'confirmScan'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('void_status', [DocumentTaxHandoverController::class, 'voidStatus'])->middleware('operation.access:document_tax_handover,void');
+                    Route::post('get_tax_for_handover_tax', [DocumentTaxHandoverController::class, 'getTaxforHandoverTax']);
+                    Route::post('store_w_barcode', [DocumentTaxHandoverController::class, 'store_w_barcode'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('destroy', [DocumentTaxHandoverController::class, 'destroy'])->middleware('operation.access:document_tax_handover,delete');
                 });
                 
                 Route::prefix('journal')->middleware(['operation.access:journal,view','lockacc'])->group(function () {

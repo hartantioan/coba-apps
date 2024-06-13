@@ -452,7 +452,7 @@
                 </div>
             </div>
             @if($data->type == '1' && $data->document_status == '3' && $data->account->type == '1')
-                <div class="part2" style="margin-top:20%">
+                <div class="part2" style="margin-top:1%">
                     <table border="0" width="100%" style="font-size:1em" class="tb-header">
                         <tr>
                             <td width="83%" class="left-align" >

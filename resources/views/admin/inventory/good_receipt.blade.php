@@ -865,7 +865,8 @@
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
-            
+            let id = $(this).data('detail');
+            $('.row_item_serial[data-detail="' + id + '"]').remove();
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="empty-item">
@@ -1599,7 +1600,7 @@
                                         <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                         <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                         <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
                                                 <i class="material-icons">delete</i>
                                             </a>
                                         </td>
@@ -1695,7 +1696,7 @@
                                     columns += (i > val.qty_serial ? `` : `<input name="arr_serial[]" class="browser-default" type="text" placeholder="Nomor serial item..." value="" style="width:150px;" required data-item="` + val.item_id + `" data-po="`+ val.purchase_order_detail_id +`">`);
                                 }
                                 $('#body-item-serial').append(`
-                                    <tr class="row_item_serial" data-po="` + response.id + `">
+                                    <tr class="row_item_serial" data-po="` + response.id + `" data-detail="` + val.purchase_order_detail_id + `">
                                         <td style="width:200px !important;">
                                             ` + val.item_name + `
                                         </td>
@@ -1850,7 +1851,7 @@
                                 <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
                                 <input type="hidden" name="arr_warehouse[]" id="arr_warehouse` + count + `" value="` + val.warehouse_id + `">
                                 <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-detail="` + val.purchase_order_detail_id + `">
                                         <i class="material-icons">delete</i>
                                     </a>
                                 </td>
@@ -1958,7 +1959,7 @@
                             columns += `<input name="arr_serial[]" class="browser-default" type="text" placeholder="Nomor serial item..." value="` + value + `" style="width:150px;" required data-item="` + val.item_id + `" data-po="`+ val.purchase_order_detail_id +`">`;
                         });
                         $('#body-item-serial').append(`
-                            <tr class="row_item_serial" data-po="` + val.purchase_order_id + `">
+                            <tr class="row_item_serial" data-po="` + val.purchase_order_id + `" data-detail="` + val.purchase_order_detail_id + `">
                                 <td style="width:200px !important;">
                                     ` + val.item_name + `
                                 </td>

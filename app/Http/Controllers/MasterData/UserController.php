@@ -633,7 +633,7 @@ class UserController extends Controller
                     $query->employee_type   = $request->type == '1' ? $request->employee_type : NULL;
                     $query->is_ar_invoice   = $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL;
                     $query->last_change_password =  $request->password ? date('Y-m-d H:i:s') : $query->last_change_password;
-                    $query->is_special_lock_user = $request->is_special_lock_user ?? NULL;
+                    $query->is_special_lock_user = $request->is_special_lock_user && $request->type == '1' ? $request->is_special_lock_user : NULL;
                     $query->save();
 
                     /* DB::commit();
@@ -682,7 +682,7 @@ class UserController extends Controller
                         'employee_type'         => $request->type == '1' ? $request->employee_type : NULL,
                         'is_ar_invoice'         => $request->type == '2' ? ($request->is_ar_invoice ? $request->is_ar_invoice : NULL) : NULL,
                         // 'last_change_password'  => date('Y-m-d H:i:s'),
-                        'is_special_lock_user'  => $request->is_special_lock_user ?? NULL,
+                        'is_special_lock_user'  => $request->is_special_lock_user && $request->type == '1' ? $request->is_special_lock_user : NULL,
                     ]);
                     if($request->type == 1){
                         $query_salary_component = SalaryComponent::where('status',1)->get();

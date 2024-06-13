@@ -713,7 +713,7 @@ class PurchaseOrderController extends Controller
                 if(!$passedZero){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Harga item tidak boleh 0.'
+                        'message' => 'Harga total tidak boleh 0.'
                     ]);
                 }
             }

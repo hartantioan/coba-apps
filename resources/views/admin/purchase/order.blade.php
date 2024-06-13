@@ -3081,14 +3081,14 @@
                     rownominal = rownominal / (1 + (percent_tax / 100));
                 }
                 rownominal = Math.round(rownominal * 100) / 100;
-                rowtax = rownominal * (percent_tax / 100);
+                rowtax = Math.floor(rownominal * (percent_tax / 100));
             }
 
             rownominal = Math.round(rownominal * 100) / 100;
 
             if($('select[name^="arr_wtax"]').eq(index).val() !== '0'){
                 let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
-                rowwtax = rownominal * (percent_wtax / 100);
+                rowwtax = Math.floor(rownominal * (percent_wtax / 100));
             }
 
             $('input[name^="arr_nominal_total"]').eq(index).val(

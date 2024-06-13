@@ -235,9 +235,6 @@ class ApprovalController extends Controller
             'code',
             'date_request',
             'user_id',
-            'coderef',
-            'note_ref',
-            'status',
         ];
 
         $start  = $request->start;

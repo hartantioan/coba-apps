@@ -352,7 +352,7 @@
                 { name: 'user', orderable: false, className: '' },
                 { name: 'code_ref', orderable: false, className: 'center-align' },
                 { name: 'note_ref', orderable: false, className: '' },
-                { name: 'status', searchable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

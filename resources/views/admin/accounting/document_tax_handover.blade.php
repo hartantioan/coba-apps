@@ -393,7 +393,7 @@
                 $('#table_item_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_item_length"]').addClass('browser-default');
 
-                getTaxDocument()
+                getTaxDocument();
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){

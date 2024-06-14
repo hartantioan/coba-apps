@@ -32,11 +32,23 @@ class DocumentTax extends Model
         'approval_status',
         'tax_status',
         'reference',
-        'url'
+        'url',
+        'user_id',
+        
     ];
 
     public function documentTaxDetail()
     {
         return $this->hasMany('App\Models\DocumentTaxDetail');
     }
+
+    public function documentTaxHandoverDetail()
+    {
+        return $this->hasOne('App\Models\DocumentTaxHandoverDetail')->whereIn('status',['1','2']);
+    }
+
+    public function user(){
+        return $this->belongsTo('App\Models\User','user_id','id');
+    }
+
 }

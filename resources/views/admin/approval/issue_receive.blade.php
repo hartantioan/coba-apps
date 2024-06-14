@@ -125,12 +125,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">{{ $title }} # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.issue_receive') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.issue_receive') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -150,34 +150,34 @@
         <div class="row">
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    INFO UTAMA
+                    {{ __('translations.primary_info') }}
                 </div>
                 <div class="col s4">
-                    Nama
+                    {{ __('translations.name') }}
                 </div>
                 <div class="col s8">
                     {{ $data->user->name }}
                 </div>
                 <div class="col s4">
-                    Plant
+                    {{ __('translations.plant') }}
                 </div>
                 <div class="col s8">
                     {{ $data->place->code }}
                 </div>
                 <div class="col s4">
-                    No.PROD
+                    {{ __('translations.production_code') }}
                 </div>
                 <div class="col s8">
                     {{ $data->productionOrder->code }}
                 </div>
                 <div class="col s4">
-                    No.Jadwal
+                    {{ __('translations.schedule_code') }}
                 </div>
                 <div class="col s8">
                     {{ $data->productionOrder->productionSchedule->code }}
                 </div>
                 <div class="col s4">
-                    Shift
+                    {{ __('translations.shift') }}
                 </div>
                 <div class="col s8">
                     {{ $data->shift->code.' - '.$data->shift->name }}
@@ -185,40 +185,40 @@
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    LAIN-LAIN
+                    {{ __('translations.others') }}
                 </div>
                 <div class="col s4">
-                    Mulai Proses
+                    {{ __('translations.start_process') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y H:i',strtotime($data->start_process_time)) }}
                 </div>
                 <div class="col s4">
-                    Selesai Proses
+                    {{ __('translations.end_process') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y H:i',strtotime($data->end_process_time)) }}
                 </div>
                 <div class="col s4">
-                    Line
+                    {{ __('translations.line') }}
                 </div>
                 <div class="col s8">
                     {{ $data->line->code }}
                 </div>
                 <div class="col s4">
-                    Grup
+                    {{ __('translations.group') }}
                 </div>
                 <div class="col s8">
                     {{ $data->group }}
                 </div>
                 <div class="col s4">
-                    Tgl.Post
+                    {{ __('translations.post_date') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
-                    Keterangan
+                    {{ __('translations.information') }}
                 </div>
                 <div class="col s8">
                     {{ $data->note }}
@@ -233,16 +233,16 @@
                         <th colspan="10" class="center-align">Daftar Coa/Item Issue (Terpakai)</th>
                     </tr>
                     <tr>
-                        <th class="center">No.</th>
-                        <th class="center">Item/Resource</th>
-                        <th class="center">Qty Planned</th>
-                        <th class="center">Qty Real</th>
-                        <th class="center">Nominal Planned</th>
-                        <th class="center">Nominal Real</th>
-                        <th class="center">Total Planned</th>
-                        <th class="center">Total Real</th>
-                        <th class="center">Satuan UoM</th>
-                        <th class="center">Plant & Gudang</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
+                        <th class="center">{{ __('translations.item/resource') }}</th>
+                        <th class="center">{{ __('translations.qty_planned') }}</th>
+                        <th class="center">{{ __('translations.qty_real') }}</th>
+                        <th class="center">{{ __('translations.nominal_planned') }}</th>
+                        <th class="center">{{ __('translations.nominal_real') }}</th>
+                        <th class="center">{{ __('translations.total_planned') }}</th>
+                        <th class="center">{{ __('translations.total_real') }}</th>
+                        <th class="center">{{ __('translations.uom_unit') }}</th>
+                        <th class="center">{{ __('translations.plant') }} & {{ __('translations.warehouse') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -271,16 +271,16 @@
                         <th colspan="10" class="center-align">Daftar Item Receive (Diterima)</th>
                     </tr>
                     <tr>
-                        <th class="center">No.</th>
-                        <th class="center">Item</th>
-                        <th class="center">Qty Planned (Prod.)</th>
-                        <th class="center">Qty Real (Prod.)</th>
-                        <th class="center">Shading</th>
-                        <th class="center">Batch</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Line</th>
-                        <th class="center">Gudang</th>
-                        <th class="center">Area</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
+                        <th class="center">{{ __('translations.item') }}</th>
+                        <th class="center">{{ __('translations.qty_planned') }} (Prod.)</th>
+                        <th class="center">{{ __('translations.qty_real') }} (Prod.)</th>
+                        <th class="center">{{ __('translations.shading') }}</th>
+                        <th class="center">{{ __('translations.batch') }}</th>
+                        <th class="center">{{ __('translations.plant') }}</th>
+                        <th class="center">{{ __('translations.line') }}</th>
+                        <th class="center">{{ __('translations.warehouse') }}</th>
+                        <th class="center">{{ __('translations.area') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -315,7 +315,7 @@
                     @endforeach
                 </tbody>
             </table>
-            <span class="red-text">*Baris item warna merah adalah ITEM REJECT.</span>
+            <span class="red-text">*{{ __('translations.danger_issue_receive') }}.</span>
         </div>
 
         <!-- invoice subtotal -->
@@ -331,7 +331,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                     @if($data->approval())

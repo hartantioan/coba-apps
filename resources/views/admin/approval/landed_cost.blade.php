@@ -121,12 +121,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">NO # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.no') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Landed Cost</h5>
+                <h5 class="indigo-text">{{ __('translations.landed_cost') }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
@@ -147,7 +147,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Dari
+                                {{ __('translations.from') }}
                             </td>
                             <td width="60%">
                                 {{ $data->user->name }}

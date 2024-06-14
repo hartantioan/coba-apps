@@ -2701,8 +2701,10 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[DocumentTaxHandoverController::class, 'rowDetail']);
                     Route::post('get_code', [DocumentTaxHandoverController::class, 'getCode']);
                     Route::post('create',[DocumentTaxHandoverController::class, 'create'])->middleware('operation.access:document_tax_handover,update');
-                    Route::post('confirm_scan',[DocumentTaxHandoverController::class, 'confirmScan'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('confirm_scan',[DocumentTaxHandoverController::class, 'confirmScan'])->middleware('operation.access:document_tax_handover,journal');
+                    Route::post('save_detail',[DocumentTaxHandoverController::class, 'saveDetail'])->middleware('operation.access:document_tax_handover,journal');
                     Route::post('void_status', [DocumentTaxHandoverController::class, 'voidStatus'])->middleware('operation.access:document_tax_handover,void');
+                    Route::get('print_individual/{id}',[DocumentTaxHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('get_tax_for_handover_tax', [DocumentTaxHandoverController::class, 'getTaxforHandoverTax']);
                     Route::post('store_w_barcode', [DocumentTaxHandoverController::class, 'store_w_barcode'])->middleware('operation.access:document_tax_handover,update');
                     Route::post('destroy', [DocumentTaxHandoverController::class, 'destroy'])->middleware('operation.access:document_tax_handover,delete');

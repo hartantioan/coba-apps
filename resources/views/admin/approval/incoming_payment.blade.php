@@ -121,12 +121,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Penutupan BS # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.incoming_payment') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Kas/Bank Masuk</h5>
+                <h5 class="indigo-text">{{ __('translations.incoming_payment') }}</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -149,7 +149,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Nama
+                                {{ __('translations.name') }}
                             </td>
                             <td width="60%">
                                 {{ $data->user->name.' - '.$data->user->phone }}
@@ -157,7 +157,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Posisi
+                                {{ __('translations.position') }}
                             </td>
                             <td width="60%">
                                 {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
@@ -165,7 +165,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Depart.
+                                {{ __('translations.department') }}.
                             </td>
                             <td width="60%">
                                 {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
@@ -177,7 +177,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Partner Bisnis
+                                {{ __('translations.bussiness_partner') }}
                             </td>
                             <td width="60%">
                                 {{ $data->account->name.' - '.$data->account->phone }}
@@ -185,7 +185,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Kas / Bank
+                                {{ __('translations.bank') }}
                             </td>
                             <td width="60%">
                                 {{ $data->coa->name }}
@@ -197,7 +197,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Perusahaan
+                                {{ __('translations.company') }}
                             </td>
                             <td width="60%">
                                 {{ $data->company->name }}
@@ -205,7 +205,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Status
+                                {{ __('translations.status') }}
                             </td>
                             <td width="60%">
                                 {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -221,14 +221,14 @@
         <table class="bordered">
             <thead>
                 <tr>
-                    <th class="center-align">No.</th>
-                    <th class="center-align">Referensi</th>
-                    <th class="center-align">Tipe</th>
-                    <th class="center-align">Dist.Biaya</th>
-                    <th class="center-align">Total</th>
-                    <th class="center-align">Pembulatan</th>
-                    <th class="center-align">Subtotal</th>
-                    <th class="center-align">Keterangan</th>
+                    <th class="center-align">{{ __('translations.no') }}.</th>
+                    <th class="center-align">{{ __('translations.reference') }}</th>
+                    <th class="center-align">{{ __('translations.type') }}</th>
+                    <th class="center-align">{{ __('translations.cost_distribution') }}</th>
+                    <th class="center-align">{{ __('translations.total') }}</th>
+                    <th class="center-align">{{ __('translations.rounding') }}</th>
+                    <th class="center-align">{{ __('translations.subtotal') }}</th>
+                    <th class="center-align">{{ __('translations.information') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -255,13 +255,13 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        Dibuat oleh,
+                        {{ __('translations.created_by') }},
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>
                         @endif

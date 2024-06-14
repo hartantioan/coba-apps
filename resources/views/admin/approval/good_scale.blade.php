@@ -121,12 +121,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Timbangan Truk # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.good_scale') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Timbangan Truk</h5>
+                <h5 class="indigo-text">{{ __('translations.good_scale') }}</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="80%">
@@ -145,40 +145,40 @@
         <!-- invoice address and contact -->
         <div class="row invoice-info">
             <div class="col m6 s6">
-                <h6 class="invoice-from">Dari</h6>
+                <h6 class="invoice-from">{{ __('translations.from') }}</h6>
                 <div class="row">
                     <div class="col s3">
-                        Name
+                        {{ __('translations.name') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->name }}
                     </div>
                     <div class="col s3">
-                        Posisi
+                        {{ __('translations.position') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
                     </div>
                     <div class="col s3">
-                        Depart.
+                        {{ __('translations.department') }}.
                     </div>
                     <div class="col s9">
                         {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
                     </div>
                     <div class="col s3">
-                        HP
+                        {{ __('translations.phone_number') }}
                     </div>
                     <div class="col s9">
                         {{ $data->user->phone }}
                     </div>
                     <div class="col s3">
-                        No. Kendaraan
+                        {{ __('translations.license_plate') }}
                     </div>
                     <div class="col s9">
                         {{ $data->vehicle_no }}
                     </div>
                     <div class="col s3">
-                        Nama Supir
+                        {{ __('translations.driver') }}
                     </div>
                     <div class="col s9">
                         {{ $data->driver }}
@@ -189,25 +189,25 @@
                 <h6 class="invoice-from">Lain-lain</h6>
                 <div class="row">
                     <div class="col s3">
-                        Nomor S.J
+                        {{ __('translations.driver') }}
                     </div>
                     <div class="col s9">
                         {{ $data->delivery_no }}
                     </div>
                     <div class="col s3">
-                        Plant
+                        {{ __('translations.plant') }}
                     </div>
                     <div class="col s9">
                         {{ $data->place->name }}
                     </div>
                     <div class="col s3">
-                        Lampiran
+                        {{ __('translations.attachment') }}
                     </div>
                     <div class="col s9">
                         <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
                     </div>
                     <div class="col s3">
-                        Status
+                        {{ __('translations.status') }}
                     </div>
                     <div class="col s9">
                         {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -225,7 +225,7 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -233,7 +233,7 @@
                     <td class="">
                         
                         
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                        
                     </td>
                 </tr>

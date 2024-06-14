@@ -163,20 +163,29 @@ class DocumentTaxController extends Controller
         $response['data'] = [];
         if($query_data <> FALSE) {
             foreach($query_data as $val) {
-				
+                $refrence = '';
+				if($val->documentTaxHandoverDetail()->exists()){
+                    info($val->documentTaxHandoverDetail->id);
+                    $refrence = $val->documentTaxHandoverDetail->documentTaxHandover->code;
+                }else{
+                    $refrence = "belum terpakai";
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->date,
                     $val->transaction_code.$val->replace.$val->code,
+                    $val->user->name ?? '-',
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
+                    $refrence,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     $val->documentTaxDetail->first()->item ?? '-',
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
+                    
                 ];
 
             }
@@ -377,6 +386,7 @@ class DocumentTaxController extends Controller
                                 'tax_status'=> $phpDataArray['statusFaktur'],
                                 'reference'=> isset($phpDataArray['referensi'])? $phpDataArray['referensi'] : null,
                                 'url'=> $barcode,
+                                'user_id'=> session('bo_id'),
                             ]);
     
                     

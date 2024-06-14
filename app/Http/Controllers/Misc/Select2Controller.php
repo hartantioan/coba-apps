@@ -21,6 +21,7 @@ use App\Models\HardwareItemGroup;
 use App\Models\InventoryTransferOut;
 use App\Models\ItemStock;
 use App\Models\LeaveType;
+use App\Models\DocumentTax;
 use App\Models\Level;
 use App\Models\Line;
 use App\Models\MarketingOrder;
@@ -4041,6 +4042,48 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function documentTaxforHandover(Request $request)
+    {
+        info($request);
+        $response = [];
+        $search     = $request->search;
+        $tax_array = $request->tax_array;
+        $date       = $request->date;
+        $data = DocumentTax::where(function($query) use($search,$tax_array,$request){
+            $query->where(function($query) use ($search, $request) {
+                if ($search) {
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('npwp_number', 'like', "%$search%")
+                        ->orWhere('npwp_address', 'like', "%$search%")
+                        ->orWhere('npwp_name', 'like', "%$search%")
+                        ->orWhere('npwp_target', 'like', "%$search%")
+                        ->orWhere('npwp_target_name', 'like', "%$search%")
+                        ->orWhere('npwp_target_address', 'like', "%$search%")
+                        ->orWhere('transaction_code', 'like', "%$search%");
+                }
+            })->whereDoesntHave('documentTaxHandoverDetail');
+            
+            if ($request->tax_array) {
+                $query->whereNotIn('id', $tax_array);
+            }
+            
+        })
+        ->orderBy('date','DESC')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->date.'||'.$d->transaction_code.$d->code,
+                'code'              => $d->code,
+                'date'              => $d->date,
+
             ];
         }
 

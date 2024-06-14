@@ -158,6 +158,16 @@ class PurchaseInvoice extends Model
         return $this->hasMany('App\Models\PurchaseInvoiceDp');
     }
 
+    public function listUsedApdp(){
+        $arr = [];
+
+        foreach($this->purchaseInvoiceDp as $row){
+            $arr[] = $row->purchaseDownPayment->code;
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function hasPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
             $query->whereIn('status',['2','3']);

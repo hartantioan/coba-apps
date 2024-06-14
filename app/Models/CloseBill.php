@@ -82,6 +82,21 @@ class CloseBill extends Model
         return $this->hasMany('App\Models\CloseBillDetail');
     }
 
+    public function listCreq(){
+        $arr = [];
+        
+        foreach($this->closeBillDetail as $row){
+            if($row->personalCloseBill()->exists()){
+                $arr[] = $row->personalCloseBill->code;
+            }
+            if($row->outgoingPayment()->exists()){
+                $arr[] = $row->outgoingPayment->code;
+            }
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function closeBillCost()
     {
         return $this->hasMany('App\Models\CloseBillCost');

@@ -162,7 +162,18 @@ class PurchaseInvoice extends Model
         $arr = [];
 
         foreach($this->purchaseInvoiceDp as $row){
-            $arr[] = $row->purchaseDownPayment->code.' - '.date('d/m/Y',strtotime($row->purchaseDownPayment->post_date));
+            $arr[] = $row->purchaseDownPayment->code;
+        }
+
+        return implode(', ',$arr);
+    }
+
+
+    public function listUsedApdpDate(){
+        $arr = [];
+
+        foreach($this->purchaseInvoiceDp as $row){
+            $arr[] = date('d/m/Y',strtotime($row->purchaseDownPayment->post_date));
         }
 
         return implode(', ',$arr);

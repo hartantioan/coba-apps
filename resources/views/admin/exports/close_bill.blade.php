@@ -8,6 +8,7 @@
             <th>Tgl.Post</th>
             <th>Keterangan</th>
             <th>Ref.CREQ</th>
+            <th>Tgl.CREQ</th>
             <th>Status</th>
             <th>Coa</th>
             <th>Dist.Biaya</th>
@@ -35,6 +36,7 @@
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->listCreq() }}</td>
+                <td>{{ $row->listCreqDate() }}</td>
                 <td>{!! $row->status() !!}</td>
                 <td>{{ $rowdetail->coa->code.' - '.$rowdetail->coa->name }}</td>
                 <td>{{ ($rowdetail->costDistribution()->exists() ? $rowdetail->costDistribution->code.' - '.$rowdetail->costDistribution->name : '-') }}</td>

@@ -87,10 +87,25 @@ class CloseBill extends Model
         
         foreach($this->closeBillDetail as $row){
             if($row->personalCloseBill()->exists()){
-                $arr[] = $row->personalCloseBill->code.' - '.date('d/m/Y',strtotime($row->personalCloseBill->post_date));
+                $arr[] = $row->personalCloseBill->code;
             }
             if($row->outgoingPayment()->exists()){
-                $arr[] = $row->outgoingPayment->code.' - '.date('d/m/Y',strtotime($row->outgoingPayment->post_date));
+                $arr[] = $row->outgoingPayment->code;
+            }
+        }
+
+        return implode(', ',$arr);
+    }
+
+    public function listCreqDate(){
+        $arr = [];
+        
+        foreach($this->closeBillDetail as $row){
+            if($row->personalCloseBill()->exists()){
+                $arr[] = date('d/m/Y',strtotime($row->personalCloseBill->post_date));
+            }
+            if($row->outgoingPayment()->exists()){
+                $arr[] = date('d/m/Y',strtotime($row->outgoingPayment->post_date));
             }
         }
 

@@ -162,7 +162,7 @@ class PurchaseInvoice extends Model
         $arr = [];
 
         foreach($this->purchaseInvoiceDp as $row){
-            $arr[] = $row->purchaseDownPayment->code;
+            $arr[] = $row->purchaseDownPayment->code.' - '.date('d/m/Y',strtotime($row->purchaseDownPayment->post_date));
         }
 
         return implode(', ',$arr);

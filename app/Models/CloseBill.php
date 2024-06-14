@@ -87,10 +87,10 @@ class CloseBill extends Model
         
         foreach($this->closeBillDetail as $row){
             if($row->personalCloseBill()->exists()){
-                $arr[] = $row->personalCloseBill->code;
+                $arr[] = $row->personalCloseBill->code.' - '.date('d/m/Y',strtotime($row->personalCloseBill->post_date));
             }
             if($row->outgoingPayment()->exists()){
-                $arr[] = $row->outgoingPayment->code;
+                $arr[] = $row->outgoingPayment->code.' - '.date('d/m/Y',strtotime($row->outgoingPayment->post_date));
             }
         }
 

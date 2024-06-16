@@ -2468,14 +2468,14 @@ class Select2Controller extends Controller {
                 ->get();
 
         foreach($data as $d) {
-            /* if($d->getBalanceReceipt() > 0){ */
+            if($d->getBalanceReceipt() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
                     'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceReceipt()).' '.$d->itemUnit->unit->code,
                     'qty'               => CustomHelper::formatConditionalQty($d->getBalanceReceipt()),
                     'item_unit_id'      => $d->item_unit_id,
                 ];
-            /* } */
+            }
         }
 
         return response()->json(['items' => $response]);

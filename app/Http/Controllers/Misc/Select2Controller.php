@@ -310,6 +310,7 @@ class Select2Controller extends Controller {
                 'is_sales_item'     => $d->is_sales_item ? $d->is_sales_item : '',
                 'list_shading'      => $d->arrShading(),
                 'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+                'has_bom'           => $d->bom()->exists() ? '1' : '',
             ];
         }
 
@@ -2467,14 +2468,14 @@ class Select2Controller extends Controller {
                 ->get();
 
         foreach($data as $d) {
-            if($d->getBalanceReceipt() > 0){
+            /* if($d->getBalanceReceipt() > 0){ */
                 $response[] = [
                     'id'   			    => $d->id,
                     'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceReceipt()).' '.$d->itemUnit->unit->code,
                     'qty'               => CustomHelper::formatConditionalQty($d->getBalanceReceipt()),
                     'item_unit_id'      => $d->item_unit_id,
                 ];
-            }
+            /* } */
         }
 
         return response()->json(['items' => $response]);
@@ -3950,6 +3951,9 @@ class Select2Controller extends Controller {
                     'description'       => $row->description ?? '',
                     'type'              => $row->type(),
                     'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
+                    'issue_method'      => $row->issue_method,
+                    'has_bom'           => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
+                    /* 'list_batch'        => $row->lookable_type == 'items' ? $row->lookable->listBatch() : [], */
                 ];
             }
 
@@ -4033,15 +4037,18 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%");
                 })
                 ->where('item_id',$request->item_id)
-                ->whereHas('lookable',function($query)use($search){
+                /* ->whereHas('lookable',function($query)use($search){
                     $query->where('code', 'like', "%$search%");
-                })
+                }) */
+                ->orderBy('created_at')
                 ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code,
+                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code,
+                'code'          => $d->code,
+                'qty'           => CustomHelper::formatConditionalQty($d->qty),
             ];
         }
 

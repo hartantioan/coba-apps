@@ -1862,7 +1862,7 @@
                                     ` + val.item_name + `
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);adjustSerial(this,` + val.purchase_order_detail_id + `,` + val.item_id + `);" style="text-align:right;width:100px;" data-activa="` + val.is_activa + `" data-code="` + count + `" data-conversion="` + val.qty_conversion + `" ` + (response.type == '2' ? `readonly` : ``) + `>
                                 </td>
                                 <td class="center">
                                     <span>` + val.unit + `</span>

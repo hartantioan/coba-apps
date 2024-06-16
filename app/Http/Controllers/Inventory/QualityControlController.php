@@ -80,11 +80,12 @@ class QualityControlController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
+                            ->orWhere('delivery_no', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('driver', 'like', "%$search%")
+                            ->orWhereHas('item',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name','like',"%$search%");
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -118,11 +119,12 @@ class QualityControlController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('goodScaleDetail',function($query) use($search, $request){
-                                $query->whereHas('item',function($query) use($search, $request){
-                                    $query->where('code', 'like', "%$search%")
-                                        ->orWhere('name','like',"%$search%");
-                                });
+                            ->orWhere('delivery_no', 'like', "%$search%")
+                            ->orWhere('vehicle_no', 'like', "%$search%")
+                            ->orWhere('driver', 'like', "%$search%")
+                            ->orWhereHas('item',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name','like',"%$search%");
                             })
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")

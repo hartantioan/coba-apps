@@ -266,21 +266,38 @@ class QualityControlController extends Controller
                 
                 if($goodScale){
 
+                    if($goodScale->goodReceiptDetail()->exists()){
+                        return response()->json([
+                            'status'    => 500,
+                            'message'   => 'Ups. Maaf, Data telah ditarik menjadi GRPO. Silahkan void dokumen terkait.'
+                        ]);
+                    }
+
                     if($request->file('document') && $goodScale->image_qc){
                         $goodScale->deleteImageQc();
                     }
 
+                    $qty_qc = 0;
+                    $qty_final = 0;
+
+                    if($goodScale->qty_balance > 0){
+                        $qty_qc = round(((str_replace(',','.',str_replace('.','',$request->water_content)) / 100) * $goodScale->qty_balance),3);
+                        $qty_final = round($goodScale->qty_balance - $qty_qc,3);
+                    }
+
                     $goodScale->update([
-                        'water_content' => $goodScale->water_content == 0 ? str_replace(',','.',str_replace('.','',$request->water_content)) : $goodScale->water_content,
+                        'water_content' => str_replace(',','.',str_replace('.','',$request->water_content)),
                         'viscosity'     => str_replace(',','.',str_replace('.','',$request->viscosity)),
                         'residue'       => str_replace(',','.',str_replace('.','',$request->residue)),
-                        'status_qc'     => $goodScale->water_content == 0 ? $request->status_qc : $goodScale->status_qc,
+                        'status_qc'     => $request->status_qc,
                         'note_qc'       => $request->note,
                         'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : ($goodScale->image_qc ? $goodScale->image_qc : NULL),
                         'user_qc'       => session('bo_id'),
                         'time_scale_qc' => date('Y-m-d H:i:s'),
-                        'status'        => $goodScale->water_content == 0 ? ($request->status_qc == '1' ? $goodScale->status : '5') : $goodScale->status,
-                        'note'          => $goodScale->water_content == 0 ? ($request->status_qc == '2' ? $goodScale->note.' - Ditutup oleh bagian QC.' : $goodScale->note) : $goodScale->note,
+                        'status'        => $request->status_qc == '1' ? $goodScale->status : '5',
+                        'note'          => $request->status_qc == '2' ? $goodScale->note.' - Ditutup oleh bagian QC.' : $goodScale->note,
+                        'qty_qc'        => $qty_final > 0 ? $qty_qc : 0,
+                        'qty_final'     => $qty_final > 0 ? $qty_final : 0,
                         /* 'done_id'       => $request->status_qc == '2' ? session('bo_id') : NULL,
                         'done_note'     => $request->status_qc == '2' ? 'Ditutup oleh bagian QC.' : NULL, */
                     ]);

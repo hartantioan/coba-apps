@@ -468,6 +468,19 @@ class Item extends Model
         return $this->hasMany('App\Models\Bom','item_id','id')->where('status','1');
     }
 
+    public function productionBatch()
+    {
+        return $this->hasMany('App\Models\ProductionBatch','item_id','id');
+    }
+
+    public function listBatch(){
+        $list = [];
+        foreach($this->productionBatch()->where('qty','>',0)->get() as $row){
+            $list[] = $row;
+        }
+        return $list;
+    }
+
     public function listBom(){
         $arr = [];
         $firstBom = $this->bom()->latest()->first();

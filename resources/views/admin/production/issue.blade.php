@@ -36,6 +36,10 @@
         position: sticky;
         top: 50px;
     } */
+
+    #table-detail-item-issue input {
+        height:2rem !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -314,20 +318,19 @@
                                                             <th class="center">Nominal Real</th>
                                                             <th class="center">Total Real</th>
                                                             <th class="center">Plant & Gudang</th>
-                                                            <th class="center">Batch</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="10">
+                                                            <td class="center-align" colspan="9">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="10">
+                                                            <th colspan="9">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -717,7 +720,7 @@
                 $('#production_order_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="10">
+                        <td class="center-align" colspan="9">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -737,86 +740,11 @@
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
 
         $('#body-item-issue').on('click', '.delete-data-item-issue', function() {
+            let id = $(this).data('id');
+            $('.row_item_batch[data-code="' + id + '"]').remove();
             $(this).closest('tr').remove();
         });
     });
-
-    function addReject(){
-        if($('#production_order_id').val()){
-            let no_receive = $('.row_item_receive').length + 1;
-            var count = makeid(10);    
-            $('#body-item-receive').append(`
-                <tr class="row_item_receive" data-id="` + $('#production_order_id').val() + `">
-                    <input type="hidden" name="arr_type[]" value="2">
-                    <input type="hidden" name="arr_lookable_type[]" value="items">
-                    <input type="hidden" name="arr_production_order_id[]" value="` + $('#production_order_id').val() + `">
-                    <input type="hidden" name="arr_bom_id[]" value="0">
-                    <input type="hidden" name="arr_qty_bom[]" value="0">
-                    <input type="hidden" name="arr_nominal_bom[]" value="0,00">
-                    <input type="hidden" name="arr_total_bom[]" value="0,00">
-                    <input type="hidden" name="arr_nominal[]" value="0,00">
-                    <input type="hidden" name="arr_total[]" value="0,00">
-                    <input type="hidden" name="arr_is_fg[]" value="0">
-                    <input type="hidden" name="arr_item_stock_id[]" value="0">
-                    <td class="center-align">
-                        ` + no_receive + `
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','items')"></select>
-                    </td>
-                    <td class="right-align">
-                        0,000
-                    </td>
-                    <td class="center">
-                        <div class="input-field col s10">
-                            <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);checkQty();" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
-                        </div>
-                    </td>
-                    <td class="center-align" id="arr_unit` + count + `">
-                        -
-                    </td>
-                    <td class="center-align">
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                            @foreach ($place as $rowplace)
-                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td class="center-align">
-                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                            <option value="">--Kosong--</option>
-                            @foreach ($line as $rowline)
-                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td class="center-align">
-                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                            <option value="">--Silahkan pilih item--</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                            <option value="0">--Kosong--</option>
-                        </select>
-                    </td>
-                    <td class="center">
-                        <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required readonly>
-                    </td>
-                    <td class="center">
-                        <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required>
-                    </td>
-                </tr>
-            `);
-            select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/item") }}');
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih Production Order terlebih dahulu.',
-                icon: 'error'
-            });
-        }
-    }
 
     function addLine(type){
         if($('#production_order_id').val()){
@@ -828,16 +756,10 @@
                     <input type="hidden" name="arr_lookable_type[]" value="` + type + `">
                     <input type="hidden" name="arr_production_order_id[]" value="` + $('#production_order_id').val() + `">
                     <input type="hidden" name="arr_bom_id[]" value="0">
+                    <input type="hidden" name="arr_bom_detail_id[]" value="0">
                     <input type="hidden" name="arr_qty_bom[]" value="0,000">
                     <input type="hidden" name="arr_nominal_bom[]" value="0,00">
                     <input type="hidden" name="arr_total_bom[]" value="0,00">
-                    <input type="hidden" name="arr_place[]" value="0">
-                    <input type="hidden" name="arr_line[]" value="0">
-                    <input type="hidden" name="arr_warehouse[]" value="0">
-                    <input type="hidden" name="arr_area[]" value="0">
-                    <input type="hidden" name="arr_shading[]" value="">
-                    <input type="hidden" name="arr_batch[]" value="">
-                    <input type="hidden" name="arr_is_fg[]" value="0">
                     <td class="center-align">
                         ` + no_issue + `
                     </td>
@@ -848,13 +770,13 @@
                         0,000
                     </td>
                     <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center" id="arr_unit` + count + `">
                         -
                     </td>
                     <td class="center">
-                        <input name="arr_nominal[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (type == 'items' ? 'readonly' : '') + `>
+                        <input name="arr_nominal[]" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (type == 'items' ? 'readonly' : '') + `>
                     </td>
                     <td class="center">
                         <input name="arr_total[]" type="text" value="0,00" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_total` + count + `" readonly>
@@ -863,7 +785,7 @@
                         -
                     </td>
                     <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
                             <i class="material-icons">delete</i>
                         </a>
                     </td>
@@ -887,6 +809,7 @@
     function getRowUnit(val,type){
         $("#arr_unit" + val).empty();
         $("#arr_stock" + val).empty();
+        $('.row_item_batch[data-code="' + val + '"]').remove();
         if($("#arr_lookable_id" + val).val()){
             $("#arr_unit" + val).text($("#arr_lookable_id" + val).select2('data')[0].uom);
             if(type == 'items'){
@@ -908,6 +831,65 @@
                         `);
                     });
                 }
+                if($("#arr_lookable_id" + val).select2('data')[0].has_bom){
+                    $('#arr_lookable_id' + val).parent().prev().attr('rowspan','2');
+                    $('#arr_lookable_id' + val).parent().parent().parent().append(`
+                        <tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_id').val() + `" data-code="` + val + `">
+                            <td colspan="2" class="right-align">
+                                Ambil dari Batch : 
+                            </td>
+                            <td colspan="6">
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="arr_batch` + val + `" name="arr_batch[]" data-id="` + val + `"></select>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + val + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
+                                        <label class="active">&nbsp;</label>
+                                    </div>
+                                    <div class="col m12 s12">
+                                        <table class="bordered" style="width:500px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th>No.Batch</th>
+                                                    <th>Qty Dipakai</th>
+                                                    <th>Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-batch` + val + `"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `);
+                    $('#arr_batch' + val).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/production_batch") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                return {
+                                    search: params.term,
+                                    item_id: $("#arr_lookable_id" + val).val(),
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    $('#arr_lookable_id' + val).parent().prev().removeAttr('rowspan');
+                }
             }
             if(type == 'resources'){
                 $("#arr_stock" + val).html(`
@@ -919,6 +901,7 @@
         }else{
             $("#arr_unit" + val).text('-');
             $("#arr_stock" + val).text('-');
+            $('#arr_lookable_id' + val).parent().prev().removeAttr('rowspan');
         }
     }
 
@@ -1065,7 +1048,7 @@
                 $('.row_item_issue[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="10">
+                        <td class="center-align" colspan="9">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1141,11 +1124,6 @@
 
                         $('#last-row-item-issue,#last-row-item-receive').remove();
 
-                        $('#group').val(datakuy.group);
-                        $('#shift_id').empty().append(`
-                            <option value="` + datakuy.shift_id + `">` + datakuy.shift_name + `</option>
-                        `);
-
                         var count = makeid(10);
 
                         let no_issue = $('.row_item_issue').length + 1;
@@ -1161,24 +1139,18 @@
                                 optionStock += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
                             }
                             optionStock += `</select>`;
+
                             $('#body-item-issue').append(`
                                 <tr class="row_item_issue" data-id="` + $('#production_order_id').val() + `">
-                                    <input type="hidden" name="arr_type[]" value="1">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                     <input type="hidden" name="arr_production_order_id[]" value="` + datakuy.id + `">
                                     <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
+                                    <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
                                     <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_bom + `">
                                     <input type="hidden" name="arr_nominal_bom[]" value="` + val.nominal_bom + `">
                                     <input type="hidden" name="arr_total_bom[]" value="` + val.total_bom + `">
-                                    <input type="hidden" name="arr_place[]" value="0">
-                                    <input type="hidden" name="arr_line[]" value="0">
-                                    <input type="hidden" name="arr_warehouse[]" value="0">
-                                    <input type="hidden" name="arr_area[]" value="0">
-                                    <input type="hidden" name="arr_shading[]" value="">
-                                    <input type="hidden" name="arr_batch[]" value="">
-                                    <input type="hidden" name="arr_is_fg[]" value="0">
-                                    <td class="center-align">
+                                    <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
                                         ` + no_issue + `
                                     </td>
                                     <td>
@@ -1188,28 +1160,83 @@
                                         ` + val.qty_planned + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                                     </td>
                                     <td class="center" id="arr_unit` + count + `">
                                         ` + val.unit + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal_planned + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : '') + `>
+                                        <input name="arr_nominal[]" type="text" value="` + val.nominal_planned + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;` + (val.lookable_type == 'items' ? 'border-bottom: none;' : (val.issue_method == '1' ? '' : 'border-bottom: none;')) + `" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : (val.issue_method == '1' ? '' : 'readonly')) + `>
                                     </td>
                                     <td class="center">
-                                        <input name="arr_total[]" type="text" value="` + val.total_planned + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_total` + count + `" readonly>
+                                        <input name="arr_total[]" type="text" value="` + val.total_planned + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;border-bottom: none;" id="arr_total` + count + `" readonly>
                                     </td>
                                     <td class="center" id="arr_stock` + count + `">
                                         ` + optionStock + `
                                     </td>
                                     <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
                                             <i class="material-icons">delete</i>
                                         </a>
                                     </td>
                                 </tr>
-                            `);
+                            ` +
+                                (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_id').val() + `" data-code="` + count + `">
+                                    <td colspan="2" class="right-align">
+                                        Ambil dari Batch : 
+                                    </td>
+                                    <td colspan="6">
+                                        <div class="row">
+                                            <div class="input-field col m3 s12">
+                                                <select class="browser-default" id="arr_batch` + count + `" name="arr_batch[]" data-id="` + count + `"></select>
+                                            </div>
+                                            <div class="input-field col m3 s12">
+                                                <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
+                                                <label class="active">&nbsp;</label>
+                                            </div>
+                                            <div class="col m12 s12">
+                                                <table class="bordered" style="width:500px !important;">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.Batch</th>
+                                                            <th>Qty Dipakai</th>
+                                                            <th>Hapus</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="table-batch` + count + `"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>` : ``)
+                            );
                             $('#rowQty' + count).trigger('keyup');
+                            if(val.has_bom){
+                                $('#arr_batch' + count).select2({
+                                    placeholder: '-- Kosong --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/production_batch") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                item_id: val.lookable_id,
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
+                            }
                             no_issue++;
                         });
                         $('#output-line').empty().text(datakuy.line);
@@ -1232,7 +1259,7 @@
             $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item-issue').empty().append(`
                 <tr id="last-row-item-issue">
-                    <td class="center-align" colspan="10">
+                    <td class="center-align" colspan="9">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
@@ -1244,6 +1271,44 @@
                     </td>
                 </tr>
             `);
+        }
+    }
+
+    function removeBatch(element){
+        $(element).parent().parent().remove();
+    }
+
+    function addBatch(code){
+        if($('#arr_batch' + code).val()){
+            let data = $('#arr_batch' + code).select2('data')[0];
+            let count = makeid(10);
+            $('#table-batch' + code).append(`
+                <tr>
+                    <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + count + `" value="` + data.id + `">
+                    <td>` + data.code + `</td>
+                    <td>
+                        <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="` + data.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `')" data-qty="` + data.qty + `" data-id="` + count + `" class="" id="rowBatch`+ count +`" style="text-align:right;">    
+                    </td>
+                    <td>
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" onclick="removeBatch(this);">
+                            <i class="material-icons">delete</i>
+                        </a> 
+                    </td>
+                </tr>
+            `);
+            $('#arr_batch' + code).empty();
+        }else{
+            
+        }
+    }
+
+    function checkQtyBatch(code){
+        let qtyMax = parseFloat($('#rowBatch' + code).data('qty').replaceAll(".", "").replaceAll(",","."));
+        let qty = parseFloat($('#rowBatch' + code).val().replaceAll(".", "").replaceAll(",","."));
+        if(qty > qtyMax){
+            $('#rowBatch' + code).val(
+                (qtyMax >= 0 ? '' : '-') + formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',','))
+            );
         }
     }
 
@@ -1554,27 +1619,39 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
+                formData.delete("arr_batch_id[]");
+                formData.delete("arr_qty_batch[]");
 
                 let passedInput = true, passedStock = true;
 
-                $('*[name^="arr_is_fg[]"]').each(function(index){
-                    if($('*[name^="arr_type[]"]').eq(index).val() == '2'){
-                        if($(this).val() == '1'){
-                            if($('*[name^="arr_area[]"]').eq(index).val() == '0'){
-                                passedInput = false;
-                            }
-
-                            if(!$('*[name^="arr_shading[]"]').eq(index).val()){
-                                passedInput = false;
-                            }
-                        }
-                        if(!$('*[name^="arr_batch[]"]').eq(index).val()){
-                            passedInput = false;
-                        }
+                $('*[name^="arr_batch[]"]').each(function(index){
+                    let id = $(this).data('id');
+                    if($('.qty-batch-' + id).length == 0){
+                        passedInput = false;
+                    }
+                    let qtyNeeded = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",","."));
+                    let qtyBatch = 0;
+                    $('.qty-batch-' + id).each(function(index){
+                        qtyBatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                    });
+                    if(qtyNeeded !== qtyBatch){
+                        passedStock = false;
+                    }
+                });
+                
+                $('*[name^="arr_qty[]"]').each(function(index){
+                    let id = $(this).data('id');
+                    if($('.qty-batch-' + id).length > 0){
+                        $('.qty-batch-' + id).each(function(){
+                            let idkuy = $(this).data('id');
+                            formData.append('arr_batch_index[]',index);
+                            formData.append('arr_batch_id[]',$('#arr_batch_id' + idkuy).val());
+                            formData.append('arr_qty_batch[]',$(this).val());
+                        });
                     }
                 });
 
-                $('*[name^="arr_item_stock_id[]"]').each(function(index){
+                $('*[name^="arr_qty[]"]').each(function(index){
                     let val = $(this).val();
                     if($('*[name^="arr_lookable_type[]"]').eq(index).val() == 'items' && $('*[name^="arr_type[]"]').eq(index).val() == '1'){
                         if(val == '0'){
@@ -1586,7 +1663,7 @@
                 if(!passedStock){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Terdapat stok Item ISSUE yang tidak ditemukan datanya.',
+                        text: 'Terdapat stok Item ISSUE yang tidak ditemukan datanya. Terdapat qty batch yang tidak sesuai dengan qty real pemakaian.',
                         icon: 'error'
                     });
                     return;
@@ -1595,7 +1672,7 @@
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Area & shading untuk item FG, dan batch harus ditentukan. Tidak boleh kosong.',
+                        text: 'Batch untuk item WIP tidak boleh kosong.',
                         icon: 'error'
                     });
                 }else{
@@ -1723,12 +1800,11 @@
                     <option value="` + response.production_order_id + `">` + response.production_order_code + `</option>
                 `);
 
-                $('.row_item_issue,.row_item_receive').remove();
+                $('.row_item_issue').remove();
                         
-                $('#last-row-item-issue,#last-row-item-receive').remove();
+                $('#last-row-item-issue').remove();
 
                 let no_issue = $('.row_item_issue').length + 1;
-                let no_receive = $('.row_item_receive').length + 1;
 
                 $.each(response.detail_issue, function(i, val) {
                     var count = makeid(10);
@@ -1743,22 +1819,15 @@
                     optionStock += `</select>`;
                     $('#body-item-issue').append(`
                         <tr class="row_item_issue" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_type[]" value="1">
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                             <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                             <input type="hidden" name="arr_production_order_id[]" value="` + val.id + `">
                             <input type="hidden" name="arr_bom_id[]" value="` + (val.bom_id ? val.bom_id : '0' ) + `">
+                            <input type="hidden" name="arr_bom_detail_id[]" value="` + (val.bom_detail_id ? val.bom_detail_id : '0' ) + `">
                             <input type="hidden" name="arr_qty_bom[]" value="` + (val.bom_id ? val.qty_bom : '0,000') + `">
                             <input type="hidden" name="arr_nominal_bom[]" value="` + (val.bom_id ? val.nominal_bom : '0,00') + `">
                             <input type="hidden" name="arr_total_bom[]" value="` + (val.bom_id ? val.total_bom : '0,00') + `">
-                            <input type="hidden" name="arr_place[]" value="0">
-                            <input type="hidden" name="arr_line[]" value="0">
-                            <input type="hidden" name="arr_warehouse[]" value="0">
-                            <input type="hidden" name="arr_area[]" value="0">
-                            <input type="hidden" name="arr_shading[]" value="">
-                            <input type="hidden" name="arr_batch[]" value="">
-                            <input type="hidden" name="arr_is_fg[]" value="0">
-                            <td class="center-align">
+                            <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
                                 ` + no_issue + `
                             </td>
                             <td>
@@ -1768,16 +1837,16 @@
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `
                             </td>
                             <td class="center">
-                                <input name="arr_nominal[]" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : '') + `>
+                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;` + (val.lookable_type == 'items' ? 'border-bottom: none;' : (val.issue_method == '1' ? '' : 'border-bottom: none;')) + `" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : (val.issue_method == '1' ? '' : 'readonly')) + `>
                             </td>
                             <td class="center">
-                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_total` + count + `" readonly>
+                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;border-bottom: none;" id="arr_total` + count + `" readonly>
                             </td>
                             <td class="center" id="arr_stock` + count + `">
                                 ` + optionStock + `
@@ -1788,171 +1857,84 @@
                                 </a>
                             </td>
                         </tr>
-                    `);
+                    ` +
+                        (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_id').val() + `" data-code="` + count + `">
+                            <td colspan="2" class="right-align">
+                                Ambil dari Batch : 
+                            </td>
+                            <td colspan="6">
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="arr_batch` + count + `" name="arr_batch[]" data-id="` + count + `"></select>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
+                                        <label class="active">&nbsp;</label>
+                                    </div>
+                                    <div class="col m12 s12">
+                                        <table class="bordered" style="width:500px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th>No.Batch</th>
+                                                    <th>Qty Dipakai</th>
+                                                    <th>Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-batch` + count + `"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>` : ``)
+                    );
                     if(val.item_stock_id){
                         $('#arr_item_stock_id' + count).val(val.item_stock_id);
                     }
+                    $('#rowQty' + count).trigger('keyup');
+                    if(val.has_bom){
+                        $('#arr_batch' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/production_batch") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: val.lookable_id,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    $.each(val.list_batch, function(i, value) {
+                        let countdetail = makeid(10);
+                        $('#table-batch' + count).append(`
+                            <tr>
+                                <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + countdetail + `" value="` + value.production_batch_id + `">
+                                <td>` + value.production_batch_code + `</td>
+                                <td>
+                                    <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + countdetail + `')" data-qty="` + value.max_qty + `" data-id="` + countdetail + `" class="" id="rowBatch`+ countdetail +`" style="text-align:right;">    
+                                </td>
+                                <td>
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" onclick="removeBatch(this);">
+                                        <i class="material-icons">delete</i>
+                                    </a> 
+                                </td>
+                            </tr>
+                        `);
+                    });
                     no_issue++;
-                });
-
-                $.each(response.detail_receive, function(i, val) {
-                    var count = makeid(10);
-
-                    let datalist = `<datalist id="list-shading` + count + `">`;
-                    if(val.arr_shading.length > 0){
-                        $.each(val.arr_shading, function(i, valkuy) {
-                            datalist += `<option value="` + valkuy.code + `">` + valkuy.code + `</option>`;
-                        });
-                    }
-                    datalist += `</datalist>`;
-                    
-                    if(val.bom_id){
-                        $('#body-item-receive').append(`
-                            <tr class="row_item_receive" data-id="` + response.production_order_id + `">
-                                <input type="hidden" name="arr_type[]" value="2">
-                                <input type="hidden" name="arr_lookable_type[]" value="items">
-                                <input type="hidden" name="arr_lookable_id[]" value="` + val.item_id + `">
-                                <input type="hidden" name="arr_production_order_id[]" value="` + val.production_order_id + `">
-                                <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `">
-                                <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_bom + `">
-                                <input type="hidden" name="arr_nominal_bom[]" value="0,00">
-                                <input type="hidden" name="arr_total_bom[]" value="0,00">
-                                <input type="hidden" name="arr_nominal[]" value="0,00">
-                                <input type="hidden" name="arr_total[]" value="0,00">
-                                <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
-                                <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
-                                <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
-                                <input type="hidden" name="arr_is_fg[]" value="` + val.is_fg + `">
-                                <input type="hidden" name="arr_item_stock_id[]" value="0">
-                                <td class="center-align">
-                                    ` + no_receive + `
-                                </td>
-                                <td>
-                                    ` + val.item_code + ` - ` + val.item_name + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.qty_planned + `
-                                </td>
-                                <td class="center">
-                                    <div class="input-field col s10">
-                                        <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkQty();" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
-                                    </div>
-                                </td>
-                                <td class="center-align">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.place_name + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.line_code + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.warehouse_name + `
-                                </td>
-                                <td>
-                                    ` + (val.is_fg ? `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                                        <option value="0">--Kosong--</option>
-                                        @foreach ($area as $rowarea)
-                                            <option value="{{ $rowarea->id }}">{{ $rowarea->name }}</option>
-                                        @endforeach
-                                    </select>` : `<select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                                        <option value="0">--Kosong--</option>
-                                    </select>`) + `
-                                </td>
-                                <td class="center">
-                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required ` + (val.is_fg ? '' : 'readonly') + ` value="` + val.shading + `">
-                                    ` + datalist + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required value="` + val.batch_no + `">
-                                </td>
-                            </tr>
-                        `);
-                    }else{
-                        $('#body-item-receive').append(`
-                            <tr class="row_item_receive" data-id="` + response.production_order_id + `">
-                                <input type="hidden" name="arr_type[]" value="2">
-                                <input type="hidden" name="arr_lookable_type[]" value="items">
-                                <input type="hidden" name="arr_production_order_id[]" value="` + response.production_order_id + `">
-                                <input type="hidden" name="arr_bom_id[]" value="0">
-                                <input type="hidden" name="arr_qty_bom[]" value="0">
-                                <input type="hidden" name="arr_nominal_bom[]" value="0,00">
-                                <input type="hidden" name="arr_total_bom[]" value="0,00">
-                                <input type="hidden" name="arr_nominal[]" value="0,00">
-                                <input type="hidden" name="arr_total[]" value="0,00">
-                                <input type="hidden" name="arr_is_fg[]" value="0">
-                                <input type="hidden" name="arr_item_stock_id[]" value="0">
-                                <td class="center-align">
-                                    ` + no_receive + `
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','items')"></select>
-                                </td>
-                                <td class="right-align">
-                                    0,000
-                                </td>
-                                <td class="center">
-                                    <div class="input-field col s10">
-                                        <input class="browser-default" name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);checkQty();" style="text-align:right;min-width:100% !important;" id="rowQty`+ count +`" data-id="` + count + `" required>
-                                    </div>
-                                </td>
-                                <td class="center-align" id="arr_unit` + count + `">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="center-align">
-                                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                        @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td class="center-align">
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                        <option value="">--Kosong--</option>
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td class="center-align">
-                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                        <option value="">--Silahkan pilih item--</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="browser-default" id="arr_area` + count + `" name="arr_area[]">
-                                        <option value="0">--Kosong--</option>
-                                    </select>
-                                </td>
-                                <td class="center">
-                                    <input list="list-shading` + count + `" name="arr_shading[]" class="browser-default" value="` + val.shading + `" id="arr_shading` + count + `" type="text" placeholder="Kode Shading..." style="width:100%;" required readonly>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_batch[]" class="browser-default" type="text" placeholder="Nomor batch..." style="width:100%;" required value="` + val.batch_no + `">
-                                </td>
-                            </tr>
-                        `);
-                        $('#arr_warehouse' + count).empty();
-                        $.each(val.list_warehouse, function(i, value) {
-                            $('#arr_warehouse' + count).append(`
-                                <option value="` + value.id + `">` + value.name + `</option>
-                            `);
-                        });
-                        $('#arr_warehouse' + count).val(val.warehouse_id);
-                        $('#arr_place' + count).val(val.place_id);
-                        $('#arr_line' + count).val(val.line_id);
-                        $('#arr_lookable_id' + count).append(`
-                            <option value="` + val.item_id + `">` + val.item_code + ` - ` + val.item_name + `</option>
-                        `);
-                        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/item") }}');
-                    }
-
-                    if(val.area_id){
-                        $('#arr_area' + count).val(val.area_id);
-                    }
-                    
-                    no_receive++;
                 });
 
                 M.updateTextFields();

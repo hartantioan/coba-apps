@@ -68,6 +68,7 @@ use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\MaterialRequest;
+use App\Models\ProductionBatch;
 use App\Models\ProductionIssue;
 use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
@@ -4065,7 +4066,7 @@ class CustomHelper {
 			self::updateEmployeeTransfer($transfer);
 
 		}elseif($table_name == 'production_issues'){
-			$pir = ProductionIssue::find($table_id);
+			/* $pir = ProductionIssue::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -4078,67 +4079,7 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
-			foreach($pir->productionIssueDetail()->get() as $row){
-				if($row->bom_id){
-					$total = 0;
-
-					foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $rowcost){
-						$total += $rowcost->total;
-					}
-
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable->itemGroup->coa_id,
-						'place_id'		=> $row->place_id,
-						'line_id'		=> $row->line_id,
-						'machine_id'	=> $row->productionIssueReceive->machine_id,
-						'warehouse_id'	=> $row->warehouse_id,
-						'type'			=> '1',
-						'nominal'		=> $total,
-						'nominal_fc'	=> $total,
-					]);
-
-					$shade = NULL;
-
-					if($row->shading){
-						$shading = ItemShading::where('item_id',$row->lookable_id)->where('code',$row->shading)->first();
-						if(!$shading){
-							$shade = ItemShading::create([
-								'item_id'	=> $row->lookable_id,
-								'code'		=> $row->shading,
-							]);
-						}else{
-							$shade = $shading;
-						}
-					}
-
-					self::sendCogs($table_name,
-						$pir->id,
-						$pir->company_id,
-						$row->place_id,
-						$row->warehouse_id,
-						$row->lookable_id,
-						$row->qty,
-						$total,
-						'IN',
-						$pir->post_date,
-						$row->area_id,
-						$shade ? $shade->id : NULL,
-					);
-
-					self::sendStock(
-						$row->place_id,
-						$row->warehouse_id,
-						$row->lookable_id,
-						$row->qty,
-						'IN',
-						$row->area_id,
-						$shade ? $shade->id : NULL,
-					);
-				}
-			}
-
-			foreach($pir->productionIssueReceiveDetail()->where('type','1')->get() as $row){
+			foreach($pir->productionIssueDetail as $row){
 				if($row->lookable_type == 'items'){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -4162,7 +4103,7 @@ class CustomHelper {
 						$row->total,
 						'OUT',
 						$pir->post_date,
-						$row->itemStock->area_id ?? NULL,
+						NULL,
 						NULL,
 					);
 	
@@ -4172,7 +4113,7 @@ class CustomHelper {
 						$row->itemStock->item_id,
 						$row->qty,
 						'OUT',
-						$row->itemStock->area_id ?? NULL,
+						NULL,
 						NULL,
 					);
 				}elseif($row->lookable_type == 'resources'){
@@ -4191,7 +4132,7 @@ class CustomHelper {
 
 			$pir->update([
 				'status'	=> '3'
-			]);
+			]); */
 		}elseif($table_name == 'production_receives'){
 
 		}elseif($table_name == 'adjust_rates'){
@@ -4916,5 +4857,20 @@ class CustomHelper {
 
 		// Return a hex colour ID string
 		return sprintf('#%02X%02X%02X', $r, $g, $b);
+	}
+
+	public static function updateProductionBatch($id,$qty,$type){
+		$data = ProductionBatch::find($id);
+		if($data){
+			if($type == 'IN'){
+				$data->update([
+					'qty'	=> $data->qty + round($qty,3)
+				]);
+			}elseif($type == 'OUT'){
+				$data->update([
+					'qty'	=> $data->qty - round($qty,3)
+				]);
+			}
+		}
 	}
 }

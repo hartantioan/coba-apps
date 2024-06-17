@@ -15,8 +15,7 @@ class ProductionBatchUsage extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'code',
-        'item_id',
+        'production_batch_id',
         'lookable_type',
         'lookable_id',
         'qty'
@@ -26,7 +25,7 @@ class ProductionBatchUsage extends Model
         return $this->morphTo();
     }
 
-    public function item(){
-        return $this->belongsTo('App\Models\Item','item_id','id');
+    public function productionBatch(){
+        return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id');
     }
 }

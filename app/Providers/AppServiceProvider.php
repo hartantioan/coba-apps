@@ -96,6 +96,8 @@ class AppServiceProvider extends ServiceProvider
             'personal_close_bills'                  => 'App\Models\PersonalCloseBill',
             'adjust_rates'                          => 'App\Models\AdjustRate',
             'resources'                             => 'App\Models\Resource',
+            'production_issue_details'              => 'App\Models\ProductionIssueDetail',
+            'production_issues'                     => 'App\Models\ProductionIssue',
         ]);
     }
 }

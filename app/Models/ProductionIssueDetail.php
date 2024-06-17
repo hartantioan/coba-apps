@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,6 +21,7 @@ class ProductionIssueDetail extends Model
         'lookable_type',
         'lookable_id',
         'bom_id',
+        'bom_detail_id',
         'qty',
         'nominal',
         'total',
@@ -30,13 +32,11 @@ class ProductionIssueDetail extends Model
         'nominal_planned',
         'total_planned',
         'from_item_stock_id',
-        'batch_no',
-        'place_id',
-        'line_id',
-        'warehouse_id',
-        'area_id',
-        'production_batch_id',
     ];
+
+    public function productionBatchUsage(){
+        return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+    }
 
     public function productionIssueReceive()
     {
@@ -51,28 +51,12 @@ class ProductionIssueDetail extends Model
         return $this->belongsTo('App\Models\ItemStock','from_item_stock_id','id');
     }
 
-    public function productionBatch(){
-        return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id');
-    }
-
-    public function place(){
-        return $this->belongsTo('App\Models\Place','place_id','id');
-    }
-
-    public function line(){
-        return $this->belongsTo('App\Models\Line','line_id','id');
-    }
-
-    public function warehouse(){
-        return $this->belongsTo('App\Models\Warehouse','warehouse_id','id');
-    }
-
-    public function area(){
-        return $this->belongsTo('App\Models\Area','area_id','id');
-    }
-
     public function bom(){
         return $this->belongsTo('App\Models\Bom','bom_id','id')->withTrashed();
+    }
+
+    public function bomDetail(){
+        return $this->belongsTo('App\Models\BomDetail','bom_detail_id','id')->withTrashed();
     }
 
     public function lookable(){
@@ -103,5 +87,13 @@ class ProductionIssueDetail extends Model
         }else{
             return $this->where('id',-1);
         }
+    }
+
+    public function listBatchUsed(){
+        $arr = [];
+        foreach($this->productionBatchUsage as $row){
+            $arr[] = $row->productionBatch->code.' - '.CustomHelper::formatConditionalQty($row->qty);
+        }
+        return implode(', ',$arr);
     }
 }

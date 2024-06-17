@@ -668,6 +668,22 @@
                     `);
                 }
                 $('#marketing_order_plan_id').empty();
+
+                $('#body-item-detail-normal').empty().append(`
+                    <tr class="last-row-item-detail-normal">
+                        <td colspan="3">
+                            Silahkan tambahkan Marketing Order Produksi...
+                        </td>
+                    </tr>
+                `);
+
+                $('#body-item-detail-powder').empty().append(`
+                    <tr class="last-row-item-detail-powder">
+                        <td colspan="3">
+                            Silahkan tambahkan Marketing Order Produksi...
+                        </td>
+                    </tr>
+                `);
             }
         });
 

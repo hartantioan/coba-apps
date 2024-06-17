@@ -1135,7 +1135,9 @@ class Select2Controller extends Controller {
                     }
                     if($typegrpo){
                         if($typegrpo == '2'){
-                            $query->whereHas('goodScale');
+                            $query->whereHas('goodScale',function($query){
+                                $query->whereDoesntHave('goodReceiptDetail');
+                            });
                         }elseif($typegrpo == '1'){
                             $query->whereDoesntHave('goodScale');
                         }

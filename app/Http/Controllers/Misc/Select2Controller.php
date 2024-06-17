@@ -2496,6 +2496,7 @@ class Select2Controller extends Controller {
                     })
                     ->where('code','like',"%$request->search%");
                 })
+                ->whereDoesntHave('goodReceiptDetail')
                 ->whereIn('status',['2','3'])
                 ->where('qty_final','>',0)
                 ->where('purchase_order_detail_id',$request->pod)
@@ -3936,8 +3937,10 @@ class Select2Controller extends Controller {
                 $query->whereNotNull('is_default');
             })->get() as $row){
                 $qty_planned = $row->qty * $qtyBobotOutput;
+                //info($qty_planned);
                 $bomdetail[] = [
                     'bom_id'            => $row->bom->id,
+                    'bom_detail_id'     => $row->id,
                     'name'              => $row->lookable->code.' - '.$row->lookable->name,
                     'unit'              => $row->lookable->uomUnit->code,
                     'lookable_type'     => $row->lookable_type,

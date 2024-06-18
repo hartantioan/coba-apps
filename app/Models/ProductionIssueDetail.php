@@ -38,9 +38,9 @@ class ProductionIssueDetail extends Model
         return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
-    public function productionIssueReceive()
+    public function productionIssue()
     {
-        return $this->belongsTo('App\Models\ProductionIssueReceive', 'production_issue_receive_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
 
     public function productionOrder(){

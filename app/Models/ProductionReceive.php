@@ -8,22 +8,28 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
-class MarketingOrderPlan extends Model
+class ProductionReceive extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'marketing_order_plans';
+    protected $table = 'production_receives';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
         'user_id',
         'company_id',
+        'production_order_id',
         'place_id',
+        'shift_id',
+        'group',
         'line_id',
+        'machine_id',
         'post_date',
-        'type',
+        'start_process_time',
+        'end_process_time',
         'document',
+        'note',
         'status',
         'void_id',
         'void_note',
@@ -34,6 +40,11 @@ class MarketingOrderPlan extends Model
         'done_date',
         'done_note',
     ];
+
+    public function deleteUser()
+    {
+        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
 
     public function user()
     {
@@ -50,45 +61,39 @@ class MarketingOrderPlan extends Model
         return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
     }
 
-    public function marketingOrder()
-    {
-        return $this->belongsTo('App\Models\MarketingOrder', 'marketing_order_id', 'id')->withTrashed();
-    }
-
-    public function deleteUser()
-    {
-        return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
-    }
-
-    public function type(){
-        $type = match ($this->type) {
-            '1' => 'Normal',
-            '2' => 'Susulan dari Sales',
-            '3' => 'Susulan dari Produksi',
-            default => 'Invalid',
-        };
-
-        return $type;
-    }
-
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function productionOrder()
+    {
+        return $this->belongsTo('App\Models\ProductionOrder', 'production_order_id', 'id')->withTrashed();
     }
 
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-
+    
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 
-    public function marketingOrderPlanDetail()
+    public function shift()
     {
-        return $this->hasMany('App\Models\MarketingOrderPlanDetail');
+        return $this->belongsTo('App\Models\Shift', 'shift_id', 'id')->withTrashed();
+    }
+
+    public function machine()
+    {
+        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+    }
+
+    public function productionReceiveDetail()
+    {
+        return $this->hasMany('App\Models\ProductionReceiveDetail');
     }
 
     public function used(){
@@ -143,7 +148,7 @@ class MarketingOrderPlan extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = MarketingOrderPlan::selectRaw('RIGHT(code, 8) as code')
+        $query = ProductionReceive::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -186,24 +191,21 @@ class MarketingOrderPlan extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        foreach($this->marketingOrderPlanDetail as $row){
-            if($row->productionScheduleDetail()->exists()){
-                $hasRelation = true;
-            }
-        }
-
         return $hasRelation;
     }
 
-    public function balanceQty(){
-        $total = 0;
-
-        foreach($this->marketingOrderPlanDetail as $row){
-            $total += round($row->qty * $row->item->sell_convert);
-            $total -= round($row->totalScheduled());
+    function checkArray($val,$array){
+        $index = -1;
+        foreach($array as $key => $row){
+            if($row['psd_id'] == $val){
+                $index = $key;
+            }
         }
+        return $index;
+    }
 
-        return $total;
+    public function journal(){
+        return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function printCounter()

@@ -166,6 +166,12 @@
                 <div class="col s8">
                     {{ $data->place->code }}
                 </div>
+                <div class="col s4">
+                    Line
+                </div>
+                <div class="col s8">
+                    {{ $data->line->code }}
+                </div>
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
@@ -176,12 +182,6 @@
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
-                </div>
-                <div class="col s4">
-                    Tgl.Proses
-                </div>
-                <div class="col s8">
-                    {{ date('d/m/Y',strtotime($data->start_date)).' - '.date('d/m/Y',strtotime($data->end_date)) }}
                 </div>
                 <div class="col s4">
                     Tipe
@@ -201,7 +201,6 @@
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan</th>
                         <th class="center-align">Tgl.Request</th>
-                        <th class="center-align">Line</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -212,13 +211,12 @@
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
-                        <td class="center-align">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan 1: {{ $row->note }}</td>
+                        <td colspan="5">Keterangan 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="6">Keterangan 2: {{ $row->note2 }}</td>
+                        <td colspan="5">Keterangan 2: {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                 </tbody>

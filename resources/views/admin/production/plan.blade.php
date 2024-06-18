@@ -128,10 +128,9 @@
                                                         <th>Pengguna</th>
                                                         <th>Perusahaan</th>
                                                         <th>Plant</th>
+                                                        <th>Line</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tipe</th>
-                                                        <th>Tgl.Mulai</th>
-                                                        <th>Tgl.Selesai</th>
                                                         <th>Dokumen</th>
                                                         <th>Status</th>
                                                         <th>By</th>
@@ -196,6 +195,14 @@
                                         </select>
                                         <label class="" for="place_id">Plant</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id" name="line_id">
+                                            @foreach ($line as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id">Line</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Posting</label>
@@ -216,14 +223,6 @@
                                         <div class="file-path-wrapper">
                                             <input class="file-path validate" type="text">
                                         </div>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="start_date" name="start_date" min="{{ $minDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                        <label class="active" for="start_date">Tgl.Mulai Proses</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="end_date" name="end_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Valid">
-                                        <label class="active" for="end_date">Tgl.Selesai Proses</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
@@ -266,7 +265,6 @@
                                                         <th class="center">Keterangan 1</th>
                                                         <th class="center">Keterangan 2</th>
                                                         <th class="center">Tgl.Request</th>
-                                                        <th class="center">Line</th>
                                                         <th class="center">Hapus</th>
                                                     </tr>
                                                 </thead>
@@ -278,12 +276,12 @@
                                                         <td class="right-align" id="total-mop">
                                                             0,000
                                                         </td>
-                                                        <td class="left-align" colspan="6">
+                                                        <td class="left-align" colspan="5">
                                                             M<sup>2</sup>
                                                         </td>
                                                     </tr>
                                                     <tr id="custom-add">
-                                                        <td colspan="9">
+                                                        <td colspan="8">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -634,14 +632,6 @@
                         </td>
                         <td>
                             <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                        </td>
-                        <td>
-                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                <option value="">--Kosong--</option>
-                                @foreach ($line as $rowline)
-                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                @endforeach
-                            </select>    
                         </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1054,10 +1044,9 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
+                { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'type', className: '' },
-                { name: 'start_date', className: 'center-align' },
-                { name: 'end_date', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1148,14 +1137,9 @@
                 var formData = new FormData($('#form_data')[0]), passedLine = true;
 
                 formData.delete('arr_marketing_order_detail[]');
-                formData.delete('arr_line[]');
 
-                $('select[name^="arr_line[]"]').each(function(index){
-                    if(!$(this).val()){
-                        passedLine = false;
-                    }
-                    formData.append('arr_line[]',($(this).val() ? $(this).val() : '' ));
-                    formData.append('arr_marketing_order_detail[]',($('input[name^="arr_marketing_order_detail[]"]').eq(index).val() ? $('input[name^="arr_marketing_order_detail[]"]').eq(index).val() : '' ));
+                $('select[name^="arr_marketing_order_detail[]"]').each(function(index){
+                    formData.append('arr_marketing_order_detail[]',($(this).val() ? $(this).val() : '' ));
                 });
 
                 if(!passedLine){
@@ -1277,9 +1261,8 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
+                $('#line_id').val(response.line_id).formSelect();
                 $('#type').val(response.type).formSelect();
-                $('#start_date').val(response.start_date);
-                $('#end_date').val(response.end_date);
 
                 if(response.details.length > 0){
                     $('.row_item').each(function(){
@@ -1315,14 +1298,6 @@
                                 <td>
                                     <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                 </td>
-                                <td>
-                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                        <option value="">--Kosong--</option>
-                                        @foreach ($line as $rowline)
-                                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                        @endforeach
-                                    </select>    
-                                </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -1335,9 +1310,6 @@
                                 <option value="` + val.item_id + `">` + val.item_code + ' - ' + val.item_name + `</option>
                             `);
                             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
-                        }
-                        if(val.line_id){
-                            $('#arr_line' + count).val(val.line_id);
                         }
                     });
                 }
@@ -1433,10 +1405,10 @@
                                             <input name="arr_note[]" type="text" placeholder="Keterangan barang..." value="` + val.note + `" required>
                                         </td>
                                         <td>
-                                            <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
+                                            <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value=" ` + val.note2 + `" required>
                                         </td>
                                         <td>
-                                            <input name="arr_priority[]" type="number" value="` + val.priority + `" min="0" step="1">
+                                            <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
                                         </td>
                                         <td class="center">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1546,14 +1518,6 @@
                 </td>
                 <td>
                     <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                        <option value="">--Kosong--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                        @endforeach
-                    </select>    
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

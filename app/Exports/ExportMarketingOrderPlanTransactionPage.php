@@ -38,10 +38,9 @@ class ExportMarketingOrderPlanTransactionPage implements FromCollection, WithTit
         'Tgl.Done',
         'Ket.Done',
         'Plant',
+        'Line',
         'Tanggal Post',
         'Tipe',
-        'Tanggal Mulai',
-        'Tanggal Akhir',
         'Lampiran',
         'Status',
     ];
@@ -104,10 +103,9 @@ class ExportMarketingOrderPlanTransactionPage implements FromCollection, WithTit
                 '12' => $val->doneUser()->exists() ? $val->done_note : '',
                 '13' => date('d/m/Y', strtotime($val->post_date)),
                 '14' => $val->place->code,
+                '15' => $val->line->code,
                 '16' => date('d/m/Y', strtotime($val->post_date)),
                 '17' => $val->type(),
-                '18' => date('d/m/Y', strtotime($val->start_date)),
-                '19' => date('d/m/Y', strtotime($val->end_date)),
                 '20' => $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                 '21' => $val->status(),
             ];

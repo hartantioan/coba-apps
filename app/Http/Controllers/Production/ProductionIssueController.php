@@ -10,28 +10,20 @@ use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\Area;
-use App\Models\Bom;
-use App\Models\BomDetail;
 use App\Models\Item;
-use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
-use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionIssue;
 use App\Models\ProductionIssueDetail;
 use App\Models\ProductionOrder;
-use App\Models\ProductionOrderDetail;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 class ProductionIssueController extends Controller
 {

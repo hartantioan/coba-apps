@@ -1,4 +1,4 @@
-@php
+i@php
     use App\Helpers\CustomHelper;
 
 @endphp
@@ -167,8 +167,6 @@
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:1em">Diajukan: {{ date('d/m/Y',strtotime($data->post_date)) }}</small>
-                                <small style="font-size:1em">Mulai: {{ date('d/m/Y',strtotime($data->start_date)) }}</small>
-                                <small style="font-size:1em">Sampai: {{ date('d/m/Y',strtotime($data->end_date)) }}</small>
                             </td>
                         </tr>
                         <tr>
@@ -288,7 +286,6 @@
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
                                 <th class="center">Tgl.Request</th>
-                                <th class="center">Line</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -299,13 +296,12 @@
                                 <td align="center">{{ $row->qty }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
-                                <td align="center">{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                             </tr>
                             <tr>
-                                <td colspan="6">Keterangan 1 : {{ $row->note }}</td>
+                                <td colspan="5">Keterangan 1 : {{ $row->note }}</td>
                             </tr>
                             <tr>
-                                <td colspan="6">Keterangan 2 : {{ $row->note2 }}</td>
+                                <td colspan="5">Keterangan 2 : {{ $row->note2 }}</td>
                             </tr>
                             @endforeach
                         </tbody>

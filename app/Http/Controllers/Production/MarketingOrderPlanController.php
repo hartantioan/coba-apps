@@ -100,9 +100,8 @@ class MarketingOrderPlanController extends Controller
             'user_id',
             'company_id',
             'place_id',
+            'line_id',
             'post_date',
-            'start_date',
-            'end_date',
             'type',
         ];
 
@@ -212,10 +211,9 @@ class MarketingOrderPlanController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->code,
+                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),
-                    date('d/m/Y',strtotime($val->start_date)),
-                    date('d/m/Y',strtotime($val->end_date)),
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -278,7 +276,6 @@ class MarketingOrderPlanController extends Controller
             'arr_qty'                   => 'required|array',
             'arr_request_date'          => 'required|array',
             'arr_note'                  => 'required|array',
-            'arr_line'                  => 'required|array',
         ], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -296,8 +293,6 @@ class MarketingOrderPlanController extends Controller
             'arr_request_date.array'            => 'Tgl request harus array.',
             'arr_note.required'                 => 'Catatan item tidak boleh kosong.',
             'arr_note.array'                    => 'Catatan item harus array.',
-            'arr_line.required'                 => 'Line tidak boleh kosong.',
-            'arr_line.array'                    => 'Line harus array.',
         ]);
 
         if($validation->fails()) {
@@ -358,10 +353,9 @@ class MarketingOrderPlanController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
+                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->type = $request->type;
-                        $query->start_date = $request->start_date;
-                        $query->end_date = $request->end_date;
                         $query->document = $document;
                         $query->status = '1';
 
@@ -393,10 +387,9 @@ class MarketingOrderPlanController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
+                        'line_id'	                => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'type'                      => $request->type,
-                        'start_date'                => $request->start_date,
-                        'end_date'                  => $request->end_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,
                         'status'                    => '1',
                     ]);
@@ -421,7 +414,6 @@ class MarketingOrderPlanController extends Controller
                             'request_date'                  => $request->arr_request_date[$key],
                             'note'                          => $request->arr_note[$key] ? $request->arr_note[$key] : NULL,
                             'note2'                         => $request->arr_note2[$key] ? $request->arr_note2[$key] : NULL,
-                            'line_id'                       => $request->arr_line[$key] ?? NULL,
                         ]);
                     }
 
@@ -471,7 +463,6 @@ class MarketingOrderPlanController extends Controller
                 'request_date'          => $row->request_date,
                 'note'                  => $row->note ?? '',
                 'note2'                 => $row->note2 ?? '',
-                'line_id'               => $row->line_id ?? '',
             ];
         }
 
@@ -523,7 +514,6 @@ class MarketingOrderPlanController extends Controller
                                 <th class="center-align">Tgl.Request</th>
                                 <th class="center-align">Ket 1</th>
                                 <th class="center-align">Ket 2</th>
-                                <th class="center-align">Line</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
@@ -538,7 +528,6 @@ class MarketingOrderPlanController extends Controller
                 <td class="center-align">'.date('d/m/Y',strtotime($row->request_date)).'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="">'.$row->note2.'</td>
-                <td class="center-align">'.($row->line()->exists() ? $row->line->code : '-').'</td>
             </tr>';
         }
         $string .= '<tr>

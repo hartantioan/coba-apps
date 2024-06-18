@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('production_batches', function (Blueprint $table) {
-            //
+        Schema::table('production_receive_details', function (Blueprint $table) {
+            $table->decimal('total',20,5)->nullable()->after('production_batch_id');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('production_batches', function (Blueprint $table) {
-            //
+        Schema::table('production_receive_details', function (Blueprint $table) {
+            $table->dropColumn('total');
         });
     }
 };

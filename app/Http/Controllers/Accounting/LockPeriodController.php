@@ -593,6 +593,12 @@ class LockPeriodController extends Controller
 
             CustomHelper::sendNotification($data->getTable(),$data->id,'Status Kunci Periode No. '.$data->code.' telah diupdate','Status kunci periode dokumen '.$data->code.' telah di-'.$data->statusClosing().'.',session('bo_id'));
 
+            activity()
+                ->performedOn(new LockPeriod())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Update status kunci periode data');
+
             $response = [
                 'status'  => 200,
                 'message' => 'Status berhasil dirubah.',

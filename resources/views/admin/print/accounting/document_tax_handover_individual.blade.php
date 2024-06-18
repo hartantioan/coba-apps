@@ -217,7 +217,7 @@
                                         Untuk
                                     </td>
                                     <td width="60%">
-                                        {{ $data->account->name ? $data->account->name : '-' }}
+                                        {{ optional($data->account)->name ?? '-' }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -260,7 +260,7 @@
                             @foreach($data->documentTaxHandoverDetail as $key => $row)
                                 <tr>
                                     <td  align="center">{{ $key + 1 }}</td>
-                                    <td>{{ $row->documentTax->transaction_code }}{{$row->documentTax->code}}</td>
+                                    <td>{{ $row->documentTax->transaction_code }}.{{$row->documentTax->code}}</td>
                                     <td  align="right">{{ number_format($row->documentTax->total,0,',','.') }}</td>
                                     <td  align="center">{{ $row->documentTax->npwp_name }}</td>
                                     <td  align="center" style="color:{{$row->statusColor()}}">{{ $row->status() }}</td>
@@ -297,7 +297,7 @@
                                 @if($data->user->signature)
                                     <div>{!! $data->user->signature() !!}</div>
                                 @endif
-                                
+                                <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                             </td>
                             @if($data->account)
                                 <td class="center-align">
@@ -307,7 +307,7 @@
                                     @if($data->account->signature)
                                         <div>{!! $data->account->signature() !!}</div>
                                     @endif
-                                   
+                                    <div class="{{ $data->account->signature ? '' : 'mt-5' }}">{{ $data->account->name }}</div>
                                 </td>
                             @endif
                         </tr>

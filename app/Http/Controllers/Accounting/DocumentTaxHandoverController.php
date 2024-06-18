@@ -97,6 +97,7 @@ class DocumentTaxHandoverController extends Controller
                     ->offset($start)
                     ->limit($length)
                     ->orderBy($order, $dir)
+                    ->orderBy('created_at', 'DESC')
                     ->get();
         
 

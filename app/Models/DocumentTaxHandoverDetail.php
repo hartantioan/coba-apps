@@ -26,7 +26,7 @@ class DocumentTaxHandoverDetail extends Model
     }
 
     public function documentTaxHandover(){
-        return $this->belongsTo('App\Models\documentTaxHandover','document_tax_handover_id','id');
+        return $this->belongsTo('App\Models\DocumentTaxHandover','document_tax_handover_id','id');
     }
 
     public function status(){

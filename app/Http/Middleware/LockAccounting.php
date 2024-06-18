@@ -20,8 +20,8 @@ class LockAccounting
     public function handle(Request $request, Closure $next)
     {
         if(in_array($request->segment(count($request->segments())),['create'])){
-            if(isset($request->post_date)){
-                $month = date('Y-m',strtotime($request->post_date));
+            if(isset($request->post_date) || isset($request->pay_date)){
+                $month = isset($request->pay_date) ? date('Y-m',strtotime($request->pay_date)) : date('Y-m',strtotime($request->post_date));
                 $cekLock = LockPeriod::where('month',$month)->whereIn('status',['2','3'])->first();
                 if($cekLock){
                     $passedSpecial = false;

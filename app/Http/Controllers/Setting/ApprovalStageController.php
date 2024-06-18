@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\Setting;
+
+use App\Exports\ExportApprovalStageTransactionPage;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
@@ -50,15 +52,10 @@ class ApprovalStageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('level', 'like', "%$search%")
+                            ->orwhere('level', 'like', "%$search%")
                             ->orWhereHas('approval',function($query) use($search){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('document_text','like',"%$search%");
-                            })
-                            ->orWhereHas('approvalStageDetail', function($query) use($search){
-                                $query->orWhereHas('user',function($query) use($search){
-                                    $query->where('name','like',"%$search%");
-                                });
                             });
                     });
                 }
@@ -77,15 +74,10 @@ class ApprovalStageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('level', 'like', "%$search%")
+                            ->orwhere('level', 'like', "%$search%")
                             ->orWhereHas('approval',function($query) use($search){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('document_text','like',"%$search%");
-                            })
-                            ->orWhereHas('approvalStageDetail', function($query) use($search){
-                                $query->orWhereHas('user',function($query) use($search){
-                                    $query->where('name','like',"%$search%");
-                                });
                             });
                     });
                 }
@@ -295,5 +287,12 @@ class ApprovalStageController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+      
+		return Excel::download(new ExportApprovalStageTransactionPage($search,$status), 'approval_stage'.uniqid().'.xlsx');
     }
 }

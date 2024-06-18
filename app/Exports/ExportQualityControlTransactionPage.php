@@ -8,17 +8,19 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
+class ExportQualityControlTransactionPage implements FromView,ShouldAutoSize
 {
-    protected $search,$start_date, $end_date, $status, $modedata;
-    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata)
+    protected $search,$start_date, $end_date, $status,$status_qc, $modedata;
+    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata,string $status_qc)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status   = $status ? $status : '';
+        $this->status_qc   = $status_qc ? $status_qc : '';
         $this->modedata = $modedata ? $modedata : '';
     }
+
     public function view(): View
     {
        $x= GoodScale::where(function($query) {
@@ -56,7 +58,7 @@ class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
     })
     ->get();
     
-        return view('admin.exports.good_scale', [
+        return view('admin.exports.quality_control_transaction_page', [
             'data' => $x
         ]);
         

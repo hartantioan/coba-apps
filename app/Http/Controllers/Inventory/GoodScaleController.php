@@ -1096,8 +1096,9 @@ class GoodScaleController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
+        $status_qc = $request->status_qc ? $request->status_qc : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportGoodScaleTransactionPage($search,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodScaleTransactionPage($search,$post_date,$end_date,$status,$modedata,$status_qc), 'good_scale'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){

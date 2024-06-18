@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Inventory;
 
 use App\Exports\ExportGoodScale;
-use App\Exports\ExportGoodScaleTransactionPage;
+use App\Exports\ExportQualityControlTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\GoodScale;
@@ -378,5 +378,14 @@ class QualityControlController extends Controller
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
+    }
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $status = $request->status ? $request->status : '';
+        $status_qc = $request->status_qc ? $request->status_qc : '';
+		$modedata = $request->modedata ? $request->modedata : '';
+		return Excel::download(new ExportQualityControlTransactionPage($search,$post_date,$end_date,$status,$status_qc,$modedata), 'quality_control'.uniqid().'.xlsx');
     }
 }

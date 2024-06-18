@@ -45,6 +45,11 @@
                                                 <option value="2">Non-Aktif</option>
                                             </select>
                                         </div>
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                                            <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                            <span class="hide-on-small-onl">Export</span>
+                                            <i class="material-icons right">view_headline</i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -547,5 +552,13 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status ;
+       
     }
 </script>

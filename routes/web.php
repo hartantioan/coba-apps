@@ -1247,6 +1247,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[ApprovalStageController::class, 'datatable']);
                     Route::post('create',[ApprovalStageController::class, 'create'])->middleware('operation.access:approval_stage,update');
                     Route::post('show', [ApprovalStageController::class, 'show']);
+                    Route::get('export_from_page',[ApprovalStageController::class, 'exportFromTransactionPage']);
                     Route::get('row_detail',[ApprovalStageController::class, 'rowDetail']);
                     Route::post('destroy', [ApprovalStageController::class, 'destroy'])->middleware('operation.access:approval_stage,delete');
                 });
@@ -1747,6 +1748,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('good_scale')->middleware(['operation.access:good_scale,view','lockacc'])->group(function () {
                     Route::get('/',[GoodScaleController::class, 'index']);
                     Route::post('datatable',[GoodScaleController::class, 'datatable']);
+                    
                     Route::post('done',[GoodScaleController::class, 'done'])->middleware('operation.access:good_scale,update');
                     Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
                     Route::post('show', [GoodScaleController::class, 'show']);
@@ -1776,6 +1778,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('inspect', [QualityControlController::class, 'inspect']);
                     Route::post('create',[QualityControlController::class, 'create'])->middleware('operation.access:quality_control,update');
                     Route::post('remove_used_data', [QualityControlController::class, 'removeUsedData']);
+                    Route::get('export_from_page',[QualityControlController::class, 'exportFromTransactionPage']);
                     Route::get('row_detail',[QualityControlController::class, 'rowDetail']);
                 });
 

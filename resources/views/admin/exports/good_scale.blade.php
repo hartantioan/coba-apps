@@ -6,26 +6,37 @@
             <th>Pengguna</th>
             <th>Code</th>
             <th>Perusahaan</th>
-            <th>Plant</th>
             <th>Tanggal</th>
+            <th>No SJ</th>
+            <th>No Kendaraan</th>
+            <th>Supir</th>
             <th>Keterangan</th>
-            <th>Dokumen</th>
+            <th>Waktu Masuk</th>
+            <th>Cek QC</th>
+            <th>Waktu QC</th>
+            <th>Waktu Keluar</th>
+            <th>Status Dokumen</th>
+            <th>Status QC</th>
+            <th>Catatan QC</th>
             <th>Status</th>
+            <th>Ref.PO</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
             <th>Voider</th>
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
-            <th>Ref.PO</th>
             <th>Item</th>
             <th>Qty.PO</th>
-            <th>Qty.Datang</th>
-            <th>Qty.Pulang</th>
+            <th>Qty.Bruto</th>
+            <th>Qty.Tara</th>
             <th>Qty.Netto</th>
+            <th>Qty.QC</th>
+            <th>Qty.Final</th>
+            <th>Viscositas</th>
+            <th>Residu</th>
+            <th>Kadar Air</th>
             <th>Satuan</th>
-            <th>Ket.1</th>
-            <th>Ket.2</th>
             <th>Plant</th>
             <th>Gudang</th>
         </tr>
@@ -35,40 +46,49 @@
             $no = 1;
         @endphp
         @foreach($data as $key => $row)
-            @foreach($row->goodScaleDetail as $key1 => $rowdetail)
             <tr align="center">
                 <td>{{ $no }}</td>
                 <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->company->name }}</td>
-                <td>{{ $row->place->code }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                <td>{{ $row->delivery_no }}</td>
+                <td>{{ $row->vehicle_no }}</td>
+                <td>{{ $row->driver }}</td>
                 <td>{{ $row->note }}</td>
-                <td><a href="{{ $row->attachment() }}">File</a></td>
-                <td>{!! $row->status() !!}</td>
+                <td>{{ $row->time_scale_in }}</td>
+                <td>{!! $row->qualityCheck() !!}</td>
+                <td>{{ $row->time_scale_qc }}</td>
+                <td>{{ $row->time_scale_out }}</td>
+                <td>{{ $row->document }}</td>
+                <td>{{ $row->statusQcRaw() }}</td>
+                <td>{{ $row->note_qc }}</td>
+                <td>{{ $row->statusRaw() }}</td>
+                <td>{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
                 <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
-                <td>{{ $rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
-                <td>{{ $rowdetail->item->code.' - '.$rowdetail->item->name }}</td>
-                <td>{{ $rowdetail->purchase_order_detail_id ? $rowdetail->purchaseOrderDetail->qty : '-' }}</td>
-                <td>{{ $rowdetail->qty_in }}</td>
-                <td>{{ $rowdetail->qty_out }}</td>
-                <td>{{ $rowdetail->qty_balance }}</td>
-                <td>{{ $rowdetail->item->uomUnit->code }}</td>
-                <td>{{ $rowdetail->note }}</td>
-                <td>{{ $rowdetail->note2 }}</td>
-                <td>{{ $rowdetail->place->code }}</td>
-                <td>{{ $rowdetail->warehouse->name }}</td>
+                <td>{{ $row->item->code.' - '.$row->item->name }}</td>
+                <td>{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->qty : '-' }}</td>
+                <td>{{ $row->qty_in }}</td>
+                <td>{{ $row->qty_out }}</td>
+                <td>{{ $row->qty_balance }}</td>
+                <td>{{ $row->qty_qc }}</td>
+                <td>{{ $row->qty_final }}</td>
+                <td>{{ $row->viscosity }}</td>
+                <td>{{ $row->residue }}</td>
+                <td>{{ $row->water_content }}</td>
+                <td>{{ $row->item->uomUnit->code }}</td>
+                <td>{{ $row->place->code }}</td>
+                <td>{{ $row->warehouse->name }}</td>
             </tr>
             @php
                 $no++;
             @endphp
-            @endforeach
         @endforeach
     </tbody>
 </table>

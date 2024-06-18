@@ -2,11 +2,13 @@
     <thead>
         <tr>
             <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
+            <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Status</th>
             <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
             <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
+            
         </tr>
         <tr>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
@@ -21,6 +23,7 @@
             @foreach($data as $key => $row)
                 <tr>
                     <td style="border: 1px solid black;">{{ $key + 1 }}.</td>
+                    <td style="border: 1px solid black;">{{ $row->status()}}</td>
                     <td style="border: 1px solid black;">{{ $row->date }}</td>
                     <td style="border: 1px solid black;">{{ $row->transaction_code.$row->replace.$row->code }}</td>
                     
@@ -30,6 +33,7 @@
                     <td style="border: 1px solid black;">{{ number_format($row->total,2,',','.')}}</td>
                     <td style="border: 1px solid black;">{{ number_format($row->tax,2,',','.') }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTaxDetail->first()->item ?? '-' }}</td>
+
                 </tr>
             @endforeach
         @endif

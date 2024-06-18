@@ -327,7 +327,7 @@ class DocumentTaxController extends Controller
         $finish_date = $request->finish_date ? $request->finish_date : '';
         $search = $request->search ? $request->search : '';
         $multiple = $request->multiple ? $request->multiple : '';
-
+        
 		return Excel::download(new ExportDocumentTaxTable($start_date,$finish_date,$search,$multiple),'faktur_pajak'.uniqid().'.xlsx');
     }
 

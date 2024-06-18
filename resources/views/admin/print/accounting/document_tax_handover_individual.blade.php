@@ -258,9 +258,22 @@
                         </thead>
                         <tbody>
                             @foreach($data->documentTaxHandoverDetail as $key => $row)
+                            @php
+                                $number = $row->documentTax->code;
+
+                            
+                                $number = strval($number);
+                                
+                                // Extract parts of the number
+                                $part1 = substr($number, 0, 3);
+                                $part2 = substr($number, 3, 2);
+                                $part3 = substr($number, 5);
+
+                                $formattedNumber = "{$part1}-{$part2}.{$part3}";
+                            @endphp
                                 <tr>
                                     <td  align="center">{{ $key + 1 }}</td>
-                                    <td>{{ $row->documentTax->transaction_code }}.{{$row->documentTax->code}}</td>
+                                    <td>{{ $row->documentTax->transaction_code }}{{$row->documentTax->replace}}.{{$formattedNumber}}</td>
                                     <td  align="right">{{ number_format($row->documentTax->total,0,',','.') }}</td>
                                     <td  align="center">{{ $row->documentTax->npwp_name }}</td>
                                     <td  align="center" style="color:{{$row->statusColor()}}">{{ $row->status() }}</td>

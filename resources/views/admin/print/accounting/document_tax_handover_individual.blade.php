@@ -261,7 +261,7 @@
                                 <tr>
                                     <td  align="center">{{ $key + 1 }}</td>
                                     <td>{{ $row->documentTax->transaction_code }}{{$row->documentTax->code}}</td>
-                                    <td  align="right">{{ $row->documentTax->total }}</td>
+                                    <td  align="right">{{ number_format($row->documentTax->total,0,',','.') }}</td>
                                     <td  align="center">{{ $row->documentTax->npwp_name }}</td>
                                     <td  align="center" style="color:{{$row->statusColor()}}">{{ $row->status() }}</td>
                                 </tr>

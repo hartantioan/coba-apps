@@ -165,16 +165,17 @@ class DocumentTaxController extends Controller
             foreach($query_data as $val) {
                 $refrence = '';
 				if($val->documentTaxHandoverDetail()->exists()){
-                    info($val->documentTaxHandoverDetail->id);
+                 
                     $refrence = $val->documentTaxHandoverDetail->documentTaxHandover->code;
                 }else{
-                    $refrence = "belum terpakai";
+                    $refrence = "-";
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->date,
                     $val->transaction_code.$val->replace.$val->code,
                     $val->user->name ?? '-',
+                    $val->status(),
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
@@ -347,7 +348,8 @@ class DocumentTaxController extends Controller
         ->where('code', $xmlObject->nomorFaktur)
         ->where('replace', $xmlObject->fgPengganti)
         ->where('transaction_code', $xmlObject->kdJenisTransaksi)
-        ->whereNull('deleted_at') 
+        ->whereNull('deleted_at')
+        ->whereIn('status',['1','2']) 
         ->exists();
         
         
@@ -387,6 +389,7 @@ class DocumentTaxController extends Controller
                                 'reference'=> isset($phpDataArray['referensi'])? $phpDataArray['referensi'] : null,
                                 'url'=> $barcode,
                                 'user_id'=> session('bo_id'),
+                                'status'=> '1',
                             ]);
     
                     

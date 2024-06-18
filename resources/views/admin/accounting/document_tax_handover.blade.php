@@ -116,7 +116,7 @@
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tanggal Post</th>
 
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Approval</th>
-                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Keterangan</th>
+     
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Status</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Action</th>
                                                     </tr>
@@ -213,13 +213,7 @@
                             </div>
                         </fieldset>
                         <div class="row">
-                            <div class="input-field col m4 s12 step6">
-                                <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
-                                <label class="active" for="note">Keterangan</label>
-                            </div>
-                            <div class="input-field col m4 s12">
-                               
-                            </div>
+                            
                             <div class="col s12 mt-3">
                                 <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                             </div>
@@ -338,6 +332,7 @@
                         'selectAll',
                         'selectNone'
                     ],
+                    "order": [[0, 'desc']],
                     "language": {
                         "lengthMenu": "Menampilkan _MENU_ data per halaman",
                         "zeroRecords": "Data tidak ditemukan / kosong",
@@ -505,7 +500,7 @@
             "destroy": true,
             "iDisplayInLength": 10,
             
-            "order": [[0, 'desc']],
+            "order": [[0, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -532,7 +527,6 @@
             columns: [
                         { name: 'id', searchable: false, className: 'center-align' },
                         { name: 'transaction_code', className: 'center-align' },
-                        { name: 'date', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },
@@ -896,7 +890,7 @@
                 $('#temp_con').val(id);
                 
                 $('#temp_confirmation').val(id);
-                $('#document_tax_note').append(`<p>Keterangan:`+response.note+`<p>`);
+               
                 $('#document_tax_post_date').append(`<p>Post Date:`+response.post_date+`<p>`);
                 $('#document_tax_created_by').append(`<p>Created By:`+response.users+`<p>`);
                 $('#document_tax_code').append(`<p>Kode Tanda Terima:`+response.code+`<p>`);
@@ -933,7 +927,6 @@
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
-                M.updateTextFields();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

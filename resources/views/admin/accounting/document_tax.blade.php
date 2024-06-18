@@ -131,7 +131,7 @@
                                                     <tr>
                                                         <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
                                                         <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
-                                                        <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
+                                                        <th align="center" colspan="4" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Refrensi</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
                                                         <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
@@ -142,6 +142,7 @@
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Scanner</th>
+                                                        <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Status</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama </th>
                                                         <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Alamat Lengkap</th>
@@ -348,6 +349,7 @@
                         { name: 'transaction_code', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
+                        { name: 'status', className: 'center-align' },
                         { name: 'scanner', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },

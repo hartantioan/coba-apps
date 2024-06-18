@@ -34,7 +34,7 @@ class DocumentTax extends Model
         'reference',
         'url',
         'user_id',
-        
+        'status',
     ];
 
     public function documentTaxDetail()
@@ -49,6 +49,17 @@ class DocumentTax extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id');
+    }
+
+    public function status(){
+        $status = match ($this->status) {
+          '1' => 'Pending',
+          '2' => 'Digunakan',
+          '3' => 'Revisi',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
     }
 
 }

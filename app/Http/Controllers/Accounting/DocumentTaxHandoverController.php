@@ -58,7 +58,6 @@ class DocumentTaxHandoverController extends Controller
             'company_id',
             'account_id',
             'post_date',
-            'note',
             'void_id',
             'void_note',
             'void_date',
@@ -123,21 +122,30 @@ class DocumentTaxHandoverController extends Controller
         if($query_data <> FALSE) {
             $angka = 1;
             foreach($query_data as $val) {
-				
+				if($val->status == '2'){
+                    $m = '
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                       
+                        
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+					';
+                }else{
+                    $m = '
+                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="Konfirmasi" onclick="confirm(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">playlist_add_check</i></button>
+                        
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+					';
+                }
                 $response['data'][] = [
                     $angka,
                     $val->code,
                     $val->user->name,
                     $val->post_date,
                     $val->account->name??'',
-                    $val->note,
+                  
                     $val->status(),
-                    '
-                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="Konfirmasi" onclick="confirm(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">playlist_add_check</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
-					'
+                    $m
                 ];
                 $angka++;
             }
@@ -185,14 +193,12 @@ class DocumentTaxHandoverController extends Controller
             'post_date'			        => 'required',
             'code_place_id'             => 'required',
             'company_id'		        => 'required',
-            'note'                      => 'required',
             'arr_tax'                   => 'required|array',
         ], [
             'code.required' 				    => 'Kode/No tidak boleh kosong.',
             'code_place_id.required'            => 'Plant tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'note.required' 			        => 'Keterangan / catatan tidak boleh kosong.',
             'arr_tax.required'                  => 'Harap pilih pajak sebelum menyimpan',
             'arr_tax.array'                     => ''
         ]);
@@ -216,7 +222,6 @@ class DocumentTaxHandoverController extends Controller
                     $query->post_date = $request->post_date;
                     $query->currency_id = $request->currency_id;
                     $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                    $query->note = $request->note;
                     $query->status = '1';
                     $query->save();
 
@@ -238,7 +243,6 @@ class DocumentTaxHandoverController extends Controller
                     'company_id'    => $request->company_id,
                     'post_date'	    => $request->post_date,
                     'status'        => '1',
-                    'note'          => $request->note,
                 ]);
             }
             
@@ -252,6 +256,9 @@ class DocumentTaxHandoverController extends Controller
                         'status'                   => '1',
                        
                     ]);
+                    $document_tax = DocumentTax::find($row);
+                    $document_tax->status = '2';
+                    $document_tax->save();
                 }
 
                 $response = [
@@ -281,6 +288,9 @@ class DocumentTaxHandoverController extends Controller
                     
                     if ($detail) {
                         $detail->status = 2;
+                        $document_tax_reject = DocumentTax::find($id);
+                        $document_tax_reject->status = '2';
+                        $document_tax_reject->save(); 
                         $detail->save();
                     }
                 }
@@ -291,7 +301,10 @@ class DocumentTaxHandoverController extends Controller
                         ->where('document_tax_handover_id', $query_tax_handover->id)
                         ->first();
                     if ($detail) {
-                        $detail->status = 3; 
+                        $detail->status = 3;
+                        $document_tax_reject = DocumentTax::find($id);
+                        $document_tax_reject->status = '3'; 
+                        $document_tax_reject->save();
                         $detail->save();
                     }
                 }
@@ -393,10 +406,10 @@ class DocumentTaxHandoverController extends Controller
         $angka = 1;
         foreach($query_tax_handover->documentTaxHandoverDetail as $row){
             $checkIcon = '';
-            if ($row->status == 1) {
+            if ($row->status == '1' || $row->status == '3' ) {
                 $checkIcon = '<input type="checkbox" class="filled-in" name="arr_tax_detail" data-id="'.$row->document_tax_id.'"/>';
-            } elseif ($row->status == 2) {
-                $checkIcon = '<input type="checkbox" class="filled-in" check="checked" name="arr_tax_detail" data-id="'.$row->document_tax_id.'"/>';
+            } elseif ($row->status == '2') {
+                $checkIcon = '<input type="checkbox" class="filled-in" checked="check" name="arr_tax_detail" data-id="'.$row->document_tax_id.'"/>';
             }
             $arr[] = [
                 'id'                => $row->document_tax_id,
@@ -473,6 +486,9 @@ class DocumentTaxHandoverController extends Controller
         if($query->delete()) {
 
             foreach($query->documentTaxHandoverDetail as $row){
+                $document_tax_reject = DocumentTax::find($row->document_tax_id);
+                $document_tax_reject->status = '1'; 
+                $document_tax_reject->save();
                 $row->delete();
             }
 
@@ -499,7 +515,7 @@ class DocumentTaxHandoverController extends Controller
     public function getTaxforHandoverTax(Request $request){
         $search     = $request->search;
         $data = DocumentTax::whereDoesntHave('documentTaxHandoverDetail')
-                // ->where('status')
+                ->whereNotIn('status',['2','3'])
                 ->where(function($query)use($request,$search){
                     if ($search) {
                         $query->where('code', 'like', "%$search%")
@@ -512,12 +528,14 @@ class DocumentTaxHandoverController extends Controller
                             ->orWhere('transaction_code', 'like', "%$search%");
                     }
                 })
+                ->orderBy('created_at', 'DESC')
                 ->get();
 
         $arr = [];
+       
         $angka =1;
         foreach($data as $row){
-            /* if($row->balancePaymentIncoming() > 0){ */
+           
                 $arr[] = [
                     'id'                => $row->id,
                     'no'                => $angka,
@@ -532,9 +550,9 @@ class DocumentTaxHandoverController extends Controller
                     'type'              => $row->getTable(),
                 ];
             $angka++;
-            /* } */
+          
         }
-
+        
         return response()->json($arr);
     }
 

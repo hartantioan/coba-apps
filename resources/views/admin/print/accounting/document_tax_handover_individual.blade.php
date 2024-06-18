@@ -170,18 +170,15 @@
                     <td width="83%" class="left-align" >
                         <tr>
                             <td>
-                                <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                                <span class="invoice-number mr-1" style="font-size: 1rem"># {{ $data->code }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <td style="margin-top: -2px;">
-                                <small>Diajukan:</small>
-                                <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
-                            </td>
+                            
                         </tr>
                         <tr>
                             <td>
-                                <h5 class="indigo-text">Tanda Terima Ke Tax</h5>
+                                <h3 class="indigo-text">TANDA TERIMA KE TAX</h3>
                             </td>
                         </tr>
                                 
@@ -217,41 +214,19 @@
                                 </tr>
                                 <tr>
                                     <td width="40%">
-                                        Posisi
+                                        Untuk
                                     </td>
                                     <td width="60%">
-                                        {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
+                                        {{ $data->account->name ? $data->account->name : '-' }}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td width="40%">
-                                        Depart.
-                                    </td>
-                                    <td width="60%">
-                                        {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
-                                    </td>
+                                    
                                 </tr>
                             </table>
                         </td>
                         <td width="33%" class="left-align" style="vertical-align: top !important;">
-                            <table border="0" width="100%">
-                                <tr>
-                                    <td width="40%">
-                                        Perusahaan
-                                    </td>
-                                    <td width="60%">
-                                        {{ $data->company->name }}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="40%">
-                                        Catatan
-                                    </td>
-                                    <td width="60%">
-                                        {{ $data->note }}
-                                    </td>
-                                </tr>
-                            </table>
+                            
                         </td>
                         <td width="33%" class="left-align">
                             <table border="0" width="100%">
@@ -303,9 +278,7 @@
                             <tr class="break-row">
                                 <td>
                                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                    <div class="mt-3">
-                                        Catatan : {{ $data->note }}
-                                    </div>
+                                    
                                    
                                 </td>
                                 
@@ -324,8 +297,7 @@
                                 @if($data->user->signature)
                                     <div>{!! $data->user->signature() !!}</div>
                                 @endif
-                                <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
+                                
                             </td>
                             @if($data->account)
                                 <td class="center-align">
@@ -335,8 +307,7 @@
                                     @if($data->account->signature)
                                         <div>{!! $data->account->signature() !!}</div>
                                     @endif
-                                    <div class="{{ $data->account->signature ? '' : 'mt-5' }}">{{ $data->account->name }}</div>
-                                    <div class="mt-1">{{ $data->account->position()->exists() ? $data->account->position->Level->name.' - '.$data->account->position->division->name : '-' }}</div>
+                                   
                                 </td>
                             @endif
                         </tr>

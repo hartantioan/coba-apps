@@ -68,6 +68,14 @@ class PurchaseOrderDetail extends Model
         return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
     }
 
+    public function qtyStock(){
+        $qty = 0;
+        if($this->item()->exists()){
+            $qty = $this->item->getStockPlace($this->place_id) * $this->qty_conversion;
+        }
+        return $qty;
+    }
+
     public function coaUnit()
     {
         return $this->belongsTo('App\Models\Unit', 'coa_unit_id', 'id')->withTrashed();

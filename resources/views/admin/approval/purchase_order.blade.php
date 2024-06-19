@@ -258,6 +258,7 @@
                         <th class="center-align">  {{ __('translations.No') }}.</th>
                         <th class="center-align">  {{ __('translations.item/service') }}</th>
                         <th class="center-align">  {{ __('translations.item_group') }}</th>
+                        <th class="center-align">  {{ __('translations.stock_in_hand') }}</th>
                         <th class="center-align">  {{ __('translations.qty') }}</th>
                         <th class="center-align">  {{ __('translations.unit') }}</th>
                         <th class="center-align">  {{ __('translations.price') }}</th>
@@ -273,6 +274,7 @@
                         <td class="center-align" rowspan="4">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->itemGroup->name : '-' }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qtyStock()) }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ ($row->itemUnit()->exists() ? $row->itemUnit->unit->code : ($row->coaUnit()->exists() ? $row->coaUnit->code : '-')) }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
@@ -282,20 +284,20 @@
                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">  {{ __('translations.note') }} 1: {{ $row->note }}</td>
+                        <td colspan="11">  {{ __('translations.note') }} 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">  {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
+                        <td colspan="11">  {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">  {{ __('translations.note') }} 3: {{ $row->note3 }}</td>
+                        <td colspan="11">  {{ __('translations.note') }} 3: {{ $row->note3 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="10">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
+                        <td colspan="11">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="7" rowspan="8">
+                        <td colspan="8" rowspan="8">
                             {{ __('translations.bank_account') }} :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">

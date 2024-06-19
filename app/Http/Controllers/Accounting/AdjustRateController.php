@@ -252,7 +252,7 @@ class AdjustRateController extends Controller
                         'type_document' => 'GRPO',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
                         'type'          => '2',
                     ];
                 }
@@ -270,7 +270,7 @@ class AdjustRateController extends Controller
                         'type_document' => 'APDP',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
                         'type'          => '2',
                     ];
                 }
@@ -288,7 +288,7 @@ class AdjustRateController extends Controller
                         'type_document' => 'APIN',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format($latest_rate * $total,2,',','.'),
+                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
                         'type'          => '2',
                     ];
                 }

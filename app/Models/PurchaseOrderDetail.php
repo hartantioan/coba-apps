@@ -71,7 +71,7 @@ class PurchaseOrderDetail extends Model
     public function qtyStock(){
         $qty = 0;
         if($this->item()->exists()){
-            $qty = $this->item->getStockPlace($this->place_id) * $this->qty_conversion;
+            $qty = round($this->item->getStockPlace($this->place_id) / $this->qty_conversion,3);
         }
         return $qty;
     }

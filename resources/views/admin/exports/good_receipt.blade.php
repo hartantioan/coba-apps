@@ -72,7 +72,7 @@
                 <td align="center">{{ $rowdetail->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
-                <td align="center">{{ $rowdetail->goodScale()->exists() ? CustomHelper::formatConditionalQty($rowdetail->goodScale->qty_balance) : '0' }}</td>
+                <td align="center">{{ $rowdetail->goodScale()->exists() ? $rowdetail->goodScale->qty_balance : '0' }}</td>
                 <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->water_content) }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>

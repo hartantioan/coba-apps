@@ -25,11 +25,12 @@
             <th>Plant</th>
             <th>Ket. 1</th>
             <th>Ket. 2</th>
-            <th>Qty.</th>
-            <th>Satuan</th>
-            <th>Qty. Konversi</th>
-            <th>Satuan</th>
+            <th>Qty Netto</th>
             <th>Kadar Air (%)</th>
+            <th>Qty Diterima</th>
+            <th>Satuan</th>
+            <th>Qty Konversi</th>
+            <th>Satuan</th>
             <th>Kurs</th>
             <th>Total</th>
             <th>Line</th>
@@ -71,11 +72,12 @@
                 <td align="center">{{ $rowdetail->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{{ $rowdetail->note2 }}</td>
+                <td align="center">{{ $rowdetail->goodScale()->exists() ? CustomHelper::formatConditionalQty($rowdetail->goodScale->qty_balance) : '0' }}</td>
+                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->water_content) }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
-                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->water_content) }}</td>
                 <td align="center">{{ $nominal ? $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate : '' }}</td>
                 <td align="center">{{ $nominal ? round($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total,2) : '' }}</td>
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>

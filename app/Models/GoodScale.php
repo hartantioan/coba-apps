@@ -87,6 +87,19 @@ class GoodScale extends Model
         });
     }
 
+    public function goodReceiptDetailExcel(){
+        
+        $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
+            $query->whereIn('status',['2','3']);
+        })->get();
+        $array = [];
+        foreach($x as  $row){
+            $array[]=$row->goodReceipt->code;
+        }
+        $codesString = implode(', ', $array);
+        return $codesString;
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

@@ -254,7 +254,7 @@
                             </div>
                             <div class="input-field col m3 s12 step3">
                                 <input type="hidden" id="temp" name="temp">
-                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getTopSupplier();"></select>
+                                <select class="browser-default" id="supplier_id" name="supplier_id" onchange="getPurchaseOrder(this.value);getTopSupplier();"></select>
                                 <label class="active" for="supplier_id">Supplier</label>
                             </div>
                             <div class="input-field col m3 s12 step4">
@@ -315,12 +315,7 @@
                             </div>
                             <div class="col m12 s12 step13">
                                 <p class="mt-2 mb-2">
-                                    <h6>
-                                        Detail Purchase Order / Req. Dana (Centang jika ada)
-                                        <a class="waves-effect waves-light red btn-small" style="margin-top: 0.5em;margin-left:0.2em" href="javascript:void(0);" onclick="getPurchaseOrder();">
-                                            Tambah PO
-                                        </a>
-                                    </h6>
+                                    <h6>Detail Purchase Order / Req. Dana (Centang jika ada)</h6>
                                     <div style="overflow:auto;width:100% !important;">
                                         <table class="bordered" id="table-detail" style="min-width:1800px !important;">
                                             <thead>
@@ -1431,14 +1426,14 @@
         }
     } */
 
-    function getPurchaseOrder(){
-        if($('#supplier_id').val()){
+    function getPurchaseOrder(val){
+        if(val){
             $.ajax({
                 url: '{{ Request::url() }}/get_purchase_order',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    supplier: $('#supplier_id').val()
+                    supplier: val
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1502,11 +1497,6 @@
             `);
             $('#grandtotal,#total,#tax,#wtax').text('0,00');
             $('#subtotal').val('0,00');
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih supplier.',
-                icon: 'warning'
-            });
         }
     }
 

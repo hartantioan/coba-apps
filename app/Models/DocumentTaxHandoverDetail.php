@@ -33,7 +33,7 @@ class DocumentTaxHandoverDetail extends Model
         $status = match ($this->status) {
           '1' => 'Pending',
           '2' => 'Approved',
-          '3' => 'Ditolak',
+          '3' => 'Rejected',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 

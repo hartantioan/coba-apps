@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
+            <th align="center" rowspan="2"  style="background-color: navy; color: white;border: 1px solid white;">Status</th>
             <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
             <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
@@ -21,6 +22,7 @@
             @foreach($data as $key => $row)
                 <tr>
                     <td style="border: 1px solid black;">{{ $key + 1 }}.</td>
+                    <td style="border: 1px solid black;">{{ $row->documentTax->status() }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->date }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code }}</td>
                     <td style="border: 1px solid black;">'{{ number_format($row->documentTax->npwp_number, 0, '.', '') }}</td>

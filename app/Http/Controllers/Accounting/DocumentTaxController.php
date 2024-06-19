@@ -164,22 +164,26 @@ class DocumentTaxController extends Controller
         if($query_data <> FALSE) {
             foreach($query_data as $val) {
                 $refrence = '';
+                $pdate_dtax ="";
 				if($val->documentTaxHandoverDetail()->exists()){
                  
                     $refrence = $val->documentTaxHandoverDetail->documentTaxHandover->code;
+                    $pdate_dtax =  date('d/m/Y',strtotime($val->documentTaxHandoverDetail->documentTaxHandover->post_date));
                 }else{
                     $refrence = "-";
+                    $pdate_dtax ="-";
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
-                    $val->date,
-                    $val->transaction_code.$val->replace.$val->code,
+                    $pdate_dtax,
+                    $refrence,
                     $val->user->name ?? '-',
                     $val->status(),
+                    $val->date,
+                    $val->transaction_code.$val->replace.$val->code,
                     $val->npwp_number,
                     $val->npwp_name,
                     $val->npwp_address,
-                    $refrence,
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     $val->documentTaxDetail->first()->item ?? '-',
@@ -318,7 +322,7 @@ class DocumentTaxController extends Controller
 
     public function export(Request $request){
 		$no_faktur = $request->no_faktur ? $request->no_faktur : ''   ;
-        
+        info($request);
 		return Excel::download(new ExportDocumentTax($no_faktur),'faktur_pajak'.uniqid().'.xlsx');
     }
 

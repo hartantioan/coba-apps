@@ -2069,7 +2069,7 @@
                                         $('#account_no').val(val.no_account);
                                         $('#account_bank').val(val.bank_account);
                                         $('#account_name').val(val.name_account);
-                                        $('#payment_type').val(val.payment_type);
+                                        $('#payment_type').val(val.payment_type).formSelect();
                                         $('#note').val(val.remark);
                                         if(val.is_reimburse){
                                             $('#is_reimburse').val(val.is_reimburse).formSelect();

@@ -717,6 +717,7 @@ class PaymentRequestController extends Controller
                                 'document_status' => $data->document_status,
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => '',
+                                'payment_type'  => $data->payment_type ?? '1',
                             ];
                         }
                     }
@@ -774,6 +775,7 @@ class PaymentRequestController extends Controller
                                 'document_status' => '',
                                 'is_reimburse'  => $is_reimburse,
                                 'raw_due_date'  => $required_date,
+                                'payment_type'  => $data->payment_type ?? '1',
                             ];
                         }
                     }
@@ -829,6 +831,7 @@ class PaymentRequestController extends Controller
                                 'document_status' => '',
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => $raw_due_date,
+                                'payment_type'  => $data->payment_type ?? '1',
                             ];
                         }
                     }
@@ -872,6 +875,7 @@ class PaymentRequestController extends Controller
                                 'document_status' => '',
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => '',
+                                'payment_type'  => $data->payment_type ?? '1',
                             ];
                         }
                     }

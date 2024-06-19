@@ -494,13 +494,13 @@
             "scrollY": '400px',
             "responsive": false,
             "scrollX":true,
-            "stateSave": true,
+           
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
             
-            "order": [[0, 'asc']],
+            "order": [[1, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',

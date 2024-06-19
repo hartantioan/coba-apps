@@ -23,7 +23,7 @@ class DocumentTaxHandoverController extends Controller
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
     public function __construct(){
         $user = User::find(session('bo_id'));
-
+        
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
@@ -32,6 +32,8 @@ class DocumentTaxHandoverController extends Controller
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
+        $this->lasturl = $lastSegment;
+        info($this->lasturl.'index');
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
@@ -69,7 +71,15 @@ class DocumentTaxHandoverController extends Controller
             'status',
         ];
         
-
+        $lastSegment = request()->segment(3);
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','journal')->first();
+        $direksi = '';
+        if($menuUser){
+            $direksi='ASC';
+        }else{
+            $direksi='DESC';
+        }
         $start  = $request->start;
         $length = $request->length;
         $order  = $column[$request->input('order.0.column')];
@@ -97,7 +107,7 @@ class DocumentTaxHandoverController extends Controller
                     ->offset($start)
                     ->limit($length)
                     ->orderBy($order, $dir)
-                    ->orderBy('created_at', 'DESC')
+                    ->orderBy('created_at',$direksi)
                     ->get();
         
 
@@ -123,17 +133,16 @@ class DocumentTaxHandoverController extends Controller
         if($query_data <> FALSE) {
             $angka = 1;
             foreach($query_data as $val) {
-				if($val->status == '2'){
+				if($menuUser){
                     $m = '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                       
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="Konfirmasi" onclick="confirm(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">playlist_add_check</i></button>
                         
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }else{
                     $m = '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="Konfirmasi" onclick="confirm(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">playlist_add_check</i></button>
                         
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';

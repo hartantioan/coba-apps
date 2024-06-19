@@ -93,7 +93,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="19" align="center">
+                <td colspan="20" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

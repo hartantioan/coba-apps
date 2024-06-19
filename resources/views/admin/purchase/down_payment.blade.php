@@ -42,6 +42,10 @@
     .preserveLines {
         white-space: pre-line;
     }
+
+    .dataTables_scrollHeadInner, .dataTable {
+        width: 100% !important; 
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -615,22 +619,54 @@
             <div class="col s12">
                 <div class="row">
                     <div class="col s12 mt-2">
-                        <div id="datatable_buttons_multi"></div>
-                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
-                        <table id="table_multi" class="display" width="100%">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">Kode Dokumen</th>
-                                    <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">Total</th>
-                                    <th class="center-align">PPN</th>
-                                    <th class="center-align">PPh</th>
-                                    <th class="center-align">Grandtotal</th>
-                                    <th class="center-align">Keterangan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-detail-multi"></tbody>
-                        </table>
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>FUND REQUEST / PERMOHONAN DANA (TIDAK LENGKAP)</div>
+                                <div class="collapsible-body" style="display:block;">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_buttons_multi"></div>
+                                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                        <table id="table_multi" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">Kode Dokumen</th>
+                                                    <th class="center-align">Tgl.Post</th>
+                                                    <th class="center-align">Total</th>
+                                                    <th class="center-align">PPN</th>
+                                                    <th class="center-align">PPh</th>
+                                                    <th class="center-align">Grandtotal</th>
+                                                    <th class="center-align">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-multi"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>PURCHASE ORDER / ORDER PEMBELIAN</div>
+                                <div class="collapsible-body">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_buttons_multi_purchase_order"></div>
+                                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                        <table id="table_multi_purchase_order" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">Kode Dokumen</th>
+                                                    <th class="center-align">Tgl.Post</th>
+                                                    <th class="center-align">Total</th>
+                                                    <th class="center-align">PPN</th>
+                                                    <th class="center-align">PPh</th>
+                                                    <th class="center-align">Grandtotal</th>
+                                                    <th class="center-align">Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-multi-purchase-order"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -863,13 +899,65 @@
                 });
                 $('#table_multi_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
                 $('select[name="table_multi_length"]').addClass('browser-default');
+
+                table_multi_po = $('#table_multi_purchase_order').DataTable({
+                    "ordering": false,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_multi_purchase_order_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_purchase_order');
+                $('select[name="table_multi_purchase_order_length"]').addClass('browser-default');
+                $('.collapsible').on('shown.bs.collapse', function () {
+                    table_multi.columns.adjust().draw();
+                    table_multi_po.columns.adjust().draw();
+                });
             },
             onCloseEnd: function(modal, trigger){
                 $('#body-detail-multi').empty();
+                $('#body-detail-multi-purchase-order').empty();
                 $('#account_name').text('');
                 $('#preview_data').html('');
                 $('#table_multi').DataTable().clear().destroy();
+                $('#table_multi_purchase_order').DataTable().clear().destroy();
             }
+        });
+
+        $('#table_multi tbody').on('click', 'tr', function () {
+            table_multi_po.rows().deselect();
+        });
+
+        $('#table_multi_purchase_order tbody').on('click', 'tr', function () {
+            table_multi.rows().deselect();
         });
 
         $('#table_multi').on('click', 'input', function(event) {
@@ -1446,7 +1534,8 @@
                     $('#modal6').modal('open');
                     if(response.length > 0){
                         $.each(response, function(i, val) {
-                            $('#body-detail-multi').append(`
+                            let div = (val.type == 'fund_requests' ? '#body-detail-multi' : '#body-detail-multi-purchase-order' );
+                            $(div).append(`
                                 <tr data-type="` + val.type + `" data-id="` + val.id + `">
                                     <td class="center">
                                         ` + val.po_no + `
@@ -1514,6 +1603,11 @@
             if (willDelete) {
                 let arr_id = [], arr_type = [];
                 $.map(table_multi.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                    arr_type.push($(item).data('type'));
+                });
+
+                $.map(table_multi_po.rows('.selected').nodes(), function (item) {
                     arr_id.push($(item).data('id'));
                     arr_type.push($(item).data('type'));
                 });

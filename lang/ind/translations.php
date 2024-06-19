@@ -109,7 +109,7 @@ return [
     'reference'     =>  'Referensi',
     'rounding'      =>  'Pembulatan',
     'admin'         =>  'Admin',
-    'grandtotal'    =>  'Total Keseluruhan',
+    'grandtotal'    =>  'Grandtotal',
     'regarded'      =>  'Terbilang',
     'created_by'    =>  'Dibuat Oleh',
     'fee_list'      => 'Daftar Biaya',

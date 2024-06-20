@@ -2487,6 +2487,7 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('finance_report')->middleware('direct.access')->group(function () {
                     Route::prefix('finance_recap')->middleware('operation.access:finance_recap,view')->group(function () {
                         Route::get('/',[FinanceReportController::class, 'index']);
+                        Route::get('export_good_receipt',[FinanceReportController::class, 'exportGoodReceipt']);
                     });
                     Route::prefix('employee_receivable')->middleware('operation.access:employee_receivable,view')->group(function () {
                         Route::get('/',[EmployeeReceivableController::class, 'index']);

@@ -26,6 +26,7 @@
                                                 @foreach ($menus as $row)
                                                     <option value="{{ $row->fullUrl() }}">{{ $row->name }}</option>
                                                 @endforeach
+                                                <option value="good_receipt">Penerimaan PO</option>
                                             </select>
                                             <label class="" for="type">Tipe Module Purchase</label>
                                         </div>
@@ -81,7 +82,12 @@
         var search = $('#start_date').val();
         var status = $('#end_date').val();
         var mode = $('#mode').val();
-        window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
+        if(tipe == 'good_receipt'){
+            window.location ="{{ URL::to('/')}}/admin/finance/finance_report/finance_recap/export_good_receipt?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
+        }else{
+            window.location = "{{ URL::to('/') }}/admin/"+tipe+"/export?start_date=" + search + "&end_date=" + status + "&mode=" + mode;
+        }
+       
     }
     function getOutstanding(){
         var tipe = $('#type').val();

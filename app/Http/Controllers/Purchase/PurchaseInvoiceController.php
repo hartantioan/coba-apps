@@ -575,7 +575,7 @@ class PurchaseInvoiceController extends Controller
                             'buy_unit'      => $rowdetail->itemUnit->unit->code,
                             'rawcode'       => $datagr->code,
                             'post_date'     => date('d/m/Y',strtotime($datagr->post_date)),
-                            'due_date'      => '-',
+                            'due_date'      => '',
                             'total'         => number_format($rowdetail->total,2,',','.'),
                             'tax'           => number_format($rowdetail->tax,2,',','.'),
                             'wtax'          => number_format($rowdetail->wtax,2,',','.'),

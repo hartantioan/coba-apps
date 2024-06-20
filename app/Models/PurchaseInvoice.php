@@ -200,6 +200,7 @@ class PurchaseInvoice extends Model
             '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
             '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
             '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
+            '8' => '<span class="pink darken-4 medium-small white-text padding-3">Ditutup Balik</span>',
             default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -215,6 +216,7 @@ class PurchaseInvoice extends Model
             '5' => 'Ditutup',
             '6' => 'Direvisi',
             '7' => 'Schedule',
+            '8' => 'Ditutup Balik',
             default => 'Invalid',
         };
 
@@ -336,6 +338,22 @@ class PurchaseInvoice extends Model
 
         if($this->adjustRateDetail()->exists()){
             $hasRelation = true;
+        }
+
+        return $hasRelation;
+    }
+
+    public function hasChildDocumentExceptAdjustRate(){
+        $hasRelation = false;
+
+        if($this->hasPaymentRequestDetail()->exists()){
+            $hasRelation = true;
+        }
+
+        foreach($this->purchaseInvoiceDetail as $row){
+            if($row->purchaseMemoDetail()->exists()){
+                $hasRelation = true;
+            }
         }
 
         return $hasRelation;
@@ -670,5 +688,9 @@ class PurchaseInvoice extends Model
             $currency_rate = $row->adjustRate->currency_rate;
         }
         return $currency_rate;
+    }
+
+    public function cancelDocument(){
+        return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
     }
 }

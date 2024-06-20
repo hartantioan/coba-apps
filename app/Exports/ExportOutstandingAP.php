@@ -97,6 +97,15 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
                         AND ard.lookable_type = 'purchase_invoices'
                         AND ard.lookable_id = pi.id
                 ),0) AS adjust_nominal,
+                IFNULL((SELECT
+                    '1'
+                    FROM cancel_documents cd
+                    WHERE 
+                        cd.post_date <= :date6
+                        AND cd.lookable_type = 'purchase_invoices'
+                        AND cd.lookable_id = pi.id
+                        AND cd.deleted_at IS NULL
+                ),0) AS status_cancel,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -113,9 +122,9 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date6
+                    pi.post_date <= :date7
                     AND pi.balance > 0
-                    AND pi.status IN ('2','3','7')
+                    AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
         ", array(
             'date1' => $this->date,
@@ -124,6 +133,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
             'date4' => $this->date,
             'date5' => $this->date,
             'date6' => $this->date,
+            'date7' => $this->date,
         ));
 
         $results2 = DB::select("
@@ -224,7 +234,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
             $total_received_after_adjust = round(($row->balance * $currency_rate) + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile + $row->total_journal) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
-            if($balance > 0){
+            if($balance > 0 && $row->status_cancel == '0'){
                 $data_tempura = [
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,

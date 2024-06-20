@@ -1096,7 +1096,7 @@ class PurchaseDownPaymentController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            }elseif($query->hasChildDocument()){
+            }elseif($query->hasChildDocumentExceptAdjustRate()){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah digunakan pada Payment Request / A/P Invoice sebagai DP.'
@@ -1111,7 +1111,7 @@ class PurchaseDownPaymentController extends Controller
                 ]);
 
                 $cd = CancelDocument::create([
-                    'code'          => CancelDocument::generateCode(substr($query->code,8,2),$request->cancel_date),
+                    'code'          => CancelDocument::generateCode(substr($query->code,7,2),$request->cancel_date),
                     'user_id'       => session('bo_id'),
                     'post_date'     => $request->cancel_date,
                     'lookable_type' => $query->getTable(),
@@ -1637,6 +1637,42 @@ class PurchaseDownPaymentController extends Controller
 
                 
             }
+
+            if($query->cancelDocument()->exists()){
+                foreach($query->cancelDocument->journal->journalDetail()->where(function($query){
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+                    if($row->type == '1'){
+                        $total_debit_asli += $row->nominal_fc;
+                        $total_debit_konversi += $row->nominal;
+                    }
+                    if($row->type == '2'){
+                        $total_kredit_asli += $row->nominal_fc;
+                        $total_kredit_konversi += $row->nominal;
+                    }
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                        <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                        <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
+                }
+            }
+
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>

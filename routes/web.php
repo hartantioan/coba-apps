@@ -2437,6 +2437,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[PurchaseInvoiceController::class, 'create'])->middleware('operation.access:purchase_invoice,update');
                     Route::post('create_multi',[PurchaseInvoiceController::class, 'createMulti'])->middleware('operation.access:purchase_invoice,update');
                     Route::post('void_status', [PurchaseInvoiceController::class, 'voidStatus'])->middleware('operation.access:purchase_invoice,void');
+                    Route::post('cancel_status', [PurchaseInvoiceController::class, 'cancelStatus'])->middleware('operation.access:purchase_invoice,void');
                     Route::get('approval/{id}',[PurchaseInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseInvoiceController::class, 'destroy'])->middleware('operation.access:purchase_invoice,delete');
                     Route::get('export_from_page',[PurchaseInvoiceController::class, 'exportFromTransactionPage']);

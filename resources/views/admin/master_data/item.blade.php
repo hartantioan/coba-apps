@@ -598,10 +598,21 @@
                             <div class="row">
                                 <div class="input-field col s12 m12">
                                     <div class="switch mb-1">
-                                        <label for="status">Pengecekan QC</label>
+                                        <label for="is_quality_check">Pengecekan QC</label>
                                         <label class="right">
                                             Tidak
                                             <input type="checkbox" id="is_quality_check" name="is_quality_check" value="1" onclick="showQcParameter();">
+                                            <span class="lever"></span>
+                                            Ya
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="input-field col s12 m12">
+                                    <div class="switch mb-1">
+                                        <label for="is_reject">Item Reject (Hanya 1)</label>
+                                        <label class="right">
+                                            Tidak
+                                            <input type="checkbox" id="is_reject" name="is_reject" value="1">
                                             <span class="lever"></span>
                                             Ya
                                         </label>
@@ -1619,6 +1630,12 @@
                     $('#is_hide_supplier').prop( "checked", true);
                 }else{
                     $('#is_hide_supplier').prop( "checked", false);
+                }
+
+                if(response.is_reject == '1'){
+                    $('#is_reject').prop( "checked", true);
+                }else{
+                    $('#is_reject').prop( "checked", false);
                 }
 
                 if(response.is_sales_item == '1'){

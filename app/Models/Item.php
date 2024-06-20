@@ -42,6 +42,7 @@ class Item extends Model
         'status',
         'is_quality_check',
         'is_hide_supplier',
+        'is_reject',
         'type_id',
         'size_id',
         'variety_id',

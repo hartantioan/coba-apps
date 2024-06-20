@@ -174,7 +174,7 @@
                             <label class="active" for="cost">Biaya Rp / 1 Qty</label>
                         </div>
                         <div class="input-field col m3 s12 ">
-                            <select class="select2 browser-default" id="coa_id" name="coa_id">
+                            <select class="browser-default" id="coa_id" name="coa_id">
                                 <option value="">-- Pilih Coa --</option>
                                 @foreach($coa as $c)
                                     <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
@@ -422,15 +422,12 @@
 
         $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
         
-        $("#uom_unit").select2({
+        $("#uom_unit,#coa_id").select2({
             dropdownAutoWidth: true,
             width: '100%',
         });
 
         $('.stock-unit').text('-');
-        $(".select2").select2({
-            width: '100%',
-        });
     });
 
     function getUnitStock(){

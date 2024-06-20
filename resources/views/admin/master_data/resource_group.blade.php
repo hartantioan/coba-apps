@@ -42,12 +42,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right modal-trigger" href="#modal2">
-                            <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
-                            <i class="material-icons right">file_download</i>
-                        </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="print();">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">Print</span>
                             <i class="material-icons right">local_printshop</i>
@@ -67,25 +62,20 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            <ul class="collapsible collapsible-accordion">
-                                <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
-                                    <div class="collapsible-body">
-                                        <div class="row">
-                                            <div class="col m3 s3 ">
-                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
-                                                <div class="input-field">
-                                                    <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>  
+                            <div class="card-panel">
+                                <div class="row">
+                                    <div class="col s12 ">
+                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                            <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                <option value="">Semua</option>
+                                                <option value="1">Aktif</option>
+                                                <option value="2">Non-Aktif</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">List Data</h4>
@@ -101,13 +91,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Nama Lain</th>
-                                                        <th>Satuan</th>
-                                                        <th>Biaya Rp / Qty</th>
+                                                        <th>Parent</th>
                                                         <th>Coa</th>
-                                                        <th>Plant</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -119,14 +107,12 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="content-overlay"></div>
         </div>
     </div>
 </div>
-
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
@@ -140,38 +126,34 @@
                     <div class="col s12">
                         <div class="input-field col m3 s12 ">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <input id="code" name="code" type="text" placeholder="Kode grup">
                             <label class="active" for="code">Kode</label>
                         </div>
                         <div class="input-field col m3 s12 ">
-                            <select class="form-control" id="place_id" name="place_id">
-                                <option value="">--Kosong--</option>
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}" {{ $rowplace->id == session('bo_place_id') ? 'selected' : '' }}>{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Plant</label>
-                        </div>
-                        <div class="input-field col m3 s12 ">
-                            <input id="name" name="name" type="text" placeholder="Nama">
+                            <input id="name" name="name" type="text" placeholder="Nama grup">
                             <label class="active" for="name">Nama</label>
                         </div>
                         <div class="input-field col m3 s12 ">
                             <input id="other_name" name="other_name" type="text" placeholder="Nama Lain">
-                            <label class="active" for="other_name">Nama Lain</label>
+                            <label class="active" for="name">Nama Lain</label>
                         </div>
                         <div class="input-field col m3 s12 ">
-                            <select class="browser-default" id="uom_unit" name="uom_unit" onchange="getUnitStock();">
-                                <option value="">--Silahkan pilih--</option>
-                                @foreach ($unit as $row)
-                                    <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                            <select class="select2 browser-default" id="parent_id" name="parent_id">
+                                <option value="">Parent (Utama)</option>
+                                @foreach($parent as $m)
+                                    <option value="{{ $m->id }}">{{ $m->name }}</option>
+                                    @foreach($m->childSub as $m2)
+                                        <option value="{{ $m2->id }}"> - {{ $m2->name }}</option>
+                                        @foreach($m2->childSub as $m3)
+                                            <option value="{{ $m3->id }}"> - - {{ $m3->name }}</option>
+                                            @foreach($m3->childSub as $m4)
+                                                <option value="{{ $m4->id }}"> - - - {{ $m4->name }}</option>
+                                            @endforeach
+                                        @endforeach
+                                    @endforeach
                                 @endforeach
                             </select>
-                            <label class="active" for="uom_unit">Satuan</label>
-                        </div>
-                        <div class="input-field col m3 s12 ">
-                            <input name="cost" id="cost" type="text" value="0,00" onkeyup="formatRupiahTwoDecimal(this);">
-                            <label class="active" for="cost">Biaya Rp / 1 Qty</label>
+                            <label class="active" for="parent_id">Parent Menu</label>
                         </div>
                         <div class="input-field col m3 s12 ">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
@@ -182,9 +164,11 @@
                             </select>
                             <label class="active" for="coa_id">Coa</label>
                         </div>
-                        <div class="input-field col m3 s12">
+                        <div class="col m12 s12">
+                        </div>
+                        <div class="input-field col m3 s12 ">
                             <div class="switch mb-1">
-                                <label for="status">Status</label>
+                                <label for="order">Status</label>
                                 <label>
                                     Non-Active
                                     <input checked type="checkbox" id="status" name="status" value="1">
@@ -196,39 +180,6 @@
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
                         </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
-    </div>
-</div>
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
-    <div class="modal-content">
-        <div class="row">
-            <div class="col s12">
-                <h4>Import Excel</h4>
-                <div class="col s12">
-                    <div id="validation_alertImport" style="display:none;"></div>
-                </div>
-                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
-                    @csrf
-                    <div class="file-field input-field col m6 s12">
-                        <div class="btn">
-                            <span>Dokumen</span>
-                            <input type="file" class="form-control-file" id="fileExcel" name="file">
-                        </div>
-                        <div class="file-path-wrapper">
-                            <input class="file-path validate" type="text">
-                        </div>
-                    </div>
-                    <div class="input-field col m6 s12">
-                        <h6>Anda bisa menggunakan fitur copy paste dari format excel yang telah disediakan. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Jangan menyalin kolom paling atas (bagian header), dan tempel pada isian paling kiri di tabel di bawah ini.</h6>
-                    </div>
-                    <div class="input-field col m12 s12">
-                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
                     </div>
                 </form>
             </div>
@@ -274,117 +225,9 @@
     });
     $(function() {
         loadDataTable();
-        
+
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-        });
-
-        $('#form_dataimport').submit(function(event) {
-            event.preventDefault();
-
-            var formData = new FormData(this);
-
-            $.ajax({
-                url: $(this).attr('action'),
-                type: $(this).attr('method'),
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#validation_alertImport').hide();
-                    $('#validation_alertImport').html('');
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    if(response.status == 200) {
-                        successImport();
-                        M.toast({
-                            html: response.message
-                        });
-                    } else if(response.status == 422) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
-                                            <p> `+val.errors[0]+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
-                    }else if(response.status == 432) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
-                    } else {
-                        M.toast({
-                            html: response.message
-                        });
-                    }
-                    loadingClose('.modal-content');
-                },
-                error: function(response) {
-                    var errors = response.responseJSON.errors;
-                    var errorMessage = '';
-                    if(response.status == 422) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-                        
-                        swal({
-                            title: 'Ups! Validation',
-                            text: 'Check your form.',
-                            icon: 'warning'
-                        });
-
-                        $.each(errors, function(index, error) {
-                        var message = '';
-
-                        $.each(error.errors, function(index, value) {
-                            message += value + '\n';
-                        });
-
-                        errorMessage += errors.file;
-                    });
-
-                    $('#validation_alertImport').html(`
-                        <div class="card-alert card red">
-                            <div class="card-content white-text">
-                                <p>` + errorMessage + `</p>
-                            </div>
-                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                    `).show();
-
-                    }
-                    
-                   
-                }
-            });
-
         });
         
         $('#modal1').modal({
@@ -401,52 +244,22 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $("#coa_id").val($("#coa_id option:first").val()).trigger('change');
-                $("#uom_unit").val($("#uom_unit option:first").val()).trigger('change');
+                $('#coa_id,#parent_id').val('').trigger('change');
                 M.updateTextFields();
             }
         });
-        $('#modal2').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                
-            },
-            onOpenEnd: function(modal, trigger) { 
-                $('#validation_alertImport').hide();
-                $('#validation_alertImport').html('');
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_dataimport')[0].reset();
-            }
-        });
 
-        $('#place_id').val("{{ session('bo_place_id') }}").formSelect();
-        
-        $("#uom_unit").select2({
-            dropdownAutoWidth: true,
-            width: '100%',
-        });
-
-        $('.stock-unit').text('-');
         $(".select2").select2({
             width: '100%',
         });
     });
 
-    function getUnitStock(){
-        if($('#uom_unit').val()){
-            $('.stock-unit').text($("#uom_unit").select2().find(":selected").data("code"));
-        }else{
-            $('.stock-unit').text('-');
-        }
-    }
-
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": false,
             "scrollX": true,
+            "responsive": false,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -457,8 +270,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    status : $('#filter_status').val(),
-                    balance : $('#filter_balance').val(),
+                    status : $('#filter_status').val()
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -476,14 +288,12 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
+                { name: 'id', searchable: false, className: 'center-align' },
+                { name: 'code', className: '' },
                 { name: 'name', className: '' },
                 { name: 'other_name', className: '' },
-                { name: 'unit', className: 'center-align' },
-                { name: 'cost', className: 'right-align' },
-                { name: 'coa_id', className: '' },
-                { name: 'place_id', className: 'center-align' },
+                { name: 'parent_id', className: '' },
+                { name: 'coa', searchable: false, orderable: false, className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -518,7 +328,6 @@
             },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
@@ -545,6 +354,12 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 if(response.status == 200) {
+                    $('#parent_id').empty();
+
+                    $.each(response.data, function(i, val) {
+                        $('#parent_id').append(val);
+                    });
+
                     success();
                     M.toast({
                         html: response.message
@@ -596,11 +411,6 @@
         $('#modal1').modal('close');
     }
 
-    function successImport(){
-        loadDataTable();
-        $('#modal2').modal('close');
-    }
-
     function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
@@ -618,22 +428,21 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
+                
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#other_name').val(response.other_name);
-                $('#place_id').val(response.place_id).formSelect();
-                $('#uom_unit').val(response.uom_unit).trigger('change');
-                $('#cost').val(response.cost);
+                $('#parent_id').val(response.parent_id).trigger('change');
                 if(response.coa_id){
                     $('#coa_id').val(response.coa_id).trigger('change');
                 }
-
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();
@@ -649,76 +458,7 @@
             }
         });
     }
-    function saveImport(){
-			
-            var formData = new FormData($('#form_dataImport')[0]);
-            
-            $.ajax({
-                url: '{{ Request::url() }}/import',
-                type: 'POST',
-                dataType: 'JSON',
-                data: formData,
-                contentType: false,
-                processData: false,
-                cache: true,
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    $('#validation_alertImport').hide();
-                    $('#validation_alertImport').html('');
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    if(response.status == 200) {
-                        success();
-                        M.toast({
-                            html: response.message
-                        });
-                    } else if(response.status == 422) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-                        
-                        swal({
-                            title: 'Ups! Validation',
-                            text: 'Check your form.',
-                            icon: 'warning'
-                        });
-    
-                        $.each(response.error, function(i, val) {
-                            $.each(val, function(i, val) {
-                                $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>` + val + `</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                            });
-                        });
-                    } else {
-                        M.toast({
-                            html: response.message
-                        });
-                    }
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-    }
 
-    
     function destroy(id){
         swal({
             title: "Apakah anda yakin?",
@@ -762,13 +502,6 @@
         });
     }
 
-    function exportExcel(){
-        var search = window.table.search();
-        var status = $('#filter_status').val();
-        
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
-    }
-
     var printService = new WebSocketPrinter({
         onConnect: function () {
             
@@ -784,11 +517,12 @@
     });
 
     function print(){
-        var search = window.table.search(), status = $('#filter_status').val();
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
         arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
             var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
+           
         });
         
         $.ajax({
@@ -822,5 +556,12 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status;
     }
 </script>

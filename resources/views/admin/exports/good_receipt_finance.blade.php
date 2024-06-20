@@ -26,6 +26,7 @@
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
+            <th>Gudang</th>
         </tr>
     </thead>
     <tbody>
@@ -60,9 +61,7 @@
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
-
-                
-            </tr>
+                <td align="center">{{ $rowdetail->warehouse->name }}</td>
             @php
                 $no++;
             @endphp

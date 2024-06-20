@@ -208,10 +208,9 @@
 								<th>Kode</th>
 								<th>Nama</th>
 								<th>Nama Lain</th>
-								<th>Grup Resource</th>
-								<th>Qty</th>
 								<th>Satuan</th>
 								<th>Biaya</th>
+                                <th>Coa</th>
 								<th>Plant</th>
 								<th>Status</th>
 							</tr>
@@ -223,10 +222,9 @@
 									<td>{{ $row->code }}</td>
 									<td>{{ $row->name }}</td>
                                     <td>{{ $row->other_name }}</td>
-									<td>{{ $row->resourceGroup->name }}</td>
-									<td>{{ number_format($row->qty,3,',','.') }}</td>
                                     <td>{{ $row->uomUnit->code }}</td>
 									<td>{{ number_format($row->cost,2,',','.') }}</td>
+                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
                                     <td>{{ $row->place->code }}</td>
 									<td>{{ $row->statusRaw() }}</td>
 								</tr>

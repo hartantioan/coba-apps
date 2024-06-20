@@ -20,7 +20,9 @@ class ProductionReceiveDetail extends Model
         'production_order_id',
         'item_id',
         'bom_id',
+        'is_powder',
         'qty',
+        'qty_planned',
         'place_id',
         'warehouse_id',
         'tank_id',
@@ -63,9 +65,5 @@ class ProductionReceiveDetail extends Model
 
     public function tank(){
         return $this->belongsTo('App\Models\Tank','tank_id','id')->withTrashed();
-    }
-
-    public function lookable(){
-        return $this->morphTo();
     }
 }

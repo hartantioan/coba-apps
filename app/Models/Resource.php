@@ -18,10 +18,10 @@ class Resource extends Model
         'code',
         'name',
         'other_name',
-        'resource_group_id',
         'uom_unit',
         'qty',
         'cost',
+        'coa_id',
         'place_id',
         'status',
     ];
@@ -50,9 +50,9 @@ class Resource extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-    public function resourceGroup()
+    public function coa()
     {
-        return $this->belongsTo('App\Models\ResourceGroup', 'resource_group_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
 
     public function uomUnit(){

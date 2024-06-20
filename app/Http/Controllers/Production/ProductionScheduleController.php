@@ -489,6 +489,7 @@ class ProductionScheduleController extends Controller
                 'note'              => $row->marketingOrderPlanDetail->note ? $row->marketingOrderPlanDetail->note : '',
                 'has_bom'           => $cekBom->exists() ? '1' : '',
                 'place_id'          => $po->place_id,
+                'line'              => $row->marketingOrderPlanDetail->marketingOrderPlan->line->code,
                 'details'           => $arrDetail,
             ];
         }
@@ -601,10 +602,12 @@ class ProductionScheduleController extends Controller
             
             $htmlDetail .= '</tr></thead><tbody><tr>';
 
+            $start = $data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row['mopd_id'])->count(); 
+
             foreach($data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row['mopd_id'])->orderBy('id')->get() as $keydetail => $rowdetail){
                 $option = '-';
                 if($rowdetail->status == '1'){
-                    $option = '<select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($rowdetail->id).'`,this)" style="width:150px;">
+                    $option = '<select class="browser-default" onfocus="updatePrevious(this);" onchange="updateDocumentStatus(`'.CustomHelper::encrypt($rowdetail->id).'`,this,'.$start.')" style="width:150px;">
                     <option value="" '.($rowdetail->status_process == NULL || $rowdetail->status_process == '' ? 'selected' : '').'>MENUNGGU</option>
                     <option value="1" '.($rowdetail->status_process == '1' ? 'selected' : '').'>PROSES</option>
                     <option value="2" '.($rowdetail->status_process == '2' ? 'selected' : '').' disabled>SELESAI</option>
@@ -631,6 +634,7 @@ class ProductionScheduleController extends Controller
                     <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.date('d/m/Y H:i:s',strtotime($rowdetail->end_date)).'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->type().'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->note.'</td>';
+                $start -= 1;
             }
 
             $htmlDetail .= '</tr></tbody></table>';
@@ -1148,7 +1152,8 @@ class ProductionScheduleController extends Controller
         if($data){
             $lastSegment = 'production_order';
             $menu = Menu::where('url', $lastSegment)->first();
-            $newCode = ProductionOrder::generateCode($menu->document_code.date('y').substr($data->productionSchedule->code,7,2));
+            $order = $request->order;
+            $newCode = ProductionOrder::generateCode($menu->document_code.date('y').substr($data->productionSchedule->code,7,2),$order);
             
             $query = ProductionOrder::create([
                 'code'			                => $newCode,

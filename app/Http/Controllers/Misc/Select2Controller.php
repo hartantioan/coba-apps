@@ -3175,6 +3175,7 @@ class Select2Controller extends Controller {
                     'priority'          => $row->priority,
                     'has_bom'           => $cekBom->exists() ? '1' : '',
                     'place_id'          => $request->place_id,
+                    'line'              => $d->line->code,
                     'list_warehouse'    => $row->item->warehouseList(),
                     'list_bom'          => $row->item->listBom(),
                 ];
@@ -3984,6 +3985,65 @@ class Select2Controller extends Controller {
                 'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionOrderReceive(Request $request)
+    {
+        $response = [];
+        $shift = Shift::find($request->shift_id);
+        $search   = $request->search;
+        $data = ProductionOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->where(function($query)use($request){
+            $query->whereHas('productionScheduleDetail',function($query)use($request){
+                $query->where('line_id',$request->line_id)
+                    ->whereHas('productionSchedule',function($query)use($request){
+                        $query->where('place_id',$request->place_id);
+                    })
+                    ->whereHas('item',function($query){
+                        $query->whereNull('is_sales_item');
+                    });
+            });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2'])
+        ->get();
+
+        foreach($data as $d) {
+            $type = $d->productionScheduleDetail->bom->is_powder ? 'powder' : 'normal';
+            $response[] = [
+                'id'   			                => $d->id,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'code'                          => $d->code,
+                'item_receive_id'               => $d->productionScheduleDetail->item_id,
+                'item_receive_code'             => $d->productionScheduleDetail->item->code,
+                'item_receive_name'             => $d->productionScheduleDetail->item->name,
+                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
+                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
+                'line'                          => $d->productionScheduleDetail->line->code,
+                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
+                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
+                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
+                'line_id'                       => $d->productionScheduleDetail->line_id,
+                'line_code'                     => $d->productionScheduleDetail->line->code,
+                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
+                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
+                'bom_id'                        => $d->productionScheduleDetail->bom_id,
+                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
+                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
+                'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
+                'batch_no'                      => ProductionBatch::generateCode($type,$shift->code,$request->group),
+                'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
             ];
         }
 

@@ -72,9 +72,14 @@ class ProductionOrder extends Model
         return $this->hasMany('App\Models\ProductionOrderDetail');
     }
 
-    public function productionIssueReceive()
+    public function productionIssue()
     {
-        return $this->hasMany('App\Models\ProductionIssueReceive')->whereIn('status',['1','2','3']);
+        return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3']);
+    }
+
+    public function productionReceive()
+    {
+        return $this->hasMany('App\Models\ProductionReceive')->whereIn('status',['1','2','3']);
     }
 
     public function voidUser()
@@ -129,7 +134,7 @@ class ProductionOrder extends Model
         return $status;
     }
 
-    public static function generateCode($prefix)
+    public static function generateCode($prefix,$order)
     {
         $cek = substr($prefix,0,7);
         $query = ProductionOrder::selectRaw('RIGHT(code, 8) as code')
@@ -140,9 +145,10 @@ class ProductionOrder extends Model
             ->get();
 
         if($query->count() > 0) {
-            $code = (int)$query[0]->code + 1;
+            $newcode = $order.substr($query[0]->code,1,7);
+            $code = (int)$newcode + 1;
         } else {
-            $code = '00000001';
+            $code = $order.'0000001';
         }
 
         $no = str_pad($code, 8, 0, STR_PAD_LEFT);
@@ -175,7 +181,11 @@ class ProductionOrder extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->productionIssueReceive()->exists()){
+        if($this->productionIssue()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->productionReceive()->exists()){
             $hasRelation = true;
         }
 

@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\ResourceGroup;
+use App\Models\Coa;
 use App\Models\Place;
 use App\Models\Unit;
 use Maatwebsite\Excel\Excel;
@@ -22,7 +22,7 @@ class ExportTemplateMasterResource implements WithEvents
         $event->writer->getSheetByIndex(2); #resource group
         $event->writer->getSheetByIndex(3); #unit
     
-        $resource_group = ResourceGroup::where('status','1')->whereDoesntHave('childSub')->whereNotNull('parent_id')->orderBy('code')->get();
+        $coa = Coa::where('status', '1')->where('level',5)->oldest('code')->get();
         $place = Place::where('status','1')->get();
         $unit = Unit::where('status','1')->get();
         
@@ -33,7 +33,7 @@ class ExportTemplateMasterResource implements WithEvents
         }
 
         $startRow = 2;
-        foreach($resource_group as $row){
+        foreach($coa as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
             $startRow++;

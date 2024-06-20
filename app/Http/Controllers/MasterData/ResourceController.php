@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
-use App\Models\ResourceGroup;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Date;
@@ -24,6 +23,7 @@ use App\Exports\ExportAsset;
 use App\Exports\ExportResource;
 use App\Exports\ExportTemplateMasterResource;
 use App\Imports\ImportResource;
+use App\Models\Coa;
 use App\Models\Resource;
 use App\Models\Unit;
 
@@ -44,7 +44,7 @@ class ResourceController extends Controller
             'title'         => 'Resource',
             'content'       => 'admin.master_data.resource',
             'place'         => Place::where('status','1')->get(),
-            'group'         => ResourceGroup::where('status','1')->get(),
+            'coa'           => Coa::where('status', '1')->where('level',5)->oldest('code')->get(),
             'unit'          => Unit::where('status','1')->get(),
         ];
 
@@ -57,10 +57,9 @@ class ResourceController extends Controller
             'code',
             'name',
             'other_name',
-            'resource_group_id',
             'uom_unit',
-            'qty',
             'cost',
+            'coa_id',
             'place_id',
         ];
 
@@ -115,10 +114,9 @@ class ResourceController extends Controller
                     $val->code,
                     $val->name,
                     $val->other_name,
-                    $val->resourceGroup->name,
-                    number_format($val->qty,3,',','.'),
                     $val->uomUnit->code,
                     number_format($val->cost,0,',','.'),
+                    $val->coa->code.' - '.$val->coa->name,
                     $val->place()->exists() ? $val->place->code : '-',
                     $val->status(),
                     '
@@ -150,18 +148,16 @@ class ResourceController extends Controller
             'name'                  => 'required',
             'place_id'              => 'required',
             'uom_unit'              => 'required',
-            'qty'                   => 'required',
             'cost'                  => 'required',
-            'resource_group_id'     => 'required',
+            'coa_id'                => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai.',
             'name.required'                 => 'Nama tidak boleh kosong.',
             'place_id.required'             => 'Plant tidak boleh kosong.',
             'uom_unit.required'             => 'Satuan tidak boleh kosong.',
-            'qty.required'                  => 'Jumlah qty tidak boleh kosong.',
             'cost.required'                 => 'Biaya tidak boleh kosong.',
-            'resource_group_id.required'    => 'Grup Resource tidak boleh kosong.',
+            'coa_id.required'               => 'Coa tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -178,9 +174,8 @@ class ResourceController extends Controller
                     $query->place_id            = $request->place_id ? $request->place_id : NULL;
                     $query->name	            = $request->name;
                     $query->other_name	        = $request->other_name;
-                    $query->resource_group_id	= $request->resource_group_id;
+                    $query->coa_id	            = $request->coa_id;
                     $query->uom_unit	        = $request->uom_unit;
-                    $query->qty	                = str_replace(',','.',str_replace('.','',$request->qty));
                     $query->cost	            = str_replace(',','.',str_replace('.','',$request->cost));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
@@ -196,9 +191,8 @@ class ResourceController extends Controller
                         'place_id'                  => $request->place_id ? $request->place_id : NULL,
                         'name'	                    => $request->name,
                         'other_name'	            => $request->other_name,
-                        'resource_group_id'	        => $request->resource_group_id,
+                        'coa_id'	                => $request->coa_id,
                         'uom_unit'	                => $request->uom_unit,
-                        'qty'	                    => str_replace(',','.',str_replace('.','',$request->qty)),
                         'cost'	                    => str_replace(',','.',str_replace('.','',$request->cost)),
                         'status'                    => $request->status ? $request->status : '2',
                     ]);

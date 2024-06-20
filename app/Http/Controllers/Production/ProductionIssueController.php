@@ -218,68 +218,67 @@ class ProductionIssueController extends Controller
     }
 
     public function create(Request $request){
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                'company_id'			    => 'required',
+                'place_id'                  => 'required',
+                'shift_id'                  => 'required',
+                'group'                     => 'required',
+                'line_id'                   => 'required',
+                'machine_id'                => 'required',
+                'post_date'		            => 'required',
+                'production_order_id'       => 'required',
+                'start_process_time'        => 'required',
+                'end_process_time'          => 'required',
+            ], [
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+                'place_id'                          => 'Plant tidak boleh kosong.',
+                'shift_id'                          => 'Shift tidak boleh kosong.',
+                'group'                             => 'Grup tidak boleh kosong.',
+                'line_id'                           => 'Line tidak boleh kosong.',
+                'machine_id'                        => 'Mesin tidak boleh kosong.',
+                'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
+                'production_order_id.required' 		=> 'Production Order tidak boleh kosong.',
+                'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
+                'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
+            ]);
 
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
-            'company_id'			    => 'required',
-            'place_id'                  => 'required',
-            'shift_id'                  => 'required',
-            'group'                     => 'required',
-            'line_id'                   => 'required',
-            'machine_id'                => 'required',
-            'post_date'		            => 'required',
-            'production_order_id'       => 'required',
-            'start_process_time'        => 'required',
-            'end_process_time'          => 'required',
-        ], [
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'place_id'                          => 'Plant tidak boleh kosong.',
-            'shift_id'                          => 'Shift tidak boleh kosong.',
-            'group'                             => 'Grup tidak boleh kosong.',
-            'line_id'                           => 'Line tidak boleh kosong.',
-            'machine_id'                        => 'Mesin tidak boleh kosong.',
-            'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'production_order_id.required' 		=> 'Production Order tidak boleh kosong.',
-            'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
-            'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
-        ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+                $passedQty = true;
+                $arrNotPassedQty = [];
 
-            $passedQty = true;
-            $arrNotPassedQty = [];
-
-            foreach($request->arr_qty as $key => $row){
-                if($request->arr_lookable_type[$key] == 'items'){
-                    $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
-                    $qty = str_replace(',','.',str_replace('.','',$row));
-                    if($itemstock){
-                        if(round($qty,3) > $itemstock->qty){
-                            $passedQty = false;
-                            $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                foreach($request->arr_qty as $key => $row){
+                    if($request->arr_lookable_type[$key] == 'items'){
+                        $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
+                        $qty = str_replace(',','.',str_replace('.','',$row));
+                        if($itemstock){
+                            if(round($qty,3) > $itemstock->qty){
+                                $passedQty = false;
+                                $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                            }
                         }
                     }
                 }
-            }
 
-            if(!$passedQty){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, item '.implode(', ',$arrNotPassedQty).' tidak mencukup stok yang ada. Silahkan atur qty yang ingin diproduksi.'
-                ]);
-            }
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if(!$passedQty){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, item '.implode(', ',$arrNotPassedQty).' tidak mencukup stok yang ada. Silahkan atur qty yang ingin diproduksi.'
+                    ]);
+                }
+                
+                if($request->temp){
                     $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -343,20 +342,14 @@ class ProductionIssueController extends Controller
                             }
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Production Issue sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status Production Issue sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
+                    
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=ProductionIssue::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -378,17 +371,9 @@ class ProductionIssueController extends Controller
                         'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-
-                /* DB::beginTransaction();
-                try { */
+                
+                if($query) {
                     foreach($request->arr_qty as $key => $row){
                         $qty_planned = 0;
                         $nominal_planned = 0;
@@ -459,31 +444,31 @@ class ProductionIssueController extends Controller
                         }
                     }
 
-                    /* DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                } */
+                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
+                    activity()
+                        ->performedOn(new ProductionIssue())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit issue production.');
 
-                activity()
-                    ->performedOn(new ProductionIssue())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit issue production.');
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
 
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 
 		return response()->json($response);
     }
@@ -1111,7 +1096,7 @@ class ProductionIssueController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionIssueReceive::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionIssue::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

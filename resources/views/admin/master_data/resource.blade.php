@@ -104,10 +104,9 @@
                                                         <th>Code</th>
                                                         <th>Nama</th>
                                                         <th>Nama Lain</th>
-                                                        <th>Grup</th>
-                                                        <th>Qty</th>
                                                         <th>Satuan</th>
                                                         <th>Biaya Rp / Qty</th>
+                                                        <th>Coa</th>
                                                         <th>Plant</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -171,55 +170,17 @@
                             <label class="active" for="uom_unit">Satuan</label>
                         </div>
                         <div class="input-field col m3 s12 ">
-                            <input name="qty" id="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
-                            <div class="form-control-feedback stock-unit">-</div>
-                            <label class="active" for="qty">Qty</label>
-                        </div>
-                        <div class="input-field col m3 s12 ">
                             <input name="cost" id="cost" type="text" value="0,00" onkeyup="formatRupiahTwoDecimal(this);">
-                            <label class="active" for="cost">Biaya Rp / Qty</label>
+                            <label class="active" for="cost">Biaya Rp / 1 Qty</label>
                         </div>
                         <div class="input-field col m3 s12 ">
-                            <select class="select2 browser-default" id="resource_group_id" name="resource_group_id">
-                                @foreach($group->whereNull('parent_id') as $c)
-                                        @if(!$c->childSub()->exists())
-                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                        @else
-                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                            @foreach($c->childSub as $bc)
-                                                @if(!$bc->childSub()->exists())
-                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                @else
-                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                        @foreach($bc->childSub as $bcc)
-                                                            @if(!$bcc->childSub()->exists())
-                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                            @else
-                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                    @foreach($bcc->childSub as $bccc)
-                                                                        @if(!$bccc->childSub()->exists())
-                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                        @else
-                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                    @endif
-                                                                                @endforeach
-                                                                            </optgroup>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </optgroup>
-                                                            @endif
-                                                        @endforeach
-                                                    </optgroup>
-                                                @endif
-                                            @endforeach
-                                            </optgroup>
-                                        @endif
+                            <select class="select2 browser-default" id="coa_id" name="coa_id">
+                                <option value="">-- Pilih Coa --</option>
+                                @foreach($coa as $c)
+                                    <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="resource_group_id">Grup Resource</label>
+                            <label class="active" for="coa_id">Coa</label>
                         </div>
                         <div class="input-field col m3 s12">
                             <div class="switch mb-1">
@@ -516,10 +477,9 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: '' },
                 { name: 'other_name', className: '' },
-                { name: 'resource_group_id', className: '' },
-                { name: 'qty', className: 'center-align' },
                 { name: 'unit', className: 'center-align' },
                 { name: 'cost', className: 'right-align' },
+                { name: 'coa_id', className: '' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -662,8 +622,10 @@
                 $('#place_id').val(response.place_id).formSelect();
                 $('#resource_group_id').val(response.resource_group_id).trigger('change');
                 $('#uom_unit').val(response.uom_unit).trigger('change');
-                $('#qty').val(response.qty);
                 $('#cost').val(response.cost);
+                if(response.coa_id){
+                    $('#coa_id').val(response.coa_id).trigger('change');
+                }
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

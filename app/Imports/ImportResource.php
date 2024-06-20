@@ -4,9 +4,9 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\AssetGroup;
+use App\Models\Coa;
 use App\Models\Place;
 use App\Models\Resource;
-use App\Models\ResourceGroup;
 use App\Models\Unit;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -28,8 +28,8 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
     {
         $row = $row->toArray();
         $place = Place::where('code',$row['place_id'])->first();
-        $resource_group_code= explode('#',$row['resource_group_id'])[0];
-        $resource_group = ResourceGroup::where('code',$resource_group_code)->first();
+        $coacode= explode('#',$row['coa_id'])[0];
+        $coa = Coa::where('code',$coacode)->first();
         $uom = explode('#', $row['uom_unit'])[0];
         $uom_unit = Unit::where('code',$uom)->first();
         
@@ -37,10 +37,9 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
             'code'              => $row['code'],
             'name'              => $row['name'],
             'other_name'        => $row['other_name'],
-            'resource_group_id' => $resource_group->id,
+            'coa_id'            => $coa->id,
             'uom_unit'          => $uom_unit->id,
             'place_id'          => $place->id,
-            'qty'               => $row['qty'],
             'cost'              => $row['cost'],
             'status'            => '1',
         ]);
@@ -57,9 +56,8 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
             '*.code'                => 'required|unique:resources,code',
             '*.place_id'            => 'required',
             '*.name'                => 'required',
-            '*.resource_group_id'   => 'required',
+            '*.coa_id'              => 'required',
             '*.uom_unit'            => 'required',
-            '*.qty'                 => 'required',
             '*.cost'                => 'nullable',
         ];
     }

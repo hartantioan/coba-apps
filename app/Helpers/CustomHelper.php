@@ -4066,7 +4066,7 @@ class CustomHelper {
 			self::updateEmployeeTransfer($transfer);
 
 		}elseif($table_name == 'production_issues'){
-			/* $pir = ProductionIssue::find($table_id);
+			$pir = ProductionIssue::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -4076,8 +4076,12 @@ class CustomHelper {
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
 				'note'			=> $data->note,
-				'status'		=> '3'
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
 			]);
+
+			$total = 0;
 
 			foreach($pir->productionIssueDetail as $row){
 				if($row->lookable_type == 'items'){
@@ -4085,12 +4089,13 @@ class CustomHelper {
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->lookable->itemGroup->coa_id,
 						'place_id'		=> $row->itemStock->place_id,
-						'line_id'		=> $row->productionIssueReceive->line_id,
+						'line_id'		=> $row->productionIssue->line_id,
 						'item_id'		=> $row->itemStock->item_id,
 						'warehouse_id'	=> $row->itemStock->warehouse_id,
 						'type'			=> '2',
 						'nominal'		=> $row->total,
 						'nominal_fc'	=> $row->total,
+						'note'			=> $pir->code,
 					]);
 	
 					self::sendCogs($table_name,
@@ -4117,22 +4122,67 @@ class CustomHelper {
 						NULL,
 					);
 				}elseif($row->lookable_type == 'resources'){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable->resourceGroup->coa_id,
-						'line_id'		=> $row->productionIssueReceive->line_id,
-						'place_id'		=> $row->productionIssueReceive->place_id,
-						'machine_id'	=> $row->productionIssueReceive->machine_id,
-						'type'			=> '2',
-						'nominal'		=> $row->total,
-						'nominal_fc'	=> $row->total,
-					]);
+					if($row->bomDetail()->exists()){
+						if($row->bomDetail->cost_distribution_id){
+							$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($row->bomDetail->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $row->total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $row->total);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'						=> $row->lookable->coa_id,
+									'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
+									'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($pir->machine_id ?? NULL),
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+									'type'                          => '2',
+									'nominal'						=> $nominal,
+									'nominal_fc'					=> $nominal,
+									'note'							=> $pir->code,
+								]);
+							}
+						}
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->lookable->coa_id,
+							'line_id'		=> $pir->line_id,
+							'place_id'		=> $pir->place_id,
+							'machine_id'	=> $pir->machine_id,
+							'type'			=> '2',
+							'nominal'		=> $row->total,
+							'nominal_fc'	=> $row->total,
+							'note'			=> $pir->code,
+						]);
+					}
 				}
+
+				$total += $row->total;
 			}
+
+			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '1',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+			]);
 
 			$pir->update([
 				'status'	=> '3'
-			]); */
+			]);
 		}elseif($table_name == 'production_receives'){
 
 		}elseif($table_name == 'adjust_rates'){

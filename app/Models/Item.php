@@ -486,12 +486,15 @@ class Item extends Model
         $firstBom = $this->bom()->latest()->first();
         if($firstBom){
             $data1 = [
+                'id'            => $firstBom->id,
+                'bom_name'      => $firstBom->code.' - '.$firstBom->name,
                 'item_id'       => $firstBom->item_id,
                 'item_name'     => $firstBom->item->code.' - '.$firstBom->item->name,
                 'name'          => $firstBom->code.' - '.$firstBom->name,
                 'qty'           => $firstBom->qty_output,
                 'unit'          => $firstBom->item->uomUnit->code,
                 'type'          => $firstBom->is_powder ?? '',
+                'list_warehouse'=> $firstBom->item->warehouseList(),
                 'details'       => [],
             ];
             if(!$firstBom->bomParentMap()->exists()){
@@ -510,12 +513,15 @@ class Item extends Model
                 $secondBom = $firstBom->bomParentMap()->latest()->first();
                 if($secondBom){
                     $data2 = [
+                        'id'            => $secondBom->child->id,
+                        'bom_name'      => $secondBom->child->code.' - '.$secondBom->child->name,
                         'item_id'       => $secondBom->child->item_id,
                         'item_name'     => $secondBom->child->item->code.' - '.$secondBom->child->item->name,
                         'name'          => $secondBom->child->code.' - '.$secondBom->child->name,
                         'qty'           => $secondBom->child->qty_output,
                         'unit'          => $secondBom->child->item->uomUnit->code,
                         'type'          => $secondBom->child->is_powder ?? '',
+                        'list_warehouse'=> $secondBom->child->item->warehouseList(),
                         'details'       => [],
                     ];
                     if(!$secondBom->child->bomParentMap()->exists()){
@@ -534,12 +540,15 @@ class Item extends Model
                         $thirdBom = $secondBom->child->bomParentMap()->latest()->first();
                         if($thirdBom){
                             $data3 = [
+                                'id'            => $thirdBom->child->id,
+                                'bom_name'      => $thirdBom->child->code.' - '.$thirdBom->child->name,
                                 'item_id'       => $thirdBom->child->item_id,
                                 'item_name'     => $thirdBom->child->item->code.' - '.$thirdBom->child->item->name,
                                 'name'          => $thirdBom->child->code.' - '.$thirdBom->child->name,
                                 'qty'           => $thirdBom->child->qty_output,
                                 'unit'          => $thirdBom->child->item->uomUnit->code,
                                 'type'          => $thirdBom->child->is_powder ?? '',
+                                'list_warehouse'=> $thirdBom->child->item->warehouseList(),
                                 'details'       => [],
                             ];
                             if(!$thirdBom->child->bomParentMap()->exists()){
@@ -558,12 +567,16 @@ class Item extends Model
                                 $fourthBom = $thirdBom->child->bomParentMap()->latest()->first();
                                 if($fourthBom){
                                     $data4 = [
+                                        'id'            => $fourthBom->child->id,
+                                        'bom_name'      => $fourthBom->child->code.' - '.$fourthBom->child->name,
                                         'item_id'       => $fourthBom->child->item_id,
                                         'item_name'     => $fourthBom->child->item->code.' - '.$fourthBom->child->item->name,
                                         'name'          => $fourthBom->child->code.' - '.$fourthBom->child->name,
                                         'qty'           => $fourthBom->child->qty_output,
                                         'unit'          => $fourthBom->child->item->uomUnit->code,
                                         'type'          => $fourthBom->child->is_powder ?? '',
+                                        'list_warehouse'=> $fourthBom->child->item->warehouseList(),
+                                        'details'       => [],
                                     ];
                                     if(!$fourthBom->child->bomParentMap()->exists()){
                                         $details = [];
@@ -581,11 +594,14 @@ class Item extends Model
                                         $fifthBom = $fourthBom->child->bomParentMap()->latest()->first();
                                         if($fifthBom){
                                             $data5 = [
+                                                'id'            => $fifthBom->child->id,
+                                                'bom_name'      => $fifthBom->child->code.' - '.$fifthBom->child->name,
                                                 'item_id'       => $fifthBom->child->item_id,
                                                 'item_name'     => $fifthBom->child->item->code.' - '.$fifthBom->child->item->name,
                                                 'name'          => $fifthBom->child->code.' - '.$fifthBom->child->name,
                                                 'qty'           => $fifthBom->child->qty_output,
                                                 'unit'          => $fifthBom->child->item->uomUnit->code,
+                                                'list_warehouse'=> $fifthBom->child->item->warehouseList(),
                                                 'type'          => $fifthBom->child->is_powder ?? '',
                                                 'details'       => [],
                                             ];
@@ -605,12 +621,15 @@ class Item extends Model
                                                 $sixthBom = $fifthBom->child->bomParentMap()->latest()->first();
                                                 if($sixthBom){
                                                     $arr[] = [
+                                                        'id'            => $sixthBom->child->id,
+                                                        'bom_name'      => $sixthBom->child->code.' - '.$sixthBom->child->name,
                                                         'item_id'       => $sixthBom->child->item_id,
                                                         'item_name'     => $sixthBom->child->item->code.' - '.$sixthBom->child->item->name,
                                                         'name'          => $sixthBom->child->code.' - '.$sixthBom->child->name,
                                                         'qty'           => $sixthBom->child->qty_output,
                                                         'unit'          => $sixthBom->child->item->uomUnit->code,
                                                         'type'          => $sixthBom->child->is_powder ?? '',
+                                                        'list_warehouse'=> $sixthBom->child->item->warehouseList(),
                                                         'details'       => [],
                                                     ];
                                                 }

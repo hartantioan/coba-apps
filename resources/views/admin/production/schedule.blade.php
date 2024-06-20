@@ -235,11 +235,12 @@
                                                         <th class="center" style="min-width:150px;">Satuan UoM</th>
                                                         <th class="center" style="min-width:150px;">Remark</th>
                                                         <th class="center" style="min-width:150px;">Tgl.Request</th>
+                                                        <th class="center">Line</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="8">
+                                                        <td colspan="9">
                                                             Silahkan tambahkan Marketing Order Produksi...
                                                         </td>
                                                     </tr>
@@ -250,7 +251,7 @@
                                                         <td class="right-align" id="data-foot">
                                                             0,000
                                                         </td>
-                                                        <td colspan="5"></td>
+                                                        <td colspan="6"></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -651,7 +652,7 @@
                 if($('#last-row-item').length == 0){
                     $('#total-row-target').before(`
                         <tr id="last-row-item">
-                            <td colspan="8">
+                            <td colspan="9">
                                 Silahkan tambahkan Marketing Order Produksi...
                             </td>
                         </tr>
@@ -885,7 +886,7 @@
                     if($('#last-row-item').length == 0){
                         $('#total-row-target').before(`
                             <tr id="last-row-item">
-                                <td colspan="8">
+                                <td colspan="9">
                                     Silahkan tambahkan Marketing Order Produksi...
                                 </td>
                             </tr>
@@ -1095,13 +1096,16 @@
                                     <td class="center-align">
                                         ` + val.request_date + `
                                     </td>
+                                    <td class="center-align">
+                                        ` + val.line + `
+                                    </td>
                                 </tr>
                             `);
                             
                             let datanormal = `<table class="bordered"><thead><tr>`;
 
-                            $.each(val.list_bom, function(i, detail) {
-                                if(!detail.type){
+                            $.each(val.list_bom, function(z, detail) {
+                                if(detail.type == ''){
                                     datanormal += `
                                         <th class="center" style="min-width:150px !important;">Item</th>
                                         <th class="center" style="min-width:150px !important;">Qty</th>
@@ -1118,12 +1122,13 @@
 
                             datanormal += `</tr></thead><tbody><tr>`;
 
-                            let arrCountNormal = [];
+                            let arrCountNormal = [], arrDataNormal = [];
 
-                            $.each(val.list_bom, function(i, detail) {
-                                if(!detail.type){
+                            $.each(val.list_bom, function(z, detail) {
+                                if(detail.type == ''){
                                     var count = makeid(10);
                                     arrCountNormal.push(count);
+                                    arrDataNormal.push(detail);
                                     let randomColor = getRandomColor();
                                     datanormal += `
                                         <input type="hidden" name="arr_type[]" value="normal">
@@ -1184,8 +1189,21 @@
                                 </tr>
                             `);
 
-                            $.each(arrCountNormal, function(i, row) {
+                            $.each(arrCountNormal, function(z, row) {
+                                $('#arr_item_detail_id' + row).append(`
+                                    <option value="` + arrDataNormal[z].item_id + `">` + arrDataNormal[z].item_name + `</option> 
+                                `);
                                 select2ServerSide('#arr_item_detail_id' + row, '{{ url("admin/select2/item_has_bom") }}');
+                                $('#arr_unit' + row).text(arrDataNormal[z].unit);
+                                $('#arr_warehouse' + row).empty();
+                                $.each(arrDataNormal[z].list_warehouse, function(j, warehouserow) {
+                                    $('#arr_warehouse' + row).append(`
+                                        <option value="` + warehouserow.id + `">` + warehouserow.name + `</option>
+                                    `);
+                                });
+                                $('#arr_bom' + row).append(`
+                                    <option value="` + arrDataNormal[z].id + `">` + arrDataNormal[z].bom_name + `</option>
+                                `);
                                 $('#arr_bom' + row).select2({
                                     placeholder: '-- Kosong --',
                                     minimumInputLength: 1,
@@ -1215,8 +1233,8 @@
 
                             let datapowder = `<table class="bordered"><thead><tr>`;
 
-                            $.each(val.list_bom, function(i, detail) {
-                                if(detail.type){
+                            $.each(val.list_bom, function(z, detail) {
+                                if(detail.type == '1'){
                                     datapowder += `
                                         <th class="center" style="min-width:150px !important;">Item</th>
                                         <th class="center" style="min-width:150px !important;">Qty</th>
@@ -1233,12 +1251,13 @@
 
                             datapowder += `</tr></thead><tbody><tr>`;
 
-                            let arrCountPowder = [];
+                            let arrCountPowder = [], arrDataPowder = [];
 
-                            $.each(val.list_bom, function(i, detail) {
-                                if(detail.type){
+                            $.each(val.list_bom, function(z, detail) {
+                                if(detail.type == '1'){
                                     var count = makeid(10);
                                     arrCountPowder.push(count);
+                                    arrDataPowder.push(detail);
                                     let randomColor = getRandomColor();
                                     datapowder += `
                                         <input type="hidden" name="arr_type[]" value="powder">
@@ -1299,8 +1318,21 @@
                                 </tr>
                             `);
 
-                            $.each(arrCountPowder, function(i, row) {
+                            $.each(arrCountPowder, function(z, row) {
+                                $('#arr_item_detail_id' + row).append(`
+                                    <option value="` + arrDataPowder[z].item_id + `">` + arrDataPowder[z].item_name + `</option> 
+                                `);
                                 select2ServerSide('#arr_item_detail_id' + row, '{{ url("admin/select2/item_has_bom") }}');
+                                $('#arr_unit' + row).text(arrDataPowder[z].unit);
+                                $('#arr_warehouse' + row).empty();
+                                $.each(arrDataPowder[z].list_warehouse, function(j, warehouserow) {
+                                    $('#arr_warehouse' + row).append(`
+                                        <option value="` + warehouserow.id + `">` + warehouserow.name + `</option>
+                                    `);
+                                });
+                                $('#arr_bom' + row).append(`
+                                    <option value="` + arrDataPowder[z].id + `">` + arrDataPowder[z].bom_name + `</option>
+                                `);
                                 $('#arr_bom' + row).select2({
                                     placeholder: '-- Kosong --',
                                     minimumInputLength: 1,
@@ -1839,6 +1871,11 @@
                         $('#total-row-target').before(`
                             <tr class="row_item" data-id="` + val.id + `">
                                 <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
                                 <td>
                                     ` + val.mop_code + `
                                 </td>
@@ -1862,9 +1899,7 @@
                                     ` + val.request_date + `
                                 </td>
                                 <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.id + `" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
+                                    ` + val.line + `
                                 </td>
                             </tr>
                         `);
@@ -2457,7 +2492,7 @@
         previous = $(element).val();
     }
 
-    function updateDocumentStatus(code,element){
+    function updateDocumentStatus(code,element,order){
         var status = $(element).val();
         if($(element).val()){
             swal({
@@ -2477,6 +2512,7 @@
                         data : {
                             code : code,
                             status : status,
+                            order : order,
                         },
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

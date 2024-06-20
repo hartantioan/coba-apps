@@ -2410,6 +2410,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('get_outstanding', [PurchaseDownPaymentController::class, 'getOutstanding']);
                     Route::post('create',[PurchaseDownPaymentController::class, 'create'])->middleware('operation.access:purchase_down_payment,update');
                     Route::post('void_status', [PurchaseDownPaymentController::class, 'voidStatus'])->middleware('operation.access:purchase_down_payment,void');
+                    Route::post('cancel_status', [PurchaseDownPaymentController::class, 'cancelStatus'])->middleware('operation.access:purchase_down_payment,void');
                     Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
                     Route::get('export_from_page',[PurchaseDownPaymentController::class, 'exportFromTransactionPage']);

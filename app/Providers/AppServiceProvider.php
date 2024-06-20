@@ -98,6 +98,7 @@ class AppServiceProvider extends ServiceProvider
             'resources'                             => 'App\Models\Resource',
             'production_issue_details'              => 'App\Models\ProductionIssueDetail',
             'production_issues'                     => 'App\Models\ProductionIssue',
+            'cancel_documents'                      => 'App\Models\CancelDocument',
         ]);
     }
 }

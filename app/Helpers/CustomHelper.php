@@ -19,6 +19,7 @@ use App\Models\ApprovalTemplate;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\PrintCounter;
 use App\Models\Asset;
+use App\Models\CancelDocument;
 use App\Models\Capitalization;
 use App\Models\CloseBill;
 use App\Models\ClosingJournal;
@@ -4515,6 +4516,50 @@ class CustomHelper {
 		foreach($data as $row){
 			$row->journalDetail()->delete();
 			$row->delete();
+		}
+	}
+
+	public static function cancelJournal($data = null, $date = null){
+		if($data->lookable_type == 'purchase_down_payments'){
+			$pdp = PurchaseDownPayment::find($data->lookable_id);
+
+			$coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$pdp->company_id)->first();
+			$coauangmuka = Coa::where('code','100.01.07.01.01')->where('company_id',$pdp->company_id)->first();
+
+			$currency_rate = $pdp->latestCurrencyRateByDate($date);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pdp->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($date)).'00'),
+				'lookable_type'	=> $data->getTable(),
+				'lookable_id'	=> $data->id,
+				'currency_id'	=> $pdp->currency_id,
+				'currency_rate'	=> $currency_rate,
+				'post_date'		=> $date,
+				'note'			=> 'VOID CANCEL',
+				'status'		=> '3'
+			]);
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coahutangusaha->id,
+				'account_id'	=> $coahutangusaha->bp_journal ? $pdp->account_id : NULL,
+				'type'			=> '1',
+				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+				'note'			=> 'VOID CANCEL',
+			]);
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coauangmuka->id,
+				'account_id'	=> $coauangmuka->bp_journal ? $pdp->account_id : NULL,
+				'type'			=> '2',
+				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
+				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
+				'note'			=> 'VOID CANCEL',
+			]);
 		}
 	}
 

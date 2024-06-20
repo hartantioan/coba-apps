@@ -246,3 +246,15 @@ textarea.materialize-textarea {
 .modal > .modal-content > .row { 
 	margin-top:4% !important;
 }
+
+.swal2-modal {
+	padding:0 25px 0 25px !important;
+}
+
+#swal2-input {
+	max-width:100% !important;
+	min-width:50% !important;    
+	width:150px !important;
+	margin:auto !important;
+	display:block !important;
+}

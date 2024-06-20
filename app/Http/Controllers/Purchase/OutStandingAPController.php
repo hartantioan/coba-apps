@@ -172,7 +172,8 @@ class OutStandingAPController extends Controller
                 rs.adjust_nominal,
                 rs.total_payment,
                 rs.total_memo,
-                rs.total_reconcile
+                rs.total_reconcile,
+                rs.status_cancel
             FROM
                 (SELECT
                     pi.top AS topdp,
@@ -224,6 +225,15 @@ class OutStandingAPController extends Controller
                             AND ard.lookable_type = 'purchase_down_payments'
                             AND ard.lookable_id = pi.id
                     ),0) AS adjust_nominal,
+                    IFNULL((SELECT
+                        '1'
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date5
+                            AND cd.lookable_type = 'purchase_down_payments'
+                            AND cd.lookable_id = pi.id
+                            AND cd.deleted_at IS NULL
+                    ),0) AS status_cancel,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     pi.code,
@@ -239,12 +249,13 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date <= :date5
+                        pi.post_date <= :date6
                         AND pi.grandtotal > 0
-                        AND pi.status IN ('2','3','7')
+                        AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
                 ) AS rs
                 WHERE (rs.grandtotal - rs.total_payment - rs.total_memo - rs.total_reconcile) > 0
+                AND rs.status_cancel = '0'
                 ORDER BY rs.post_date ASC
         ", array(
             'date1' => $date,
@@ -252,6 +263,7 @@ class OutStandingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $totalAll = 0;

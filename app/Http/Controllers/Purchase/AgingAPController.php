@@ -182,6 +182,15 @@ class AgingAPController extends Controller
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pi.id
                 ),0) AS adjust_nominal,
+                IFNULL((SELECT
+                    '1'
+                    FROM cancel_documents cd
+                    WHERE 
+                        cd.post_date <= :date5
+                        AND cd.lookable_type = 'purchase_down_payments'
+                        AND cd.lookable_id = pi.id
+                        AND cd.deleted_at IS NULL
+                ),0) AS status_cancel,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -197,9 +206,9 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date5
+                    pi.post_date <= :date6
                     AND pi.grandtotal > 0
-                    AND pi.status IN ('2','3','7')
+                    AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
         ", array(
             'date1' => $date,
@@ -207,6 +216,7 @@ class AgingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $countPeriod = 1;
@@ -299,7 +309,7 @@ class AgingAPController extends Controller
             $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
-            if($balance > 0){
+            if($balance > 0 && $row->status_cancel == '0'){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $index = $this->findDuplicate($row->account_code,$newData);
                 if($index >= 0){
@@ -561,6 +571,15 @@ class AgingAPController extends Controller
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pi.id
                 ),0) AS adjust_nominal,
+                IFNULL((SELECT
+                    '1'
+                    FROM cancel_documents cd
+                    WHERE 
+                        cd.post_date <= :date5
+                        AND cd.lookable_type = 'purchase_down_payments'
+                        AND cd.lookable_id = pi.id
+                        AND cd.deleted_at IS NULL
+                ),0) AS status_cancel,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -576,7 +595,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date5
+                    pi.post_date <= :date6
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7')
                     AND pi.deleted_at IS NULL
@@ -586,6 +605,7 @@ class AgingAPController extends Controller
             'date3' => $date,
             'date4' => $date,
             'date5' => $date,
+            'date6' => $date,
         ));
 
         $countPeriod = 1;
@@ -665,7 +685,7 @@ class AgingAPController extends Controller
             $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
             $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
-            if($balance > 0){
+            if($balance > 0 && $row->status_cancel == '0'){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
                 $arrDetail = [];
                 foreach($arrColumn as $key => $rowcolumn){

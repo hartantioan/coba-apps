@@ -54,6 +54,7 @@ use App\Models\FundRequestDetail;
 use App\Models\MenuUser;
 use App\Models\User;
 use App\Helpers\TreeHelper;
+use App\Models\CancelDocument;
 use App\Models\Tax;
 
 class PurchaseDownPaymentController extends Controller
@@ -1062,6 +1063,70 @@ class PurchaseDownPaymentController extends Controller
                     ->log('Void the purchase order down payment data');
     
                 CustomHelper::sendNotification('purchase_down_payments',$query->id,'AP Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function cancelStatus(Request $request){
+        $query = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($request->cancel_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Payment Request / A/P Invoice sebagai DP.'
+                ];
+            }else{
+                
+                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+
+                $query->update([
+                    'status'    => '8',
+                ]);
+
+                $cd = CancelDocument::create([
+                    'code'          => CancelDocument::generateCode(substr($query->code,8,2),$request->cancel_date),
+                    'user_id'       => session('bo_id'),
+                    'post_date'     => $request->cancel_date,
+                    'lookable_type' => $query->getTable(),
+                    'lookable_id'   => $query->id,
+                ]);
+
+                CustomHelper::cancelJournal($cd,$request->cancel_date);
+    
+                activity()
+                    ->performedOn(new PurchaseDownPayment())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void cancel the purchase order down payment data');
+    
+                CustomHelper::sendNotification('purchase_down_payments',$query->id,'AP Down Payment No. '.$query->code.' telah ditutup dengan tombol cancel void.','AP Down Payment No. '.$query->code.' telah ditutup dengan tombol cancel void.',$query->user_id);
     
                 $response = [
                     'status'  => 200,

@@ -143,7 +143,7 @@
                         </div>
                     </div>
                     <div class="input-field col m6 s12">
-                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_bom_map.xlsx')) }}" target="_blank">disini</a> untuk mengunduh. Item yang sudah terdaftar pada Grup Item FG tidak bisa didaftarkan melalui import atau di-lewati. Silahkan hapus item yang sudah terdaftar.</h6>
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{ asset(Storage::url('format_imports/format_bom_map.xlsx')) }}" target="_blank">disini</a> untuk mengunduh.</h6>
                     </div>
                     <div class="input-field col m12 s12">
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>

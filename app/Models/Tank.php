@@ -17,6 +17,7 @@ class Tank extends Model
     protected $fillable = [
         'code',
         'name',
+        'line_id',
         'status'
     ];
 
@@ -34,5 +35,10 @@ class Tank extends Model
         }
 
         return $status;
+    }
+
+    public function line()
+    {
+        return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
     }
 }

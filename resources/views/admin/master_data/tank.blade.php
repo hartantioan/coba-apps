@@ -71,6 +71,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
+                                                        <th>Line</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -100,14 +101,22 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">Kode</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
+                        </div>
+                        <div class="input-field col m3 s4">
+                            <select class="form-control" id="line_id" name="line_id">
+                                @foreach ($line as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="line_id">Line</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -225,6 +234,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'line_id', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -331,6 +341,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#line_id').val(response.line_id).formSelect();
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

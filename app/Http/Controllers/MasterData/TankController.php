@@ -2,19 +2,31 @@
 
 namespace App\Http\Controllers\MasterData;
 use App\Http\Controllers\Controller;
+use App\Models\Line;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Tank;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class TankController extends Controller
 {
+    protected $dataplaces;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+
+    }
+
     public function index()
     {
         $data = [
             'title'     => 'Tangki',
             'content'   => 'admin.master_data.tank',
+            'line'      => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -25,6 +37,7 @@ class TankController extends Controller
             'id',
             'code',
             'name',
+            'line_id',
         ];
 
         $start  = $request->start;
@@ -75,6 +88,7 @@ class TankController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
+                    $val->line()->exists() ? $val->line->code : '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -103,10 +117,12 @@ class TankController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('tanks', 'code')->ignore($request->temp)] : 'required|unique:tanks,code',
             'name'              => 'required',
+            'line_id'           => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
+            'line_id.required'      => 'Line tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -121,6 +137,7 @@ class TankController extends Controller
                     $query = Tank::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->line_id	        = $request->line_id;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -133,6 +150,7 @@ class TankController extends Controller
                     $query = Tank::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'line_id'	    => $request->line_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

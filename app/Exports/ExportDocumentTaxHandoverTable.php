@@ -53,14 +53,8 @@ class ExportDocumentTaxHandoverTable implements ShouldAutoSize,FromView
 
         })->get();
        
-        $documentTaxHandoverIds = $documentTaxHandover->pluck('id')->toArray();
-
-        $handover_detail = DocumentTaxHandoverDetail::join('document_taxes', 'document_tax_handover_details.document_tax_id', '=', 'document_taxes.id')
-            ->whereIn('document_tax_handover_details.document_tax_handover_id', $documentTaxHandoverIds)
-            ->orderBy('document_taxes.created_at')
-            ->select('document_tax_handover_details.*') 
-            ->get();
-
+        $handover_detail = DocumentTaxHandoverDetail::whereIn('document_tax_handover_id', $documentTaxHandover->pluck('id')->toArray())->get();
+        
         return view('admin.exports.document_tax_detail_handover', [
             'data' => $handover_detail,
         ]);

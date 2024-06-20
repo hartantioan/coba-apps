@@ -322,7 +322,7 @@ class DocumentTaxController extends Controller
 
     public function export(Request $request){
 		$no_faktur = $request->no_faktur ? $request->no_faktur : ''   ;
-        info($request);
+  
 		return Excel::download(new ExportDocumentTax($no_faktur),'faktur_pajak'.uniqid().'.xlsx');
     }
 

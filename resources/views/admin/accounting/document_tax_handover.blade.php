@@ -500,7 +500,7 @@
             "destroy": true,
             "iDisplayInLength": 10,
             
-            "order": [[1, 'desc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -526,7 +526,7 @@
             },
             columns: [
                         { name: 'id', searchable: false, className: 'center-align' },
-                        { name: 'transaction_code', className: 'center-align' },
+                        { name: 'code', className: 'center-align',orderable: false},
                         { name: 'date', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },

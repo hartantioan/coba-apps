@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Usage;
-
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Models\HardwareItem;
 use App\Helpers\CustomHelper;
 use App\Models\ReceptionHardwareItemsUsage;
-use App\Models\ReturnHardwareItemsUsage;
+use App\Exports\ExportReceptionHardwareUsage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -42,12 +42,21 @@ class ReceptionHardwareItemUsageController extends Controller
                 'item_id' => $item->id,
                 'itemName' => $itemName,
                 'itemCode' => $item->code,
+                'itemdetail' => $item->detail1. (isset($item->detail2) ? ' - ' . $item->detail2 : ''),
             ];
             $item_ready[] = $itemData;
         }
 
         $response['itemInStorage']=$item_ready;
         return response()->json($response);
+    }
+
+    public function export(Request $request){
+		$start_date = $request->start_date ? $request->start_date : ''   ;
+        $finish_date = $request->finish_date ? $request->finish_date : '';
+        $search = $request->search ? $request->search : '';
+
+		return Excel::download(new ExportReceptionHardwareUsage($search),'serah_terima_inventaris'.uniqid().'.xlsx');
     }
 
     public function store_w_barcode(Request $request){
@@ -252,6 +261,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $nomor,
                     $val->code,
                     $val->user->name ?? '-',
+                    $val->hardwareItem->code ?? '',
                     $val->hardwareItem->item ?? '',
                     $val->location,
                     date('d/m/Y',strtotime($val->date)),

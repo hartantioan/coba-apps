@@ -23,6 +23,11 @@
                             <span class="hide-on-small-onl">Refresh</span>
                             <i class="material-icons right">refresh</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="excel();">
+                            <i class="material-icons hide-on-med-and-up">subtitles</i>
+                            <span class="hide-on-small-onl">EXCEL DATA TABLE</span>
+                            <i class="material-icons right">subtitles</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -86,6 +91,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>User</th>
+                                                        <th>Kode Inventaris</th>
                                                         <th>Item</th>
                                                         <th>Lokasi</th>
                                                         <th>Tanggal</th>
@@ -469,6 +475,12 @@
         }
     }
 
+    function excel(){
+        var search = window.table.search();
+        
+        window.location = "{{ Request::url() }}/export?search=" + search; 
+    }
+
     function fetchStorage(){
         $.ajax({
             url: '{{ Request::url() }}/fetch_storage',
@@ -487,10 +499,11 @@
                 $.each(response.itemInStorage, function(i, val) {
                     $('#in_storage').append(
                         `
-                        <div class="col s12 m1 l1">
+                        <div class="col s12 m12 l12">
                             <div class="card-panel border-radius-6 pt-4 pb-4 card_idle grey lighten-1" style="max-height:2em;overflow:hidden;min-height:2em;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
                                 <div class="display-flex justify-content-center align-items-center" style="height: 100%;">
-                                    <span style="text-align:center;font-size:0.6em;"> `+val.itemName+`-`+val.itemCode+`</span>
+                                    <div style="text-align:center;font-size:1em;"> `+val.itemName+`-`+val.itemCode+` : `+val.itemdetail+`</div>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -562,6 +575,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
+                { name: 'hardware_item_code', className: 'center-align' },
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },

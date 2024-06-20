@@ -107,7 +107,7 @@ class DocumentTaxHandoverController extends Controller
                     ->offset($start)
                     ->limit($length)
                     ->orderBy($order, $dir)
-                    ->orderBy('created_at',$direksi)
+                    ->orderBy('created_at','DESC')
                     ->get();
         
 
@@ -176,8 +176,9 @@ class DocumentTaxHandoverController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = DocumentTaxHandover::where('code',CustomHelper::decrypt($id))->first();
-                
+        $pr = DocumentTaxHandover::with(['documentTaxHandoverDetail.documentTax' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }])->where('code',CustomHelper::decrypt($id))->first();        
         if($pr){
             
             $pdf = PrintHelper::print($pr,'Document Tax Handover','a4','portrait','admin.print.accounting.document_tax_handover_individual');
@@ -414,7 +415,10 @@ class DocumentTaxHandoverController extends Controller
     
         $arr = [];
         $angka = 1;
-        foreach($query_tax_handover->documentTaxHandoverDetail as $row){
+        $sortedDetails = $query_tax_handover->documentTaxHandoverDetail->sortBy(function($detail) {
+            return $detail->documentTax->created_at;
+        });
+        foreach($sortedDetails as $row){
             $checkIcon = '';
             if ($row->status == '1' || $row->status == '3' ) {
                 $checkIcon = '<input type="checkbox" class="filled-in" name="arr_tax_detail" data-id="'.$row->document_tax_id.'"/>';

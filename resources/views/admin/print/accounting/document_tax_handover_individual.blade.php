@@ -257,7 +257,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->documentTaxHandoverDetail as $key => $row)
+                            @php
+                                $sortedDetails = $data->documentTaxHandoverDetail->sortBy(function($detail) {
+                                    return $detail->documentTax->created_at;
+                                });
+                            @endphp
+                            @foreach($sortedDetails as $key => $row)
                             @php
                                 $number = $row->documentTax->code;
 

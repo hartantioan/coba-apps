@@ -139,6 +139,7 @@ class TreeHelper {
                     $query_gr = GoodReceipt::where('id',$gr_id)->first();
                     foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
                         $name = $good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name ?? null;
+                        
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
@@ -161,6 +162,8 @@ class TreeHelper {
                             $data_id_po[]= $good_receipt_detail->purchaseOrderDetail->purchaseOrder->id; 
                             $added = true; 
                         }
+                        
+                       
 
                         if($good_receipt_detail->goodReturnPODetail()->exists()){
                             foreach($good_receipt_detail->goodReturnPODetail as $goodReturnPODetail){
@@ -261,8 +264,8 @@ class TreeHelper {
                                 ];
                                 $data_go_chart[]=$data_gscale;
                                 $data_link[]=[
-                                    'from'=>$good_receipt_detail->goodScale->code,
-                                    'to'=>$query_gr->code,
+                                    'from'=>$query_gr->code,
+                                    'to'=>$good_receipt_detail->goodScale->code,
                                     'string_link'=>$good_receipt_detail->goodScale->code.$query_gr->code
                                 ];
                                 $data_id_good_scale[]= $good_receipt_detail->goodScale->id; 
@@ -471,30 +474,30 @@ class TreeHelper {
                         }
                     }
 
-                    if($query_gs->purchaseOrderDetail()->exists()){
-                        $po = [
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$query_gs->purchaseOrderDetail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                    // if($query_gs->purchaseOrderDetail()->exists()){
+                    //     $po = [
+                    //         'properties'=> [
+                    //             ['name'=> "Tanggal: ".$query_gs->purchaseOrderDetail->purchaseOrder->post_date],
+                    //             ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                 
-                            ],
-                            'key'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
-                            'name'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
-                            'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($query_gs->purchaseOrderDetail->purchaseOrder->code),
-                        ];
+                    //         ],
+                    //         'key'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                    //         'name'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                    //         'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($query_gs->purchaseOrderDetail->purchaseOrder->code),
+                    //     ];
 
-                        $data_go_chart[]=$po;
-                        $data_link[]=[
-                            'from'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
-                            'to'=>$query_gs->code,
-                            'string_link'=>$query_gs->purchaseOrderDetail->purchaseOrder->code.$query_gs->code
-                        ];
-                        if(!in_array($query_gs->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
-                            $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
-                            $added = true; 
-                        }
-                        $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
-                    }
+                    //     $data_go_chart[]=$po;
+                    //     $data_link[]=[
+                    //         'from'=>$query_gs->purchaseOrderDetail->purchaseOrder->code,
+                    //         'to'=>$query_gs->code,
+                    //         'string_link'=>$query_gs->purchaseOrderDetail->purchaseOrder->code.$query_gs->code
+                    //     ];
+                    //     if(!in_array($query_gs->purchaseOrderDetail->purchaseOrder->id, $data_id_po)){
+                    //         $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
+                    //         $added = true; 
+                    //     }
+                    //     $data_id_po[]= $query_gs->purchaseOrderDetail->purchaseOrder->id; 
+                    // }
 
                 }
             }
@@ -1919,30 +1922,30 @@ class TreeHelper {
                             
                             
                         }
-                        /* if($purchase_order_detail->goodScale()->exists()){
-                            foreach($purchase_order_detail->goodScale as $row_scale){
-                                $data_good_scale_tempura = [
-                                    'key'   => $row_scale->code,
-                                    "name"  => $row_scale->code,
+                        // if($purchase_order_detail->goodScale()->exists()){
+                        //     foreach($purchase_order_detail->goodScale as $row_scale){
+                        //         $data_good_scale_tempura = [
+                        //             'key'   => $row_scale->code,
+                        //             "name"  => $row_scale->code,
                                 
-                                    'properties'=> [
-                                        ['name'=> "Tanggal: ".$row_scale->post_date],
+                        //             'properties'=> [
+                        //                 ['name'=> "Tanggal: ".$row_scale->post_date],
                                     
-                                    ],
-                                    'url'   =>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($row_scale->code),
-                                ];
-                                $data_go_chart[]=$data_good_scale_tempura;
-                                $data_link[]=[
-                                    'from'  =>   $query_po->code,
-                                    'to'    =>   $row_scale->code,
-                                    'string_link'=>$query_po->code.$row_scale->code,
-                                ];
-                                if(!in_array($row_scale->id,$data_id_good_scale)){
-                                    $data_id_good_scale[]=$row_scale->id;
-                                    $added = true;
-                                }
-                            }
-                        } */
+                        //             ],
+                        //             'url'   =>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($row_scale->code),
+                        //         ];
+                        //         $data_go_chart[]=$data_good_scale_tempura;
+                        //         $data_link[]=[
+                        //             'from'  =>   $query_po->code,
+                        //             'to'    =>   $row_scale->code,
+                        //             'string_link'=>$query_po->code.$row_scale->code,
+                        //         ];
+                        //         if(!in_array($row_scale->id,$data_id_good_scale)){
+                        //             $data_id_good_scale[]=$row_scale->id;
+                        //             $added = true;
+                        //         }
+                        //     }
+                        // }
                         
                     }
 

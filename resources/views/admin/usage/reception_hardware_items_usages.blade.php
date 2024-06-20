@@ -500,8 +500,8 @@
                     $('#in_storage').append(
                         `
                         <div class="col s12 m12 l12">
-                            <div class="card-panel border-radius-6 pt-4 pb-4 card_idle grey lighten-1" style="max-height:2em;overflow:hidden;min-height:2em;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
-                                <div class="display-flex justify-content-center align-items-center" style="height: 100%;">
+                            <div class="border-radius-6  card_idle grey lighten-1" style="max-height:0.5em;overflow:hidden;padding:1rem;padding-bottom:2rem;" onclick="targeted_item(`+val.item_id+`,'`+btoa(val.itemName)+`')">
+                                <div>
                                     <div style="text-align:center;font-size:1em;"> `+val.itemName+`-`+val.itemCode+` : `+val.itemdetail+`</div>
                                     
                                 </div>

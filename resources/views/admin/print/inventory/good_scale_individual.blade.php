@@ -172,13 +172,13 @@
         </style>
     </head>
     <body>
-        <header style="margin-top:20px;">
+        <header style="margin-top:15px;">
             <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
                     <td width="33%" class="left-align" style="padding-top:15px;">
-                        <span class="invoice-number mr-1"># {{ $data->code }}</span>
+                        <span class="invoice-number mr-1">Tiket Timbangan # {{ $data->code }}</span>
                         <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
-                        <h4 class="indigo-text">Tiket Timbangan</h4>
+                        <h4 class="indigo-text"></h4>
                     </td>
                     <td width="33%" class="right-align">
                     </td>
@@ -190,7 +190,7 @@
             </table>
             <hr style="border-top: 1px solid black; margin-top:-15px">
         </header>
-        <main style="margin-top:20px;">
+        <main style="margin-top:10px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">
@@ -255,6 +255,14 @@
                                          </td>
                                          <td>
                                              {{ $data->purchaseOrderDetail->purchaseOrder->code }}
+                                          </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Catatan
+                                         </td>
+                                         <td>
+                                            {{ $data->note }}
                                           </td>
                                     </tr>
                                     {{-- <tr>
@@ -372,18 +380,6 @@
                     <!-- invoice subtotal -->
                     <div class="invoice-subtotal break-row">
                         <div class="row">
-                        <div class="column1">
-                            <table style="width:100%">
-                                <tr class="break-row">
-                                    <td>
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                    </td>
-                                    
-                                </tr>
-                            </table>
-                        </div>
                         <div class="column2">
                         </div>
                         </div>

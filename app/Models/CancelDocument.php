@@ -28,9 +28,9 @@ class CancelDocument extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public static function generateCode($plant,$date)
+    public static function generateCode($prefix,$plant,$date)
     {
-        $cek = 'CADO-'.date('y',strtotime($date));
+        $cek = $prefix.'-'.date('y',strtotime($date));
         $query = CancelDocument::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()

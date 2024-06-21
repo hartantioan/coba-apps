@@ -1840,7 +1840,7 @@ class PurchaseInvoiceController extends Controller
                 ]);
 
                 $cd = CancelDocument::create([
-                    'code'          => CancelDocument::generateCode(substr($query->code,7,2),$request->cancel_date),
+                    'code'          => CancelDocument::generateCode('CAPN',substr($query->code,7,2),$request->cancel_date),
                     'user_id'       => session('bo_id'),
                     'post_date'     => $request->cancel_date,
                     'lookable_type' => $query->getTable(),

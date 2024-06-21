@@ -14,6 +14,7 @@ use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
+use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
@@ -351,63 +352,35 @@ class ProductionReceiveController extends Controller
                 
                 if($query) {
                     foreach($request->arr_qty as $key => $row){
-                        $qty_planned = 0;
-                        $nominal_planned = 0;
-                        $total_planned = 0;
-                        $nominal = 0;
-                        $total = 0;
-                        if($request->arr_bom_id[$key] !== '0'){
-                            $bobot = round($query->productionOrder->productionScheduleDetail->qty / $query->productionOrder->productionScheduleDetail->bom->qty_output,2);
-                            $qty_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key]));
-                            if($request->arr_lookable_type[$key] == 'items'){
-                                $item = Item::find($request->arr_lookable_id[$key]);
-                                if($item){
-                                    $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
-                                    $nominal_planned = $itemstock->priceDate($query->post_date);
-                                    $nominal = $nominal_planned;
-                                    $total_planned = round($nominal_planned * $qty_planned,2);
-                                    $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
-                                }
-                            }elseif($request->arr_lookable_type[$key] == 'resources'){
-                                $nominal_planned = str_replace(',','.',str_replace('.','',$request->arr_nominal_bom[$key]));
-                                $total_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_total_bom[$key]));
-                                $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
-                                $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                            }
-                        }else{
-                            if($request->arr_lookable_type[$key] == 'items'){
-                                $item = Item::find($request->arr_lookable_id[$key]);
-                                if($item){
-                                    $nominal = $item->itemStock->priceDate($query->post_date);
-                                    $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
-                                }
-                            }elseif($request->arr_lookable_type[$key] == 'resources'){
-                                $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
-                                $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                            }
-                        }
-                        $querydetail = ProductionIssueDetail::create([
-                            'production_issue_id'           => $query->id,
+                        $querydetail = ProductionReceiveDetail::create([
+                            'production_receive_id'         => $query->id,
                             'production_order_id'           => $request->arr_production_order_id[$key] ?? NULL,
-                            'lookable_type'                 => $request->arr_lookable_type[$key],
-                            'lookable_id'                   => $request->arr_lookable_id[$key],
-                            'bom_id'                        => $request->arr_bom_id[$key] == '0' ? NULL : $request->arr_bom_id[$key],
-                            'bom_detail_id'                 => $request->arr_bom_detail_id[$key] == '0' ? NULL : $request->arr_bom_detail_id[$key],
+                            'item_id'                       => $request->arr_item_id[$key],
+                            'bom_id'                        => $request->arr_bom_id[$key],
+                            'is_powder'                     => $request->arr_is_powder[$key] == '0' ? NULL : $request->arr_is_powder[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$row)),
-                            'nominal'                       => $nominal,
-                            'total'                         => $total,
-                            'qty_bom'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key])),
-                            'nominal_bom'                   => str_replace(',','.',str_replace('.','',$request->arr_nominal_bom[$key])),
-                            'total_bom'                     => str_replace(',','.',str_replace('.','',$request->arr_total_bom[$key])),
-                            'qty_planned'                   => $qty_planned,
-                            'nominal_planned'               => $nominal_planned,
-                            'total_planned'                 => $total_planned,
-                            'from_item_stock_id'            => $request->arr_item_stock_id[$key] == '0' ? NULL : $request->arr_item_stock_id[$key],
+                            'qty_planned'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key])),
+                            'place_id'                      => $request->arr_place_id[$key],
+                            'warehouse_id'                  => $request->arr_warehouse_id[$key],
+                            'tank_id'                       => $request->arr_tank_id[$key],
+                        ]);
+                        $type = $querydetail->is_powder ? 'powder' : 'normal';
+                        $batch = ProductionBatch::create([
+                            'code'          => ProductionBatch::generateCode($type,$query->shift->code,$query->group),
+                            'item_id'       => $querydetail->item_id,
+                            'lookable_type' => $querydetail->getTable(),
+                            'lookable_id'   => $querydetail->id,
+                            'qty'           => $querydetail->qty,
+                        ]);
+                        $updaterow = ProductionReceiveDetail::find($querydetail->id);
+                        $updaterow->update([
+                            'batch_no'              => $batch->code,
+                            'production_batch_id'   => $batch->id,
                         ]);
                     }
                     
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
+                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive No. '.$query->code);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Receive No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
                     activity()
                         ->performedOn(new ProductionReceive())

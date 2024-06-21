@@ -4537,7 +4537,7 @@ class CustomHelper {
 				'currency_id'	=> $pdp->currency_id,
 				'currency_rate'	=> $currency_rate,
 				'post_date'		=> $date,
-				'note'			=> 'VOID CANCEL',
+				'note'			=> 'VOID CANCEL '.$pdp->code,
 				'status'		=> '3'
 			]);
 
@@ -4548,7 +4548,7 @@ class CustomHelper {
 				'type'			=> '1',
 				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
 				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> 'VOID CANCEL',
+				'note'			=> $pdp->code
 			]);
 
 			JournalDetail::create([
@@ -4558,7 +4558,7 @@ class CustomHelper {
 				'type'			=> '2',
 				'nominal'		=> round($pdp->grandtotal * $currency_rate,2),
 				'nominal_fc'	=> $pdp->currency->type == '1' ? round($pdp->grandtotal * $currency_rate,2) : $pdp->grandtotal,
-				'note'			=> 'VOID CANCEL',
+				'note'			=> $pdp->code
 			]);
 		}elseif($data->lookable_type == 'purchase_invoices'){
 			$pi = PurchaseInvoice::find($data->lookable_id);
@@ -4576,7 +4576,7 @@ class CustomHelper {
 				'currency_id'	=> $pi->currency_id,
 				'currency_rate'	=> $currency_rate_invoice,
 				'post_date'		=> $data->post_date,
-				'note'			=> 'VOID CANCEL',
+				'note'			=> 'VOID CANCEL '.$pi->code,
 				'status'		=> '3'
 			]);
 

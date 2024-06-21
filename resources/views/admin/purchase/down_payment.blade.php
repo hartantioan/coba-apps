@@ -44,6 +44,9 @@
         white-space: pre-line;
     }
 
+    #table_multi_purchase_order_wrapper > .dataTables_scrollHeadInner {
+        width: 100% !important; 
+    }
     #table_multi_purchase_order_wrapper > .dataTable {
         width: 100% !important; 
     }

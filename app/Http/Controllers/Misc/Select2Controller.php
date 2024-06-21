@@ -2462,7 +2462,9 @@ class Select2Controller extends Controller {
                         if($request->account_id){
                             $query->where('account_id',$request->account_id);
                         }
-                        $query->where('code','like',"%$search%");
+                        $query->where('code','like',"%$search%")
+                            ->whereIn('status',['2'])
+                            ->where('inventory_type','1');
                     });
                 })
                 ->whereIn('place_id',$this->dataplaces)

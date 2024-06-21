@@ -350,6 +350,10 @@ class ItemController extends Controller
                         $query->itemUnit()->whereNotIn('unit_id',$request->arr_unit)->delete();
                     }
 
+                    if(!$query->itemCogs()->exists()){
+                        $query->itemStock()->delete();
+                    }
+
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();

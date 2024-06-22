@@ -164,20 +164,20 @@
             }
            
             .mt-5 {
-                margin-top:40px;
+                margin-top:30px;
             }
             .mt-2 {
-                margin-top:20px;
+                margin-top:10px;
             }
         </style>
     </head>
     <body>
-        <header style="margin-top:15px;">
+        <header style="margin-top:20px;">
             <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
                     <td width="66%" class="left-align" style="padding-top:15px;">
                         <span class="invoice-number mr-1">Tiket Timbangan # {{ $data->code }}</span>
-                        <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
+                        <br><span>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                         <h4 class="indigo-text"></h4>
                     </td>
                     <td width="34%" class="right-align">
@@ -255,14 +255,6 @@
                                              {{ $data->purchaseOrderDetail->purchaseOrder->code }}
                                           </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            Catatan
-                                         </td>
-                                         <td>
-                                            {{ $data->note }}
-                                          </td>
-                                    </tr>
                                     {{-- <tr>
                                         <td>
                                             Status QC
@@ -338,6 +330,14 @@
                                         <td>
                                              {{ CustomHelper::formatConditionalQty($data->qty_balance) }}
                                         </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            Catatan
+                                         </td>
+                                         <td>
+                                            {{ $data->note }}
+                                          </td>
                                     </tr>
                                 </table>
                             </td>

@@ -227,4 +227,9 @@ class ProductionReceive extends Model
             return false;
         }
     }
+
+    public function total(){
+        $total = $this->productionReceiveDetail()->sum('total');
+        return $total;
+    }
 }

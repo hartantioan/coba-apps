@@ -43,6 +43,7 @@ class BomController extends Controller
             'code',
             'name',
             'item_id',
+            'item_reject_id',
             'place_id',
             'warehouse_id',
             'qty_output',
@@ -111,6 +112,7 @@ class BomController extends Controller
                     $val->code,
                     $val->name,
                     $val->item->name,
+                    $val->itemReject()->exists() ? $val->itemReject->name : '-',
                     $val->place->code,
                     $val->warehouse->name,
                     CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
@@ -196,6 +198,7 @@ class BomController extends Controller
                     $query->name                = $request->name;
                     $query->user_id             = session('bo_id');
                     $query->item_id             = $request->item_id;
+                    $query->item_reject_id      = $request->item_reject_id;
                     $query->place_id            = $request->place_id;
                     $query->warehouse_id        = $request->warehouse_id;
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
@@ -218,6 +221,7 @@ class BomController extends Controller
                         'name'			    => $request->name,
                         'user_id'           => session('bo_id'),
                         'item_id'           => $request->item_id,
+                        'item_reject_id'    => $request->item_reject_id,
                         'place_id'          => $request->place_id,
                         'warehouse_id'      => $request->warehouse_id,
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
@@ -333,6 +337,8 @@ class BomController extends Controller
     public function show(Request $request){
         $bom = Bom::find($request->id);
         $bom['item_name'] = $bom->item->name;
+        $bom['item_reject_id'] = $bom->itemReject()->exists() ? $bom->item_reject_id : '';
+        $bom['item_reject_name'] = $bom->itemReject()->exists() ? $bom->itemReject->code.' - '.$bom->itemReject->name : '';
         $bom['qty_output'] = CustomHelper::formatConditionalQty($bom->qty_output);
 
         $details = [];

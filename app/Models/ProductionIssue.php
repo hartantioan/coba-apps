@@ -96,6 +96,11 @@ class ProductionIssue extends Model
         return $this->hasMany('App\Models\ProductionIssueDetail');
     }
 
+    public function total(){
+        $total = $this->productionIssueDetail()->sum('total');
+        return $total;
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

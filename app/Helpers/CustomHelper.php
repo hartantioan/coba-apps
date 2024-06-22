@@ -71,6 +71,7 @@ use App\Models\ItemStock;
 use App\Models\MaterialRequest;
 use App\Models\ProductionBatch;
 use App\Models\ProductionIssue;
+use App\Models\ProductionReceive;
 use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
@@ -4076,7 +4077,7 @@ class CustomHelper {
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,
 				'post_date'		=> $data->post_date,
-				'note'			=> $data->note,
+				'note'			=> $pir->note,
 				'status'		=> '3',
 				'currency_rate'	=> 1,
 				'currency_id'	=> 1,
@@ -4185,6 +4186,83 @@ class CustomHelper {
 				'status'	=> '3'
 			]);
 		}elseif($table_name == 'production_receives'){
+
+			$pir = ProductionReceive::find($table_id);
+
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pir->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note,
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			$total = 0;
+
+			foreach($pir->productionReceiveDetail as $row){
+				info($row->item->itemGroup->coa_id);
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'line_id'		=> $row->productionReceive->line_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> $row->total,
+					'note'			=> $pir->note,
+				]);
+
+				self::sendCogs($table_name,
+					$pir->id,
+					$pir->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$row->total,
+					'IN',
+					$pir->post_date,
+					NULL,
+					NULL,
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'IN',
+					NULL,
+					NULL,
+				);
+
+				$total += $row->total;
+			}
+
+			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '2',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+			]);
+
+			$pir->update([
+				'status'	=> '3'
+			]);
 
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);

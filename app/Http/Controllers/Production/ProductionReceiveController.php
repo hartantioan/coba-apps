@@ -220,8 +220,8 @@ class ProductionReceiveController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -351,6 +351,16 @@ class ProductionReceiveController extends Controller
                 }
                 
                 if($query) {
+                    $totalIssue = $query->productionOrder->total();
+                    $arrTotal = [];
+                    $totalQty = 0;
+                    foreach($request->arr_qty as $key => $row){
+                        $totalQty += str_replace(',','.',str_replace('.','',$row));
+                    }
+                    foreach($request->arr_qty as $key => $row){
+                        $arrTotal[] = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalIssue,2);
+                    }
+
                     foreach($request->arr_qty as $key => $row){
                         $querydetail = ProductionReceiveDetail::create([
                             'production_receive_id'         => $query->id,
@@ -360,9 +370,9 @@ class ProductionReceiveController extends Controller
                             'is_powder'                     => $request->arr_is_powder[$key] == '0' ? NULL : $request->arr_is_powder[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$row)),
                             'qty_planned'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key])),
-                            'place_id'                      => $request->arr_place_id[$key],
-                            'warehouse_id'                  => $request->arr_warehouse_id[$key],
-                            'tank_id'                       => $request->arr_tank_id[$key],
+                            'place_id'                      => $request->arr_place[$key],
+                            'warehouse_id'                  => $request->arr_warehouse[$key],
+                            'tank_id'                       => $request->arr_tank[$key],
                         ]);
                         $type = $querydetail->is_powder ? 'powder' : 'normal';
                         $batch = ProductionBatch::create([
@@ -376,6 +386,7 @@ class ProductionReceiveController extends Controller
                         $updaterow->update([
                             'batch_no'              => $batch->code,
                             'production_batch_id'   => $batch->id,
+                            'total'                 => $arrTotal[$key],
                         ]);
                     }
                     
@@ -400,10 +411,10 @@ class ProductionReceiveController extends Controller
                 }
             }
         
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
 		return response()->json($response);
     }
@@ -1031,7 +1042,7 @@ class ProductionReceiveController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionIssueReceive::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

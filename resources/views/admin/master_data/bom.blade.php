@@ -95,6 +95,7 @@
                                                         <th>Kode</th>
                                                         <th>Nama</th>
                                                         <th>Item</th>
+                                                        <th>Item Reject</th>
                                                         <th>Plant</th>
                                                         <th>Gudang</th>
                                                         <th>Qty Output</th>
@@ -146,6 +147,10 @@
                             <div class="form-control-feedback production-unit">-</div>
                         </div>
                         <div class="input-field col s12 m3">
+                            <select class="browser-default" id="item_reject_id" name="item_reject_id"></select>
+                            <label class="active" for="item_reject_id">Item Reject (Jika ada)</label>
+                        </div>
+                        <div class="input-field col s12 m3">
                             <select class="form-control" id="place_id" name="place_id">
                                 @foreach($place as $b)
                                     <option value="{{ $b->id }}">{{ $b->code }}</option>
@@ -161,6 +166,7 @@
                             </select>
                             <label class="" for="warehouse_id">Gudang</label>
                         </div>
+                        <div class="col s12 m12"></div>
                         <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="status">BOM Powder</label>
@@ -338,6 +344,7 @@
                 M.updateTextFields();
                 resetDetailForm();
                 $('#item_id').empty();
+                $('#item_reject_id').empty();
             }
         });
 
@@ -353,6 +360,7 @@
         });
         
         select2ServerSide('#item_id', '{{ url("admin/select2/bom_item") }}');
+        select2ServerSide('#item_reject_id', '{{ url("admin/select2/bom_item") }}');
 
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
@@ -459,10 +467,10 @@
     }
 
     function countAll(){
-        $('input[name^="arr_qty"]').each(function(index){
+        $('input[name^="arr_qty[]"]').each(function(index){
             let total = 0, qty = 0, nominal = 0;
-            qty = parseFloat($('input[name^="arr_qty"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            nominal = parseFloat($('input[name^="arr_nominal"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            qty = parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+            nominal = parseFloat($('input[name^="arr_nominal[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
             total = qty * nominal;
             $('input[name^="arr_total"]').eq(index).val(
                 (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
@@ -475,11 +483,19 @@
             $('#empty-row-detail' + id).remove();
         }
         var count = makeid(10);
+        var nominal = ``, total = ``;
+        if(param == 'items'){
+            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="0,00">`;
+            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="0,00" readonly>`;
+        }else if(param == 'resources'){
+            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);countAll()">`;
+            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>`;
+        }
         $('#body-detail' + id).append(`
             <tr class="row_detail" id="row_detail` + count + `">
                 <input name="arr_alternative[]" value="` + id + `" type="hidden">
                 <input name="arr_type[]" value="` + param + `" type="hidden">
-                <td>
+                ` + (param == 'items' ? `<input id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" value="" type="hidden">` : `` ) + `<td>
                     ` + (param == 'items' ? 'Item' : 'Resource') + `
                 </td>
                 <td>
@@ -492,13 +508,14 @@
                     <span id="arr_satuan` + count + `">-</span>
                 </td>
                 <td>
-                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00">
+                    ` + nominal + `
                 </td>
                 <td>
-                    <input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>
+                    ` + total + `
                 </td>
                 <td class="center">
-                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                    ` + (param == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
+                    
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
@@ -520,8 +537,8 @@
             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/bom_item") }}');
         }else if(param == 'resources'){
             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
+            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
         }
-        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
     }
 
     function getRowUnit(val,param){
@@ -616,6 +633,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'item', className: 'center-align' },
+                { name: 'item_reject', className: 'center-align' },
                 { name: 'place', className: 'center-align' },
                 { name: 'warehouse', className: 'center-align' },
                 { name: 'qty_output', className: 'center-align' },
@@ -679,7 +697,7 @@
                     formData.append('arr_alternative_default[]',($(this).is(':checked') ? $(this).val() : ''));
                 });
 
-                $('select[name^="arr_cost_distribution[]"]').each(function(index){
+                $('*[name^="arr_cost_distribution[]"]').each(function(index){
                     formData.append('arr_cost_distribution[]',($(this).val() ? $(this).val() : ''));
                 });
 
@@ -776,10 +794,15 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#item_id').empty();
+                $('#item_id,#item_reject_id').empty();
                 $('#item_id').append(`
                     <option value="` + response.item_id + `">` + response.item_name + `</option>
                 `);
+                if(response.item_reject_id){
+                    $('#item_reject_id').append(`
+                        <option value="` + response.item_reject_id + `">` + response.item_reject_name + `</option>
+                    `);
+                }
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#warehouse_id').val(response.warehouse_id).formSelect();
@@ -860,10 +883,19 @@
 
                     $.each(val.details, function(i, value) {
                         var count = makeid(10);
+                        var nominal = ``, total = ``;
+                        if(value.lookable_type == 'items'){
+                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="` + value.nominal + `">`;
+                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="` + value.total + `" readonly>`;
+                        }else if(value.lookable_type == 'resources'){
+                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + value.nominal + `" onkeyup="formatRupiahNoMinus(this);countAll()">`;
+                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + value.total + `" readonly>`;
+                        }
                         $('#body-detail' + val.code).append(`
                             <tr class="row_detail" id="row_detail` + count + `">
                                 <input name="arr_alternative[]" value="` + val.code + `" type="hidden">
                                 <input name="arr_type[]" value="` + value.lookable_type + `" type="hidden">
+                                ` + (value.lookable_type == 'items' ? `<input id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" value="" type="hidden">` : `` ) + `
                                 <td>
                                     ` + (value.lookable_type == 'items' ? 'Item' : 'Resource') + `
                                 </td>
@@ -877,13 +909,13 @@
                                     <span id="arr_satuan` + count + `">` + value.uom_unit + `</span>
                                 </td>
                                 <td>
-                                    <input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + value.nominal + `">
+                                    ` + nominal + `
                                 </td>
                                 <td>
-                                    <input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + value.total + `" readonly>
+                                    ` + total + `
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>
+                                    ` + (value.lookable_type == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
                                 </td>
                                 <td>
                                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + value.description + `">
@@ -913,9 +945,9 @@
                             $('#arr_cost_distribution' + count).append(`
                                 <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
                             `);
+                            select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                         }
                         $('#arr_issue_method' + count).val(value.issue_method);
-                        select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                     });
                 });
 

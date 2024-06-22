@@ -206,4 +206,22 @@ class ProductionOrder extends Model
             return false;
         }
     }
+
+    public function total(){
+        $total = 0;
+        
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $rowissue){
+                $total += $rowissue->total();
+            }
+        }
+
+        if($this->productionReceive()->exists()){
+            foreach($this->productionReceive as $rowreceive){
+                $total -= $rowreceive->total();
+            }
+        }
+        
+        return $total;
+    }
 }

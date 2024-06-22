@@ -21,6 +21,7 @@ class Bom extends Model
         'name',
         'user_id',
         'item_id',
+        'item_reject_id',
         'place_id',
         'warehouse_id',
         'qty_output',
@@ -34,6 +35,10 @@ class Bom extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public function itemReject(){
+        return $this->belongsTo('App\Models\Item', 'item_reject_id', 'id')->withTrashed();
     }
 
     public function place(){

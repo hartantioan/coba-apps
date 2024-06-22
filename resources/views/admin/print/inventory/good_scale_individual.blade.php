@@ -175,12 +175,10 @@
         <header style="margin-top:15px;">
             <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
-                    <td width="33%" class="left-align" style="padding-top:15px;">
+                    <td width="66%" class="left-align" style="padding-top:15px;">
                         <span class="invoice-number mr-1">Tiket Timbangan # {{ $data->code }}</span>
                         <small>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</small>
                         <h4 class="indigo-text"></h4>
-                    </td>
-                    <td width="33%" class="right-align">
                     </td>
                     <td width="34%" class="right-align">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:15px; width:20%;right:0;">

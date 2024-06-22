@@ -172,7 +172,7 @@
         </style>
     </head>
     <body>
-        <header style="margin-top:20px;">
+        <header style="margin-top:50px;">
             <table border="0" width="100%" style="font-size:0.8em" class="tb-header">
                 <tr>
                     <td width="66%" class="left-align" style="padding-top:15px;">
@@ -188,7 +188,7 @@
             </table>
             <hr style="border-top: 1px solid black; margin-top:-15px">
         </header>
-        <main style="margin-top:10px;">
+        <main style="margin-top:30px;">
             <div class="card">
                 <div class="card-content invoice-print-area ">
                     <table border="0" width="100%">

@@ -311,6 +311,20 @@ class PurchaseOrder extends Model
         }
     }
 
+    public function hasBalanceRm(){
+        $qty = 0;
+
+        foreach($this->purchaseOrderDetail()->whereNull('status')->get() as $row){
+            $qty += $row->getBalanceReceiptRM();
+        }
+
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     public function hasBalanceInvoice(){
         $total = $this->grandtotal;
 

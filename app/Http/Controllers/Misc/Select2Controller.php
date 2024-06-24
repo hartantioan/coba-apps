@@ -1148,11 +1148,20 @@ class Select2Controller extends Controller {
                 ->where('inventory_type','1')->get();
 
         foreach($data as $d) {
-            if($d->hasBalance()){
-                $response[] = [
-                    'id'   			=> $d->id,
-                    'text' 			=> $d->code.' - '.$d->note,
-                ];
+            if($typegrpo == '1'){
+                if($d->hasBalance()){
+                    $response[] = [
+                        'id'   			=> $d->id,
+                        'text' 			=> $d->code.' - '.$d->note,
+                    ];
+                }
+            }elseif($typegrpo == '2'){
+                if($d->hasBalanceRm()){
+                    $response[] = [
+                        'id'   			=> $d->id,
+                        'text' 			=> $d->code.' - '.$d->note,
+                    ];
+                }
             }
         }
 

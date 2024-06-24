@@ -3619,7 +3619,7 @@
     function formatRupiahNominal(angka){
         let decimal = 2;
         if($('#currency_id').val() !== '1'){
-            decimal = 6;
+            decimal = 10;
         }
         let val = angka.value ? angka.value : '';
         var number_string = val.replace(/[^,\d]/g, '').toString(),

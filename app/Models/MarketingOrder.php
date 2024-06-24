@@ -435,16 +435,29 @@ class MarketingOrder extends Model
     public function details(){
         $arr = [];
         foreach($this->marketingOrderDetail as $row){
-            $arr[] = [
-                'id'            => $row->id,
-                'item_id'       => $row->item_id,
-                'item_code'     => $row->item->code,
-                'item_name'     => $row->item->name,
-                'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
-                'uom'           => $row->item->uomUnit->code,
-                'note'          => $row->note,
-                'request_date'  => $this->delivery_date,
-            ];
+            if($row->item->parentFg()->exists()){
+                $arr[] = [
+                    'id'            => $row->id,
+                    'item_id'       => $row->item->parentFg->parent->id,
+                    'item_code'     => $row->item->parentFg->parent->code,
+                    'item_name'     => $row->item->parentFg->parent->name,
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
+                    'uom'           => $row->item->parentFg->parent->uomUnit->code,
+                    'note'          => $row->note,
+                    'request_date'  => $this->delivery_date,
+                ];
+            }else{
+                $arr[] = [
+                    'id'            => $row->id,
+                    'item_id'       => $row->item_id,
+                    'item_code'     => $row->item->code,
+                    'item_name'     => $row->item->name,
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
+                    'uom'           => $row->item->uomUnit->code,
+                    'note'          => $row->note,
+                    'request_date'  => $this->delivery_date,
+                ];
+            }
         }
 
         return $arr;

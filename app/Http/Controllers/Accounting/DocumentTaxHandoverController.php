@@ -300,7 +300,7 @@ class DocumentTaxHandoverController extends Controller
                     if ($detail) {
                         $detail->status = 2;
                         $document_tax_reject = DocumentTax::find($id);
-                        $document_tax_reject->status = '2';
+                        $document_tax_reject->status = '4';
                         $document_tax_reject->save(); 
                         $detail->save();
                     }
@@ -529,7 +529,7 @@ class DocumentTaxHandoverController extends Controller
     public function getTaxforHandoverTax(Request $request){
         $search     = $request->search;
         $data = DocumentTax::whereDoesntHave('documentTaxHandoverDetail')
-                ->whereNotIn('status',['2','3'])
+                ->whereNotIn('status',['2','3','4'])
                 ->where(function($query)use($request,$search){
                     if ($search) {
                         $query->where('code', 'like', "%$search%")

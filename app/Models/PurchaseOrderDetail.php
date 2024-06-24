@@ -226,7 +226,7 @@ class PurchaseOrderDetail extends Model
             $balance = $this->goodScale->qty_final;
         }else{ */
             $received = $this->goodReceiptDetail()->sum('qty');
-            $balance = $this->qty - $received;
+            $balance = $this->qty + ($this->qty * ($this->item->tolerance_gr / 100)) - $received;
         /* } */
         
         return $balance;

@@ -50,7 +50,7 @@ class HomeController extends Controller
                 $weight = Weight::create([
                     'code'      => Str::random(25),
                     'place_id'  => $request->place_id,
-                    'nominal'   => $request->nominal,
+                    'nominal'   => str_replace(',','',$request->nominal),
                     'rawdata'   => $request->rawdata,
                 ]);
             }

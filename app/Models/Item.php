@@ -372,6 +372,11 @@ class Item extends Model
         return $this->hasMany('App\Models\FgGroup','parent_id','id');
     }
 
+    public function parentFg()
+    {
+        return $this->hasOne('App\Models\FgGroup','item_id','id');
+    }
+
     public function benchmarkPrice()
     {
         return $this->hasMany('App\Models\BenchmarkPrice','item_id','id')->where('status','1');

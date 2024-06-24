@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Pallet;
 use Illuminate\Http\Request;
@@ -25,6 +27,7 @@ class PalletController extends Controller
             'id',
             'code',
             'name',
+            'sell_convert',
             'nominal',
         ];
 
@@ -76,6 +79,7 @@ class PalletController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
+                    number_format($val->sell_convert,2,',','.'),
                     number_format($val->nominal,2,',','.'),
                     $val->status(),
                     '
@@ -123,6 +127,7 @@ class PalletController extends Controller
                     $query = Pallet::find($request->temp);
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
+                    $query->sell_convert	= str_replace(',','.',str_replace('.','',$request->sell_convert));
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
@@ -136,6 +141,7 @@ class PalletController extends Controller
                     $query = Pallet::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
+                        'sell_convert'	=> str_replace(',','.',str_replace('.','',$request->sell_convert)),
                         'nominal'       => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'        => $request->status ? $request->status : '2'
                     ]);
@@ -170,7 +176,8 @@ class PalletController extends Controller
 
     public function show(Request $request){
         $pl = Pallet::find($request->id);
-        $pl['nominal'] = number_format($pl->nominal,2,',','.');
+        $pl['nominal'] = CustomHelper::formatConditionalQty($pl->nominal);
+        $pl['sell_convert'] = CustomHelper::formatConditionalQty($pl->sell_convert);
         				
 		return response()->json($pl);
     }

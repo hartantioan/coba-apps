@@ -17,6 +17,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
+use App\Models\ProductionFgReceive;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
@@ -28,7 +29,7 @@ use Illuminate\Support\Facades\Storage;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
-class ProductionReceiveController extends Controller
+class ProductionFgReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
@@ -46,15 +47,11 @@ class ProductionReceiveController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Receive',
-            'content'       => 'admin.production.receive',
+            'title'         => 'Receive FG',
+            'content'       => 'admin.production.receive_fg',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
-                $query->whereIn('place_id',$this->dataplaces);
-            })->get(),
-            'tank'          => Tank::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -87,9 +84,9 @@ class ProductionReceiveController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ProductionReceive::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = ProductionFgReceive::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = ProductionReceive::where(function($query) use ($search, $request) {
+        $query_data = ProductionFgReceive::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -121,7 +118,7 @@ class ProductionReceiveController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = ProductionReceive::where(function($query) use ($search, $request) {
+        $total_filtered = ProductionFgReceive::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -166,15 +163,19 @@ class ProductionReceiveController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->productionOrder->code,
-                    $val->productionOrder->productionSchedule->code,
-                    $val->shift->code.' - '.$val->shift->name,
-                    date('d/m/Y H:i',strtotime($val->start_process_time)),
-                    date('d/m/Y H:i',strtotime($val->end_process_time)),
-                    $val->line->code,
-                    $val->group,
+                    $val->item->code.' - '.$val->item->name,
                     $val->place->code,
-                    $val->machine->name,
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->line->code,
+                    $val->shift->code.' - '.$val->shift->name,
+                    $val->group,
+                    $val->pallet->name,
+                    $val->shading,
+                    $val->grade->name,
+                    CustomHelper::formatConditionalQty($val->qty),
+                    $val->item->uomUnit->code,
+                    CustomHelper::formatConditionalQty(round($val->qty / $val->itemUnit->conversion,3)),
+                    $val->itemUnit->unit->code,
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :

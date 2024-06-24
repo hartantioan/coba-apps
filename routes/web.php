@@ -196,6 +196,7 @@ use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\MasterData\TankController;
+use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionIssueController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 
@@ -2131,6 +2132,28 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionReceiveController::class, 'voidStatus'])->middleware('operation.access:production_receive,void');
                     Route::post('destroy', [ProductionReceiveController::class, 'destroy'])->middleware('operation.access:production_receive,delete');
+                });
+
+                Route::prefix('production_fg_receive')->middleware(['operation.access:production_fg_receive,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionFgReceiveController::class, 'index']);
+                    Route::get('datatable',[ProductionFgReceiveController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionFgReceiveController::class, 'rowDetail']);
+                    Route::post('show', [ProductionFgReceiveController::class, 'show']);
+                    Route::post('get_code', [ProductionFgReceiveController::class, 'getCode']);
+                    Route::post('print',[ProductionFgReceiveController::class, 'print']);
+                    Route::post('done',[ProductionFgReceiveController::class, 'done'])->middleware('operation.access:production_fg_receive,update');
+                    Route::post('print_by_range',[ProductionFgReceiveController::class, 'printByRange']);
+                    Route::get('export',[ProductionFgReceiveController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionFgReceiveController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [ProductionFgReceiveController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionFgReceiveController::class, 'create'])->middleware('operation.access:production_fg_receive,update');
+                    Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_fg_receive,update');
+                    Route::get('view_journal/{id}',[ProductionFgReceiveController::class, 'viewJournal'])->middleware('operation.access:production_fg_receive,journal');
+                    Route::get('approval/{id}',[ProductionFgReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionFgReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionFgReceiveController::class, 'voidStatus'])->middleware('operation.access:production_fg_receive,void');
+                    Route::post('destroy', [ProductionFgReceiveController::class, 'destroy'])->middleware('operation.access:production_fg_receive,delete');
                 });
             });
 

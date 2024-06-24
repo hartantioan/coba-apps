@@ -71,6 +71,7 @@
                                                         <th>#</th>
                                                         <th>Code</th>
                                                         <th>Nama</th>
+                                                        <th>Konversi Satuan Jual</th>
                                                         <th>Harga per Satuan Jual</th>
                                                         <th>Status</th>
                                                         <th>Action</th>
@@ -109,6 +110,10 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">Nama</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="sell_convert" name="sell_convert" type="text" value="40" onkeyup="formatRupiah(this);">
+                            <label class="active" for="sell_convert">Konversi Satuan Jual</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);">
@@ -230,6 +235,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'sell_convert', className: 'center-align' },
                 { name: 'nominal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -338,6 +344,7 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#nominal').val(response.nominal);
+                $('#sell_convert').val(response.sell_convert);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

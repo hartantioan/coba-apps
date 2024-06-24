@@ -17,6 +17,7 @@ class Pallet extends Model
     protected $fillable = [
         'code',
         'name',
+        'sell_convert',
         'nominal',
         'status'
     ];

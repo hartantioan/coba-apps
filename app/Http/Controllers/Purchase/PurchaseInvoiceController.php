@@ -1475,6 +1475,10 @@ class PurchaseInvoiceController extends Controller
     {
         $data   = PurchaseInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
+        $canceled = "";
+        if ($data->cancelDocument()->exists()) {
+            $canceled .= '<span style="color: red;">|| Tanggal Cancel: ' . $data->cancelDocument->post_date .  ' || Void User: ' . $data->cancelDocument->user->name.' || Note:' . $data->void_note.'</span>' ;
+        }
         if (isset($data->void_date)) {
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
             $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;
@@ -1482,7 +1486,9 @@ class PurchaseInvoiceController extends Controller
             $doneUser = $data->done_id ? $data->doneUser->employee_no . '-' . $data->doneUser->name : 'Sistem';
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
-        $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.$x.'</div>
+        $string = '<div class="row pt-1 pb-1 lighten-4">
+                    <div class="col s12">'.$canceled.'</div>
+                    <div class="col s12">'.$data->code.$x.'</div>
                     <div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>

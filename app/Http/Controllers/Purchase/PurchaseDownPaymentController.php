@@ -809,6 +809,10 @@ class PurchaseDownPaymentController extends Controller
 
         $data   = PurchaseDownPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $x="";
+        $canceled = '';
+        if ($data->cancelDocument()->exists()) {
+            $canceled .= '<span style="color: red;">|| Tanggal Cancel: ' . $data->cancelDocument->post_date .  ' || Void User: ' . $data->cancelDocument->user->name.' || Note:' . $data->void_note.'</span>' ;
+        }
         if (isset($data->void_date)) {
             $voidUser = $data->voidUser ? $data->voidUser->employee_no . '-' . $data->voidUser->name : 'Sistem';
             $x .= '<span style="color: red;">|| Tanggal Void: ' . $data->void_date .  ' || Void User: ' . $voidUser.' || Note:' . $data->void_note.'</span>' ;

@@ -3617,6 +3617,10 @@
     }
 
     function formatRupiahNominal(angka){
+        let decimal = 2;
+        if($('#currency_id').val() !== '1'){
+            decimal = 6;
+        }
         let val = angka.value ? angka.value : '';
         var number_string = val.replace(/[^,\d]/g, '').toString(),
         sign = val.charAt(0),
@@ -3631,8 +3635,8 @@
         }
 
         if(split[1] != undefined){
-            if(split[1].length > 2){
-                rupiah = rupiah + ',' + split[1].slice(0,2);
+            if(split[1].length > decimal){
+                rupiah = rupiah + ',' + split[1].slice(0,decimal);
             }else{
                 rupiah = rupiah + ',' + split[1];
             }

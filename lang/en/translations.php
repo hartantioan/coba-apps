@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'batch_no' => 'Batch No.',
+    'tank' => 'Tank',
     'email' => 'Email',
     'password' => 'Password',
     'filter'   => 'Filter',
@@ -34,6 +36,7 @@ return [
     'division'  => 'Division',
     'requester' => 'Requester',
     'qty_request' => 'Qty Request',
+    'qty_reject' => 'Qty Reject',
     'project'   => 'Project',
     'total'     => 'Total',
     'approval'  => 'Approval',

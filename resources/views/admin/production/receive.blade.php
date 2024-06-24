@@ -302,24 +302,25 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:1800px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
                                                             <th class="center">Item</th>
                                                             <th class="center" width="150px">Qty Planned</th>
                                                             <th class="center" width="150px">Qty Real</th>
-                                                            <th class="center">Satuan Produksi</th>
+                                                            <th class="center" width="150px">Qty Reject (Jika ada)</th>
+                                                            <th class="center" width="300px">Satuan Produksi</th>
                                                             <th class="center">Plant</th>
                                                             <th class="center">Gudang</th>
                                                             <th class="center">Tank</th>
-                                                            <th class="center">Batch (*Nomor Sementara)</th>
+                                                            <th class="center" width="300px">Batch (*Nomor Sementara)</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="10">
+                                                            <td class="center-align" colspan="11">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
@@ -709,10 +710,10 @@
                     return null;
                 };
                 $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_id').empty();
+                $('#production_order_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="10">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -994,7 +995,7 @@
                 $('.row_item[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="10">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1011,19 +1012,14 @@
         });
     }
 
-    function checkQty(){
-        $('*[name^="arr_qty[]"]').each(function(index){
-            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let max = 0;
-            if($('*[name^="arr_item_stock_id[]"]').eq(index).val() !== '0'){
-                max = parseFloat($('*[name^="arr_item_stock_id[]"]').eq(index).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
+    function checkQtyReject(code){
+        let qtyMax = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let qtyReject = parseFloat($('#rowQtyReject' + code).val().replaceAll(".", "").replaceAll(",","."));
+        if(qtyReject > 0){
+            if(qtyReject > qtyMax){
+                $('#rowQtyReject' + code).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
             }
-            if(max > 0){
-                if(qty > max){
-                    $(this).val(formatRupiahIni(max.toFixed(3).toString().replace('.',',')));
-                }
-            }
-        });
+        }
     }
 
     function getProductionOrder(){
@@ -1087,7 +1083,10 @@
                                         ` + datakuy.item_receive_qty + `
                                     </td>
                                     <td class="center">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                                    </td>
+                                    <td class="center">
+                                        <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                                     </td>
                                     <td class="center" id="arr_unit` + count + `">
                                         ` + datakuy.item_receive_unit_uom + `
@@ -1108,7 +1107,7 @@
                                         <select class="browser-default" id="arr_tank` + count + `" name="arr_tank[]">
                                             <option value="">--Kosong--</option>
                                             @foreach ($tank as $rowtank)
-                                                <option value="{{ $rowtank->id }}">{{ $rowtank->code }}</option>
+                                                <option value="{{ $rowtank->id }}">{{ $rowtank->code.' - LINE '.$rowtank->line->code }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -1162,7 +1161,7 @@
             $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item').empty().append(`
                 <tr id="last-row-item">
-                    <td class="center-align" colspan="10">
+                    <td class="center-align" colspan="11">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
@@ -1196,25 +1195,6 @@
         }else{
             
         }
-    }
-
-    function checkQtyBatch(code){
-        let qtyMax = parseFloat($('#rowBatch' + code).data('qty').replaceAll(".", "").replaceAll(",","."));
-        let qty = parseFloat($('#rowBatch' + code).val().replaceAll(".", "").replaceAll(",","."));
-        if(qty > qtyMax){
-            $('#rowBatch' + code).val(
-                (qtyMax >= 0 ? '' : '-') + formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',','))
-            );
-        }
-    }
-
-    function countRow(code){
-        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let nominal = parseFloat($('#arr_nominal' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let total = qty * nominal;
-        $('#arr_total' + code).val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-        );
     }
 
     function printMultiSelect(){
@@ -1663,134 +1643,76 @@
 
                 let no = $('.row_item').length + 1;
 
-                $.each(response.detail, function(i, val) {
+                $.each(response.details, function(i, val) {
                     var count = makeid(10);
-                    let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
-                    if(val.list_stock.length > 0){
-                        $.each(val.list_stock, function(i, valkuy) {
-                            optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty + `</option>`;
-                        });
-                    }else{
-                        optionStock += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
-                    }
-                    optionStock += `</select>`;
                     $('#body-item').append(`
                         <tr class="row_item" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                             <input type="hidden" name="arr_production_order_id[]" value="` + val.id + `">
-                            <input type="hidden" name="arr_bom_id[]" value="` + (val.bom_id ? val.bom_id : '0' ) + `">
-                            <input type="hidden" name="arr_bom_detail_id[]" value="` + (val.bom_detail_id ? val.bom_detail_id : '0' ) + `">
-                            <input type="hidden" name="arr_qty_bom[]" value="` + (val.bom_id ? val.qty_bom : '0,000') + `">
-                            <input type="hidden" name="arr_nominal_bom[]" value="` + (val.bom_id ? val.nominal_bom : '0,00') + `">
-                            <input type="hidden" name="arr_total_bom[]" value="` + (val.bom_id ? val.total_bom : '0,00') + `">
-                            <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
+                            <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `">
+                            <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `">
+                            <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                            <input type="hidden" name="arr_is_powder[]" value="` + val.is_powder + `">
+                            <td class="center-align">
                                 ` + no + `
                             </td>
                             <td>
-                                ` + val.lookable_code + ` - ` + val.lookable_name + `
+                                ` + val.item_name + `
                             </td>
                             <td class="right-align">
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                             </td>
                             <td class="center" id="arr_unit` + count + `">
-                                ` + val.lookable_unit + `
+                                ` + val.unit + `
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                    <option value="">--Silahkan pilih item--</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_tank` + count + `" name="arr_tank[]">
+                                    <option value="">--Kosong--</option>
+                                    @foreach ($tank as $rowtank)
+                                        <option value="{{ $rowtank->id }}">{{ $rowtank->code.' - LINE '.$rowtank->line->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="` + val.batch_no + `" readonly>
                             </td>
                             <td class="center">
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;` + (val.lookable_type == 'items' ? 'border-bottom: none;' : (val.issue_method == '1' ? '' : 'border-bottom: none;')) + `" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : (val.issue_method == '1' ? '' : 'readonly')) + `>
-                            </td>
-                            <td class="center">
-                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;border-bottom: none;" id="arr_total` + count + `" readonly>
-                            </td>
-                            <td class="center" id="arr_stock` + count + `">
-                                ` + optionStock + `
-                            </td>
-                            <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
                         </tr>
-                    ` +
-                        (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_id').val() + `" data-code="` + count + `">
-                            <td colspan="2" class="right-align">
-                                Ambil dari Batch : 
-                            </td>
-                            <td colspan="6">
-                                <div class="row">
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="arr_batch` + count + `" name="arr_batch[]" data-id="` + count + `"></select>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
-                                        <label class="active">&nbsp;</label>
-                                    </div>
-                                    <div class="col m12 s12">
-                                        <table class="bordered" style="width:500px !important;">
-                                            <thead>
-                                                <tr>
-                                                    <th>No.Batch</th>
-                                                    <th>Qty Dipakai</th>
-                                                    <th>Hapus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="table-batch` + count + `"></tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>` : ``)
-                    );
-                    if(val.item_stock_id){
-                        $('#arr_item_stock_id' + count).val(val.item_stock_id);
-                    }
-                    $('#rowQty' + count).trigger('keyup');
-                    if(val.has_bom){
-                        $('#arr_batch' + count).select2({
-                            placeholder: '-- Kosong --',
-                            minimumInputLength: 1,
-                            allowClear: true,
-                            cache: true,
-                            width: 'resolve',
-                            dropdownParent: $('body').parent(),
-                            ajax: {
-                                url: '{{ url("admin/select2/production_batch") }}',
-                                type: 'GET',
-                                dataType: 'JSON',
-                                data: function(params) {
-                                    return {
-                                        search: params.term,
-                                        item_id: val.lookable_id,
-                                    };
-                                },
-                                processResults: function(data) {
-                                    return {
-                                        results: data.items
-                                    }
-                                }
-                            }
+                    `);
+
+                    if(val.list_warehouse.length > 0){
+                        $('#arr_warehouse' + count).empty();
+                        $.each(val.list_warehouse, function(i, val) {
+                            $('#arr_warehouse' + count).append(`
+                                <option value="` + val.id + `">` + val.name + `</option>
+                            `);
                         });
                     }
-                    $.each(val.list_batch, function(i, value) {
-                        let countdetail = makeid(10);
-                        $('#table-batch' + count).append(`
-                            <tr>
-                                <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + countdetail + `" value="` + value.production_batch_id + `">
-                                <td>` + value.production_batch_code + `</td>
-                                <td>
-                                    <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + countdetail + `')" data-qty="` + value.max_qty + `" data-id="` + countdetail + `" class="" id="rowBatch`+ countdetail +`" style="text-align:right;">    
-                                </td>
-                                <td>
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);">
-                                        <i class="material-icons">delete</i>
-                                    </a> 
-                                </td>
-                            </tr>
-                        `);
-                    });
+
+                    $('#arr_warehouse' + count).val(val.warehouse_id);
+                    $('#arr_place' + count).val(val.place_id);
+                    $('#arr_tank' + count).val(val.tank_id);
                     no++;
                 });
 

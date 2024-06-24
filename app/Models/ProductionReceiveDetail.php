@@ -20,9 +20,11 @@ class ProductionReceiveDetail extends Model
         'production_order_id',
         'item_id',
         'bom_id',
+        'item_reject_id',
         'is_powder',
         'qty',
         'qty_planned',
+        'qty_reject',
         'place_id',
         'warehouse_id',
         'tank_id',
@@ -33,7 +35,7 @@ class ProductionReceiveDetail extends Model
 
     public function productionBatch()
     {
-        return $this->hasOne('App\Models\ProductionBatch', 'production_batch_id', 'id');
+        return $this->hasOne('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
     }
 
     public function productionReceive()
@@ -57,6 +59,10 @@ class ProductionReceiveDetail extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    }
+
+    public function itemReject(){
+        return $this->belongsTo('App\Models\Item','item_reject_id','id')->withTrashed();
     }
 
     public function bom(){

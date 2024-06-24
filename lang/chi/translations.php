@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'batch_no' => '批号',
+    'tank' => '坦克',
     'email' => '电子邮件',
     'password' => '密码',
     'filter'   => '过滤',
@@ -34,6 +36,7 @@ return [
     'division'  => '部门',
     'requester' => '请求者',
     'qty_request' => '数量要求',
+    'qty_reject' => '数量拒绝',
     'project'   => '项目',
     'total'     => '总计',
     'approval'  => '审批',

@@ -26,6 +26,11 @@ class ProductionBatch extends Model
         return $this->morphTo();
     }
 
+    public function productionBatchUsage()
+    {
+        return $this->hasMany('App\Models\ProductionBatchUsage');
+    }
+
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id');
     }

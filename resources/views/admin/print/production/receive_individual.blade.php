@@ -179,9 +179,9 @@
                         
                     </td>
                     
-                    <td width="34%" class="right-align">
+                    <td width="34%" align="right">
                         
-                            <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%;right:0;">
                        
                     </td>
                 </tr>
@@ -327,7 +327,7 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td align="center">
-                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="5%" />
+                                            <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="30px" />
                                         </td>
                                     </tr>
                                     <tr>
@@ -345,40 +345,33 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item/Resource Issue (Terpakai)</th>
+                                <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Item/Resource</th>
+                                <th align="center">Item</th>
                                 <th align="center">Qty Planned</th>
                                 <th align="center">Qty Real</th>
-                                <th align="center">Satuan UoM</th>
-                                <th align="center">Nominal Planned</th>
-                                <th align="center">Nominal Real</th>
-                                <th align="center">Total Planned</th>
-                                <th align="center">Total Real</th>
-                                <th align="center">Plant & Gudang</th>
+                                <th align="center">Satuan Produksi</th>
+                                <th align="center">Plant</th>
+                                <th align="center">Gudang</th>
+                                <th align="center">Tank</th>
+                                <th align="center">No.Batch</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($data->productionIssueDetail()->orderBy('id')->get() as $key => $row)
+                            @foreach($data->productionReceiveDetail()->orderBy('id')->get() as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key+1) }}</td>
-                                    <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
+                                    <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->lookable->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->nominal_planned,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total_planned,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
+                                    <td align="center">{{ $row->item->uomUnit->code }}</td>
+                                    <td align="">{{ $row->place->code }}</td>
+                                    <td align="">{{ $row->warehouse->name }}</td>
+                                    <td align="">{{ ($row->tank()->exists() ? $row->tank->code : '-') }}</td>
+                                    <td align="">{{ $row->batch_no }}</td>
                                 </tr>
-                                @if($row->productionBatchUsage()->exists())
-                                    <tr>
-                                        <td colspan="10">Batch terpakai {{ $row->listBatchUsed() }}</td>
-                                    </tr>
-                                @endif
                             @endforeach
                         </tbody>
                     </table>

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'batch_no' => 'No. Batch',
+    'tank' => 'Tangki',
     'email' => 'Email',
     'password' => 'Kata Sandi',
     'filter'   => 'Saring',
@@ -34,6 +36,7 @@ return [
     'division'  => 'Divisi',
     'requester' => 'Pemohon',
     'qty_request' => 'Qty Request',
+    'qty_reject' => 'Qty Reject',
     'project'   => 'Proyek',
     'total'     => 'Total',
     'approval'  => 'Persetujuan',

@@ -717,7 +717,7 @@
                     return null;
                 };
                 $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_id').empty();
+                $('#production_order_id,#shift_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
                         <td class="center-align" colspan="9">

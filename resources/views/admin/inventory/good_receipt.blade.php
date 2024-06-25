@@ -1553,7 +1553,8 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    id: val
+                    id: val,
+                    type: $('#type').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

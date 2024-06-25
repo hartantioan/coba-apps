@@ -2071,6 +2071,7 @@
                                         $('#account_name').val(val.name_account);
                                         $('#payment_type').val(val.payment_type).formSelect();
                                         $('#note').val(val.remark);
+                                        $('#top').val(val.top);
                                         if(val.is_reimburse){
                                             $('#is_reimburse').val(val.is_reimburse).formSelect();
                                             if(val.raw_due_date){

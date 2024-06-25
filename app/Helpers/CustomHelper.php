@@ -707,6 +707,13 @@ class CustomHelper {
 				]);
 			}
 
+			if($table_name == 'production_schedules'){
+				$ps = ProductionSchedule::find($table_id);
+				$ps->productionScheduleDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
 			if(isset($data->account_id)){
 				self::sendJournal($table_name,$table_id,$data->account_id);
 			}else{

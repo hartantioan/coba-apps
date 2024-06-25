@@ -398,11 +398,7 @@ class GoodReceiptPOController extends Controller
                     $serials = [];
                     $maxcolumn = 0;
                     foreach($data->purchaseOrderDetail as $row){
-                        if($request->type == '1'){
-                            $qtyBalance = $row->getBalanceReceipt();
-                        }elseif($request->type == '2'){
-                            $qtyBalance = $row->getBalanceReceiptRM();
-                        }
+                        $qtyBalance = 9;
                         
                         if($qtyBalance > 0){
                             $details[] = [

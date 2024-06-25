@@ -300,6 +300,11 @@
                                                 <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
                                             </div>
                                         </div>
+                                        <div class="card-alert card gradient-45deg-purple-amber">
+                                            <div class="card-content white-text">
+                                                <p>Info : Production Receive tipe item FG, tidak akan menjurnal dan membuat stok.</p>
+                                            </div>
+                                        </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
                                                 <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">

@@ -4051,10 +4051,10 @@ class Select2Controller extends Controller {
                 $query->where('line_id',$request->line_id)
                     ->whereHas('productionSchedule',function($query)use($request){
                         $query->where('place_id',$request->place_id);
-                    })
+                    })/* 
                     ->whereHas('item',function($query){
                         $query->whereNull('is_sales_item');
-                    });
+                    }) */;
             });
         })
         ->whereDoesntHave('used')

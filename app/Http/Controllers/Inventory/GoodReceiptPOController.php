@@ -392,13 +392,17 @@ class GoodReceiptPOController extends Controller
                     $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
                 }
             }elseif($request->type == '2'){
-                if($data->hasBalance()){
+                if($data->hasBalanceRM()){
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
                     $details = [];
                     $serials = [];
                     $maxcolumn = 0;
                     foreach($data->purchaseOrderDetail as $row){
-                        $qtyBalance = 9;
+                        if($request->type == '1'){
+                            $qtyBalance = $row->getBalanceReceipt();
+                        }elseif($request->type == '2'){
+                            $qtyBalance = $row->getBalanceReceiptRM();
+                        }
                         
                         if($qtyBalance > 0){
                             $details[] = [

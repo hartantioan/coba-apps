@@ -1086,7 +1086,7 @@
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                                     </td>
                                     <td class="center">
-                                        <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
+                                        <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                                     </td>
                                     <td class="center" id="arr_unit` + count + `">
                                         ` + datakuy.item_receive_unit_uom + `
@@ -1665,7 +1665,7 @@
                                 <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                             </td>
                             <td class="center">
-                                <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
+                                <input name="arr_qty_reject[]" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.unit + `

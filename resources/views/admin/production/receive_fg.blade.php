@@ -269,8 +269,15 @@
                                         </div>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
+                                        <label class="active" for="qty">Qty UoM</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">Keterangan</label>
+                                    </div>
+                                    <div class="col m3 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate Barcode </a>
                                     </div>
                                 </fieldset>
                             </div>

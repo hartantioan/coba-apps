@@ -115,4 +115,12 @@ class Bom extends Model
 
         return $status;
     }
+
+    public function getQtyContent($bomParent){
+        $qty = 0;
+        foreach($bomParent->bomDetail()->where('lookable_type','items')->where('lookable_id',$this->item_id)->get() as $row){
+            $qty += $row->qty;
+        }
+        return $qty;
+    }
 }

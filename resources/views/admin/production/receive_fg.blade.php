@@ -208,6 +208,14 @@
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="production_order_id" name="production_order_id"></select>
+                                        <label class="active" for="production_order_id">Production Order</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="item_id" name="item_id"></select>
+                                        <label class="active" for="item_id">Item Child FG</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <select class="form-control" id="place_id" name="place_id">
                                             @foreach ($place as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -224,24 +232,32 @@
                                         <label class="" for="line_id">Line</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="shift_id" name="shift_id" onchange="unlockProductionOrder();"></select>
+                                        <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="group" name="group" type="text" placeholder="Grup" onkeyup="unlockProductionOrder();">
+                                        <input id="group" name="group" type="text" placeholder="Grup">
                                         <label class="active" for="group">Grup</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="pallet_id" name="pallet_id">
+                                            @foreach ($pallet as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="pallet_id">Palet</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="grade_id" name="grade_id">
+                                            @foreach ($grade as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="grade_id">Grade</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="start_process_time" name="start_process_time" type="datetime-local" placeholder="Tgl. Mulai Produksi">
-                                        <label class="active" for="start_process_time">Tgl. Mulai Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="end_process_time" name="end_process_time" type="datetime-local" placeholder="Tgl. Selesai Produksi">
-                                        <label class="active" for="end_process_time">Tgl. Selesai Produksi</label>
                                     </div>
                                     <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
@@ -262,11 +278,7 @@
                         <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Order Produksi</legend>
-                                    <div class="input-field col m4 s12 step6 disable-class">
-                                        <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getProductionOrder();" tabindex="-1"></select>
-                                        <label class="active" for="production_order_id">Daftar Order Produksi (Pilih Shift & Grup)</label>
-                                    </div>
+                                    <legend>2. Order Produksi Terpakai</legend>
                                     <div class="col m8 s12 step8">
                                         <h6>Data Terpakai : <i id="list-used-data"></i></h6>
                                     </div>
@@ -302,14 +314,15 @@
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
-                                                            <th class="center">Item</th>
-                                                            <th class="center" width="150px">Qty Planned</th>
-                                                            <th class="center" width="150px">Qty Real</th>
-                                                            <th class="center" width="150px">Qty Reject (Jika ada)</th>
-                                                            <th class="center" width="300px">Satuan Produksi</th>
+                                                            <th class="center">No.Palet</th>
+                                                            <th class="center">Kode Item</th>
+                                                            <th class="center">Nama Item</th>
+                                                            <th class="center">Shading</th>
+                                                            <th class="center">Qty Jual</th>
+                                                            <th class="center">Qty M2</th>
                                                             <th class="center">Plant</th>
-                                                            <th class="center">Gudang</th>
-                                                            <th class="center" width="300px">Batch (*Nomor Sementara)</th>
+                                                            <th class="center">Shift</th>
+                                                            <th class="center">Group</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
@@ -692,7 +705,6 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
-                $('.disable-class').css('pointer-events','none');
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -713,8 +725,6 @@
                         </td>
                     </tr>
                 `);
-                $('.disable-class').css('pointer-events','none');
-                $('#production_order_id').attr('tabindex','-1');
             }
         });
         
@@ -726,7 +736,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/production_order_receive") }}',
+                url: '{{ url("admin/select2/production_order_receive_fg") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
@@ -746,6 +756,31 @@
             }
         });
 
+        $('#item_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/child_item_fg_from_production") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        production_order_id: $('#production_order_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
@@ -754,16 +789,6 @@
             $(this).closest('tr').remove();
         });
     });
-
-    function unlockProductionOrder(){
-        if($('#shift_id').val() && $('#group').val()){
-            $('.disable-class').css('pointer-events','auto');
-            $('#production_order_id').attr('tabindex','0');
-        }else{
-            $('.disable-class').css('pointer-events','none');
-            $('#production_order_id').attr('tabindex','-1');
-        }
-    }
 
     function addLine(){
         if($('#production_order_id').val()){

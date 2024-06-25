@@ -479,6 +479,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ProductionBatch','item_id','id');
     }
 
+    public function productionScheduleDetail()
+    {
+        return $this->hasMany('App\Models\ProductionScheduleDetail');
+    }
+
     public function listBatch(){
         $list = [];
         foreach($this->productionBatch()->where('qty','>',0)->get() as $row){

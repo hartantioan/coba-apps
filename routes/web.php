@@ -386,6 +386,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
                 Route::get('production_order', [Select2Controller::class, 'productionOrder']);
                 Route::get('production_order_receive', [Select2Controller::class, 'productionOrderReceive']);
+                Route::get('production_order_receive_fg', [Select2Controller::class, 'productionOrderReceiveFg']);
                 Route::get('journal', [Select2Controller::class, 'journal']);
                 Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);
                 Route::get('all_user_bank', [Select2Controller::class, 'allUserBank']);
@@ -394,6 +395,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
                 Route::get('bom_by_item_powder', [Select2Controller::class, 'bomByItemPowder']);
                 Route::get('production_batch', [Select2Controller::class, 'productionBatch']);
+                Route::get('child_item_fg_from_production', [Select2Controller::class, 'childItemFgFromProduction']);
                 Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
             });
 

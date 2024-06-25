@@ -11,10 +11,12 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\Area;
 use App\Models\Bom;
+use App\Models\Grade;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
+use App\Models\Pallet;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionFgReceive;
@@ -52,6 +54,8 @@ class ProductionFgReceiveController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
+            'pallet'        => Pallet::where('status','1')->get(),
+            'grade'         => Grade::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),

@@ -317,6 +317,38 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function childItemFgFromProduction(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $pod_id = $request->production_order_id;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->whereHas('productionScheduleDetail',function($query)use($pod_id){
+                    $query->whereHas('productionOrder',function($query)use($pod_id){
+                        $query->where('id',$pod_id);
+                    });
+                })
+                ->where('status','1')
+                ->get();
+
+        foreach($data as $d) {
+            foreach($d->fgGroup as $row){
+                $response[] = [
+                    'id'   			    => $row->item->id,
+                    'text' 			    => $row->item->code.' - '.$row->item->name,
+                    'code'              => $row->item->code,
+                    'name'              => $row->item->name,
+                    'uom'               => $row->item->uomUnit->code,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function bomItem(Request $request)
     {
         $response = [];
@@ -4055,6 +4087,39 @@ class Select2Controller extends Controller {
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'batch_no'                      => ProductionBatch::generateCode($type,$shift->code,$request->group),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionOrderReceiveFg(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->where(function($query){
+            $query->whereHas('productionScheduleDetail',function($query){
+                $query->whereHas('item',function($query){
+                    $query->whereNotNull('is_sales_item');
+                });
+            });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2'])
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text' 	=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
             ];
         }
 

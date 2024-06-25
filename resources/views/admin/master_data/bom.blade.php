@@ -945,6 +945,8 @@
                             $('#arr_cost_distribution' + count).append(`
                                 <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
                             `);
+                        }
+                        if(value.lookable_type == 'resources'){
                             select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
                         }
                         $('#arr_issue_method' + count).val(value.issue_method);

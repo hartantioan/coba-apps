@@ -169,8 +169,8 @@ class AttendancePeriodController extends Controller
             $query->where('employee_type','2');
             // $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
             // ,'312403008','312403012']);
-            // $query->whereIn('employee_no',['312402007']);
-            // $query->whereIn('employee_no',['312402038']);        
+            // $query->whereIn('employee_no',['312401001']);
+            // // $query->whereIn('employee_no',['312402038']);        
             })->get();
         
         $query_salary_report = SalaryReport::create([

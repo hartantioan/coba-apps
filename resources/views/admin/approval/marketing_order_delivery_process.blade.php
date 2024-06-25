@@ -121,12 +121,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Surat Jalan # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.marketing_order_delivery') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Dikirimkan:</small>
+                        <small>{{ __('translations.delivered') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Surat Jalan</h5>
+                <h5 class="indigo-text">{{ __('translations.marketing_order_delivery') }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -146,43 +146,43 @@
         <div class="row">
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    CUSTOMER
+                    {{ __('translations.customer') }}
                 </div>
                 <div class="col s4">
-                    Nama
+                    {{ __('translations.name') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->account->name }}
                 </div>
                 <div class="col s4">
-                    Alamat
+                    {{ __('translations.address') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->account->address }}
                 </div>
                 <div class="col s4">
-                    Telepon
+                    {{ __('translations.phone_number') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->account->phone.' / '.$data->marketingOrderDelivery->marketingOrder->account->office_no }}
                 </div>
                 <div class="col s12 center-align mt-3">
-                    EKSPEDISI
+                    {{ __('translations.expedition') }}
                 </div>
                 <div class="col s4">
-                    Partner Bisnis
+                    {{ __('translations.bussiness_partner') }}
                 </div>
                 <div class="col s8">
                     {{ $data->account->name }}
                 </div>
                 <div class="col s4">
-                    Alamat
+                    {{ __('translations.address') }}
                 </div>
                 <div class="col s8">
                     {{ $data->account->address }}
                 </div>
                 <div class="col s4">
-                    Telepon
+                    {{ __('translations.phone_number') }}
                 </div>
                 <div class="col s8">
                     {{ $data->account->phone.' / '.$data->account->office_no }}
@@ -190,40 +190,40 @@
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    PENGIRIMAN
+                    {{ __('translations.delivery') }}
                 </div>
                 <div class="col s4">
-                    Tipe
+                    {{ __('translations.type') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->deliveryType() }}
                 </div>
                 <div class="col s4">
-                    Tgl.Kirim
+                    {{ __('translations.sent_date') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
-                    Almt Kirim
+                    {{ __('translations.shipping_address') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->shipment_address }}
                 </div>
                 <div class="col s4">
-                    Almt Tujuan
+                    {{ __('translations.destination_address') }}
                 </div>
                 <div class="col s8">
                     {{ $data->marketingOrderDelivery->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrderDelivery->marketingOrder->subdistrict->name.' - '.$data->marketingOrderDelivery->marketingOrder->city->name.' - '.$data->marketingOrderDelivery->marketingOrder->province->name)) }}
                 </div>
                 <div class="col s4">
-                    Supir
+                    {{ __('translations.driver') }}
                 </div>
                 <div class="col s8">
                     {{ $data->driver_name.' / '.$data->driver_hp }}
                 </div>
                 <div class="col s4">
-                    Kendaraan
+                    {{ __('translations.vehicle') }}
                 </div>
                 <div class="col s8">
                     {{ $data->vehicle_name.' / '.$data->vehicle_no }}
@@ -235,11 +235,11 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">No.</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">Satuan</th>
-                        <th class="center-align">Kondisi</th>
+                        <th class="center-align">{{ __('translations.no') }}.</th>
+                        <th class="center-align">{{ __('translations.item') }}</th>
+                        <th class="center-align">{{ __('translations.qty') }}</th>
+                        <th class="center-align">{{ __('translations.unit') }}</th>
+                        <th class="center-align">{{ __('translations.condition') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -252,16 +252,16 @@
                         <td class="center-align"></td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan: {{ $row->note }}</td>
+                        <td colspan="5">{{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td class="center-align">Ambil Item dari : </td>
+                        <td class="center-align">{{ __('translations.take_items_from') }} : </td>
                         <td colspan="4">
                             <table class="bordered" id="table-detail-source">
                                 <thead>
                                     <tr>
-                                        <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
-                                        <th class="center-align">Qty Kirim</th>
+                                        <th class="center-align">{{__('translations.plant_origin-warehouse-area-shading')}}</th>
+                                        <th class="center-align">{{ __('translations.qty_sent') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -279,10 +279,10 @@
                     <tr>
                         <td colspan="6">
                             <div class="mt-3">
-                                Catatan Internal : {{ $data->note_internal }}
+                                {{ __('translations.note_internal') }} : {{ $data->note_internal }}
                             </div>
                             <div class="mt-3">
-                                Catatan Eksternal : {{ $data->note_external }}
+                                {{ __('translations.note_external') }} : {{ $data->note_external }}
                             </div>
                         </td>
                     </tr>
@@ -302,17 +302,17 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center-align">
-                        <div >Supir, {{ $data->driver_name }}</div>
+                        <div >{{ __('translations.driver') }}, {{ $data->driver_name }}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="center-align">
-                        <div style="margin-top:75px;">Customer,...............</div>
+                        <div style="margin-top:75px;">{{ __('translations.customer') }},...............</div>
                     </td>
                 </tr>
                 @if($data->approval())

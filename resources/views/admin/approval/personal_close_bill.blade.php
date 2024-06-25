@@ -121,12 +121,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">Penutupan BS # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.close_bill') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -135,7 +135,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Penutupan BS Karyawan</h5>
+                <h5 class="indigo-text">{{ __('translations.employee_close_bill') }}</h5>
             </div>
             <div class="col m6 s12">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%" class="right">
@@ -149,7 +149,7 @@
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
                             <td width="40%" style="vertical-align:top;">
-                                Nama
+                                {{ __('translations.name') }}
                             </td>
                             <td width="1%" style="vertical-align:top;">
                                 :
@@ -160,7 +160,7 @@
                         </tr>
                         <tr>
                             <td width="40%" style="vertical-align:top;">
-                                Telp.
+                                {{ __('translations.phone_number') }}
                             </td>
                             <td width="1%" style="vertical-align:top;">
                                 :
@@ -175,7 +175,7 @@
                     <table border="0" width="100%" class="tbl-info">
                         <tr>
                             <td width="40%" style="vertical-align:top;">
-                                Posisi
+                                {{ __('translations.position') }}
                             </td>
                             <td width="1%" style="vertical-align:top;">
                                 :
@@ -186,7 +186,7 @@
                         </tr>
                         <tr>
                             <td width="40%" style="vertical-align:top;">
-                                Tgl.Pengajuan
+                                {{ __('translations.date_of_submission') }}
                             </td>
                             <td width="1%" style="vertical-align:top;">
                                 :
@@ -208,10 +208,10 @@
                         <th class="center" colspan="4">Daftar Dokumen Terpakai</th>
                     </tr>
                     <tr>
-                        <th class="center">No</th>
-                        <th class="center">No.Dokumen</th>
-                        <th class="center">Keterangan</th>
-                        <th class="center">Grandtotal</th>
+                        <th class="center">{{ __('translations.no') }}</th>
+                        <th class="center">{{ __('translations.document_no') }}</th>
+                        <th class="center">{{ __('translations.note') }}</th>
+                        <th class="center">{{ __('translations.grandtotal') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -229,17 +229,17 @@
             <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                 <thead>
                     <tr>
-                        <th class="center" colspan="8">Daftar Biaya</th>
+                        <th class="center" colspan="8">{{ __('translations.cost_list') }}</th>
                     </tr>
                     <tr>
-                        <th class="center">Item</th>
-                        <th class="center">Jum.</th>
-                        <th class="center">Sat.</th>
-                        <th class="center">Harga @</th>
-                        <th class="center">Subtotal</th>
-                        <th class="center">PPN</th>
-                        <th class="center">PPh</th>
-                        <th class="center">Grandtotal</th>
+                        <th class="center">{{ __('translations.item') }}</th>
+                        <th class="center">{{ __('translations.qty') }}.</th>
+                        <th class="center">{{ __('translations.unit') }}.</th>
+                        <th class="center">{{ __('translations.price') }} @</th>
+                        <th class="center">{{ __('translations.subtotal') }}</th>
+                        <th class="center">{{ __('translations.tax') }}</th>
+                        <th class="center">{{ __('translations.wtax') }}</th>
+                        <th class="center">{{ __('translations.grandtotal') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -267,7 +267,7 @@
                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
@@ -275,7 +275,7 @@
                     <td class="">
                         
                         
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                        
                     </td>
                 </tr>

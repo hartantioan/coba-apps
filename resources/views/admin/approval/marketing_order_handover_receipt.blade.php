@@ -135,16 +135,16 @@
         <div class="row">
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    INFO UTAMA
+                    {{ __('translations.main_info') }}
                 </div>
                 <div class="col s4">
-                    Perusahaan
+                    {{ __('translations.company') }}
                 </div>
                 <div class="col s8">
                     {{ $data->company->name }}
                 </div>
                 <div class="col s4">
-                    Collector
+                    {{ __('translations.collector') }}
                 </div>
                 <div class="col s8">
                     {{ $data->account->name }}
@@ -152,13 +152,13 @@
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s4">
-                    Bukti
+                    {{ __('translations.proof') }}
                 </div>
                 <div class="col s8">
                     <a href="{{ $data->attachment() }}" target="_blank">Lihat</a>
                 </div>
                 <div class="col s4">
-                    Keterangan
+                    {{ __('translations.note') }}
                 </div>
                 <div class="col s8">
                     {{ $data->note }}
@@ -171,12 +171,12 @@
         <table class="bordered">
             <thead>
                 <tr>
-                    <th class="center-align" width="5%">No.</th>
-                    <th class="center-align" width="15%">No.Kwitansi</th>
-                    <th class="center-align" width="20%">Customer</th>
-                    <th class="center-align" width="30%">Alamat</th>
-                    <th class="center-align" width="10%">Tgl</th>
-                    <th class="center-align" width="20%">Tagihan</th>
+                    <th class="center-align" width="5%">{{ __('translations.no') }}.</th>
+                    <th class="center-align" width="15%">{{ __('translations.receipt_no') }}</th>
+                    <th class="center-align" width="20%">{{ __('translations.customer') }}</th>
+                    <th class="center-align" width="30%">{{ __('translations.address') }}</th>
+                    <th class="center-align" width="10%">{{ __('translations.date') }}</th>
+                    <th class="center-align" width="20%">{{ __('translations.bill') }}</th>
                 </tr>
             </thead>
             <tbody>

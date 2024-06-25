@@ -130,12 +130,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">INVOICE # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.purchase_down_payment') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -144,7 +144,7 @@
         <!-- logo and title -->
         <div class="row mt-3 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">Purchase Down Payment</h5>
+                <h5 class="indigo-text">{{ __('translations.purchase_down_payment') }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="40%">
@@ -158,7 +158,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="50%">
-                                Supplier
+                                {{ __('translations.supplier') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->name }}
@@ -166,7 +166,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Alamat
+                                {{ __('translations.address') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->address }}
@@ -174,7 +174,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Telepon
+                                {{ __('translations.phone_number') }}
                             </td>
                             <td width="50%">
                                 {{ $data->supplier->phone.' / '.$data->supplier->office_no }}
@@ -182,7 +182,7 @@
                         </tr>
                         <tr>
                             <td width="50%">
-                                Tipe Pembayaran
+                                {{ __('translations.payment_type') }}
                             </td>
                             <td width="50%">
                                 {{ $data->type() }}
@@ -193,25 +193,25 @@
                 <td width="50%" class="left-align">
                     <div class="row">
                         <div class="col s6">
-                            Lampiran
+                            {{ __('translations.attachment') }}
                         </div>
                         <div class="col s6">
                             <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
                         </div>
                         <div class="col s6">
-                            Mata Uang
+                            {{ __('translations.currency') }}
                         </div>
                         <div class="col s6">
                             {{ $data->currency->code }}
                         </div>
                         <div class="col s6">
-                            Konversi
+                            {{ __('translations.conversion') }}
                         </div>
                         <div class="col s6">
                             {{ $data->currency_rate }}
                         </div>
                         <div class="col s6">
-                            Status
+                            {{ __('translations.status') }}
                         </div>
                         <div class="col s6">
                             {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -226,13 +226,13 @@
                 <table border="1" style="border-collapse:collapse" width="100%">
                     <thead>
                         <tr>
-                            <th class="center-align">PO/FR No.</th>
-                            <th class="center-align">PR No.</th>
-                            <th class="center-align">Tgl.Post</th>
-                            <th class="center-align">Tgl.Kirim</th>
-                            <th class="center-align">Keterangan</th>
-                            <th class="center-align">Total</th>
-                            <th class="center-align">DP Total</th>
+                            <th class="center-align">PO/FR {{ __('translations.no') }}.</th>
+                            <th class="center-align">PR {{ __('translations.no') }}.</th>
+                            <th class="center-align">{{ __('translations.post_date') }}</th>
+                            <th class="center-align">{{ __('translations.sent_date') }}</th>
+                            <th class="center-align">{{ __('translations.note') }}</th>
+                            <th class="center-align">{{ __('translations.total') }}</th>
+                            <th class="center-align">DP {{ __('translations.total') }}</th>
                             
                         </tr>
                         
@@ -276,37 +276,37 @@
                 <tbody>
                     <tr>
                         <td colspan="7" rowspan="6">
-                            Rekening :
+                            {{ __('translations.bank_account') }} :
                             {{ $data->supplier->defaultBank() ? $data->supplier->defaultBank() : ' - ' }}
                             <div class="mt-3">
-                                Catatan : {{ $data->note }}
+                                {{ __('translations.note') }} : {{ $data->note }}
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Subtotal</td>
+                        <td class="right-align" colspan="2">{{ __('translations.subtotal') }}</td>
                         <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Diskon</td>
+                        <td class="right-align" colspan="2">{{ __('translations.disc') }}</td>
                         <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Total</td>
+                        <td class="right-align" colspan="2">{{ __('translations.total') }}</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">Pajak</td>
+                        <td class="right-align" colspan="2">{{ __('translations.tax') }}</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2"><h6>Grandtotal</h6></td>
+                        <td class="right-align" colspan="2"><h6>{{ __('translations.grandtotal') }}</h6></td>
                         <td class="right-align"><h6>{{ number_format($data->grandtotal,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="10">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="10">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>
@@ -322,7 +322,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                 @if($data->approval())

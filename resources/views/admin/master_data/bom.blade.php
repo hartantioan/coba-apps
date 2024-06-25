@@ -53,6 +53,11 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                            <i class="material-icons hide-on-med-and-up">file_download</i>
+                            <span class="hide-on-small-onl">Import</span>
+                            <i class="material-icons right">file_download</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -274,6 +279,40 @@
     </div>
 </div>
 
+<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>Import Excel</h4>
+                <div class="col s12">
+                    <div id="validation_alertImport" style="display:none;"></div>
+                </div>
+                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
+                    @csrf
+                    <div class="file-field input-field col m6 s12">
+                        <div class="btn">
+                            <span>Dokumen Excel</span>
+                            <input type="file" class="form-control-file" id="fileExcel" name="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                    <div class="input-field col m6 s12">
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh.</h6>
+                    </div>
+                    <div class="input-field col m12 s12">
+                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+    </div>
+</div>
+
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -348,6 +387,16 @@
             }
         });
 
+        $('#modal2').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_dataimport')[0].reset();
+            }
+        });
+
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -357,6 +406,114 @@
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
             }
+        });
+
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    if(response.status == 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
+                                            <p> `+val.errors[0]+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                        });
+                    }else if(response.status == 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        $.each(response.error, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>` +val+`</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                        });
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                    loadingClose('.modal-content');
+                },
+                error: function(response) {
+                    var errors = response.responseJSON.errors;
+                    var errorMessage = '';
+                    if(response.status == 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        $.each(errors, function(index, error) {
+                        var message = '';
+
+                        $.each(error.errors, function(index, value) {
+                            message += value + '\n';
+                        });
+
+                        errorMessage += errors.file;
+                    });
+
+                    $('#validation_alertImport').html(`
+                        <div class="card-alert card red">
+                            <div class="card-content white-text">
+                                <p>` + errorMessage + `</p>
+                            </div>
+                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    `).show();
+
+                    }
+                    
+                   
+                }
+            });
+
         });
         
         select2ServerSide('#item_id', '{{ url("admin/select2/bom_item") }}');
@@ -967,6 +1124,11 @@
                 });
             }
         });
+    }
+
+    function successImport(){
+        loadDataTable();
+        $('#modal2').modal('close');
     }
 
     function destroy(id){

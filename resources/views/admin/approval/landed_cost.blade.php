@@ -155,7 +155,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Posisi
+                                {{ __('translations.position') }}
                             </td>
                             <td width="60%">
                                 {{ $data->user->position_id ? $data->user->position->Level->name : '-' }}
@@ -163,7 +163,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Depart.
+                                {{ __('translations.department') }}
                             </td>
                             <td width="60%">
                                 {{ $data->user->position_id ? $data->user->position->division->name : '-' }}
@@ -175,7 +175,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Vendor
+                                {{ __('translations.vendor') }}
                             </td>
                             <td width="60%">
                                 {{ $data->vendor->name }}
@@ -183,7 +183,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Alamat
+                                {{ __('translations.address') }}
                             </td>
                             <td width="60%">
                                 {{ $data->vendor->address }}
@@ -191,7 +191,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Telepon
+                                {{ __('translations.phone_number') }}
                             </td>
                             <td width="60%">
                                 {{ $data->vendor->phone.' / '.$data->vendor->office_no }}
@@ -203,7 +203,7 @@
                     <table border="0" width="100%">
                         <tr>
                             <td width="40%">
-                                Lampiran
+                                {{ __('translations.attachment') }}
                             </td>
                             <td width="60%">
                                 <a href="{{ $data->attachment() }}" target="_blank"><i class="material-icons">attachment</i></a>
@@ -211,7 +211,7 @@
                         </tr>
                         <tr>
                             <td width="40%">
-                                Status
+                                {{ __('translations.status') }}
                             </td>
                             <td width="60%">
                                 {!! $data->status().''.($data->void_id ? '<div class="mt-2">oleh '.$data->voidUser->name.' tgl. '.date('d/m/Y',strtotime($data->void_date)).' alasan : '.$data->void_note.'</div>' : '') !!}
@@ -225,15 +225,15 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No</th>
-                        <th class="center">Plant</th>
-                        <th class="center">Divisi</th>
-                        <th class="center">Gudang</th>
-                        <th class="center">Item</th>
-                        <th class="center">Qty</th>
-                        <th class="center">Satuan</th>
-                        <th class="center">Harga Total</th>
-                        <th class="center">Harga Satuan</th>
+                        <th class="center">{{ __('translations.no') }}</th>
+                        <th class="center">{{ __('translations.plant') }}</th>
+                        <th class="center">{{ __('translations.division') }}</th>
+                        <th class="center">{{ __('translations.warehouse') }}</th>
+                        <th class="center">{{ __('translations.item') }}</th>
+                        <th class="center">{{ __('translations.qty') }}</th>
+                        <th class="center">{{ __('translations.unit') }}</th>
+                        <th class="center">{{ __('translations.total_price') }}</th>
+                        <th class="center">{{ __('translations.unit_price') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -251,29 +251,29 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td class="right-align" colspan="7">Total</td>
+                        <td class="right-align" colspan="7">{{ __('translations.total') }}</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="7">PPN</td>
+                        <td class="right-align" colspan="7">{{ __('translations.tax') }}</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="7">PPh</td>
+                        <td class="right-align" colspan="7">{{ __('translations.wtax') }}</td>
                         <td class="right-align">{{ number_format($data->wtax,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="7">Grandtotal</td>
+                        <td class="right-align" colspan="7">{{ __('translations.grandtotal') }}</td>
                         <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
                         <td class="right-align"></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="9">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>
@@ -284,13 +284,13 @@
                     {!! ucwords(strtolower($data->user->place->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                 </div>
                 <div class="col m6 s6 l6">
-                    Catatan : {{ $data->note }}
+                    {{ __('translations.note') }} : {{ $data->note }}
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div >{{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                     @if($data->approval())

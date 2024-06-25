@@ -311,14 +311,16 @@
                 console.log(response.menu);
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+                const datePart = response.start_date.split(' ')[0];
+                const datePart2 = response.end_date.split(' ')[0];
+              
                 $('#temp').val(id);
                 $('#description').val(response.description);
-                $('#start_date').val(response.start_date);
-                $('#end_date').val(response.end_date);
+                $('#start_date').val(datePart);
+                $('#end_date').val(datePart2);
                 if(response.menu.length > 0){
                     var options = [];
-                    console.log('masid');
+                    
                     $.each(response.menu, function(i, val) {
                         options.push(new Option(val.name, val.id, true, true));
                     });

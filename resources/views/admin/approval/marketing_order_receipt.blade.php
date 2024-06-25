@@ -135,45 +135,46 @@
         <div class="row">
             <div class="col s12 row mt-2">
                 <div class="col s3 m3">
-                    Telah terima dari
+                    {{ __('translations.received_from') }}
                 </div>
                 <div class="col s9 m9">
                     : {{ $data->account->name }}
                 </div>
                 <div class="col s3 m3">
-                    Untuk pembayaran
+                    {{ __('translations.for_payment') }}
                 </div>
                 <div class="col s9 m9">
                     : {{ implode(', ',$data->arrInvoice()) }}
                 </div>
                 <div class="col s3 m3">
-                    Keterangan
+                    {{ __('translations.note') }}
                 </div>
                 <div class="col s9 m9">
                     : {{ $data->note }}
                 </div>
                 <div class="col s3 m3">
-                    Total Nominal
+                    {{ __('translations.nominal_total') }}
                 </div>
                 <div class="col s9 m9">
                     : Rp. {{ number_format($data->grandtotal,2,',','.') }}
                 </div>
                 <div class="col s3 m3">
-                    Terbilang
+                    {{ __('translations.regarded') }}
                 </div>
                 <div class="col s9 m9">
                     : {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                 </div>
             </div>
             <div class="col s12 mt-2">
-                NB : Bukan merupakan bukti penerimaan, pembayaran dianggap sah jika :
+                {{ __('translations.nb_marketing_order_receipt') }}
+               {{--  NB : Bukan merupakan bukti penerimaan, pembayaran dianggap sah jika --}} :
                 <ol>
-                    <li>Cek/Giro telah dicairkan di rekening</li>
-                    <li>Transfer dana telah diterima di rekening</li>
+                    <li>{{ __('translations.nb_marketing_li1') }}</li>
+                    <li>{{ __('translations.nb_marketing_li2') }}</li>
                 </ol>
             </div>
             <div class="col s7 mt-2" style="border:1px solid black;">
-                Mohon ditransfer ke :<br>
+                {{ __('translations.please_transfer_to') }} :<br>
                 <b>{!! $data->company->banks() !!}</b><br>
             </div>
             <div class="col s5 mt-2 center-align">
@@ -181,7 +182,7 @@
                 <br><br><br><br>
                 __________________________
                 <br>
-                Tanda Tangan dan Nama Terang
+                {{ __('translations.signature_and_name') }}
             </div>
         </div>
     </div>

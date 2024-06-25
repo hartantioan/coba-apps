@@ -91,8 +91,8 @@ class AnnouncementController extends Controller
                     $val->user->name,
                     $val->description,
                     $val->menuMany(),
-                    $val->start_date,
-                    $val->end_date,
+                    date('d/m/Y',strtotime($val->start_date)),
+                    date('d/m/Y',strtotime($val->end_date)),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>

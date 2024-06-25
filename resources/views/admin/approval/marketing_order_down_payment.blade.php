@@ -126,12 +126,12 @@
         <!-- header section -->
         <div class="row invoice-date-number">
             <div class="col xl4 s5">
-                <span class="invoice-number mr-1">AR Down Payment # {{ $data->code }}</span>
+                <span class="invoice-number mr-1">{{ __('translations.marketing_order_down_payment') }} # {{ $data->code }}</span>
             </div>
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small>{{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
         <!-- logo and title -->
         <div class="row mt-1 invoice-logo-title">
             <div class="col m6 s12">
-                <h5 class="indigo-text">AR Down Payment</h5>
+                <h5 class="indigo-text">{{ __('translations.marketing_order_down_payment') }}</h5>
             </div>
             <div class="col m6 s12 right-align">
                 <img src="{{ url('website/logo_web_fix.png') }}" width="35%">
@@ -153,44 +153,44 @@
             <table width="60%" align="center">
                 <thead>
                     <tr>
-                        <th width="19%">Customer</th>
+                        <th width="19%">{{ __('translations.Customer') }}</th>
                         <th width="1%">:</th>
                         <th width="80%">{{ $data->account->name }}</th>
                     </tr>
                     <tr>
-                        <th>Alamat</th>
+                        <th>{{ __('translations.address') }}</th>
                         <th>:</th>
                         <th>{{ $data->account->address }}</th>
                     </tr>
                     <tr>
-                        <th>Telepon</th>
+                        <th>{{ __('translations.phone_number') }}</th>
                         <th>:</th>
                         <th>{{ $data->account->phone.' / '.$data->account->office_no }}</th>
                     </tr>
                     <tr>
-                        <th>Tipe Bayar</th>
+                        <th>{{ __('translations.payment_type') }}</th>
                         <th>:</th>
                         <th>{{ $data->type() }}</th>
                     </tr>
                     <tr>
-                        <th>Total</th>
+                        <th>{{ __('translations.total') }}</th>
                         <th>:</th>
                         <th>{{ number_format($data->grandtotal,2,',','.') }}</th>
                     </tr>
                     <tr>
-                        <th>Terbilang</th>
+                        <th>{{ __('translations.regarded') }}</th>
                         <th>:</th>
                         <th><i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                     @if($data->type !== '1')
                     <tr>
-                        <th>Rekening</th>
+                        <th>{{ __('translations.bank_account') }}</th>
                         <th>:</th>
                         <th>{!! $data->company->banks() !!}</th>
                     </tr>
                     @endif
                     <tr>
-                        <th>Catatan</th>
+                        <th>{{ __('translations.note') }}</th>
                         <th>:</th>
                         <th>{{ $data->note }}</th>
                     </tr>
@@ -201,13 +201,13 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align" colspan="4">Sales Order</th>
+                        <th class="center-align" colspan="4">{{ __('translations.sales_order') }}</th>
                     </tr>
                     <tr>
-                        <th class="center-align">Nomor</th>
-                        <th class="center-align">Tgl.Post</th>
-                        <th class="center-align">Catatan</th>
-                        <th class="center-align">Grandtotal</th>
+                        <th class="center-align">{{ __('translations.no') }}</th>
+                        <th class="center-align">{{ __('translations.post_date') }}</th>
+                        <th class="center-align">{{ __('translations.note') }}</th>
+                        <th class="center-align">{{ __('translations.grandtotal') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -241,7 +241,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td>
-                        Dibuat oleh,
+                        {{ __('translations.created_by') }},
                         @if($data->user->signature)
                             <div>{!! $data->user->signature() !!}</div>
                         @endif

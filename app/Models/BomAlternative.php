@@ -15,6 +15,7 @@ class BomAlternative extends Model
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
+        'code',
         'bom_id',
         'name',
         'is_default'

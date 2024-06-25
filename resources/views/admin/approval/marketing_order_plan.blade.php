@@ -126,7 +126,7 @@
             <div class="col xl8 s7">
                 <div class="invoice-date display-flex align-items-right flex-wrap" style="right:0px !important;">
                     <div class="mr-2">
-                        <small>Diajukan:</small>
+                        <small> {{ __('translations.submitted') }}:</small>
                         <span>{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                     </div>
                 </div>
@@ -146,28 +146,28 @@
         <div class="row">
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    INFO UTAMA
+                    {{ __('translations.main_info') }}
                 </div>
                 <div class="col s4">
-                    Nama
+                    {{ __('translations.name') }}
                 </div>
                 <div class="col s8">
                     {{ $data->user->name }}
                 </div>
                 <div class="col s4">
-                    Perusahaan
+                    {{ __('translations.company') }}
                 </div>
                 <div class="col s8">
                     {{ $data->company->name }}
                 </div>
                 <div class="col s4">
-                    Plant
+                    {{ __('translations.plant') }}
                 </div>
                 <div class="col s8">
                     {{ $data->place->code }}
                 </div>
                 <div class="col s4">
-                    Line
+                    {{ __('translations.line') }}
                 </div>
                 <div class="col s8">
                     {{ $data->line->code }}
@@ -175,16 +175,16 @@
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">
-                    TANGGAL
+                    {{ __('translations.date') }}
                 </div>
                 <div class="col s4">
-                    Tgl.Post
+                    {{ __('translations.post_date') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->post_date)) }}
                 </div>
                 <div class="col s4">
-                    Tipe
+                    {{ __('translations.type') }}
                 </div>
                 <div class="col s8">
                     {{ $data->type() }}
@@ -196,11 +196,11 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">No.</th>
-                        <th class="center-align">Item</th>
-                        <th class="center-align">Qty</th>
-                        <th class="center-align">Satuan</th>
-                        <th class="center-align">Tgl.Request</th>
+                        <th class="center-align"> {{ __('translations.no') }}.</th>
+                        <th class="center-align"> {{ __('translations.item') }}</th>
+                        <th class="center-align"> {{ __('translations.qty') }}</th>
+                        <th class="center-align"> {{ __('translations.unit') }}</th>
+                        <th class="center-align"> {{ __('translations.request_date') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -213,10 +213,10 @@
                         <td class="center-align">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan 1: {{ $row->note }}</td>
+                        <td colspan="5"> {{ __('translations.note') }} 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">Keterangan 2: {{ $row->note2 }}</td>
+                        <td colspan="5"> {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
                     </tr>
                     @endforeach
                 </tbody>
@@ -235,7 +235,7 @@
             <table class="mt-3" width="100%" border="0">
                 <tr>
                     <td class="">
-                        <div >Dibuat oleh, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
+                        <div > {{ __('translations.created_by') }}, {{ $data->user->name }} {{ $data->user->position()->exists() ? $data->user->position->name : '-' }} {{ ($data->post_date ? \Carbon\Carbon::parse($data->updated_at)->format('d/m/Y H:i:s') : '-') }}</div></div>
                     </td>
                 </tr>
                     @if($data->approval())

@@ -10,12 +10,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use App\Exports\ExportTemplateMasterBom;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Bom;
 use App\Models\Place;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
+use App\Imports\BomsImport;
 use App\Models\BomAlternative;
 use App\Models\Line;
 use App\Models\Machine;
@@ -280,6 +282,20 @@ class BomController extends Controller
 		}
 		
 		return response()->json($response);
+    }
+
+    public function import(Request $request)
+    {
+        Excel::import(new BomsImport, $request->file('file'));
+
+        return response()->json([
+            'status'    => 200,
+            'message'   => 'Import sukses!'
+        ]);
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateMasterBom(), 'format_master_bom'.uniqid().'.xlsx');
     }
 
     public function rowDetail(Request $request)

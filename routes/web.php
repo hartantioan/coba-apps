@@ -805,6 +805,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [BomController::class, 'show']);
                         Route::post('print',[BomController::class, 'print']);
                         Route::get('export',[BomController::class, 'export']);
+                        Route::post('import',[BomController::class, 'import'])->middleware('operation.access:resource,update');
+                        Route::get('get_import_excel',[BomController::class, 'getImportExcel']);
                         Route::post('create',[BomController::class, 'create'])->middleware('operation.access:bom,update');
                         Route::post('destroy', [BomController::class, 'destroy'])->middleware('operation.access:bom,delete');
                     });

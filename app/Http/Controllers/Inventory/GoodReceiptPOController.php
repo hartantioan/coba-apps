@@ -333,62 +333,122 @@ class GoodReceiptPOController extends Controller
             $data['status'] = '500';
             $data['message'] = 'Purchase Order '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
-            if($data->hasBalance()){
-                CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
-                $details = [];
-                $serials = [];
-                $maxcolumn = 0;
-                foreach($data->purchaseOrderDetail as $row){
-                    if($request->type == '1'){
-                        $qtyBalance = $row->getBalanceReceipt();
-                    }elseif($request->type == '2'){
-                        $qtyBalance = $row->getBalanceReceiptRM();
-                    }
-                    
-                    if($qtyBalance > 0){
-                        $details[] = [
-                            'purchase_order_detail_id'  => $row->id,
-                            'item_id'                   => $row->item_id,
-                            'item_name'                 => $row->item->code.' - '.$row->item->name,
-                            'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
-                            'unit'                      => $row->itemUnit->unit->code,
-                            'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
-                            'unit_stock'                => $row->item->uomUnit->code,
-                            'place_id'                  => $row->place_id,
-                            'place_name'                => $row->place->code,
-                            'line_id'                   => $row->line_id ? $row->line_id : '',
-                            'line_name'                 => $row->line()->exists() ? $row->line->name : '-',
-                            'machine_id'                => $row->machine_id ? $row->machine_id : '',
-                            'machine_name'              => $row->machine()->exists() ? $row->machine->name : '-',
-                            'department_id'             => $row->department_id ? $row->department_id : '',
-                            'department_name'           => $row->department_id ? $row->department->name : '-',
-                            'warehouse_id'              => $row->warehouse_id,
-                            'warehouse_name'            => $row->warehouse->name,
-                            'note'                      => $row->note ? $row->note : '',
-                            'note2'                     => $row->note2 ? $row->note2 : '',
-                            'qty_conversion'            => $row->qty_conversion,
-                            'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
-                        ];
-                        if($row->item()->exists()){
-                            if($row->item->itemGroup->is_activa){
-                                $serials[] = [
-                                    'purchase_order_detail_id'  => $row->id,
-                                    'item_id'                   => $row->item_id,
-                                    'item_name'                 => $row->item->code.' - '.$row->item->name,
-                                    'qty_serial'                => $qtyBalance,
-                                ];
-                                $maxcolumn = $qtyBalance > $maxcolumn ? $qtyBalance : $maxcolumn;
+            if($request->type == '1'){
+                if($data->hasBalance()){
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
+                    $details = [];
+                    $serials = [];
+                    $maxcolumn = 0;
+                    foreach($data->purchaseOrderDetail as $row){
+                        if($request->type == '1'){
+                            $qtyBalance = $row->getBalanceReceipt();
+                        }elseif($request->type == '2'){
+                            $qtyBalance = $row->getBalanceReceiptRM();
+                        }
+                        
+                        if($qtyBalance > 0){
+                            $details[] = [
+                                'purchase_order_detail_id'  => $row->id,
+                                'item_id'                   => $row->item_id,
+                                'item_name'                 => $row->item->code.' - '.$row->item->name,
+                                'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
+                                'unit'                      => $row->itemUnit->unit->code,
+                                'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
+                                'unit_stock'                => $row->item->uomUnit->code,
+                                'place_id'                  => $row->place_id,
+                                'place_name'                => $row->place->code,
+                                'line_id'                   => $row->line_id ? $row->line_id : '',
+                                'line_name'                 => $row->line()->exists() ? $row->line->name : '-',
+                                'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                                'machine_name'              => $row->machine()->exists() ? $row->machine->name : '-',
+                                'department_id'             => $row->department_id ? $row->department_id : '',
+                                'department_name'           => $row->department_id ? $row->department->name : '-',
+                                'warehouse_id'              => $row->warehouse_id,
+                                'warehouse_name'            => $row->warehouse->name,
+                                'note'                      => $row->note ? $row->note : '',
+                                'note2'                     => $row->note2 ? $row->note2 : '',
+                                'qty_conversion'            => $row->qty_conversion,
+                                'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                            ];
+                            if($row->item()->exists()){
+                                if($row->item->itemGroup->is_activa){
+                                    $serials[] = [
+                                        'purchase_order_detail_id'  => $row->id,
+                                        'item_id'                   => $row->item_id,
+                                        'item_name'                 => $row->item->code.' - '.$row->item->name,
+                                        'qty_serial'                => $qtyBalance,
+                                    ];
+                                    $maxcolumn = $qtyBalance > $maxcolumn ? $qtyBalance : $maxcolumn;
+                                }
                             }
                         }
                     }
+    
+                    $data['details'] = $details;
+                    $data['serials'] = $serials;
+                    $data['maxcolumn'] = $maxcolumn;
+                }else{
+                    $data['status'] = '500';
+                    $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
                 }
-
-                $data['details'] = $details;
-                $data['serials'] = $serials;
-                $data['maxcolumn'] = $maxcolumn;
-            }else{
-                $data['status'] = '500';
-                $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
+            }elseif($request->type == '2'){
+                if($data->hasBalance()){
+                    CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Goods Receipt');
+                    $details = [];
+                    $serials = [];
+                    $maxcolumn = 0;
+                    foreach($data->purchaseOrderDetail as $row){
+                        if($request->type == '1'){
+                            $qtyBalance = $row->getBalanceReceipt();
+                        }elseif($request->type == '2'){
+                            $qtyBalance = $row->getBalanceReceiptRM();
+                        }
+                        
+                        if($qtyBalance > 0){
+                            $details[] = [
+                                'purchase_order_detail_id'  => $row->id,
+                                'item_id'                   => $row->item_id,
+                                'item_name'                 => $row->item->code.' - '.$row->item->name,
+                                'qty'                       => CustomHelper::formatConditionalQty($qtyBalance),
+                                'unit'                      => $row->itemUnit->unit->code,
+                                'qty_stock'                 => CustomHelper::formatConditionalQty($qtyBalance * $row->qty_conversion),
+                                'unit_stock'                => $row->item->uomUnit->code,
+                                'place_id'                  => $row->place_id,
+                                'place_name'                => $row->place->code,
+                                'line_id'                   => $row->line_id ? $row->line_id : '',
+                                'line_name'                 => $row->line()->exists() ? $row->line->name : '-',
+                                'machine_id'                => $row->machine_id ? $row->machine_id : '',
+                                'machine_name'              => $row->machine()->exists() ? $row->machine->name : '-',
+                                'department_id'             => $row->department_id ? $row->department_id : '',
+                                'department_name'           => $row->department_id ? $row->department->name : '-',
+                                'warehouse_id'              => $row->warehouse_id,
+                                'warehouse_name'            => $row->warehouse->name,
+                                'note'                      => $row->note ? $row->note : '',
+                                'note2'                     => $row->note2 ? $row->note2 : '',
+                                'qty_conversion'            => $row->qty_conversion,
+                                'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
+                            ];
+                            if($row->item()->exists()){
+                                if($row->item->itemGroup->is_activa){
+                                    $serials[] = [
+                                        'purchase_order_detail_id'  => $row->id,
+                                        'item_id'                   => $row->item_id,
+                                        'item_name'                 => $row->item->code.' - '.$row->item->name,
+                                        'qty_serial'                => $qtyBalance,
+                                    ];
+                                    $maxcolumn = $qtyBalance > $maxcolumn ? $qtyBalance : $maxcolumn;
+                                }
+                            }
+                        }
+                    }
+    
+                    $data['details'] = $details;
+                    $data['serials'] = $serials;
+                    $data['maxcolumn'] = $maxcolumn;
+                }else{
+                    $data['status'] = '500';
+                    $data['message'] = 'Seluruh item pada purchase order '.$data->code.' telah diterima di gudang.';
+                }
             }
         }
 

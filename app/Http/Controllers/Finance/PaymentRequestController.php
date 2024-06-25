@@ -718,6 +718,7 @@ class PaymentRequestController extends Controller
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => '',
                                 'payment_type'  => $data->payment_type ?? '1',
+                                'top'           => CustomHelper::countDays($data->post_date,$data->required_date),
                             ];
                         }
                     }
@@ -776,6 +777,7 @@ class PaymentRequestController extends Controller
                                 'is_reimburse'  => $is_reimburse,
                                 'raw_due_date'  => $required_date,
                                 'payment_type'  => $data->type ?? '1',
+                                'top'           => $data->top,
                             ];
                         }
                     }
@@ -832,6 +834,7 @@ class PaymentRequestController extends Controller
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => $raw_due_date,
                                 'payment_type'  => $data->type ?? '1',
+                                'top'           => CustomHelper::countDays($data->post_date,$data->due_date),
                             ];
                         }
                     }
@@ -876,6 +879,7 @@ class PaymentRequestController extends Controller
                                 'is_reimburse'  => '',
                                 'raw_due_date'  => '',
                                 'payment_type'  => $data->payment_type ?? '1',
+                                'top'           => 0,
                             ];
                         }
                     }

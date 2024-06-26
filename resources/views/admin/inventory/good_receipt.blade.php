@@ -135,7 +135,7 @@
                                                         <th rowspan="2">Operasi</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Pengajuan</th>
+                                                        <th>Terima</th>
                                                         <th>Dokumen</th>
                                                     </tr>
                                                 </thead>

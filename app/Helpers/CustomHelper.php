@@ -5413,6 +5413,24 @@ class CustomHelper {
 		return $value;
 	}
 
+	public static function formatConditionalQtyFc($qty){
+		$arr = explode('.',$qty);
+		$value = 0;
+		if(count($arr) > 1){
+			$trimmed_number = rtrim((string)$arr[1], '0');
+			$trimmed_length = strlen($trimmed_number);
+			if($trimmed_length > 3){
+				$value = number_format(floatval($arr[0].'.'.$arr[1]),10,',','.');
+			}else{
+				$value = number_format(floatval($arr[0].'.'.$arr[1]),$trimmed_length,',','.');
+			}
+		}else{
+			$value = number_format(floatval($arr[0]),0,',','.');
+		}
+
+		return $value;
+	}
+
 	public static function addNewPrinterCounter($table_name = null,$table_id = null){
 		PrintCounter::create([
 			'user_id'		=> session('bo_id'),

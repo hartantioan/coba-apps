@@ -241,6 +241,7 @@ class BomController extends Controller
                 $temp = '';
                 foreach($request->arr_main_alternative as $key => $row){
                     $queryA = BomAlternative::create([
+                        'code'          => Str::random(15),
                         'bom_id'        => $query->id,
                         'name'          => $request->arr_alternative_name[$key] ?? '',
                         'is_default'    => $request->arr_alternative_default[$key] ?? NULL,

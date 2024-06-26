@@ -317,38 +317,6 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
-    public function childItemFgFromProduction(Request $request)
-    {
-        $response = [];
-        $search   = $request->search;
-        $pod_id = $request->production_order_id;
-        $data = Item::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                        ->orWhere('name', 'like', "%$search%");
-                })
-                ->whereHas('productionScheduleDetail',function($query)use($pod_id){
-                    $query->whereHas('productionOrder',function($query)use($pod_id){
-                        $query->where('id',$pod_id);
-                    });
-                })
-                ->where('status','1')
-                ->get();
-
-        foreach($data as $d) {
-            foreach($d->fgGroup as $row){
-                $response[] = [
-                    'id'   			    => $row->item->id,
-                    'text' 			    => $row->item->code.' - '.$row->item->name,
-                    'code'              => $row->item->code,
-                    'name'              => $row->item->name,
-                    'uom'               => $row->item->uomUnit->code,
-                ];
-            }
-        }
-
-        return response()->json(['items' => $response]);
-    }
-
     public function bomItem(Request $request)
     {
         $response = [];
@@ -1565,6 +1533,11 @@ class Select2Controller extends Controller {
         $data = Pattern::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
+                })
+                ->where(function($query)use($request){
+                    if($request->brand_id){
+                        $query->where('brand_id',$request->brand_id);
+                    }
                 })
                 ->where('status','1')->get();
 
@@ -4051,10 +4024,10 @@ class Select2Controller extends Controller {
                 $query->where('line_id',$request->line_id)
                     ->whereHas('productionSchedule',function($query)use($request){
                         $query->where('place_id',$request->place_id);
-                    })
+                    })/* 
                     ->whereHas('item',function($query){
                         $query->whereNull('is_sales_item');
-                    });
+                    }) */;
             });
         })
         ->whereDoesntHave('used')
@@ -4118,8 +4091,9 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $response[] = [
-                'id'    => $d->id,
-                'text' 	=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'id'        => $d->id,
+                'text' 	    => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
             ];
         }
 

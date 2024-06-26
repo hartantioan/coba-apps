@@ -503,6 +503,7 @@ class Item extends Model
                 'item_name'     => $firstBom->item->code.' - '.$firstBom->item->name,
                 'name'          => $firstBom->code.' - '.$firstBom->name,
                 'qty'           => $firstBom->qty_output,
+                'qty_needed'    => $firstBom->qty_output,
                 'unit'          => $firstBom->item->uomUnit->code,
                 'type'          => $firstBom->is_powder ?? '',
                 'list_warehouse'=> $firstBom->item->warehouseList(),
@@ -530,6 +531,7 @@ class Item extends Model
                         'item_name'     => $secondBom->child->item->code.' - '.$secondBom->child->item->name,
                         'name'          => $secondBom->child->code.' - '.$secondBom->child->name,
                         'qty'           => $secondBom->child->qty_output,
+                        'qty_needed'    => $secondBom->child->getQtyContent($secondBom->parent),
                         'unit'          => $secondBom->child->item->uomUnit->code,
                         'type'          => $secondBom->child->is_powder ?? '',
                         'list_warehouse'=> $secondBom->child->item->warehouseList(),
@@ -557,6 +559,7 @@ class Item extends Model
                                 'item_name'     => $thirdBom->child->item->code.' - '.$thirdBom->child->item->name,
                                 'name'          => $thirdBom->child->code.' - '.$thirdBom->child->name,
                                 'qty'           => $thirdBom->child->qty_output,
+                                'qty_needed'    => $thirdBom->child->getQtyContent($thirdBom->parent),
                                 'unit'          => $thirdBom->child->item->uomUnit->code,
                                 'type'          => $thirdBom->child->is_powder ?? '',
                                 'list_warehouse'=> $thirdBom->child->item->warehouseList(),
@@ -584,6 +587,7 @@ class Item extends Model
                                         'item_name'     => $fourthBom->child->item->code.' - '.$fourthBom->child->item->name,
                                         'name'          => $fourthBom->child->code.' - '.$fourthBom->child->name,
                                         'qty'           => $fourthBom->child->qty_output,
+                                        'qty_needed'    => $fourthBom->child->getQtyContent($fourthBom->parent),
                                         'unit'          => $fourthBom->child->item->uomUnit->code,
                                         'type'          => $fourthBom->child->is_powder ?? '',
                                         'list_warehouse'=> $fourthBom->child->item->warehouseList(),
@@ -611,6 +615,7 @@ class Item extends Model
                                                 'item_name'     => $fifthBom->child->item->code.' - '.$fifthBom->child->item->name,
                                                 'name'          => $fifthBom->child->code.' - '.$fifthBom->child->name,
                                                 'qty'           => $fifthBom->child->qty_output,
+                                                'qty_needed'    => $fifthBom->child->getQtyContent($fifthBom->parent),
                                                 'unit'          => $fifthBom->child->item->uomUnit->code,
                                                 'list_warehouse'=> $fifthBom->child->item->warehouseList(),
                                                 'type'          => $fifthBom->child->is_powder ?? '',
@@ -638,6 +643,7 @@ class Item extends Model
                                                         'item_name'     => $sixthBom->child->item->code.' - '.$sixthBom->child->item->name,
                                                         'name'          => $sixthBom->child->code.' - '.$sixthBom->child->name,
                                                         'qty'           => $sixthBom->child->qty_output,
+                                                        'qty_needed'    => $sixthBom->child->getQtyContent($sixthBom->parent),
                                                         'unit'          => $sixthBom->child->item->uomUnit->code,
                                                         'type'          => $sixthBom->child->is_powder ?? '',
                                                         'list_warehouse'=> $sixthBom->child->item->warehouseList(),
@@ -659,6 +665,9 @@ class Item extends Model
             }
             $arr[] = $data1;
         }
+
+        $arr = array_reverse($arr);
+
         return $arr;
     }
 

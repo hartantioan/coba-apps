@@ -271,6 +271,8 @@ class ProductionReceiveController extends Controller
                                 }else{
                                     $arrItemReject[] = $bom->item_reject_id;
                                 }
+                            }else{
+                                $arrItemReject[] = NULL;
                             }
                         }
                     }

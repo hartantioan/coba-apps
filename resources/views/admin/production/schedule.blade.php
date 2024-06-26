@@ -1066,6 +1066,8 @@
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10);
 
+                            let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
+
                             $('#total-row-target').before(`
                                 <tr class="row_item" data-id="` + mop.id + `">
                                     <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
@@ -1122,7 +1124,7 @@
 
                             datanormal += `</tr></thead><tbody><tr>`;
 
-                            let arrCountNormal = [], arrDataNormal = [];
+                            let arrCountNormal = [], arrDataNormal = [], qtyRow = qtyTarget;
 
                             $.each(val.list_bom, function(z, detail) {
                                 if(detail.type == ''){
@@ -1130,14 +1132,16 @@
                                     arrCountNormal.push(count);
                                     arrDataNormal.push(detail);
                                     let randomColor = getRandomColor();
+                                    qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
                                     datanormal += `
                                         <input type="hidden" name="arr_type[]" value="normal">
                                         <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
+                                        
                                         <td style="background-color:` + randomColor + `;">
                                             <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                         </td>
                                         <td style="background-color:` + randomColor + `;" class="right-align">
-                                            <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                            <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                         </td>
                                         <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
                                             -
@@ -1259,6 +1263,7 @@
                                     arrCountPowder.push(count);
                                     arrDataPowder.push(detail);
                                     let randomColor = getRandomColor();
+                                    qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
                                     datapowder += `
                                         <input type="hidden" name="arr_type[]" value="powder">
                                         <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
@@ -1266,7 +1271,7 @@
                                             <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                         </td>
                                         <td style="background-color:` + randomColor + `;" class="right-align">
-                                            <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                            <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                         </td>
                                         <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
                                             -

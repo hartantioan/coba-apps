@@ -300,6 +300,11 @@
                                                 <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
                                             </div>
                                         </div>
+                                        <div class="card-alert card gradient-45deg-purple-amber">
+                                            <div class="card-content white-text">
+                                                <p>Info : Production Receive tipe item FG, tidak akan menjurnal dan membuat stok.</p>
+                                            </div>
+                                        </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
                                                 <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
@@ -1086,7 +1091,7 @@
                                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                                     </td>
                                     <td class="center">
-                                        <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
+                                        <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                                     </td>
                                     <td class="center" id="arr_unit` + count + `">
                                         ` + datakuy.item_receive_unit_uom + `
@@ -1665,7 +1670,7 @@
                                 <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
                             </td>
                             <td class="center">
-                                <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
+                                <input name="arr_qty_reject[]" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.unit + `

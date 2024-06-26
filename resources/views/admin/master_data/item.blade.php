@@ -358,6 +358,10 @@
                                     <label class="active" for="variety_id">Jenis</label>
                                 </div>
                                 <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
+                                    <label class="active" for="brand_id">Brand</label>
+                                </div>
+                                <div class="input-field col m3 s12">
                                     <select class="browser-default" id="pattern_id" name="pattern_id" onchange="generateCode();"></select>
                                     <label class="active" for="pattern_id">Motif & Warna</label>
                                 </div>
@@ -368,10 +372,6 @@
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="grade_id" name="grade_id" onchange="generateCode();"></select>
                                     <label class="active" for="grade_id">Grade</label>
-                                </div>
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
-                                    <label class="active" for="brand_id">Brand</label>
                                 </div>
                             </div>
                         </div>
@@ -934,7 +934,32 @@
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
         select2ServerSide('#size_id', '{{ url("admin/select2/size") }}');
         select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
-        select2ServerSide('#pattern_id', '{{ url("admin/select2/pattern") }}');
+
+        $('#pattern_id').select2({
+            placeholder: '-- Pilih ya --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/pattern") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        brand_id: $('#brand_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#pallet_id', '{{ url("admin/select2/pallet") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
         select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');

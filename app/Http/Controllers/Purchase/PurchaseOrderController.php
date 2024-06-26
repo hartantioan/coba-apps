@@ -1322,7 +1322,7 @@ class PurchaseOrderController extends Controller
                 'note'                              => $row->note ?? '',
                 'note2'                             => $row->note2 ?? '',
                 'note3'                             => $row->note3 ?? '',
-                'price'                             => CustomHelper::formatConditionalQty($row->price),
+                'price'                             => $po->currency->type == '1' ? CustomHelper::formatConditionalQty($row->price) : CustomHelper::formatConditionalQtyFc($row->price),
                 'disc1'                             => number_format($row->percent_discount_1,2,',','.'),
                 'disc2'                             => number_format($row->percent_discount_2,2,',','.'),
                 'disc3'                             => number_format($row->discount_3,2,',','.'),

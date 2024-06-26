@@ -150,8 +150,9 @@ class DocumentTaxHandoverController extends Controller
                 $response['data'][] = [
                     $angka,
                     $val->code,
+                    date('d/m/Y',strtotime($val->post_date)),
                     $val->user->name,
-                    $val->post_date,
+                    date('d/m/Y',strtotime($val->updated_at)),
                     $val->account->name??'',
                   
                     $val->status(),
@@ -180,7 +181,7 @@ class DocumentTaxHandoverController extends Controller
             $query->orderBy('created_at', 'desc');
         }])->where('code',CustomHelper::decrypt($id))->first();        
         if($pr){
-            
+            info($pr);
             $pdf = PrintHelper::print($pr,'Document Tax Handover','a4','portrait','admin.print.accounting.document_tax_handover_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             // $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));

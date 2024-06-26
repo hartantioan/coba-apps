@@ -87,7 +87,7 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
 
         if ($row['kode_bom_header']) {
             $check = Bom::where('code', $row['kode_bom_header'])->first();
-            info($check);
+            $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->first();
             if ($check) {
             
                 $query = BomAlternative::create([
@@ -115,8 +115,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
 
         if ($row['kode_bom_header']) {
             $check = Bom::where('code', $row['kode_bom_header'])->first();
-            $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->first();
-            info($check);
+            $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
             if ($check) {
                
                 if($row['type']=='items'){
@@ -137,7 +136,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                     $cost_distribution_id = $cost_distribution->id;
                 }
                 $method = explode('#', $row['metode'])[1];
-                info($method);
+         
                 $query = BomDetail::create([
                     'bom_id'       => $check->id,
                     'bom_alternative_id' => $checkalternative->id,

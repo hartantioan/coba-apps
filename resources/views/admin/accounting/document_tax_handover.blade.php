@@ -112,11 +112,10 @@
                                                     <tr>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Kode</th>
+                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tgl. Penyerahan</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">User</th>
-                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tanggal Post</th>
-
+                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tgl. Terima</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Approval</th>
-     
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Status</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Action</th>
                                                     </tr>
@@ -527,6 +526,7 @@
             columns: [
                         { name: 'id', searchable: false, className: 'center-align' },
                         { name: 'code', className: 'center-align',orderable: false},
+                        { name: 'date', className: 'center-align' },
                         { name: 'date', className: 'center-align' },
                         { name: 'npwp_number', className: 'center-align' },
                         { name: 'npwp_name', className: 'center-align' },

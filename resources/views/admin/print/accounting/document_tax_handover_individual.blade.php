@@ -206,10 +206,18 @@
                             <table border="0" width="100%">
                                 <tr>
                                     <td width="40%">
+                                        Tgl. Penyerahan
+                                    </td>
+                                    <td width="60%">
+                                        :{!! CustomHelper::tgl_indo($data->post_date) !!}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="40%">
                                         Dari
                                     </td>
                                     <td width="60%">
-                                        {{ $data->user->name }}
+                                        :{{ $data->user->name }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -217,7 +225,7 @@
                                         Untuk
                                     </td>
                                     <td width="60%">
-                                        {{ optional($data->account)->name ?? '-' }}
+                                        :{{ optional($data->account)->name ?? '-' }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -261,8 +269,9 @@
                                 $sortedDetails = $data->documentTaxHandoverDetail->sortBy(function($detail) {
                                     return $detail->documentTax->created_at;
                                 });
+                                $key= 0;
                             @endphp
-                            @foreach($sortedDetails as $key => $row)
+                            @foreach($sortedDetails as $row)
                             @php
                                 $number = $row->documentTax->code;
 
@@ -276,8 +285,11 @@
 
                                 $formattedNumber = "{$part1}-{$part2}.{$part3}";
                             @endphp
+                            @php
+                                $key=$key+1;
+                            @endphp
                                 <tr>
-                                    <td  align="center">{{ $key + 1 }}</td>
+                                    <td  align="center">{{ $key}}</td>
                                     <td>{{ $row->documentTax->transaction_code }}{{$row->documentTax->replace}}.{{$formattedNumber}}</td>
                                     <td  align="right">{{ number_format($row->documentTax->total,0,',','.') }}</td>
                                     <td  align="center">{{ $row->documentTax->npwp_name }}</td>
@@ -295,7 +307,7 @@
                         <table style="width:100%">
                             <tr class="break-row">
                                 <td>
-                                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
+                                   
                                     
                                    
                                 </td>
@@ -319,7 +331,7 @@
                             </td>
                             @if($data->account)
                                 <td class="center-align">
-                                
+                                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->updated_at->format('Y-m-d')) !!}
                                     <br>
                                     Diterima oleh,
                                     @if($data->account->signature)

@@ -395,6 +395,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
                 Route::get('bom_by_item_powder', [Select2Controller::class, 'bomByItemPowder']);
                 Route::get('production_batch', [Select2Controller::class, 'productionBatch']);
+                Route::get('production_batch_fg', [Select2Controller::class, 'productionBatchFg']);
                 Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
                 Route::get('production_issue', [Select2Controller::class, 'productionIssue']);
             });

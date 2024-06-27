@@ -4158,6 +4158,40 @@ class Select2Controller extends Controller {
                 /* ->whereHas('lookable',function($query)use($search){
                     $query->where('code', 'like', "%$search%");
                 }) */
+                ->where('qty','>',0)
+                ->orderBy('created_at')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' Tangki No. '.($d->tank()->exists() ? $d->tank->code : '-'),
+                'code'          => $d->code,
+                'qty'           => CustomHelper::formatConditionalQty($d->qty),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionBatchFg(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionBatch::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%");
+                })
+                ->where(function($query)use($request){
+                    if($request->pod_id){
+                        $query->where('lookable_type','production_receive_details')
+                            ->whereHas('lookable',function($query)use($request){
+                                $query->whereHas('productionReceive',function($query)use($request){
+                                    $query->where('production_order_id',$request->pod_id);
+                                });
+                            });
+                    }
+                })
+                ->where('qty','>',0)
                 ->orderBy('created_at')
                 ->get();
 

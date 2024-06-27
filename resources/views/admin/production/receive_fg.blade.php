@@ -262,17 +262,8 @@
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <div class="form-control-feedback" id="qty-unit">-</div>
-                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countSellQty();">
-                                        <label class="active" for="qty">Qty UoM</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="conversion" name="conversion" type="text" value="0,000" readonly>
-                                        <label class="active" for="conversion">Konversi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <div class="form-control-feedback" id="sell-unit">-</div>
-                                        <input id="qty_sell" name="qty_sell" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <label class="active" for="qty_sell">Qty Jual</label>
+                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
+                                        <label class="active" for="qty">Qty UoM Terpakai</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="area_id" name="area_id"></select>
@@ -312,9 +303,44 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col s12">
+                                <fieldset style="min-width: 100%;">
+                                    <legend>3. Pilih Batch</legend>
+                                    <div class="col m12 s12">
+                                        <div class="col s12" style="overflow:auto;min-width:100%;">
+                                            <p class="mt-2 mb-2">
+                                                <table class="bordered" style="border: 1px solid;width:600px !important;" id="table-detail-item">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="center">No.</th>
+                                                            <th class="center">No. Batch</th>
+                                                            <th class="center">Qty Terpakai</th>
+                                                            <th class="center">Hapus</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="body-batch">
+                                                        <tr id="last-row-batch">
+                                                            <td class="center-align" colspan="4">
+                                                                Silahkan tambah dengan tombol dibawah
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    <tfoot>
+                                                        <td colspan="4" class="center-align">
+                                                            <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addBatch();" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
+                                                        </td>
+                                                    </tfoot>
+                                                </table>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Detail Item Receive FG & Palet</legend>
+                                    <legend>4. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
@@ -738,6 +764,13 @@
                         </td>
                     </tr>
                 `);
+                $('#body-batch').empty().append(`
+                    <tr id="last-row-batch">
+                        <td class="center-align" colspan="4">
+                            Silahkan tambah dengan tombol dibawah
+                        </td>
+                    </tr>
+                `);
                 $('#qty-unit,#sell-unit').text('-');
             }
         });
@@ -780,56 +813,68 @@
             $('.row_item_batch[data-code="' + id + '"]').remove();
             $(this).closest('tr').remove();
         });
+
+        $('#body-batch').on('click', '.delete-data-batch', function() {
+            $(this).closest('tr').remove();
+            if($('.row_batch').length == 0){
+                $('#body-batch').append(`
+                    <tr id="last-row-batch">
+                        <td class="center-align" colspan="4">
+                            Silahkan tambah dengan tombol dibawah
+                        </td>
+                    </tr>
+                `);
+            }
+        });
     });
 
-    function addLine(){
+    function addBatch(){
         if($('#production_order_id').val()){
-            let no = $('.row_item').length + 1;
+            $('#body-batch').empty();
+            let no = $('.row_batch').length + 1;
             var count = makeid(10);
-            $('#body-item').append(`
-                <tr class="row_item" data-id="">
-                    <input type="hidden" name="arr_production_order_id[]" value="` + $('#production_order_id').val() + `">
-                    <input type="hidden" name="arr_bom_id[]" value="0">
-                    <input type="hidden" name="arr_qty_bom[]" value="0,000">
+            $('#body-batch').append(`
+                <tr class="row_batch">
                     <td class="center-align">
                         ` + no + `
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_item_id` + count + `" name="arr_item_id[]" onchange="getRowUnit('` + count + `')"></select>
+                        <select class="browser-default" id="arr_production_batch_id` + count + `" name="arr_production_batch_id[]"></select>
                     </td>
-                    <td class="right-align">
-                        0,000
+                    <td>
+                        <input name="arr_qty_batch[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;">    
                     </td>
                     <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
-                    </td>
-                    <td class="center" id="arr_unit` + count + `">
-                        -
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                            @foreach ($place as $rowplace)
-                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                            <option value="">--Silahkan pilih item--</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="" readonly>
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-batch" href="javascript:void(0);">
                             <i class="material-icons">delete</i>
                         </a>
                     </td>
                 </tr>
             `);
-
-            select2ServerSide('#arr_item_id' + count, '{{ url("admin/select2/item") }}');
+            $('#arr_production_batch_id' + count).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/production_batch_fg") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            pod_id: $('#production_order_id').val(),
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
         }else{
             swal({
                 title: 'Ups!',
@@ -1097,30 +1142,6 @@
 
     function removeBatch(element){
         $(element).parent().parent().remove();
-    }
-
-    function addBatch(code){
-        if($('#arr_batch' + code).val()){
-            let data = $('#arr_batch' + code).select2('data')[0];
-            let count = makeid(10);
-            $('#table-batch' + code).append(`
-                <tr>
-                    <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + count + `" value="` + data.id + `">
-                    <td>` + data.code + `</td>
-                    <td>
-                        <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="` + data.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `')" data-qty="` + data.qty + `" data-id="` + count + `" class="" id="rowBatch`+ count +`" style="text-align:right;">    
-                    </td>
-                    <td>
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);">
-                            <i class="material-icons">delete</i>
-                        </a> 
-                    </td>
-                </tr>
-            `);
-            $('#arr_batch' + code).empty();
-        }else{
-            
-        }
     }
 
     function printMultiSelect(){

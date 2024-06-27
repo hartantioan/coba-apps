@@ -208,12 +208,12 @@
                                         <label class="" for="company_id">Perusahaan</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_order_id" name="production_order_id"></select>
+                                        <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getItemProductionOrder();"></select>
                                         <label class="active" for="production_order_id">Production Order</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="item_id" name="item_id"></select>
-                                        <label class="active" for="item_id">Item Child FG</label>
+                                        <input id="item_name" name="item_name" type="text" value="-" readonly>
+                                        <label class="active" for="item_name">Item Child FG</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="form-control" id="place_id" name="place_id">
@@ -240,20 +240,12 @@
                                         <label class="active" for="group">Grup</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="form-control" id="pallet_id" name="pallet_id">
-                                            @foreach ($pallet as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="pallet_id">Palet</label>
+                                        <select class="browser-default" id="pallet_id" name="pallet_id"></select>
+                                        <label class="active" for="pallet_id">Palet</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="form-control" id="grade_id" name="grade_id">
-                                            @foreach ($grade as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="grade_id">Grade</label>
+                                        <select class="browser-default" id="grade_id" name="grade_id"></select>
+                                        <label class="active" for="grade_id">Grade</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -269,8 +261,22 @@
                                         </div>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
+                                        <div class="form-control-feedback" id="qty-unit">-</div>
+                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countSellQty();">
                                         <label class="active" for="qty">Qty UoM</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="conversion" name="conversion" type="text" value="0,000" readonly>
+                                        <label class="active" for="conversion">Konversi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <div class="form-control-feedback" id="sell-unit">-</div>
+                                        <input id="qty_sell" name="qty_sell" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
+                                        <label class="active" for="qty_sell">Qty Jual</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="area_id" name="area_id"></select>
+                                        <label class="active" for="area_id">Area</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -308,11 +314,11 @@
                         <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Detail Item Receive</legend>
+                                    <legend>3. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
-                                                <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
+                                                <p>Info : Nomor palet yang muncul adalah generate dari hasil kombinasi Shift, Group, dan Palet.</p>
                                             </div>
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
@@ -732,6 +738,7 @@
                         </td>
                     </tr>
                 `);
+                $('#qty-unit,#sell-unit').text('-');
             }
         });
         
@@ -763,32 +770,10 @@
             }
         });
 
-        $('#item_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/child_item_fg_from_production") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        production_order_id: $('#production_order_id').val(),
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
-        });
-
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
+        select2ServerSide('#pallet_id', '{{ url("admin/select2/pallet") }}');
+        select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
             let id = $(this).data('id');
@@ -1041,142 +1026,72 @@
         }
     }
 
-    function getProductionOrder(){
+    function getItemProductionOrder(){
         if($('#production_order_id').val()){
-            if($('#shift_id').val() && $('#group').val()){
-                let datakuy = $('#production_order_id').select2('data')[0];
-                $.ajax({
-                    url: '{{ Request::url() }}/send_used_data',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: $('#production_order_id').val(),
-                        type: datakuy.table,
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
+            $('#item_name').val($('#production_order_id').select2('data')[0].item_name);
+            $('#qty').val($('#production_order_id').select2('data')[0].qty);
+            $('#conversion').val($('#production_order_id').select2('data')[0].conversion);
+            $('#qty-unit').text($('#production_order_id').select2('data')[0].uom_unit);
+            $('#sell-unit').text($('#production_order_id').select2('data')[0].sell_unit);
+        }else{
+            $('#item_name').val('');
+            $('#qty,#conversion').val('0,000');
+            $('#qty-unit,#sell-unit').text('-');
+        }
+    }
 
-                        if(response.status == 500){
-                            swal({
-                                title: 'Ups!',
-                                text: response.message,
-                                icon: 'warning'
-                            });
-                        }else{
+    function generateBarcode(){
+        if($('#production_order_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_pallet_barcode',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    pod_id: $('#production_order_id').val(),
+                    shift_id: $('#shift_id').val(),
+                    group: $('#group').val(),
+                    pallet_id: $('#pallet_id').val(),
+                    grade_id: $('#grade_id').val(),
+                    place_id: $('#place_id').val(),
+                    line_id: $('#line_id').val(),
+                    qty: $('#qty').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
 
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + datakuy.code + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#production_order_id').val() + `')">close</i>
-                                </div>
-                            `);
-
-                            $('#last-row-item').remove();
-
-                            var count = makeid(10);
-
-                            let no = $('.row_item').length + 1;
-
-                            var count = makeid(10);
-
-                            $('#body-item').append(`
-                                <tr class="row_item" data-id="` + $('#production_order_id').val() + `">
-                                    <input type="hidden" name="arr_production_order_id[]" value="` + datakuy.id + `">
-                                    <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
-                                    <input type="hidden" name="arr_qty_bom[]" value="` + datakuy.item_receive_qty + `">
-                                    <input type="hidden" name="arr_item_id[]" value="` + datakuy.item_receive_id + `">
-                                    <input type="hidden" name="arr_is_powder[]" value="` + datakuy.is_powder + `">
-                                    <td class="center-align">
-                                        ` + no + `
-                                    </td>
-                                    <td>
-                                        ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + datakuy.item_receive_qty + `
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_qty_reject[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
-                                    </td>
-                                    <td class="center" id="arr_unit` + count + `">
-                                        ` + datakuy.item_receive_unit_uom + `
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                            <option value="">--Silahkan pilih item--</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="` + datakuy.batch_no + `" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-
-                            if(datakuy.list_warehouse.length > 0){
-                                $('#arr_warehouse' + count).empty();
-                                $.each(datakuy.list_warehouse, function(i, val) {
-                                    $('#arr_warehouse' + count).append(`
-                                        <option value="` + val.id + `">` + val.name + `</option>
-                                    `);
-                                });
-                            }
-
-                            $('#arr_warehouse' + count).val(datakuy.warehouse_id);
-
-                            $('#output-line').empty().text(datakuy.line);
-                            $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
-                            $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
-                            M.updateTextFields();
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                    if(response.status == 500){
                         swal({
                             title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
+                            text: response.message,
+                            icon: 'warning'
                         });
+                    }else{
+
+                        
                     }
-                });
-            }else{
-                swal({
-                    title: 'Ups!',
-                    text: 'Mohon maaf. Shift & Grup tidak boleh kosong.',
-                    icon: 'error'
-                });
-                $('#production_order_id').empty();
-            }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }else{
-            $('#output-line,#output-fg,#output-qty').text('-');
-            $('#body-item').empty().append(`
-                <tr id="last-row-item">
-                    <td class="center-align" colspan="11">
-                        Silahkan tambahkan Order Produksi untuk memulai...
-                    </td>
-                </tr>
-            `);
+            swal({
+                title: 'Ups!',
+                text: 'Production Order, Shift, Group, Palet, Grade, Plant, Line harus dipilih.',
+                icon: 'warning'
+            });
         }
     }
 

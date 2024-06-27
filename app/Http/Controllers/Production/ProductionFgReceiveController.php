@@ -54,8 +54,6 @@ class ProductionFgReceiveController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'pallet'        => Pallet::where('status','1')->get(),
-            'grade'         => Grade::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -67,6 +65,12 @@ class ProductionFgReceiveController extends Controller
     }
 
     public function getCode(Request $request){
+        $code = ProductionReceive::generateCode($request->val);
+        				
+		return response()->json($code);
+    }
+
+    public function getPalletBarcode(Request $request){
         $code = ProductionReceive::generateCode($request->val);
         				
 		return response()->json($code);

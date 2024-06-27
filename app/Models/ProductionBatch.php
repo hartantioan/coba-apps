@@ -17,9 +17,11 @@ class ProductionBatch extends Model
     protected $fillable = [
         'code',
         'item_id',
+        'tank_id',
         'lookable_type',
         'lookable_id',
-        'qty'
+        'qty',
+        'total'
     ];
 
     public function lookable(){
@@ -33,6 +35,10 @@ class ProductionBatch extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id');
+    }
+
+    public function tank(){
+        return $this->belongsTo('App\Models\Tank','tank_id','id');
     }
 
     public static function generateCode($type,$line,$group){
@@ -51,6 +57,29 @@ class ProductionBatch extends Model
             $code = (int)$query[0]->code + 1;
         } else {
             $code = '00000001';
+        }
+
+        $no = str_pad($code, 8, 0, STR_PAD_LEFT);
+
+        return $newcode.$no.'.'.strtoupper($line).strtoupper($group);
+    }
+
+    public static function generateCodeWithNumber($type,$line,$group,$number){
+        $newcode = '';
+        if($type == 'normal'){
+            $newcode .= 'PD'.date('y');
+        }elseif($type == 'powder'){
+            $newcode .= 'PW'.date('y');
+        }
+        $query = ProductionBatch::selectRaw('SUBSTRING(code,5,8) as code')
+            ->whereRaw("code LIKE '$newcode%'")
+            ->orderByDesc('id')
+            ->limit(1)
+            ->get();
+        if($query->count() > 0) {
+            $code = (int)$query[0]->code + 1 + $number;
+        } else {
+            $code = 1 + $number;
         }
 
         $no = str_pad($code, 8, 0, STR_PAD_LEFT);

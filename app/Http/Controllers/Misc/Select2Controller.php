@@ -4036,7 +4036,6 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
-            $type = $d->productionScheduleDetail->bom->is_powder ? 'powder' : 'normal';
             $response[] = [
                 'id'   			                => $d->id,
                 'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
@@ -4058,7 +4057,6 @@ class Select2Controller extends Controller {
                 'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
-                'batch_no'                      => ProductionBatch::generateCode($type,$shift->code,$request->group),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
             ];
         }
@@ -4094,6 +4092,10 @@ class Select2Controller extends Controller {
                 'id'        => $d->id,
                 'text' 	    => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
+                'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
+                'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
+                'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
             ];
         }
 

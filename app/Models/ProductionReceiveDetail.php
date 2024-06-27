@@ -27,7 +27,6 @@ class ProductionReceiveDetail extends Model
         'qty_reject',
         'place_id',
         'warehouse_id',
-        'tank_id',
         'batch_no',
         'production_batch_id',
         'total',
@@ -67,9 +66,5 @@ class ProductionReceiveDetail extends Model
 
     public function bom(){
         return $this->belongsTo('App\Models\Bom','bom_id','id')->withTrashed();
-    }
-
-    public function tank(){
-        return $this->belongsTo('App\Models\Tank','tank_id','id')->withTrashed();
     }
 }

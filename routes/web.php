@@ -395,7 +395,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('bom_by_item', [Select2Controller::class, 'bomByItem']);
                 Route::get('bom_by_item_powder', [Select2Controller::class, 'bomByItemPowder']);
                 Route::get('production_batch', [Select2Controller::class, 'productionBatch']);
-                Route::get('child_item_fg_from_production', [Select2Controller::class, 'childItemFgFromProduction']);
                 Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
             });
 
@@ -2122,6 +2121,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionReceiveController::class, 'rowDetail']);
                     Route::post('show', [ProductionReceiveController::class, 'show']);
                     Route::post('get_code', [ProductionReceiveController::class, 'getCode']);
+                    Route::post('get_batch_code', [ProductionReceiveController::class, 'getBatchCode']);
                     Route::post('print',[ProductionReceiveController::class, 'print']);
                     Route::post('done',[ProductionReceiveController::class, 'done'])->middleware('operation.access:production_receive,update');
                     Route::post('print_by_range',[ProductionReceiveController::class, 'printByRange']);
@@ -2144,6 +2144,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionFgReceiveController::class, 'rowDetail']);
                     Route::post('show', [ProductionFgReceiveController::class, 'show']);
                     Route::post('get_code', [ProductionFgReceiveController::class, 'getCode']);
+                    Route::post('get_pallet_barcode', [ProductionFgReceiveController::class, 'getPalletBarcode']);
                     Route::post('print',[ProductionFgReceiveController::class, 'print']);
                     Route::post('done',[ProductionFgReceiveController::class, 'done'])->middleware('operation.access:production_fg_receive,update');
                     Route::post('print_by_range',[ProductionFgReceiveController::class, 'printByRange']);

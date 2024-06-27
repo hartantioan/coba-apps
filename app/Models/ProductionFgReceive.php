@@ -30,6 +30,7 @@ class ProductionFgReceive extends Model
         'grade_id',
         'item_unit_id',
         'qty',
+        'area_id',
         'post_date',
         'document',
         'note',
@@ -67,6 +68,11 @@ class ProductionFgReceive extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function area()
+    {
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
 
     public function productionOrder()
@@ -236,7 +242,7 @@ class ProductionFgReceive extends Model
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', [3, 2])
+                        ->whereIn('status_closing', ['3'])
                         ->get();
        
         if(count($see)>0){

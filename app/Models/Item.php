@@ -131,7 +131,24 @@ class Item extends Model
     }
     
     public function sellUnit(){
-        return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed();
+        /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
+        $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
+
+        return $itemUnit->unit->code;
+    }
+
+    public function itemUnitSellId(){
+        /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
+        $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
+
+        return $itemUnit->id;
+    }
+
+    public function sellConversion(){
+        /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
+        $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
+
+        return $itemUnit->conversion;
     }
 
     public function productionUnit(){

@@ -197,7 +197,7 @@ class ProductionOrder extends Model
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', [3, 2])
+                        ->whereIn('status_closing', ['3'])
                         ->get();
        
         if(count($see)>0){
@@ -223,5 +223,29 @@ class ProductionOrder extends Model
         }
         
         return $total;
+    }
+
+    public function totalFg(){
+        $total = 0;
+        
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $rowissue){
+                $total += $rowissue->total();
+            }
+        }
+        
+        return $total;
+    }
+
+    public function qtyReceiveFg(){
+        $qty = 0;
+        
+        if($this->productionReceive()->exists()){
+            foreach($this->productionReceive as $rowreceive){
+                $qty += $rowreceive->qty();
+            }
+        }
+        
+        return $qty;
     }
 }

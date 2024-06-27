@@ -20,6 +20,7 @@ use App\Models\ProductionBatchUsage;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
+use App\Models\Shift;
 use App\Models\Tank;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -69,6 +70,14 @@ class ProductionReceiveController extends Controller
         $code = ProductionReceive::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getBatchCode(Request $request){
+        $pod = ProductionOrder::find($request->pod_id);
+        $type = $pod->productionScheduleDetail->bom->is_powder ? 'powder' : 'normal';
+        $shift = Shift::find($request->shift_id);
+        $code = ProductionBatch::generateCodeWithNumber($type,$shift->code,$request->group,$request->number);
+        return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -418,20 +427,25 @@ class ProductionReceiveController extends Controller
                             'qty_reject'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_reject[$key])),
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
-                            'tank_id'                       => $request->arr_tank[$key],
                         ]);
                         $type = $querydetail->is_powder ? 'powder' : 'normal';
-                        $batch = ProductionBatch::create([
-                            'code'          => ProductionBatch::generateCode($type,$query->shift->code,$query->group),
-                            'item_id'       => $querydetail->item_id,
-                            'lookable_type' => $querydetail->getTable(),
-                            'lookable_id'   => $querydetail->id,
-                            'qty'           => $querydetail->qty,
-                        ]);
+                        foreach($request->arr_count_detail as $keydetail => $rowdetail){
+                            if($request->arr_count_header[$key] == $rowdetail){
+                                $cekBatch = ProductionBatch::where('code',$request->arr_batch_no[$keydetail])->first();
+                                $code_batch = $cekBatch ? ProductionBatch::generateCode($type,$query->shift->code,$query->group) : $request->arr_batch_no[$keydetail];
+                                ProductionBatch::create([
+                                    'code'          => $code_batch,
+                                    'item_id'       => $querydetail->item_id,
+                                    'tank_id'       => $request->arr_tank[$keydetail],
+                                    'lookable_type' => $querydetail->getTable(),
+                                    'lookable_id'   => $querydetail->id,
+                                    'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
+                                    'total'         => round((str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])) / $querydetail->qty) * $arrTotal[$key],2)
+                                ]);
+                            }
+                        }
                         $updaterow = ProductionReceiveDetail::find($querydetail->id);
                         $updaterow->update([
-                            'batch_no'              => $batch->code,
-                            'production_batch_id'   => $batch->id,
                             'total'                 => $arrTotal[$key],
                         ]);
                     }

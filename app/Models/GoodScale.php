@@ -470,7 +470,7 @@ class GoodScale extends Model
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', [3, 2])
+                        ->whereIn('status_closing', ['3'])
                         ->get();
        
         if(count($see)>0){

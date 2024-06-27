@@ -34,7 +34,7 @@ class ProductionReceiveDetail extends Model
 
     public function productionBatch()
     {
-        return $this->hasOne('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
+        return $this->hasMany('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
     }
 
     public function productionReceive()

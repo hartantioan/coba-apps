@@ -230,7 +230,7 @@
             <table class="bordered" style="min-width:1400px !important;">
                 <thead>
                     <tr>
-                        <th colspan="11" class="center-align">Daftar Item Receive</th>
+                        <th colspan="9" class="center-align">Daftar Item Receive</th>
                     </tr>
                     <tr>
                         <th class="center">{{ __('translations.no') }}.</th>
@@ -241,23 +241,50 @@
                         <th class="center">{{ __('translations.uom_unit') }}</th>
                         <th class="center">{{ __('translations.plant') }}</th>
                         <th class="center">{{ __('translations.warehouse') }}</th>
-                        <th class="center">{{ __('translations.tank') }}</th>
                         <th class="center">{{ __('translations.batch_no') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($data->productionReceiveDetail()->orderBy('id')->get() as $key => $row)
+                        @php
+                            $batch = '<ol>';
+
+                            foreach($row->productionBatch as $rowbatch){
+                                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty).'</li>';
+                            }
+
+                            $batch .= '</ol>';
+                        @endphp
                         <tr>
                             <td class="center-align">{{ ($key+1) }}</td>
-                            <td>{{ $row->lookable->code.' - '.$row->lookable->name }}</td>
+                            <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty_reject) }}</td>
-                            <td class="center-align">{{ $row->lookable->uomUnit->code }}</td>
+                            <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                             <td class="">{{ $row->place->code }}</td>
                             <td class="">{{ $row->warehouse->name }}</td>
-                            <td class="">{{ ($row->tank()->exists() ? $row->tank->code : '-') }}</td>
-                            <td class="">{{ $row->batch_no }}</td>
+                            <td class="">{!! $batch !!}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <table class="bordered mt-2" style="width:350px !important;">
+                <thead>
+                    <tr>
+                        <th colspan="2" class="center-align">Daftar Production Issue Terpakai</th>
+                    </tr>
+                    <tr>
+                        <th class="center">{{ __('translations.no') }}.</th>
+                        <th class="center">No.Production Issue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($data->productionReceiveIssue()->orderBy('id')->get() as $key => $row)
+                        <tr>
+                            <td class="center-align">{{ ($key+1) }}</td>
+                            <td>{{ $row->productionIssue->code }}</td>
                         </tr>
                     @endforeach
                 </tbody>

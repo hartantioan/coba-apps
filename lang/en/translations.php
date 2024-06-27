@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'no' => 'No',
     'batch_no' => 'Batch No.',
     'tank' => 'Tank',
     'email' => 'Email',

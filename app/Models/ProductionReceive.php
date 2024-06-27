@@ -96,6 +96,11 @@ class ProductionReceive extends Model
         return $this->hasMany('App\Models\ProductionReceiveDetail');
     }
 
+    public function productionReceiveIssue()
+    {
+        return $this->hasMany('App\Models\ProductionReceiveIssue');
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

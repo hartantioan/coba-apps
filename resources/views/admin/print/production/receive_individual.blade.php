@@ -1,13 +1,14 @@
 @php
     use App\Helpers\CustomHelper;
-
+    use App\Helpers\PrintHelper;
+    use Carbon\Carbon;
 @endphp
 <!doctype html>
 <html lang="en">
     <head>
         <style>
 
-           @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
+            @font-face { font-family: 'china'; font-style: normal; src: url({{ storage_path('fonts/chinese_letter.ttf') }}) format('truetype'); }
             body { font-family: 'china', Tahoma, Arial, sans-serif;}
             .break-row {
                 margin-top: 2%;
@@ -348,29 +349,58 @@
                                 <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
-                                <th align="center">Item</th>
-                                <th align="center">Qty Planned</th>
-                                <th align="center">Qty Real</th>
-                                <th align="center">Satuan Produksi</th>
-                                <th align="center">Plant</th>
-                                <th align="center">Gudang</th>
-                                <th align="center">Tank</th>
-                                <th align="center">No.Batch</th>
+                                <th align="center">{{ __('translations.no') }}.</th>
+                                <th align="center">{{ __('translations.item') }}</th>
+                                <th align="center">{{ __('translations.qty_planned') }}</th>
+                                <th align="center">{{ __('translations.qty_real') }}</th>
+                                <th align="center">{{ __('translations.qty_reject') }}</th>
+                                <th align="center">{{ __('translations.uom_unit') }}</th>
+                                <th align="center">{{ __('translations.plant') }}</th>
+                                <th align="center">{{ __('translations.warehouse') }}</th>
+                                <th align="center">{{ __('translations.batch_no') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($data->productionReceiveDetail()->orderBy('id')->get() as $key => $row)
+                                @php
+                                    $batch = '<ol>';
+
+                                    foreach($row->productionBatch as $rowbatch){
+                                        $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty).'</li>';
+                                    }
+
+                                    $batch .= '</ol>';
+                                @endphp
                                 <tr>
                                     <td align="center">{{ ($key+1) }}</td>
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_planned) }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_reject) }}</td>
                                     <td align="center">{{ $row->item->uomUnit->code }}</td>
                                     <td align="">{{ $row->place->code }}</td>
                                     <td align="">{{ $row->warehouse->name }}</td>
-                                    <td align="">{{ ($row->tank()->exists() ? $row->tank->code : '-') }}</td>
-                                    <td align="">{{ $row->batch_no }}</td>
+                                    <td align="">{!! $batch !!}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                    <table class="bordered" border="1" width="350px" class="table-data-item" style="border-collapse:collapse;margin-top:25px;">
+                        <thead>
+                            <tr>
+                                <th colspan="2" class="center-align">Daftar Production Issue Terpakai</th>
+                            </tr>
+                            <tr>
+                                <th class="center">{{ __('translations.no') }}.</th>
+                                <th class="center">No.Production Issue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data->productionReceiveIssue()->orderBy('id')->get() as $key => $row)
+                                <tr>
+                                    <td class="center-align">{{ ($key+1) }}</td>
+                                    <td>{{ $row->productionIssue->code }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -17,12 +17,15 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
+use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
+use App\Models\ProductionReceiveIssue;
 use App\Models\Shift;
 use App\Models\Tank;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -245,6 +248,7 @@ class ProductionReceiveController extends Controller
                 'production_order_id'       => 'required',
                 'start_process_time'        => 'required',
                 'end_process_time'          => 'required',
+                'arr_production_issue_id'   => 'required|array',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -258,6 +262,8 @@ class ProductionReceiveController extends Controller
                 'production_order_id.required' 		=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
                 'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
+                'arr_production_issue_id.required'  => 'Production issue tidak boleh kosong.',
+                'arr_production_issue_id.array'     => 'Production issue harus array.',
             ]);
 
             if($validation->fails()) {
@@ -373,6 +379,8 @@ class ProductionReceiveController extends Controller
                             }
                             $row->delete();
                         }
+
+                        $query->productionReceiveIssue()->delete();
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -404,7 +412,17 @@ class ProductionReceiveController extends Controller
                 }
                 
                 if($query) {
-                    $totalIssue = $query->productionOrder->total();
+                    $totalIssue = 0;
+                    foreach($request->arr_production_issue_id as $key => $row){
+                        $pi = ProductionIssue::find($row);
+                        if($pi){
+                            $totalIssue += $pi->total();
+                        }
+                        ProductionReceiveIssue::create([
+                            'production_receive_id' => $query->id,
+                            'production_issue_id'   => $row,
+                        ]);
+                    }
                     $arrTotal = [];
                     $totalQty = 0;
                     foreach($request->arr_qty as $key => $row){
@@ -484,7 +502,26 @@ class ProductionReceiveController extends Controller
 
         $po = ProductionReceive::where('code',CustomHelper::decrypt($request->id))->first();
 
+        $issue = [];
+
+        foreach($po->productionReceiveIssue as $rowissue){
+            $issue[] = [
+                'production_issue_id'   => $rowissue->production_issue_id,
+                'production_issue_name' => $rowissue->productionIssue->code.' Tgl. '.date('d/m/Y',strtotime($rowissue->productionIssue->post_date)).' Shift '.$rowissue->productionIssue->shift->code.' Group '.$rowissue->productionIssue->group
+            ];
+        }
+
         foreach($po->productionReceiveDetail()->orderBy('id')->get() as $key => $row){
+            $batch = [];
+
+            foreach($row->productionBatch as $rowbatch){
+                $batch[] = [
+                    'batch_no'  => $rowbatch->code,
+                    'tank_id'   => $rowbatch->tank_id ?? '',
+                    'qty'       => CustomHelper::formatConditionalQty($rowbatch->qty),
+                ];
+            }
+
             $detail_receive[] = [
                 'id'                    => $row->production_order_id,
                 'bom_id'                => $row->bom_id ?? '',
@@ -496,10 +533,9 @@ class ProductionReceiveController extends Controller
                 'qty_reject'            => CustomHelper::formatConditionalQty($row->qty_reject),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
-                'tank_id'               => $row->tank_id ?? '',
-                'batch_no'              => $row->batch_no,
                 'list_warehouse'        => $row->item->warehouseList(),
                 'is_powder'             => $row->is_powder ?? '0',
+                'list_batch'            => $batch,
             ];
         }
 
@@ -509,6 +545,7 @@ class ProductionReceiveController extends Controller
         $po['po_code']                          = $po->productionOrder->code;
         $po['details']                          = $detail_receive;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
+        $po['issues']                           = $issue;
         
 		return response()->json($po);
     }
@@ -537,7 +574,7 @@ class ProductionReceiveController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10" style="font-size:20px !important;">Daftar Item Receive</th>
+                                <th class="center-align" colspan="9" style="font-size:20px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
@@ -548,7 +585,6 @@ class ProductionReceiveController extends Controller
                                 <th class="center">Satuan Produksi</th>
                                 <th class="center">Plant</th>
                                 <th class="center">Gudang</th>
-                                <th class="center">Tank</th>
                                 <th class="center">No.Batch</th>
                             </tr>
                         </thead><tbody>';
@@ -559,6 +595,13 @@ class ProductionReceiveController extends Controller
             $totalqtyplanned+=$row->qty_planned;
             $totalqtyreal+=$row->qty;
             $totalqtyreject+=$row->qty_reject;
+            $batch = '<ol>';
+
+            foreach($row->productionBatch as $rowbatch){
+                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty).'</li>';
+            }
+
+            $batch .= '</ol>';
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
@@ -568,8 +611,7 @@ class ProductionReceiveController extends Controller
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->place->code.'</td>
                 <td class="">'.$row->warehouse->name.'</td>
-                <td class="">'.($row->tank()->exists() ? $row->tank->code : '-').'</td>
-                <td class="">'.$row->batch_no.'</td>
+                <td class="">'.$batch.'</td>
             </tr>';
         }
         $string .= '<tr>
@@ -577,13 +619,29 @@ class ProductionReceiveController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreject, 3, ',', '.') . '</td>
-                <td colspan="5"></td>
+                <td colspan="4"></td>
             </tr>  
         ';
 
-        $string .= '</tbody></table></div>';
+        $string .= '</tbody></table></div><div class="col s12 mt-2"><table style="width:350px !important;" class="bordered" id="table-detail-row">
+        <thead>
+            <tr>
+                <th class="center-align" colspan="2" style="font-size:20px !important;">Daftar Production Issue Terpakai</th>
+            </tr>
+            <tr>
+                <th class="center">No.</th>
+                <th class="center">No. Production Issue</th>
+            </tr>
+        </thead><tbody>';
 
-        $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
+        foreach($data->productionReceiveIssue as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key+1).'.</td>
+                <td>'.$row->productionIssue->code.'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div><div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center-align" colspan="5">Approval</th>
@@ -642,13 +700,38 @@ class ProductionReceiveController extends Controller
         $pr = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Issue','a4','portrait','admin.print.production.receive_individual');
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $data = [
+                'title'     => 'Production Receive',
+                'data'      => $pr
+            ];
+
+            $opciones_ssl=array(
+                "ssl"=>array(
+                "verify_peer"=>false,
+                "verify_peer_name"=>false,
+                ),
+            );
+            $options = PDF::getDomPDF()->getOptions();
+            $options->set('isFontSubsettingEnabled', true);
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+            $img_path = 'website/logo_web_fix.png';
+            $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+            $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+            $img_base_64 = base64_encode($image_temp);
+            $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+            $data["image"]=$path_img;
+          
+            $pdf = Pdf::loadView('admin.print.production.receive_individual', $data)->setPaper('a4','portrait');
+            $pdf->render();
+    
+   
+            $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}",'', 10, array(0,0,0));
+            
             
             $content = $pdf->download()->getOriginalContent();
             
-            $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
+            $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+    
     
             return $document_po;
         }else{
@@ -692,6 +775,11 @@ class ProductionReceiveController extends Controller
                         if($row->productionBatch()->exists()){
                             $row->productionBatch()->delete();
                         }
+                    }
+                    foreach($query->productionReceiveIssue as $row){
+                        $row->productionIssue->update([
+                            'status'	=> '2'
+                        ]);
                     }
                 }
 
@@ -771,7 +859,10 @@ class ProductionReceiveController extends Controller
                 if($row->productionBatch()->exists()){
                     $row->productionBatch()->delete();
                 }
+                $row->delete();
             }
+
+            $query->productionReceiveIssue()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
 

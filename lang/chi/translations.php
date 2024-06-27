@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'no' => '数字',
     'batch_no' => '批号',
     'tank' => '坦克',
     'email' => '电子邮件',

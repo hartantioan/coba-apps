@@ -75,6 +75,7 @@ use App\Models\Journal;
 use App\Models\Pallet;
 use App\Models\Pattern;
 use App\Models\ProductionBatch;
+use App\Models\ProductionIssue;
 use App\Models\ProductionOrder;
 use App\Models\Resource;
 use App\Models\Size;
@@ -4163,9 +4164,35 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code,
+                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' Tangki No. '.($d->tank()->exists() ? $d->tank->code : '-'),
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionIssue(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionIssue::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%");
+                })
+                ->where(function($query)use($request){
+                    if($request->pod_id){
+                        $query->where('production_order_id',$request->pod_id);
+                    }
+                })
+                ->whereIn('status',['2','3'])
+                ->orderBy('created_at')
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group,
             ];
         }
 

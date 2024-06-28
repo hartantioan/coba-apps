@@ -74,7 +74,7 @@
                                                         <th>Coa Beli</th>
                                                         <th>Coa Jual</th>
                                                         <th>{{ __('translations.type') }}</th>
-                                                        <th>{{ __('translations.percentage) }}</th>
+                                                        <th>{{ __('translations.percentage') }}</th>
                                                         <th>Default PPN</th>
                                                         <th>Default PPh</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -125,7 +125,7 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="percentage" name="percentage" type="text" onkeyup="formatRupiah(this)">
-                            <label class="active" for="prosentase">{{ __('translations.percentage) }}</label>
+                            <label class="active" for="prosentase">{{ __('translations.percentage') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="form-control" id="type" name="type">

@@ -213,7 +213,7 @@
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>{{ __('translations.conversion') }}</th>
-                                                        <th>{{ __('translations.percentage) }}</th>
+                                                        <th>{{ __('translations.percentage') }}</th>
                                                         <th>{{ __('translations.nominal') }}</th>
                                                     </tr>
                                                 </thead>

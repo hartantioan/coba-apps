@@ -122,7 +122,7 @@ table.bordered th {
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
-                                    <th class="center" width="15%">{{ __('translations.percentage) }}</th>
+                                    <th class="center" width="15%">{{ __('translations.percentage') }}</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>
@@ -146,7 +146,7 @@ table.bordered th {
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
-                                    <th class="center" width="15%">{{ __('translations.percentage) }}</th>
+                                    <th class="center" width="15%">{{ __('translations.percentage') }}</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>

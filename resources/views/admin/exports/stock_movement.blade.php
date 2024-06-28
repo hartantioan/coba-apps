@@ -8,7 +8,7 @@
                 <th class="center-align">Gudang.</th>
                 <th class="center-align">Kode Item</th>
                 <th class="center-align">Nama Item</th>
-                <th class="center-align">Satuan</th>
+                <th class="center-align">{{ __('translations.unit') }}</th>
                 <th class="center-align">No Dokumen</th>
                 <th class="center-align">Mutasi</th>
                 <th class="center-align">Balance</th>
@@ -68,11 +68,11 @@
         <thead>
             <tr align="center">
                 <th align="center">No.</th>
-                <th align="center">Plant</th>
-                <th align="center">Gudang</th>
-                <th align="center">Kode</th>
+                <th align="center">{{ __('translations.plant') }}</th>
+                <th align="center">{{ __('translations.warehouse') }}</th>
+                <th align="center">{{ __('translations.code') }}</th>
                 <th align="center">Nama Item</th>
-                <th align="center">Satuan</th>
+                <th align="center">{{ __('translations.unit') }}</th>
                 <th align="center">Balance</th>
             </tr>
         </thead>

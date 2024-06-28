@@ -54,7 +54,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
@@ -66,11 +66,11 @@
                                                 </select>
                                             </div>
                                             <div class="col m2 s6 ">
-                                                <label for="date_start" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="date_start" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="date_start" name="date_start" value="{{ date('Y-m'.'-01') }}">
                                             </div>
                                             <div class="col m2 s6 ">
-                                                <label for="date_end" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="date_end" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="date_end" name="date_end" value="{{ date('Y-m-d') }}">
                                             </div>
                                             <div class="col m4 s6 pt-2">

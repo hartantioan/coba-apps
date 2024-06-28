@@ -51,7 +51,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -71,7 +71,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
@@ -105,7 +105,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
@@ -116,7 +116,7 @@
                                                         <th >Tempat</th>
                                                         <th >Equipment</th>
                                                         <th >Nama Aktivitas</th>
-                                                        <th >Area</th>
+                                                        <th >{{ __('translations.area') }}</th>
                                                         <th  class="center-align">Requested By</th>
                                                         <th >Tipe Maintenance</th>
                                                         <th >Prioritas</th>
@@ -126,7 +126,7 @@
                                                         <th >Waktu Perbaikan</th>
                                                         <th >Detail Keterangan</th>
                                                         <th >Hasil yang Diharapkan</th>
-                                                        <th >Status</th>
+                                                        <th >{{ __('translations.status') }}</th>
                                                         <th >Operasi</th>
                                                     </tr>
                                                 </thead>
@@ -162,7 +162,7 @@
                                         <option value="{{ $rowarea->id }}">{{ $rowarea->name}}</option>
                                     @endforeach
                                 </select>    
-                                <label for="area_id">Area</label>
+                                <label for="area_id">{{ __('translations.area') }}</label>
                             </div>
                             <div class="input-field col m6 s12">
                                 <select class="form-control" id="place_id" name="place_id">
@@ -170,7 +170,7 @@
                                         <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                     @endforeach
                                 </select>    
-                                <label for="place_id">Plant</label>
+                                <label for="place_id">{{ __('translations.plant') }}</label>
                             </div>
                             <div class="input-field col m4 s12">
                                 <select class="form-control" id="activity_id" name="activity_id">
@@ -304,13 +304,13 @@
                                                                 <th class="center" width="10%">
                                                                     <label>
                                                                         <input type="checkbox" onclick="chooseAll(this)">
-                                                                        <span>Semua</span>
+                                                                        <span>{{ __('translations.all') }}</span>
                                                                     </label>
                                                                 </th>
-                                                                <th class="center">Code</th>
-                                                                <th class="center">Nama</th>
+                                                                <th class="center">{{ __('translations.code') }}</th>
+                                                                <th class="center">{{ __('translations.name') }}</th>
                                                                 <th class="center">Spesifikasi</th>
-                                                                <th class="center">Status</th>
+                                                                <th class="center">{{ __('translations.status') }}</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-detail">
@@ -352,7 +352,7 @@
                                                                 <th class="center">Deskripsi</th>
                                                                 <th class="center">Created At</th>
                                                                 <th class="center">Display</th>
-                                                                <th class="center">Action</th>
+                                                                <th class="center">{{ __('translations.action') }}</th>
                                                                 
                                                             </tr>
                                                         </thead>
@@ -381,15 +381,15 @@
                                                 
                                             </div>
                                             <div class="input-field col m4 s12">
-                                                <button id="btn-save-pic" class="btn waves-effect waves-light right submit" onclick="savePIC();">Simpan <i class="material-icons right">send</i></button>
+                                                <button id="btn-save-pic" class="btn waves-effect waves-light right submit" onclick="savePIC();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                                             </div>
                                             <div class="col m12 s12">
                                                 <div style="overflow:auto;">
                                                     <table class="bordered" style="max-width:1650px !important;">
                                                         <thead>
                                                             <tr>
-                                                                <th class="center">Nama</th>
-                                                                <th class="center">Action</th>
+                                                                <th class="center">{{ __('translations.name') }}</th>
+                                                                <th class="center">{{ __('translations.action') }}</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody id="body-pic">
@@ -413,7 +413,7 @@
                                                     <table class="bordered" style="max-width:1650px !important;">
                                                         <thead>
                                                             <tr>
-                                                                <th class="center">Item</th>
+                                                                <th class="center">{{ __('translations.item') }}</th>
                                                                 <th class="center" colspan="5">Information</th>
                                                             </tr>
                                                         </thead>
@@ -433,7 +433,7 @@
                                 </div>
                             </div>
                             <div class="col s12 mt-3">
-                                <button id="btn-save" class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button id="btn-save" class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -442,7 +442,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -455,7 +455,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -472,7 +472,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -485,7 +485,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

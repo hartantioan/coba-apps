@@ -131,23 +131,23 @@
 					<tr align="center">
 						<th rowspan="2">No</th>
                         <th rowspan="2">LC NO.</th>
-                        <th rowspan="2">Pengguna</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
 						<th rowspan="2">Vendor</th>
-                        <th rowspan="2">Perusahaan</th>
-						<th rowspan="2">Tanggal</th>
+                        <th rowspan="2">{{ __('translations.company') }}</th>
+						<th rowspan="2">{{ __('translations.date') }}</th>
                         <th rowspan="2">Referensi</th>
-                        <th colspan="2">Mata Uang</th>
-                        <th rowspan="2">Keterangan</th>
+                        <th colspan="2">{{ __('translations.currency') }}</th>
+                        <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">Lampiran</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
                         <th rowspan="2">Total</th>
                         <th rowspan="2">PPN</th>
 						<th rowspan="2">PPh</th>
                         <th rowspan="2">Grandtotal</th>
 					</tr>
                     <tr align="center">
-                        <th>Kode</th>
-                        <th>Konversi</th>
+                        <th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -175,13 +175,13 @@
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
-											<th>Plant</th>
-											<th>Line</th>
-											<th>Divisi</th>
-											<th>Gudang</th>
-                                            <th>Item</th>
+											<th>{{ __('translations.plant') }}</th>
+											<th>{{ __('translations.line') }}</th>
+											<th>{{ __('translations.division') }}</th>
+											<th>{{ __('translations.warehouse') }}</th>
+                                            <th>{{ __('translations.item') }}</th>
                                             <th>Qty</th>
-                                            <th>Satuan</th>
+                                            <th>{{ __('translations.unit') }}</th>
                                             <th>Harga Total</th>
                                             <th>Harga Satuan</th>
                                         </tr>

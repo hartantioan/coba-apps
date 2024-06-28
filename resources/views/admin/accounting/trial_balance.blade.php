@@ -54,7 +54,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m3 s6 ">

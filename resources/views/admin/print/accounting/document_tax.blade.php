@@ -130,7 +130,7 @@
 						<th>Kode Transaksi</th>
 						<th>FG Pengganti</th>
 						<th>No Faktur</th>
-						<th>Tanggal</th>
+						<th>{{ __('translations.date') }}</th>
 						<th>No NPWP</th>
 						<th>Nama Pemilik NPWP</th>
 						<th>Alamat Pemilik NPWP</th>

@@ -232,15 +232,15 @@
                             <thead>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Item</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Keterangan 1</th>
                                     <th class="center">Keterangan 2</th>
                                     <th class="center">Remark</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Divisi</th>
-                                    <th class="center">Gudang</th>
+                                    <th class="center">{{ __('translations.plant') }}</th>
+                                    <th class="center">{{ __('translations.division') }}</th>
+                                    <th class="center">{{ __('translations.warehouse') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

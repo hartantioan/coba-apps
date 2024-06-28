@@ -43,7 +43,7 @@
                         
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         
@@ -59,11 +59,11 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <label for="filter_status" style="font-size:1rem;">{{ __('translations.filter_status') }} :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
@@ -101,7 +101,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
@@ -113,14 +113,14 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Perusahaan</th>
-                                                        <th>Plant</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>{{ __('translations.company') }}</th>
+                                                        <th>{{ __('translations.plant') }}</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Keterangan</th>
+                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>Dokumen</th>
-                                                        <th>Status</th>
+                                                        <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -144,7 +144,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -153,7 +153,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. Informasi Utama</legend>
+                                    <legend>1. {{ __('translations.main_information') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -173,7 +173,7 @@
                                                 <option value="{{ $row->id }}">{{ $row->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="company_id">Perusahaan</label>
+                                        <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="place_id" name="place_id">
@@ -181,7 +181,7 @@
                                                 <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="place_id">Plant</label>
+                                        <label class="" for="place_id">{{ __('translations.plant') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -227,15 +227,15 @@
                                             <table class="bordered" id="table-detail" style="min-width:100%;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" style="min-width:75px;">Hapus</th>
+                                                        <th class="center" style="min-width:75px;">{{ __('translations.delete') }}</th>
                                                         <th class="center" style="min-width:150px;">MOP</th>
-                                                        <th class="center" style="min-width:150px;">Item</th>
+                                                        <th class="center" style="min-width:150px;">{{ __('translations.item') }}</th>
                                                         <th class="center" style="min-width:150px;">Qty MOP</th>
                                                         <th class="center" style="min-width:150px;">Qty dalam Proses</th>
                                                         <th class="center" style="min-width:150px;">Satuan UoM</th>
                                                         <th class="center" style="min-width:150px;">Remark</th>
                                                         <th class="center" style="min-width:150px;">Tgl.Request</th>
-                                                        <th class="center">Line</th>
+                                                        <th class="center">{{ __('translations.line') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
@@ -281,7 +281,7 @@
                                                         <th colspan="3">NORMAL BOM</th>
                                                     </tr>
                                                     <tr>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
                                                         <th class="center">Target</th>
                                                         <th>Data Shift & BOM</th>
                                                     </tr>
@@ -304,7 +304,7 @@
                                                         <th colspan="3">POWDER BOM</th>
                                                     </tr>
                                                     <tr>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
                                                         <th class="center">Target</th>
                                                         <th>Data Shift & BOM</th>
                                                     </tr>
@@ -342,7 +342,7 @@
                         <div class="row">
                             <div class="input-field col s12 m6 l4">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <label class="active" for="note">{{ __('translations.note') }}</label>
                             </div>
                         </div>
                     </div>
@@ -352,7 +352,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light mr-1 submit step12" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light mr-1 submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -366,7 +366,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
@@ -382,7 +382,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -395,7 +395,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -486,7 +486,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -960,7 +960,7 @@
                 </td>
                 <td>
                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                        <option value="">--Kosong--</option>
+                        <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                         @endforeach
@@ -1109,12 +1109,12 @@
                             $.each(val.list_bom, function(z, detail) {
                                 if(detail.type == ''){
                                     datanormal += `
-                                        <th class="center" style="min-width:150px !important;">Item</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
                                         <th class="center" style="min-width:150px !important;">Qty</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                         <th class="center" style="min-width:150px !important;">BOM</th>
-                                        <th class="center" style="min-width:150px !important;">Line</th>
-                                        <th class="center" style="min-width:150px !important;">Gudang</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
                                         <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
                                         <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
                                         <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1151,7 +1151,7 @@
                                         </td>
                                         <td style="background-color:` + randomColor + `;">
                                             <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                                <option value="">--Kosong--</option>
+                                                <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($line as $rowline)
                                                     <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                                                 @endforeach
@@ -1240,12 +1240,12 @@
                             $.each(val.list_bom, function(z, detail) {
                                 if(detail.type == '1'){
                                     datapowder += `
-                                        <th class="center" style="min-width:150px !important;">Item</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
                                         <th class="center" style="min-width:150px !important;">Qty</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                         <th class="center" style="min-width:150px !important;">BOM</th>
-                                        <th class="center" style="min-width:150px !important;">Line</th>
-                                        <th class="center" style="min-width:150px !important;">Gudang</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
                                         <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
                                         <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
                                         <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1281,7 +1281,7 @@
                                         </td>
                                         <td style="background-color:` + randomColor + `;">
                                             <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                                <option value="">--Kosong--</option>
+                                                <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($line as $rowline)
                                                     <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                                                 @endforeach
@@ -1914,12 +1914,12 @@
                         $.each(val.details, function(i, detail) {
                             if(detail.type == 'normal'){
                                 datanormal += `
-                                    <th class="center" style="min-width:150px !important;">Item</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
                                     <th class="center" style="min-width:150px !important;">Qty</th>
                                     <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                     <th class="center" style="min-width:150px !important;">BOM</th>
-                                    <th class="center" style="min-width:150px !important;">Line</th>
-                                    <th class="center" style="min-width:150px !important;">Gudang</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
                                     <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
                                     <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
                                     <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1953,7 +1953,7 @@
                                     </td>
                                     <td style="background-color:` + randomColor + `;">
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                            <option value="">--Kosong--</option>
+                                            <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($line as $rowline)
                                                 <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                                             @endforeach
@@ -2055,12 +2055,12 @@
                         $.each(val.details, function(i, detail) {
                             if(detail.type == 'powder'){
                                 datapowder += `
-                                    <th class="center" style="min-width:150px !important;">Item</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
                                     <th class="center" style="min-width:150px !important;">Qty</th>
                                     <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                     <th class="center" style="min-width:150px !important;">BOM</th>
-                                    <th class="center" style="min-width:150px !important;">Line</th>
-                                    <th class="center" style="min-width:150px !important;">Gudang</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
+                                    <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
                                     <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
                                     <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
                                     <th class="center" style="min-width:150px !important;">Remark</th>
@@ -2094,7 +2094,7 @@
                                     </td>
                                     <td style="background-color:` + randomColor + `;">
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                            <option value="">--Kosong--</option>
+                                            <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($line as $rowline)
                                                 <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
                                             @endforeach

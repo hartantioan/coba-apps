@@ -5,10 +5,12 @@
             bottom: 50px;
             left: calc(300px + 19px); /* Adjust the 300px to match the expanded width of the aside */
             transition: left 0.01s;
+            max-width: calc(100vw - 20%);
         }
 
         .sidenav-collapsed #announcement_div {
             left: calc(64px + 19px); /* Adjust the 80px to match the collapsed width of the aside */
+            max-width: calc(100vw - 20%);
         }
     </style>
     <aside id="sidenav" class="sidenav-main nav-expanded nav-lock nav-collapsible sidenav-light sidenav-active-square">

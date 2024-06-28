@@ -287,9 +287,9 @@
                             <thead>
                                 <tr>
                                     <th>Referensi</th>
-                                    <th>Tipe</th>
+                                    <th>{{ __('translations.type') }}</th>
                                     <th>Dist.Biaya</th>
-                                    <th>Keterangan</th>
+                                    <th>{{ __('translations.note') }}</th>
                                     <th>Total</th>
                                     <th>Pembulatan</th>
                                     <th>Subtotal</th>

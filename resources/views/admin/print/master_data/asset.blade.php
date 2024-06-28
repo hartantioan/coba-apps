@@ -205,17 +205,17 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Plant</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.plant') }}</th>
 								<th>Grup Aset</th>
 								<th>Tgl.Kapt</th>
 								<th>Nominal.Kapt</th>
 								<th>Akum.Depre</th>
 								<th>Saldo Buku</th>
 								<th>Metode</th>
-								<th>Keterangan</th>
-								<th>Status</th>
+								<th>{{ __('translations.note') }}</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

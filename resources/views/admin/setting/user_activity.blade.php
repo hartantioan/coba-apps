@@ -48,7 +48,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-1" href="javascript:void(0);" onclick="exportExcel();">
@@ -60,7 +60,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Pengguna</th>
+                                                        <th>{{ __('translations.user') }}</th>
                                                         <th>Aktivitas</th>
                                                         <th>Form</th>
                                                         <th>Waktu</th>

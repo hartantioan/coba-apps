@@ -281,11 +281,11 @@
                         <thead>
                             <tr>
                                 <th class="center" rowspan="2">Coa</th>
-                                <th class="center" rowspan="2">Partner Bisnis</th>
-                                <th class="center" rowspan="2">Plant</th>
-                                <th class="center" rowspan="2">Line</th>
-                                <th class="center" rowspan="2">Mesin</th>
-                                <th class="center" rowspan="2">Divisi</th>
+                                <th class="center" rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+                                <th class="center" rowspan="2">{{ __('translations.plant') }}</th>
+                                <th class="center" rowspan="2">{{ __('translations.line') }}</th>
+                                <th class="center" rowspan="2">{{ __('translations.engine') }}</th>
+                                <th class="center" rowspan="2">{{ __('translations.division') }}</th>
                                 <th class="center" rowspan="2">Proyek</th>
                                 <th class="center" rowspan="2">Ket.1</th>
                                 <th class="center" rowspan="2">Ket.2</th>

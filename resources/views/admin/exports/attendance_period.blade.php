@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>No</th>
-            <th>Nama</th>
+            <th>{{ __('translations.name') }}</th>
             <th>Tanggal </th>
             <th>Waktu</th>
             

@@ -176,7 +176,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <h5 style="margin-top: -2px">Warehouse</h5>
+                                <h5 style="margin-top: -2px">{{ __('translations.warehouse') }}</h5>
                             </td>
                         </tr>
                                 
@@ -205,10 +205,10 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Keterangan</th>
-								<th>Status</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.note') }}</th>
+								<th>{{ __('translations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody>

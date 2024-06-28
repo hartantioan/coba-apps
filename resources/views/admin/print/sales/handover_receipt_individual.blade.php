@@ -168,7 +168,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>No.Invoice</th>
-                                <th>Tanggal</th>
+                                <th>{{ __('translations.date') }}</th>
                                 <th>Grandtotal</th>
                                 <th>Surat Jalan</th>
                             </tr>

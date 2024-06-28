@@ -209,10 +209,10 @@ class ItemController extends Controller
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
-                    $val->name,
-                    $val->other_name,
-                    $val->itemGroup->name,
-                    $val->uomUnit->code,
+                    $val->name??'',
+                    $val->other_name??'',
+                    $val->itemGroup->name??'',
+                    $val->uomUnit->code??'',
                     $val->status(),
                     $btnShading.
                     '

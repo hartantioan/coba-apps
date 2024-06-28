@@ -200,18 +200,18 @@
                         <th class="center">No.</th>
                         <th class="center">Kode Aset</th>
                         <th class="center">Nama Aset</th>
-                        <th class="center-align">Plant</th>
-                        <th class="center-align">Gudang</th>
-                        <th class="center-align">Line</th>
-                        <th class="center-align">Mesin</th>
-                        <th class="center-align">Divisi</th>
+                        <th class="center-align">{{ __('translations.plant') }}</th>
+                        <th class="center-align">{{ __('translations.warehouse') }}</th>
+                        <th class="center-align">{{ __('translations.line') }}</th>
+                        <th class="center-align">{{ __('translations.engine') }}</th>
+                        <th class="center-align">{{ __('translations.division') }}</th>
                         <th class="center-align">Proyek</th>
                         <th class="center-align">Dist.Biaya</th>
-                        <th class="center">Harga</th>
+                        <th class="center">{{ __('translations.price') }}</th>
                         <th class="center">Qty</th>
-                        <th class="center">Satuan</th>
+                        <th class="center">{{ __('translations.unit') }}</th>
                         <th class="center">Total</th>
-                        <th class="center">Keterangan</th>
+                        <th class="center">{{ __('translations.note') }}</th>
                     </tr>
                 </thead>
                 <tbody>

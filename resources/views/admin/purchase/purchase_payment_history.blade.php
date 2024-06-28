@@ -57,7 +57,7 @@
                         
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         
@@ -73,14 +73,14 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Menunggu</option>
                                                         <option value="2">Dalam Proses</option>
                                                         <option value="3">Selesai</option>
@@ -94,7 +94,7 @@
                                                 <label for="filter_type" style="font-size:1rem;">Tipe :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_type" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Cash</option>
                                                         <option value="2">Credit</option>
                                                     </select>
@@ -104,7 +104,7 @@
                                                 <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         @foreach ($company as $rowcompany)
                                                             <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
@@ -118,13 +118,13 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
@@ -143,21 +143,21 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside">
                                                 <thead>
                                                     <tr>
                                                         <th rowspan="2">#</th>
-                                                        <th rowspan="2">Code</th>
-                                                        <th rowspan="2">Pengguna</th>
+                                                        <th rowspan="2">{{ __('translations.code') }}</th>
+                                                        <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">Sup/Ven</th>
-                                                        <th rowspan="2">Perusahaan</th>
-                                                        <th colspan="4" class="center-align">Tanggal</th>
-                                                        <th rowspan="2">Tipe</th>
+                                                        <th rowspan="2">{{ __('translations.company') }}</th>
+                                                        <th colspan="4" class="center-align">{{ __('translations.date') }}</th>
+                                                        <th rowspan="2">{{ __('translations.type') }}</th>
                                                         <th rowspan="2">Dokumen</th>
-                                                        <th rowspan="2">Keterangan</th>
+                                                        <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">No.Faktur Pajak</th>
                                                         <th rowspan="2">No.Bukti Potong</th>
                                                         <th rowspan="2">Tgl.Bukti Potong</th>
@@ -171,16 +171,16 @@
                                                         <th rowspan="2">Grandtotal</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
-                                                        <th rowspan="2">Status</th>
-                                                        <th rowspan="2">Action</th>
+                                                        <th rowspan="2">{{ __('translations.status') }}</th>
+                                                        <th rowspan="2">{{ __('translations.action') }}</th>
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
                                                         <th>Terima</th>
                                                         <th>Tenggat</th>
                                                         <th>Dokumen</th>
-                                                        <th>Prosentase</th>
-                                                        <th>Nominal</th>
+                                                        <th>{{ __('translations.percentage) }}</th>
+                                                        <th>{{ __('translations.nominal') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -349,7 +349,7 @@
                                 <th class="center-align">Code Outgoing Payment</th>
                                 <th class="center-align">Date</th>
                                 <th class="center-align">Code Payment Request</th>
-                                <th class="center-align">Nominal</th>
+                                <th class="center-align">{{ __('translations.nominal') }}</th>
                             </tr>                  
                     </thead>
                     <tbody id="body_history_table">
@@ -360,7 +360,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

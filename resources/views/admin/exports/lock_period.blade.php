@@ -4,11 +4,11 @@
             <th>No</th>
             <th>No.Dokumen</th>
             <th>Status Closing</th>
-            <th>Pengguna</th>
-            <th>Perusahaan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
             <th>Periode</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Status Dokumen</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>

@@ -274,15 +274,15 @@
                         <thead>
                             <tr>
                                 <th class="center">No<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">数字</div></th>
-                                <th class="center">Item<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">项目</div></th>
+                                <th class="center">{{ __('translations.item') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">项目</div></th>
                                 <th class="center">Qty.<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">数量</div></th>
                                 <th class="center">Sat.<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">单元</div></th>
                                 <th class="center">Ket. 1<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">说明1</div></th>
                                 <th class="center">Ket. 2<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">说明2</div></th>
                                 <th class="center">Tgl.Dipakai<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">使用日期</div></th>
-                                <th class="center">Plant<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">植物</div></th>
-                                <th class="center">Gudang<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">古当</div></th>
-                                <th class="center">Divisi<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">分配</div></th>
+                                <th class="center">{{ __('translations.plant') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">植物</div></th>
+                                <th class="center">{{ __('translations.warehouse') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">古当</div></th>
+                                <th class="center">{{ __('translations.division') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">分配</div></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -305,8 +305,8 @@
                             </tr>
                             <tr>
                                 <td colspan="9">
-                                    <b>Line</b> 线 : {{ $row->line()->exists() ? $row->line->code : '-' }},  
-                                    <b>Mesin</b> 机器 : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                                    <b>{{ __('translations.line') }}</b> 线 : {{ $row->line()->exists() ? $row->line->code : '-' }},  
+                                    <b>{{ __('translations.engine') }}</b> 机器 : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
                                     <b>Requester</b> 请求者 : {{ $row->requester }},
                                     <b>Proyek</b> 项目 : {{ $row->project()->exists() ? $row->project->name : '-' }}
                                 </td>

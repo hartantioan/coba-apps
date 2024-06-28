@@ -63,7 +63,7 @@
                         
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         
@@ -79,11 +79,11 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <label for="filter_status" style="font-size:1rem;">{{ __('translations.filter_status') }} :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
                                                         <option value="1">Menunggu</option>
@@ -121,7 +121,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
@@ -133,26 +133,26 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Perusahaan</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Keterangan</th>
+                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>No.PROD</th>
-                                                        <th>Item</th>
-                                                        <th>Plant</th>
-                                                        <th>Line</th>
+                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>{{ __('translations.plant') }}</th>
+                                                        <th>{{ __('translations.line') }}</th>
                                                         <th>Shift</th>
                                                         <th>Group</th>
                                                         <th>Pallet</th>
-                                                        <th>Shading</th>
+                                                        <th>{{ __('translations.shading') }}</th>
                                                         <th>Grade</th>
                                                         <th>Qty UoM</th>
                                                         <th>Satuan UoM</th>
                                                         <th>Qty Jual</th>
                                                         <th>Satuan Jual</th>
                                                         <th>Dokumen</th>
-                                                        <th>Status</th>
+                                                        <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
@@ -176,7 +176,7 @@
     <div class="modal-content" style="overflow:auto !important;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -185,7 +185,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. Informasi Utama</legend>
+                                    <legend>1. {{ __('translations.main_information') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -205,7 +205,7 @@
                                                 <option value="{{ $row->id }}">{{ $row->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="company_id">Perusahaan</label>
+                                        <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getItemProductionOrder();"></select>
@@ -221,7 +221,7 @@
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="place_id">Plant</label>
+                                        <label class="" for="place_id">{{ __('translations.plant') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="form-control" id="line_id" name="line_id">
@@ -229,7 +229,7 @@
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="line_id">Line</label>
+                                        <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
@@ -271,7 +271,7 @@
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                        <label class="active" for="note">Keterangan</label>
+                                        <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="col m3 s12">
                                         <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate Barcode </a>
@@ -356,13 +356,13 @@
                                                             <th class="center">No.Palet</th>
                                                             <th class="center">Kode Item</th>
                                                             <th class="center">Nama Item</th>
-                                                            <th class="center">Shading</th>
+                                                            <th class="center">{{ __('translations.shading') }}</th>
                                                             <th class="center">Qty Jual</th>
                                                             <th class="center">Qty M2</th>
-                                                            <th class="center">Plant</th>
+                                                            <th class="center">{{ __('translations.plant') }}</th>
                                                             <th class="center">Shift</th>
                                                             <th class="center">Group</th>
-                                                            <th class="center">Hapus</th>
+                                                            <th class="center">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item">
@@ -395,7 +395,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
     </div>
 </div>
@@ -409,7 +409,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
@@ -425,7 +425,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -438,7 +438,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -529,7 +529,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -566,12 +566,12 @@
                         <tr>
                             <th class="center-align" rowspan="2">No</th>
                             <th class="center-align" rowspan="2">Coa</th>
-                            <th class="center-align" rowspan="2">Partner Bisnis</th>
-                            <th class="center-align" rowspan="2">Plant</th>
-                            <th class="center-align" rowspan="2">Line</th>
-                            <th class="center-align" rowspan="2">Mesin</th>
-                            <th class="center-align" rowspan="2">Divisi</th>
-                            <th class="center-align" rowspan="2">Gudang</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.plant') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.line') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.engine') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.division') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.warehouse') }}</th>
                             <th class="center-align" rowspan="2">Proyek</th>
                             <th class="center-align" rowspan="2">Ket.1</th>
                             <th class="center-align" rowspan="2">Ket.2</th>
@@ -592,7 +592,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

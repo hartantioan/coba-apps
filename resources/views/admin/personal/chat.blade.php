@@ -195,7 +195,7 @@
       </div>
   </div>
   <div class="modal-footer">
-      <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+      <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
   </div>
 </div>
 

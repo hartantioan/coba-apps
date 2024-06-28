@@ -32,7 +32,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
                     </div>
@@ -47,11 +47,11 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
-                                                <label for="filter_place" style="font-size:1rem;">Plant :</label>
+                                                <label for="filter_place" style="font-size:1rem;">{{ __('translations.plant') }} :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_place" name="filter_place" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
@@ -62,24 +62,24 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Item</th>
-                                                        <th>Plant</th>
-                                                        <th>Nominal</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>{{ __('translations.plant') }}</th>
+                                                        <th>{{ __('translations.nominal') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -101,7 +101,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -110,18 +110,18 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="item_id" name="item_id"></select>
-                            <label class="active" for="item_id">Item</label>
+                            <label class="active" for="item_id">{{ __('translations.item') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="place_id" name="place_id"></select>
-                            <label class="active" for="place_id">Plant</label>
+                            <label class="active" for="place_id">{{ __('translations.plant') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this)">
-                            <label class="active" for="nominal">Nominal</label>
+                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -129,7 +129,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -137,7 +137,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Import Excel</h4>
+                <h4>{{ __('translations.import') }} Excel</h4>
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
@@ -163,7 +163,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

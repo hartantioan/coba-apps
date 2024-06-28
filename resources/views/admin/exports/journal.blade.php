@@ -3,29 +3,29 @@
         <tr align="center">
             <th>No</th>
             <th>No.Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
-            <th>Pengguna</th>
+            <th>{{ __('translations.user') }}</th>
             <th>Tgl. Post</th>
             <th>Kode Coa</th>
             <th>Nama Coa</th>
-            <th>Partner Bisnis</th>
-            <th>Plant</th>
-            <th>Line</th>                        
-            <th>Mesin</th>
-            <th>Divisi</th>
-            <th>Gudang</th>
+            <th>{{ __('translations.bussiness_partner') }}</th>
+            <th>{{ __('translations.plant') }}</th>
+            <th>{{ __('translations.line') }}</th>                        
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
+            <th>{{ __('translations.warehouse') }}</th>
             <th>Proyek</th>
             <th>Ket. 1</th>
             <th>Ket. 2</th>
             <th>Ket. 3</th>
-            <th>Mata Uang</th>
-            <th>Konversi</th>
+            <th>{{ __('translations.currency') }}</th>
+            <th>{{ __('translations.conversion') }}</th>
             <th>Debit Real</th>
             <th>Kredit Real</th>
             <th>Debit Convert</th>

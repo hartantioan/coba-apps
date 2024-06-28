@@ -36,7 +36,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -46,7 +46,7 @@
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
                     </div>
@@ -61,24 +61,24 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m3 s6 ">
-                                                <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                                <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">{{ __('translations.active') }}</option>
+                                                        <option value="2">{{ __('translations.non_active') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
-                                                <label for="filter_company" style="font-size:1.2rem;">Filter Cabang :</label>
+                                                <label for="filter_company" style="font-size:1.2rem;">{{ __('translations.branch_filter') }} :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         @foreach($company as $m)
                                                         <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
                                                         @endforeach
@@ -86,12 +86,12 @@
                                                 </div>
                                             </div>
                                             <div class="col m6 s6 ">
-                                                <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
+                                                <label for="filter_type" style="font-size:1.2rem;">{{ __('translations.filter_type') }} :</label>
                                                 <div class="input-field">
                                                     <select multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                        <option value="" selected>Semua</option>
-                                                        <option value="2">Akun Jurnal</option>
-                                                        <option value="3">Akun Kas</option>
+                                                        <option value="" selected>{{ __('translations.all') }}</option>
+                                                        <option value="2">{{ __('translations.journal_account') }}</option>
+                                                        <option value="3">{{ __('translations.cash_account') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -101,32 +101,32 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Prefix</th>
-                                                        <th>Kode</th>
-                                                        <th>Nama</th>
-                                                        <th>Perusahaan</th>
-                                                        <th>Parent</th>
-                                                        <th>Mata Uang</th>
-                                                        <th>Level</th>
-                                                        <th>Akun Kas</th>
-                                                        <th>Block</th>
-                                                        <th>Muncul di Jurnal</th>
-                                                        <th>Wajib BP di Jurnal</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.prefix') }}</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
+                                                        <th>{{ __('translations.company') }}</th>
+                                                        <th>{{ __('translations.parent') }}</th>
+                                                        <th>{{ __('translations.currency') }}</th>
+                                                        <th>{{ __('translations.level') }}</th>
+                                                        <th>{{ __('translations.cash_account') }}</th>
+                                                        <th>{{ __('translations.block') }}</th>
+                                                        <th>{{ __('translations.show_in_journal') }}</th>
+                                                        <th>{{ __('translations.bp_mandatory_in_journal') }}</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -148,7 +148,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit COA</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} COA</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -156,16 +156,16 @@
                     <div class="col s12">
                         <div class="input-field col s12 m6">
                             <input id="prefix" name="prefix" type="text" placeholder="Kode Prefix">
-                            <label class="active" for="prefix">Prefix</label>
+                            <label class="active" for="prefix">{{ __('translations.prefix') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode</label>
+                            <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="code">Nama</label>
+                            <label class="active" for="code">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="" id="company_id" name="company_id">
@@ -173,81 +173,81 @@
                                     <option value="{{ $m->id }}">{{ $m->code.' '.$m->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="company_id">Perusahaan</label>
+                            <label class="" for="company_id">{{ __('translations.company') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="level" name="level" type="number" placeholder="Level" step="1" value="1" min="1">
-                            <label class="active" for="level">Level</label>
+                            <label class="active" for="level">{{ __('translations.level') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="parent_id" name="parent_id"></select>
-                            <label class="active" for="parent_id">Parent Coa</label>
+                            <label class="active" for="parent_id">{{ __('translations.parent') }} Coa</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="col s12 m6 row">
                             <div class="input-field col s12">
                                 <div class="switch mb-1">
-                                    <label for="is_cash_account">Akun Kas</label>
+                                    <label for="is_cash_account">{{ __('translations.cash_account') }}</label>
                                     <label class="right">
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input type="checkbox" id="is_cash_account" name="is_cash_account" value="1" onclick="showCurrency();">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div>
                             </div>
                             <div class="input-field col s12 hide" id="currency_option">
                                 <select class="browser-default" id="currency_id" name="currency_id">
-                                    <option value="">--Kosong--</option>
+                                    <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($currency as $row)
                                         <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="active" for="currency_id">Mata Uang</label>
+                                <label class="active" for="currency_id">{{ __('translations.currency') }}</label>
                             </div>
                         </div>
                         <div class="col s12 m6 row">
                             <div class="input-field col s12">
                                 <div class="switch mb-1">
-                                    <label for="show_journal">Muncul di Jurnal</label>
+                                    <label for="show_journal">{{ __('translations.show_in_journal') }}</label>
                                     <label class="right">
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input type="checkbox" id="show_journal" name="show_journal" value="1">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div>
                                 <div class="switch mb-1">
                                     <label for="bp_journal">BP di Form Jurnal</label>
                                     <label class="right">
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input type="checkbox" id="bp_journal" name="bp_journal" value="1">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div>
                                 <div class="switch mb-1">
-                                    <label for="status">Status</label>
+                                    <label for="status">{{ __('translations.status') }}</label>
                                     <label class="right">
-                                        Non-Active
+                                        {{ __('translations.non_active') }}
                                         <input checked type="checkbox" id="status" name="status" value="1">
                                         <span class="lever"></span>
-                                        Active
+                                        {{ __('translations.active') }}
                                     </label>
                                 </div>
                                 {{-- <div class="switch mb-1">
                                     <label for="is_hidden">Sembunyikan dari Transaksi</label>
                                     <label class="right">
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input type="checkbox" id="is_hidden" name="is_hidden" value="1">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div> --}}
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -255,7 +255,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
@@ -288,7 +288,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -301,7 +301,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

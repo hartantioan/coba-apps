@@ -3,7 +3,7 @@
         <tr>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kode Coa</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="500px">Nama Coa</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="100px">Tanggal</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="100px">{{ __('translations.date') }}</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">No.JE</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">Dok.Ref.</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit FC</th>
@@ -14,10 +14,10 @@
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 1</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 2</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 3</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Plant</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Gudang</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Line</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Mesin</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.plant') }}</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.warehouse') }}</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.line') }}</th>
+            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.engine') }}</th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Divisi </th>
             <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Proyek</th>
         </tr>

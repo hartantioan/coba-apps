@@ -31,7 +31,7 @@
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">

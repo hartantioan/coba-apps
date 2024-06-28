@@ -81,15 +81,15 @@
                             <thead>
                                 <tr>
                                     <th class="center-align">No.</th>
-                                    <th class="center-align">Item</th>
-                                    <th class="center-align">Stock</th>
-                                    <th class="center-align">Plant</th>
-                                    <th class="center-align">Gudang</th>
-                                    <th class="center-align">Area</th>
-                                    <th class="center-align">Shading</th>
+                                    <th class="center-align">{{ __('translations.item') }}</th>
+                                    <th class="center-align">{{ __('translations.stock') }}</th>
+                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                    <th class="center-align">{{ __('translations.area') }}</th>
+                                    <th class="center-align">{{ __('translations.shading') }}</th>
                                     <th class="center-align">UOM</th>
-                                    <th class="center-align">Lokasi</th>
-                                    <th class="center-align">Action</th>
+                                    <th class="center-align">{{ __('translations.location') }}</th>
+                                    <th class="center-align">{{ __('translations.action') }}</th>
                                 </tr>
                             
                             </thead>
@@ -119,9 +119,9 @@
                     <thead>
                         <tr>
                             <th class="center-align">No.</th>
-                            <th class="center-align">Plant</th>
-                            <th class="center-align">Warehouse</th>
-                            <th class="center-align">Stock</th>
+                            <th class="center-align">{{ __('translations.plant') }}</th>
+                            <th class="center-align">{{ __('translations.warehouse') }}</th>
+                            <th class="center-align">{{ __('translations.stock') }}</th>
             
                         </tr>
                     </thead>
@@ -132,7 +132,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

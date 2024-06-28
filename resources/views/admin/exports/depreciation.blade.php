@@ -4,12 +4,12 @@
             <th>No</th>
             <th>No Depresiasi</th>
             <th>NIK</th>
-            <th>Pengguna</th>
-            <th>Perusahaan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
             <th>Periode</th>
-            <th>Keterangan</th>
-            <th>Status</th>
+            <th>{{ __('translations.note') }}</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>

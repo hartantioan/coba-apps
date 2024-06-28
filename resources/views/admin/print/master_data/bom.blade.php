@@ -205,13 +205,13 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Item</th>
-								<th>Plant</th>
-                                <th>Gudang</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.item') }}</th>
+								<th>{{ __('translations.plant') }}</th>
+                                <th>{{ __('translations.warehouse') }}</th>
 								<th>Qty Output</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -234,7 +234,7 @@
 													<th>Item/Resource</th>
 													<th>Description</th>
 													<th>Qty</th>
-													<th>Nominal</th>
+													<th>{{ __('translations.nominal') }}</th>
 													<th>Total</th>
 												</tr>
 											</thead>

@@ -3,12 +3,12 @@
         <tr align="center">
             <tr>
             <th class="center-align">No.</th>
-            <th class="center-align">Item</th>
-            <th class="center-align">Customer</th>
+            <th class="center-align">{{ __('translations.item') }}</th>
+            <th class="center-align">{{ __('translations.customer') }}</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
-            <th class="center-align">Plant</th>
-            <th class="center-align">Harga</th>
+            <th class="center-align">{{ __('translations.plant') }}</th>
+            <th class="center-align">{{ __('translations.price') }}</th>
             <th class="center-align">Margin</th>
             <th class="center-align">Diskon 1</th>
             <th class="center-align">Diskon 2</th>

@@ -243,9 +243,9 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Dokumen</th>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
+                                    <th>{{ __('translations.unit') }}</th>
                                     <th>Total</th>
                                     <th>PPN</th>
                                     <th>Grandtotal</th>

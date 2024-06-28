@@ -20,7 +20,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable();">
                             <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
+                            <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                             <i class="material-icons right">refresh</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="excel();">
@@ -41,12 +41,12 @@
                             <div class="card-panel">
                                 <div class="row">
                                     <div class="col s12 ">
-                                        {{-- <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        {{-- <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
+                                                <option value="">{{ __('translations.all') }}</option>
+                                                <option value="1">{{ __('translations.active') }}</option>
+                                                <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div> --}}
                                     </div>
@@ -76,32 +76,32 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>{{ __('translations.code') }}</th>
                                                         <th>User</th>
                                                         <th>Kode Inventaris</th>
-                                                        <th>Item</th>
-                                                        <th>Lokasi</th>
-                                                        <th>Tanggal</th>
+                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>{{ __('translations.location') }}</th>
+                                                        <th>{{ __('translations.date') }}</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>
                                                         <th>User(Bersangkutan)</th>
                                                         <th>Tanggal Pengembalian</th>
                                                         <th>Keterangan Pengembalian</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -160,7 +160,7 @@
                         </div>
                         <div class="input-field col s12 m6 step3">
                             <input id="location" name="location" type="text" placeholder="Keterangan">
-                            <label class="active" for="location">Lokasi</label>
+                            <label class="active" for="location">{{ __('translations.location') }}</label>
                         </div>
                         <div class="input-field col s12 m6 step4"> 
                             <input type="date" id="date" name="date" min="{{ $minDate }}">
@@ -168,21 +168,21 @@
                         </div>
                         <div class="input-field col s12 step5">
                             <input id="info" name="info" type="text" placeholder="Info">
-                            <label class="active" for="info">Keterangan</label>
+                            <label class="active" for="info">{{ __('translations.note') }}</label>
                         </div>
                         <div class="input-field col s12 m6 step6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="order">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
                         <div class="col s12 mt-3 step7">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -191,7 +191,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -212,16 +212,16 @@
                         </div>
                         <div class="input-field col s12">
                             <input id="info" name="info" type="text" placeholder="Info">
-                            <label class="active" for="info">Keterangan</label>
+                            <label class="active" for="info">{{ __('translations.note') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="order">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
@@ -234,7 +234,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -251,7 +251,7 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="tempes" name="tempes"> 
                             <input id="items" name="items" disabled></input>
-                            <label class="active" for="items">Item</label>
+                            <label class="active" for="items">{{ __('translations.item') }}</label>
                         </div>
                         <div class="input-field col s12 m3 ">
                             <input id="detail1s" name="detail1s" disabled></input>
@@ -271,7 +271,7 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="location1" name="location1" type="text" placeholder="Keterangan">
-                            <label class="active" for="location1">Lokasi</label>
+                            <label class="active" for="location1">{{ __('translations.location') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                           
@@ -284,12 +284,12 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="order">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status1" name="status1" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
@@ -302,7 +302,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modalbarcode" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
@@ -321,7 +321,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal_print" class="modal modal-fixed-footer" style="">
@@ -331,7 +331,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

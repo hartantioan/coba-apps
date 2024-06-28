@@ -75,7 +75,7 @@
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">
@@ -131,14 +131,14 @@
                                                     <tr>
                                                         <th class="center-align fixed">No.</th>
                                                         <th class="center-align fixed2">NIK</th>
-                                                        <th class="center-align fixed1">Nama</th>
-                                                        <th class="center-align">Tanggal</th>
+                                                        <th class="center-align fixed1">{{ __('translations.name') }}</th>
+                                                        <th class="center-align">{{ __('translations.date') }}</th>
                                                         <th class="center-align">Nama Shift</th>
                                                         <th class="center-align">Shift Awal</th>
                                                         <th class="center-align">Shift Masuk</th>
                                                         <th class="center-align">Check In</th>
                                                         <th class="center-align">Menit Terlambat</th>
-                                                        <th class="center-align">Tipe</th>
+                                                        <th class="center-align">{{ __('translations.type') }}</th>
                                                         <th class="center-align">Shift Pulang</th>
                                                         <th class="center-align">Check Out</th>
                                                         <th class="center-align">Shift Akhir</th>

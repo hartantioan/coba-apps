@@ -4,26 +4,26 @@
             <th>No</th>
            
             <th>No. Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
-            <th>Pengguna</th>
+            <th>{{ __('translations.user') }}</th>
             <th>Tgl.Posting</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
             <th>Qty</th>
-            <th>Satuan</th>
-            <th>Asal</th>
-            <th>Nominal</th>
+            <th>{{ __('translations.unit') }}</th>
+            <th>{{ __('translations.origin') }}</th>
+            <th>{{ __('translations.nominal') }}</th>
             <th>Coa</th>
-            <th>Line</th>
-            <th>Mesin</th>
-            <th>Divisi</th>
+            <th>{{ __('translations.line') }}</th>
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
             <th>Proyek</th>
         </tr>
     </thead>

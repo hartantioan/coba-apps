@@ -247,17 +247,17 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th align="center" rowspan="2">Item</th>
-                                    <th align="center" colspan="4">Asal</th>
+                                    <th align="center" rowspan="2">{{ __('translations.item') }}</th>
+                                    <th align="center" colspan="4">{{ __('translations.origin') }}</th>
                                     <th align="center" rowspan="2">Jum.Keluar</th>
                                     <th align="center" rowspan="2">Jum.Kembali</th>
-                                    <th align="center" rowspan="2">Satuan</th>
+                                    <th align="center" rowspan="2">{{ __('translations.unit') }}</th>
                                 </tr>
                                 <tr>
-                                    <th align="center">Plant</th>
-                                    <th align="center">Gudang</th>
-                                    <th align="center">Area</th>
-                                    <th align="center">Shading</th>
+                                    <th align="center">{{ __('translations.plant') }}</th>
+                                    <th align="center">{{ __('translations.warehouse') }}</th>
+                                    <th align="center">{{ __('translations.area') }}</th>
+                                    <th align="center">{{ __('translations.shading') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

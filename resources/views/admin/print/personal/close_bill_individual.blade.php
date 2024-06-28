@@ -286,7 +286,7 @@
                                 <tr>
                                     <th class="center">No</th>
                                     <th class="center">No.Dokumen</th>
-                                    <th class="center">Keterangan</th>
+                                    <th class="center">{{ __('translations.note') }}</th>
                                     <th class="center">Grandtotal</th>
                                 </tr>
                             </thead>
@@ -310,7 +310,7 @@
                                     <th class="center" colspan="8">Daftar Biaya</th>
                                 </tr>
                                 <tr>
-                                    <th class="center">Item</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Harga @</th>

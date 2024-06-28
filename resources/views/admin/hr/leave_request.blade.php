@@ -53,12 +53,12 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable()">
                             <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
+                            <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                             <i class="material-icons right">refresh</i>
                         </a>
                     </div>
@@ -74,22 +74,22 @@
                             <input type="hidden" id="selectedCode" value="{{ request()->query('code') }}">
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
+                                                        <th>{{ __('translations.code') }}</th>
                                                         <th>Pembuat</th>
-                                                        <th>Perusahaan</th>
+                                                        <th>{{ __('translations.company') }}</th>
                                                         <th>Orang yang Bersangkutan</th>
                                                         <th>Tipe Ijin</th>
                                                         <th>Jam Mulai</th>
@@ -98,8 +98,8 @@
                                                         <th>Tanggal Akhir</th>
                                                         <th>Catatan</th>
                                                         <th>File</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -121,7 +121,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -144,7 +144,7 @@
                         </div>
                         <div class="input-field col s6 step3">
                             <select class="select2 browser-default" id="account_id" name="account_id" onchange="getQuotas()">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
                             <label class="active" for="account_id">Select Employee</label>
                         </div>
@@ -156,7 +156,7 @@
                                 <option value=""></option>
                                 
                             </select>
-                            <label  class="active" for="type">Tipe</label>
+                            <label  class="active" for="type">{{ __('translations.type') }}</label>
                         </div>
                         <div class="input-field col s6 employee_inputs step6" id="place_select">
                             <select id="company_id" name="company_id">
@@ -165,7 +165,7 @@
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
-                            <label for="company_id">Perusahaan</label>
+                            <label for="company_id">{{ __('translations.company') }}</label>
                         </div>
                         <div class="input-field col s6 step7" >
                             <input id="start_date" name="start_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tanggal Mulai" onchange="resetSchedule()">
@@ -195,7 +195,7 @@
                                     <thead>
                                         <tr>
                                             <th class="center">Schedule</th>
-                                            <th class="center">Action</th>
+                                            <th class="center">{{ __('translations.action') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body_item">
@@ -225,7 +225,7 @@
                         </div>
                         <div class="input-field col s6 step13">
                             <input id="note" name="note" type="text" placeholder="">
-                            <label class="active" for="note">Keterangan</label>
+                            <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
                         <div class="file-field input-field col m3 s12 step14">
                             <div class="btn">
@@ -237,7 +237,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3 step15">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -246,7 +246,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -337,7 +337,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
     </div>
 </div>
 

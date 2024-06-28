@@ -3,11 +3,11 @@
         <tr>
             <th>No</th>
             <th>NIK</th>
-            <th>Nama</th>
+            <th>{{ __('translations.name') }}</th>
             <th>Periode</th>
             <th>Tipe Denda</th>
             <th>Freq</th>
-            <th>Tanggal</th>
+            <th>{{ __('translations.date') }}</th>
             <th>Total</th>
             
         </tr>

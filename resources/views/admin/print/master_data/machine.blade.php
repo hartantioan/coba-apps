@@ -205,10 +205,10 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-								<th>Kode</th>
-								<th>Line</th>
-								<th>Nama</th>
-								<th>Keterangan</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.line') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.note') }}</th>
                             </tr>
                         </thead>
                         <tbody>

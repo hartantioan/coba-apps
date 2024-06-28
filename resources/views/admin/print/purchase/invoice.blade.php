@@ -131,14 +131,14 @@
 					<tr align="center">
 						<th>No</th>
                         <th>Inv No.</th>
-                        <th>Pengguna</th>
+                        <th>{{ __('translations.user') }}</th>
 						<th>Sup/Ven</th>
-						<th>Perusahaan</th>
+						<th>{{ __('translations.company') }}</th>
                         <th>Tgl.Post</th>
 						<th>Tgl.Terima</th>
                         <th>Tgl.Tenggat</th>
                         <th>Tgl.Dokumen</th>
-                        <th>Tipe</th>
+                        <th>{{ __('translations.type') }}</th>
                         <th>Total</th>
                         <th>PPN</th>
 						<th>PPh</th>
@@ -147,7 +147,7 @@
                         <th>Sisa</th>
                         <th>Dok.</th>
                         <th>Ket.</th>
-                        <th>Status</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>

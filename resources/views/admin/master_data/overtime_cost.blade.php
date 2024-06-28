@@ -63,16 +63,16 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s12 ">
-                                                <label for="filter_status" style="font-size:1rem;">Filter Status :</label>
+                                                <label for="filter_status" style="font-size:1rem;">{{ __('translations.filter_status') }} :</label>
                                                 <div class="input-field col s12">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">{{ __('translations.active') }}</option>
+                                                        <option value="2">{{ __('translations.non_active') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -80,7 +80,7 @@
                                                 <label for="filter_type" style="font-size:1rem;">Filter Tipe :</label>
                                                 <div class="input-field col s12">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                        <option value="" disabled>Semua</option>
+                                                        <option value="" disabled>{{ __('translations.all') }}</option>
                                                         <option value="1">Item Stok</option>
                                                         <option value="2">Item Penjualan</option>
                                                         <option value="3">Item Pembelian</option>
@@ -94,28 +94,28 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>No</th>
-                                                        <th>Nama</th>
+                                                        <th>{{ __('translations.name') }}</th>
                                                         <th>Penempatan</th>
-                                                        <th>Level</th>
+                                                        <th>{{ __('translations.level') }}</th>
                                                         <th>Tipe Cuti</th>
-                                                        <th>Nominal</th>
+                                                        <th>{{ __('translations.nominal') }}</th>
                                                         <th>Start Date</th>
                                                         <th>End Date</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -138,7 +138,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Item</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Item</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -151,7 +151,7 @@
                         </div>
                         <div class="input-field col s12">
                             <input id="nominal" name="nominal" type="text" >
-                            <label class="active" for="nominal">Nominal</label>
+                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
                         </div>
                         <div class="input-field col s12">
                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="mm/dd/yyyy">
@@ -163,13 +163,13 @@
                         </div>
                         <div class="input-field col s4">
                             <select class="select2 browser-default" id="place_id" name="place_id">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
                             <label class="active" for="place_id">Select Plant</label>
                         </div>
                         <div class="input-field col s4">
                             <select class="select2 browser-default" id="level_id" name="level_id">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
                             <label class="active" for="level_id">Select Level</label>
                         </div>
@@ -182,17 +182,17 @@
                         </div>
                         <div class="input-field col s12">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="order">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit step35" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit step35" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -200,7 +200,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

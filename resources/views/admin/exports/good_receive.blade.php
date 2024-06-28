@@ -3,34 +3,34 @@
         <tr align="center">
             <th>No.</th>
             <th>No. Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
-            <th>Pengguna</th>
-            <th>Tgl. Posting</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.post_date') }}</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Dokumen</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
-            <th>Plant</th>
+            <th>{{ __('translations.plant') }}</th>
             <th>Ket. Detail</th>
             <th>Tipe Penerimaan</th>
             <th>COA</th>
             <th>Distribusi Biaya</th>
             <th>Qty.</th>
-            <th>Satuan</th>
-            <th>Line</th>
-            <th>Mesin</th>
-            <th>Divisi</th>
-            <th>Gudang</th>
-            <th>Area</th>
-            <th>Shading</th>
+            <th>{{ __('translations.unit') }}</th>
+            <th>{{ __('translations.line') }}</th>
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
+            <th>{{ __('translations.warehouse') }}</th>
+            <th>{{ __('translations.area') }}</th>
+            <th>{{ __('translations.shading') }}</th>
             <th>Proyek</th>
-            <th>Harga</th>
+            <th>{{ __('translations.price') }}</th>
             <th>Total</th>
         </tr>
     </thead>

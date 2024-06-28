@@ -127,24 +127,24 @@
 				<thead>
 					<tr align="center">
 						<th rowspan="2">No</th>
-                        <th rowspan="2">Code</th>
-                        <th rowspan="2">Pengguna</th>
-                        <th rowspan="2">Partner Bisnis</th>
-                        <th rowspan="2">Perusahaan</th>
+                        <th rowspan="2">{{ __('translations.code') }}</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
+                        <th rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+                        <th rowspan="2">{{ __('translations.company') }}</th>
                         <th rowspan="2">Kas/Bank</th>
-                        <th colspan="2" class="center-align">Tanggal</th>
-                        <th colspan="2" class="center-align">Mata Uang</th>
+                        <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
+                        <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
                         <th rowspan="2">Dokumen</th>
-                        <th rowspan="2">Keterangan</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.note') }}</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
                         <th rowspan="2">Admin</th>
                         <th rowspan="2">Bayar</th>
 					</tr>
                     <tr align="center">
 						<th>Post</th>
                         <th>Bayar</th>
-                        <th>Kode</th>
-                        <th>Konversi</th>
+                        <th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
 					</tr>
 				</thead>
 				<tbody>

@@ -301,8 +301,8 @@ use App\Helpers\PrintHelper;
                                     <th class="center-align">No.</th>
                                     <th class="center-align">Item/Jasa</th>
                                     <th class="center-align">Qty</th>
-                                    <th class="center-align">Satuan</th>
-                                    <th class="center-align">Harga</th>
+                                    <th class="center-align">{{ __('translations.unit') }}</th>
+                                    <th class="center-align">{{ __('translations.price') }}</th>
                                     <th class="center-align">Disc.1 (%)</th>
                                     <th class="center-align">Disc.2 (%)</th>
                                     <th class="center-align">Disc.3 ({{ $data->currency->code }})</th>

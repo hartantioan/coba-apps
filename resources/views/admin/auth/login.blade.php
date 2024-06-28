@@ -177,6 +177,13 @@
 					});
 				}
 			});
+
+            function reloadPage() {
+                window.location.reload();
+            }
+
+            
+            setInterval(reloadPage, 3600000);
 		});
 	</script>
     <!-- END PAGE LEVEL JS-->

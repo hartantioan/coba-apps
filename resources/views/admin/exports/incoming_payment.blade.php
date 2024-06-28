@@ -3,7 +3,7 @@
         <tr align="center">
             <th>No.</th>
             <th>No. Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
@@ -12,10 +12,10 @@
             <th>Ket. Delete</th>
             <th>NIK</th>
             <th>User</th>
-            <th>Partner Bisnis</th>
-            <th>Tgl. Posting</th>
+            <th>{{ __('translations.bussiness_partner') }}</th>
+            <th>{{ __('translations.post_date') }}</th>
             <th>Kas/Bank</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Subtotal</th>
             <th>Pembulatan</th>
             <th>Total</th>

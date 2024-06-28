@@ -1,7 +1,7 @@
 {{-- <table border="1">
     <thead>
         <tr>
-            <th>Item</th>
+            <th>{{ __('translations.item') }}</th>
             <th>IR Code</th>
             <th>IR Date</th>
             <th>IR Qty</th>
@@ -84,7 +84,7 @@
 <table border="1">
     <thead>
         <tr>
-            <th>Item</th>
+            <th>{{ __('translations.item') }}</th>
             <th>Created</th>
             <th>IR Code</th>
             <th>IR Date</th>

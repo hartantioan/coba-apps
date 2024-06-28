@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th rowspan="3">NIK</th>
-            <th rowspan="3">Nama</th>
-            <th align="center" colspan="{{ $distinctDatesCount }}">Tanggal</th>
+            <th rowspan="3">{{ __('translations.name') }}</th>
+            <th align="center" colspan="{{ $distinctDatesCount }}">{{ __('translations.date') }}</th>
         </tr>
         <tr>
             

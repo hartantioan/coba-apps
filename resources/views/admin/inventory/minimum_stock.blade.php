@@ -54,7 +54,7 @@
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
-                                            <label class="" for="plant">Plant</label>
+                                            <label class="" for="plant">{{ __('translations.plant') }}</label>
                                            
                                         </div>
                                         <div class="input-field col m4 s12">
@@ -132,13 +132,13 @@
                         <thead>
                             <tr>
                                 <th rowspan="2" class="center-align">No.</th>
-                                <th rowspan="2" class="center-align">Plant</th>
-                                <th rowspan="2" class="center-align">Gudang</th>
+                                <th rowspan="2" class="center-align">{{ __('translations.plant') }}</th>
+                                <th rowspan="2" class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th rowspan="2" class="center-align">Kode Item</th>
                                 <th rowspan="2" class="center-align">Nama Item</th>
-                                <th colspan="3" class="center-align">Stock</th>
+                                <th colspan="3" class="center-align">{{ __('translations.stock') }}</th>
                                 <th rowspan="2" class="center-align">Required</th>
-                                <th rowspan="2" class="center-align">Satuan</th>
+                                <th rowspan="2" class="center-align">{{ __('translations.unit') }}</th>
                                 <th rowspan="2" class="center-align">Detail</th>
                             </tr>
                             <tr>
@@ -165,9 +165,9 @@
                     <thead>
                         <tr>
                             <th class="center-align">No.</th>
-                            <th class="center-align">Plant</th>
-                            <th class="center-align">Warehouse</th>
-                            <th class="center-align">Stock</th>
+                            <th class="center-align">{{ __('translations.plant') }}</th>
+                            <th class="center-align">{{ __('translations.warehouse') }}</th>
+                            <th class="center-align">{{ __('translations.stock') }}</th>
             
                         </tr>
                     </thead>
@@ -178,7 +178,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

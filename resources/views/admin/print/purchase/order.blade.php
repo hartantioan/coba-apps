@@ -104,9 +104,9 @@
 							<tr align="center">
 								<th rowspan="2">No</th>
 								<th rowspan="2">PO NO.</th>
-								<th rowspan="2">Pengguna</th>
+								<th rowspan="2">{{ __('translations.user') }}</th>
 								<th rowspan="2">Supplier</th>
-								<th colspan="2">Tanggal</th>
+								<th colspan="2">{{ __('translations.date') }}</th>
 								<th colspan="3">Penerima</th>
 								<th rowspan="2">Tipe PO</th>
 								<th rowspan="2">Jenis PO</th>
@@ -114,9 +114,9 @@
 								<th rowspan="2">Dok.Att</th>
 								<th rowspan="2">PPN(%)</th>
 								<th colspan="2">Pembayaran</th>
-								<th colspan="2">Mata Uang</th>
-								<th rowspan="2">Keterangan</th>
-								<th rowspan="2">Status</th>
+								<th colspan="2">{{ __('translations.currency') }}</th>
+								<th rowspan="2">{{ __('translations.note') }}</th>
+								<th rowspan="2">{{ __('translations.status') }}</th>
 								<th rowspan="2">Subtotal</th>
 								<th rowspan="2">Diskon</th>
 								<th rowspan="2">Total</th>
@@ -127,13 +127,13 @@
 							<tr align="center">
 								<th>Pengajuan</th>
 								<th>Kirim</th>
-								<th>Nama</th>
-								<th>Alamat</th>
-								<th>Telepon</th>
-								<th>Tipe</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.address') }}</th>
+								<th>{{ __('translations.phone_number') }}</th>
+								<th>{{ __('translations.type') }}</th>
 								<th>Term(Hari)</th>
-								<th>Kode</th>
-								<th>Konversi</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.conversion') }}</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -171,18 +171,18 @@
 										<table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
 											<thead>
 												<tr align="center">
-													<th>Item</th>
+													<th>{{ __('translations.item') }}</th>
 													<th>Qty</th>
-													<th>Satuan</th>
-													<th>Keterangan</th>
+													<th>{{ __('translations.unit') }}</th>
+													<th>{{ __('translations.note') }}</th>
 													<th>Price</th>
 													<th>Discount 1 (%)</th>
 													<th>Discount 2 (%)</th>
 													<th>Discount 3 (Rp)</th>
 													<th>Subtotal</th>
-													<th>Plant</th>
+													<th>{{ __('translations.plant') }}</th>
 													<th>Departemen</th>
-													<th>Gudang</th>
+													<th>{{ __('translations.warehouse') }}</th>
 												</tr>
 											</thead>
 											<tbody>

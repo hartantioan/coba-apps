@@ -281,7 +281,7 @@ i@php
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th class="center">Item</th>
+                                <th class="center">{{ __('translations.item') }}</th>
                                 <th class="center">Referensi</th>
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>

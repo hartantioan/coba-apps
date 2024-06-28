@@ -7,7 +7,7 @@
             <th rowspan="1" style="background-color:rgb(219, 219, 113);">Work Order Code </th>
             <th rowspan="1" style="background-color:rgb(219, 219, 113);">Request Date</th>
             <th rowspan="1" style="background-color:rgb(219, 219, 113);">Summary Issue </th>
-            <th rowspan="1" style="background-color:rgb(219, 219, 113);">Status</th>
+            <th rowspan="1" style="background-color:rgb(219, 219, 113);">{{ __('translations.status') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -27,7 +27,7 @@
             </tr>
             <tr align="center">
                 <th>No</th>
-                <th>Item</th>
+                <th>{{ __('translations.item') }}</th>
                 <th>Qty Request</th>
                 <th>Qty Usage</th>
                 <th>Qty Return</th>

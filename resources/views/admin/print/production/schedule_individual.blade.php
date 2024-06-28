@@ -258,10 +258,10 @@
                             <tr>
                                 <th align="center">No.</th>
                                 <th align="center">MOP</th>
-                                <th align="center">Item</th>
+                                <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty Target</th>
                                 <th align="center">Qty MOP</th>
-                                <th align="center">Satuan</th>
+                                <th align="center">{{ __('translations.unit') }}</th>
                                 <th align="center">Tgl.Request</th>
                             </tr>
                         </thead>
@@ -292,11 +292,11 @@
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Item</th>
+                                <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty</th>
-                                <th align="center">Satuan</th>
-                                <th align="center">Line</th>
-                                <th align="center">Gudang</th>
+                                <th align="center">{{ __('translations.unit') }}</th>
+                                <th align="center">{{ __('translations.line') }}</th>
+                                <th align="center">{{ __('translations.warehouse') }}</th>
                                 <th align="center">Tgl.Mulai</th>
                                 <th align="center">Tgl.Selesai</th>
                             </tr>

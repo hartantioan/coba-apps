@@ -349,15 +349,15 @@
                                 <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
-                                <th align="center">{{ __('translations.no') }}.</th>
+                                <th align="center">No.</th>
                                 <th align="center">{{ __('translations.item') }}</th>
-                                <th align="center">{{ __('translations.qty_planned') }}</th>
-                                <th align="center">{{ __('translations.qty_real') }}</th>
-                                <th align="center">{{ __('translations.qty_reject') }}</th>
-                                <th align="center">{{ __('translations.uom_unit') }}</th>
+                                <th align="center">Qty Planned</th>
+                                <th align="center">Qty Real</th>
+                                <th align="center">Satuan Produksi</th>
                                 <th align="center">{{ __('translations.plant') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>
-                                <th align="center">{{ __('translations.batch_no') }}</th>
+                                <th align="center">Tank</th>
+                                <th align="center">No.Batch</th>
                             </tr>
                         </thead>
                         <tbody>

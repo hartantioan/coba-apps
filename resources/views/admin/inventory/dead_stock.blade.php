@@ -89,17 +89,17 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="plant" name="plant">
-                                                <option value="all">Semua</option>
+                                                <option value="all">{{ __('translations.all') }}</option>
                                                 @foreach ($place as $row)
                                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                                 @endforeach
                                             </select>
-                                            <label class="" for="plant">Plant</label>
+                                            <label class="" for="plant">{{ __('translations.plant') }}</label>
                                         </div>
                                         
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
-                                                <option value="all">Semua</option>
+                                                <option value="all">{{ __('translations.all') }}</option>
                                                 @foreach ($warehouse as $row)
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
@@ -131,11 +131,11 @@
                         <thead>
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
+                                <th class="center-align">{{ __('translations.plant') }}</th>
+                                <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Keterangan</th>
+                                <th class="center-align">{{ __('translations.note') }}</th>
                                 <th class="center-align">Tgl Terakhir</th>
                                 <th class="center-align">Lama Hari</th>
                             </tr>

@@ -3,9 +3,9 @@
         <tr align="center">
             <th>No</th>
             <th>Dok.No.</th>
-            <th>Pengguna</th>
-            <th>Partner Bisnis</th>
-            <th>Perusahaan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.bussiness_partner') }}</th>
+            <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
             <th>Total</th>
             <th>PPN</th>
@@ -13,7 +13,7 @@
             <th>Grandtotal</th>
             <th>Dok.</th>
             <th>Ket.</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
         </tr>
     </thead>
     <tbody>

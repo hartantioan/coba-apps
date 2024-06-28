@@ -31,7 +31,7 @@
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">
@@ -82,14 +82,14 @@
                                                     <tr>
                                                         <th class="center-align">No.</th>
                                                         <th class="center-align">No Invoice</th>
-                                                        <th class="center-align">Customer</th>
+                                                        <th class="center-align">{{ __('translations.customer') }}</th>
                                                         <th class="center-align">TGL Post</th>
                                                         <th class="center-align">TOP(Hari)</th>
                                                         <th class="center-align">Nama Item</th>
                                                         <th class="center-align">Note</th>
                                                         <th class="center-align">Qty Order</th>
                                                         <th class="center-align">Qty Invoice</th>
-                                                        <th class="center-align">Satuan</th>
+                                                        <th class="center-align">{{ __('translations.unit') }}</th>
                                                         <th class="center-align">Harga Satuan</th>
                                                         <th class="center-align">Total</th>
                                                         <th class="center-align">PPN</th>

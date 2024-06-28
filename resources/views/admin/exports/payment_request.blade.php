@@ -2,29 +2,29 @@
     <thead>
         <tr align="center">
             <th rowspan="2">No</th>
-            <th rowspan="2">Code</th>
-            <th rowspan="2">Pengguna</th>
-            <th rowspan="2">Partner Bisnis</th>
-            <th rowspan="2">Plant</th>
+            <th rowspan="2">{{ __('translations.code') }}</th>
+            <th rowspan="2">{{ __('translations.user') }}</th>
+            <th rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+            <th rowspan="2">{{ __('translations.plant') }}</th>
             <th rowspan="2">Kas/Bank</th>
             <th rowspan="2">Tipe Pembayaran</th>
             <th rowspan="2">No.Cek/BG</th>
-            <th colspan="2" class="center-align">Tanggal</th>
-            <th colspan="2" class="center-align">Mata Uang</th>
+            <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
+            <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
             <th rowspan="2">Dokumen</th>
             <th rowspan="2">Bank Rekening</th>
             <th rowspan="2">No Rekening</th>
             <th rowspan="2">Pemilik Rekening</th>
-            <th rowspan="2">Keterangan</th>
-            <th rowspan="2">Status</th>
+            <th rowspan="2">{{ __('translations.note') }}</th>
+            <th rowspan="2">{{ __('translations.status') }}</th>
             <th rowspan="2">Admin</th>
             <th rowspan="2">Bayar</th>
         </tr>
         <tr align="center">
             <th>Post</th>
             <th>Bayar</th>
-            <th>Kode</th>
-            <th>Konversi</th>
+            <th>{{ __('translations.code') }}</th>
+            <th>{{ __('translations.conversion') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -55,8 +55,8 @@
                 <th></th>
                 <th>No</th>
                 <th>Referensi</th>
-                <th>Tipe</th>
-                <th>Keterangan</th>
+                <th>{{ __('translations.type') }}</th>
+                <th>{{ __('translations.note') }}</th>
                 <th>Coa</th>
                 <th>Bayar</th>
             </tr>

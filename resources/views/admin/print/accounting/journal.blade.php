@@ -127,16 +127,16 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-                        <th>Pengguna</th>
-						<th>Perusahaan</th>
-						<th>Kode</th>
+                        <th>{{ __('translations.user') }}</th>
+						<th>{{ __('translations.company') }}</th>
+						<th>{{ __('translations.code') }}</th>
                         <th>Referensi</th>
-                        <th>Mata Uang</th>
-                        <th>Konversi</th>
+                        <th>{{ __('translations.currency') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
                         <th>Tgl. Post</th>
                         <th>Tgl. Jatuh Tempo</th>
-                        <th>Keterangan</th>
-                        <th>Status</th>
+                        <th>{{ __('translations.note') }}</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -160,11 +160,11 @@
                                     <thead>
                                         <tr align="center">
                                             <th>Coa</th>
-                                            <th>Plant</th>
-											<th>Partner Bisnis</th>
-                                            <th>Item</th>
-                                            <th>Divisi</th>
-                                            <th>Gudang</th>
+                                            <th>{{ __('translations.plant') }}</th>
+											<th>{{ __('translations.bussiness_partner') }}</th>
+                                            <th>{{ __('translations.item') }}</th>
+                                            <th>{{ __('translations.division') }}</th>
+                                            <th>{{ __('translations.warehouse') }}</th>
                                             <th>Debit</th>
                                             <th>Kredit</th>
                                         </tr>

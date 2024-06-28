@@ -206,9 +206,9 @@
                 <tr>
                     <th class="center-align">No.</th>
                     <th class="center-align">OP No.</th>
-                    <th class="center-align">Partner Bisnis</th>
+                    <th class="center-align">{{ __('translations.bussiness_partner') }}</th>
                     <th class="center-align">Tgl.Bayar</th>
-                    <th class="center-align">Keterangan</th>
+                    <th class="center-align">{{ __('translations.note') }}</th>
                     <th class="center-align">Nominal Terpakai</th>
                 </tr>
             </thead>
@@ -233,10 +233,10 @@
                 <tr>
                     <th class="center-align">Coa</th>
                     <th class="center-align">Dist.Biaya</th>
-                    <th class="center-align">Plant</th>
-                    <th class="center-align">Line</th>
-                    <th class="center-align">Mesin</th>
-                    <th class="center-align">Divisi</th>
+                    <th class="center-align">{{ __('translations.plant') }}</th>
+                    <th class="center-align">{{ __('translations.line') }}</th>
+                    <th class="center-align">{{ __('translations.engine') }}</th>
+                    <th class="center-align">{{ __('translations.division') }}</th>
                     <th class="center-align">Proyek</th>
                     <th class="center-align">Ket.1</th>
                     <th class="center-align">Ket.2</th>

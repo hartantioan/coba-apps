@@ -64,7 +64,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -74,7 +74,7 @@
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal4">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
                     </div>
@@ -90,21 +90,21 @@
                             <div class="card-panel">
                                 <div class="row">
                                     <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
+                                                <option value="">{{ __('translations.all') }}</option>
+                                                <option value="1">{{ __('translations.active') }}</option>
+                                                <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div>
 
                                         <label for="filter_type" style="font-size:1.2rem;">Filter Tipe :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select id="filter_type" name="filter_type" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
+                                                <option value="">{{ __('translations.all') }}</option>
                                                 <option value="1">Pegawai</option>
-                                                <option value="2">Customer</option>
+                                                <option value="2">{{ __('translations.customer') }}</option>
                                                 <option value="3">Supplier</option>
                                                 <option value="4">Ekspedisi</option>
                                             </select>
@@ -123,27 +123,27 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Nama</th>
+                                                        <th>{{ __('translations.name') }}</th>
                                                         <th>Username</th>
                                                         <th>NIK/Code</th>
-                                                        <th>Tipe</th>
+                                                        <th>{{ __('translations.type') }}</th>
                                                         <th>Grup</th>
                                                         <th>Posisi</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -165,7 +165,7 @@
     <div class="modal-content" style="overflow-x: hidden !important;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <div class="card-alert card blue">
                     <div class="card-content white-text">
                         <p>Info : Untuk penambahan BP Supplier & Ekspedisi dibuka akses hanya pak Sandi.</p>
@@ -180,7 +180,7 @@
                         <div class="input-field col s12 m3">
                             <select id="type" name="type" onchange="changeMode(this);refreshGroup();">
                                 <option value="1">Pegawai</option>
-                                <option value="2">Customer</option>
+                                <option value="2">{{ __('translations.customer') }}</option>
                                 <option value="3">Supplier</option>
                                 <option value="4">Ekspedisi</option>
                             </select>
@@ -189,7 +189,7 @@
                         <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m3 employee_inputs">
                             <input id="username" name="username" type="text" placeholder="Username">
@@ -206,7 +206,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="phone" name="phone" type="text" placeholder="Phone">
-                            <label class="active" for="phone">Telepon</label>
+                            <label class="active" for="phone">{{ __('translations.phone_number') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="email" name="email" type="text" placeholder="Email">
@@ -214,7 +214,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="address" name="address" type="text" placeholder="Alamat">
-                            <label class="active" for="address">Alamat</label>
+                            <label class="active" for="address">{{ __('translations.address') }}</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col s12 m3">
@@ -263,7 +263,7 @@
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label for="company_id">Perusahaan</label>
+                            <label for="company_id">{{ __('translations.company') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="gender" name="gender">
@@ -299,25 +299,25 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
-                            <label class="active" for="province_id">Provinsi</label>
+                            <label class="active" for="province_id">{{ __('translations.province') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
                             <label class="active" for="city_id">Kota/Kabupaten</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
-                            <label class="active" for="district_id">Kecamatan</label>
+                            <label class="active" for="district_id">{{ __('translations.subdistrict') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
-                                <option value="">--Pilih ya--</option>
+                                <option value="">--{{ __('translations.select') }}--</option>
                             </select>
-                            <label class="active" for="subdistrict_id">Kelurahan</label>
+                            <label class="active" for="subdistrict_id">{{ __('translations.urban_village') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="country_id" name="country_id"></select>
@@ -347,10 +347,10 @@
                                 <div class="switch mb-1">
                                     <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
                                     <label>
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input checked type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div>
                             </div>
@@ -358,21 +358,21 @@
                                 <div class="switch mb-1">
                                     <label for="is_special_lock_user">Spesial (Kunci Periode)</label>
                                     <label>
-                                        Tidak
+                                        {{ __('translations.no') }}
                                         <input type="checkbox" id="is_special_lock_user" name="is_special_lock_user" value="1">
                                         <span class="lever"></span>
-                                        Ya
+                                        {{ __('translations.yes') }}
                                     </label>
                                 </div>
                             </div>
                             <div class="input-field col s12 m3">
                                 <div class="switch mb-1">
-                                    <label for="status">Status</label>
+                                    <label for="status">{{ __('translations.status') }}</label>
                                     <label>
-                                        Non-Active
+                                        {{ __('translations.non_active') }}
                                         <input checked type="checkbox" id="status" name="status" value="1">
                                         <span class="lever"></span>
-                                        Active
+                                        {{ __('translations.active') }}
                                     </label>
                                 </div>
                             </div>
@@ -390,11 +390,11 @@
                                         <thead>
                                             <tr>
                                                 <th width="30%" class="center">Bank</th>
-                                                <th width="20%" class="center">Atas Nama</th>
-                                                <th width="20%" class="center">No. Rekening</th>
-                                                <th width="20%" class="center">Cabang</th>
+                                                <th width="20%" class="center">{{ __('translations.on_behalf_of') }}</th>
+                                                <th width="20%" class="center">{{ __('translations.bank_account') }}</th>
+                                                <th width="20%" class="center">{{ __('translations.branch') }}</th>
                                                 <th width="20%" class="center">Utama</th>
-                                                <th width="10%" class="center">Hapus</th>
+                                                <th width="10%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-bank">
@@ -416,15 +416,15 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Judul</th>
-                                                <th class="center">Keterangan</th>
+                                                <th class="center">{{ __('translations.note') }}</th>
                                                 <th class="center">NPWP</th>
-                                                <th class="center">Alamat</th>
+                                                <th class="center">{{ __('translations.address') }}</th>
                                                 <th class="center">Negara</th>
-                                                <th class="center">Provinsi</th>
-                                                <th class="center">Kota</th>
-                                                <th class="center">Kecamatan</th>
-                                                <th class="center">Kelurahan</th>
-                                                <th width="5%" class="center">Hapus</th>
+                                                <th class="center">{{ __('translations.province') }}</th>
+                                                <th class="center">{{ __('translations.city') }}</th>
+                                                <th class="center">{{ __('translations.subdistrict') }}</th>
+                                                <th class="center">{{ __('translations.urban_village') }}</th>
+                                                <th width="5%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-info">
@@ -445,9 +445,9 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
-                                                <th width="30%" class="center">Nama</th>
+                                                <th width="30%" class="center">{{ __('translations.name') }}</th>
                                                 <th width="60%" class="center">No HP/WA</th>
-                                                <th width="10%" class="center">Hapus</th>
+                                                <th width="10%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-driver">
@@ -464,7 +464,7 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -472,7 +472,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -480,7 +480,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Lampiran Pengguna</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Lampiran Pengguna</h4>
                 <div class="card-alert card green">
                     <div class="card-content white-text">
                         <p>Maksimal ukuran adalah 1 Mb, dengan jumlah 5.</p>
@@ -497,7 +497,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -510,7 +510,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -544,7 +544,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -552,7 +552,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Hak Akses - <span id="tempname"></span></h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Hak Akses - <span id="tempname"></span></h4>
                 <form class="row" id="form_data_access" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_access" style="display:none;"></div>
@@ -901,7 +901,7 @@
                                                     <th>
                                                         <label>
                                                             <input type="checkbox" onclick="checkAllPlace(this);" id="check-all-place">
-                                                            <span>Semua</span>
+                                                            <span>{{ __('translations.all') }}</span>
                                                         </label>
                                                     </th>
                                                 </tr>
@@ -925,7 +925,7 @@
                                         </table>
                                     </div>
                                     <div class="col s12">
-                                        <h5 class="card-title center">Gudang</h5>
+                                        <h5 class="card-title center">{{ __('translations.warehouse') }}</h5>
                                         <table class="bordered centered">
                                             <thead>
                                                 <tr>
@@ -937,7 +937,7 @@
                                                     <th>
                                                         <label>
                                                             <input type="checkbox" onclick="checkAllWarehouse(this);" id="check-all-warehouse">
-                                                            <span>Semua</span>
+                                                            <span>{{ __('translations.all') }}</span>
                                                         </label>
                                                     </th>
                                                 </tr>
@@ -978,8 +978,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
-        <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">Simpan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
     </div>
 </div>
 
@@ -1060,7 +1060,7 @@
                 $('#manager_select').empty();
                 refreshGroup();
                 $('#subdistrict_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
+                    <option value="">--{{ __('translations.select') }}--</option>
                 `);
                 $('#name').prop('readonly',false);
             }
@@ -1274,7 +1274,7 @@
         $('#group_id').empty();
         var type = $('#type').val();
         $('#group_id').append(`
-            <option value="">--Kosong--</option>
+            <option value="">--{{ __('translations.empty') }}--</option>
         `);
         for(let i=0;i<arrgroup.length;i++){
             if(arrgroup[i]['type'] == type){
@@ -1379,7 +1379,7 @@
 
     function getCity(){
         $('#city_id,#district_id,#subdistrict_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#province_id').val()){
             $.each($('#province_id').select2('data')[0].cities, function(i, value) {
@@ -1392,7 +1392,7 @@
 
     function getDistrict(){
         $('#district_id,#subdistrict_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#city_id').val()){
             $.each($("#city_id").select2().find(":selected").data("district"), function(i, value) {
@@ -1405,7 +1405,7 @@
 
     function getSubdistrict(){
         $('#subdistrict_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#district_id').val()){
             $.each($("#district_id").select2().find(":selected").data("subdistrict"), function(i, value) {
@@ -2097,7 +2097,7 @@
                 if(!response.manager_id && response.type == 1){
                     $('#manager_select').append(`
                         <select class="select2 browser-default" id="manager_id" name="manager_id">
-                                    <option value="">--Pilih ya--</option>
+                                    <option value="">--{{ __('translations.select') }}--</option>
                         </select>
                         <label class="active" for="manager_id">Select Manager</label>
                     `);
@@ -2105,7 +2105,7 @@
                 }
                 
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
+                    <option value="">--{{ __('translations.select') }}--</option>
                 `);
 
                 if(response.cities){

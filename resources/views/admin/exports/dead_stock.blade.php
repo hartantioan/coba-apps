@@ -2,11 +2,11 @@
     <thead>
         <tr align="center">
             <th class="center-align">No.</th>
-            <th class="center-align">Plant</th>
-            <th class="center-align">Gudang</th>
+            <th class="center-align">{{ __('translations.plant') }}</th>
+            <th class="center-align">{{ __('translations.warehouse') }}</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
-            <th class="center-align">Keterangan</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">Tgl Terakhir</th>
             <th class="center-align">Lama Hari</th> 
         </tr>

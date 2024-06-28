@@ -338,11 +338,11 @@
                                                 <tr>
                                                     <th class="center-align">No.</th>
                                                     <th class="center-align">Item (dari Stok)</th>
-                                                    <th class="center-align">Shading</th>
-                                                    <th class="center-align">Plant</th>
-                                                    <th class="center-align">Gudang</th>
-                                                    <th class="center-align">Area</th>
-                                                    <th class="center-align">Shading</th>
+                                                    <th class="center-align">{{ __('translations.shading') }}</th>
+                                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                                    <th class="center-align">{{ __('translations.area') }}</th>
+                                                    <th class="center-align">{{ __('translations.shading') }}</th>
                                                     <th class="center-align">Qty in Stock</th>
                                                     <th class="center-align">Qty Commited</th>
                                                     <th class="center-align">Rp</th>
@@ -371,9 +371,9 @@
                                                 <tr>
                                                     <th class="center-align">No.</th>
                                                     <th class="center-align">Referensi</th>
-                                                    <th class="center-align">Item</th>
-                                                    <th class="center-align">Plant</th>
-                                                    <th class="center-align">Gudang</th>
+                                                    <th class="center-align">{{ __('translations.item') }}</th>
+                                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
                                                     <th class="center-align">Date</th>
                                                     <th class="center-align">Nominal Masuk</th>
                                                     <th class="center-align">Nominal Keluar</th>
@@ -423,7 +423,7 @@
            <div class="col s12" >
                <div class="card subscriber-list-card animate fadeRight">
                   <div class="card-content">
-                     <h4 class="card-title">Jam Kedatangan (00:00 - 12:00) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+                     <h4 class="card-title">Jam Kedatangan (00:00 - 12:00) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">{{ __('translations.close') }}</a></h4>
                   </div>
                   <table class="subscription-table responsive-table highlight">
                      <thead>
@@ -448,7 +448,7 @@
            <div class="col s12" >
             <div class="card subscriber-list-card animate fadeRight">
                <div class="card-content">
-                  <h4 class="card-title">Jam Keluar (12:01 - 23:59) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+                  <h4 class="card-title">Jam Keluar (12:01 - 23:59) <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">{{ __('translations.close') }}</a></h4>
                </div>
                <table class="subscription-table responsive-table highlight">
                   <thead>
@@ -466,7 +466,7 @@
        </div>
    </div>
    <div class="modal-footer">
-       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
    </div>
 </div>
 
@@ -476,7 +476,7 @@
            <div class="col s12" >
             <div class="card subscriber-list-card animate fadeRight">
                <div class="card-content">
-                  <h4 class="card-title">Jadwal Harian<a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">Close</a></h4>
+                  <h4 class="card-title">Jadwal Harian<a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat float-right">{{ __('translations.close') }}</a></h4>
                </div>
                <table class="subscription-table responsive-table highlight">
                   <thead>
@@ -495,7 +495,7 @@
        </div>
    </div>
    <div class="modal-footer">
-       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+       <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
    </div>
 </div>
 

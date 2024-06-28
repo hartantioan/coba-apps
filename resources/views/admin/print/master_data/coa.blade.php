@@ -205,15 +205,15 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Cabang</th>
-								<th>Parent</th>
-								<th>Level</th>
-								<th>Status</th>
-								<th>Akun Kas</th>
-								<th>Muncul di Jurnal</th>
-								<th>Wajib BP di Jurnal</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.branch') }}</th>
+								<th>{{ __('translations.parent') }}</th>
+								<th>{{ __('translations.level') }}</th>
+								<th>{{ __('translations.status') }}</th>
+								<th>{{ __('translations.cash_account') }}</th>
+								<th>{{ __('translations.show_in_journal') }}</th>
+								<th>{{ __('translations.bp_mandatory_in_journal') }}</th>
 							</tr>
                         </thead>
                         <tbody>

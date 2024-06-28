@@ -3,33 +3,33 @@
         <tr align="center">
             <th>No.</th>
             <th>No. Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
-            <th>Pengguna</th>
-            <th>Tgl. Posting</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.post_date') }}</th>
             <th>Nama Supplier</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Dokumen</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
-            <th>Plant</th>
+            <th>{{ __('translations.plant') }}</th>
             <th>Ket. 1</th>
             <th>Ket. 2</th>
             <th>Qty. Diterima</th>
             <th>Qty. Kembali</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>List Serial</th>
-            <th>Line</th>
-            <th>Mesin</th>
-            <th>Divisi</th>
-            <th>Gudang</th>
+            <th>{{ __('translations.line') }}</th>
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
+            <th>{{ __('translations.warehouse') }}</th>
             <th>Based On</th>
-            <th>Nominal</th>
+            <th>{{ __('translations.nominal') }}</th>
         </tr>
     </thead>
     <tbody>

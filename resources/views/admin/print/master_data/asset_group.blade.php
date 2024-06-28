@@ -205,14 +205,14 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Parent</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.parent') }}</th>
 								<th>Coa Pengakuan Aset</th>
 								<th>Coa Akumulasi Penyusutan</th>
 								<th>Coa Biaya</th>
 								<th>Periode Penyusutan (Bulan)</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

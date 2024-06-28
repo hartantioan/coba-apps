@@ -45,16 +45,16 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">{{ __('translations.active') }}</option>
+                                                        <option value="2">{{ __('translations.non_active') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -72,7 +72,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
@@ -80,12 +80,12 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Versi</th>
-                                                        <th>Pengguna</th>
+                                                        <th>{{ __('translations.user') }}</th>
                                                         <th>Tgl.Rilis</th>
                                                         <th>Judul</th>
                                                         <th>Deskripsi</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -108,7 +108,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -123,7 +123,7 @@
                            
                             <div class="input-field col m4 s12">
                                 <input type="date" id="release_date" name="release_date"  onchange="loadDataTable()">
-                                <label class="active" for="release_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                <label class="active" for="release_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                             </div>
                             <div class="input-field col m4 s12">
                                 <input id="title" name="title" type="text" placeholder="Judul">
@@ -131,12 +131,12 @@
                             </div>
                             <div class="input-field col s6">
                                 <div class="switch mb-1">
-                                    <label for="order">Status</label>
+                                    <label for="order">{{ __('translations.status') }}</label>
                                     <label>
-                                        Non-Active
+                                        {{ __('translations.non_active') }}
                                         <input checked type="checkbox" id="status" name="status" value="1">
                                         <span class="lever"></span>
-                                        Active
+                                        {{ __('translations.active') }}
                                     </label>
                                 </div>
                             </div>
@@ -144,7 +144,7 @@
                                 <textarea class="browser-default" id="description" name="description" rows="10"></textarea>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -153,7 +153,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

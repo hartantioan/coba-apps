@@ -270,10 +270,10 @@
                                     <th colspan="5">Dari {{ $data->inventoryTransferOut->placeFrom->code.' - '.$data->inventoryTransferOut->warehouseFrom->name }} -- KE -- {{ $data->inventoryTransferOut->placeTo->code.' - '.$data->inventoryTransferOut->warehouseTo->name }}</th>
                                 </tr>
                                 <tr>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Keterangan</th>
+                                    <th>{{ __('translations.unit') }}</th>
+                                    <th>{{ __('translations.note') }}</th>
                                     <th>Area Tujuan</th>
                                 </tr>
                             </thead>

@@ -337,7 +337,7 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th class="center">Item</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Harga @</th>

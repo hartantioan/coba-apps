@@ -35,7 +35,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="input-field col m3 s12">
@@ -56,19 +56,19 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Item</th>
-                                                        <th>Customer</th>
+                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>{{ __('translations.customer') }}</th>
                                                         <th>Dokumen</th>
-                                                        <th>Tanggal</th>
-                                                        <th>Plant</th>
-                                                        <th>Harga</th>
+                                                        <th>{{ __('translations.date') }}</th>
+                                                        <th>{{ __('translations.plant') }}</th>
+                                                        <th>{{ __('translations.price') }}</th>
                                                         <th>Margin</th>
                                                         <th>Discount 1</th>
                                                         <th>Discount 2</th>

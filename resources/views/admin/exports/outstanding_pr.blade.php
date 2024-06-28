@@ -6,18 +6,18 @@
         <tr>
             <th class="center-align">No</th>
             <th class="center-align">Dokumen</th>
-            <th class="center-align">Pengguna</th>
+            <th class="center-align">{{ __('translations.user') }}</th>
             <th class="center-align">Tgl.Post</th>
-            <th class="center-align">Keterangan</th>
-            <th class="center-align">Status</th>
-            <th class="center-align">Plant</th>
-            <th class="center-align">Gudang</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
+            <th class="center-align">{{ __('translations.status') }}</th>
+            <th class="center-align">{{ __('translations.plant') }}</th>
+            <th class="center-align">{{ __('translations.warehouse') }}</th>
             <th class="center-align">Grup Item</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
             <th class="center-align">Keterangan 1</th>
             <th class="center-align">Keterangan 2</th>
-            <th class="center-align">Satuan</th>
+            <th class="center-align">{{ __('translations.unit') }}</th>
             <th class="center-align">Qty Req.</th>
             <th class="center-align">Qty PO</th>
             <th class="center-align">Tunggakan</th>

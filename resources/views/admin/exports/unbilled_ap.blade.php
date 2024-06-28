@@ -6,7 +6,7 @@
             <th align="center">Supplier/Vendor</th>
             <th align="center">Tgl.Post</th>
             <th align="center">No.Surat Jalan</th>
-            <th align="center">Keterangan</th>
+            <th align="center">{{ __('translations.note') }}</th>
             <th align="center">Kurs</th>
             <th align="center">Total Sisa FC</th>
             <th align="center">Total Diterima</th>

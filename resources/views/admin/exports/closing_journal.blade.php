@@ -3,13 +3,13 @@
         <tr align="center">
             <th>No</th>
             <th>No.Dokumen</th>
-            <th>Pengguna</th>
-            <th>Perusahaan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
             <th>Bulan</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Laba Berjalan</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>

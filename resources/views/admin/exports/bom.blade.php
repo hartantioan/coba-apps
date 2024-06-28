@@ -29,7 +29,7 @@
                     <th>Item/Resource</th>
                     <th>Description</th>
                     <th>Qty</th>
-                    <th>Nominal</th>
+                    <th>{{ __('translations.nominal') }}</th>
                     <th>Total</th>
                     <th>Dist.Biaya</th>
                 </tr>

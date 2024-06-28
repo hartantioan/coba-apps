@@ -347,9 +347,9 @@
                                 </tr>
                                 <tr>
                                     <th class="center">Referensi</th>
-                                    <th class="center">Tipe</th>
+                                    <th class="center">{{ __('translations.type') }}</th>
                                     <th class="center">Tgl.Tenggat</th>
-                                    <th class="center">Keterangan</th>
+                                    <th class="center">{{ __('translations.note') }}</th>
                                     <th class="center">Bayar</th>
                                 </tr>
                             </thead>
@@ -381,10 +381,10 @@
                                 <tr>
                                     <th class="center-align">No.</th>
                                     <th class="center-align">Coa</th>
-                                    <th class="center-align">Plant</th>
-                                    <th class="center-align">Line</th>
-                                    <th class="center-align">Mesin</th>
-                                    <th class="center-align">Divisi</th>
+                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                    <th class="center-align">{{ __('translations.line') }}</th>
+                                    <th class="center-align">{{ __('translations.engine') }}</th>
+                                    <th class="center-align">{{ __('translations.division') }}</th>
                                     <th class="center-align">Proyek</th>
                                     <th class="center-align">Debit</th>
                                     <th class="center-align">Kredit</th>

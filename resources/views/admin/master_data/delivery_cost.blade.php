@@ -32,7 +32,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
                     </div>
@@ -47,33 +47,33 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
-                                                        <option value="1">Aktif</option>
-                                                        <option value="2">Non-Aktif</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
+                                                        <option value="1">{{ __('translations.active') }}</option>
+                                                        <option value="2">{{ __('translations.non_active') }}</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="filter_account" style="font-size:1rem;">Partner Bisnis :</label>
+                                                <label for="filter_account" style="font-size:1rem;">{{ __('translations.bussiness_partner') }} :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_account" name="filter_account" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
@@ -84,32 +84,32 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
-                                                        <th>Nama</th>
-                                                        <th>Partner Bisnis</th>
-                                                        <th>Valid Dari</th>
-                                                        <th>Valid Sampai</th>
-                                                        <th>Kota Asal</th>
-                                                        <th>Kecamatan Asal</th>
-                                                        <th>Kota Tujuan</th>
-                                                        <th>Kecamatan Tujuan</th>
-                                                        <th>Tonase</th>
-                                                        <th>Harga</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
+                                                        <th>{{ __('translations.bussiness_partner') }}</th>
+                                                        <th>{{ __('translations.valid_date') }}</th>
+                                                        <th>{{ __('translations.valid_until') }}</th>
+                                                        <th>{{ __('translations.starting_city') }}</th>
+                                                        <th>{{ __('translations.starting_subdistrict') }}</th>
+                                                        <th>{{ __('translations.destination_city') }}</th>
+                                                        <th>{{ __('translations.destination_subdistrict') }}</th>
+                                                        <th>{{ __('translations.tonnage') }}</th>
+                                                        <th>{{ __('translations.price') }}</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -131,7 +131,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -140,71 +140,71 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">Kode</label>
+                            <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="valid_from" name="valid_from" type="date" max="{{ date('Y-m-d') }}">
-                            <label class="active" for="valid_from">Valid Dari</label>
+                            <label class="active" for="valid_from">{{ __('translations.valid_from') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="valid_to" name="valid_to" type="date" max="{{ date('9999'.'-12-31') }}" min="{{ date('Y-m-d') }}">
-                            <label class="active" for="valid_to">Valid Sampai</label>
+                            <label class="active" for="valid_to">{{ __('translations.valid_until') }}</label>
                         </div>
                         <div class="col s12">
-                            <h6>Asal</h6>
+                            <h6>{{ __('translations.origin') }}</h6>
                             <div class="input-field col m6 s12">
                                 <select class="browser-default" id="from_city_id" name="from_city_id" onchange="getSubdistrict('from')"></select>
-                                <label class="active" for="from_city_id">Kota</label>
+                                <label class="active" for="from_city_id">{{ __('translations.city') }}</label>
                             </div>
                             <div class="input-field col m6 s12">
                                 <select class="select2 browser-default" id="from_subdistrict_id" name="from_subdistrict_id">
-                                    <option value="">--Pilih ya--</option>
+                                    <option value="">--{{ __('translations.select') }}--</option>
                                 </select>
-                                <label class="active" for="from_subdistrict_id">Kecamatan</label>
+                                <label class="active" for="from_subdistrict_id">{{ __('translations.subdistrict') }}</label>
                             </div>
                         </div>
                         <div class="col s12">
                             <h6>Tujuan</h6>
                             <div class="input-field col m6 s12">
                                 <select class="browser-default" id="to_city_id" name="to_city_id" onchange="getSubdistrict('to')"></select>
-                                <label class="active" for="to_city_id">Kota</label>
+                                <label class="active" for="to_city_id">{{ __('translations.city') }}</label>
                             </div>
                             <div class="input-field col m6 s12">
                                 <select class="select2 browser-default" id="to_subdistrict_id" name="to_subdistrict_id">
-                                    <option value="">--Pilih ya--</option>
+                                    <option value="">--{{ __('translations.select') }}--</option>
                                 </select>
-                                <label class="active" for="to_subdistrict_id">Kecamatan</label>
+                                <label class="active" for="to_subdistrict_id">{{ __('translations.subdistrict') }}</label>
                             </div>
                         </div>
                         <div class="input-field col m6 s12">
                             <select class="browser-default" id="account_id" name="account_id"></select>
-                            <label class="active" for="account_id">Partner Bisnis</label>
+                            <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
                         </div>
                         <div class="input-field col m6 s12">
                             <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="tonnage">Tonase</label>
+                            <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
                         </div>
                         <div class="input-field col m6 s12">
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="nominal">Nominal</label>
+                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
-                                <label for="status">Status</label>
+                                <label for="status">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -212,7 +212,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -246,7 +246,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -409,7 +409,7 @@
                 M.updateTextFields();
                 $('#from_city_id,#to_city_id').empty();
                 $('#from_subdistrict_id,#to_subdistrict_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
+                    <option value="">--{{ __('translations.select') }}--</option>
                 `);
             }
         });
@@ -444,7 +444,7 @@
             });
         }else{
             $('#' + type + '_subdistrict_id').empty().append(`
-                <option value="">--Pilih ya--</option>
+                <option value="">--{{ __('translations.select') }}--</option>
             `);
         }
     }

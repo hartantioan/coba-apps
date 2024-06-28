@@ -209,7 +209,7 @@
                                         Tgl. Penyerahan
                                     </td>
                                     <td width="60%">
-                                        :{!! CustomHelper::tgl_indo($data->post_date) !!}
+                                        : {!! CustomHelper::tgl_indo($data->post_date) !!}
                                     </td>
                                 </tr>
                                 <tr>
@@ -217,7 +217,7 @@
                                         Dari
                                     </td>
                                     <td width="60%">
-                                        :{{ $data->user->name }}
+                                        : {{ $data->user->name }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -225,7 +225,7 @@
                                         Untuk
                                     </td>
                                     <td width="60%">
-                                        :{{ optional($data->account)->name ?? '-' }}
+                                        : {{ optional($data->account)->name ?? '-' }}
                                     </td>
                                 </tr>
                                 <tr>
@@ -260,8 +260,8 @@
                                 <th class="center">No.</th>
                                 <th class="center">Kode Faktur</th>
                                 <th class="center">Total</th>
-                                <th class="center">Perusahaan</th>
-                                <th class="center">Status</th>
+                                <th class="center">{{ __('translations.company') }}</th>
+                                <th class="center">{{ __('translations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody>

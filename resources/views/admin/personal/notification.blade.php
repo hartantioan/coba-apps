@@ -44,17 +44,17 @@
                                 <div class="card-content">
                                     <ul class="collapsible collapsible-accordion">
                                         <li>
-                                            <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                            <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                             <div class="collapsible-body">
                                                 <div class="row">
                                                     <div class="col m4 s6 ">
-                                                        <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                        <label for="start-date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                         <div class="input-field col s12">
                                                         <input type="date" id="start-date" name="start-date"  onchange="loadDataTable()">
                                                         </div>
                                                     </div>
                                                     <div class="col m4 s6 ">
-                                                        <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                        <label for="finish-date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                         <div class="input-field col s12">
                                                             <input type="date" id="finish-date" name="finish-date"  onchange="loadDataTable()">
                                                         </div>
@@ -63,13 +63,13 @@
                                             </div>
                                         </li>
                                     </ul>
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >

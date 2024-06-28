@@ -45,7 +45,7 @@
                     <div class="col s12 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -55,7 +55,7 @@
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">Import</span>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
                         </a>
                     </div>
@@ -71,12 +71,12 @@
                             <div class="card-panel">
                                 <div class="row">
                                     <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
+                                                <option value="">{{ __('translations.all') }}</option>
+                                                <option value="1">{{ __('translations.active') }}</option>
+                                                <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -84,29 +84,29 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
-                                                        <th>Nama</th>
-                                                        <th>Item</th>
-                                                        <th>Item Reject</th>
-                                                        <th>Plant</th>
-                                                        <th>Gudang</th>
-                                                        <th>Qty Output</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
+                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>{{ __('translations.item_reject') }}/th>
+                                                        <th>{{ __('translations.plant') }}</th>
+                                                        <th>{{ __('translations.warehouse') }}</th>
+                                                        <th>{{ __('translations.item') }}</th>
                                                         <th>Bom Powder</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -127,7 +127,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Bill of Material</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Bill of Material</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -140,11 +140,11 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="code" name="code" type="text" placeholder="Kode Bill Of Material">
-                            <label class="active" for="code">Kode</label>
+                            <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="name" name="name" type="text" placeholder="Nama Bill Of Material">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="qty_output" name="qty_output" type="text" placeholder="Qty Output" onkeyup="formatRupiah(this)">
@@ -161,7 +161,7 @@
                                     <option value="{{ $b->id }}">{{ $b->code }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="place_id">Plant</label>
+                            <label class="" for="place_id">{{ __('translations.plant') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="form-control" id="warehouse_id" name="warehouse_id">
@@ -169,7 +169,7 @@
                                     <option value="{{ $b->id }}">{{ $b->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="" for="warehouse_id">Gudang</label>
+                            <label class="" for="warehouse_id">{{ __('translations.warehouse') }}</label>
                         </div>
                         <div class="col s12 m12"></div>
                         <div class="input-field col s12 m3">
@@ -185,12 +185,12 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <div class="switch mb-1">
-                                <label for="status">Status</label>
+                                <label for="status">{{ __('translations.status') }}</label>
                                 <label class="right">
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                   {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
@@ -220,16 +220,16 @@
                                             <table class="bordered">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Tipe</th>
+                                                        <th class="center">{{ __('translations.type') }}</th>
                                                         <th class="center">Item/Resource</th>
                                                         <th class="center">Qty</th>
                                                         <th class="center">Satuan (Produksi)</th>
-                                                        <th class="center">Nominal</th>
+                                                        <th class="center">{{ __('translations.nominal') }}</th>
                                                         <th class="center">Total</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">Deskripsi</th>
                                                         <th class="center">Issue Method</th>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-detail0">
@@ -274,8 +274,8 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect green waves-light mr-1 submit" onclick="addAlternative();">Tambah Alternatif <i class="material-icons right">playlist_add</i></button>
-        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -283,7 +283,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Import Excel</h4>
+                <h4>{{ __('translations.import') }} Excel</h4>
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
@@ -309,7 +309,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -322,7 +322,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -564,16 +564,16 @@
                     <table class="bordered table-composition">
                         <thead>
                             <tr>
-                                <th class="center">Tipe</th>
+                                <th class="center">{{ __('translations.type') }}</th>
                                 <th class="center">Item/Resource</th>
                                 <th class="center">Qty</th>
                                 <th class="center">Satuan (Produksi)</th>
-                                <th class="center">Nominal</th>
+                                <th class="center">{{ __('translations.nominal') }}</th>
                                 <th class="center">Total</th>
                                 <th class="center">Dist.Biaya</th>
                                 <th class="center">Deskripsi</th>
                                 <th class="center">Issue Method</th>
-                                <th class="center">Hapus</th>
+                                <th class="center">{{ __('translations.delete') }}</th>
                             </tr>
                         </thead>
                         <tbody id="body-detail` + count + `">
@@ -1005,16 +1005,16 @@
                                 <table class="bordered table-composition">
                                     <thead>
                                         <tr>
-                                            <th class="center">Tipe</th>
+                                            <th class="center">{{ __('translations.type') }}</th>
                                             <th class="center">Item/Resource</th>
                                             <th class="center">Qty</th>
                                             <th class="center">Satuan (Produksi)</th>
-                                            <th class="center">Nominal</th>
+                                            <th class="center">{{ __('translations.nominal') }}</th>
                                             <th class="center">Total</th>
                                             <th class="center">Dist.Biaya</th>
                                             <th class="center">Deskripsi</th>
                                             <th class="center">Issue Method</th>
-                                            <th class="center">Hapus</th>
+                                            <th class="center">{{ __('translations.delete') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-detail` + val.code + `">

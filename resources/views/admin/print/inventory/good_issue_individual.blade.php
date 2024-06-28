@@ -265,20 +265,20 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th class="center">Item</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Tipe Biaya</th>
                                     <th class="center">Coa</th>
                                     <th class="center">Dari Plant</th>
                                     <th class="center">Dari Gudang</th>
-                                    <th class="center">Area</th>
-                                    <th class="center">Shading</th>
+                                    <th class="center">{{ __('translations.area') }}</th>
+                                    <th class="center">{{ __('translations.shading') }}</th>
                                     <th class="center">Dist.Biaya</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Line</th>
-                                    <th class="center">Mesin</th>
-                                    <th class="center">Divisi</th>
+                                    <th class="center">{{ __('translations.plant') }}</th>
+                                    <th class="center">{{ __('translations.line') }}</th>
+                                    <th class="center">{{ __('translations.engine') }}</th>
+                                    <th class="center">{{ __('translations.division') }}</th>
                                     <th class="center">Proyek</th>
                                     <th class="center">Requester</th>
                                     <th class="center">Jum.Kembali</th>

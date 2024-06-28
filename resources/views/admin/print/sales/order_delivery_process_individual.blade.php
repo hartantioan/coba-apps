@@ -313,10 +313,10 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Kode</th>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.code') }}</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
+                                    <th>{{ __('translations.unit') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

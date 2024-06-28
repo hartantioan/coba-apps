@@ -35,7 +35,7 @@
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
                                 <li class="active">
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
                                             <div class="col s12">
@@ -77,20 +77,20 @@
                         </div>
                         <div class="card">
                             <div class="card-content">
-                                <h4 class="card-title">List Data</h4>
+                                <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                 <div class="row">
                                     <div class="col s12" id="table_monthly">
                                         <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                         <table id="datatable_serverside" >
                                             <thead id="thead_shift">
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Nama</th>
+                                                    <th>{{ __('translations.name') }}</th>
                                                     <th>Jumlah Shift</th>
                                                     <th>Tepat waktu</th>
                                                     <th>Ijin Kusus</th>
@@ -171,7 +171,7 @@
                 var string =`
                     <tr>
                     <th>#</th>
-                    <th>Nama</th>
+                    <th>{{ __('translations.name') }}</th>
                     <th>Jumlah Shift</th>
                 `;
                 @if(isset($punishment_code))
@@ -240,7 +240,7 @@
         var string =`
             <tr>
             <th>#</th>
-            <th>Nama</th>
+            <th>{{ __('translations.name') }}</th>
             <th>Jumlah Shift</th>
         `;
         $.each(column_name,function(i,val){
@@ -310,7 +310,7 @@
                 <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                 <table id="datatable_serverside" >

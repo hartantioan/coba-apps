@@ -49,7 +49,7 @@
                                                 <option value="all">DENGAN MUTASI</option>
                                                 <option value="final">TANPA MUTASI (FINAL)</option>
                                             </select>
-                                            <label class="" for="type">Tipe</label>
+                                            <label class="" for="type">{{ __('translations.type') }}</label>
                                         </div>
                                         <div class="input-field col m4 s12">
                                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
@@ -153,7 +153,7 @@
                                 <th class="center-align">Gudang.</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">No Dokumen</th>
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
@@ -219,11 +219,11 @@
                         $('#t_head').append(`
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Kode</th>
+                                <th class="center-align">{{ __('translations.plant') }}</th>
+                                <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                <th class="center-align">{{ __('translations.code') }}</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
                         $.each(response.message, function(i, val) { 
@@ -251,7 +251,7 @@
                                 <th class="center-align">Gudang.</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">No Dokumen</th>
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>

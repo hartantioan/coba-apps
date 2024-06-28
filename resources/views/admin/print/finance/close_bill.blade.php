@@ -127,12 +127,12 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-                        <th>Pengguna</th>
-						<th>Code</th>
-                        <th>Perusahaan</th>
+                        <th>{{ __('translations.user') }}</th>
+						<th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.company') }}</th>
                         <th>Tgl.Post</th>
-                        <th>Keterangan</th>
-                        <th>Status</th>
+                        <th>{{ __('translations.note') }}</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -152,10 +152,10 @@
                                     <thead>
                                         <tr align="center">
                                             <th>No. FR</th>
-                                            <th>Partner Bisnis</th>
+                                            <th>{{ __('translations.bussiness_partner') }}</th>
                                             <th>Coa</th>
-                                            <th>Keterangan</th>
-                                            <th>Nominal</th>
+                                            <th>{{ __('translations.note') }}</th>
+                                            <th>{{ __('translations.nominal') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

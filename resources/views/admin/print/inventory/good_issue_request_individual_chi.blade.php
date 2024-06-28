@@ -268,17 +268,17 @@
                         <thead>
                             <tr>
                                 <th align="center">No<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">数字</div></th>
-                                <th align="center">Item<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">项目</div></th>
+                                <th align="center">{{ __('translations.item') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">项目</div></th>
                                 <th align="center">Qty.<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">数量</div></th>
-                                <th align="center">Stock<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">库存</div></th>
+                                <th align="center">{{ __('translations.stock') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">库存</div></th>
                                 <th align="center">Outstanding<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">杰出的</div></th>
                                 <th align="center">Unit<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">单元</div></th>
                                 <th align="center">Used Date<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">使用日期</div></th>
-                                <th align="center">Plant<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">工厂</div></th>
-                                <th align="center">Gudang<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">仓库</div></th>
-                                <th align="center">Line<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">工作站</div></th>
+                                <th align="center">{{ __('translations.plant') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">工厂</div></th>
+                                <th align="center">{{ __('translations.warehouse') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">仓库</div></th>
+                                <th align="center">{{ __('translations.line') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">工作站</div></th>
                                 <th align="center">Machine<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">机器</div></th>
-                                <th align="center">Divisi<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">分配</div></th>
+                                <th align="center">{{ __('translations.division') }}<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">分配</div></th>
                                 <th align="center">Project<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">项目</div></th>
                                 <th align="center-">Requester<div style="font-family: 'china', Tahoma, Arial, sans-serif; font-weight:normal">请求者</div></th>
                             </tr>

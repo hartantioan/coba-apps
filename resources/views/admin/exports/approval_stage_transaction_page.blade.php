@@ -2,12 +2,12 @@
     <thead>
         <tr align="center">
             <th>No.</th>
-            <th>Kode</th>
+            <th>{{ __('translations.code') }}</th>
             <th>Approval</th>
-            <th>Level</th>
+            <th>{{ __('translations.level') }}</th>
             <th>Min. Approve</th>
             <th>Min. Reject</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
         </tr>
     </thead>
     <tbody>

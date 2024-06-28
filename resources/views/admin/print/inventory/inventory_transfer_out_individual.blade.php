@@ -297,10 +297,10 @@
                                     <th colspan="5">Dari {{ $data->placeFrom->code.' - '.$data->warehouseFrom->name }} -- KE -- {{ $data->placeTo->code.' - '.$data->warehouseTo->name }}</th>
                                 </tr>
                                 <tr>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Keterangan</th>
+                                    <th>{{ __('translations.unit') }}</th>
+                                    <th>{{ __('translations.note') }}</th>
                                     <th>Area Tujuan</th>
                                 </tr>
                             </thead>

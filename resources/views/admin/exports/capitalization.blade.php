@@ -3,13 +3,13 @@
         <tr align="center">
             <th>No</th>
             <th>No Kapitalisasi</th>
-            <th>Pengguna</th>
-            <th>Perusahaan</th>
-            <th>Mata Uang</th>
-            <th>Konversi</th>
-            <th>Tanggal</th>
-            <th>Keterangan</th>
-            <th>Status</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.company') }}</th>
+            <th>{{ __('translations.currency') }}</th>
+            <th>{{ __('translations.conversion') }}</th>
+            <th>{{ __('translations.date') }}</th>
+            <th>{{ __('translations.note') }}</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
@@ -17,11 +17,11 @@
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
             <th>Aset</th>
-            <th>Harga</th>
+            <th>{{ __('translations.price') }}</th>
             <th>Qty</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>Total</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
         </tr>
     </thead>
     <tbody>

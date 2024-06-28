@@ -127,18 +127,18 @@
 				<thead>
 					<tr align="center">
 						<th rowspan="2">No</th>
-                        <th rowspan="2">Pengguna</th>
-						<th rowspan="2">Code</th>
-                        <th rowspan="2">Perusahaan</th>
-                        <th rowspan="2">Tanggal</th>
-                        <th colspan="2">Mata Uang</th>
-                        <th rowspan="2">Keterangan</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
+						<th rowspan="2">{{ __('translations.code') }}</th>
+                        <th rowspan="2">{{ __('translations.company') }}</th>
+                        <th rowspan="2">{{ __('translations.date') }}</th>
+                        <th colspan="2">{{ __('translations.currency') }}</th>
+                        <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">Dokumen</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
 					</tr>
                     <tr align="center">
-                        <th>Kode</th>
-                        <th>Konversi</th>
+                        <th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -160,12 +160,12 @@
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
-                                            <th>Item</th>
+                                            <th>{{ __('translations.item') }}</th>
                                             <th>Qty</th>
-                                            <th>Satuan</th>
-                                            <th>Keterangan</th>
+                                            <th>{{ __('translations.unit') }}</th>
+                                            <th>{{ __('translations.note') }}</th>
                                             <th>Coa</th>
-											<th>Plant</th>
+											<th>{{ __('translations.plant') }}</th>
                                             <th>Dari Gudang</th>
                                         </tr>
                                     </thead>

@@ -246,16 +246,16 @@
                         <thead>
                             <tr>
                                 <th align="center">No</th>
-                                <th align="center">Item</th>
+                                <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Jum.</th>
                                 <th align="center">Stok</th>
                                 <th align="center">Sat.</th>
                                 <th align="center">Tgl.Dipakai</th>
-                                <th align="center">Plant</th>
-                                <th align="center">Gudang</th>
-                                <th align="center">Line</th>
+                                <th align="center">{{ __('translations.plant') }}</th>
+                                <th align="center">{{ __('translations.warehouse') }}</th>
+                                <th align="center">{{ __('translations.line') }}</th>
                                 <th align="center">Machine</th>
-                                <th align="center">Divisi</th>
+                                <th align="center">{{ __('translations.division') }}</th>
                                 <th align="center">Proyek</th>
                                 <th align="center-">Requester</th>
                             </tr>

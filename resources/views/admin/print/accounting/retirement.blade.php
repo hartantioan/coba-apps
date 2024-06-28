@@ -128,13 +128,13 @@
 					<tr align="center">
 						<th>No</th>
                         <th>No.Retirement</th>
-						<th>Pengguna</th>
-						<th>Perusahaan</th>
-                        <th>Mata Uang</th>
-                        <th>Konversi</th>
-                        <th>Tanggal</th>
-                        <th>Keterangan</th>
-                        <th>Status</th>
+						<th>{{ __('translations.user') }}</th>
+						<th>{{ __('translations.company') }}</th>
+                        <th>{{ __('translations.currency') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
+                        <th>{{ __('translations.date') }}</th>
+                        <th>{{ __('translations.note') }}</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -159,10 +159,10 @@
                                             <th>No.</th>
                                             <th>Aset</th>
                                             <th>Qty</th>
-                                            <th>Satuan</th>
+                                            <th>{{ __('translations.unit') }}</th>
                                             <th>Nominal Aset</th>
                                             <th>Nominal Retirement</th>
-                                            <th>Keterangan</th>
+                                            <th>{{ __('translations.note') }}</th>
                                             <th>Coa</th>
                                         </tr>
                                     </thead>

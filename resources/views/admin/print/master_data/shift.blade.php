@@ -205,15 +205,15 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Plant</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.plant') }}</th>
 								<th>Departemen</th>
 								<th>Min Time In</th>
 								<th>Time In</th>
 								<th>Time Out</th>
 								<th>Max Time Out</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

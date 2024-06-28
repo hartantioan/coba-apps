@@ -203,7 +203,7 @@
                         <th class="center-align">Bahan/Biaya</th>
                         <th class="center-align">Qty</th>
                         <th class="center-align">Satuan (Produksi)</th>
-                        <th class="center-align">Nominal</th>
+                        <th class="center-align">{{ __('translations.nominal') }}</th>
                         <th class="center-align">Total</th>
                     </tr>
                 </thead>

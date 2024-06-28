@@ -82,7 +82,7 @@ table.bordered th {
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Nama</th>
+                                                        <th>{{ __('translations.name') }}</th>
                                                         <th>Url</th>
                                                         <th>Peta Jurnal</th>
                                                     </tr>
@@ -106,7 +106,7 @@ table.bordered th {
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Coa Menu - <b><i><span id="title_coa_menu"></span></i></b></h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Coa Menu - <b><i><span id="title_coa_menu"></span></i></b></h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -122,7 +122,7 @@ table.bordered th {
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
-                                    <th class="center" width="15%">Prosentase</th>
+                                    <th class="center" width="15%">{{ __('translations.percentage) }}</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>
@@ -146,7 +146,7 @@ table.bordered th {
                                 <tr>
                                     <th class="center" width="40%">Coa</th>
                                     <th class="center" width="20%">Kolom</th>
-                                    <th class="center" width="15%">Prosentase</th>
+                                    <th class="center" width="15%">{{ __('translations.percentage) }}</th>
                                     <th class="center" width="5%">Delete</th>
                                 </tr>
                             </thead>
@@ -162,14 +162,14 @@ table.bordered th {
                         </table>
                     </div>
                     <div class="col s12 mt-1 center-align">
-                        <button class="btn waves-effect waves-light submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                        <button class="btn waves-effect waves-light submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

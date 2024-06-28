@@ -122,7 +122,7 @@
                     @if(!$data->status_tracking)
                     <div class="row">
                         <div class="col l12 m12 s12 p-3 right-align">
-                            <button class="btn waves-effect waves-light right" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                     @endif

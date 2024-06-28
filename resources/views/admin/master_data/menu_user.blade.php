@@ -46,7 +46,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -56,7 +56,7 @@
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="loadDataTable();">
                             <i class="material-icons hide-on-med-and-up">refresh</i>
-                            <span class="hide-on-small-onl">Refresh</span>
+                            <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                             <i class="material-icons right">refresh</i>
                         </a>
                     </div>
@@ -161,7 +161,7 @@
                         <div class="card-content">
                             <div class="row">
                                 <div class="col s12">
-                                    <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                    <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                                     <table style="width: 100%;line-height: inherit;text-align: left;" >
                                         <thead>
                                             <tr>
@@ -228,14 +228,14 @@
                                         <thead>
                                             <tr>
                                                 <th>#</th>
-                                                <th>Nama</th>
+                                                <th>{{ __('translations.name') }}</th>
                                                 <th>Username</th>
                                                 <th>NIK/Code</th>
-                                                <th>Tipe</th>
+                                                <th>{{ __('translations.type') }}</th>
                                                 <th>Grup</th>
                                                 <th>Posisi</th>
-                                                <th>Status</th>
-                                                <th>Action</th>
+                                                <th>{{ __('translations.status') }}</th>
+                                                <th>{{ __('translations.action') }}</th>
                                             </tr>
                                         </thead>
                                     </table>
@@ -254,7 +254,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Hak Akses - <span id="tempname"></span></h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Hak Akses - <span id="tempname"></span></h4>
                 <form class="row" id="form_data_access" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert_access" style="display:none;"></div>
@@ -603,7 +603,7 @@
                                                     <th>
                                                         <label>
                                                             <input type="checkbox" onclick="checkAllPlace(this);" id="check-all-place">
-                                                            <span>Semua</span>
+                                                            <span>{{ __('translations.all') }}</span>
                                                         </label>
                                                     </th>
                                                 </tr>
@@ -627,7 +627,7 @@
                                         </table>
                                     </div>
                                     <div class="col s12">
-                                        <h5 class="card-title center">Gudang</h5>
+                                        <h5 class="card-title center">{{ __('translations.warehouse') }}</h5>
                                         <table class="bordered centered">
                                             <thead>
                                                 <tr>
@@ -639,7 +639,7 @@
                                                     <th>
                                                         <label>
                                                             <input type="checkbox" onclick="checkAllWarehouse(this);" id="check-all-warehouse">
-                                                            <span>Semua</span>
+                                                            <span>{{ __('translations.all') }}</span>
                                                         </label>
                                                     </th>
                                                 </tr>
@@ -680,8 +680,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
-        <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">Simpan <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light right submit" onclick="saveAccess();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
     </div>
 </div>
 

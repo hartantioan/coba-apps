@@ -205,13 +205,13 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Tipe</th>
-								<th>Alamat</th>
-								<th>Kota</th>
-								<th>Provinsi</th>
-								<th>Telepon</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.type') }}</th>
+								<th>{{ __('translations.address') }}</th>
+								<th>{{ __('translations.city') }}</th>
+								<th>{{ __('translations.province') }}</th>
+								<th>{{ __('translations.phone_number') }}</th>
 								<th>Limit Credit</th>
 							</tr>
                         </thead>

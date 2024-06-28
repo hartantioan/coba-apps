@@ -296,7 +296,7 @@
                                             <th class="center-align">PR No.</th>
                                             <th class="center-align">Tgl.Post</th>
                                             <th class="center-align">Tgl.Kirim/Tgl.Pakai</th>
-                                            <th class="center-align">Keterangan</th>
+                                            <th class="center-align">{{ __('translations.note') }}</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">DP Total</th>
                                         </tr>
@@ -546,7 +546,7 @@
                                             <th class="center-align">PR No.</th>
                                             <th class="center-align">Tgl.Post</th>
                                             <th class="center-align">Tgl.Kirim</th>
-                                            <th class="center-align">Keterangan</th>
+                                            <th class="center-align">{{ __('translations.note') }}</th>
                                             <th class="center-align">Total</th>
                                             <th class="center-align">DP Total</th>
                                            

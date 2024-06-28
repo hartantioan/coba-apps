@@ -72,7 +72,7 @@
                         
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
@@ -92,7 +92,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m3 s6 ">
@@ -109,13 +109,13 @@
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
@@ -134,7 +134,7 @@
                                             <div id="datatable_buttons"></div>
                                             <div class="col s12 m12">
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-2 right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                    <span class="hide-on-small-onl">Refresh</span>
+                                                    <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                     <i class="material-icons right">refresh</i>
                                                 </a>
                                                 {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
@@ -146,11 +146,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>{{ __('translations.code') }}</th>
                                                         <th>Ref.PO</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Tanggal</th>
-                                                        <th>Keterangan</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>{{ __('translations.date') }}</th>
+                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>Driver</th>
                                                         <th>No.Kendaraan</th>
                                                         <th>Foto QC</th>
@@ -219,7 +219,7 @@
                                 <div id="account_id" class="mt-2">
 
                                 </div>
-                                <label class="active" for="account_id">Partner Bisnis</label>
+                                <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <div id="item_name" class="mt-2">
@@ -256,7 +256,7 @@
                             <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <label class="active" for="note">{{ __('translations.note') }}</label>
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="col m6 s12 step6">
@@ -286,8 +286,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <button class="btn waves-effect waves-light mr-1 submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -300,7 +300,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

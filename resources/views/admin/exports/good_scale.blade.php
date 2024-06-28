@@ -3,7 +3,7 @@
         <tr align="center">
             <th>No</th>
             <th>No Dokumen</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl.Delete</th>
             <th>Ket.Delete</th>
@@ -11,12 +11,12 @@
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
             <th>NIK</th>
-            <th>Pengguna</th>
+            <th>{{ __('translations.user') }}</th>
             <th>Tgl Terima</th>
             <th>No SJ</th>
             <th>No Kendaraan</th>
             <th>Supir</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Waktu Masuk</th>
             <th>Cek QC</th>
             <th>Waktu QC</th>
@@ -24,10 +24,10 @@
             <th>Catatan QC</th>
             <th>Waktu Keluar</th>
             <th>Item Code</th>
-            <th>Item</th>
-            <th>Satuan</th>
-            <th>Plant</th>
-            <th>Gudang</th>
+            <th>{{ __('translations.item') }}</th>
+            <th>{{ __('translations.unit') }}</th>
+            <th>{{ __('translations.plant') }}</th>
+            <th>{{ __('translations.warehouse') }}</th>
             <th>Qty.Bruto</th>
             <th>Qty.Tara</th>
             <th>Qty.Netto</th>

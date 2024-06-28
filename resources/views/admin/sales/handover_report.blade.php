@@ -39,17 +39,17 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="input-field col m3 s12">
-                                                <label class="active" for="account_id">Customer</label>
+                                                <label class="active" for="account_id">{{ __('translations.customer') }}</label>
                                                 <select class="browser-default " id="account_id" name="account_id" onchange="loadDataTable()"></select>
                                             </div>
                                             <div class="input-field col m3 s12">
-                                                <label class="active" for="type">Status</label>
+                                                <label class="active" for="type">{{ __('translations.status') }}</label>
                                                 <select id="type" name="type" onchange="loadDataTable()">
-                                                    <option value="">Semua</option>
+                                                    <option value="">{{ __('translations.all') }}</option>
                                                     <option value="1">Belum TT Invoice</option>
                                                     <option value="2">Belum Kwitansi</option>
                                                     <option value="3">Sudah Kwitansi & Belum TT Kwitansi</option>
@@ -69,7 +69,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
@@ -77,8 +77,8 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>Invoice</th>
-                                                        <th>Customer</th>
-                                                        <th>Tanggal</th>
+                                                        <th>{{ __('translations.customer') }}</th>
+                                                        <th>{{ __('translations.date') }}</th>
                                                         <th>Tagihan</th>
                                                         <th>Sisa</th>
                                                         <th>TT.Invoice</th>
@@ -110,7 +110,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

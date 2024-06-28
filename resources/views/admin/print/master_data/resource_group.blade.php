@@ -205,12 +205,12 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-                                <th>Nama Lain</th>
-								<th>Parent</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+                                <th>{{ __('translations.other_name') }}</th>
+								<th>{{ __('translations.parent') }}</th>
 								<th>Coa</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

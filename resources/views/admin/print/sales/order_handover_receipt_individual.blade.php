@@ -137,11 +137,11 @@
                             <tr>
                                 <th width="5%">No</th>
                                 <th width="20%">Kwitansi</th>
-                                <th width="20%">Nama</th>
-                                <th width="10%">Tanggal</th>
+                                <th width="20%">{{ __('translations.name') }}</th>
+                                <th width="10%">{{ __('translations.date') }}</th>
                                 <th width="15%">Grandtotal</th>
-                                <th width="10%">Status</th>
-                                <th width="20%">Keterangan</th>
+                                <th width="10%">{{ __('translations.status') }}</th>
+                                <th width="20%">{{ __('translations.note') }}</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -7,11 +7,11 @@
             <th class="center-align">No</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
-            <th class="center-align">Keterangan</th>
-            <th class="center-align">Status</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
+            <th class="center-align">{{ __('translations.status') }}</th>
             <th class="center-align">Kode Item</th>
             <th class="center-align">Nama Item</th>
-            <th class="center-align">Satuan</th>
+            <th class="center-align">{{ __('translations.unit') }}</th>
             <th class="center-align">Qty .</th>
             <th class="center-align">Qty Inv.</th>
             <th class="center-align">Tunggakan</th>

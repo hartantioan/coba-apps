@@ -205,11 +205,11 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Parent</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.parent') }}</th>
 								<th>Coa</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody>

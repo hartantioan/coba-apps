@@ -66,7 +66,7 @@
                     <div class="col s12 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         
@@ -83,12 +83,12 @@
                             <div class="card-panel">
                                 <div class="row"> 
                                     <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
+                                                <option value="">{{ __('translations.all') }}</option>
+                                                <option value="1">{{ __('translations.active') }}</option>
+                                                <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -96,25 +96,25 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
-                                                        <th>Nama</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
                                                         <th>Periode Mulai</th>
                                                         <th>Periode Akhir</th>
-                                                        <th>Plant</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.plant') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -136,7 +136,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -144,12 +144,12 @@
                     <div class="col s12">
                         <div class="input-field col s12">
                             <input id="code" name="code" type="text" placeholder="Nama Periode">
-                            <label class="active" for="code">Code</label>
+                            <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12">
                             <input type="hidden" id="temp" name="temp">
                             <input id="name" name="name" type="text" placeholder="Nama Periode">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12">
                             <select id="plant_id" name="plant_id">
@@ -157,7 +157,7 @@
                                     <option value="{{ $row->id }}">{{ $row->code }}</option>
                                 @endforeach
                             </select>
-                            <label for="plant_id">Plant</label>
+                            <label for="plant_id">{{ __('translations.plant') }}</label>
                         </div>
                         <div class="input-field col m6 s12">
                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -168,7 +168,7 @@
                             <label class="active" for="end_date">Tanggal Akhir</label>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -176,7 +176,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -227,7 +227,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -251,8 +251,8 @@
                             <tr>
                                 <th class="center-align fixed">No.</th>
                                 <th class="center-align fixed2">NIK</th>
-                                <th class="center-align fixed1">Nama</th>
-                                <th class="center-align">Tanggal</th>
+                                <th class="center-align fixed1">{{ __('translations.name') }}</th>
+                                <th class="center-align">{{ __('translations.date') }}</th>
                                 <th class="center-align">Nama Shift</th>
                                 <th class="center-align">Shift Awal</th>
                                 <th class="center-align">Shift Masuk</th>
@@ -261,7 +261,7 @@
                                 <th class="center-align">Shift Pulang</th>
                                 <th class="center-align">Check Out</th>
                                 <th class="center-align">Shift Akhir</th>
-                                <th class="center-align">Status</th>
+                                <th class="center-align">{{ __('translations.status') }}</th>
                             </tr>
                         </thead>
                         <tbody id="daily_report">
@@ -274,7 +274,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -298,11 +298,11 @@
                             <tr>
                                 <th class="center-align fixed">No.</th>
                                 <th class="center-align fixed2">NIK</th>
-                                <th class="center-align fixed1">Nama</th>
+                                <th class="center-align fixed1">{{ __('translations.name') }}</th>
                                 <th class="center-align">Periode</th>
                                 <th class="center-align">Tipe Denda</th>
                                 <th class="center-align">Frekuensi</th>
-                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">{{ __('translations.date') }}</th>
                                 <th class="center-align">Total</th>
                             </tr>
                         </thead>
@@ -316,7 +316,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -342,7 +342,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

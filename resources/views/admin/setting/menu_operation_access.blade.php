@@ -44,8 +44,8 @@
                                                         <th colspan="4">AKSES</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>Code</th>
-                                                        <th>Nama</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
                                                         <th>Posisi</th>
                                                         <th>View</th>
                                                         <th>Create/Update</th>

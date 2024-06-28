@@ -127,15 +127,15 @@
 				<thead>
 					<tr align="center">
 						<th rowspan="2">No</th>
-                        <th rowspan="2">Pengguna</th>
-						<th rowspan="2">Code</th>
-                        <th rowspan="2">Plant</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
+						<th rowspan="2">{{ __('translations.code') }}</th>
+                        <th rowspan="2">{{ __('translations.plant') }}</th>
                         <th rowspan="2">Departemen</th>
-                        <th rowspan="2">Partner Bisnis</th>
-						<th rowspan="2">Tipe</th>
-                        <th colspan="2" class="center-align">Tanggal</th>
-                        <th colspan="2" class="center-align">Mata Uang</th>
-                        <th rowspan="2">Keterangan</th>
+                        <th rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+						<th rowspan="2">{{ __('translations.type') }}</th>
+                        <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
+                        <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
+                        <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">Termin</th>
                         <th rowspan="2">Tipe Pembayaran</th>
                         <th rowspan="2">Rekening Penerima</th>
@@ -145,13 +145,13 @@
                         <th rowspan="2">PPh</th>
                         <th rowspan="2">Grandtotal</th>
                         <th rowspan="2">Dokumen</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
 					</tr>
                     <tr align="center">
 						<th>Pengajuan</th>
                         <th>Req.Pembayaran</th>
-                        <th>Kode</th>
-                        <th>Konversi</th>
+                        <th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.conversion') }}</th>
 					</tr>
 				</thead>
 				<tbody>

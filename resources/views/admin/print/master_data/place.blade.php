@@ -205,16 +205,16 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Alamat</th>
-								<th>Cabang</th>
-								<th>Tipe</th>
-								<th>Provinsi</th>
-								<th>Kota</th>
-                                <th>Kecamatan</th>
-                                <th>Kelurahan</th>
-                                <th>Kapasitas</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.address') }}</th>
+								<th>{{ __('translations.branch') }}</th>
+								<th>{{ __('translations.type') }}</th>
+								<th>{{ __('translations.province') }}</th>
+								<th>{{ __('translations.city') }}</th>
+                                <th>{{ __('translations.subdistrict') }}</th>
+                                <th>{{ __('translations.urban_village') }}</th>
+                                <th>{{ __('translations.capacity') }}</th>
 							</tr>
                         </thead>
                         <tbody>

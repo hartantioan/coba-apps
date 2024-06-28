@@ -205,16 +205,16 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
 								<th>Grup</th>
 								<th>Satuan Stok</th>
 								<th>Item Stok</th>
 								<th>Item Penjualan</th>
 								<th>Item Pembelian</th>
 								<th>Item Aset</th>
-								<th>Gudang</th>
-								<th>Keterangan</th>	
+								<th>{{ __('translations.warehouse') }}</th>
+								<th>{{ __('translations.note') }}</th>	
                             </tr>
                         </thead>
                         <tbody>

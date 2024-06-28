@@ -313,14 +313,14 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Harga</th>
+                                    <th>{{ __('translations.unit') }}</th>
+                                    <th>{{ __('translations.price') }}</th>
                                     <th>Diskon 1</th>
                                     <th>Diskon 2</th>
                                     <th>Diskon 3</th>
-                                    <th>Harga Final</th>
+                                    <th>{{ __('translations.final_price') }}</th>
                                     <th>Total</th>
                                 </tr>
                             </thead>

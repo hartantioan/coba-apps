@@ -7,9 +7,9 @@
             <th rowspan="2">Equipment </th>
             <th rowspan="2">Nama Aktivitas</th>
             <th rowspan="2">Area </th>
-            <th colspan="2">Tanggal</th>
+            <th colspan="2">{{ __('translations.date') }}</th>
             <th rowspan="2">Catatan</th>
-            <th rowspan="2">Status</th>
+            <th rowspan="2">{{ __('translations.status') }}</th>
         </tr>
         <tr align="center">
             <th>Pengajuan</th>
@@ -36,7 +36,7 @@
             </tr>
             <tr align="center">
                 <th>No</th>
-                <th>Item</th>
+                <th>{{ __('translations.item') }}</th>
             </tr>
             @foreach($row->workOrderPartDetail as $keydetail => $rowdetail)
             <tr>

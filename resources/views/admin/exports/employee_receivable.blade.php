@@ -6,7 +6,7 @@
             <th class="center-align">Karyawan</th>
             <th class="center-align">Tgl.Pengajuan</th>
             <th class="center-align">Tgl.Req.Bayar</th>
-            <th class="center-align">Keterangan</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">Total</th>
             <th class="center-align">PPN</th>
             <th class="center-align">PPh</th>

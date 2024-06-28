@@ -49,7 +49,7 @@
                                                 <option value="all">SEMUA</option>
                                                 <option value="final">FINAL</option>
                                             </select>
-                                            <label class="" for="type">Tipe</label>
+                                            <label class="" for="type">{{ __('translations.type') }}</label>
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
@@ -66,7 +66,7 @@
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
-                                            <label class="" for="plant">Plant</label>
+                                            <label class="" for="plant">{{ __('translations.plant') }}</label>
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
@@ -145,12 +145,12 @@
                         <thead id="t_head">
                             <tr>
                                 <th class="center-align">No.</th>
-                                <th class="center-align">Tanggal</th>
-                                <th class="center-align">Plant</th>
-                                <th class="center-align">Gudang</th>
-                                <th class="center-align">Kode</th>
+                                <th class="center-align">{{ __('translations.date') }}</th>
+                                <th class="center-align">{{ __('translations.plant') }}</th>
+                                <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                <th class="center-align">{{ __('translations.code') }}</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">No. Dokumen</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Harga </th>
@@ -221,11 +221,11 @@
                             $('#t_head').append(`
                                 <tr>
                                     <th class="center-align">No.</th>
-                                    <th class="center-align">Plant</th>
-                                    <th class="center-align">Gudang</th>
-                                    <th class="center-align">Kode</th>
+                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                    <th class="center-align">{{ __('translations.code') }}</th>
                                     <th class="center-align">Nama Item</th>
-                                    <th class="center-align">Satuan</th>
+                                    <th class="center-align">{{ __('translations.unit') }}</th>
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
@@ -257,12 +257,12 @@
                             $('#t_head').append(`
                                 <tr>
                                     <th class="center-align">No.</th>
-                                    <th class="center-align">Tanggal</th>
-                                    <th class="center-align">Plant</th>
-                                    <th class="center-align">Gudang</th>
-                                    <th class="center-align">Kode</th>
+                                    <th class="center-align">{{ __('translations.date') }}</th>
+                                    <th class="center-align">{{ __('translations.plant') }}</th>
+                                    <th class="center-align">{{ __('translations.warehouse') }}</th>
+                                    <th class="center-align">{{ __('translations.code') }}</th>
                                     <th class="center-align">Nama Item</th>
-                                    <th class="center-align">Satuan</th>
+                                    <th class="center-align">{{ __('translations.unit') }}</th>
                                     <th class="center-align">No. Dokumen</th>
                                     <th class="center-align">Qty</th>
                                     <th class="center-align">Harga </th>

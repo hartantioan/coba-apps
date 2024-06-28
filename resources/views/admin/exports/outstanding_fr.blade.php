@@ -8,8 +8,8 @@
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Nama User Terkait</th>
-            <th class="center-align">Keterangan</th>
-            <th class="center-align">Status</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
+            <th class="center-align">{{ __('translations.status') }}</th>
             <th class="center-align">Total Fund Request</th>
             <th class="center-align">Total Payment Request</th>
             <th class="center-align">Tunggakan</th>

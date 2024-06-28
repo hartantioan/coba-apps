@@ -76,10 +76,10 @@
                                             <table id="datatable_serverside_downpayment">
                                                 <thead>
                                                     <tr>
-                                                        <th>Code</th>
-                                                        <th>Customer</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.customer') }}</th>
                                                         <th>Payment</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -100,10 +100,10 @@
                                             <table id="datatable_serverside_invoice">
                                                 <thead>
                                                     <tr>
-                                                        <th>Code</th>
-                                                        <th>Customer</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.customer') }}</th>
                                                         <th>Payment</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -128,7 +128,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

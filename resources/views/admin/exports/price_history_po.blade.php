@@ -4,8 +4,8 @@
             <tr>
             <th class="center-align">No.</th>
             <th class="center-align">Supplier</th>
-            <th class="center-align">Code</th>
-            <th class="center-align">Item</th>
+            <th class="center-align">{{ __('translations.code') }}</th>
+            <th class="center-align">{{ __('translations.item') }}</th>
             <th class="center-align">TGL</th>
             <th class="center-align">Harga Awal</th>
             <th class="center-align">Diskon 1</th>

@@ -51,7 +51,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
@@ -68,13 +68,13 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
@@ -96,7 +96,7 @@
                             </ul>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div class="card-alert card purple">
@@ -112,7 +112,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
@@ -121,10 +121,10 @@
                                                         <th>#</th>
                                                         <th>No</th>
                                                         <th>Status Closing</th>
-                                                        <th>Pengguna</th>
-                                                        <th>Perusahaan</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>{{ __('translations.company') }}</th>
                                                         <th>Periode</th>
-                                                        <th>Keterangan</th>
+                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>Status Dokumen</th>
                                                     </tr>
                                                 </thead>
@@ -147,7 +147,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -173,11 +173,11 @@
                                         <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                     @endforeach
                                 </select>
-                                <label class="" for="company_id">Perusahaan</label>
+                                <label class="" for="company_id">{{ __('translations.company') }}</label>
                             </div>
                             <div class="input-field col s3 step4">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                <label class="active" for="post_date">Tgl. Posting</label>
+                                <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                             </div>
                             <div class="input-field col s3 step5">
                                 <input id="month" name="month" type="month" placeholder="Periode depresiasi" value="{{ date('Y-m') }}">
@@ -185,7 +185,7 @@
                             </div>
                             <div class="input-field col s3 step6">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">Keterangan</label>
+                                <label class="active" for="note">{{ __('translations.note') }}</label>
                             </div>
                         </div>
                         <div class="row">
@@ -196,8 +196,8 @@
                                     <thead>
                                         <tr>
                                             <th class="center" width="15%">No.</th>
-                                            <th class="center" width="55%">Nama</th>
-                                            <th class="center" width="30%">Hapus</th>
+                                            <th class="center" width="55%">{{ __('translations.name') }}</th>
+                                            <th class="center" width="30%">{{ __('translations.delete') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-detail">
@@ -214,7 +214,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step8" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step8" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -224,7 +224,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -237,7 +237,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

@@ -2,20 +2,20 @@
     <thead>
         <tr align="center">
             <th>No</th>
-            <th>Pengguna</th>
-            <th>Code</th>
-            <th>Perusahaan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.code') }}</th>
+            <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Ref.CREQ</th>
             <th>Tgl.CREQ</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Coa</th>
             <th>Dist.Biaya</th>
-            <th>Plant</th>
-            <th>Line</th>
-            <th>Mesin</th>
-            <th>Divisi</th>
+            <th>{{ __('translations.plant') }}</th>
+            <th>{{ __('translations.line') }}</th>
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
             <th>Proyek</th>
             <th>Ket.1</th>
             <th>Ket.2</th>

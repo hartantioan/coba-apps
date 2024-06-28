@@ -3,14 +3,14 @@
         <tr>
             <th>No.</th>
             <th>No Invoice</th>
-            <th>Customer</th>
+            <th>{{ __('translations.customer') }}</th>
             <th>TGL Post</th>
             <th>TOP(Hari)</th>
             <th>Nama Item</th>
             <th>Note</th>
             <th>Qty Order</th>
             <th>Qty Invoice</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>Harga Satuan</th>
             <th>Total</th>
             <th>PPN</th>

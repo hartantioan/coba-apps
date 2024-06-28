@@ -11,22 +11,22 @@
             <th>Kadar Air</th>
             <th>Qty. Diterima</th>
             <th>Harga Satuan</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>Total</th>
             <th>Total Bayar</th>
-            <th>Plant</th>
+            <th>{{ __('translations.plant') }}</th>
             <th>Nomor PO</th>
             <th>No. Dokumen</th>
             <th>Based On</th>
             <th>Keterangan 1</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
-            <th>Gudang</th>
+            <th>{{ __('translations.warehouse') }}</th>
         </tr>
     </thead>
     <tbody>

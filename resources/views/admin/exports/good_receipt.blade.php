@@ -3,8 +3,8 @@
         <tr align="center">
             <th>No.</th>
             <th>No. Dokumen</th>
-            <th>Tipe</th>
-            <th>Status</th>
+            <th>{{ __('translations.type') }}</th>
+            <th>{{ __('translations.status') }}</th>
             <th>Deleter</th>
             <th>Tgl. Delete</th>
             <th>Ket. Delete</th>
@@ -12,31 +12,31 @@
             <th>Tgl. Void</th>
             <th>Ket. Void</th>
             <th>NIK</th>
-            <th>Pengguna</th>
+            <th>{{ __('translations.user') }}</th>
             <th>Nama Supplier</th>
             <th>Tgl. Terima</th>
             <th>Tgl. SJ</th>
             <th>No. SJ</th>
             <th>Penerima</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Dokumen</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
-            <th>Plant</th>
+            <th>{{ __('translations.plant') }}</th>
             <th>Ket. 1</th>
             <th>Ket. 2</th>
             <th>Qty Netto</th>
             <th>Kadar Air (%)</th>
             <th>Qty Diterima</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>Qty Konversi</th>
-            <th>Satuan</th>
+            <th>{{ __('translations.unit') }}</th>
             <th>Kurs</th>
             <th>Total</th>
-            <th>Line</th>
-            <th>Mesin</th>
-            <th>Divisi</th>
-            <th>Gudang</th>
+            <th>{{ __('translations.line') }}</th>
+            <th>{{ __('translations.engine') }}</th>
+            <th>{{ __('translations.division') }}</th>
+            <th>{{ __('translations.warehouse') }}</th>
             <th>Based On</th>
         </tr>
     </thead>

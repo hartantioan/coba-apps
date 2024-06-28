@@ -2,18 +2,18 @@
     <thead>
         <tr align="center">
             <th>#</th>
-            <th>Code</th>
+            <th>{{ __('translations.code') }}</th>
             <th>User</th>
             <th>Kode Inventaris</th>
-            <th>Item</th>
-            <th>Lokasi</th>
-            <th>Tanggal</th>
+            <th>{{ __('translations.item') }}</th>
+            <th>{{ __('translations.location') }}</th>
+            <th>{{ __('translations.date') }}</th>
             <th>Tanggal Penyerahan</th>
             <th>Keterangan Penyerahan</th>
             <th>User(Bersangkutan)</th>
             <th>Tanggal Pengembalian</th>
             <th>Keterangan Pengembalian</th>
-            <th>Status</th>
+            <th>{{ __('translations.status') }}</th>
         </tr>
     </thead>
     <tbody>

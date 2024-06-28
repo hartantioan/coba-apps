@@ -231,9 +231,9 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Surat Jalan</th>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
+                                    <th>{{ __('translations.unit') }}</th>
                                     <th>Tujuan</th>
                                 </tr>
                             </thead>

@@ -35,7 +35,7 @@
                         <div class="col s12">
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
@@ -68,7 +68,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
@@ -76,9 +76,9 @@
                                                     <tr>
                                                         <th >#</th>
                                                         <th >Supplier</th>
-                                                        <th >Code</th>
-                                                        <th >Item</th>
-                                                        <th class="center-align">Tanggal</th>
+                                                        <th >{{ __('translations.code') }}</th>
+                                                        <th >{{ __('translations.item') }}</th>
+                                                        <th class="center-align">{{ __('translations.date') }}</th>
                                                         <th> Harga Awal  </th>
                                                         <th >Discount 1  </th>
                                                         <th >Discount 2  </th>

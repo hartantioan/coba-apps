@@ -17,14 +17,14 @@
                     <thead>
                         <tr>
                             
-                            <th>Nama</th>
-                            <th>Keterangan</th>
+                            <th>{{ __('translations.name') }}</th>
+                            <th>{{ __('translations.note') }}</th>
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Akhir</th>
                             <th>Umur</th>
                             <th>Limit</th>
-                            <th>Status</th>
-                            <th>Action</th>
+                            <th>{{ __('translations.status') }}</th>
+                            <th>{{ __('translations.action') }}</th>
                         </tr>
                     </thead>
                     <tbody id="body-reminder"></tbody>
@@ -34,7 +34,7 @@
         </div>
     </div>
     <div class="modal-footer" style="background: #fee13e">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <script>

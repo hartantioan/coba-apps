@@ -127,15 +127,15 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-                        <th>Pengguna</th>
-						<th>Code</th>
-                        <th>Perusahaan</th>
-                        <th>Tanggal</th>
-						<th>Asal</th>
+                        <th>{{ __('translations.user') }}</th>
+						<th>{{ __('translations.code') }}</th>
+                        <th>{{ __('translations.company') }}</th>
+                        <th>{{ __('translations.date') }}</th>
+						<th>{{ __('translations.origin') }}</th>
 						<th>Tujuan</th>
-                        <th>Keterangan</th>
+                        <th>{{ __('translations.note') }}</th>
                         <th>Dokumen</th>
-                        <th>Status</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -157,10 +157,10 @@
                                 <table border="1" cellpadding="2" cellspacing="0" style="border-collapse: collapse;">
                                     <thead>
                                         <tr align="center">
-                                            <th>Item</th>
+                                            <th>{{ __('translations.item') }}</th>
                                             <th>Qty</th>
-                                            <th>Satuan</th>
-                                            <th>Keterangan</th>
+                                            <th>{{ __('translations.unit') }}</th>
+                                            <th>{{ __('translations.note') }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>

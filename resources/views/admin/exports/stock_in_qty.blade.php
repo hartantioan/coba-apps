@@ -3,11 +3,11 @@
         <tr align="center">
             <th class="center-align">No.</th>
         
-            <th class="center-align">Plant</th>
-            <th class="center-align">Gudang</th>
-            <th class="center-align">Kode</th>
+            <th class="center-align">{{ __('translations.plant') }}</th>
+            <th class="center-align">{{ __('translations.warehouse') }}</th>
+            <th class="center-align">{{ __('translations.code') }}</th>
             <th class="center-align">Nama Item</th>
-            <th class="center-align">Satuan</th>
+            <th class="center-align">{{ __('translations.unit') }}</th>
             <th class="center-align">Qty</th>
         </tr>
     </thead>

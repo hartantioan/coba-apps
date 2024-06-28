@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th rowspan="2" align="center">No.</th>
-            <th rowspan="2" align="center">Customer</th>
+            <th rowspan="2" align="center">{{ __('translations.customer') }}</th>
             <th rowspan="2" align="center">Total Tagihan</th>
             <th colspan="{{ $countPeriod }}" align="center">Nominal Tenggat</th>
         </tr>

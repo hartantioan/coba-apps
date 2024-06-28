@@ -3,11 +3,11 @@
         <tr align="center">
             <th class="center-align">No.</th>
             <th class="center-align">Dokumen</th>
-            <th class="center-align">Customer</th>
-            <th class="center-align">Tipe</th>
+            <th class="center-align">{{ __('translations.customer') }}</th>
+            <th class="center-align">{{ __('translations.type') }}</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Tgl.Tenggat</th>
-            <th class="center-align">Keterangan</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">Subtotal</th>
             <th class="center-align">Diskon</th>
             <th class="center-align">Total</th>

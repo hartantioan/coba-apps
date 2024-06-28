@@ -280,9 +280,9 @@
                                 <tr>
                                     <th align="center">No.</th>
                                     <th align="center">OP/CREQ No.</th>
-                                    <th align="center">Partner Bisnis</th>
+                                    <th align="center">{{ __('translations.bussiness_partner') }}</th>
                                     <th align="center">Tgl.Bayar</th>
-                                    <th align="center">Keterangan</th>
+                                    <th align="center">{{ __('translations.note') }}</th>
                                     <th align="center">Nominal Terpakai</th>
                                 </tr>
                             </thead>
@@ -323,10 +323,10 @@
                                 <tr>
                                     <th align="center">Coa</th>
                                     <th align="center">Dist.Biaya</th>
-                                    <th align="center">Plant</th>
-                                    <th align="center">Line</th>
-                                    <th align="center">Mesin</th>
-                                    <th align="center">Divisi</th>
+                                    <th align="center">{{ __('translations.plant') }}</th>
+                                    <th align="center">{{ __('translations.line') }}</th>
+                                    <th align="center">{{ __('translations.engine') }}</th>
+                                    <th align="center">{{ __('translations.division') }}</th>
                                     <th align="center">Proyek</th>
                                     <th align="center">Debit FC</th>
                                     <th align="center">Kredit FC</th>

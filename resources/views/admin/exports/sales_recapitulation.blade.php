@@ -3,7 +3,7 @@
         <tr>
             <th>No.</th>
             <th>No Invoice</th>
-            <th>Customer</th>
+            <th>{{ __('translations.customer') }}</th>
             <th>Tgl.Post</th>
             <th>TOP</th>
             <th>Note</th>

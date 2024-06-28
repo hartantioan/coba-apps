@@ -131,13 +131,13 @@
 					<tr align="center">
 						<th rowspan="2">No</th>
                         <th rowspan="2">GR NO.</th>
-                        <th rowspan="2">Pengguna</th>
-						<th rowspan="2">Partner Bisnis</th>
-						<th colspan="3">Tanggal</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
+						<th rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+						<th colspan="3">{{ __('translations.date') }}</th>
 						<th rowspan="2">Penerima</th>
                         <th rowspan="2">Dokumen</th>
                         <th rowspan="2">Catatan</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
 					</tr>
                     <tr align="center">
 						<th>Pengajuan</th>
@@ -166,16 +166,16 @@
 									<thead>
 										<tr align="center">
 											<th>No</th>
-											<th>Item</th>
+											<th>{{ __('translations.item') }}</th>
 											<th>Jum.</th>
 											<th>Sat.</th>
 											<th>Keterangan 1</th>
 											<th>Keterangan 2</th>
 											<th>Remark</th>
-											<th>Plant</th>
-											<th>Line</th>
+											<th>{{ __('translations.plant') }}</th>
+											<th>{{ __('translations.line') }}</th>
 											<th>Departemen</th>
-											<th>Gudang</th>
+											<th>{{ __('translations.warehouse') }}</th>
 										</tr>
 									</thead>
 									<tbody>

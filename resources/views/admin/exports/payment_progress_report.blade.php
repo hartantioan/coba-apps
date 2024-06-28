@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>No</th>
-            <th>Item</th>
+            <th>{{ __('translations.item') }}</th>
             <th>Item Code</th>
             <th>PO Code</th>
             <th>PO Date</th>

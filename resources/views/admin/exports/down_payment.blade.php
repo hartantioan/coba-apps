@@ -6,8 +6,8 @@
             <th class="center-align">Tgl.Posting</th>
             <th class="center-align">Kode Supplier</th>
             <th class="center-align">Nama Supplier</th>
-            <th class="center-align">Tipe</th>
-            <th class="center-align">Keterangan</th>
+            <th class="center-align">{{ __('translations.type') }}</th>
+            <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">Total RP</th>
             <th class="center-align">Total FC</th>
             <th class="center-align">Sisa RP</th>

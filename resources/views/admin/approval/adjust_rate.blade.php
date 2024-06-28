@@ -198,7 +198,7 @@
                 <thead>
                     <tr>
                         <th class="center">No.</th>
-                        <th class="center">Nomor</th>
+                        <th class="center">{{ __('translations.number') }}/th>
                         <th class="center">Coa</th>
                         <th class="center">Nominal Sisa (FC)</th>
                         <th class="center">Kurs Terakhir</th>

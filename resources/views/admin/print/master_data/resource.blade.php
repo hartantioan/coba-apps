@@ -205,14 +205,14 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
-								<th>Nama</th>
-								<th>Nama Lain</th>
-								<th>Satuan</th>
+								<th>{{ __('translations.code') }}</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.other_name') }}</th>
+								<th>{{ __('translations.unit') }}</th>
 								<th>Biaya</th>
                                 <th>Coa</th>
-								<th>Plant</th>
-								<th>Status</th>
+								<th>{{ __('translations.plant') }}</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

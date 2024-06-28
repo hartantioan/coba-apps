@@ -224,8 +224,8 @@
                 <thead>
                     <tr>
                         <th class="center">No.</th>
-                        <th class="center">Code</th>
-                        <th class="center">Nama</th>
+                        <th class="center">{{ __('translations.code') }}</th>
+                        <th class="center">{{ __('translations.name') }}</th>
                         <th class="center">Spesifikasi</th>
                     </tr>
                 </thead>

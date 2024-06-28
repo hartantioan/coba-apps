@@ -19,7 +19,7 @@
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
                         <ol class="breadcrumbs mb-0">
-                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>
+                            <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">{{ __('translations.dashboard') }}</a>
                             </li>
                             <li class="breadcrumb-item"><a href="#">{{ Str::title(str_replace('_',' ',Request::segment(2))) }}</a>
                             </li>
@@ -32,7 +32,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
@@ -53,12 +53,12 @@
                             <div class="card-panel">
                                 <div class="row">
                                     <div class="col s12 ">
-                                        <label for="filter_status" style="font-size:1.2rem;">Filter Status :</label>
+                                        <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">Semua</option>
-                                                <option value="1">Aktif</option>
-                                                <option value="2">Non-Aktif</option>
+                                                <option value="">{{ __('translations.all') }}</option>
+                                                <option value="1">{{ __('translations.active') }}</option>
+                                                <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -66,28 +66,28 @@
                             </div>
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Kode</th>
-                                                        <th>Nama</th>
-                                                        <th>Parent</th>
-                                                        <th>Coa Pengakuan Aset</th>
-                                                        <th>Coa Akumulasi Penyusutan</th>
-                                                        <th>Coa Biaya</th>
-                                                        <th>Periode Penyusutan (Bln)</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.code') }}</th>
+                                                        <th>{{ __('translations.name') }}</th>
+                                                        <th>{{ __('translations.parent') }}</th>
+                                                        <th>{{ __('translations.asset_recognition_coa') }}</th>
+                                                        <th>{{ __('translations.accumulated_depreciation_coa') }}</th>
+                                                        <th>{{ __('translations.cost_coa') }}</th>
+                                                        <th>{{ __('translations.depreciation_period') }} ({{ __('translations.month') }})</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -108,7 +108,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -117,15 +117,15 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode grup">
-                            <label class="active" for="code">Kode</label>
+                            <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama grup">
-                            <label class="active" for="name">Nama</label>
+                            <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="parent_id" name="parent_id">
-                                <option value="">Parent (Utama)</option>
+                                <option value="">{{ __('translations.parent') }} ({{ __('translations.primary') }})</option>
                                 @foreach($parent as $m)
                                     <option value="{{ $m->id }}">{{ $m->name }}</option>
                                     @foreach($m->childSub as $m2)
@@ -139,47 +139,47 @@
                                     @endforeach
                                 @endforeach
                             </select>
-                            <label class="active" for="parent_id">Parent Menu</label>
+                            <label class="active" for="parent_id">{{ __('translations.parent_menu') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="coa_id" name="coa_id">
-                                <option value="">-- Pilih Coa --</option>
+                                <option value="">-- {{ __('translations.select_coa') }} --</option>
                                 @foreach($coa as $c)
                                     <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="coa_id">Coa Pengakuan Aset (Kapitalisasi)</label>
+                            <label class="active" for="coa_id">{{ __('translations.asset_recognition_coa') }} ({{ __('translations.capitalization') }})</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="select2 browser-default" id="depreciation_coa_id" name="depreciation_coa_id">
-                                <option value="">-- Pilih Coa --</option>
+                                <option value="">-- {{ __('translations.select_coa') }} --</option>
                                 @foreach($coa as $c)
                                     <option value="{{ $c->id }}">{{ $c->code.' - '.$c->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="depreciation_coa_id">Coa Akumulasi Penyusutan</label>
+                            <label class="active" for="depreciation_coa_id">{{ __('translations.accumulated_depreciation_coa') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="depreciation_period" name="depreciation_period" type="number" step="1" value="0">
-                            <label class="active" for="depreciation_period">Periode Penyusutan (Bulan)</label>
+                            <label class="active" for="depreciation_period">{{ __('translations.depreciation_period') }} ({{ __('translations.month') }})</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="cost_coa_id" name="cost_coa_id"></select>
-                            <label class="active" for="cost_coa_id">Coa Biaya</label>
+                            <label class="active" for="cost_coa_id">{{ __('translations.cost_coa') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
-                                <label for="order">Status</label>
+                                <label for="order">{{ __('translations.status') }}</label>
                                 <label>
-                                    Non-Active
+                                    {{ __('translations.non_active') }}
                                     <input checked type="checkbox" id="status" name="status" value="1">
                                     <span class="lever"></span>
-                                    Active
+                                    {{ __('translations.active') }}
                                 </label>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -187,7 +187,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

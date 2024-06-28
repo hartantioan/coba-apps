@@ -88,14 +88,14 @@
 						<tr align="center">
 							<th rowspan="2">No</th>
 							<th rowspan="2">PODP NO.</th>
-							<th rowspan="2">Pengguna</th>
+							<th rowspan="2">{{ __('translations.user') }}</th>
 							<th rowspan="2">Supplier</th>
-							<th colspan="2">Tanggal</th>
+							<th colspan="2">{{ __('translations.date') }}</th>
 							<th rowspan="2">Lampiran</th>
 							<th rowspan="2">Pembayaran</th>
-							<th colspan="2">Mata Uang</th>
-							<th rowspan="2">Keterangan</th>
-							<th rowspan="2">Status</th>
+							<th colspan="2">{{ __('translations.currency') }}</th>
+							<th rowspan="2">{{ __('translations.note') }}</th>
+							<th rowspan="2">{{ __('translations.status') }}</th>
 							<th rowspan="2">Subtotal</th>
 							<th rowspan="2">Diskon</th>
 							<th rowspan="2">Total</th>
@@ -106,8 +106,8 @@
 						<tr align="center">
 							<th>Pengajuan</th>
 							<th>Tenggat</th>
-							<th>Kode</th>
-							<th>Konversi</th>
+							<th>{{ __('translations.code') }}</th>
+							<th>{{ __('translations.conversion') }}</th>
 						</tr>
 					</thead>
 					<tbody style="border: 1px solid black" >

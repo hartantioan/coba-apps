@@ -8,7 +8,7 @@
             <th align="center">Tgl.Terima</th>
             <th align="center">TOP(Hari)</th>
             <th align="center">Tgl.Jatuh Tempo</th>
-            <th align="center">Keterangan</th>
+            <th align="center">{{ __('translations.note') }}</th>
             <th align="center">Kurs</th>
             <th align="center">Sisa FC</th>
             <th align="center">Total</th>

@@ -2,12 +2,12 @@
     <thead>
         <tr>
             <th>No</th>
-            <th>Kode</th>
-            <th>Nama</th>
-            <th>Plant</th>
-            <th>Area</th>
-            <th>Item</th>
-            <th>Status</th>
+            <th>{{ __('translations.code') }}</th>
+            <th>{{ __('translations.name') }}</th>
+            <th>{{ __('translations.plant') }}</th>
+            <th>{{ __('translations.area') }}</th>
+            <th>{{ __('translations.item') }}</th>
+            <th>{{ __('translations.status') }}</th>
         </tr>
     </thead>
     <tbody>

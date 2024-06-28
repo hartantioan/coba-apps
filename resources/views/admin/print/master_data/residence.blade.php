@@ -206,9 +206,9 @@
 							<tr align="center">
 								<th>No</th>
 								<th>Kode.</th>
-								<th>Nama</th>
-								<th>Keterangan</th>
-								<th>Status</th>
+								<th>{{ __('translations.name') }}</th>
+								<th>{{ __('translations.note') }}</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
 						</thead>
                         <tbody>

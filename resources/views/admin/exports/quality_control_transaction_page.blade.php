@@ -3,11 +3,11 @@
         <tr align="center">
             <th>No</th>
             <th>Ref.PO</th>
-            <th>Code</th>
+            <th>{{ __('translations.code') }}</th>
             <th>NIK</th>
-            <th>Pengguna</th>
-            <th>Tanggal</th>
-            <th>Keterangan</th>
+            <th>{{ __('translations.user') }}</th>
+            <th>{{ __('translations.date') }}</th>
+            <th>{{ __('translations.note') }}</th>
             <th>Driver</th>
             <th>No Kendaraan</th>
             <th>Status Dokumen</th>

@@ -214,12 +214,12 @@
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Item</th>
+                                    <th>{{ __('translations.item') }}</th>
                                     <th>NO.MOD</th>
                                     <th>NO.SJ</th>
                                     <th>Qty</th>
-                                    <th>Satuan</th>
-                                    <th>Harga</th>
+                                    <th>{{ __('translations.unit') }}</th>
+                                    <th>{{ __('translations.price') }}</th>
                                     <th>Total</th>
                                     <th>PPN</th>
                                     <th>Grandtotal</th>
@@ -353,7 +353,7 @@
                                 <tr>
                                     <th>No.</th>
                                     <th>Dokumen</th>
-                                    <th>Keterangan</th>
+                                    <th>{{ __('translations.note') }}</th>
                                     <th>Total</th>
                                     <th>PPN</th>
                                     <th>Grandtotal</th>

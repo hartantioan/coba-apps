@@ -277,10 +277,10 @@
                                 <th class="center">No.</th>
                                 <th class="center">Aset</th>
                                 <th class="center">Qty</th>
-                                <th class="center">Satuan</th>
+                                <th class="center">{{ __('translations.unit') }}</th>
                                 <th class="center">Nominal Aset</th>
                                 <th class="center">Nominal Retirement</th>
-                                <th class="center">Keterangan</th>
+                                <th class="center">{{ __('translations.note') }}</th>
                                 <th class="center">Coa</th>
                             </tr>
                         </thead>

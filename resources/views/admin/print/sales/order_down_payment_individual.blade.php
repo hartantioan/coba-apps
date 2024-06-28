@@ -186,17 +186,17 @@
                     <!-- header section -->
                     <table border="0" width="60%" style="margin-left: auto;margin-right: auto;font-size:12px;font-weight:800;">
                         <tr>
-                            <td width="19%">Customer</td>
+                            <td width="19%">{{ __('translations.customer') }}</td>
                             <td width="1%">:</td>
                             <td width="80%">{{ $data->account->name }}</td>
                         </tr>
                         <tr>
-                            <td>Alamat</td>
+                            <td>{{ __('translations.address') }}</td>
                             <td>:</td>
                             <td>{{ $data->account->address }}</td>
                         </tr>
                         <tr>
-                            <td>Telepon</td>
+                            <td>{{ __('translations.phone_number') }}</td>
                             <td>:</td>
                             <td>{{ $data->account->phone.' / '.$data->account->office_no }}</td>
                         </tr>

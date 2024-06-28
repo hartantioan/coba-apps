@@ -51,7 +51,7 @@
                                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
-                                            <label class="" for="plant">Plant</label>
+                                            <label class="" for="plant">{{ __('translations.plant') }}</label>
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="form-control" id="warehouse" name="warehouse">
@@ -133,11 +133,11 @@
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Plant.</th>
-                                <th class="center-align">Gudang</th>
+                                <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">{{ __('translations.unit') }}</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">

@@ -49,7 +49,7 @@
                         
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                       
@@ -66,7 +66,7 @@
                             
                             <ul class="collapsible collapsible-accordion">
                                 <li>
-                                    <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                    <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
                                             <div class="col m4 s6 ">
@@ -86,7 +86,7 @@
                                                 <label for="filter_type" style="font-size:1rem;">Tipe Penjualan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_type" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Proyek</option>
                                                         <option value="2">Retail</option>
                                                         <option value="3">Khusus</option>
@@ -98,7 +98,7 @@
                                                 <label for="filter_payment" style="font-size:1rem;">Tipe Pembayaran :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_payment" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Cash</option>
                                                         <option value="2">Credit</option>
                                                     </select>
@@ -108,7 +108,7 @@
                                                 <label for="filter_delivery" style="font-size:1rem;">Tipe Pengiriman :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_delivery" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Loco</option>
                                                         <option value="2">Franco</option>
                                                     </select>
@@ -118,7 +118,7 @@
                                                 <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_company" onchange="loadDataTable()">
-                                                        <option value="">Semua</option>
+                                                        <option value="">{{ __('translations.all') }}</option>
                                                         @foreach ($company as $rowcompany)
                                                             <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                                         @endforeach
@@ -147,7 +147,7 @@
                                                 <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
                                                 <div class="input-field">
                                                     <select class="select2 browser-default" multiple="multiple" id="filter_currency" name="filter_currency" onchange="loadDataTable()">
-                                                        <option value="" disabled>Semua</option>
+                                                        <option value="" disabled>{{ __('translations.all') }}</option>
                                                         @foreach ($currency as $row)
                                                             <option value="{{ $row->id }}">{{ $row->code }}</option>
                                                         @endforeach
@@ -155,13 +155,13 @@
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
                                             <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
@@ -185,7 +185,7 @@
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
@@ -197,11 +197,11 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Code</th>
+                                                        <th>{{ __('translations.code') }}</th>
                                                         <th>Petugas</th>
-                                                        <th>Customer</th>
-                                                        <th>Perusahaan</th>
-                                                        <th>Tipe</th>
+                                                        <th>{{ __('translations.customer') }}</th>
+                                                        <th>{{ __('translations.company') }}</th>
+                                                        <th>{{ __('translations.type') }}</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Valid Hingga</th>
                                                         <th>Proyek</th>
@@ -216,15 +216,15 @@
                                                         <th>TOP.Customer</th>
                                                         <th>Bergaransi</th>
                                                         <th>Alamat Penagihan</th>
-                                                        <th>Outlet</th>
+                                                        <th>{{ __('translations.outlet') }}</th>
                                                         <th>Alamat Tujuan</th>
                                                         <th>Provinsi Tujuan</th>
                                                         <th>Kota Tujuan</th>
                                                         <th>Kecamatan Tujuan</th>
                                                         <th>KelurahanTujuan</th>
                                                         <th>Sales</th>
-                                                        <th>Mata Uang</th>
-                                                        <th>Konversi</th>
+                                                        <th>{{ __('translations.currency') }}</th>
+                                                        <th>{{ __('translations.conversion') }}</th>
                                                         <th>% DP</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
@@ -235,9 +235,9 @@
                                                         <th>Total Stlh PPN</th>
                                                         <th>Rounding</th>
                                                         <th>Grandtotal</th>
-                                                        <th>Status</th>
+                                                        <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -259,7 +259,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -268,7 +268,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. Informasi Utama</legend>
+                                    <legend>1. {{ __('translations.main_information') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
@@ -284,7 +284,7 @@
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
                                         <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();"></select>
-                                        <label class="active" for="account_id">Customer</label>
+                                        <label class="active" for="account_id">{{ __('translations.customer') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="select2 browser-default" id="billing_address" name="billing_address">
@@ -298,7 +298,7 @@
                                                 <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="company_id">Perusahaan</label>
+                                        <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step6">
                                         <select class="form-control" id="type" name="type">
@@ -311,7 +311,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step7">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
-                                        <label class="active" for="post_date">Tgl. Posting</label>
+                                        <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step8">
                                         <input id="valid_date" name="valid_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Valid">
@@ -351,7 +351,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step15">
                                         <select class="browser-default" id="outlet_id" name="outlet_id" onchange="getOutletAddress();"></select>
-                                        <label class="active" for="outlet_id">Outlet</label>
+                                        <label class="active" for="outlet_id">{{ __('translations.outlet') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step16">
                                         <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
@@ -359,25 +359,25 @@
                                     </div>
                                     <div class="input-field col m3 s12 step17">
                                         <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
-                                        <label class="active" for="province_id">Provinsi</label>
+                                        <label class="active" for="province_id">{{ __('translations.province') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step18">
                                         <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
-                                            <option value="">--Pilih ya--</option>
+                                            <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
-                                        <label class="active" for="city_id">Kota</label>
+                                        <label class="active" for="city_id">{{ __('translations.city') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step19">
                                         <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
-                                            <option value="">--Pilih ya--</option>
+                                            <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
-                                        <label class="active" for="district_id">Kecamatan</label>
+                                        <label class="active" for="district_id">{{ __('translations.subdistrict') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step20">
                                         <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
-                                            <option value="">--Pilih ya--</option>
+                                            <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
-                                        <label class="active" for="subdistrict_id">Kelurahan</label>
+                                        <label class="active" for="subdistrict_id">{{ __('translations.urban_village') }}</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -412,11 +412,11 @@
                                                 <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
                                             @endforeach
                                         </select>
-                                        <label class="" for="currency_id">Mata Uang</label>
+                                        <label class="" for="currency_id">{{ __('translations.currency') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step26">
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
-                                        <label class="active" for="currency_rate">Konversi</label>
+                                        <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step27">
                                         <input id="percent_dp" name="percent_dp" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;">
@@ -450,20 +450,20 @@
                                             <table class="bordered" style="width:3500px;" id="table-detail">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">Item</th>
-                                                        <th class="center">Plant</th>
+                                                        <th class="center">{{ __('translations.item') }}</th>
+                                                        <th class="center">{{ __('translations.plant') }}</th>
                                                         <th class="center">Qty Skrg</th>
                                                         <th class="center">Qty Sementara</th>
                                                         <th class="center">Satuan UoM</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">Satuan Pesanan</th>
-                                                        <th class="center">Harga</th>
+                                                        <th class="center">{{ __('translations.price') }}</th>
                                                         <th class="center">Margin</th>
                                                         <th class="center">
                                                             PPN
                                                             <label class="pl-2">
                                                                 <input type="checkbox" onclick="chooseAllPpn(this)">
-                                                                <span style="padding-left: 25px;">Semua</span>
+                                                                <span style="padding-left: 25px;">{{ __('translations.all') }}</span>
                                                             </label>
                                                         </th>
                                                         <th class="center">Termasuk PPN</th>
@@ -471,10 +471,10 @@
                                                         <th class="center">Disc2(%)</th>
                                                         <th class="center">Disc3(Rp)</th>
                                                         <th class="center">Biaya Lain</th>
-                                                        <th class="center">Harga Final</th>
+                                                        <th class="center">{{ __('translations.final_price') }}</th>
                                                         <th class="center">Total</th>
-                                                        <th class="center">Keterangan</th>
-                                                        <th class="center">Hapus</th>
+                                                        <th class="center">{{ __('translations.note') }}</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
@@ -554,7 +554,7 @@
                                 </table>
                             </div>
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step35" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step35" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -564,7 +564,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -577,7 +577,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -592,7 +592,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -605,7 +605,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -696,7 +696,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -817,7 +817,7 @@
                 }
                 M.updateTextFields();
                 $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
+                    <option value="">--{{ __('translations.select') }}--</option>
                 `);
                 $('#billing_address').empty().append(`
                     <option value="">--Pilih customer ya--</option>
@@ -937,7 +937,7 @@
         }else{
             $('destination_address').val('');
             $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
-                <option value="">--Pilih ya--</option>
+                <option value="">--{{ __('translations.select') }}--</option>
             `);
         }
     }
@@ -993,7 +993,7 @@
 
     function getCity(){
         $('#city_id,#subdistrict_id,#district_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#province_id').val()){
             city = $('#province_id').select2('data')[0].cities;
@@ -1011,7 +1011,7 @@
 
     function getDistrict(){
         $('#subdistrict_id,#district_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#city_id').val()){
             let index = -1;
@@ -1035,7 +1035,7 @@
 
     function getSubdistrict(){
         $('#subdistrict_id').empty().append(`
-            <option value="">--Pilih ya--</option>
+            <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#district_id').val()){
             
@@ -1976,7 +1976,7 @@
                 $('#destination_address').val(response.destination_address);
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`
-                    <option value="">--Pilih ya--</option>
+                    <option value="">--{{ __('translations.select') }}--</option>
                 `);
                 $('#project_id').empty();
                 if(response.project_name){
@@ -2603,7 +2603,7 @@
                         $('#destination_address').val(response.destination_address);
                         $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
                         $('#subdistrict_id,#district_id,#city_id').empty().append(`
-                            <option value="">--Pilih ya--</option>
+                            <option value="">--{{ __('translations.select') }}--</option>
                         `);
                         $('#project_id').empty();
                         if(response.project_name){

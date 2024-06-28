@@ -350,10 +350,10 @@
                             <thead>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Nama</th>
-                                    <th class="center">Nominal</th>
-                                    <th class="center">Satuan</th>
-                                    <th class="center">Keterangan</th>
+                                    <th class="center">{{ __('translations.name') }}</th>
+                                    <th class="center">{{ __('translations.nominal') }}</th>
+                                    <th class="center">{{ __('translations.unit') }}</th>
+                                    <th class="center">{{ __('translations.note') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

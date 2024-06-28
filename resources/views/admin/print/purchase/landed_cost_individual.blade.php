@@ -245,11 +245,11 @@
                                 </tr>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Item</th>
-                                    <th class="center">Plant</th>
-                                    <th class="center">Gudang</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
+                                    <th class="center">{{ __('translations.plant') }}</th>
+                                    <th class="center">{{ __('translations.warehouse') }}</th>
                                     <th class="center">Qty</th>
-                                    <th class="center">Satuan</th>
+                                    <th class="center">{{ __('translations.unit') }}</th>
                                     <th class="center">Surat Jalan</th>
                                     <th class="center">Landed Cost</th>
                                     <th class="center">Grandtotal</th>

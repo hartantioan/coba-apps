@@ -222,8 +222,8 @@
                 <thead>
                     <tr>
                         <th class="center-align">NIK</th>
-                        <th class="center-align">Keterangan</th>
-                        <th class="center-align">Nominal</th>
+                        <th class="center-align">{{ __('translations.note') }}</th>
+                        <th class="center-align">{{ __('translations.nominal') }}</th>
                         <th class="center-align">Cicilan</th>
                         <th class="center-align">Nominal Pembayaran</th>
                     </tr>

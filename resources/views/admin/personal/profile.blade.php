@@ -40,16 +40,16 @@
                                             </div>
                                             <div class="row mt-5">
                                                 <div class="col s12"><hr></div>
-                                                <div class="col s4">Nama</div><div class="col s8">: {{ $data->name }}</div>
+                                                <div class="col s4">{{ __('translations.name') }}</div><div class="col s8">: {{ $data->name }}</div>
                                                 <div class="col s4">NIK</div><div class="col s8">: {{ $data->employee_no }}</div>
                                                 <div class="col s4">Username</div><div class="col s8">: {{ $data->username }}</div>
                                                 <div class="col s4">Email</div><div class="col s8">: {{ $data->email }}</div>
                                                 <div class="col s4">HP</div><div class="col s8">: {{ $data->phone }}</div>
-                                                <div class="col s4">Alamat</div><div class="col s8">: {{ $data->address }}</div>
-                                                <div class="col s4">Kota</div><div class="col s8">: {{ $data->city()->exists() ? $data->city->name : '' }}</div>
-                                                <div class="col s4">Provinsi</div><div class="col s8">: {{ $data->province()->exists() ? $data->province->name : '' }}</div>
+                                                <div class="col s4">{{ __('translations.address') }}</div><div class="col s8">: {{ $data->address }}</div>
+                                                <div class="col s4">{{ __('translations.city') }}</div><div class="col s8">: {{ $data->city()->exists() ? $data->city->name : '' }}</div>
+                                                <div class="col s4">{{ __('translations.province') }}</div><div class="col s8">: {{ $data->province()->exists() ? $data->province->name : '' }}</div>
                                                 <div class="col s12"><hr></div>
-                                                <div class="col s4">Perusahaan</div><div class="col s8">: {{ $data->company()->exists() ? $data->company->name : '' }}</div>
+                                                <div class="col s4">{{ __('translations.company') }}</div><div class="col s8">: {{ $data->company()->exists() ? $data->company->name : '' }}</div>
                                                 <div class="col s4">Penempatan</div><div class="col s8">: {{ $data->place_id ? $data->place->code : '-' }}</div>
                                                 <div class="col s4">Departemen</div><div class="col s8">: {{ $data->department_id ? $data->department->name : '-' }}</div>
                                                 <div class="col s4">Posisi</div><div class="col s8">: {{ $data->position_id ? $data->position->name : '-' }}</div>
@@ -121,12 +121,12 @@
                                                 <div class="col s12">
                                                     <div class="input-field col s12">
                                                         <input id="name" name="name" type="text" placeholder="Nama Alat" value="{{ $data->name }}">
-                                                        <label class="active" for="name">Nama</label>
+                                                        <label class="active" for="name">{{ __('translations.name') }}</label>
                                                     </div>
                                                     
                                                     <div class="input-field col s12">
                                                         <input id="address" name="address" type="text" placeholder="Alamat" value="{{ $data->address }}">
-                                                        <label class="active" for="address">Alamat</label>
+                                                        <label class="active" for="address">{{ __('translations.address') }}</label>
                                                     </div>
                                                     <div class="input-field col s12">
                                                         <select class="browser-default" id="province_id" name="province_id">
@@ -134,7 +134,7 @@
                                                             <option value="{{ $data->province_id }}">{{ $data->province->name }}</option>
                                                             @endif
                                                         </select>
-                                                        <label class="active" for="province_id">Provinsi</label>
+                                                        <label class="active" for="province_id">{{ __('translations.province') }}</label>
                                                     </div>
                                                     <div class="input-field col s12">
                                                         <select class="browser-default" id="city_id" name="city_id">
@@ -177,7 +177,7 @@
                                                         <label class="active" for="">Preview Foto Profil</label>
                                                     </div>
                                                     <div class="col s12 mt-3">
-                                                        <button class="btn waves-effect waves-light right submit" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                                        <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                                                     </div>
                                                 </div>
                                             </form>

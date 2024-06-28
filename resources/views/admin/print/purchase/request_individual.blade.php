@@ -246,15 +246,15 @@
                         <thead>
                             <tr>
                                 <th class="center">No</th>
-                                <th class="center">Item</th>
+                                <th class="center">{{ __('translations.item') }}</th>
                                 <th class="center">Jum.</th>
                                 <th class="center">Sat.</th>
                                 <th class="center">Ket. 1</th>
                                 <th class="center">Ket. 2</th>
                                 <th class="center">Tgl.Dipakai</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Gudang</th>
-                                <th class="center">Divisi</th>
+                                <th class="center">{{ __('translations.plant') }}</th>
+                                <th class="center">{{ __('translations.warehouse') }}</th>
+                                <th class="center">{{ __('translations.division') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -273,8 +273,8 @@
                             </tr>
                             <tr>
                                 <td colspan="9">
-                                    <b>Line</b> : {{ $row->line()->exists() ? $row->line->code : '-' }},  
-                                    <b>Mesin</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
+                                    <b>{{ __('translations.line') }}</b> : {{ $row->line()->exists() ? $row->line->code : '-' }},  
+                                    <b>{{ __('translations.engine') }}</b> : {{ $row->machine()->exists() ? $row->machine->name : '-' }},
                                     <b>Requester</b> : {{ $row->requester }},
                                     <b>Proyek</b> : {{ $row->project()->exists() ? $row->project->name : '-' }}
                                 </td>

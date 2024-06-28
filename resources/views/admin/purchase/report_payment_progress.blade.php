@@ -59,7 +59,7 @@
                                                 <div class="input-field col m4 s12">
                                                     
                                                     <select class="form-control" id="type" name="type" onchange="loadDataTable()">
-                                                        <option value="all">Semua</option>
+                                                        <option value="all">{{ __('translations.all') }}</option>
                                                         <option value="sisa">Sisa</option>
                                                     </select>
                                                     <label for="type" style="font-size:1rem;">Tipe :</label>

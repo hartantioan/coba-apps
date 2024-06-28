@@ -295,16 +295,16 @@
                             <thead>
                                 <tr>
                                     <th class="center">No</th>
-                                    <th class="center">Item</th>
+                                    <th class="center">{{ __('translations.item') }}</th>
                                     <th class="center">BP</th>
                                     <th class="center">Jum.Diterima</th>
                                     <th class="center">Jum.Kembali</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Ket. 1</th>
                                     <th class="center">Ket. 2</th>
-                                    <th class="center">Plant</th>
+                                    <th class="center">{{ __('translations.plant') }}</th>
                                     <th class="center">Departemen</th>
-                                    <th class="center">Gudang</th>
+                                    <th class="center">{{ __('translations.warehouse') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

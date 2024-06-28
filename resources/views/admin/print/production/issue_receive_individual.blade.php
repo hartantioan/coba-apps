@@ -387,15 +387,15 @@
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
-                                <th align="center">Item</th>
+                                <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty Planned (Prod.)</th>
                                 <th align="center">Qty Real (Prod.)</th>
-                                <th align="center">Shading</th>
+                                <th align="center">{{ __('translations.shading') }}</th>
                                 <th align="center">Batch</th>
-                                <th align="center">Plant</th>
-                                <th align="center">Line</th>
-                                <th align="center">Gudang</th>
-                                <th align="center">Area</th>
+                                <th align="center">{{ __('translations.plant') }}</th>
+                                <th align="center">{{ __('translations.line') }}</th>
+                                <th align="center">{{ __('translations.warehouse') }}</th>
+                                <th align="center">{{ __('translations.area') }}</th>
                             </tr>
                         </thead>
                         <tbody>

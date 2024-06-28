@@ -205,10 +205,10 @@
                         <thead>
                             <tr align="center">
 								<th>No</th>
-								<th>Kode</th>
+								<th>{{ __('translations.code') }}</th>
 								<th>Judul</th>
 								<th>Deskripsi</th>
-								<th>Status</th>
+								<th>{{ __('translations.status') }}</th>
 							</tr>
                         </thead>
                         <tbody>

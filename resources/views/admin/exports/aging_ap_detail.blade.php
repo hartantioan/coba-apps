@@ -4,7 +4,7 @@
             <th rowspan="2" align="center">No.</th>
             <th rowspan="2" align="center">Supplier</th>
             <th rowspan="2" align="center">Invoice</th>
-            <th rowspan="2" align="center">Nominal</th>
+            <th rowspan="2" align="center">{{ __('translations.nominal') }}</th>
             <th colspan="{{ $countPeriod }}" align="center">Nominal Tenggat</th>
         </tr>
         <tr>

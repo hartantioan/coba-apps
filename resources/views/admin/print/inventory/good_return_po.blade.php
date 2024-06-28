@@ -131,12 +131,12 @@
 					<tr align="center">
 						<th>No</th>
                         <th>Good Return No.</th>
-                        <th>Pengguna</th>
-						<th>Partner Bisnis</th>
+                        <th>{{ __('translations.user') }}</th>
+						<th>{{ __('translations.bussiness_partner') }}</th>
 						<th>Tgl.Post</th>
                         <th>Dokumen</th>
                         <th>Catatan</th>
-                        <th>Status</th>
+                        <th>{{ __('translations.status') }}</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -157,15 +157,15 @@
 									<thead>
 										<tr align="center">
 											<th>No</th>
-											<th>Item</th>
+											<th>{{ __('translations.item') }}</th>
 											<th>Jum.Diterima</th>
                                             <th>Jum.Kembali</th>
 											<th>Sat.</th>
 											<th>Catatan 1</th>
 											<th>Catatan 2</th>
-											<th>Plant</th>
-											<th>Divisi</th>
-											<th>Gudang</th>
+											<th>{{ __('translations.plant') }}</th>
+											<th>{{ __('translations.division') }}</th>
+											<th>{{ __('translations.warehouse') }}</th>
 										</tr>
 									</thead>
 									<tbody>

@@ -50,17 +50,17 @@
                                 <div class="card-content">
                                     <ul class="collapsible collapsible-accordion">
                                         <li>
-                                            <div class="collapsible-header"><i class="material-icons">filter_list</i> FILTER</div>
+                                            <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                             <div class="collapsible-body">
                                                 <div class="row">
                                                     <div class="col m4 s6 ">
-                                                        <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                                        <label for="start-date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                         <div class="input-field col s12">
                                                         <input type="date" id="start-date" name="start-date"  onchange="loadDataTable()">
                                                         </div>
                                                     </div>
                                                     <div class="col m4 s6 ">
-                                                        <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                                        <label for="finish-date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                         <div class="input-field col s12">
                                                             <input type="date" id="finish-date" name="finish-date"  onchange="loadDataTable()">
                                                         </div>
@@ -69,27 +69,27 @@
                                             </div>
                                         </li>
                                     </ul>
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Nama</th>
-                                                        <th>Keterangan</th>
+                                                        <th>{{ __('translations.name') }}</th>
+                                                        <th>{{ __('translations.note') }}</th>
                                                         <th>Tanggal Mulai</th>
                                                         <th>Tanggal Akhir</th>
                                                         <th>Umur</th>
                                                         <th>Limit</th>
-                                                        <th>Status</th>
-                                                        <th>Action</th>
+                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -109,7 +109,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -139,7 +139,7 @@
                             </div>
                             
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step25" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step25" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">

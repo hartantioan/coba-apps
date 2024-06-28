@@ -127,8 +127,8 @@
 				<thead>
 					<tr align="center">
 						<th>No</th>
-						<th>Kode</th>
-						<th>Nama</th>
+						<th>{{ __('translations.code') }}</th>
+						<th>{{ __('translations.name') }}</th>
 					</tr>
 				</thead>
 				<tbody>

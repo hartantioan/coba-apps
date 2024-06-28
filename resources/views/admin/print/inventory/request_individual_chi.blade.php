@@ -248,14 +248,14 @@
                                 <th align="center">No <div style="font-weight:normal !important">数字</div></th>
                                 <th align="center">Item <div style="font-weight:normal !important">项目</div></th>
                                 <th align="center">Qty.<div style="font-weight:normal !important">数量</div></th>
-                                <th align="center">Stock<div style="font-weight:normal !important">库存</div></th>
+                                <th align="center">{{ __('translations.stock') }}<div style="font-weight:normal !important">库存</div></th>
                                 <th align="center">Unit.<div style="font-weight:normal !important">单元</div></th>
                                 <th align="center">Used Date<div style="font-weight:normal !important">使用日期</div></th>
-                                <th align="center">Plant<div style="font-weight:normal !important">工厂</div></th>
-                                <th align="center">Warehouse<div style="font-weight:normal !important">古当</div></th>
-                                <th align="center">Line<div style="font-weight:normal !important">机器链条</div></th>
+                                <th align="center">{{ __('translations.plant') }}<div style="font-weight:normal !important">工厂</div></th>
+                                <th align="center">{{ __('translations.warehouse') }}<div style="font-weight:normal !important">古当</div></th>
+                                <th align="center">{{ __('translations.line') }}<div style="font-weight:normal !important">机器链条</div></th>
                                 <th align="center">Machine<div style="font-weight:normal !important">引擎</div></th>
-                                <th align="center">Divisi<div style="font-weight:normal !important">分配</div></th>
+                                <th align="center">{{ __('translations.division') }}<div style="font-weight:normal !important">分配</div></th>
                                 <th align="center">Proyek<div style="font-weight:normal !important">项目</div></th>
                                 <th align="center-">Requester<div style="font-weight:normal !important">请求者</div></th>
                             </tr>

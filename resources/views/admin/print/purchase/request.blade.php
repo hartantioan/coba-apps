@@ -128,12 +128,12 @@
 				<thead>
 					<tr align="center">
 						<th rowspan="2">No  {{ __('translations.email') }}</th>
-                        <th rowspan="2">Pengguna</th>
-						<th rowspan="2">Kode</th>
-						<th colspan="3">Tanggal</th>
-                        <th rowspan="2">Keterangan</th>
+                        <th rowspan="2">{{ __('translations.user') }}</th>
+						<th rowspan="2">{{ __('translations.code') }}</th>
+						<th colspan="3">{{ __('translations.date') }}</th>
+                        <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">Dokumen</th>
-                        <th rowspan="2">Status</th>
+                        <th rowspan="2">{{ __('translations.status') }}</th>
 					</tr>
                     <tr align="center">
 						<th>Pengajuan</th>

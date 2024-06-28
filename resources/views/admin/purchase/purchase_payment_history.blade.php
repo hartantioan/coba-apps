@@ -179,7 +179,7 @@
                                                         <th>Terima</th>
                                                         <th>Tenggat</th>
                                                         <th>Dokumen</th>
-                                                        <th>{{ __('translations.percentage) }}</th>
+                                                        <th>{{ __('translations.percentage') }}</th>
                                                         <th>{{ __('translations.nominal') }}</th>
                                                     </tr>
                                                 </thead>

@@ -63,4 +63,17 @@ class DocumentTax extends Model
         return $status;
     }
 
+    public function reverseStatus(){
+        $status = match ($this->status) {
+          'Pending' => '1',
+          'Digunakan' => '2',
+          'Ditolak' => '3',
+          'Disetujui' => '4',
+          default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+        };
+
+        return $status;
+    }
+
+
 }

@@ -13,25 +13,37 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
 {
-    protected $no_faktur;
+    protected $no_faktur,$arr_status;
 
-    public function __construct(string $no_faktur)
+    public function __construct(string $no_faktur,string $arr_status)
     {
         $this->no_faktur = $no_faktur ? $no_faktur : '';
-      
+        $this->arr_status = $arr_status ? $arr_status : '';
     }
 
     public function sheets(): array
     {
         $no_faktur_arr = explode(',', $this->no_faktur);
         $outputArray = [];
-
-        foreach ($no_faktur_arr as $string) {
-            $result = substr($string, 3); // Start from the 4th character
-            $outputArray[] = $result;
+        $arr_status = explode(',', $this->arr_status);
+        foreach ($no_faktur_arr as $key=>$string) {
+            $result = substr($string, 3);
+            $status = match ($arr_status[$key]) {
+                'Pending' => '1',
+                'Digunakan' => '2',
+                'Ditolak' => '3',
+                'Disetujui' => '4',
+                default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+              };
+            
+            $taxbos = DocumentTax::where(function($query) use($result,$status) {
+                $query->where('code',$result)
+                    ->where('status',$status);
+            })->first();
+            $outputArray[] = $taxbos->id;
         }
         $taxes = DocumentTax::where(function($query) use($outputArray) {
-            $query->whereIn('code',$outputArray);
+            $query->whereIn('id',$outputArray);
         })->get();
         $taxDetail = DocumentTaxDetail::whereIn('document_tax_id', $taxes->pluck('id')->toArray())->get();
 

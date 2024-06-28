@@ -5,7 +5,7 @@
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal Serah Terima</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Refrensi</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Scanner</th>
-            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Status</th>
+            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.status') }}</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor FP</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
@@ -26,7 +26,7 @@
                     <td style="border: 1px solid black;">{{ $row->status()}}</td>
                     <td style="border: 1px solid black;">{{ $row->date }}</td>
                     <td style="border: 1px solid black;">{{ $row->transaction_code.$row->replace.$row->code }}</td>
-                    <td style="border: 1px solid black;">'{{ number_format($row->npwp_number, 0, '.', '') }}</td>
+                    <td style="border: 1px solid black;">'{{ $row->npwp_number}}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->npwp_address }}</td>
                     <td style="border: 1px solid black;">{{ number_format($row->total,2,',','.')}}</td>

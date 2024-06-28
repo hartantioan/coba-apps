@@ -5,7 +5,7 @@
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal Serah Terima</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Refrensi</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Scanner</th>
-            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Status</th>
+            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.status') }}</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor FP</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
@@ -27,7 +27,7 @@
                     <td style="border: 1px solid black;">{{ $row->documentTax->status() }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->date }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->transaction_code.$row->documentTax->replace.$row->documentTax->code }}</td>
-                    <td style="border: 1px solid black;">'{{ number_format($row->documentTax->npwp_number, 0, '.', '') }}</td>
+                    <td style="border: 1px solid black;">'{{$row->documentTax->npwp_number}}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_name }}</td>
                     <td style="border: 1px solid black;">{{ $row->documentTax->npwp_address }}</td>
                     <td style="border: 1px solid black;">{{ number_format(round($row->total - 0.5, 0, PHP_ROUND_HALF_UP),2,',','.')}}</td>

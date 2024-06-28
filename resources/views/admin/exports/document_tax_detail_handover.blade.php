@@ -6,8 +6,8 @@
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Ke</th>
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Detail</th>
             <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Rp</th>
-            <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Nama</th>
-            <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
+            <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.name') }}</th>
+            <th align="center"   style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.date') }}</th>
         </tr>
     </thead>
     <tbody>

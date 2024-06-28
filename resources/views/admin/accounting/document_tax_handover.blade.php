@@ -38,7 +38,7 @@
                     <div class="col s4 m6 l6">
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">Print</span>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
                         
@@ -57,13 +57,13 @@
                                     <h4 class="card-title">Filter</h4>
                                     <div class="row">
                                         <div class="col m4 s6 ">
-                                            <label for="start-date" style="font-size:1rem;">Tanggal Mulai :</label>
+                                            <label for="start-date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                             <div class="input-field col s12">
                                             <input type="date" max="{{ date('9999'.'-12-31') }}" id="start-date" name="start-date"  onchange="loadDataTable()">
                                             </div>
                                         </div>
                                         <div class="col m4 s6 ">
-                                            <label for="finish-date" style="font-size:1rem;">Tanggal Akhir :</label>
+                                            <label for="finish-date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                             <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish-date" name="finish-date"  onchange="loadDataTable()">
                                             </div>
@@ -98,26 +98,26 @@
                             
                             <div class="card">
                                 <div class="card-content">
-                                    <h4 class="card-title">List Data</h4>
+                                    <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
-                                                <span class="hide-on-small-onl">Refresh</span>
+                                                <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">No</th>
-                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Kode</th>
+                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.code') }}</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tgl. Penyerahan</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">User</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Tgl. Terima</th>
                                                         <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Approval</th>
-                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Status</th>
-                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">Action</th>
+                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.status') }}</th>
+                                                        <th align="center"  style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -138,7 +138,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Tambah/Edit Serah Terima Pajak</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Serah Terima Pajak</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -162,7 +162,7 @@
                                 </div>
                                 <div class="input-field col m4 s12 step3">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                    <label class="active" for="post_date">Tgl. Posting</label>
+                                    <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                                 </div>
                                 <div class="input-field col m4 s12 step4">
                                     <select class="form-control" id="company_id" name="company_id">
@@ -170,7 +170,7 @@
                                             <option value="{{ $row->id }}">{{ $row->name }}</option>
                                         @endforeach
                                     </select>
-                                    <label class="" for="company_id">Perusahaan</label>
+                                    <label class="" for="company_id">{{ __('translations.company') }}</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -182,7 +182,7 @@
                                 <div class="right">
                                     <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="refreshTax();">
                                         <i class="material-icons hide-on-med-and-up">refresh</i>
-                                        <span class="hide-on-small-onl">Refresh</span>
+                                        <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                         <i class="material-icons right">refresh</i>
                                     </a>
                                 </div>
@@ -199,8 +199,8 @@
                                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
                                         </tr>
                                         <tr>
-                                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Tanggal</th>
-                                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nomor</th>
+                                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.date') }}</th>
+                                            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.number') }}/th>
                                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">NPWP</th>
                                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama </th>
                                             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Alamat Lengkap</th>
@@ -214,7 +214,7 @@
                         <div class="row">
                             
                             <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">Simpan <i class="material-icons right">send</i></button>
+                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                             </div>
                         </div>
                     </div>
@@ -223,7 +223,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal_confirmation" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
@@ -267,7 +267,7 @@
                                     <th align="center" colspan="1" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
                                     <th align="center" colspan="1" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
                                     <th align="center" rowspan="1" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
-                                    <th align="center" rowspan="1" style="background-color: navy; color: white;border: 1px solid white;">Action</th>
+                                    <th align="center" rowspan="1" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.action') }}</th>
                                 </tr>
                             </thead>
                             <tbody id="body_confirm">
@@ -275,14 +275,14 @@
                         </table>
                     </div>
                     <div class="col s12 mt-3">
-                        <button class="btn waves-effect waves-light right submit step10" onclick="saveDetail();">Simpan <i class="material-icons right">send</i></button>
+                        <button class="btn waves-effect waves-light right submit step10" onclick="saveDetail();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
@@ -294,7 +294,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
 

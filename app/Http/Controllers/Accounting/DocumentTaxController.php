@@ -117,6 +117,22 @@ class DocumentTaxController extends Controller
                         } else if($request->finish_date) {
                             $query->whereDate('date','<=', $request->finish_date);
                         }
+
+                        if ($request->handover_date_start && $request->handover_date_end) {
+                            $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                                $query->whereDate('created_at', '>=', $request->handover_date_start)
+                                      ->whereDate('created_at', '<=', $request->handover_date_end);
+                            });
+                        } elseif ($request->handover_date_start) {
+                            $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                                $query->whereDate('created_at', '>=', $request->handover_date_start);
+                            });
+                        } elseif ($request->handover_date_end) {
+                            $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                                $query->whereDate('created_at', '<=', $request->handover_date_end);
+                            });
+                        }
+                        
                     })
                     
                     ->offset($start)
@@ -156,6 +172,21 @@ class DocumentTaxController extends Controller
                     $query->whereDate('date','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('date','<=', $request->finish_date);
+                }
+
+                if ($request->handover_date_start && $request->handover_date_end) {
+                    $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                        $query->whereDate('created_at', '>=', $request->handover_date_start)
+                              ->whereDate('created_at', '<=', $request->handover_date_end);
+                    });
+                } elseif ($request->handover_date_start) {
+                    $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                        $query->whereDate('created_at', '>=', $request->handover_date_start);
+                    });
+                } elseif ($request->handover_date_end) {
+                    $query->whereHas('documentTaxHandoverDetail', function($query) use ($request) {
+                        $query->whereDate('created_at', '<=', $request->handover_date_end);
+                    });
                 }
             })
             ->count();
@@ -322,8 +353,8 @@ class DocumentTaxController extends Controller
 
     public function export(Request $request){
 		$no_faktur = $request->no_faktur ? $request->no_faktur : ''   ;
-  
-		return Excel::download(new ExportDocumentTax($no_faktur),'faktur_pajak'.uniqid().'.xlsx');
+        $arr_status = $request->arr_status ? $request->arr_status : '';
+		return Excel::download(new ExportDocumentTax($no_faktur,$arr_status),'faktur_pajak'.uniqid().'.xlsx');
     }
 
     public function exportDataTable(Request $request){

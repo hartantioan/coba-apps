@@ -573,7 +573,7 @@ class GoodReceiptPOController extends Controller
                 if($pod){
 
                     if($pod->item->is_quality_check){
-                        if(!$request->arr_scale[$key]){
+                        if(!$request->arr_scale[$key] && $request->account_id){
                             $passedScale = false;
                             $arrMustScaleItem[] = $pod->item->code.' - '.$pod->item->name;
                         }

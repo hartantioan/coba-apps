@@ -367,6 +367,16 @@ class PurchaseOrder extends Model
         return $html;
     }
 
+    public function getListItemText(){
+        $arr = [];
+
+        foreach($this->purchaseOrderDetail as $row){
+            $arr[] = ($row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->name).' Qty. '.CustomHelper::formatConditionalQty($row->qty).' '.($row->item_id ? $row->itemUnit->unit->code : '-');
+        }
+
+        return implode(', ',$arr);
+    }
+
     public function hasChildDocument(){
         $hasRelation = false;
 

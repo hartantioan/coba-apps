@@ -1161,7 +1161,7 @@ class Select2Controller extends Controller {
                 if($d->hasBalance()){
                     $response[] = [
                         'id'   			=> $d->id,
-                        'text' 			=> $d->code.' - '.($d->isSecretPo() ? '' : $d->note),
+                        'text' 			=> $d->code.' - '.($d->isSecretPo() ? $d->getListItemText() : $d->note),
                     ];
                 }
             }elseif($typegrpo == '2'){

@@ -144,7 +144,7 @@ class TreeHelper {
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
                                 ['name'=> "Vendor  : "/* . ($name !== null ? $name : ' ') */],
-                                ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')]
+                                ['name'=> "Nominal : 0"]
                             ],
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                             'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,

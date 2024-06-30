@@ -194,12 +194,6 @@ class ProductionOrderController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    $val->productionSchedule->code,
-                    $val->productionScheduleDetail->item->code.' - '.$val->productionScheduleDetail->item->name,
-                    CustomHelper::formatConditionalQty($val->productionScheduleDetail->qty),
-                    $val->productionScheduleDetail->item->uomUnit->code,
-                    $val->productionScheduleDetail->line->code,
-                    $val->productionScheduleDetail->warehouse->name,
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -256,9 +250,6 @@ class ProductionOrderController extends Controller
                 'plan_qty'                  => CustomHelper::formatConditionalQty($data->planned_qty),
                 'complete_qty'              => '0,000',
                 'reject_qty'                => '0,000',
-                'schedule_time_start'       => $data->productionScheduleDetail->start_date,
-                'schedule_time_end'         => $data->productionScheduleDetail->end_date,
-                'unit'                      => $data->productionScheduleDetail->item->uomUnit->code,
             ];
             $response = [
                 'status'    => 200,
@@ -467,7 +458,39 @@ class ProductionOrderController extends Controller
         $data   = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.'</div>
-        <div class="col s12"></div>';
+        <div class="col s12"></div><div class="col s12" style="overflow:auto;"><table style="min-width:100%;">
+        <thead>
+            <tr>
+                <th class="center-align" colspan="9">Daftar Item Produksi</th>
+            </tr>
+            <tr>
+                <th class="center-align">No.</th>
+                <th class="center-align">Kode Item</th>
+                <th class="center-align">Nama Item</th>
+                <th class="center-align">Kode BOM</th>
+                <th class="center-align">Qty</th>
+                <th class="center-align">Satuan UoM</th>
+                <th class="center-align">Line</th>
+                <th class="center-align">Gudang</th>
+                <th class="center-align">Tipe</th>
+                <th class="center-align">Keterangan</th></tr></thead><tbody>';
+
+        foreach($data->productionOrderDetail as $key => $row){
+            $string .= '<tr>
+                <td class="center-align" style="min-width:150px !important;">'.($key + 1).'</td>           
+                <td style="min-width:150px !important;">'.$row->productionScheduleDetail->item->code.'</td>
+                <td style="min-width:150px !important;">'.$row->productionScheduleDetail->item->name.'</td>
+                <td style="min-width:150px !important;">'.$row->productionScheduleDetail->bom->code.' - '.$row->productionScheduleDetail->bom->name.'</td>
+                <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty).'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->productionScheduleDetail->item->uomUnit->code.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->productionScheduleDetail->line->code.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->productionScheduleDetail->warehouse->name.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->productionScheduleDetail->type().'</td>
+                <td style="min-width:150px !important;">'.$row->productionScheduleDetail->note.'</td>
+            </tr>';
+        }
+
+        $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>

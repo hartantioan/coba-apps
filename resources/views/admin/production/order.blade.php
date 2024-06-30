@@ -118,12 +118,6 @@
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
                                                         <th>{{ __('translations.note') }}</th>
-                                                        <th>Jadwal Produksi</th>
-                                                        <th>Item Output</th>
-                                                        <th>Qty Output</th>
-                                                        <th>{{ __('translations.unit') }}</th>
-                                                        <th>{{ __('translations.line') }}</th>
-                                                        <th>{{ __('translations.warehouse') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>Operasi</th>
@@ -307,17 +301,14 @@
                                     <legend align="left">2. Penerimaan Hasil Produksi / Quantities</legend>
                                     <div class="input-field col m3 s12">
                                         <input id="plan_qty" name="plan_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback stock-unit">-</div>
                                         <label class="active" for="plan_qty">Jumlah Perencanaan</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="complete_qty" name="complete_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback stock-unit">-</div>
                                         <label class="active" for="complete_qty">Jumlah Selesai</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="reject_qty" name="reject_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback stock-unit">-</div>
                                         <label class="active" for="reject_qty">Jumlah Rusak</label>
                                     </div>
                                 </fieldset>
@@ -625,7 +616,6 @@
                 $('#form_data_calculate')[0].reset();
                 $('#tempClose').val('');
                 $('#close-form-code').text('');
-                $('.stock-unit').text('-');
                 M.updateTextFields();
             }
         });
@@ -713,9 +703,6 @@
                     $('#plan_qty').val(response.data.plan_qty);
                     $('#complete_qty').val(response.data.complete_qty);
                     $('#reject_qty').val(response.data.reject_qty);
-                    $('#schedule_time_start').val(response.data.schedule_time_start);
-                    $('#schedule_time_end').val(response.data.schedule_time_end);
-                    $('.stock-unit').text(response.data.unit);
                 }
                 M.toast({
                     html: response.message
@@ -1165,12 +1152,6 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
-                { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'production_schedule_detail_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'qty_output', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'unit_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'warehouse_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },

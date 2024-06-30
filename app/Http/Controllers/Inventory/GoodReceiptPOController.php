@@ -1001,7 +1001,7 @@ class GoodReceiptPOController extends Controller
                 'warehouse_name'            => $row->warehouse->name,
                 'is_activa'                 => $row->item->itemGroup->is_activa ? $row->item->itemGroup->is_activa : '',
                 'qty_conversion'            => $row->qty_conversion,
-                'secret_po'                 => $row->purchaseOrderDetail->purchaseOrder->isSecretPo() ? '1' : '',
+                'secret_po'                 => $row->item->is_hide_supplier ?? '',
             ];
         }
 

@@ -496,7 +496,7 @@ class GoodReceiptPOController extends Controller
             'code'                      => 'required',
             'code_place_id'             => 'required',
            /*  'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receipts,code',
-             *//* 'account_id'                => 'required' */,
+             *//* 'account_id'                => 'required', */
             'company_id'                => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',

@@ -1577,9 +1577,7 @@
                             $('#account_id').empty().append(`
                                 <option value="` + response.account_id + `">` + response.account_name + `</option>
                             `);
-                            if(response.secret_po){
-                                $('.div-account').addClass('hide');
-                            }
+                            
                             $('#empty-item').remove();
 
                             $('#list-used-data').append(`
@@ -1658,6 +1656,10 @@
                                         </td>
                                     </tr>
                                 `);
+
+                                if(val.secret_po){
+                                    $('.div-account').addClass('hide');
+                                }
 
                                 $('#arr_scale' + count).select2({
                                     placeholder: '-- Pilih ya --',

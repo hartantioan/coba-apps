@@ -1657,10 +1657,6 @@
                                     </tr>
                                 `);
 
-                                if(val.secret_po){
-                                    $('.div-account').addClass('hide');
-                                }
-
                                 $('#arr_scale' + count).select2({
                                     placeholder: '-- Pilih ya --',
                                     minimumInputLength: 1,
@@ -1915,6 +1911,9 @@
                             $('#arr_scale' + count).append(`
                                 <option value="` + val.good_scale_id + `">` + val.good_scale_name + `</option>
                             `);
+                        }
+                        if(val.secret_po){
+                            $('.div-account').addClass('hide');
                         }
                         $('#arr_scale' + count).select2({
                             placeholder: '-- Pilih ya --',

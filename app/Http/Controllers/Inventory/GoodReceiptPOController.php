@@ -496,7 +496,7 @@ class GoodReceiptPOController extends Controller
             'code'                      => 'required',
             'code_place_id'             => 'required',
            /*  'code'			            => $request->temp ? ['required', Rule::unique('good_receipts', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:good_receipts,code',
-             */'account_id'                => 'required',
+             *//* 'account_id'                => 'required' */,
             'company_id'                => 'required',
 			'receiver_name'			    => 'required',
 			'post_date'		            => 'required',
@@ -558,6 +558,8 @@ class GoodReceiptPOController extends Controller
 
             $arrToleranceMessage = [];
 
+            $account_id = NULL;
+
             foreach($request->arr_purchase as $key => $row){
                 $wtax = 0;
                 $total = 0;
@@ -565,6 +567,8 @@ class GoodReceiptPOController extends Controller
                 $tax = 0;
 
                 $pod = PurchaseOrderDetail::find(intval($row));
+
+                $account_id = $pod->purchaseOrder->account_id;
 
                 if($pod){
 
@@ -686,7 +690,7 @@ class GoodReceiptPOController extends Controller
                         
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
+                        $query->account_id = $account_id;
                         $query->company_id = $request->company_id;
                         $query->receiver_name = $request->receiver_name;
                         $query->post_date = $request->post_date;
@@ -728,7 +732,7 @@ class GoodReceiptPOController extends Controller
                     $query = GoodReceipt::create([
                         'code'			        => $newCode,
                         'user_id'		        => session('bo_id'),
-                        'account_id'            => $request->account_id,
+                        'account_id'            => $account_id,
                         'company_id'            => $request->company_id,
                         'receiver_name'         => $request->receiver_name,
                         'post_date'             => $request->post_date,

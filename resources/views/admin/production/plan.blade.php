@@ -128,7 +128,6 @@
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
-                                                        <th>{{ __('translations.line') }}</th>
                                                         <th>Tgl.Post</th>
                                                         <th>{{ __('translations.type') }}</th>
                                                         <th>Dokumen</th>
@@ -194,14 +193,6 @@
                                             @endforeach
                                         </select>
                                         <label class="" for="place_id">{{ __('translations.plant') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="line_id" name="line_id">
-                                            @foreach ($line as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
@@ -1045,7 +1036,6 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
-                { name: 'line_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'type', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
@@ -1262,7 +1252,6 @@
                 $('#post_date').val(response.post_date);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
-                $('#line_id').val(response.line_id).formSelect();
                 $('#type').val(response.type).formSelect();
 
                 if(response.details.length > 0){

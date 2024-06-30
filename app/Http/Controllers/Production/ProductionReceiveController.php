@@ -750,11 +750,13 @@ class ProductionReceiveController extends Controller
                 ]);
             }
             foreach($query->productionReceiveDetail as $row){
-                if($row->productionBatch->productionBatchUsage()->exists()){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, nomor batch telah digunakan pada dokumen lainnya.'
-                    ]);
+                foreach($row->productionBatch as $rowbatch){
+                    if($rowbatch->productionBatchUsage()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, nomor batch telah digunakan pada dokumen lainnya.'
+                        ]);
+                    }
                 }
             }
             if(in_array($query->status,['4','5'])){

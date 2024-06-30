@@ -19,9 +19,6 @@ class ProductionOrder extends Model
         'code',
         'user_id',
         'company_id',
-        'production_schedule_id',
-        'production_schedule_detail_id',
-        'warehouse_id',
         'post_date',
         'note',
         'status',
@@ -57,16 +54,6 @@ class ProductionOrder extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function productionSchedule()
-    {
-        return $this->belongsTo('App\Models\ProductionSchedule', 'production_schedule_id', 'id')->withTrashed();
-    }
-
-    public function productionScheduleDetail()
-    {
-        return $this->belongsTo('App\Models\ProductionScheduleDetail', 'production_schedule_detail_id', 'id')->withTrashed();
-    }
-
     public function productionOrderDetail()
     {
         return $this->hasMany('App\Models\ProductionOrderDetail');
@@ -95,11 +82,6 @@ class ProductionOrder extends Model
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
-    }
-
-    public function warehouse()
-    {
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function used(){

@@ -347,7 +347,11 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
-                })->where('status','1')->whereHas('bom')->get();
+                })->where('status','1')->whereHas('bom',function($query){
+                    $query->whereHas('bomAlternative',function($query){
+                        $query->whereNotNull('is_default');
+                    });
+                })->get();
 
         foreach($data as $d) {
             $response[] = [
@@ -3178,7 +3182,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $details = [];
 
-            foreach($d->MarketingOrderPlanDetail as $row){
+            foreach($d->marketingOrderPlanDetail as $row){
                 $cekBom = $row->item->bomPlace($request->place_id);
                 $details[] = [
                     'mopd_id'           => $row->id,
@@ -3188,11 +3192,11 @@ class Select2Controller extends Controller {
                     'qty'               => CustomHelper::formatConditionalQty($row->qty),
                     'uom'               => $row->item->uomUnit->code,
                     'request_date'      => date('d/m/Y',strtotime($row->request_date)),
-                    'note'              => $row->note ? $row->note : '',
+                    'note'              => $row->note ?? '',
+                    'note2'             => $row->note2 ?? '',
                     'priority'          => $row->priority,
                     'has_bom'           => $cekBom->exists() ? '1' : '',
                     'place_id'          => $request->place_id,
-                    'line'              => $d->line->code,
                     'list_warehouse'    => $row->item->warehouseList(),
                     'list_bom'          => $row->item->listBom(),
                 ];
@@ -3219,10 +3223,12 @@ class Select2Controller extends Controller {
             $query->where('code', 'like', "%$search%")
                 ->orWhere('name','like',"%$search%");
         })
+        ->whereHas('bomAlternative',function($query){
+            $query->whereNotNull('is_default');
+        })
         ->where('place_id',$place_id)
         ->where('item_id',$item_id)
         ->where('status','1')
-        ->whereNull('is_powder')
         ->orderByDesc('id')
         ->get();
 

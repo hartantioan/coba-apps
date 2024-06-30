@@ -50,7 +50,6 @@ class MarketingOrderPlanController extends Controller
             'content'       => 'admin.production.plan',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -100,7 +99,6 @@ class MarketingOrderPlanController extends Controller
             'user_id',
             'company_id',
             'place_id',
-            'line_id',
             'post_date',
             'type',
         ];
@@ -211,7 +209,6 @@ class MarketingOrderPlanController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->place->code,
-                    $val->line->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->type(),
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
@@ -268,7 +265,6 @@ class MarketingOrderPlanController extends Controller
             'code_place_id'             => 'required',
             'company_id'			    => 'required',
             'place_id'		            => 'required',
-            'line_id'		            => 'required',
             'post_date'		            => 'required',
             'type'                      => 'required',
             'arr_item'                  => 'required|array',
@@ -280,7 +276,6 @@ class MarketingOrderPlanController extends Controller
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
-            'line_id.required' 			        => 'Line tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'type.required'		                => 'Tipe tidak boleh kosong.',
             'arr_item.required'                 => 'Item tidak boleh kosong.',
@@ -351,7 +346,6 @@ class MarketingOrderPlanController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->type = $request->type;
                         $query->document = $document;
@@ -385,7 +379,6 @@ class MarketingOrderPlanController extends Controller
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
                         'place_id'	                => $request->place_id,
-                        'line_id'	                => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'type'                      => $request->type,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/marketing_order_plans') : NULL,

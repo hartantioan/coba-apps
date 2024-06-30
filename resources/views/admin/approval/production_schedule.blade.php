@@ -223,7 +223,7 @@
             <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="14" class="center-align">Daftar Jadwal Produksi</th>
+                        <th colspan="12" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">{{ __('translations.process') }}</th>
@@ -235,8 +235,6 @@
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.uom_unit') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.line') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
-                        <th class="center-align" style="min-width:150px !important;">{{ __('translations.start_date') }}</th>
-                        <th class="center-align" style="min-width:150px !important;">{{ __('translations.end_date') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.status') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.pdo_no') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.type') }}</th>
@@ -262,11 +260,9 @@
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ $row->line->code }}</td>
-                        <td class="center-align">{{ $row->warehouse->code }}</td>
-                        <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->start_date)) }}</td>
-                        <td class="center-align">{{ date('d/m/Y H:i:s',strtotime($row->end_date)) }}</td>
+                        <td class="center-align">{{ $row->warehouse->name }}</td>
                         <td class="center-align">{{ $row->status() }}</td>           
-                        <td class="center-align">{{ ($row->productionOrder()->exists() ? $row->productionOrder->code : '-') }}</td>
+                        <td class="center-align">{{ ($row->productionOrderDetail()->exists() ? $row->productionOrderDetail->productionOrder->code : '-') }}</td>
                         <td class="center-align">{{ $row->type() }}</td>
                     </tr>
                     <tr>

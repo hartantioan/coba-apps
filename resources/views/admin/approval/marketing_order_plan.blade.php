@@ -166,12 +166,6 @@
                 <div class="col s8">
                     {{ $data->place->code }}
                 </div>
-                <div class="col s4">
-                    {{ __('translations.line') }}
-                </div>
-                <div class="col s8">
-                    {{ $data->line->code }}
-                </div>
             </div>
             <div class="col s6 row mt-2">
                 <div class="col s12 center-align">

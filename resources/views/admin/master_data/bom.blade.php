@@ -177,7 +177,7 @@
                                 <label for="status">BOM Powder</label>
                                 <label class="right">
                                     Tidak
-                                    <input checked type="checkbox" id="is_powder" name="is_powder" value="1">
+                                    <input type="checkbox" id="is_powder" name="is_powder" value="1">
                                     <span class="lever"></span>
                                     Ya
                                 </label>

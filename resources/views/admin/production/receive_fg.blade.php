@@ -266,15 +266,11 @@
                                         <label class="active" for="qty">Qty UoM Terpakai</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="area_id" name="area_id"></select>
-                                        <label class="active" for="area_id">Area</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="col m3 s12">
-                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate Barcode </a>
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate No.Palet</a>
                                     </div>
                                 </fieldset>
                             </div>
@@ -349,7 +345,7 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:1500px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
@@ -809,9 +805,16 @@
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
-            let id = $(this).data('id');
-            $('.row_item_batch[data-code="' + id + '"]').remove();
             $(this).closest('tr').remove();
+            if($('.row_item').length == 0){
+                $('#body-item').append(`
+                    <tr id="last-row-item">
+                        <td class="center-align" colspan="11">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
+            }
         });
 
         $('#body-batch').on('click', '.delete-data-batch', function() {
@@ -839,10 +842,10 @@
                         ` + no + `
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_production_batch_id` + count + `" name="arr_production_batch_id[]"></select>
+                        <select class="browser-default" id="arr_production_batch_id` + count + `" name="arr_production_batch_id[]" onchange="applyQty('` + count + `')"></select>
                     </td>
                     <td>
-                        <input name="arr_qty_batch[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;">    
+                        <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">    
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-batch" href="javascript:void(0);">
@@ -881,6 +884,26 @@
                 text: 'Silahkan pilih Production Order terlebih dahulu.',
                 icon: 'error'
             });
+        }
+    }
+
+    function checkQty(code){
+        let qtyMax = parseFloat($('#arr_qty_batch' + code).data('max').replaceAll(".", "").replaceAll(",","."));
+        let qty = parseFloat($('#arr_qty_batch' + code).val().replaceAll(".", "").replaceAll(",","."));
+        if(qty > 0){
+            if(qty > qtyMax){
+                $('#arr_qty_batch' + code).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+            }
+        }
+    }
+
+    function applyQty(code){
+        if($('#arr_production_batch_id' + code).val()){
+            $('#arr_qty_batch' + code).data('max',$("#arr_production_batch_id" + code).select2('data')[0].qty);
+            $('#arr_qty_batch' + code).val($("#arr_production_batch_id" + code).select2('data')[0].qty);
+        }else{
+            $('#arr_qty_batch' + code).data('max','0,000');
+            $('#arr_qty_batch' + code).val('0,000');
         }
     }
 
@@ -1061,16 +1084,6 @@
         });
     }
 
-    function checkQtyReject(code){
-        let qtyMax = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let qtyReject = parseFloat($('#rowQtyReject' + code).val().replaceAll(".", "").replaceAll(",","."));
-        if(qtyReject > 0){
-            if(qtyReject > qtyMax){
-                $('#rowQtyReject' + code).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-            }
-        }
-    }
-
     function getItemProductionOrder(){
         if($('#production_order_id').val()){
             $('#item_name').val($('#production_order_id').select2('data')[0].item_name);
@@ -1086,7 +1099,7 @@
     }
 
     function generateBarcode(){
-        if($('#production_order_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val()){
+        if($('#production_order_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#post_date').val()){
             $.ajax({
                 url: '{{ Request::url() }}/get_pallet_barcode',
                 type: 'POST',
@@ -1100,6 +1113,7 @@
                     place_id: $('#place_id').val(),
                     line_id: $('#line_id').val(),
                     qty: $('#qty').val(),
+                    date: $('#post_date').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1116,9 +1130,61 @@
                             text: response.message,
                             icon: 'warning'
                         });
+                        if(response.errors){
+                            $.each(response.errors, function(i, val) {
+                                M.toast({
+                                    html: val
+                                });
+                            });
+                        }
                     }else{
-
-                        
+                        if(response.length > 0){
+                            $('#body-item').empty();
+                            $.each(response, function(i, val) {
+                                let count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item">
+                                        <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                        <td class="center-align">
+                                            ` + (i+1) + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_pallet_no[]" id="arr_pallet_no` + count + `" type="text" value="` + val.code + `" readonly>
+                                        </td>
+                                        <td>
+                                            ` + val.item_code + `
+                                        </td>
+                                        <td>
+                                            ` + val.item_name + `
+                                        </td>
+                                        <td>
+                                            <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="-">
+                                        </td>
+                                        <td class="right-align">
+                                            1
+                                        </td>
+                                        <td class="right-align">
+                                            <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty + `" readonly>
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.plant + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.shift + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.group + `
+                                        </td>
+                                        <td class="center-align">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `);
+                            });
+                            $('.modal-content').scrollTop($("#body-item").offset().top);
+                        }
                     }
                 },
                 error: function() {
@@ -1134,7 +1200,7 @@
         }else{
             swal({
                 title: 'Ups!',
-                text: 'Production Order, Shift, Group, Palet, Grade, Plant, Line harus dipilih.',
+                text: 'Production Order, Shift, Group, Palet, Grade, Plant, Line, Tanggal harus dipilih.',
                 icon: 'warning'
             });
         }
@@ -1447,12 +1513,31 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
-                let passedInput = true;
+                let passedInput = true, qtyHeader = parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")), qtyBatch = 0;
+
+                $('input[name^="arr_qty_batch[]"]').each(function(index){
+                    qtyBatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                    if(!$('select[name^="arr_production_batch_id[]"]').val()){
+                       passedInput = false; 
+                    }
+                });
+
+                if($('.row_item').length == 0){
+                    passedInput = false;
+                }
+
+                if(qtyHeader <= 0 || qtyBatch <= 0){
+                    passedInput = false;
+                }
+
+                if(qtyHeader !== qtyBatch){
+                    passedInput = false;
+                }
 
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty hasil produksi tidak boleh kosong atau 0.',
+                        text: 'Qty uom tidak boleh kosong. Nomor batch tidak boleh kosong. Qty batch tidak boleh kosong. Baris nomor palet tidak boleh kosong. Qty uom dan qty batch harus sama.',
                         icon: 'error'
                     });
                 }else{

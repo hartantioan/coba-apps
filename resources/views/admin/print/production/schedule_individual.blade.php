@@ -288,7 +288,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="8" class="center-align">Daftar Shift & Target Produksi</th>
+                                <th colspan="6" class="center-align">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th align="center">No.</th>
@@ -297,8 +297,6 @@
                                 <th align="center">{{ __('translations.unit') }}</th>
                                 <th align="center">{{ __('translations.line') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>
-                                <th align="center">Tgl.Mulai</th>
-                                <th align="center">Tgl.Selesai</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -309,12 +307,10 @@
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->line->code }}</td>
-                                <td align="center">{{ $row->warehouse->code }}</td>
-                                <td align="center">{{ date('d/m/Y H:i:s',strtotime($row->start_date)) }}</td>
-                                <td align="center">{{ date('d/m/Y H:i:s',strtotime($row->end_date)) }}</td>
+                                <td align="center">{{ $row->warehouse->name }}</td>
                             </tr>
                             <tr>
-                                <td colspan="7">Keterangan : {{ $row->note }}</td>
+                                <td colspan="6">Keterangan : {{ $row->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

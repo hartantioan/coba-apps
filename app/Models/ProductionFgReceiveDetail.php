@@ -17,7 +17,9 @@ class productionFgReceiveDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_fg_receive_id',
+        'item_id',
         'pallet_no',
+        'shading',
         'qty_sell',
         'qty',
     ];
@@ -25,5 +27,29 @@ class productionFgReceiveDetail extends Model
     public function productionFgReceive()
     {
         return $this->belongsTo('App\Models\ProductionReceive', 'production_fg_receive_id', 'id')->withTrashed();
+    }
+
+    public function item()
+    {
+        return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public static function getLatestCode($prefix){
+        $query = ProductionReceive::selectRaw('RIGHT(code, 5) as code')
+            ->whereRaw("code LIKE '$prefix%'")
+            ->withTrashed()
+            ->orderByDesc('id')
+            ->limit(1)
+            ->get();
+
+        if($query->count() > 0) {
+            $code = (int)$query[0]->code + 1;
+        } else {
+            $code = '00001';
+        }
+
+        $no = str_pad($code, 5, 0, STR_PAD_LEFT);
+
+        return $prefix.'.'.$no;
     }
 }

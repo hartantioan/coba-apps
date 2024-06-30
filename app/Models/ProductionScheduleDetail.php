@@ -22,8 +22,6 @@ class ProductionScheduleDetail extends Model
         'qty',
         'line_id',
         'warehouse_id',
-        'start_date',
-        'end_date',
         'note',
         'status',
         'type',
@@ -56,8 +54,10 @@ class ProductionScheduleDetail extends Model
         return $this->belongsTo('App\Models\Warehouse','warehouse_id','id')->withTrashed();
     }
 
-    public function productionOrder(){
-        return $this->hasOne('App\Models\ProductionOrder','production_schedule_detail_id','id')->whereIn('status',['1','2','3']);
+    public function productionOrderDetail(){
+        return $this->hasOne('App\Models\ProductionOrderDetail','production_schedule_detail_id','id')->whereHas('productionOrder',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function status(){
@@ -85,8 +85,9 @@ class ProductionScheduleDetail extends Model
 
     public function type(){
         $type = match ($this->type) {
-            '1'     => 'Normal',
-            '2'     => 'Powder',
+            '1'     => 'Powder',
+            '2'     => 'Green Tile',
+            '3'     => 'FG',
             default => 'Invalid',
         };
 

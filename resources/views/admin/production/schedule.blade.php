@@ -221,10 +221,10 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Detail Target Produksi</legend>
+                                    <legend>3. Detail Target MOP</legend>
                                     <div class="col m12 s12 step10" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
-                                            <table class="bordered" id="table-detail" style="min-width:100%;">
+                                            <table class="bordered" id="table-detail" style="min-width:1500px;">
                                                 <thead>
                                                     <tr>
                                                         <th class="center" style="min-width:75px;">{{ __('translations.delete') }}</th>
@@ -233,9 +233,9 @@
                                                         <th class="center" style="min-width:150px;">Qty MOP</th>
                                                         <th class="center" style="min-width:150px;">Qty dalam Proses</th>
                                                         <th class="center" style="min-width:150px;">Satuan UoM</th>
-                                                        <th class="center" style="min-width:150px;">Remark</th>
+                                                        <th class="center" style="min-width:150px;">Keterangan 1</th>
+                                                        <th class="center" style="min-width:150px;">Keterangan 2</th>
                                                         <th class="center" style="min-width:150px;">Tgl.Request</th>
-                                                        <th class="center">{{ __('translations.line') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
@@ -270,10 +270,11 @@
                                         </div>
                                     </div>
                                     <ul class="tabs step11">
-                                        <li class="tab col m6 s12 l6"><a class="active" href="#normal">Normal</a></li>
-                                        <li class="tab col m6 s12 l6"><a href="#powder">Powder</a></li>
+                                        <li class="tab col m4 s12 l4"><a class="active" href="#fg">FG</a></li>
+                                        <li class="tab col m4 s12 l4"><a href="#green">Green Tile</a></li>
+                                        <li class="tab col m4 s12 l4"><a href="#powder">Powder</a></li>
                                     </ul>
-                                    <div id="normal" class="col m12 s12 active" style="overflow:auto;width:100% !important;">
+                                    <div id="fg" class="col m12 s12 active" style="overflow:auto;width:100% !important;">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="min-width:100%;">
                                                 <thead>
@@ -293,6 +294,43 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('normal')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Item </a>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </p>
+                                    </div>
+                                    <div id="green" class="col s12" style="overflow:auto;min-width:100%;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="min-width:100%;">
+                                                <thead>
+                                                    <tr>
+                                                        <th colspan="3">GREEN TILE BOM</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
+                                                        <th class="center">Target</th>
+                                                        <th>Data Shift & BOM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="body-item-detail-green" id="body-item-detail-green">
+                                                    <tr class="last-row-item-detail-green">
+                                                        <td colspan="3">
+                                                            Silahkan tambahkan Marketing Order Produksi...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('green')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Item </a>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </p>
                                     </div>
@@ -316,6 +354,13 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('powder')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Item </a>
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </p>
                                     </div>
@@ -395,7 +440,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Close</a>
     </div>
 </div>
 
@@ -685,6 +730,14 @@
                         </td>
                     </tr>
                 `);
+
+                $('#body-item-detail-green').empty().append(`
+                    <tr class="last-row-item-detail-green">
+                        <td colspan="3">
+                            Silahkan tambahkan Marketing Order Produksi...
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -868,6 +921,61 @@
         });
     }
 
+    function updateDocumentStatus(mop_id = null, psc_id = null, pscd_id = null, type = null, element = null){
+        let code = mop_id ? mop_id : pscd_id;
+        swal({
+            title: "Apakah anda yakin ingin update status?",
+            text: "Untuk status PROSES, maka akan otomatis membuat PDO.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    type : "POST",
+                    url  : '{{ Request::url() }}/update_document_status',
+                    data : {
+                        mop_id : mop_id,
+                        psc_id : psc_id,
+                        pscd_id : pscd_id,
+                        type : type,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    cache: false,
+                    beforeSend: function() {
+                        loadingOpen('#datatable_serverside');
+                    },
+                    success: function(data){
+                        loadingClose('#datatable_serverside');
+                        if(data.status == '200'){
+                            M.toast({
+                                html: data.message
+                            });
+                            $('.pod-' + type + code).text(data.value);
+                            let parent = $(element).parent();
+                            $(element).remove();
+                            parent.append(`-`);
+                        }else{
+                            if(data.status == '422'){
+                                $(element).val(data.value);
+                            }
+                            swal({
+                                title: 'Ups!',
+                                text: data.message,
+                                icon: 'warning'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     function removeUsedData(type,id){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
@@ -909,6 +1017,9 @@
         $('#arr_unit' + val).empty();
         $('#list-bom-' + val).remove();
         if($("#arr_item_detail_id" + val).val()){
+            if($('#item_name_' + val).length > 0){
+                $('#item_name_' + val).text($("#arr_item_detail_id" + val).select2('data')[0].text);
+            }
             if($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item_detail_id" + val).select2('data')[0].list_warehouse, function(i, value) {
                     $('#arr_warehouse' + val).append(`
@@ -930,67 +1041,78 @@
                 <option value="">--Silahkan pilih item--</option>
             `);
             $('#arr_unit' + val).text('-');
+            if($('#item_name_' + val).length > 0){
+                $('#item_name_' + val).text('-');
+            }
         }
     }
 
-    function addItem(type){
-        if($('.last-row-item-detail-' + type).length > 0){
-            $('.last-row-item-detail-' + type).remove();
-        }
+    function addLine(type){
         var count = makeid(10);
-        $('#total-row-detail-' + type).before(`
-            <tr class="row_item_detail">
-                <input type="hidden" name="arr_type[]" value="` + type + `">
+        let randomColor = getRandomColor();
+        $('.last-row-item-detail-' + type).remove();
+        $('#body-item-detail-' + type).append(`
+            <tr class="row_detail_item" data-id="">
                 <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" data-id="` + count +`" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-normal" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
-                <td>
-                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
-                </td>
-                <td class="right-align">
-                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
-                </td>
-                <td class="center-align" id="arr_unit` + count + `">
+                <td style="min-width:250px !important;" id="item_name_` + count + `">
                     -
                 </td>
-                <td class="">
-                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
-                </td>
                 <td>
-                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                        <option value="">--{{ __('translations.empty') }}--</option>
-                        @foreach ($line as $rowline)
-                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
-                        @endforeach
-                    </select>    
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                        <option value="">--Silahkan pilih item--</option>
-                    </select>
-                </td>
-                <td class="">
-                    <input name="arr_start_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                </td>
-                <td class="">
-                    <input name="arr_end_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                </td>
-                <td class="">
-                    <select class="browser-default" id="arr_shift` + count + `" name="arr_shift[]"></select>
-                </td>
-                <td class="">
-                    <input name="arr_group[]" type="text" required>
-                </td>
-                <td class="">
-                    <input name="arr_note[]" type="text" required>
+                    <table class="bordered">
+                        <thead>
+                            <tr>
+                                <th class="center" style="min-width:150px !important;">Item</th>
+                                <th class="center" style="min-width:150px !important;">Qty</th>
+                                <th class="center" style="min-width:150px !important;">Satuan UoM</th>
+                                <th class="center" style="min-width:150px !important;">BOM</th>
+                                <th class="center" style="min-width:150px !important;">Line</th>
+                                <th class="center" style="min-width:150px !important;">Gudang</th>
+                                <th class="center" style="min-width:150px !important;">Remark</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-detail-` + type + `-` + count + `">
+                            <tr>
+                                <input type="hidden" name="arr_type[]" value="` + type + `">
+                                <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="">
+                                <td style="background-color:` + randomColor + `;">
+                                    <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
+                                </td>
+                                <td style="background-color:` + randomColor + `;" class="right-align">
+                                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                </td>
+                                <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                    -
+                                </td>
+                                <td style="background-color:` + randomColor + `;" class="">
+                                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                                </td>
+                                <td style="background-color:` + randomColor + `;">
+                                    <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                        <option value="">--{{ __('translations.empty') }}--</option>
+                                        @foreach ($line as $rowline)
+                                            <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                        @endforeach
+                                    </select>    
+                                </td>
+                                <td style="background-color:` + randomColor + `;">
+                                    <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                        <option value="">--Silahkan pilih item--</option>
+                                    </select>
+                                </td>
+                                <td style="background-color:` + randomColor + `;" class="">
+                                    <input name="arr_note[]" type="text" required>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </td>
             </tr>
         `);
-
         select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
-
         $('#arr_bom' + count).select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1060,7 +1182,6 @@
                         
                         if(mop.details.length > 0){
                             $('#body-item-detail-normal').empty();
-                            $('#body-item-detail-powder').empty();
                         }
                         
                         $.each(mop.details, function(i, val) {
@@ -1095,34 +1216,24 @@
                                     <td class="">
                                         ` + val.note + `
                                     </td>
-                                    <td class="center-align">
-                                        ` + val.request_date + `
+                                    <td class="">
+                                        ` + val.note2 + `
                                     </td>
                                     <td class="center-align">
-                                        ` + val.line + `
+                                        ` + val.request_date + `
                                     </td>
                                 </tr>
                             `);
                             
-                            let datanormal = `<table class="bordered"><thead><tr>`;
-
-                            $.each(val.list_bom, function(z, detail) {
-                                if(detail.type == ''){
-                                    datanormal += `
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
+                            let datanormal = `<table class="bordered"><thead><tr>
+                                        <th class="center" style="min-width:150px !important;">Item</th>
                                         <th class="center" style="min-width:150px !important;">Qty</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                         <th class="center" style="min-width:150px !important;">BOM</th>
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
-                                        <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
-                                        <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
+                                        <th class="center" style="min-width:150px !important;">Line</th>
+                                        <th class="center" style="min-width:150px !important;">Gudang</th>
                                         <th class="center" style="min-width:150px !important;">Remark</th>
-                                    `;
-                                }
-                            });
-
-                            datanormal += `</tr></thead><tbody><tr>`;
+                                    </tr></thead><tbody>`;
 
                             let arrCountNormal = [], arrDataNormal = [], qtyRow = qtyTarget;
 
@@ -1133,7 +1244,7 @@
                                     arrDataNormal.push(detail);
                                     let randomColor = getRandomColor();
                                     qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
-                                    datanormal += `
+                                    datanormal += `<tr>
                                         <input type="hidden" name="arr_type[]" value="normal">
                                         <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
                                         
@@ -1163,19 +1274,13 @@
                                             </select>
                                         </td>
                                         <td style="background-color:` + randomColor + `;" class="">
-                                            <input name="arr_start_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
-                                            <input name="arr_end_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
                                             <input name="arr_note[]" type="text" required>
                                         </td>
-                                    `;
+                                    </tr>`;
                                 }
                             });
 
-                            datanormal += `</tr></tbody></table>`;
+                            datanormal += `</tbody></table>`;
 
                             $('#body-item-detail-normal').append(`
                                 <tr class="row_detail_item" data-id="` + val.mopd_id + `">
@@ -1217,136 +1322,6 @@
                                     dropdownParent: $('body').parent(),
                                     ajax: {
                                         url: '{{ url("admin/select2/bom_by_item") }}',
-                                        type: 'GET',
-                                        dataType: 'JSON',
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                item_id: $('#arr_item_detail_id' + row).val(),
-                                                place_id: $('#place_id').val(),
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.items
-                                            }
-                                        }
-                                    }
-                                });
-                            });
-
-                            let datapowder = `<table class="bordered"><thead><tr>`;
-
-                            $.each(val.list_bom, function(z, detail) {
-                                if(detail.type == '1'){
-                                    datapowder += `
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
-                                        <th class="center" style="min-width:150px !important;">Qty</th>
-                                        <th class="center" style="min-width:150px !important;">Satuan UoM</th>
-                                        <th class="center" style="min-width:150px !important;">BOM</th>
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
-                                        <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
-                                        <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
-                                        <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
-                                        <th class="center" style="min-width:150px !important;">Remark</th>
-                                    `;
-                                }
-                            });
-
-                            datapowder += `</tr></thead><tbody><tr>`;
-
-                            let arrCountPowder = [], arrDataPowder = [];
-
-                            $.each(val.list_bom, function(z, detail) {
-                                if(detail.type == '1'){
-                                    var count = makeid(10);
-                                    arrCountPowder.push(count);
-                                    arrDataPowder.push(detail);
-                                    let randomColor = getRandomColor();
-                                    qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
-                                    datapowder += `
-                                        <input type="hidden" name="arr_type[]" value="powder">
-                                        <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
-                                        <td style="background-color:` + randomColor + `;">
-                                            <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="right-align">
-                                            <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
-                                            -
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
-                                            <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;">
-                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                                <option value="">--{{ __('translations.empty') }}--</option>
-                                                @foreach ($line as $rowline)
-                                                    <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
-                                                @endforeach
-                                            </select>    
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;">
-                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                <option value="">--Silahkan pilih item--</option>
-                                            </select>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
-                                            <input name="arr_start_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
-                                            <input name="arr_end_date[]" type="datetime-local" value="{{ date('Y-m-d H:i:s') }}" required>
-                                        </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
-                                            <input name="arr_note[]" type="text" required>
-                                        </td>
-                                    `;
-                                }
-                            });
-
-                            datapowder += `</tr></tbody></table>`;
-
-                            $('#body-item-detail-powder').append(`
-                                <tr class="row_detail_item" data-id="` + val.mopd_id + `">
-                                    <td class="center-align">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-powder" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                    <td style="min-width:250px !important;">
-                                        ` + val.item_code + ` - ` + val.item_name + `
-                                    </td>
-                                    <td>
-                                        ` + datapowder + `
-                                    </td>
-                                </tr>
-                            `);
-
-                            $.each(arrCountPowder, function(z, row) {
-                                $('#arr_item_detail_id' + row).append(`
-                                    <option value="` + arrDataPowder[z].item_id + `">` + arrDataPowder[z].item_name + `</option> 
-                                `);
-                                select2ServerSide('#arr_item_detail_id' + row, '{{ url("admin/select2/item_has_bom") }}');
-                                $('#arr_unit' + row).text(arrDataPowder[z].unit);
-                                $('#arr_warehouse' + row).empty();
-                                $.each(arrDataPowder[z].list_warehouse, function(j, warehouserow) {
-                                    $('#arr_warehouse' + row).append(`
-                                        <option value="` + warehouserow.id + `">` + warehouserow.name + `</option>
-                                    `);
-                                });
-                                $('#arr_bom' + row).append(`
-                                    <option value="` + arrDataPowder[z].id + `">` + arrDataPowder[z].bom_name + `</option>
-                                `);
-                                $('#arr_bom' + row).select2({
-                                    placeholder: '-- Kosong --',
-                                    minimumInputLength: 1,
-                                    allowClear: true,
-                                    cache: true,
-                                    width: 'resolve',
-                                    dropdownParent: $('body').parent(),
-                                    ajax: {
-                                        url: '{{ url("admin/select2/bom_by_item_powder") }}',
                                         type: 'GET',
                                         dataType: 'JSON',
                                         data: function(params) {
@@ -1699,6 +1674,8 @@
                 
                 var formData = new FormData($('#form_data')[0]), passed = true;
 
+                formData.delete('arr_detail_id[]');
+
                 $('input[name^="arr_qty[]"]').each(function(index){
                     if(!$(this).val()){
                         passed = false;
@@ -1718,15 +1695,10 @@
                     if(!$('select[name^="arr_warehouse[]"]').eq(index).val()){
                         passed = false;
                     }
-                    if(!$('input[name^="arr_start_date[]"]').eq(index).val()){
-                        passed = false;
-                    }
-                    if(!$('input[name^="arr_end_date[]"]').eq(index).val()){
-                        passed = false;
-                    }
                     if(!$('select[name^="arr_line[]"]').eq(index).val()){
                         passed = false;
                     }
+                    formData.append('arr_detail_id[]',($('input[name^="arr_detail_id[]"]').eq(index).val() ? $('input[name^="arr_detail_id[]"]').eq(index).val() : ''));
                 });
 
                 if(passed){
@@ -1867,6 +1839,7 @@
 
                     if(response.targets.length > 0){
                         $('#body-item-detail-normal').empty();
+                        $('#body-item-detail-green').empty();
                         $('#body-item-detail-powder').empty();
                     }
 
@@ -1900,53 +1873,33 @@
                                 <td class="">
                                     ` + val.note + `
                                 </td>
+                                <td class="">
+                                    ` + val.note2 + `
+                                </td>
                                 <td class="center-align">
                                     ` + val.request_date + `
                                 </td>
-                                <td class="center-align">
-                                    ` + val.line + `
-                                </td>
                             </tr>
                         `);
+                    });
 
-                        let datanormal = `<table class="bordered"><thead><tr>`;
-                        
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'normal'){
-                                datanormal += `
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
-                                    <th class="center" style="min-width:150px !important;">Qty</th>
-                                    <th class="center" style="min-width:150px !important;">Satuan UoM</th>
-                                    <th class="center" style="min-width:150px !important;">BOM</th>
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
-                                    <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
-                                    <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
-                                    <th class="center" style="min-width:150px !important;">Remark</th>
-                                `;
-                            }
-                        });
-
-                        datanormal += `</tr></thead><tbody><tr>`;
-
-                        let arrCountNormal = [];
-
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'normal'){
-                                var count = makeid(10);
-                                arrCountNormal.push(count);
-                                let randomColor = getRandomColor();
-                                datanormal += `
-                                    <input type="hidden" name="arr_type[]" value="normal">
-                                    <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + detail.mopd_id + `">
+                    $.each(response.details, function(i, val) {
+                        var count = makeid(10);
+                        let randomColor = getRandomColor();
+                        if(val.mopd_id && $('.row_detail_item[data-id="' + val.mopd_id + '"]').length > 0){
+                            $('.row_detail_item[data-id="' + val.mopd_id + '"] tbody').append(`
+                                <tr>
+                                    <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                    <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
+                                    
                                     <td style="background-color:` + randomColor + `;">
                                         <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                     </td>
                                     <td style="background-color:` + randomColor + `;" class="right-align">
-                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + detail.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                     </td>
                                     <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
-                                        ` + detail.uom + `
+                                        ` + val.uom + `
                                     </td>
                                     <td style="background-color:` + randomColor + `;" class="">
                                         <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
@@ -1965,231 +1918,113 @@
                                         </select>
                                     </td>
                                     <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_start_date[]" type="datetime-local" required value="` + detail.start_date + `">
+                                        <input name="arr_note[]" type="text" required value="` + val.note + `">
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_end_date[]" type="datetime-local" required value="` + detail.end_date + `">
+                                </tr>
+                            `);
+                        }else{
+                            $('#body-item-detail-' + val.type).append(`
+                                <tr class="row_detail_item" data-id="` + val.mopd_id + `">
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + val.type + `" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_note[]" type="text" required value="` + detail.note + `">
+                                    <td style="min-width:250px !important;">
+                                        ` + val.item_code + `
                                     </td>
-                                `;
-                            }else{
-                                arrCountNormal.push('');
-                            }
-                        });
-
-                        datanormal += `</tr></tbody></table>`;
-
-                        $('#body-item-detail-normal').append(`
-                            <tr class="row_detail_item" data-id="` + val.mopd_id + `">
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-normal" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                                <td style="min-width:250px !important;">
-                                    ` + val.item_code + ` - ` + val.item_name + `
-                                </td>
-                                <td>
-                                ` + datanormal + `
-                                </td>
-                            </tr>
-                        `);
-
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'normal' && arrCountNormal[i] !== ''){
-                                if(detail.item_id){
-                                    $('#arr_item_detail_id' + arrCountNormal[i]).append(`
-                                        <option value="` + detail.item_id + `">` + detail.item_code + `</value>
-                                    `);
-                                }
-                                if(detail.bom_id){
-                                    $('#arr_bom' + arrCountNormal[i]).append(`
-                                        <option value="` + detail.bom_id + `">` + detail.bom_code + `</value>
-                                    `);
-                                }
-                                if(detail.line_id){
-                                    $('#arr_line' + arrCountNormal[i]).val(detail.line_id);
-                                }
-                                if(detail.warehouse_id){
-                                    $('#arr_warehouse' + arrCountNormal[i]).empty();
-                                    $.each(detail.list_warehouse, function(j, value) {
-                                        $('#arr_warehouse' + arrCountNormal[i]).append(`
-                                            <option value="` + value.id + `">` + value.name + `</option>
-                                        `);
-                                    });
-                                    $('#arr_warehouse' + arrCountNormal[i]).val(detail.warehouse_id);
-                                }
-                                select2ServerSide('#arr_item_detail_id' + arrCountNormal[i], '{{ url("admin/select2/item_has_bom") }}');
-                                $('#arr_bom' + arrCountNormal[i]).select2({
-                                    placeholder: '-- Kosong --',
-                                    minimumInputLength: 1,
-                                    allowClear: true,
-                                    cache: true,
-                                    width: 'resolve',
-                                    dropdownParent: $('body').parent(),
-                                    ajax: {
-                                        url: '{{ url("admin/select2/bom_by_item") }}',
-                                        type: 'GET',
-                                        dataType: 'JSON',
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                item_id: $('#arr_item_detail_id' + arrCountNormal[i]).val(),
-                                                place_id: $('#place_id').val(),
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.items
-                                            }
-                                        }
+                                    <td>
+                                        <table class="bordered"><thead><tr>
+                                            <th class="center" style="min-width:150px !important;">Item</th>
+                                            <th class="center" style="min-width:150px !important;">Qty</th>
+                                            <th class="center" style="min-width:150px !important;">Satuan UoM</th>
+                                            <th class="center" style="min-width:150px !important;">BOM</th>
+                                            <th class="center" style="min-width:150px !important;">Line</th>
+                                            <th class="center" style="min-width:150px !important;">Gudang</th>
+                                            <th class="center" style="min-width:150px !important;">Remark</th>
+                                        </tr></thead>
+                                            <tbody>
+                                                <tr>
+                                                    <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                                                    <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
+                                                    
+                                                    <td style="background-color:` + randomColor + `;">
+                                                        <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;" class="right-align">
+                                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                                        ` + val.uom + `
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;" class="">
+                                                        <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;">
+                                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
+                                                            <option value="">--{{ __('translations.empty') }}--</option>
+                                                            @foreach ($line as $rowline)
+                                                                <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
+                                                            @endforeach
+                                                        </select>    
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;">
+                                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                            <option value="">--Silahkan pilih item--</option>
+                                                        </select>
+                                                    </td>
+                                                    <td style="background-color:` + randomColor + `;" class="">
+                                                        <input name="arr_note[]" type="text" required value="` + val.note + `">
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        if(val.bom_id){
+                            $('#arr_bom' + count).append(`
+                                <option value="` + val.bom_id + `">` + val.bom_code + `</option>
+                            `);
+                        }
+                        $('#arr_bom' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/bom_by_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: $('#arr_item_detail_id' + count).val(),
+                                        place_id: $('#place_id').val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
                                     }
-                                });
+                                }
                             }
                         });
-
-                        let datapowder = `<table class="bordered"><thead><tr>`;
-                        
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'powder'){
-                                datapowder += `
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.item') }}</th>
-                                    <th class="center" style="min-width:150px !important;">Qty</th>
-                                    <th class="center" style="min-width:150px !important;">Satuan UoM</th>
-                                    <th class="center" style="min-width:150px !important;">BOM</th>
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.line') }}</th>
-                                    <th class="center" style="min-width:150px !important;">{{ __('translations.warehouse') }}</th>
-                                    <th class="center" style="min-width:150px !important;">Tgl.Mulai</th>
-                                    <th class="center" style="min-width:150px !important;">Tgl.Selesai</th>
-                                    <th class="center" style="min-width:150px !important;">Remark</th>
-                                `;
-                            }
+                        $('#arr_line' + count).val(val.line_id);
+                        $('#arr_warehouse' + count).empty();
+                        $.each(val.list_warehouse, function(j, warehouserow) {
+                            $('#arr_warehouse' + count).append(`
+                                <option value="` + warehouserow.id + `">` + warehouserow.name + `</option>
+                            `);
                         });
-
-                        datapowder += `</tr></thead><tbody><tr>`;
-
-                        let arrCountPowder = [];
-
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'powder'){
-                                var count = makeid(10);
-                                arrCountPowder.push(count);
-                                let randomColor = getRandomColor();
-                                datapowder += `
-                                    <input type="hidden" name="arr_type[]" value="normal">
-                                    <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + detail.mopd_id + `">
-                                    <td style="background-color:` + randomColor + `;">
-                                        <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="right-align">
-                                        <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + detail.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
-                                        ` + detail.uom + `
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;">
-                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
-                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                            @foreach ($line as $rowline)
-                                                <option value="{{ $rowline->id }}">{{ $rowline->name }}</option>
-                                            @endforeach
-                                        </select>    
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;">
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                            <option value="">--Silahkan pilih item--</option>
-                                        </select>
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_start_date[]" type="datetime-local" required value="` + detail.start_date + `">
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_end_date[]" type="datetime-local" required value="` + detail.end_date + `">
-                                    </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
-                                        <input name="arr_note[]" type="text" required value="` + detail.note + `">
-                                    </td>
-                                `;
-                            }else{
-                                arrCountPowder.push('');
-                            }
-                        });
-
-                        datapowder += `</tr></tbody></table>`;
-
-                        $('#body-item-detail-powder').append(`
-                            <tr class="row_detail_item" data-id="` + val.mopd_id + `">
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-normal" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                                <td style="min-width:250px !important;">
-                                    ` + val.item_code + ` - ` + val.item_name + `
-                                </td>
-                                <td>
-                                ` + datapowder + `
-                                </td>
-                            </tr>
+                        $('#arr_warehouse' + count).val(val.warehouse_id);
+                        $('#arr_item_detail_id' + count).append(`
+                            <option value="` + val.item_id + `">` + val.item_code + `</option> 
                         `);
-
-                        $.each(val.details, function(i, detail) {
-                            if(detail.type == 'powder' && arrCountPowder[i] !== ''){
-                                if(detail.item_id){
-                                    $('#arr_item_detail_id' + arrCountPowder[i]).append(`
-                                        <option value="` + detail.item_id + `">` + detail.item_code + `</value>
-                                    `);
-                                }
-                                if(detail.bom_id){
-                                    $('#arr_bom' + arrCountPowder[i]).append(`
-                                        <option value="` + detail.bom_id + `">` + detail.bom_code + `</value>
-                                    `);
-                                }
-                                if(detail.line_id){
-                                    $('#arr_line' + arrCountPowder[i]).val(detail.line_id);
-                                }
-                                if(detail.warehouse_id){
-                                    $('#arr_warehouse' + arrCountPowder[i]).empty();
-                                    $.each(detail.list_warehouse, function(j, value) {
-                                        $('#arr_warehouse' + arrCountPowder[i]).append(`
-                                            <option value="` + value.id + `">` + value.name + `</option>
-                                        `);
-                                    });
-                                    $('#arr_warehouse' + arrCountPowder[i]).val(detail.warehouse_id);
-                                }
-                                select2ServerSide('#arr_item_detail_id' + arrCountPowder[i], '{{ url("admin/select2/item_has_bom") }}');
-                                $('#arr_bom' + arrCountPowder[i]).select2({
-                                    placeholder: '-- Kosong --',
-                                    minimumInputLength: 1,
-                                    allowClear: true,
-                                    cache: true,
-                                    width: 'resolve',
-                                    dropdownParent: $('body').parent(),
-                                    ajax: {
-                                        url: '{{ url("admin/select2/bom_by_item") }}',
-                                        type: 'GET',
-                                        dataType: 'JSON',
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                item_id: $('#arr_item_detail_id' + arrCountPowder[i]).val(),
-                                                place_id: $('#place_id').val(),
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.items
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        });
+                        select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
                     });
 
                     countTarget();
@@ -2497,7 +2332,7 @@
         previous = $(element).val();
     }
 
-    function updateDocumentStatus(code,element,order){
+    /* function updateDocumentStatus(code,element,order){
         var status = $(element).val();
         if($(element).val()){
             swal({
@@ -2553,5 +2388,5 @@
         }else{
             $(element).val(previous);
         }
-    }
+    } */
 </script>

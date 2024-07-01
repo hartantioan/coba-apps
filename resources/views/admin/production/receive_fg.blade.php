@@ -208,8 +208,8 @@
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getItemProductionOrder();"></select>
-                                        <label class="active" for="production_order_id">Production Order</label>
+                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getItemProductionOrder();"></select>
+                                        <label class="active" for="production_order_detail_id">Production Order</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <input id="item_name" name="item_name" type="text" value="-" readonly>
@@ -771,7 +771,7 @@
             }
         });
         
-        $('#production_order_id').select2({
+        $('#production_order_detail_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -779,7 +779,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/production_order_receive_fg") }}',
+                url: '{{ url("admin/select2/production_order_detail_receive_fg") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {

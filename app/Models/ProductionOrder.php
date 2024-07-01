@@ -59,16 +59,6 @@ class ProductionOrder extends Model
         return $this->hasMany('App\Models\ProductionOrderDetail');
     }
 
-    public function productionIssue()
-    {
-        return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3']);
-    }
-
-    public function productionReceive()
-    {
-        return $this->hasMany('App\Models\ProductionReceive')->whereIn('status',['1','2','3']);
-    }
-
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();
@@ -192,15 +182,17 @@ class ProductionOrder extends Model
     public function total(){
         $total = 0;
         
-        if($this->productionIssue()->exists()){
-            foreach($this->productionIssue as $rowissue){
-                $total += $rowissue->total();
+        foreach($this->productionOrderDetail as $row){
+            if($row->productionIssue()->exists()){
+                foreach($row->productionIssue as $rowissue){
+                    $total += $rowissue->total();
+                }
             }
-        }
 
-        if($this->productionReceive()->exists()){
-            foreach($this->productionReceive as $rowreceive){
-                $total -= $rowreceive->total();
+            if($row->productionReceive()->exists()){
+                foreach($row->productionReceive as $rowreceive){
+                    $total -= $rowreceive->total();
+                }
             }
         }
         
@@ -210,9 +202,11 @@ class ProductionOrder extends Model
     public function totalFg(){
         $total = 0;
         
-        if($this->productionIssue()->exists()){
-            foreach($this->productionIssue as $rowissue){
-                $total += $rowissue->total();
+        foreach($this->productionOrderDetail as $row){
+            if($row->productionIssue()->exists()){
+                foreach($row->productionIssue as $rowissue){
+                    $total += $rowissue->total();
+                }
             }
         }
         
@@ -222,9 +216,11 @@ class ProductionOrder extends Model
     public function qtyReceiveFg(){
         $qty = 0;
         
-        if($this->productionReceive()->exists()){
-            foreach($this->productionReceive as $rowreceive){
-                $qty += $rowreceive->qty();
+        foreach($this->productionOrderDetail as $row){
+            if($row->productionReceive()->exists()){
+                foreach($row->productionReceive as $rowreceive){
+                    $qty += $rowreceive->qty();
+                }
             }
         }
         

@@ -4271,6 +4271,56 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function productionOrderDetailReceiveFg(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionOrderDetail::where(function($query)use($search){  
+            $query->whereHas('productionOrder',function($query) use($search){
+                $query->where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+                });
+            })->orWhereHas('productionScheduleDetail',function($query) use($search){
+                $query->whereHas('item',function($query) use($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhere('name','like',"%$search%");
+                })
+                ->orWhereHas('productionSchedule',function($query) use($search){
+                    $query->where('code','like',"%$search%");
+                });
+            });
+        })
+        ->whereHas('productionOrder',function($query){
+            $query->whereDoesntHave('used')
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2']);
+        })
+        ->whereHas('productionScheduleDetail',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereNotNull('is_sales_item');
+            });
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'        => $d->id,
+                'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
+                'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
+                'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
+                'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function itemSerial(Request $request)
     {
         $response = [];

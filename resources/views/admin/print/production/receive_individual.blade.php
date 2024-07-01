@@ -238,7 +238,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->productionOrder->code }}
+                                            {{ $data->productionOrderDetail->productionOrder->code }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -353,10 +353,10 @@
                                 <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty Planned</th>
                                 <th align="center">Qty Real</th>
+                                <th align="center">Qty Reject</th>
                                 <th align="center">Satuan Produksi</th>
                                 <th align="center">{{ __('translations.plant') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>
-                                <th align="center">Tank</th>
                                 <th align="center">No.Batch</th>
                             </tr>
                         </thead>

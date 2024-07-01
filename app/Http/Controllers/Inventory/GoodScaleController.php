@@ -707,6 +707,7 @@ class GoodScaleController extends Controller
             $gs->qty_final = $qty_final;
             $gs->time_scale_out = date('Y-m-d H:i:s');
             $gs->image_out = $newFile ? $newFile : NULL;
+            $gs->note = $request->noteUpdate;
             $gs->save();
     
             /* if($adapo){

@@ -391,25 +391,25 @@
                         <div class="row">
                             <input type="hidden" id="tempPlace">
                             <input type="hidden" id="tempGoodScale" name="tempGoodScale">
-                            <div class="input-field col m4 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="codeUpdate" class="mt-2">
 
                                 </div>
                                 <label class="active" for="codeUpdate">{{ __('translations.code') }}</label>
                             </div>
-                            <div class="input-field col m4 s12 supplier-class">
+                            <div class="input-field col m3 s12 supplier-class">
                                 <div id="supplierUpdate" class="mt-2">
 
                                 </div>
                                 <label class="active" for="supplierUpdate">Supplier</label>
                             </div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="plantUpdate" class="mt-2">
 
                                 </div>
                                 <label class="active" for="plantUpdate">{{ __('translations.plant') }}</label>
                             </div>
-                            <div class="input-field col m2 s12">
+                            <div class="input-field col m3 s12">
                                 <div id="warehouseUpdate" class="mt-2">
 
                                 </div>
@@ -440,11 +440,16 @@
                                 <input id="qtyBalanceUpdate" name="qtyBalanceUpdate" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qtyBalanceUpdate">Qty Netto</label>
                             </div>
+                            <div class="col m12 s12"></div>
                             <div class="input-field col m3 s12">
                                 <div id="unitUpdate" class="mt-2">
 
                                 </div>
                                 <label class="active" for="unitUpdate">{{ __('translations.unit') }}</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <textarea class="materialize-textarea" id="noteUpdate" name="noteUpdate" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                <label class="active" for="noteUpdate">{{ __('translations.note') }}</label>
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="col m1 s12">
@@ -1919,6 +1924,7 @@
                 $('#purchaseOrderUpdate').text(response.purchase_code);
                 $('#qtyInUpdate').text(response.qty_in);
                 $('#unitUpdate').text(response.unit);
+                $('#noteUpdate').text(response.note);
 
                 if(response.is_hide){
                     $('.supplier-class').addClass('hide');

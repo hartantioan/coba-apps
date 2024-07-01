@@ -19,7 +19,7 @@ class ProductionFgReceive extends Model
         'code',
         'user_id',
         'company_id',
-        'production_order_id',
+        'production_order_detail_id',
         'item_id',
         'place_id',
         'line_id',

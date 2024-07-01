@@ -354,5 +354,5 @@ return [
     'regency'           => 'Regency',
     'other_name'        => 'Other Name',
     'handover_date'     => 'Handover Date',
-    ''
+    'order'             => 'Order',
 ];  

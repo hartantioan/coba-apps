@@ -2726,36 +2726,7 @@ Route::prefix('admin')->group(function () {
                     });
                 });
 
-                Route::prefix('document_tax')->middleware('operation.access:document_tax,view')->group(function () {
-                    Route::get('/', [DocumentTaxController::class, 'index']);
-                    Route::get('datatable', [DocumentTaxController::class, 'datatable']);
-                    Route::post('show', [DocumentTaxController::class, 'show']);
-                    Route::post('print', [DocumentTaxController::class, 'print']);
-                    Route::get('export', [DocumentTaxController::class, 'export']);
-                    Route::get('export_data_table', [DocumentTaxController::class, 'exportDataTable']);
-                    Route::get('row_detail',[DocumentTaxController::class, 'rowDetail']);
-                    Route::post('store_w_barcode', [DocumentTaxController::class, 'store_w_barcode'])->middleware('operation.access:document_tax,update');
-                    Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');
-                });
-
-                Route::prefix('document_tax_handover')->middleware('operation.access:document_tax_handover,view')->group(function () {
-                    Route::get('/', [DocumentTaxHandoverController::class, 'index']);
-                    Route::get('datatable', [DocumentTaxHandoverController::class, 'datatable']);
-                    Route::post('show', [DocumentTaxHandoverController::class, 'show']);
-                    Route::post('print', [DocumentTaxHandoverController::class, 'print']);
-                    Route::get('export', [DocumentTaxHandoverController::class, 'export']);
-                    Route::get('export_data_table', [DocumentTaxHandoverController::class, 'exportDataTable']);
-                    Route::get('row_detail',[DocumentTaxHandoverController::class, 'rowDetail']);
-                    Route::post('get_code', [DocumentTaxHandoverController::class, 'getCode']);
-                    Route::post('create',[DocumentTaxHandoverController::class, 'create'])->middleware('operation.access:document_tax_handover,update');
-                    Route::post('confirm_scan',[DocumentTaxHandoverController::class, 'confirmScan'])->middleware('operation.access:document_tax_handover,journal');
-                    Route::post('save_detail',[DocumentTaxHandoverController::class, 'saveDetail'])->middleware('operation.access:document_tax_handover,journal');
-                    Route::post('void_status', [DocumentTaxHandoverController::class, 'voidStatus'])->middleware('operation.access:document_tax_handover,void');
-                    Route::get('print_individual/{id}',[DocumentTaxHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
-                    Route::post('get_tax_for_handover_tax', [DocumentTaxHandoverController::class, 'getTaxforHandoverTax']);
-                    Route::post('store_w_barcode', [DocumentTaxHandoverController::class, 'store_w_barcode'])->middleware('operation.access:document_tax_handover,update');
-                    Route::post('destroy', [DocumentTaxHandoverController::class, 'destroy'])->middleware('operation.access:document_tax_handover,delete');
-                });
+                
                 
                 Route::prefix('journal')->middleware(['operation.access:journal,view','lockacc'])->group(function () {
                     Route::get('/',[JournalController::class, 'index']);
@@ -2856,6 +2827,38 @@ Route::prefix('admin')->group(function () {
                         Route::post('process', [ProfitLossController::class, 'process']);
                         Route::get('export', [ProfitLossController::class, 'export']);
                     });
+                });
+            });
+            Route::prefix('taxes')->middleware('direct.access')->group(function () {
+                Route::prefix('document_tax')->middleware('operation.access:document_tax,view')->group(function () {
+                    Route::get('/', [DocumentTaxController::class, 'index']);
+                    Route::get('datatable', [DocumentTaxController::class, 'datatable']);
+                    Route::post('show', [DocumentTaxController::class, 'show']);
+                    Route::post('print', [DocumentTaxController::class, 'print']);
+                    Route::get('export', [DocumentTaxController::class, 'export']);
+                    Route::get('export_data_table', [DocumentTaxController::class, 'exportDataTable']);
+                    Route::get('row_detail',[DocumentTaxController::class, 'rowDetail']);
+                    Route::post('store_w_barcode', [DocumentTaxController::class, 'store_w_barcode'])->middleware('operation.access:document_tax,update');
+                    Route::post('destroy', [DocumentTaxController::class, 'destroy'])->middleware('operation.access:document_tax,delete');
+                });
+
+                Route::prefix('document_tax_handover')->middleware('operation.access:document_tax_handover,view')->group(function () {
+                    Route::get('/', [DocumentTaxHandoverController::class, 'index']);
+                    Route::get('datatable', [DocumentTaxHandoverController::class, 'datatable']);
+                    Route::post('show', [DocumentTaxHandoverController::class, 'show']);
+                    Route::post('print', [DocumentTaxHandoverController::class, 'print']);
+                    Route::get('export', [DocumentTaxHandoverController::class, 'export']);
+                    Route::get('export_data_table', [DocumentTaxHandoverController::class, 'exportDataTable']);
+                    Route::get('row_detail',[DocumentTaxHandoverController::class, 'rowDetail']);
+                    Route::post('get_code', [DocumentTaxHandoverController::class, 'getCode']);
+                    Route::post('create',[DocumentTaxHandoverController::class, 'create'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('confirm_scan',[DocumentTaxHandoverController::class, 'confirmScan'])->middleware('operation.access:document_tax_handover,journal');
+                    Route::post('save_detail',[DocumentTaxHandoverController::class, 'saveDetail'])->middleware('operation.access:document_tax_handover,journal');
+                    Route::post('void_status', [DocumentTaxHandoverController::class, 'voidStatus'])->middleware('operation.access:document_tax_handover,void');
+                    Route::get('print_individual/{id}',[DocumentTaxHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('get_tax_for_handover_tax', [DocumentTaxHandoverController::class, 'getTaxforHandoverTax']);
+                    Route::post('store_w_barcode', [DocumentTaxHandoverController::class, 'store_w_barcode'])->middleware('operation.access:document_tax_handover,update');
+                    Route::post('destroy', [DocumentTaxHandoverController::class, 'destroy'])->middleware('operation.access:document_tax_handover,delete');
                 });
             });
         });

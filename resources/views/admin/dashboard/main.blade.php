@@ -326,7 +326,24 @@
                             </div>
 
                         </div>
+                        <div class="col s12 m12 l12">
+                           <div class="col s12 m6 l4">
+                              <div class="card  gradient-shadow black-text animate fadeLeft" style="cursor: pointer; transition: box-shadow 0.3s;">
+                                 <div class="padding-2" style="display: flex; align-items: center;" onmouseover="this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)'" onmouseout="this.style.boxShadow='none'">
+                                 
+                                       <div style="flex: 3; display: flex; flex-direction: column; justify-content: center;">
+                                          <p class="no-margin center-align">DOWNLOAD PLUGINS &nbsp;</p>
+                                          
                         
+                                       </div>
+                                       <a class="btn-floating btn-small waves-effect waves-light gradient-45deg-amber-amber gradient-shadow" href="https://porcelain.superiorprimasukses.com/plugins/whb.exe">
+                                          <i class="material-icons">file_download</i>
+                                       </a>
+                                    
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
                         
                         {{-- <div class="col s12 m12 l12">
                             <div class="card padding-4 animate fadeLeft">

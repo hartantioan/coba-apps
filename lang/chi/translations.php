@@ -355,7 +355,7 @@ return [
     'regency'           => '地方政府',
     'other_name'        => '其他名称',
     'handover_date'     => '交接日期',
-
+    'order'             => '命令',
 
 ];
 

@@ -354,8 +354,8 @@ return [
     'capacity'          => 'Kapasitas',
     'regency'           => 'Kabupaten',
     'other_name'        => 'Nama Lain',
-    'handover_date'     => 'Tanggal Serah Terima'
-
+    'handover_date'     => 'Tanggal Serah Terima',
+    'order'             => 'Urutan',
 
 
 ];

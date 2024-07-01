@@ -607,17 +607,7 @@
                                         </label>
                                     </div>
                                 </div>
-                                <div class="input-field col s12 m12">
-                                    <div class="switch mb-1">
-                                        <label for="is_reject">Item Reject (Hanya 1)</label>
-                                        <label class="right">
-                                            {{ __('translations.no') }}
-                                            <input type="checkbox" id="is_reject" name="is_reject" value="1">
-                                            <span class="lever"></span>
-                                            {{ __('translations.yes') }}
-                                        </label>
-                                    </div>
-                                </div>
+                                
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -1657,11 +1647,7 @@
                     $('#is_hide_supplier').prop( "checked", false);
                 }
 
-                if(response.is_reject == '1'){
-                    $('#is_reject').prop( "checked", true);
-                }else{
-                    $('#is_reject').prop( "checked", false);
-                }
+                
 
                 if(response.is_sales_item == '1'){
                     $('#is_sales_item').trigger('click');

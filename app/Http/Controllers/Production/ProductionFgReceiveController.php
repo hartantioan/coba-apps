@@ -112,30 +112,31 @@ class ProductionFgReceiveController extends Controller
 
                         $sellConvert = $itemChild->sellConversion();
 
-                        $qtySell = round($qty / $sellConvert);
                         $result = [];
                         $prefix = 'PLT/'.$plant->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
                         $latestCode = ProductionFgReceiveDetail::getLatestCode($prefix);
                         $startNumber = intval(substr($latestCode,(strlen($latestCode)-5),5));
-                        $totalAll = $qty;
-                        for($i=1;$i<=$qtySell;$i++){
-                            $qtyRow = $totalAll >= $sellConvert ? $sellConvert : $totalAll;
-                            $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
-                            $code = $prefix.'.'.$no;
-                            $result[] = [
-                                'item_id'   => $itemChild->id,
-                                'item_code' => $itemChild->code,
-                                'item_name' => $itemChild->name,
-                                'code'      => $code,
-                                'qty_uom'   => CustomHelper::formatConditionalQty($sellConvert),
-                                'qty'       => CustomHelper::formatConditionalQty($qtyRow),
-                                'plant'     => $plant->code,
-                                'shift'     => $shift->code,
-                                'group'     => $group,
-                            ];
-                            $startNumber++;
-                            $totalAll -= $sellConvert;
-                        }
+                        $qtyRow = floor($qty / $sellConvert);
+                        $qtyUsed = $qtyRow * $sellConvert;
+                        $qtyBalance = $qty - $qtyUsed;
+                        $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
+                        $code = $prefix.'.'.$no;
+                        $result[] = [
+                            'item_id'       => $itemChild->id,
+                            'item_code'     => $itemChild->code,
+                            'item_name'     => $itemChild->name,
+                            'code'          => $code,
+                            'qty_convert'   => CustomHelper::formatConditionalQty($sellConvert),
+                            'qty_sell'      => CustomHelper::formatConditionalQty($qtyRow),
+                            'qty_uom'       => CustomHelper::formatConditionalQty($qty),
+                            'sell_unit'     => $itemChild->sellUnit(),
+                            'qty_used'      => CustomHelper::formatConditionalQty($qtyUsed),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($qtyBalance),
+                            'uom_unit'      => $itemChild->uomUnit->code,
+                            'plant'         => $plant->code,
+                            'shift'         => $shift->code,
+                            'group'         => $group,
+                        ];
 
                         return response()->json($result);
                     }else{

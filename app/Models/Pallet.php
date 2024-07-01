@@ -16,6 +16,7 @@ class Pallet extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
+        'prefix_code',
         'name',
         'nominal',
         'status'

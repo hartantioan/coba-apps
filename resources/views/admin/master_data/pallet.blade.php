@@ -70,6 +70,7 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
+                                                        <th>Prefix</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>Harga per Satuan Jual</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -104,7 +105,11 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
-                            <label class="active" for="code">{{ __('translations.code') }}</label>
+                            <label class="active" for="code">{{ __('translations.code') }} (Untuk kode item FG)</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="prefix_code" name="prefix_code" type="text" placeholder="Kode Palet / Curah">
+                            <label class="active" for="code">Prefix (Untuk awalan kode palet/curah FG)</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
@@ -229,6 +234,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
+                { name: 'prefix_code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'nominal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -336,6 +342,7 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#code').val(response.code);
+                $('#prefix_code').val(response.prefix_code);
                 $('#name').val(response.name);
                 $('#nominal').val(response.nominal);
                 if(response.status == '1'){

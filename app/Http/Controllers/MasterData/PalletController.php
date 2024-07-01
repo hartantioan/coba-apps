@@ -26,6 +26,7 @@ class PalletController extends Controller
         $column = [
             'id',
             'code',
+            'prefix_code',
             'name',
             'nominal',
         ];
@@ -42,6 +43,7 @@ class PalletController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('prefix_code','like',"%$search%")
                             ->orWhere('name', 'like', "%$search%");
                     });
                 }
@@ -59,6 +61,7 @@ class PalletController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('prefix_code','like',"%$search%")
                             ->orWhere('name', 'like', "%$search%");
                     });
                 }
@@ -77,6 +80,7 @@ class PalletController extends Controller
                 $response['data'][] = [
                     $val->id,
                     $val->code,
+                    $val->prefix_code,
                     $val->name,
                     number_format($val->nominal,2,',','.'),
                     $val->status(),
@@ -107,10 +111,12 @@ class PalletController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('pallets', 'code')->ignore($request->temp)] : 'required|unique:pallets,code',
             'name'              => 'required',
+            'prefix_code'       => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
+            'prefix_code.required'  => 'Kode prefix palet / curah tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -124,6 +130,7 @@ class PalletController extends Controller
                 try {
                     $query = Pallet::find($request->temp);
                     $query->code            = $request->code;
+                    $query->prefix_code     = $request->prefix_code;
                     $query->name	        = $request->name;
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status          = $request->status ? $request->status : '2';
@@ -137,6 +144,7 @@ class PalletController extends Controller
                 try {
                     $query = Pallet::create([
                         'code'          => $request->code,
+                        'prefix_code'   => $request->prefix_code,
                         'name'			=> $request->name,
                         'nominal'       => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'        => $request->status ? $request->status : '2'

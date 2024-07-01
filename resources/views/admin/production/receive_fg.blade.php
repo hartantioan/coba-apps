@@ -353,16 +353,21 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:1500px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:2200px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
-                                                            <th class="center">No.Palet</th>
+                                                            <th class="center">No.Palet/Curah</th>
                                                             <th class="center">Kode Item</th>
                                                             <th class="center">Nama Item</th>
                                                             <th class="center">{{ __('translations.shading') }}</th>
                                                             <th class="center">Qty Jual</th>
-                                                            <th class="center">Qty M2</th>
+                                                            <th class="center">Satuan Jual</th>
+                                                            <th class="center">Konversi Jual</th>
+                                                            <th class="center">Qty Produksi</th>
+                                                            <th class="center">Satuan Produksi</th>
+                                                            <th class="center">Qty Terpakai</th>
+                                                            <th class="center">Qty Sisa</th>
                                                             <th class="center">{{ __('translations.plant') }}</th>
                                                             <th class="center">Shift</th>
                                                             <th class="center">Group</th>
@@ -371,7 +376,7 @@
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="11">
+                                                            <td class="center-align" colspan="16">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
@@ -763,7 +768,7 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="11">
+                        <td class="center-align" colspan="16">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -817,7 +822,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="11">
+                        <td class="center-align" colspan="16">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1099,7 +1104,7 @@
                 $('.row_item[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="11">
+                        <td class="center-align" colspan="16">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -1191,10 +1196,25 @@
                                             <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="-">
                                         </td>
                                         <td class="right-align">
-                                            1
+                                            <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.sell_unit + `
                                         </td>
                                         <td class="right-align">
-                                            <input name="arr_qty[]" id="arr_qty` + count + `" type="text" value="` + val.qty + `" readonly>
+                                            <input name="arr_qty_convert[]" id="arr_qty_convert` + count + `" type="text" value="` + val.qty_convert + `" readonly>
+                                        </td>
+                                        <td class="right-align">
+                                            <input name="arr_qty_uom[]" id="arr_qty_uom` + count + `" type="text" value="` + val.qty_uom + `" readonly>
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.uom_unit + `
+                                        </td>
+                                        <td class="right-align">
+                                            <input name="arr_qty_used[]" id="arr_qty_used` + count + `" type="text" value="` + val.qty_used + `" readonly>
+                                        </td>
+                                        <td class="right-align">
+                                            <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" type="text" value="` + val.qty_balance + `" readonly>
                                         </td>
                                         <td class="center-align">
                                             ` + val.plant + `

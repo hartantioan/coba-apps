@@ -4049,7 +4049,7 @@ class Select2Controller extends Controller {
         })
         ->whereHas('productionScheduleDetail',function($query){
             $query->whereHas('item',function($query){
-                $query->whereNotNull('is_sales_item');
+                $query->whereNull('is_sales_item');
             });
         })
         ->get();

@@ -343,7 +343,7 @@ return [
     'reception'         => 'Reception',
     'buy'               => 'Buy',
     'sell'              => 'sell',
-    'default'           => 'default',
+    'default'           => 'Default',
     'minimum_stock'     => 'Minimum Stock',
     'maximum_stock'     => 'Maximum Stock',
     'quality_check'     => 'Quality Check',

@@ -542,7 +542,7 @@
                                             <th class="center">{{ __('translations.conversion') }}</th>
                                             <th class="center">{{ __('translations.sell') }}</th>
                                             <th class="center">{{ __('translations.buy') }}</th>
-                                            <th class="center">{{ __('translations.sell') }}</th>
+                                            <th class="center">{{ __('translations.default') }}</th>
                                             <th class="center">{{ __('translations.delete') }}</th>
                                         </tr>
                                     </thead>

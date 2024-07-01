@@ -4326,6 +4326,7 @@ class Select2Controller extends Controller {
                 'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' Tangki No. '.($d->tank()->exists() ? $d->tank->code : '-'),
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
+                'tank_code'     => $d->tank()->exists() ? $d->tank->code : '-',
             ];
         }
 

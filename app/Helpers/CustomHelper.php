@@ -4212,7 +4212,6 @@ class CustomHelper {
 			$total = 0;
 
 			foreach($pir->productionReceiveDetail as $row){
-				info($row->item->itemGroup->coa_id);
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->item->itemGroup->coa_id,

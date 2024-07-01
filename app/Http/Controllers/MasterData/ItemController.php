@@ -710,7 +710,7 @@ class ItemController extends Controller
         $item['brand_name'] = $item->brand()->exists() ? $item->brand->code.' - '.$item->brand->name : '';
         $item['brand_code'] = $item->brand()->exists() ? $item->brand->code : '';
         $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
-        $item['used'] = '';
+        $item['used'] = $item->hasChildDocument() ? '1' : '';
         
         $units = [];
         $buffer = [];

@@ -4047,6 +4047,11 @@ class Select2Controller extends Controller {
                 ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
                 ->whereIn('status',['2']);
         })
+        ->whereHas('productionScheduleDetail',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereNotNull('is_sales_item');
+            });
+        })
         ->get();
 
         foreach($data as $d) {

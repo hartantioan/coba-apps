@@ -385,7 +385,9 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_delivery_process_po', [Select2Controller::class, 'marketingOrderDeliveryProcessPO']);
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
                 Route::get('production_order', [Select2Controller::class, 'productionOrder']);
+                Route::get('production_order_detail', [Select2Controller::class, 'productionOrderDetail']);
                 Route::get('production_order_receive', [Select2Controller::class, 'productionOrderReceive']);
+                Route::get('production_order_detail_receive', [Select2Controller::class, 'productionOrderDetailReceive']);
                 Route::get('production_order_receive_fg', [Select2Controller::class, 'productionOrderReceiveFg']);
                 Route::get('journal', [Select2Controller::class, 'journal']);
                 Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);
@@ -2106,8 +2108,6 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[ProductionIssueController::class, 'printByRange']);
                     Route::get('export',[ProductionIssueController::class, 'export']);
                     Route::get('viewstructuretree',[ProductionIssueController::class, 'viewStructureTree']);
-                    Route::post('send_used_data',[ProductionIssueController::class, 'sendUsedData']);
-                    Route::post('remove_used_data', [ProductionIssueController::class, 'removeUsedData']);
                     Route::post('create',[ProductionIssueController::class, 'create'])->middleware('operation.access:production_issue,update');
                     Route::post('send_used_data',[ProductionIssueController::class, 'sendUsedData'])->middleware('operation.access:production_issue,update');
                     Route::get('view_journal/{id}',[ProductionIssueController::class, 'viewJournal'])->middleware('operation.access:production_issue,journal');
@@ -2129,10 +2129,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[ProductionReceiveController::class, 'printByRange']);
                     Route::get('export',[ProductionReceiveController::class, 'export']);
                     Route::get('viewstructuretree',[ProductionReceiveController::class, 'viewStructureTree']);
-                    Route::post('send_used_data',[ProductionReceiveController::class, 'sendUsedData']);
-                    Route::post('remove_used_data', [ProductionReceiveController::class, 'removeUsedData']);
                     Route::post('create',[ProductionReceiveController::class, 'create'])->middleware('operation.access:production_receive,update');
-                    Route::post('send_used_data',[ProductionReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_receive,update');
                     Route::get('view_journal/{id}',[ProductionReceiveController::class, 'viewJournal'])->middleware('operation.access:production_receive,journal');
                     Route::get('approval/{id}',[ProductionReceiveController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[ProductionReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');

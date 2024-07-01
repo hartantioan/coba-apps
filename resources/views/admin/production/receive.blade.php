@@ -268,11 +268,8 @@
                                 <fieldset>
                                     <legend>2. Order Produksi</legend>
                                     <div class="input-field col m4 s12 step6 disable-class">
-                                        <select class="browser-default" id="production_order_id" name="production_order_id" onchange="getProductionOrder();" tabindex="-1"></select>
-                                        <label class="active" for="production_order_id">Daftar Order Produksi (Pilih Shift & Grup)</label>
-                                    </div>
-                                    <div class="col m8 s12 step8">
-                                        <h6>Data Terpakai : <i id="list-used-data"></i></h6>
+                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getProductionOrder();" tabindex="-1"></select>
+                                        <label class="active" for="production_order_detail_id">Daftar Order Produksi (Pilih Shift & Grup)</label>
                                     </div>
                                     <div class="col m12">
                                         <div class="row">
@@ -730,9 +727,6 @@
                 $('#validation_alert').html('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
-                    if($('.data-used').length > 0){
-                        $('.data-used').trigger('click');
-                    }
                     return 'You will lose all changes made since your last save';
                 };
                 $('.disable-class').css('pointer-events','none');
@@ -741,14 +735,11 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
                 window.onbeforeunload = function() {
                     return null;
                 };
                 $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_id,#shift_id').empty();
+                $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td class="center-align" colspan="10">
@@ -757,7 +748,7 @@
                     </tr>
                 `);
                 $('.disable-class').css('pointer-events','none');
-                $('#production_order_id').attr('tabindex','-1');
+                $('#production_order_detail_id').attr('tabindex','-1');
                 $('#body-issue').empty().append(`
                     <tr id="last-row-issue">
                         <td class="center-align" colspan="3">
@@ -768,7 +759,7 @@
             }
         });
         
-        $('#production_order_id').select2({
+        $('#production_order_detail_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
             allowClear: true,
@@ -776,7 +767,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/production_order_receive") }}',
+                url: '{{ url("admin/select2/production_order_detail_receive") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
@@ -812,20 +803,20 @@
     function unlockProductionOrder(){
         if($('#shift_id').val() && $('#group').val()){
             $('.disable-class').css('pointer-events','auto');
-            $('#production_order_id').attr('tabindex','0');
+            $('#production_order_detail_id').attr('tabindex','0');
         }else{
             $('.disable-class').css('pointer-events','none');
-            $('#production_order_id').attr('tabindex','-1');
+            $('#production_order_detail_id').attr('tabindex','-1');
         }
     }
 
     function addLine(){
-        if($('#production_order_id').val()){
+        if($('#production_order_detail_id').val()){
             let no = $('.row_item').length + 1;
             var count = makeid(10);
             $('#body-item').append(`
                 <tr class="row_item" data-id="">
-                    <input type="hidden" name="arr_production_order_id[]" value="` + $('#production_order_id').val() + `">
+                    <input type="hidden" name="arr_production_order_detail_id[]" value="` + $('#production_order_detail_id').val() + `">
                     <input type="hidden" name="arr_bom_id[]" value="0">
                     <input type="hidden" name="arr_qty_bom[]" value="0,000">
                     <td class="center-align">
@@ -1025,42 +1016,6 @@
         });
     }
 
-    function removeUsedData(type,id){
-        $.ajax({
-            url: '{{ Request::url() }}/remove_used_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: { 
-                id : id,
-                type : type,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                
-            },
-            success: function(response) {
-                $('.row_item[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
-                $('#body-item').empty().append(`
-                    <tr id="last-row-item">
-                        <td class="center-align" colspan="10">
-                            Silahkan tambahkan Order Produksi untuk memulai...
-                        </td>
-                    </tr>
-                `);
-                $('#production_order_id').empty();
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
     function checkQtyReject(code){
         let qtyMax = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
         let qtyReject = parseFloat($('#rowQtyReject' + code).val().replaceAll(".", "").replaceAll(",","."));
@@ -1072,152 +1027,108 @@
     }
 
     function getProductionOrder(){
-        if($('#production_order_id').val()){
+        if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
-                let datakuy = $('#production_order_id').select2('data')[0];
-                $.ajax({
-                    url: '{{ Request::url() }}/send_used_data',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id: $('#production_order_id').val(),
-                        type: datakuy.table,
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
+                let datakuy = $('#production_order_detail_id').select2('data')[0];
+                $('#last-row-item').remove();
 
-                        if(response.status == 500){
-                            swal({
-                                title: 'Ups!',
-                                text: response.message,
-                                icon: 'warning'
-                            });
-                        }else{
+                var count = makeid(10);
 
-                            $('#list-used-data').append(`
-                                <div class="chip purple darken-4 gradient-shadow white-text">
-                                    ` + datakuy.code + `
-                                    <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#production_order_id').val() + `')">close</i>
+                let no = $('.row_item').length + 1;
+
+                var count = makeid(10);
+
+                $('#body-item').append(`
+                    <tr class="row_item" data-id="` + $('#production_order_detail_id').val() + `">
+                        <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
+                        <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
+                        <input type="hidden" name="arr_qty_bom[]" value="` + datakuy.item_receive_qty + `">
+                        <input type="hidden" name="arr_item_id[]" value="` + datakuy.item_receive_id + `">
+                        <input type="hidden" name="arr_is_powder[]" value="` + datakuy.is_powder + `">
+                        <td class="center-align">
+                            ` + no + `
+                        </td>
+                        <td>
+                            ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
+                        </td>
+                        <td class="right-align">
+                            ` + datakuy.item_receive_qty + `
+                        </td>
+                        <td class="center">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required>
+                        </td>
+                        <td class="center">
+                            <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
+                        </td>
+                        <td class="center" id="arr_unit` + count + `">
+                            ` + datakuy.item_receive_unit_uom + `
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                <option value="">--Silahkan pilih item--</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="row">
+                                <div class="col m12 s12">
+                                    <table class="bordered" style="width:500px !important;">
+                                        <thead>
+                                            <tr>
+                                                <th>No.Batch</th>
+                                                <th>Tangki (Jika ada)</th>
+                                                <th>Qty Diterima</th>
+                                                <th>Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-batch` + count + `"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="4" class="center-align">
+                                                    <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
+                                                </td>    
+                                            </tr>    
+                                        </tfoot>
+                                    </table>
                                 </div>
-                            `);
+                            </div>
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
 
-                            $('#last-row-item').remove();
+                if(datakuy.list_warehouse.length > 0){
+                    $('#arr_warehouse' + count).empty();
+                    $.each(datakuy.list_warehouse, function(i, val) {
+                        $('#arr_warehouse' + count).append(`
+                            <option value="` + val.id + `">` + val.name + `</option>
+                        `);
+                    });
+                }
 
-                            var count = makeid(10);
+                $('#arr_warehouse' + count).val(datakuy.warehouse_id);
 
-                            let no = $('.row_item').length + 1;
-
-                            var count = makeid(10);
-
-                            $('#body-item').append(`
-                                <tr class="row_item" data-id="` + $('#production_order_id').val() + `">
-                                    <input type="hidden" name="arr_production_order_id[]" value="` + datakuy.id + `">
-                                    <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
-                                    <input type="hidden" name="arr_qty_bom[]" value="` + datakuy.item_receive_qty + `">
-                                    <input type="hidden" name="arr_item_id[]" value="` + datakuy.item_receive_id + `">
-                                    <input type="hidden" name="arr_is_powder[]" value="` + datakuy.is_powder + `">
-                                    <td class="center-align">
-                                        ` + no + `
-                                    </td>
-                                    <td>
-                                        ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + datakuy.item_receive_qty + `
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required>
-                                    </td>
-                                    <td class="center">
-                                        <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" required>
-                                    </td>
-                                    <td class="center" id="arr_unit` + count + `">
-                                        ` + datakuy.item_receive_unit_uom + `
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                            <option value="">--Silahkan pilih item--</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <div class="row">
-                                            <div class="col m12 s12">
-                                                <table class="bordered" style="width:500px !important;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>No.Batch</th>
-                                                            <th>Tangki (Jika ada)</th>
-                                                            <th>Qty Diterima</th>
-                                                            <th>Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="table-batch` + count + `"></tbody>
-                                                    <tfoot>
-                                                        <tr>
-                                                            <td colspan="4" class="center-align">
-                                                                <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
-                                                            </td>    
-                                                        </tr>    
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-
-                            if(datakuy.list_warehouse.length > 0){
-                                $('#arr_warehouse' + count).empty();
-                                $.each(datakuy.list_warehouse, function(i, val) {
-                                    $('#arr_warehouse' + count).append(`
-                                        <option value="` + val.id + `">` + val.name + `</option>
-                                    `);
-                                });
-                            }
-
-                            $('#arr_warehouse' + count).val(datakuy.warehouse_id);
-
-                            $('#output-line').empty().text(datakuy.line);
-                            $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
-                            $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
-                            M.updateTextFields();
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+                $('#output-line').empty().text(datakuy.line);
+                $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
+                $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
+                M.updateTextFields();
             }else{
                 swal({
                     title: 'Ups!',
                     text: 'Mohon maaf. Shift & Grup tidak boleh kosong.',
                     icon: 'error'
                 });
-                $('#production_order_id').empty();
+                $('#production_order_detail_id').empty();
             }
         }else{
             $('#output-line,#output-fg,#output-qty').text('-');
@@ -1236,7 +1147,7 @@
     }
 
     function addIssue(){
-        if($('#production_order_id').val()){
+        if($('#production_order_detail_id').val()){
             if($('#last-row-issue').length > 0){
                 $('#last-row-issue').remove();
             }
@@ -1271,7 +1182,7 @@
                     data: function(params) {
                         return {
                             search: params.term,
-                            pod_id: $('#production_order_id').val(),
+                            pod_id: $('#production_order_detail_id').val(),
                         };
                     },
                     processResults: function(data) {
@@ -1299,7 +1210,7 @@
                 data: {
                     shift_id: $('#shift_id').val(),
                     group: $('#group').val(),
-                    pod_id: $('#production_order_id').val(),
+                    pod_id: $('#production_order_detail_id').val(),
                     number: $('input[name^="arr_batch_no[]"]').length,
                 },
                 headers: {
@@ -1559,7 +1470,7 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'production_order_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_order_detail_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'shift', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'start_process_time', searchable: false, orderable: false, className: 'center-align' },
@@ -1823,8 +1734,8 @@
                 $('#start_process_time').val(response.start_process_time);
                 $('#end_process_time').val(response.end_process_time);
                 $('#note').val(response.note);
-                $('#production_order_id').empty().append(`
-                    <option value="` + response.production_order_id + `">` + response.production_order_code + `</option>
+                $('#production_order_detail_id').empty().append(`
+                    <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
                 `);
 
                 $('.row_item').remove();
@@ -1838,7 +1749,7 @@
 
                     $('#body-item').append(`
                         <tr class="row_item" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_production_order_id[]" value="` + val.id + `">
+                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
                             <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `">
                             <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `">
                             <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
@@ -1981,7 +1892,7 @@
                             data: function(params) {
                                 return {
                                     search: params.term,
-                                    pod_id: $('#production_order_id').val(),
+                                    pod_id: $('#production_order_detail_id').val(),
                                 };
                             },
                             processResults: function(data) {

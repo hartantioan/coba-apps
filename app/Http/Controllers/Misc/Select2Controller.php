@@ -77,6 +77,7 @@ use App\Models\Pattern;
 use App\Models\ProductionBatch;
 use App\Models\ProductionIssue;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\Resource;
 use App\Models\Size;
 use App\Models\Type;
@@ -4018,6 +4019,93 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function productionOrderDetail(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionOrderDetail::where(function($query)use($search){  
+            $query->whereHas('productionOrder',function($query) use($search){
+                $query->where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+                });
+            })->orWhereHas('productionScheduleDetail',function($query) use($search){
+                $query->whereHas('item',function($query) use($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhere('name','like',"%$search%");
+                })
+                ->orWhereHas('productionSchedule',function($query) use($search){
+                    $query->where('code','like',"%$search%");
+                });
+            });
+        })
+        ->whereHas('productionOrder',function($query){
+            $query->whereDoesntHave('used')
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2']);
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $bomdetail = [];
+            $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
+            foreach($d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
+                $query->whereNotNull('is_default');
+            })->get() as $row){
+                $qty_planned = $row->qty * $qtyBobotOutput;
+                $bomdetail[] = [
+                    'bom_id'            => $row->bom->id,
+                    'bom_detail_id'     => $row->id,
+                    'name'              => $row->lookable->code.' - '.$row->lookable->name,
+                    'unit'              => $row->lookable->uomUnit->code,
+                    'lookable_type'     => $row->lookable_type,
+                    'lookable_id'       => $row->lookable_id,
+                    'qty_planned'       => CustomHelper::formatConditionalQty($qty_planned),
+                    'nominal_planned'   => number_format($row->nominal,2,',','.'),
+                    'total_planned'     => number_format($row->nominal * $qty_planned,2,',','.'),
+                    'qty_bom'           => CustomHelper::formatConditionalQty($row->qty),
+                    'nominal_bom'       => number_format($row->nominal,2,',','.'),
+                    'total_bom'         => number_format($row->total,2,',','.'),
+                    'description'       => $row->description ?? '',
+                    'type'              => $row->type(),
+                    'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
+                    'issue_method'      => $row->issue_method,
+                    'has_bom'           => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
+                    /* 'list_batch'        => $row->lookable_type == 'items' ? $row->lookable->listBatch() : [], */
+                ];
+            }
+
+            $response[] = [
+                'id'   			                => $d->id,
+                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'table'                         => $d->productionOrder->getTable(),
+                'code'                          => $d->productionOrder->code,
+                'item_receive_id'               => $d->productionScheduleDetail->item_id,
+                'item_receive_code'             => $d->productionScheduleDetail->item->code,
+                'item_receive_name'             => $d->productionScheduleDetail->item->name,
+                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
+                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
+                'line'                          => $d->productionScheduleDetail->line->code,
+                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
+                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
+                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
+                'line_id'                       => $d->productionScheduleDetail->line_id,
+                'line_code'                     => $d->productionScheduleDetail->line->code,
+                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
+                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
+                'bom_id'                        => $d->productionScheduleDetail->bom_id,
+                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
+                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
+                'bom_detail'                    => $bomdetail,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function productionOrderReceive(Request $request)
     {
         $response = [];
@@ -4051,6 +4139,66 @@ class Select2Controller extends Controller {
                 'id'   			                => $d->id,
                 'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'code'                          => $d->code,
+                'item_receive_id'               => $d->productionScheduleDetail->item_id,
+                'item_receive_code'             => $d->productionScheduleDetail->item->code,
+                'item_receive_name'             => $d->productionScheduleDetail->item->name,
+                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
+                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
+                'line'                          => $d->productionScheduleDetail->line->code,
+                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
+                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
+                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
+                'line_id'                       => $d->productionScheduleDetail->line_id,
+                'line_code'                     => $d->productionScheduleDetail->line->code,
+                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
+                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
+                'bom_id'                        => $d->productionScheduleDetail->bom_id,
+                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
+                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
+                'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
+                'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionOrderDetailReceive(Request $request)
+    {
+        $response = [];
+        $shift = Shift::find($request->shift_id);
+        $search   = $request->search;
+        $data = ProductionOrderDetail::where(function($query)use($search){  
+            $query->whereHas('productionOrder',function($query) use($search){
+                $query->where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
+                    });
+                });
+            })->orWhereHas('productionScheduleDetail',function($query) use($search){
+                $query->whereHas('item',function($query) use($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhere('name','like',"%$search%");
+                })
+                ->orWhereHas('productionSchedule',function($query) use($search){
+                    $query->where('code','like',"%$search%");
+                });
+            });
+        })
+        ->whereHas('productionOrder',function($query){
+            $query->whereDoesntHave('used')
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2']);
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			                => $d->id,
+                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'code'                          => $d->productionOrder->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
@@ -4226,7 +4374,7 @@ class Select2Controller extends Controller {
                 })
                 ->where(function($query)use($request){
                     if($request->pod_id){
-                        $query->where('production_order_id',$request->pod_id);
+                        $query->where('production_order_detail_id',$request->pod_id);
                     }
                 })
                 ->whereIn('status',['2','3'])

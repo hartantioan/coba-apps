@@ -168,13 +168,13 @@
                     {{ __('translations.production_code') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->productionOrder->code }}
+                    {{ $data->productionOrderDetail->productionOrder->code }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.schedule_code') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->productionOrder->productionSchedule->code }}
+                    {{ $data->productionOrderDetail->productionScheduleDetail->productionSchedule->code }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.shift') }}

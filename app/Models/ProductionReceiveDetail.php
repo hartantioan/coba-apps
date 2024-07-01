@@ -17,7 +17,7 @@ class ProductionReceiveDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_receive_id',
-        'production_order_id',
+        'production_order_detail_id',
         'item_id',
         'bom_id',
         'item_reject_id',
@@ -52,8 +52,9 @@ class ProductionReceiveDetail extends Model
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
-    public function productionOrder(){
-        return $this->belongsTo('App\Models\ProductionOrder','production_order_id','id')->withTrashed();
+    public function productionOrderDetail()
+    {
+        return $this->belongsTo('App\Models\ProductionOrderDetail', 'production_order_detail_id', 'id')->withTrashed();
     }
 
     public function item(){

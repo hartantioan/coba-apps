@@ -21,6 +21,7 @@ class ProductionBatch extends Model
         'lookable_type',
         'lookable_id',
         'qty',
+        'qty_real',
         'total'
     ];
 

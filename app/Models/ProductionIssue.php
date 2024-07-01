@@ -19,7 +19,7 @@ class ProductionIssue extends Model
         'code',
         'user_id',
         'company_id',
-        'production_order_id',
+        'production_order_detail_id',
         'place_id',
         'shift_id',
         'group',
@@ -66,9 +66,9 @@ class ProductionIssue extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function productionOrder()
+    public function productionOrderDetail()
     {
-        return $this->belongsTo('App\Models\ProductionOrder', 'production_order_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionOrderDetail', 'production_order_detail_id', 'id')->withTrashed();
     }
 
     public function place()

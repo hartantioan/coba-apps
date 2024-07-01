@@ -219,107 +219,14 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Depart.
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->user->position()->exists() ? $data->user->position->division->department->name : '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
                                         <td width="24%" style="vertical-align: top;">
-                                            Plant
+                                            Keterangan
                                         </td>
                                         <td width="1%" style="vertical-align: top;">
                                             :
                                         </td>
                                         <td width="75%" style="vertical-align: top;">
-                                            {{ $data->productionSchedule->place->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="24%">
-                                            Item
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td width="75%">
-                                            {{ $data->productionScheduleDetail->item->code.' - '.$data->productionScheduleDetail->item->name }}
-                                        </td>
-                                    </tr>
-                                    
-                                </table>
-                            </td>
-                            <td width="40%" class="left-align" style="vertical-align: top;">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="34%">
-                                            Qty Planned
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td width="65%">
-                                            {{ CustomHelper::formatConditionalQty($data->productionScheduleDetail->qty).' '.$data->productionScheduleDetail->item->uomUnit->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Gudang
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->warehouse->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Shift
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ $data->productionScheduleDetail->shift->code.' - '.$data->productionScheduleDetail->shift->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Tgl.Produksi
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td>
-                                            {{ date('d/m/Y',strtotime($data->productionScheduleDetail->production_date)) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="vertical-align: top;">
-                                            Grup
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            :
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            {{ $data->productionScheduleDetail->group }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="vertical-align: top;">
-                                            Line
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            :
-                                        </td>
-                                        <td style="vertical-align: top;">
-                                            {{ $data->productionScheduleDetail->line->code }}
+                                            {{ $data->note }}
                                         </td>
                                     </tr>
                                 </table>
@@ -341,8 +248,38 @@
                         </tr>
                     </table>
                 </div>
-                    <!-- product details table-->
-                <!-- invoice subtotal -->
+                <div class="invoice-product-details">
+                    <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
+                        <thead>
+                            <tr>
+                                <th colspan="6" class="center-align">Daftar Target Produksi</th>
+                            </tr>
+                            <tr>
+                                <th align="center">No.</th>
+                                <th align="center">{{ __('translations.item') }}</th>
+                                <th align="center">Qty</th>
+                                <th align="center">{{ __('translations.unit') }}</th>
+                                <th align="center">{{ __('translations.line') }}</th>
+                                <th align="center">{{ __('translations.warehouse') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($data->productionOrderDetail as $key => $row)
+                            <tr>
+                                <td align="center" rowspan="2">{{ ($key + 1) }}</td>
+                                <td align="center">{{ $row->productionScheduleDetail->item->code.' - '.$row->productionScheduleDetail->item->name }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty) }}</td>
+                                <td align="center">{{ $row->productionScheduleDetail->item->uomUnit->code }}</td>
+                                <td align="center">{{ $row->productionScheduleDetail->line->code }}</td>
+                                <td align="center">{{ $row->productionScheduleDetail->warehouse->name }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="6">Keterangan : {{ $row->productionScheduleDetail->note }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
                 <div class="divider mt-3 mb-3"></div>
                     <div class="invoice-subtotal break-row">
                         <table class="table-bot" width="100%" border="0">

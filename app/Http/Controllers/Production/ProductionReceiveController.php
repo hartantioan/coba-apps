@@ -21,6 +21,7 @@ use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\ProductionReceiveIssue;
 use App\Models\Shift;
 use App\Models\Tank;
@@ -76,7 +77,7 @@ class ProductionReceiveController extends Controller
     }
 
     public function getBatchCode(Request $request){
-        $pod = ProductionOrder::find($request->pod_id);
+        $pod = ProductionOrderDetail::find($request->pod_id);
         $type = $pod->productionScheduleDetail->bom->is_powder ? 'powder' : 'normal';
         $shift = Shift::find($request->shift_id);
         $code = ProductionBatch::generateCodeWithNumber($type,$shift->code,$request->group,$request->number);
@@ -177,8 +178,8 @@ class ProductionReceiveController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    $val->productionOrder->code,
-                    $val->productionOrder->productionSchedule->code,
+                    $val->productionOrderDetail->productionOrder->code,
+                    $val->productionOrderDetail->productionScheduleDetail->productionSchedule->code,
                     $val->shift->code.' - '.$val->shift->name,
                     date('d/m/Y H:i',strtotime($val->start_process_time)),
                     date('d/m/Y H:i',strtotime($val->end_process_time)),
@@ -245,7 +246,7 @@ class ProductionReceiveController extends Controller
                 'line_id'                   => 'required',
                 'machine_id'                => 'required',
                 'post_date'		            => 'required',
-                'production_order_id'       => 'required',
+                'production_order_detail_id'=> 'required',
                 'start_process_time'        => 'required',
                 'end_process_time'          => 'required',
                 'arr_production_issue_id'   => 'required|array',
@@ -259,7 +260,7 @@ class ProductionReceiveController extends Controller
                 'line_id'                           => 'Line tidak boleh kosong.',
                 'machine_id'                        => 'Mesin tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-                'production_order_id.required' 		=> 'Production Order tidak boleh kosong.',
+                'production_order_detail_id.required'=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
                 'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
                 'arr_production_issue_id.required'  => 'Production issue tidak boleh kosong.',
@@ -358,7 +359,7 @@ class ProductionReceiveController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->production_order_id = $request->production_order_id;
+                        $query->production_order_detail_id = $request->production_order_detail_id;
                         $query->place_id = $request->place_id;
                         $query->shift_id = $request->shift_id;
                         $query->group = $request->group;
@@ -396,7 +397,7 @@ class ProductionReceiveController extends Controller
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'production_order_id'       => $request->production_order_id,
+                        'production_order_detail_id'=> $request->production_order_detail_id,
                         'place_id'                  => $request->place_id,
                         'shift_id'                  => $request->shift_id,
                         'group'                     => $request->group,
@@ -435,7 +436,7 @@ class ProductionReceiveController extends Controller
                     foreach($request->arr_qty as $key => $row){
                         $querydetail = ProductionReceiveDetail::create([
                             'production_receive_id'         => $query->id,
-                            'production_order_id'           => $request->arr_production_order_id[$key] ?? NULL,
+                            'production_order_detail_id'    => $request->arr_production_order_detail_id[$key] ?? NULL,
                             'item_id'                       => $request->arr_item_id[$key],
                             'bom_id'                        => $request->arr_bom_id[$key],
                             'item_reject_id'                => $arrItemReject[$key], 
@@ -458,6 +459,7 @@ class ProductionReceiveController extends Controller
                                     'lookable_type' => $querydetail->getTable(),
                                     'lookable_id'   => $querydetail->id,
                                     'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
+                                    'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
                                     'total'         => round((str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])) / $querydetail->qty) * $arrTotal[$key],2)
                                 ]);
                             }
@@ -518,12 +520,12 @@ class ProductionReceiveController extends Controller
                 $batch[] = [
                     'batch_no'  => $rowbatch->code,
                     'tank_id'   => $rowbatch->tank_id ?? '',
-                    'qty'       => CustomHelper::formatConditionalQty($rowbatch->qty),
+                    'qty'       => CustomHelper::formatConditionalQty($rowbatch->qty_real),
                 ];
             }
 
             $detail_receive[] = [
-                'id'                    => $row->production_order_id,
+                'id'                    => $row->production_order_detail_id,
                 'bom_id'                => $row->bom_id ?? '',
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
@@ -540,9 +542,9 @@ class ProductionReceiveController extends Controller
         }
 
         $po['code_place_id']                    = substr($po->code,7,2);
-        $po['production_order_code']            = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
-        $po['table']                            = $po->productionOrder->getTable();
-        $po['po_code']                          = $po->productionOrder->code;
+        $po['production_order_detail_code']     = $po->productionOrderDetail->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrderDetail->productionOrder->post_date)).' - Plant : '.$po->productionOrderDetail->productionScheduleDetail->productionSchedule->place->code;
+        $po['table']                            = $po->productionOrderDetail->getTable();
+        $po['po_code']                          = $po->productionOrderDetail->productionOrder->code;
         $po['details']                          = $detail_receive;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         $po['issues']                           = $issue;

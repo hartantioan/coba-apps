@@ -168,13 +168,13 @@
                     {{ __('translations.production_code') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->productionOrder->code }}
+                    {{ $data->productionOrderDetail->productionOrder->code }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.schedule_code') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->productionOrder->productionSchedule->code }}
+                    {{ $data->productionOrderDetail->productionScheduleDetail->productionSchedule->code }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.shift') }}
@@ -250,7 +250,7 @@
                             $batch = '<ol>';
 
                             foreach($row->productionBatch as $rowbatch){
-                                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty).'</li>';
+                                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty_real).'</li>';
                             }
 
                             $batch .= '</ol>';

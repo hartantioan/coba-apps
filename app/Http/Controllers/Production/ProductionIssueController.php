@@ -14,6 +14,7 @@ use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
+use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionIssue;
 use App\Models\ProductionIssueDetail;
@@ -162,8 +163,8 @@ class ProductionIssueController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    $val->productionOrder->code,
-                    $val->productionOrder->productionSchedule->code,
+                    $val->productionOrderDetail->productionOrder->code,
+                    $val->productionOrderDetail->productionScheduleDetail->productionSchedule->code,
                     $val->shift->code.' - '.$val->shift->name,
                     date('d/m/Y H:i',strtotime($val->start_process_time)),
                     date('d/m/Y H:i',strtotime($val->end_process_time)),
@@ -230,7 +231,7 @@ class ProductionIssueController extends Controller
                 'line_id'                   => 'required',
                 'machine_id'                => 'required',
                 'post_date'		            => 'required',
-                'production_order_id'       => 'required',
+                'production_order_detail_id'=> 'required',
                 'start_process_time'        => 'required',
                 'end_process_time'          => 'required',
             ], [
@@ -243,7 +244,7 @@ class ProductionIssueController extends Controller
                 'line_id'                           => 'Line tidak boleh kosong.',
                 'machine_id'                        => 'Mesin tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-                'production_order_id.required' 		=> 'Production Order tidak boleh kosong.',
+                'production_order_detail_id.required'=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
                 'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
             ]);
@@ -320,7 +321,7 @@ class ProductionIssueController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->production_order_id = $request->production_order_id;
+                        $query->production_order_detail_id = $request->production_order_detail_id;
                         $query->place_id = $request->place_id;
                         $query->shift_id = $request->shift_id;
                         $query->group = $request->group;
@@ -358,7 +359,7 @@ class ProductionIssueController extends Controller
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'production_order_id'       => $request->production_order_id,
+                        'production_order_detail_id'=> $request->production_order_detail_id,
                         'place_id'                  => $request->place_id,
                         'shift_id'                  => $request->shift_id,
                         'group'                     => $request->group,
@@ -381,13 +382,29 @@ class ProductionIssueController extends Controller
                         $nominal = 0;
                         $total = 0;
                         if($request->arr_bom_id[$key] !== '0'){
-                            $bobot = round($query->productionOrder->productionScheduleDetail->qty / $query->productionOrder->productionScheduleDetail->bom->qty_output,2);
+                            $bobot = round($query->productionOrderDetail->productionScheduleDetail->qty / $query->productionOrderDetail->productionScheduleDetail->bom->qty_output,2);
                             $qty_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key]));
                             if($request->arr_lookable_type[$key] == 'items'){
                                 $item = Item::find($request->arr_lookable_id[$key]);
                                 if($item){
-                                    $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
-                                    $nominal_planned = $itemstock->priceDate($query->post_date);
+                                    $totalbatch = 0;
+                                    if($request->arr_batch_index){
+                                        foreach($request->arr_batch_index as $keybatch2 => $rowbatch){
+                                            if($key == $rowbatch){
+                                                $batch = ProductionBatch::find($request->arr_batch_id[$keybatch2]);
+                                                if($batch){
+                                                    $totalbatch += round(($batch->total / $batch->qty_real) * str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keybatch2])),2);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    if($totalbatch > 0){
+                                        $nominal_planned = $totalbatch / str_replace(',','.',str_replace('.','',$row));
+                                    }else{
+                                        $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
+                                        $nominal_planned = $itemstock->priceDate($query->post_date);
+                                    }
+                                    
                                     $nominal = $nominal_planned;
                                     $total_planned = round($nominal_planned * $qty_planned,2);
                                     $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
@@ -412,7 +429,7 @@ class ProductionIssueController extends Controller
                         }
                         $querydetail = ProductionIssueDetail::create([
                             'production_issue_id'           => $query->id,
-                            'production_order_id'           => $request->arr_production_order_id[$key] ?? NULL,
+                            'production_order_detail_id'    => $request->arr_production_order_detail_id[$key] ?? NULL,
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $request->arr_lookable_id[$key],
                             'bom_id'                        => $request->arr_bom_id[$key] == '0' ? NULL : $request->arr_bom_id[$key],
@@ -487,14 +504,14 @@ class ProductionIssueController extends Controller
                         'batch_index'           => $key,
                         'production_batch_id'   => $rowbatch->production_batch_id,
                         'production_batch_code' => $rowbatch->productionBatch->code,
-                        'qty'                   => CustomHelper::formatConditionalQty($rowbatch->qty),
+                        'qty'                   => CustomHelper::formatConditionalQty($rowbatch->qty_real),
                         'max_qty'               => CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty),
                     ];
                 }
             }
 
             $detail_issue[] = [
-                'id'                    => $row->production_order_id,
+                'id'                    => $row->production_order_detail_id,
                 'bom_id'                => $row->bom_id ?? '',
                 'bom_detail_id'         => $row->bom_detail_id ?? '',
                 'lookable_type'         => $row->lookable_type,
@@ -520,9 +537,9 @@ class ProductionIssueController extends Controller
         }
 
         $po['code_place_id']                    = substr($po->code,7,2);
-        $po['production_order_code']            = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
-        $po['table']                            = $po->productionOrder->getTable();
-        $po['po_code']                          = $po->productionOrder->code;
+        $po['production_order_detail_code']     = $po->productionOrderDetail->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrderDetail->productionOrder->post_date)).' - Plant : '.$po->productionOrderDetail->productionScheduleDetail->productionSchedule->place->code.' - '.$po->productionOrderDetail->productionScheduleDetail->item->code.' - '.$po->productionOrderDetail->productionScheduleDetail->item->name;
+        $po['table']                            = $po->productionOrderDetail->getTable();
+        $po['po_code']                          = $po->productionOrderDetail->productionOrder->code;
         $po['detail_issue']                     = $detail_issue;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         
@@ -714,7 +731,7 @@ class ProductionIssueController extends Controller
                     }
                 }
 
-                $query->productionOrder->update([
+                /* $query->productionOrderDetail->productionOrder->update([
                     'standard_item_cost'        => 0,
                     'standard_resource_cost'    => 0,
                     'standard_product_cost'     => 0,
@@ -727,7 +744,7 @@ class ProductionIssueController extends Controller
                     'total_production_time'     => 0,
                     'total_additional_time'     => 0,
                     'total_run_time'            => 0,
-                ]);
+                ]); */
     
                 activity()
                     ->performedOn(new ProductionIssue())
@@ -1065,22 +1082,6 @@ class ProductionIssueController extends Controller
             ];
         }
         return response()->json($response);
-    }
-
-    public function sendUsedData(Request $request){
-        $mop = ProductionOrder::find($request->id);
-       
-        if(!$mop->used()->exists()){
-            CustomHelper::sendUsedData($request->type,$request->id,'Form Production Issue');
-            return response()->json([
-                'status'    => 200,
-            ]);
-        }else{
-            return response()->json([
-                'status'    => 500,
-                'message'   => 'Dokumen no. '.$mop->used->lookable->code.' telah dipakai di '.$mop->used->ref.', oleh '.$mop->used->user->name.'.'
-            ]);
-        }
     }
 
     public function removeUsedData(Request $request){

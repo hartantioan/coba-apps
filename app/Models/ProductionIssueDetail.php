@@ -17,7 +17,7 @@ class ProductionIssueDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'production_issue_id',
-        'production_order_id',
+        'production_order_detail_id',
         'lookable_type',
         'lookable_id',
         'bom_id',
@@ -43,8 +43,9 @@ class ProductionIssueDetail extends Model
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
 
-    public function productionOrder(){
-        return $this->belongsTo('App\Models\ProductionOrder','production_order_id','id')->withTrashed();
+    public function productionOrderDetail()
+    {
+        return $this->belongsTo('App\Models\ProductionOrderDetail', 'production_order_detail_id', 'id')->withTrashed();
     }
 
     public function itemStock(){

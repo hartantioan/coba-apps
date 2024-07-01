@@ -237,7 +237,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->productionOrder->code }}
+                                            {{ $data->productionOrderDetail->productionOrder->code }}
                                         </td>
                                     </tr>
                                     <tr>

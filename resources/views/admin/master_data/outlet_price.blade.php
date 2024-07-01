@@ -116,7 +116,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. {{ __('translations.main_information') }}</legend>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col s12 m3">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)

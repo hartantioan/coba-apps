@@ -21,6 +21,7 @@ use App\Models\productionFgReceiveDetail;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
+use App\Models\ProductionOrderDetail;
 use App\Models\Shift;
 use App\Models\Tank;
 use App\Models\User;
@@ -73,7 +74,7 @@ class ProductionFgReceiveController extends Controller
 
         $plant = Place::find($request->place_id);
         $line = Line::find($request->line_id);
-        $pod = ProductionOrder::find($request->pod_id);
+        $pod = ProductionOrderDetail::find($request->pod_id);
         $shift = Shift::find($request->shift_id);
         $group = strtoupper($request->group);
         $pallet = Pallet::find($request->pallet_id);

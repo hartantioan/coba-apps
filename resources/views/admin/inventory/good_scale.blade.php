@@ -1215,7 +1215,7 @@
                 { name: 'viscosity', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'residue', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'operation', searchable: false, orderable: false, className: 'right-align' },
             ],
             dom: 'Blfrtip',
             buttons: [

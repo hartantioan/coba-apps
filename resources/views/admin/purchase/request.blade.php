@@ -184,7 +184,7 @@
                     </div>
                     <div class="col s12">
                         <fieldset>
-                            <legend>1. {{ __('translations.main_information') }}</legend>
+                            <legend>1. {{ __('translations.main_info') }}</legend>
                             <div class="row">
                                 <div class="input-field col m3 s12 step1">
                                     <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>

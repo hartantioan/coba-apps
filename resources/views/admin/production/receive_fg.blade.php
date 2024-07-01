@@ -185,7 +185,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>1. {{ __('translations.main_information') }}</legend>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -208,14 +208,6 @@
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getItemProductionOrder();"></select>
-                                        <label class="active" for="production_order_detail_id">Production Order</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="item_name" name="item_name" type="text" value="-" readonly>
-                                        <label class="active" for="item_name">Item Child FG</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <select class="form-control" id="place_id" name="place_id">
                                             @foreach ($place as $row)
                                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
@@ -235,18 +227,6 @@
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="group" name="group" type="text" placeholder="Grup">
-                                        <label class="active" for="group">Grup</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="pallet_id" name="pallet_id"></select>
-                                        <label class="active" for="pallet_id">Palet</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="grade_id" name="grade_id"></select>
-                                        <label class="active" for="grade_id">Grade</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
@@ -261,39 +241,13 @@
                                         </div>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <div class="form-control-feedback" id="qty-unit">-</div>
-                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);">
-                                        <label class="active" for="qty">Qty UoM Terpakai</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                    <div class="col m3 s12">
-                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate No.Palet</a>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>2. Order Produksi Terpakai</legend>
-                                    <div class="col m8 s12 step8">
-                                        <h6>Data Terpakai : <i id="list-used-data"></i></h6>
-                                    </div>
-                                    <div class="col m12">
-                                        <div class="row">
-                                            <div class="col m4 s12">
-                                                Line : <b id="output-line">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Target Item SFG/FG : <b id="output-fg">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Qty : <b id="output-qty">-</b>
-                                            </div>
-                                        </div>
+                                    <div class="col m12 s12"></div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getItemProductionOrder();"></select>
+                                        <label class="active" for="production_order_detail_id">Production Order</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -301,11 +255,11 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Pilih Batch</legend>
+                                    <legend>2. Pilih Batch</legend>
                                     <div class="col m12 s12">
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:600px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
@@ -334,9 +288,63 @@
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>3. Opsi Palet/Curah</legend>
+                                    <div class="input-field col m3 s12">
+                                        <input id="item_name" name="item_name" type="text" value="-" readonly>
+                                        <label class="active" for="item_name">Item FG (Parent)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="group" name="group" type="text" placeholder="Grup">
+                                        <label class="active" for="group">Grup</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="pallet_id" name="pallet_id"></select>
+                                        <label class="active" for="pallet_id">Palet</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="grade_id" name="grade_id"></select>
+                                        <label class="active" for="grade_id">Grade</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <div class="form-control-feedback" id="qty-unit">-</div>
+                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkMaxQty(this);">
+                                        <label class="active" for="qty">Qty UoM Terpakai</label>
+                                    </div>
+                                    <div class="col m3 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate No.Palet</a>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>4. Order Produksi Terpakai</legend>
+                                    <div class="col m8 s12 step8">
+                                        <h6>Data Terpakai : <i id="list-used-data"></i></h6>
+                                    </div>
+                                    <div class="col m12">
+                                        <div class="row">
+                                            <div class="col m4 s12">
+                                                Line : <b id="output-line">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Target Item SFG/FG : <b id="output-fg">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Qty : <b id="output-qty">-</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>4. Detail Item Receive FG & Palet</legend>
+                                    <legend>5. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
@@ -752,7 +760,7 @@
                     return null;
                 };
                 $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_id,#shift_id').empty();
+                $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td class="center-align" colspan="11">
@@ -828,12 +836,15 @@
                     </tr>
                 `);
             }
+            count();
         });
     });
 
     function addBatch(){
-        if($('#production_order_id').val()){
-            $('#body-batch').empty();
+        if($('#production_order_detail_id').val()){
+            if($('.row_batch').length == 0){
+                $('#body-batch').empty();
+            }   
             let no = $('.row_batch').length + 1;
             var count = makeid(10);
             $('#body-batch').append(`
@@ -868,7 +879,7 @@
                     data: function(params) {
                         return {
                             search: params.term,
-                            pod_id: $('#production_order_id').val(),
+                            pod_id: $('#production_order_detail_id').val(),
                         };
                     },
                     processResults: function(data) {
@@ -887,6 +898,17 @@
         }
     }
 
+    function checkMaxQty(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let totalbatch = 0;
+        $('input[name^="arr_qty_batch[]"]').each(function(index){
+            totalbatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        if(qty > totalbatch){
+            $('#qty').val(formatRupiahIni(totalbatch.toFixed(3).toString().replace('.',',')));
+        }
+    }
+
     function checkQty(code){
         let qtyMax = parseFloat($('#arr_qty_batch' + code).data('max').replaceAll(".", "").replaceAll(",","."));
         let qty = parseFloat($('#arr_qty_batch' + code).val().replaceAll(".", "").replaceAll(",","."));
@@ -895,6 +917,15 @@
                 $('#arr_qty_batch' + code).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
             }
         }
+        count();
+    }
+
+    function count(){
+        let totalQty = 0;
+        $('input[name^="arr_qty_batch[]"]').each(function(index){
+            totalQty += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#qty').val(formatRupiahIni(totalQty.toFixed(3).toString().replace('.',',')));
     }
 
     function applyQty(code){
@@ -905,6 +936,7 @@
             $('#arr_qty_batch' + code).data('max','0,000');
             $('#arr_qty_batch' + code).val('0,000');
         }
+        count();
     }
 
     function getRowUnit(val){
@@ -1072,7 +1104,7 @@
                         </td>
                     </tr>
                 `);
-                $('#production_order_id').empty();
+                $('#production_order_detail_id').empty();
             },
             error: function() {
                 swal({
@@ -1085,27 +1117,25 @@
     }
 
     function getItemProductionOrder(){
-        if($('#production_order_id').val()){
-            $('#item_name').val($('#production_order_id').select2('data')[0].item_name);
-            $('#qty').val($('#production_order_id').select2('data')[0].qty);
-            $('#conversion').val($('#production_order_id').select2('data')[0].conversion);
-            $('#qty-unit').text($('#production_order_id').select2('data')[0].uom_unit);
-            $('#sell-unit').text($('#production_order_id').select2('data')[0].sell_unit);
+        if($('#production_order_detail_id').val()){
+            $('#item_name').val($('#production_order_detail_id').select2('data')[0].item_name);
+            $('#conversion').val($('#production_order_detail_id').select2('data')[0].conversion);
+            $('#qty-unit').text($('#production_order_detail_id').select2('data')[0].uom_unit);
+            $('#sell-unit').text($('#production_order_detail_id').select2('data')[0].sell_unit);
         }else{
             $('#item_name').val('');
-            $('#qty,#conversion').val('0,000');
             $('#qty-unit,#sell-unit').text('-');
         }
     }
 
     function generateBarcode(){
-        if($('#production_order_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#post_date').val()){
+        if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#post_date').val()){
             $.ajax({
                 url: '{{ Request::url() }}/get_pallet_barcode',
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
-                    pod_id: $('#production_order_id').val(),
+                    pod_id: $('#production_order_detail_id').val(),
                     shift_id: $('#shift_id').val(),
                     group: $('#group').val(),
                     pallet_id: $('#pallet_id').val(),
@@ -1419,7 +1449,7 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'production_order_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_order_detail_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
@@ -1660,8 +1690,8 @@
                 $('#start_process_time').val(response.start_process_time);
                 $('#end_process_time').val(response.end_process_time);
                 $('#note').val(response.note);
-                $('#production_order_id').empty().append(`
-                    <option value="` + response.production_order_id + `">` + response.production_order_code + `</option>
+                $('#production_order_detail_id').empty().append(`
+                    <option value="` + response.production_order_detail_id + `">` + response.production_order_code + `</option>
                 `);
 
                 $('.row_item').remove();
@@ -1674,7 +1704,7 @@
                     var count = makeid(10);
                     $('#body-item').append(`
                         <tr class="row_item" data-id="` + val.id + `">
-                            <input type="hidden" name="arr_production_order_id[]" value="` + val.id + `">
+                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
                             <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `">
                             <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `">
                             <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">

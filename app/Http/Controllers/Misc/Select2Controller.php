@@ -4397,15 +4397,18 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $po_id = ProductionOrderDetail::find($request->pod_id)->production_order_id;
         $data = ProductionBatch::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%");
                 })
-                ->where(function($query)use($request){
+                ->where(function($query)use($request,$po_id){
                     if($request->pod_id){
                         $query->where('lookable_type','production_receive_details')
-                            ->whereHas('lookable',function($query)use($request){
-                                $query->whereHas('productionReceive',function($query)use($request){
-                                    $query->where('production_order_id',$request->pod_id);
+                            ->whereHas('lookable',function($query)use($po_id){
+                                $query->whereHas('productionReceive',function($query)use($po_id){
+                                    $query->whereHas('productionOrderDetail',function($query)use($po_id){
+                                        $query->where('production_order_id',$po_id);
+                                    });
                                 });
                             });
                     }
@@ -4417,7 +4420,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' Tangki No. '.($d->tank()->exists() ? $d->tank->code : '-'),
+                'text' 			=> $d->code.' - Qty : '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' - Tangki : '.($d->tank()->exists() ? $d->tank->code : '-').' - Item : '.$d->lookable->item->code.' - '.$d->lookable->item->name,
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
             ];

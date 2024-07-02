@@ -178,7 +178,7 @@ class StockInRupiahController extends Controller
             }
         
             if($request->type == "final"){
-                $all_total += $row->total_final;
+                $all_total += round($row->total_final,2);
             }
             $data_tempura = [
                 'item_id'      => $row->item->id,

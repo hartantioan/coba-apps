@@ -83,7 +83,7 @@ class StockInRupiahController extends Controller
             $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
-                    ->where('date', '<=', $request->finish_date)
+                    /* ->where('date', '<=', $request->finish_date) */
                     ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {

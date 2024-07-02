@@ -170,11 +170,11 @@ class StockInRupiahController extends Controller
             if($row->type=='IN'){
                 $priceNow = $row->price_in;
                 $cum_qty=$row->qty_in;
-                $cum_val=$row->total_in;
+                $cum_val=round($row->total_in,2);
             }else{
                 $priceNow = $row->price_out;
                 $cum_qty=$row->qty_out * -1;
-                $cum_val=$row->total_out * -1;
+                $cum_val=round($row->total_out,2) * -1;
             }
         
             if($request->type == "final"){

@@ -33,12 +33,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         if($this->type == 'final'){
             $perlu = 0 ;
            
-            $query_data = ItemCogs::whereIn('id', function ($query){            
-                $query->selectRaw('MAX(id)')
-                    ->from('item_cogs')
-                    ->where('date', '<=', $this->finish_date)
-                    ->groupBy('item_id');
-            })
+            $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$this->finish_date."' GROUP BY item_id)")
             ->where(function($query) {
                 $query->whereHas('item',function($query){
                     $query->whereIn('status',['1','2']);

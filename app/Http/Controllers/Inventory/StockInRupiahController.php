@@ -80,7 +80,13 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            $query_data = ItemCogs::where(function($query) use ( $request) {
+            $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
+                DB::table('item_cogs')
+                    ->selectRaw('id')
+                    ->groupBy('item_id')
+                    ->get();
+            })
+            ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('status',['1','2']);
                 });

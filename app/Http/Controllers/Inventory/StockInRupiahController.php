@@ -81,10 +81,10 @@ class StockInRupiahController extends Controller
         if($request->type == 'final'){
             $perlu = 0 ;
             $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
-                DB::table('item_cogs')
-                    ->selectRaw('id')
-                    ->groupBy('item_id')
-                    ->get();
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('item_cogs')
+                    ->where('date', '<=', $request->finish_date)
+                    ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){

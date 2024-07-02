@@ -83,16 +83,16 @@ class StockInRupiahController extends Controller
             $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
                 $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
-                    /* ->where('date', '<=', $request->finish_date) */
+                    ->where('date', '<=', $request->finish_date)
                     ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('status',['1','2']);
                 });
-                if($request->finish_date) {
+                /* if($request->finish_date) {
                     $query->whereDate('date','<=', $request->finish_date);
-                }
+                } */
                 if($request->item_id) {
                     $query->where('item_id',$request->item_id);
                 }
@@ -114,7 +114,7 @@ class StockInRupiahController extends Controller
                     });
                 }
             })
-            /* ->orderBy('date', 'desc') */
+            ->orderBy('date', 'desc')
             ->get();
             info($query_data);
         }else{

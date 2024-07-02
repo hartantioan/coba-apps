@@ -90,9 +90,9 @@ class StockInRupiahController extends Controller
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('status',['1','2']);
                 });
-                /* if($request->finish_date) {
+                if($request->finish_date) {
                     $query->whereDate('date','<=', $request->finish_date);
-                } */
+                }
                 if($request->item_id) {
                     $query->where('item_id',$request->item_id);
                 }
@@ -107,12 +107,12 @@ class StockInRupiahController extends Controller
                     });
                 }
     
-                if($request->filter_group){
+                /* if($request->filter_group){
                    
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('item_group_id', $request->filter_group);
                     });
-                }
+                } */
             })
             ->orderBy('date', 'desc')
             ->get();

@@ -501,7 +501,14 @@ class GoodScaleController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodScale::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+                    if($request->has('document')) {
+                        $document_name = Str::random(35).'.png';
+                        $path_document=storage_path('app/public/good_scales/'.$document_name);
+                        $newFile_document = CustomHelper::compress($request->document,$path_document,30);
+                        $document = explode('storage\\app/', $newFile_document)[1];
+                    }else{
+                        $document = null;
+                    }
                     $query = GoodScale::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -513,8 +520,8 @@ class GoodScaleController extends Controller
                         'delivery_no'               => $request->delivery_no,
                         'vehicle_no'                => $request->vehicle_no,
                         'driver'                    => $request->driver,
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL,
-                        'image_in'                  => $newFile ? $newFile : NULL,
+                        'document'                  => $document,
+                        'image_in'                  => $desiredPath ? $desiredPath : NULL,
                         'time_scale_in'             => date('Y-m-d H:i:s'),
                         'note'                      => $request->note,
                         'purchase_order_detail_id'  => $request->purchase_order_detail_id,

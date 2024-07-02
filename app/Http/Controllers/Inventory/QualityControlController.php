@@ -291,16 +291,10 @@ class QualityControlController extends Controller
                                 Storage::delete($goodScale->document);
                             }
                         }
-                        $extension = $request->document->getClientOriginalExtension();
-                        if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'bmp'])) {
-                            $document_name = Str::random(35) . '.' . $extension;
-                            $path_document = storage_path('app/public/good_scales/' . $document_name);
-                            $newFile_document = CustomHelper::compress($request->document, $path_document, 30);
-                            $document = explode('storage\\app/', $newFile_document)[1];
-                        } else {
-                            $document = $request->file('document') ? $request->file('document')->store('public/good_scales') : ($goodScale->image_qc ? $goodScale->image_qc : NULL);
-                        }
-                        
+                        $document_name = Str::random(35).'.png';
+                        $path_document=storage_path('app/public/good_scales/'.$document_name);
+                        $newFile_document = CustomHelper::compress($request->document,$path_document,30);
+                        $document = explode('storage\\app/', $newFile_document)[1];
                     } else {
                         if($goodScale->document){
                             $document = $goodScale->document;

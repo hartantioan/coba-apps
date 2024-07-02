@@ -107,12 +107,12 @@ class StockInRupiahController extends Controller
                     });
                 }
     
-                /* if($request->filter_group){
+                if($request->group){
                    
                     $query->whereHas('item',function($query) use($request){
-                        $query->whereIn('item_group_id', $request->filter_group);
+                        $query->whereIn('item_group_id', $request->group);
                     });
-                } */
+                }
             })
             ->orderBy('date', 'desc')
             ->get();

@@ -80,12 +80,7 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
-                $query->select(DB::raw('MAX(id)'))
-                    ->from('item_cogs')
-                    ->where('date', '<=', $request->finish_date)
-                    ->groupBy('item_id');
-            })
+            $query_data = ItemCogs::whereRaw('id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= "$request->finish_date" GROUP BY item_id)')
             ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('status',['1','2']);

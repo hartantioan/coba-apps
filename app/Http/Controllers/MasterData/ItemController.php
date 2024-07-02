@@ -972,6 +972,7 @@ class ItemController extends Controller
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Dokumen</th>
+                                <th class="center-align">User</th>
                                 <th class="center-align">Qty Dokumen</th>
                                 <th class="center-align">Qty Outstanding</th>
                                 <th class="center-align">Satuan</th>
@@ -986,6 +987,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_mr_d->materialRequest->code.'</td>
+                        <td >'.$row_mr_d->materialRequest->user->name.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_mr_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_mr_d->balancePr()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
@@ -1003,6 +1005,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_pr_d->purchaseRequest->code.'</td>
+                        <td >'.$row_pr_d->purchaseRequest->user->name.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_pr_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_pr_d->qtyBalance()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
@@ -1018,6 +1021,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_po_d->purchaseOrder->code.'</td>
+                        <td >'.$row_po_d->purchaseOrder->user->name.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_po_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_po_d->getBalanceReceipt()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
@@ -1033,6 +1037,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_gr_d->goodReceipt->code.'</td>
+                        <td >'.$row_gr_d->goodReceipt->user->name.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gr_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gr_d->balanceQtyInvoice()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
@@ -1049,6 +1054,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_gir_d->goodIssueRequest->code.'</td>
+                        <td >'.$row_gir_d->goodIssueRequest->user->name.'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gir_d->qty).'</td>
                         <td>'.CustomHelper::formatConditionalQty($row_gir_d->balanceGi()).'</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>
@@ -1065,6 +1071,7 @@ class ItemController extends Controller
                     $string .= '<tr>
                         <td class="center-align">'.$no.'</td>
                         <td>'.$row_lc_d->landedCost->code.'</td>
+                        <td >'.$row_lc_d->landedCost->user->name.'</td>
                         <td>'.$row_lc_d->qty.'</td>
                         <td>-</td>
                         <td class="center-align">'.$data->uomUnit->code.'</td>

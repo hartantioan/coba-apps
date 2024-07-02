@@ -81,10 +81,10 @@ class StockInRupiahController extends Controller
         if($request->type == 'final'){
             $perlu = 0 ;
             $query_data = ItemCogs::whereIn('id', function ($query) use ($request) {            
-                /* $query->selectRaw('MAX(id)')
+                $query->selectRaw('MAX(id)')
                     ->from('item_cogs')
                     ->where('date', '<=', $request->finish_date)
-                    ->groupBy('item_id'); */
+                    ->groupBy('item_id');
             })
             ->where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){
@@ -94,9 +94,7 @@ class StockInRupiahController extends Controller
                     $query->whereDate('date','<=', $request->finish_date);
                 }
                 if($request->item_id) {
-                    $query->whereHas('item',function($query) use($request){
-                        $query->where('id',$request->item_id);
-                    });
+                    $query->where('item_id',$request->item_id);
                 }
                 if($request->plant != 'all'){
                     $query->whereHas('place',function($query) use($request){
@@ -118,6 +116,7 @@ class StockInRupiahController extends Controller
             })
             ->orderBy('date', 'desc')
             ->get();
+            info($query_data);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {

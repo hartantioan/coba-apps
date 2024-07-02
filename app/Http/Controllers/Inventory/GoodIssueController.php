@@ -633,7 +633,7 @@ class GoodIssueController extends Controller
                             'item_stock_id'         => $row,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'price'                 => $rowprice,
-                            'total'                 => round($rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2),
+                            'total'                 => $rowprice * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'note'                  => $request->arr_note[$key],
                             'note2'                 => $request->arr_note2[$key],
                             'inventory_coa_id'      => $request->arr_inventory_coa[$key] ? $request->arr_inventory_coa[$key] : NULL,

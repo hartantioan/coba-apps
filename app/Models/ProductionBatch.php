@@ -87,4 +87,27 @@ class ProductionBatch extends Model
 
         return $newcode.$no.'.'.strtoupper($line).strtoupper($group);
     }
+
+    public static function getLatestCodeFg($prefix){
+        $query = ProductionBatch::selectRaw('RIGHT(code, 5) as code')
+            ->whereRaw("code LIKE '$prefix%'")
+            ->withTrashed()
+            ->orderByDesc('id')
+            ->limit(1)
+            ->get();
+
+        if($query->count() > 0) {
+            $code = (int)$query[0]->code + 1;
+        } else {
+            $code = '00001';
+        }
+
+        $no = str_pad($code, 5, 0, STR_PAD_LEFT);
+
+        return $prefix.$no;
+    }
+
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

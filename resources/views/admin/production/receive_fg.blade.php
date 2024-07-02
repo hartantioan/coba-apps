@@ -256,8 +256,8 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
                                     <legend>2. Pilih Batch</legend>
-                                    <div class="col m12 s12">
-                                        <div class="col s12" style="overflow:auto;min-width:100%;">
+                                    <div class="col m8 s12">
+                                        <div class="col m12 s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
                                                 <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
                                                     <thead>
@@ -283,6 +283,9 @@
                                                 </table>
                                             </p>
                                         </div>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <h6>Data Terpakai : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>
                             </div>
@@ -318,33 +321,10 @@
                                 </fieldset>
                             </div>
                         </div>
-                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>4. Order Produksi Terpakai</legend>
-                                    <div class="col m8 s12 step8">
-                                        <h6>Data Terpakai : <i id="list-used-data"></i></h6>
-                                    </div>
-                                    <div class="col m12">
-                                        <div class="row">
-                                            <div class="col m4 s12">
-                                                Line : <b id="output-line">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Target Item SFG/FG : <b id="output-fg">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Qty : <b id="output-qty">-</b>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
                         <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>5. Detail Item Receive FG & Palet</legend>
+                                    <legend>4. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
@@ -353,11 +333,11 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2200px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:2800px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">No.</th>
-                                                            <th class="center">No.Palet/Curah</th>
+                                                            <th class="center">No.Batch Palet/Curah</th>
                                                             <th class="center">Kode Item</th>
                                                             <th class="center">Nama Item</th>
                                                             <th class="center">{{ __('translations.shading') }}</th>
@@ -758,9 +738,6 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 M.updateTextFields();
-                if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');
-                }
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -780,6 +757,9 @@
                         </td>
                     </tr>
                 `);
+                if($('.data-used').length > 0){
+                    $('.data-used').trigger('click');
+                }
                 $('#qty-unit,#sell-unit').text('-');
             }
         });
@@ -905,10 +885,14 @@
 
     function checkMaxQty(element){
         let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
-        let totalbatch = 0;
+        let totalbatch = 0, totalUsed = 0;
         $('input[name^="arr_qty_batch[]"]').each(function(index){
             totalbatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
+        $('input[name^="arr_qty_uom[]"]').each(function(index){
+            totalUsed += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        totalbatch -= totalUsed;
         if(qty > totalbatch){
             $('#qty').val(formatRupiahIni(totalbatch.toFixed(3).toString().replace('.',',')));
         }
@@ -935,13 +919,58 @@
 
     function applyQty(code){
         if($('#arr_production_batch_id' + code).val()){
-            $('#arr_qty_batch' + code).data('max',$("#arr_production_batch_id" + code).select2('data')[0].qty);
-            $('#arr_qty_batch' + code).val($("#arr_production_batch_id" + code).select2('data')[0].qty);
+            $.ajax({
+                url: '{{ Request::url() }}/send_used_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    type: $("#arr_production_batch_id" + code).select2('data')[0].table,
+                    id: $("#arr_production_batch_id" + code).select2('data')[0].id,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        $('#arr_production_batch_id' + code).empty();
+                        count();
+                    }else{
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + $("#arr_production_batch_id" + code).select2('data')[0].code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + $("#arr_production_batch_id" + code).select2('data')[0].id + `','` + $("#arr_production_batch_id" + code).select2('data')[0].table + `')">close</i>
+                            </div>
+                        `);
+                        $('#arr_qty_batch' + code).data('max',$("#arr_production_batch_id" + code).select2('data')[0].qty);
+                        $('#arr_qty_batch' + code).val($("#arr_production_batch_id" + code).select2('data')[0].qty);
+                        count();
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }else{
             $('#arr_qty_batch' + code).data('max','0,000');
             $('#arr_qty_batch' + code).val('0,000');
+            count();
         }
-        count();
     }
 
     function getRowUnit(val){
@@ -1085,42 +1114,6 @@
         });
     }
 
-    function removeUsedData(type,id){
-        $.ajax({
-            url: '{{ Request::url() }}/remove_used_data',
-            type: 'POST',
-            dataType: 'JSON',
-            data: { 
-                id : id,
-                type : type,
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                
-            },
-            success: function(response) {
-                $('.row_item[data-id="' + id + '"],.row_item_receive[data-id="' + id + '"]').remove();
-                $('#body-item').empty().append(`
-                    <tr id="last-row-item">
-                        <td class="center-align" colspan="16">
-                            Silahkan tambahkan Order Produksi untuk memulai...
-                        </td>
-                    </tr>
-                `);
-                $('#production_order_detail_id').empty();
-            },
-            error: function() {
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-
     function getItemProductionOrder(){
         if($('#production_order_detail_id').val()){
             $('#item_name').val($('#production_order_detail_id').select2('data')[0].item_name);
@@ -1135,6 +1128,10 @@
 
     function generateBarcode(){
         if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#post_date').val()){
+            let arrNo = [];
+            $('input[name^="arr_pallet_no[]"]').each(function(index){
+                arrNo.push($(this).val());
+            });
             $.ajax({
                 url: '{{ Request::url() }}/get_pallet_barcode',
                 type: 'POST',
@@ -1149,6 +1146,7 @@
                     line_id: $('#line_id').val(),
                     qty: $('#qty').val(),
                     date: $('#post_date').val(),
+                    listno: arrNo,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1174,12 +1172,17 @@
                         }
                     }else{
                         if(response.length > 0){
-                            $('#body-item').empty();
+                            if($('.row_item').length == 0){
+                                $('#body-item').empty();
+                            }
                             $.each(response, function(i, val) {
                                 let count = makeid(10);
                                 $('#body-item').append(`
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_group[]" value="` + $('#group').val() + `">
+                                        <input type="hidden" name="arr_pallet_id[]" value="` + $('#pallet_id').val() + `">
+                                        <input type="hidden" name="arr_grade_id[]" value="` + $('#grade_id').val() + `">
                                         <td class="center-align">
                                             ` + (i+1) + `
                                         </td>
@@ -1235,6 +1238,11 @@
                             });
                             $('.modal-content').scrollTop($("#body-item").offset().top);
                         }
+
+                        $('#group').val('');
+                        $('#pallet_id').empty(); 
+                        $('#grade_id').empty();
+                        $('#qty').val('0,000');
                     }
                 },
                 error: function() {
@@ -1254,6 +1262,34 @@
                 icon: 'warning'
             });
         }
+    }
+
+    function removeUsedData(id,type){
+        $.ajax({
+            url: '{{ Request::url() }}/remove_used_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: { 
+                id : id,
+                type : type,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                
+            },
+            success: function(response) {
+
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
     function removeBatch(element){
@@ -1563,12 +1599,14 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
-                let passedInput = true, qtyHeader = parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")), qtyBatch = 0;
+                let passedInput = true ;
 
-                $('input[name^="arr_qty_batch[]"]').each(function(index){
-                    qtyBatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-                    if(!$('select[name^="arr_production_batch_id[]"]').val()){
+                $('select[name^="arr_production_batch_id[]"]').each(function(index){
+                    if(!$(this).val()){
                        passedInput = false; 
+                    }
+                    if(parseFloat($('input[name^="arr_qty_batch[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0 || !$('input[name^="arr_qty_batch[]"]').eq(index).val()){
+                        passedInput = false;
                     }
                 });
 
@@ -1576,18 +1614,10 @@
                     passedInput = false;
                 }
 
-                if(qtyHeader <= 0 || qtyBatch <= 0){
-                    passedInput = false;
-                }
-
-                if(qtyHeader !== qtyBatch){
-                    passedInput = false;
-                }
-
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty uom tidak boleh kosong. Nomor batch tidak boleh kosong. Qty batch tidak boleh kosong. Baris nomor palet tidak boleh kosong. Qty uom dan qty batch harus sama.',
+                        text: 'Batch dan qty tidak boleh kosong. Baris item fg tidak boleh kosong.',
                         icon: 'error'
                     });
                 }else{

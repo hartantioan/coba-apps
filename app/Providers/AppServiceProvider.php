@@ -104,6 +104,7 @@ class AppServiceProvider extends ServiceProvider
             'cancel_documents'                      => 'App\Models\CancelDocument',
             'production_fg_receives'                => 'App\Models\ProductionFgReceive',
             'production_fg_receive_details'         => 'App\Models\ProductionFgReceiveDetail',
+            'production_batches'                    => 'App\Models\ProductionBatch',
         ]);
     }
 }

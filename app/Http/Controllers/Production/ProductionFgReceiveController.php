@@ -82,8 +82,6 @@ class ProductionFgReceiveController extends Controller
         $qty = str_replace(',','.',str_replace('.','',$request->qty));
         $date = $request->date;
 
-        /* $conversion = $pod->productionScheduleDetail->item->sellConversion(); */
-
         $itemChild = Item::whereHas('parentFg',function($query)use($pod){
             $query->where('parent_id',$pod->productionScheduleDetail->item_id);
         })
@@ -113,14 +111,26 @@ class ProductionFgReceiveController extends Controller
                         $sellConvert = $itemChild->sellConversion();
 
                         $result = [];
-                        $prefix = 'PLT/'.$plant->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
-                        $latestCode = ProductionFgReceiveDetail::getLatestCode($prefix);
-                        $startNumber = intval(substr($latestCode,(strlen($latestCode)-5),5));
+                        $prefix = $pallet->prefix_code.'/'.$plant->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
+                        $latestCode = ProductionBatch::getLatestCodeFg($prefix);
+                        $oldprefix = 0;
+                        if($request->listno){
+                            foreach($request->listno as $row){
+                                if(substr($row,0,20) == $prefix){
+                                    $oldprefix = intval(substr($row,(strlen($row)-5),5));
+                                }
+                            }
+                        }
+                        if($oldprefix > 0){
+                            $startNumber = $oldprefix + 1;
+                        }else{
+                            $startNumber = intval(substr($latestCode,(strlen($latestCode)-5),5));
+                        }
                         $qtyRow = floor($qty / $sellConvert);
                         $qtyUsed = $qtyRow * $sellConvert;
                         $qtyBalance = $qty - $qtyUsed;
                         $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
-                        $code = $prefix.'.'.$no;
+                        $code = $prefix.$no;
                         $result[] = [
                             'item_id'       => $itemChild->id,
                             'item_code'     => $itemChild->code,
@@ -1116,10 +1126,10 @@ class ProductionFgReceiveController extends Controller
     }
 
     public function sendUsedData(Request $request){
-        $mop = ProductionOrder::find($request->id);
+        $mop = ProductionBatch::find($request->id);
        
         if(!$mop->used()->exists()){
-            CustomHelper::sendUsedData($request->type,$request->id,'Form Production Receive');
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Production Receive FG');
             return response()->json([
                 'status'    => 200,
             ]);

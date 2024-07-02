@@ -114,7 +114,7 @@ class StockInRupiahController extends Controller
                     });
                 }
             })
-            ->orderBy('date', 'desc')
+            /* ->orderBy('date', 'desc') */
             ->get();
             info($query_data);
         }else{

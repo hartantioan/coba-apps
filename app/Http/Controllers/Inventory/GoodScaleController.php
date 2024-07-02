@@ -450,12 +450,17 @@ class GoodScaleController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document_name = Str::random(35).'.png';
-                            $path_document=storage_path('app/public/good_scales/'.$document_name);
-                            $newFile_document = CustomHelper::compress($request->document,$path_document,30);
-                            $basePath = storage_path('app');
-                        
-                            $document = explode($basePath.'/', $newFile_document)[1];
+                            $extension = $request->document->getClientOriginalExtension();
+                            if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'bmp'])) {
+                                $document_name = Str::random(35).'.png';
+                                $path_document=storage_path('app/public/good_scales/'.$document_name);
+                                $newFile_document = CustomHelper::compress($request->document,$path_document,30);
+                                $basePath = storage_path('app');
+                            
+                                $document = explode($basePath.'/', $newFile_document)[1];
+                            } else {
+                                $document = $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL;
+                            }
                         } else {
                             $document = $query->document;
                         }
@@ -505,12 +510,18 @@ class GoodScaleController extends Controller
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodScale::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     if($request->has('document')) {
-                        $document_name = Str::random(35).'.png';
-                        $path_document=storage_path('app/public/good_scales/'.$document_name);
-                        $newFile_document = CustomHelper::compress($request->document,$path_document,30);
-                        $basePath = storage_path('app');
+                        $extension = $request->document->getClientOriginalExtension();
+                        if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'bmp'])) {
+                            $document_name = Str::random(35).'.png';
+                            $path_document=storage_path('app/public/good_scales/'.$document_name);
+                            $newFile_document = CustomHelper::compress($request->document,$path_document,30);
+                            $basePath = storage_path('app');
                         
-                        $document = explode($basePath.'/', $newFile_document)[1];
+                            $document = explode($basePath.'/', $newFile_document)[1];
+                        } else {
+                            $document = $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL;
+                        }
+                        
                     }else{
                         $document = null;
                     }

@@ -294,7 +294,8 @@ class QualityControlController extends Controller
                         $document_name = Str::random(35).'.png';
                         $path_document=storage_path('app/public/good_scales/'.$document_name);
                         $newFile_document = CustomHelper::compress($request->document,$path_document,30);
-                        $document = explode('storage\\app/', $newFile_document)[1];
+                        $basePath = storage_path('app');
+                        $document = explode($basePath.'/', $newFile_document)[1];
                     } else {
                         if($goodScale->document){
                             $document = $goodScale->document;

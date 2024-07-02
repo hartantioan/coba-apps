@@ -285,31 +285,13 @@ class QualityControlController extends Controller
                         $qty_final = round($goodScale->qty_balance - $qty_qc,3);
                     }
 
-                    if($request->has('document')) {
-                        if($goodScale->document){
-                            if(Storage::exists($goodScale->document)){
-                                Storage::delete($goodScale->document);
-                            }
-                        }
-                        $document_name = Str::random(35).'.png';
-                        $path_document=storage_path('app/public/good_scales/'.$document_name);
-                        $newFile_document = CustomHelper::compress($request->document,$path_document,30);
-                        $document = explode('storage\\app/', $newFile_document)[1];
-                    } else {
-                        if($goodScale->document){
-                            $document = $goodScale->document;
-                        }else{
-                            $document= null;
-                        }
-                    }
-
                     $goodScale->update([
                         'water_content' => str_replace(',','.',str_replace('.','',$request->water_content)),
                         'viscosity'     => str_replace(',','.',str_replace('.','',$request->viscosity)),
                         'residue'       => str_replace(',','.',str_replace('.','',$request->residue)),
                         'status_qc'     => $request->status_qc,
                         'note_qc'       => $request->note,
-                        'image_qc'      => $document,
+                        'image_qc'      => $request->file('document') ? $request->file('document')->store('public/good_scales') : ($goodScale->image_qc ? $goodScale->image_qc : NULL),
                         'user_qc'       => session('bo_id'),
                         'time_scale_qc' => date('Y-m-d H:i:s'),
                         'status'        => $request->status_qc == '1' ? $goodScale->status : '5',

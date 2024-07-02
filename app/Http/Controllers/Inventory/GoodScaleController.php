@@ -384,17 +384,19 @@ class GoodScaleController extends Controller
             ];
         } else {
             DB::beginTransaction();
-            try {
+           
 
                 $imageName = '';
                 $newFile = '';
                 if($request->image_in){
-                    $image = $request->image_in;  // your base64 encoded
-                    $image = str_replace('data:image/png;base64,', '', $image);
-                    $image = str_replace(' ', '+', $image);
+                    // $image = $request->image_in;  // your base64 encoded
+                    // $image = str_replace('data:image/png;base64,', '', $image);
+                    // $image = str_replace(' ', '+', $image);
                     $imageName = Str::random(35).'.png';
-                    $newFile = 'public/good_scales/'.$imageName;
-                    Storage::put($newFile,base64_decode($image));
+                    $path=storage_path('app/public/good_scales/'.$imageName);
+                    $newFile = CustomHelper::compress($request->image_in,$path,30);
+                    $desiredPath = explode('storage\\app/', $newFile)[1];
+
                 }
 
                 $itemUnit = ItemUnit::find($request->item_unit_id);
@@ -407,7 +409,6 @@ class GoodScaleController extends Controller
                         'message' => 'Item terpilih masuk ke dalam kategori wajib dicek QC, silahkan centang PENGECEKAN QC.'
                     ]);
                 }
-
                 if($request->temp){
                 
                     $query = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -448,7 +449,10 @@ class GoodScaleController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/good_scales');
+                            $document_name = Str::random(35).'.png';
+                            $path_document=storage_path('app/public/good_scales/'.$document_name);
+                            $newFile_document = CustomHelper::compress($request->document,$path_document,30);
+                            $document = explode('storage\\app/', $newFile_document)[1];
                         } else {
                             $document = $query->document;
                         }
@@ -468,7 +472,7 @@ class GoodScaleController extends Controller
                         $query->vehicle_no = $request->vehicle_no;
                         $query->driver = $request->driver;
                         $query->document = $document;
-                        $query->image_in = $newFile ? $newFile : NULL;
+                        $query->image_in = $desiredPath ? $desiredPath : NULL;
                         $query->time_scale_in = date('Y-m-d H:i:s');
                         $query->note = $request->note;
                         $query->purchase_order_detail_id = $request->purchase_order_detail_id;
@@ -551,9 +555,7 @@ class GoodScaleController extends Controller
                     ];
                 }
                 DB::commit();
-            }catch(\Exception $e){
-                DB::rollback();
-            }
+            
 		}
 		
 		return response()->json($response);

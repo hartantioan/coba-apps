@@ -832,7 +832,7 @@ class PaymentRequestController extends Controller
                                 'list_details'  => [],
                                 'document_status' => '',
                                 'is_reimburse'  => '',
-                                'raw_due_date'  => $raw_due_date,
+                                'raw_due_date'  => $raw_due_date ?? $data->due_date,
                                 'payment_type'  => $data->type ?? '1',
                                 'top'           => CustomHelper::countDays($data->post_date,$data->due_date),
                             ];

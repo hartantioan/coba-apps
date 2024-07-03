@@ -70,6 +70,7 @@ use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\MaterialRequest;
 use App\Models\ProductionBatch;
+use App\Models\ProductionFgReceive;
 use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionSchedule;
@@ -4275,6 +4276,80 @@ class CustomHelper {
 					'status'	=> '3'
 				]);
 			}
+
+		}elseif($table_name == 'production_fg_receives'){
+
+			$pir = ProductionFgReceive::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pir->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note ?? '',
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			$total = 0;
+
+			foreach($pir->productionFgReceiveDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'line_id'		=> $row->productionReceive->line_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> $row->total,
+					'note'			=> $pir->code,
+				]);
+
+				self::sendCogs($table_name,
+					$pir->id,
+					$pir->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					$row->total,
+					'OUT',
+					$pir->post_date,
+					NULL,
+					NULL,
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty,
+					'OUT',
+					NULL,
+					NULL,
+				);
+
+				$total += $row->total;
+			}
+
+			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '1',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+			]);
 
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);

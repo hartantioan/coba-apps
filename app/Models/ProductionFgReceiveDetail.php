@@ -8,7 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class productionFgReceiveDetail extends Model
+class ProductionFgReceiveDetail extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
@@ -18,19 +18,52 @@ class productionFgReceiveDetail extends Model
     protected $fillable = [
         'production_fg_receive_id',
         'item_id',
+        'item_unit_id',
         'pallet_no',
         'shading',
         'qty_sell',
         'qty',
+        'conversion',
+        'qty_used',
+        'qty_balance',
+        'group',
+        'pallet_id',
+        'grade_id',
+        'total',
     ];
 
     public function productionFgReceive()
     {
-        return $this->belongsTo('App\Models\ProductionReceive', 'production_fg_receive_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionFgReceive', 'production_fg_receive_id', 'id')->withTrashed();
     }
 
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();
+    }
+
+    public function itemUnit()
+    {
+        return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();
+    }
+
+    public function pallet()
+    {
+        return $this->belongsTo('App\Models\Pallet', 'pallet_id', 'id')->withTrashed();
+    }
+
+    public function grade()
+    {
+        return $this->belongsTo('App\Models\Grade', 'grade_id', 'id')->withTrashed();
+    }
+
+    public function productionBatch()
+    {
+        return $this->hasOne('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
+    }
+
+    public function productionFgReceiveMaterial()
+    {
+        return $this->hasMany('App\Models\ProductionFgReceiveMaterial');
     }
 }

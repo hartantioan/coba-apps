@@ -100,7 +100,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.item') }}</th>
-                                                        <th>{{ __('translations.item_reject') }}/th>
+                                                        <th>{{ __('translations.item_reject') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.warehouse') }}</th>
                                                         <th>{{ __('translations.item') }}</th>

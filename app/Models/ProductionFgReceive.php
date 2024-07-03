@@ -111,7 +111,7 @@ class ProductionFgReceive extends Model
 
     public function productionFgReceiveDetail()
     {
-        return $this->hasMany('App\Models\ProductionReceiveDetail');
+        return $this->hasMany('App\Models\ProductionFgReceiveDetail');
     }
 
     public function used(){

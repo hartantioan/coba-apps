@@ -4413,6 +4413,7 @@ class Select2Controller extends Controller {
                             });
                     }
                 })
+                ->whereDoesntHave('used')
                 ->where('qty','>',0)
                 ->orderBy('created_at')
                 ->get();
@@ -4424,6 +4425,7 @@ class Select2Controller extends Controller {
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
                 'table'         => $d->getTable(),
+                'unit'          => $d->item->uomUnit->code,
             ];
         }
 

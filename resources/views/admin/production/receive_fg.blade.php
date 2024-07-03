@@ -265,18 +265,19 @@
                                                             <th class="center">No.</th>
                                                             <th class="center">No. Batch</th>
                                                             <th class="center">Qty Terpakai</th>
+                                                            <th class="center">Satuan</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-batch">
                                                         <tr id="last-row-batch">
-                                                            <td class="center-align" colspan="4">
+                                                            <td class="center-align" colspan="5">
                                                                 Silahkan tambah dengan tombol dibawah
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
-                                                        <td colspan="4" class="center-align">
+                                                        <td colspan="5" class="center-align">
                                                             <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addBatch();" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
                                                         </td>
                                                     </tfoot>
@@ -336,27 +337,28 @@
                                                 <table class="bordered" style="border: 1px solid;min-width:2800px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
-                                                            <th class="center">No.</th>
-                                                            <th class="center">No.Batch Palet/Curah</th>
-                                                            <th class="center">Kode Item</th>
-                                                            <th class="center">Nama Item</th>
-                                                            <th class="center">{{ __('translations.shading') }}</th>
-                                                            <th class="center">Qty Jual</th>
-                                                            <th class="center">Satuan Jual</th>
-                                                            <th class="center">Konversi Jual</th>
-                                                            <th class="center">Qty Produksi</th>
-                                                            <th class="center">Satuan Produksi</th>
-                                                            <th class="center">Qty Terpakai</th>
-                                                            <th class="center">Qty Sisa</th>
-                                                            <th class="center">{{ __('translations.plant') }}</th>
-                                                            <th class="center">Shift</th>
-                                                            <th class="center">Group</th>
-                                                            <th class="center">{{ __('translations.delete') }}</th>
+                                                            <th class="center" width="25px">No.</th>
+                                                            <th class="center" width="250px">No.Batch Palet/Curah</th>
+                                                            <th class="center" width="150px">Kode Item</th>
+                                                            <th class="center" width="150px">Nama Item</th>
+                                                            <th class="center" width="100px">{{ __('translations.shading') }}</th>
+                                                            <th class="center" width="100px">Qty Jual</th>
+                                                            <th class="center" width="100px">Satuan Jual</th>
+                                                            <th class="center" width="100px">Konversi Jual</th>
+                                                            <th class="center" width="100px">Qty Produksi</th>
+                                                            <th class="center" width="100px">Satuan Produksi</th>
+                                                            <th class="center" width="100px">Qty Terpakai</th>
+                                                            <th class="center" width="100px">Qty Sisa</th>
+                                                            <th class="center" width="700px">Pemakaian Bahan</th>
+                                                            <th class="center" width="100px">{{ __('translations.plant') }}</th>
+                                                            <th class="center" width="100px">Shift</th>
+                                                            <th class="center" width="100px">Group</th>
+                                                            <th class="center" width="100px">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="16">
+                                                            <td class="center-align" colspan="17">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
@@ -745,14 +747,14 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="16">
+                        <td class="center-align" colspan="17">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
                 `);
                 $('#body-batch').empty().append(`
                     <tr id="last-row-batch">
-                        <td class="center-align" colspan="4">
+                        <td class="center-align" colspan="5">
                             Silahkan tambah dengan tombol dibawah
                         </td>
                     </tr>
@@ -802,7 +804,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="16">
+                        <td class="center-align" colspan="17">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -815,7 +817,7 @@
             if($('.row_batch').length == 0){
                 $('#body-batch').append(`
                     <tr id="last-row-batch">
-                        <td class="center-align" colspan="4">
+                        <td class="center-align" colspan="5">
                             Silahkan tambah dengan tombol dibawah
                         </td>
                     </tr>
@@ -842,6 +844,9 @@
                     </td>
                     <td>
                         <input name="arr_qty_batch[]" id="arr_qty_batch` + count + `" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQty('` + count + `')" style="text-align:right;">    
+                    </td>
+                    <td id="arr_unit_batch` + count + `">
+                        -
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-batch" href="javascript:void(0);">
@@ -953,6 +958,7 @@
                         `);
                         $('#arr_qty_batch' + code).data('max',$("#arr_production_batch_id" + code).select2('data')[0].qty);
                         $('#arr_qty_batch' + code).val($("#arr_production_batch_id" + code).select2('data')[0].qty);
+                        $('#arr_unit_batch' + code).text($("#arr_production_batch_id" + code).select2('data')[0].unit);
                         count();
                     }
                 },
@@ -969,6 +975,7 @@
         }else{
             $('#arr_qty_batch' + code).data('max','0,000');
             $('#arr_qty_batch' + code).val('0,000');
+            $('#arr_unit_batch' + code).text('-');
             count();
         }
     }
@@ -1177,9 +1184,53 @@
                             }
                             $.each(response, function(i, val) {
                                 let count = makeid(10);
+
+                                let material = `<table class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align">No</th>
+                                                    <th class="center-align">Item/Resource</th>
+                                                    <th class="center-align">Qty Dipakai</th>
+                                                    <th class="center-align">Satuan Stok</th>
+                                                    <th class="center-align">Ambil Dari</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>`;
+                                
+                                $.each(val.list_materials, function(j, row) {
+                                    let optionStock = '<select class="browser-default" name="arr_item_stock[]">';
+                                    if(row.list_stocks.length > 0){
+                                        $.each(row.list_stocks, function(k, rowstock) {
+                                            optionStock += '<option value="' + rowstock.id + '" data-qty="' + rowstock.qty_raw + '">' + rowstock.warehouse + ' - ' + rowstock.qty + '</option>';
+                                        });
+                                    }else{
+                                        optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
+                                    }
+                                    optionStock += '</select>';
+                                    material += `<tr>
+                                            <input type="hidden" name="arr_code_child_ref[]" value="` + count + `">
+                                            <input type="hidden" name="arr_bom_detail_id[]" value="` + row.bom_detail_id + `">
+                                            <td>` + (j + 1) + `</td>
+                                            <td>` + row.name + `</td>
+                                            <td>
+                                                <input name="arr_item_qty[]" type="text" value="` + row.qty + `" data-qty="` + row.qty_parent + `" readonly>
+                                            </td>
+                                            <td>
+                                                ` + row.unit + `
+                                            </td>
+                                            <td>
+                                                ` + optionStock + `    
+                                            </td>
+                                        </tr>`;
+                                });
+
+                                material += `</tbody></table>`;
+
                                 $('#body-item').append(`
                                     <tr class="row_item">
+                                        <input type="hidden" name="arr_code_head_ref[]" value="` + count + `">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                        <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
                                         <input type="hidden" name="arr_group[]" value="` + $('#group').val() + `">
                                         <input type="hidden" name="arr_pallet_id[]" value="` + $('#pallet_id').val() + `">
                                         <input type="hidden" name="arr_grade_id[]" value="` + $('#grade_id').val() + `">
@@ -1218,6 +1269,9 @@
                                         </td>
                                         <td class="right-align">
                                             <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" type="text" value="` + val.qty_balance + `" readonly>
+                                        </td>
+                                        <td class="center-align" id="list-bom-` + count + `">
+                                            ` + material + `
                                         </td>
                                         <td class="center-align">
                                             ` + val.plant + `

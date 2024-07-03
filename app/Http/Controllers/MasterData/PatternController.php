@@ -290,7 +290,7 @@ class PatternController extends Controller
 
             return response()->json($response);
         } catch (\Exception $e) {
-            info($e);
+          
             $response = [
                 'status'  => 500,
                 'message' => "Data failed to save"

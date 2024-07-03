@@ -647,7 +647,7 @@ class MenuUserController extends Controller
 	}
 
     public function saveAccessBatch(Request $request){
-        info($request);
+      
         DB::beginTransaction();
         foreach ($request->user as $value) {
             $user_temp = User::where('employee_no',$value)->first();

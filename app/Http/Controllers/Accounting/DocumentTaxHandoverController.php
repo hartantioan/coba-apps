@@ -33,7 +33,6 @@ class DocumentTaxHandoverController extends Controller
     {
         $lastSegment = request()->segment(count(request()->segments()));
         $this->lasturl = $lastSegment;
-        info($this->lasturl.'index');
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
@@ -181,7 +180,6 @@ class DocumentTaxHandoverController extends Controller
             $query->orderBy('created_at', 'desc');
         }])->where('code',CustomHelper::decrypt($id))->first();        
         if($pr){
-            info($pr);
             $pdf = PrintHelper::print($pr,'Document Tax Handover','a4','portrait','admin.print.accounting.document_tax_handover_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             // $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));

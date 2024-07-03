@@ -36,7 +36,6 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
     public function onRow(Row $row)
     {
         $row = $row->toArray();
-        info('masuk');
         if (isset($row['code']) && $row['code']) {
             $check = Bom::where('code', $row['code'])->first();
 

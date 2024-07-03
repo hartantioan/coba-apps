@@ -136,7 +136,6 @@ class UserItemController extends Controller
             'arr_item.required'     => 'Item tidak boleh kosong.',
             'arr_item.array'        => 'Item harus dalam bentuk array.',
         ]);
-        info('sid');
         if($validation->fails()) {
             $response = [
                 'status' => 422,

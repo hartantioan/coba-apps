@@ -154,7 +154,6 @@ class HardwareItemController extends Controller
         } else {
 			if($request->temp){
                 DB::beginTransaction();
-                info($request->temp);
                 try {
                     $query = HardwareItem::find($request->temp);
                     $query->code            = $request->code;

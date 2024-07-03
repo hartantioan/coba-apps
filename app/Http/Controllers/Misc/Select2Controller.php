@@ -4460,7 +4460,6 @@ class Select2Controller extends Controller {
 
     public function documentTaxforHandover(Request $request)
     {
-        info($request);
         $response = [];
         $search     = $request->search;
         $tax_array = $request->tax_array;

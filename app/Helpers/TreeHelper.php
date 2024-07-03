@@ -2850,7 +2850,7 @@ class TreeHelper {
                         ]; 
                         
                         if(!in_array( $query_production_order->productionschedule->id, $data_id_production_schedule)){
-                            info($finished_data_id_production_schedule);
+                           
                             $data_id_production_schedule[] =  $query_production_order->productionSchedule->id; 
                             $added = true;
                         } 

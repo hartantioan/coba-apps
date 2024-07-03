@@ -113,7 +113,6 @@ class StockInRupiahController extends Controller
             })
             ->orderBy('date', 'desc')
             ->get();
-            info($query_data);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {

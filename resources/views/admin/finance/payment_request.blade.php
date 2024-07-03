@@ -2077,6 +2077,8 @@
                                             if(val.raw_due_date){
                                                 $('#pay_date').val(val.raw_due_date);
                                             }
+                                        }else{
+                                            $('#pay_date').val(val.raw_due_date);
                                         }
                                     }
                                 });

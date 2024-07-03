@@ -2074,10 +2074,8 @@
                                         $('#top').val(val.top);
                                         if(val.is_reimburse){
                                             $('#is_reimburse').val(val.is_reimburse).formSelect();
-                                            if(val.raw_due_date){
-                                                $('#pay_date').val(val.raw_due_date);
-                                            }
-                                        }else{
+                                        }
+                                        if(val.raw_due_date){
                                             $('#pay_date').val(val.raw_due_date);
                                         }
                                     }

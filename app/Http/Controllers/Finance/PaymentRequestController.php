@@ -836,6 +836,8 @@ class PaymentRequestController extends Controller
                                 'payment_type'  => $data->type ?? '1',
                                 'top'           => CustomHelper::countDays($data->post_date,$data->due_date),
                             ];
+                            info($data->due_date);
+                            info($raw_due_date);
                         }
                     }
                 }elseif($row == 'marketing_order_memos'){

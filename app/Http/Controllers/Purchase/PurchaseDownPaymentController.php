@@ -940,7 +940,13 @@ class PurchaseDownPaymentController extends Controller
             </tr>';
         }
 
-        $string .= '</tbody></table></div></div>';
+       $string .= '</tbody></table></div>
+            ';
+        $string.= '<div class="col s12 mt-2" style="font-weight:bold;">List Pengguna Dokumen :</div><ol>';
+        if($data->used()->exists()){
+            $string.= '<li>'.$data->used->lookable->user->name.' - Tanggal Dipakai: '.$data->used->lookable->post_date.' Keterangan:'.$data->used->lookable->note.'</li>';
+        }
+        $string.='</ol></div>';
 		
         return response()->json($string);
     }

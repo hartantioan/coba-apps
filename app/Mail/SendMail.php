@@ -41,15 +41,26 @@ class SendMail extends Mailable
 
     public function build()
     {
-        return $this->subject($this->data['subject'])
-                    ->view($this->data['view'])
-                    ->with([
-                        'url'    => url('/'),
-                        'data'   => $this->data,
-                        'result' => $this->data['result'],
-                    ])
-                    ->attach($this->data['attachmentPath'], [
-                        'as' => $this->data['attachmentName'],
-                    ]);
+        if($this->data['attachmentPath']){
+            return $this->subject($this->data['subject'])
+                ->view($this->data['view'])
+                ->with([
+                    'url'    => url('/'),
+                    'data'   => $this->data,
+                    'result' => $this->data['result'],
+                ])
+                ->attach($this->data['attachmentPath'], [
+                    'as' => $this->data['attachmentName'],
+                ]);
+        }else{
+            return $this->subject($this->data['subject'])
+                ->view($this->data['view'])
+                ->with([
+                    'url'    => url('/'),
+                    'data'   => $this->data,
+                    'result' => $this->data['result'],
+                ]);
+        }
+        
     }
 }

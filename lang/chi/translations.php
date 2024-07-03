@@ -357,5 +357,9 @@ return [
     'handover_date'     => '交接日期',
     'order'             => '命令',
 
+    //
+    'price'             => '价格',
+    'post_date'         => '发布日期',
+    'conversion'        => '转换'
 ];
 

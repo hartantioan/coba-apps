@@ -355,4 +355,9 @@ return [
     'other_name'        => 'Other Name',
     'handover_date'     => 'Handover Date',
     'order'             => 'Order',
+
+    //
+    'price'             => 'Price',
+    'post_date'         => 'Post Date',
+    'conversion'        => 'Conversion',
 ];  

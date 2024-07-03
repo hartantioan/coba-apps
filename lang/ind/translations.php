@@ -356,7 +356,9 @@ return [
     'other_name'        => 'Nama Lain',
     'handover_date'     => 'Tanggal Serah Terima',
     'order'             => 'Urutan',
-
-
+//
+    'price'             => 'Harga',
+    'post_date'         => 'Post Date',
+    'conversion'        => 'Konversi'
 ];
 

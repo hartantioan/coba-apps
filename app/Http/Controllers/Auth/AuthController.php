@@ -558,9 +558,11 @@ class AuthController extends Controller
             ]);
 
             $data = [
-                'subject'   => 'Berhasil Reset Password',
-                'view'      => 'admin.mail.success_reset_password',
-                'result'    => $query,
+                'subject'           => 'Berhasil Reset Password',
+                'view'              => 'admin.mail.success_reset_password',
+                'result'            => $query,
+                'attachmentPath'    => '',
+                'attachmentName'    => '',
             ];
 
             Mail::to($query->email)->send(new SendMail($data));

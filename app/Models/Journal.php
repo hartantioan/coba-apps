@@ -165,4 +165,8 @@ class Journal extends Model
             return false;
         }
     }
+
+    public function used(){
+        return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
+    }
 }

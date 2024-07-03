@@ -2145,6 +2145,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ProductionFgReceiveController::class, 'show']);
                     Route::post('get_code', [ProductionFgReceiveController::class, 'getCode']);
                     Route::post('get_pallet_barcode', [ProductionFgReceiveController::class, 'getPalletBarcode']);
+                    Route::post('get_child_fg', [ProductionFgReceiveController::class, 'getChildFg']);
                     Route::post('print',[ProductionFgReceiveController::class, 'print']);
                     Route::post('done',[ProductionFgReceiveController::class, 'done'])->middleware('operation.access:production_fg_receive,update');
                     Route::post('print_by_range',[ProductionFgReceiveController::class, 'printByRange']);

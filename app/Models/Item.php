@@ -155,6 +155,11 @@ class Item extends Model
         return $this->belongsTo('App\Models\Unit', 'production_unit', 'id')->withTrashed();
     }
 
+    public function warehouse(){
+        $warehouse = $this->itemGroup->itemGroupWarehouse()->first();
+        return $warehouse->warehouse_id;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',
@@ -253,7 +258,7 @@ class Item extends Model
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
-            $pricenow = ($price->total_final / $price->qty_final) / $this->production_convert;
+            $pricenow = $price->qty_final > 0 ? $price->total_final / $price->qty_final : 0;
         }
         
         return $pricenow;

@@ -25,6 +25,11 @@ class ProductionBatch extends Model
         'total'
     ];
 
+    public function price(){
+        $price = $this->total / $this->qty_real;
+        return $price;
+    }
+
     public function lookable(){
         return $this->morphTo();
     }

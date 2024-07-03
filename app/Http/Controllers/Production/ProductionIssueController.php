@@ -171,7 +171,7 @@ class ProductionIssueController extends Controller
                     $val->line->code,
                     $val->group,
                     $val->place->code,
-                    $val->machine->name,
+                    $val->machine()->exists() ? $val->machine->name : '-',
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (

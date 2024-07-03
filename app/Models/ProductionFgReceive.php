@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -25,9 +26,6 @@ class ProductionFgReceive extends Model
         'line_id',
         'shift_id',
         'group',
-        'pallet_id',
-        'shading',
-        'grade_id',
         'item_unit_id',
         'qty',
         'post_date',
@@ -64,24 +62,23 @@ class ProductionFgReceive extends Model
         return $this->belongsTo('App\Models\User', 'done_id', 'id')->withTrashed();
     }
 
+    public function productionIssue(){
+        return $this->hasOne('App\Models\ProductionIssue','production_fg_receive_id','id')->whereIn('status',['2','3']);
+    }
+
     public function company()
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
-    public function productionOrder()
+    public function productionOrderDetail()
     {
-        return $this->belongsTo('App\Models\ProductionOrder', 'production_order_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionOrderDetail', 'production_order_detail_id', 'id')->withTrashed();
     }
 
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
-    }
-
-    public function pallet()
-    {
-        return $this->belongsTo('App\Models\Pallet', 'pallet_id', 'id')->withTrashed();
     }
     
     public function line()
@@ -92,11 +89,6 @@ class ProductionFgReceive extends Model
     public function shift()
     {
         return $this->belongsTo('App\Models\Shift', 'shift_id', 'id')->withTrashed();
-    }
-
-    public function grade()
-    {
-        return $this->belongsTo('App\Models\Grade', 'grade_id', 'id')->withTrashed();
     }
 
     public function item()
@@ -166,7 +158,7 @@ class ProductionFgReceive extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = ProductionReceive::selectRaw('RIGHT(code, 8) as code')
+        $query = ProductionFgReceive::selectRaw('RIGHT(code, 8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -209,6 +201,10 @@ class ProductionFgReceive extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        if($this->productionIssue()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 
@@ -248,5 +244,106 @@ class ProductionFgReceive extends Model
 
     public function productionBatchUsage(){
         return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function createProductionIssue(){
+        $lastSegment = 'production_issue';
+        $menu = Menu::where('url', $lastSegment)->first();
+        $newCode=ProductionIssue::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
+        
+        $query = ProductionIssue::create([
+            'code'			            => $newCode,
+            'user_id'		            => session('bo_id'),
+            'company_id'                => $this->company_id,
+            'production_order_detail_id'=> $this->production_order_detail_id,
+            'production_fg_receive_id'  => $this->id,
+            'place_id'                  => $this->place_id,
+            'shift_id'                  => $this->shift_id,
+            'group'                     => $this->group,
+            'line_id'                   => $this->line_id,
+            'post_date'                 => $this->post_date,
+            'note'                      => 'Dibuat otomatis dari Production Receive FG No. '.$this->code,
+            'status'                    => '1',
+        ]);
+
+        foreach($this->productionBatchUsage as $row){
+            $price = $row->productionBatch->price();
+            $total = round($price * $row->qty,2);
+            $itemStock = ItemStock::where('item_id',$row->productionBatch->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$row->productionBatch->item->warehouse())->first();
+            $querydetail = ProductionIssueDetail::create([
+                'production_issue_id'           => $query->id,
+                'production_order_detail_id'    => $this->production_order_detail_id,
+                'lookable_type'                 => 'items',
+                'lookable_id'                   => $row->productionBatch->item_id,
+                'bom_id'                        => NULL,
+                'bom_detail_id'                 => NULL,
+                'qty'                           => $row->qty,
+                'nominal'                       => $price,
+                'total'                         => $total,
+                'qty_bom'                       => 0,
+                'nominal_bom'                   => 0,
+                'total_bom'                     => 0,
+                'qty_planned'                   => 0,
+                'nominal_planned'               => 0,
+                'total_planned'                 => 0,
+                'from_item_stock_id'            => $itemStock->id,
+            ]);
+        }
+
+        foreach($this->productionFgReceiveDetail as $key => $row){
+            
+            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                $query->where('item_id',$row->item_id)->orderByDesc('created_at');
+            })->whereNotNull('is_default')->first();
+
+            if($bomAlternative){
+                foreach($bomAlternative->bomDetail as $rowbom){
+                    $nominal = 0;
+                    $total = 0;
+                    $itemstock = NULL;
+                    if($rowbom->lookable_type == 'items'){
+                        $item = Item::find($rowbom->lookable_id);
+                        if($item){
+                            $price = $item->priceNowProduction($this->place_id,$this->post_date);
+                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
+                            $nominal = $price;
+                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                        }
+                    }elseif($rowbom->lookable_type == 'resources'){
+                        $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                        $nominal = $rowbom->nominal;
+                    }
+                    $querydetail = ProductionIssueDetail::create([
+                        'production_issue_id'           => $query->id,
+                        'production_order_detail_id'    => $this->production_order_detail_id,
+                        'lookable_type'                 => $rowbom->lookable_type,
+                        'lookable_id'                   => $rowbom->lookable_id,
+                        'bom_id'                        => $rowbom->bom_id,
+                        'bom_detail_id'                 => $rowbom->id,
+                        'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                        'nominal'                       => $nominal,
+                        'total'                         => $total,
+                        'qty_bom'                       => 0,
+                        'nominal_bom'                   => 0,
+                        'total_bom'                     => 0,
+                        'qty_planned'                   => 0,
+                        'nominal_planned'               => 0,
+                        'total_planned'                 => 0,
+                        'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
+                    ]);
+                }
+            }
+        }
+
+        if($query){
+            CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+            CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+
+            activity()
+                ->performedOn(new ProductionIssue())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Add / edit issue production.');
+        }
     }
 }

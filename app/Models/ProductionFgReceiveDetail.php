@@ -24,11 +24,10 @@ class ProductionFgReceiveDetail extends Model
         'qty_sell',
         'qty',
         'conversion',
-        'qty_used',
-        'qty_balance',
-        'group',
         'pallet_id',
         'grade_id',
+        'total_batch',
+        'total_material',
         'total',
     ];
 
@@ -60,10 +59,5 @@ class ProductionFgReceiveDetail extends Model
     public function productionBatch()
     {
         return $this->hasOne('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
-    }
-
-    public function productionFgReceiveMaterial()
-    {
-        return $this->hasMany('App\Models\ProductionFgReceiveMaterial');
     }
 }

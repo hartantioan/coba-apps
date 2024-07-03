@@ -18,6 +18,7 @@ use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Pallet;
 use App\Models\ProductionBatch;
+use App\Models\ProductionBatchUsage;
 use App\Models\ProductionFgReceive;
 use App\Models\productionFgReceiveDetail;
 use App\Models\ProductionFgReceiveMaterial;
@@ -114,12 +115,12 @@ class ProductionFgReceiveController extends Controller
                         $sellConvert = $itemChild->sellConversion();
 
                         $result = [];
-                        $prefix = $pallet->prefix_code.'/'.$plant->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
+                        $prefix = $pallet->prefix_code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
                         $latestCode = ProductionBatch::getLatestCodeFg($prefix);
                         $oldprefix = 0;
                         if($request->listno){
                             foreach($request->listno as $row){
-                                if(substr($row,0,20) == $prefix){
+                                if(substr($row,0,17) == $prefix){
                                     $oldprefix = intval(substr($row,(strlen($row)-5),5));
                                 }
                             }
@@ -161,8 +162,6 @@ class ProductionFgReceiveController extends Controller
                             'qty_sell'      => CustomHelper::formatConditionalQty($qtyRow),
                             'qty_uom'       => CustomHelper::formatConditionalQty($qty),
                             'sell_unit'     => $itemChild->sellUnit(),
-                            'qty_used'      => CustomHelper::formatConditionalQty($qtyUsed),
-                            'qty_balance'   => CustomHelper::formatConditionalQty($qtyBalance),
                             'uom_unit'      => $itemChild->uomUnit->code,
                             'plant'         => $plant->code,
                             'shift'         => $shift->code,
@@ -192,6 +191,35 @@ class ProductionFgReceiveController extends Controller
                     'message'   => 'Bom tidak ditemukan pada item '.$itemChild->code.' - '.$itemChild->name.'.'
                 ]);
             }
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data item child dengan palet dan grade terpilih tidak ditemukan.'
+            ]);
+        }
+    }
+
+    public function getChildFg(Request $request){
+
+        $pod = ProductionOrderDetail::find($request->pod_id);
+        $pallet = Pallet::find($request->pallet_id);
+        $grade = Grade::find($request->grade_id);
+
+        $itemChild = Item::whereHas('parentFg',function($query)use($pod){
+            $query->where('parent_id',$pod->productionScheduleDetail->item_id);
+        })
+        ->where('pallet_id',$pallet->id)
+        ->where('grade_id',$grade->id)
+        ->where('status','1')
+        ->first();
+
+        if($itemChild){
+            return response()->json([
+                'status'    => 200,
+                'name'      => $itemChild->code.' - '.$itemChild->name,
+                'conversion'=> CustomHelper::formatConditionalQty($itemChild->sellConversion()),
+                'unit'      => $itemChild->sellUnit(),
+            ]);
         }else{
             return response()->json([
                 'status'    => 500,
@@ -294,19 +322,13 @@ class ProductionFgReceiveController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    $val->productionOrder->code,
+                    $val->productionOrderDetail->productionOrder->code,
+                    $val->productionIssue()->exists() ? $val->productionIssue->code : '-',
                     $val->item->code.' - '.$val->item->name,
                     $val->place->code,
                     $val->line->code,
                     $val->shift->code.' - '.$val->shift->name,
                     $val->group,
-                    $val->pallet->name,
-                    $val->shading,
-                    $val->grade->name,
-                    CustomHelper::formatConditionalQty($val->qty),
-                    $val->item->uomUnit->code,
-                    CustomHelper::formatConditionalQty(round($val->qty / $val->itemUnit->conversion,3)),
-                    $val->itemUnit->unit->code,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -362,6 +384,7 @@ class ProductionFgReceiveController extends Controller
                 'company_id'			    => 'required',
                 'place_id'                  => 'required',
                 'shift_id'                  => 'required',
+                'group'                     => 'required',
                 'line_id'                   => 'required',
                 'post_date'		            => 'required',
                 'production_order_detail_id'=> 'required',
@@ -371,6 +394,7 @@ class ProductionFgReceiveController extends Controller
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'place_id'                          => 'Plant tidak boleh kosong.',
                 'shift_id'                          => 'Shift tidak boleh kosong.',
+                'group'                             => 'Group tidak boleh kosong.',
                 'line_id'                           => 'Line tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
                 'production_order_detail_id.required'=> 'Production Order Detail tidak boleh kosong.',
@@ -384,33 +408,37 @@ class ProductionFgReceiveController extends Controller
             } else {
 
                 $passedStockMaterial = true;
-                $arrItemStock = [];
-                $arrQtyNeeded = [];
                 $arrItemMore = [];
+                $arrItem = [];
+                $arrQty = [];
 
-                if($request->arr_item_stock){
-                    foreach($request->arr_item_stock as $row){
-                        if($row){
-                            if(!in_array($row,$arrItemStock)){
-                                $arrItemStock[] = $row;
-                                $rowtotal = 0;
-                                foreach($request->arr_item_stock as $key => $rowstock){
-                                    if($rowstock == $row){
-                                        $rowtotal += str_replace(',','.',str_replace('.','',$request->arr_item_qty[$key]));
-                                    }
+                if($request->arr_item_id){
+                    foreach($request->arr_item_id as $key => $row){
+                        $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                            $query->where('item_id',$row)->orderByDesc('created_at');
+                        })->whereNotNull('is_default')->first();
+
+                        if($bomAlternative){
+                            foreach($bomAlternative->bomDetail()->where('lookable_type','items')->get() as $rowbom){
+                                if(!in_array($rowbom->lookable_id,$arrItem)){
+                                    $arrItem[] = $rowbom->lookable_id;
+                                    $arrQty[] = round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
+                                }else{
+                                    $index = array_search($rowbom->lookable_id,$arrItem);
+                                    $arrQty[$index] += round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
                                 }
-                                $arrQtyNeeded[] = $rowtotal;
                             }
                         }
                     }
+                }
 
-                    foreach($arrItemStock as $key => $row){
-                        $is = ItemStock::find($row);
-                        if($is){
-                            if($is->qty < $arrQtyNeeded[$key]){
-                                $passedStockMaterial = false;
-                                $arrItemMore[] = $is->item->code.' - '.$is->item->name;
-                            }
+                foreach($arrItem as $key => $row){
+                    $item = Item::find($row);
+                    if($item){
+                        $stock = $item->getStockPlace($request->place_id);
+                        if($stock < $arrQty[$key]){
+                            $arrItemMore[] = $item->code.' - '.$item->name;
+                            $passedStockMaterial = false;
                         }
                     }
                 }
@@ -422,6 +450,8 @@ class ProductionFgReceiveController extends Controller
                     ]);
                 }
                 
+                $pod = ProductionOrderDetail::find($request->production_order_detail_id);
+
                 if($request->temp){
                     $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -465,8 +495,10 @@ class ProductionFgReceiveController extends Controller
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->production_order_detail_id = $request->production_order_detail_id;
+                        $query->item_id = $pod->productionScheduleDetail->item_id;
                         $query->place_id = $request->place_id;
                         $query->shift_id = $request->shift_id;
+                        $query->group = $request->group;
                         $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
@@ -496,9 +528,11 @@ class ProductionFgReceiveController extends Controller
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'production_order_id'       => $request->production_order_id,
+                        'production_order_detail_id'=> $request->production_order_detail_id,
+                        'item_id'                   => $pod->productionScheduleDetail->item_id,
                         'place_id'                  => $request->place_id,
                         'shift_id'                  => $request->shift_id,
+                        'group'                     => $request->group,
                         'line_id'                   => $request->line_id,
                         'post_date'                 => $request->post_date,
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_fg_receives') : NULL,
@@ -511,30 +545,61 @@ class ProductionFgReceiveController extends Controller
                     
                     $totalCost = 0;
                     $totalQty = 0;
+                    foreach($request->arr_qty_uom as $key => $row){
+                        $totalQty += str_replace(',','.',str_replace('.','',$row));
+                    }
+
                     foreach($request->arr_production_batch_id as $key => $row){
                         $pb = ProductionBatch::find($row);
                         if($pb){
                             $totalCost += round(($pb->total / $pb->qty_real) * str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),2);
-                            $totalQty += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
+                            ProductionBatchUsage::create([
+                                'production_batch_id'   => $pb->id,
+                                'lookable_type'         => $query->getTable(),
+                                'lookable_id'           => $query->id,
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),
+                            ]);
+                            CustomHelper::updateProductionBatch($pb->id,str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),'OUT');
                         }
                     }
                     
                     foreach($request->arr_qty_uom as $key => $row){
-                        $rowtotal = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
+                        $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
+                        $rowtotalmaterial = 0;
+
+                        $bomAlternative = BomAlternative::whereHas('bom',function($query)use($request,$key){
+                            $query->where('item_id',$request->arr_item_id[$key])->orderByDesc('created_at');
+                        })->whereNotNull('is_default')->first();
+
+                        if($bomAlternative){
+                            foreach($bomAlternative->bomDetail as $rowbom){
+                                if($rowbom->lookable_type == 'items'){
+                                    $item = Item::find($rowbom->lookable_id);
+                                    if($item){
+                                        $price = $item->priceNowProduction($request->place_id,$request->post_date);
+                                        $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $price,2);
+                                    }
+                                }elseif($rowbom->lookable_type == 'resources'){
+                                    $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                                }
+                            }
+                        }
+
+                        $rowtotal = $rowtotalbatch + $rowtotalmaterial;
+
                         $pfrd = ProductionFgReceiveDetail::create([
                             'production_fg_receive_id'  => $query->id,
                             'item_id'                   => $request->arr_item_id[$key],
                             'item_unit_id'              => $request->arr_item_unit_id[$key],
                             'pallet_no'                 => $request->arr_pallet_no[$key],
                             'shading'                   => $request->arr_shading[$key],
-                            'qty_sell'                  => $request->arr_qty_sell[$key],
-                            'qty'                       => $request->arr_qty_uom[$key],
-                            'conversion'                => $request->arr_qty_convert[$key],
-                            'qty_used'                  => $request->arr_qty_used[$key],
-                            'qty_balance'               => $request->arr_qty_balance[$key],
-                            'group'                     => $request->arr_group[$key],
+                            'qty_sell'                  => str_replace(',','.',str_replace('.','',$request->arr_qty_sell[$key])),
+                            'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
+                            'conversion'                => str_replace(',','.',str_replace('.','',$request->arr_qty_convert[$key])),
                             'pallet_id'                 => $request->arr_pallet_id[$key],
                             'grade_id'                  => $request->arr_grade_id[$key],
+                            'total_batch'               => $rowtotalbatch,
+                            'total_material'            => $rowtotalmaterial,
                             'total'                     => $rowtotal,
                         ]);
 
@@ -547,28 +612,6 @@ class ProductionFgReceiveController extends Controller
                             'qty_real'      => $pfrd->qty,
                             'total'         => $pfrd->total,
                         ]);
-
-                        if($request->arr_code_child_ref){
-                            foreach($request->arr_code_child_ref as $keydetail => $rowdetail){
-                                if($rowdetail == $request->arr_code_head_ref[$key]){
-                                    $totalbom = 0;
-                                    $bomDetail = BomDetail::find($request->arr_bom_detail_id[$keydetail]);
-                                    if($bomDetail->lookable_type == 'items'){
-                                        $itemStock = ItemStock::find($request->arr_item_stock[$keydetail]);
-                                        $totalbom = round($itemStock->priceDate($query->post_date) * str_replace(',','.',str_replace('.','',$request->arr_item_qty[$keydetail])),2);
-                                    }elseif($bomDetail->lookable_type == 'resources'){
-                                        $totalbom = round($bomDetail->nominal * (str_replace(',','.',str_replace('.','',$request->arr_item_qty[$keydetail])) / $bomDetail->qty),2);
-                                    }
-                                    ProductionFgReceiveMaterial::create([
-                                        'production_fg_receive_detail_id'   => $pfrd->id,
-                                        'bom_detail_id'                     => $request->arr_bom_detail_id[$keydetail],
-                                        'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_item_qty[$keydetail])),
-                                        'item_stock_id'                     => $request->arr_item_stock[$keydetail] ?? NULL,
-                                        'total'                             => $totalbom,
-                                    ]);
-                                }
-                            }
-                        }
                     }
                     
                     CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive FG No. '.$query->code);
@@ -636,15 +679,15 @@ class ProductionFgReceiveController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionFGReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Production Issue',
+                'title'     => 'Production Receive FG',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.production_receive', $data);
+            return view('admin.approval.production_fg_receive', $data);
         }else{
             abort(404);
         }
@@ -653,54 +696,67 @@ class ProductionFgReceiveController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = ProductionReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10" style="font-size:20px !important;">Daftar Item Receive</th>
+                                <th class="center-align" colspan="11" style="font-size:20px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
-                                <th class="center">No.</th>
-                                <th class="center">Item</th>
-                                <th class="center">Qty Planned</th>
-                                <th class="center">Qty Real</th>
-                                <th class="center">Qty Reject</th>
-                                <th class="center">Satuan Produksi</th>
-                                <th class="center">Plant</th>
-                                <th class="center">Gudang</th>
-                                <th class="center">Tank</th>
-                                <th class="center">No.Batch</th>
+                                <th class="center">'.__('translations.no').'</th>
+                                <th class="center">'.__('translations.item').'</th>
+                                <th class="center">No.Batch/Palet</th>
+                                <th class="center">Shading</th>
+                                <th class="center">Qty Diterima</th>
+                                <th class="center">Satuan</th>
+                                <th class="center">Konversi</th>
+                                <th class="center">Qty Produksi</th>
+                                <th class="center">Satuan</th>
+                                <th class="center">Palet</th>
+                                <th class="center">Grade</th>
                             </tr>
                         </thead><tbody>';
-        $totalqtyplanned=0;
-        $totalqtyreal=0;
-        $totalqtyreject=0;
-        foreach($data->productionReceiveDetail()->orderBy('id')->get() as $key => $row){
-            $totalqtyplanned+=$row->qty_planned;
-            $totalqtyreal+=$row->qty;
-            $totalqtyreject+=$row->qty_reject;
+        foreach($data->productionFgReceiveDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
-                <td class="center-align">'.($key+1).'.</td>
+                <td class="center-align">'.($key+1).'</td>
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
+                <td>'.$row->pallet_no.'</td>
+                <td>'.$row->shading.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_sell).'</td>
+                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->conversion).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_reject).'</td>
                 <td class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td class="">'.$row->place->code.'</td>
-                <td class="">'.$row->warehouse->name.'</td>
-                <td class="">'.($row->tank()->exists() ? $row->tank->code : '-').'</td>
-                <td class="">'.$row->batch_no.'</td>
+                <td class="">'.$row->pallet->code.'</td>
+                <td class="">'.$row->grade->code.'</td>
             </tr>';
         }
-        $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreject, 3, ',', '.') . '</td>
-                <td colspan="5"></td>
-            </tr>  
-        ';
+
+        $string .= '</tbody></table></div>';
+
+        $string .= '<div class="col m6 s12 mt-1"><table style="min-width:100%;"><thead>
+                    <tr>
+                        <th colspan="5" class="center-align">Daftar Batch Terpakai</th>
+                    </tr>
+                    <tr>
+                        <th class="center">'.__('translations.no').'.</th>
+                        <th class="center">No.Batch</th>
+                        <th class="center">Item</th>
+                        <th class="center">Qty</th>
+                        <th class="center">Satuan</th>
+                    </tr>
+                </thead><tbody>';
+
+        foreach($data->productionBatchUsage as $key => $row){
+            $string .= '<tr>
+                <td class="center-align">'.($key+1).'</td>
+                <td>'.$row->productionBatch->code.'</td>
+                <td>'.$row->productionBatch->item->code.' - '.$row->productionBatch->item->name.'</td>
+                <td>'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.$row->productionBatch->item->uomUnit->code.'</td>
+            </tr>';
+        }
 
         $string .= '</tbody></table></div>';
 

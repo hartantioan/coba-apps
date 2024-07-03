@@ -139,18 +139,12 @@
                                                         <th>Tgl.Post</th>
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>No.PROD</th>
+                                                        <th>No.Production Issue</th>
                                                         <th>{{ __('translations.item') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.line') }}</th>
                                                         <th>Shift</th>
                                                         <th>Group</th>
-                                                        <th>Pallet</th>
-                                                        <th>{{ __('translations.shading') }}</th>
-                                                        <th>Grade</th>
-                                                        <th>Qty UoM</th>
-                                                        <th>Satuan UoM</th>
-                                                        <th>Qty Jual</th>
-                                                        <th>Satuan Jual</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -227,6 +221,10 @@
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="group" name="group" type="text" placeholder="Grup">
+                                        <label class="active" for="group">Grup</label>
+                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
@@ -244,7 +242,6 @@
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                    <div class="col m12 s12"></div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getItemProductionOrder();"></select>
                                         <label class="active" for="production_order_detail_id">Production Order</label>
@@ -300,21 +297,30 @@
                                         <label class="active" for="item_name">Item FG (Parent)</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="group" name="group" type="text" placeholder="Grup">
-                                        <label class="active" for="group">Grup</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
                                         <select class="browser-default" id="pallet_id" name="pallet_id"></select>
                                         <label class="active" for="pallet_id">Palet</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="grade_id" name="grade_id"></select>
+                                        <select class="browser-default" id="grade_id" name="grade_id" onchange="getChildFg();"></select>
                                         <label class="active" for="grade_id">Grade</label>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <input id="item_name_child" name="item_name_child" type="text" value="-" readonly>
+                                        <label class="active" for="item_name_child">Item FG (Child)</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <div class="form-control-feedback" id="qty-unit-sell">-</div>
+                                        <input id="qty_sell" name="qty_sell" type="text" value="0,000" data-conversion="0" onkeyup="formatRupiahNoMinus(this);countConvert(this);">
+                                        <label class="active" for="qty_sell">Qty Diterima</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <div class="form-control-feedback" id="qty-unit">-</div>
-                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkMaxQty(this);">
-                                        <label class="active" for="qty">Qty UoM Terpakai</label>
+                                        <input id="qty" name="qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkMaxQty(this);" readonly>
+                                        <label class="active" for="qty">Qty Batch Terpakai</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="shading" name="shading" type="text" value="-">
+                                        <label class="active" for="shading">Shading</label>
                                     </div>
                                     <div class="col m3 s12">
                                         <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate No.Palet</a>
@@ -334,7 +340,7 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2800px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:2500px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center" width="25px">No.</th>
@@ -342,14 +348,11 @@
                                                             <th class="center" width="150px">Kode Item</th>
                                                             <th class="center" width="150px">Nama Item</th>
                                                             <th class="center" width="100px">{{ __('translations.shading') }}</th>
-                                                            <th class="center" width="100px">Qty Jual</th>
-                                                            <th class="center" width="100px">Satuan Jual</th>
-                                                            <th class="center" width="100px">Konversi Jual</th>
+                                                            <th class="center" width="100px">Qty Diterima</th>
+                                                            <th class="center" width="100px">Satuan</th>
+                                                            <th class="center" width="100px">Konversi</th>
                                                             <th class="center" width="100px">Qty Produksi</th>
-                                                            <th class="center" width="100px">Satuan Produksi</th>
-                                                            <th class="center" width="100px">Qty Terpakai</th>
-                                                            <th class="center" width="100px">Qty Sisa</th>
-                                                            <th class="center" width="700px">Pemakaian Bahan</th>
+                                                            <th class="center" width="100px">Satuan</th>
                                                             <th class="center" width="100px">{{ __('translations.plant') }}</th>
                                                             <th class="center" width="100px">Shift</th>
                                                             <th class="center" width="100px">Group</th>
@@ -358,7 +361,7 @@
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="17">
+                                                            <td class="center-align" colspan="14">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
@@ -747,7 +750,7 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="17">
+                        <td class="center-align" colspan="14">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -804,7 +807,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="17">
+                        <td class="center-align" colspan="14">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -888,8 +891,17 @@
         }
     }
 
+    function countConvert(element){
+        let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let conversion = parseFloat($(element).data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
+        let qtyConvert = qty * conversion;
+        $('#qty').val(formatRupiahIni(qtyConvert.toFixed(3).toString().replace('.',',')));
+        $('#qty').trigger('keyup');
+    }
+
     function checkMaxQty(element){
         let qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
+        let conversion = parseFloat($('#qty_sell').data('conversion').toString().replaceAll(".", "").replaceAll(",","."));
         let totalbatch = 0, totalUsed = 0;
         $('input[name^="arr_qty_batch[]"]').each(function(index){
             totalbatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -900,6 +912,8 @@
         totalbatch -= totalUsed;
         if(qty > totalbatch){
             $('#qty').val(formatRupiahIni(totalbatch.toFixed(3).toString().replace('.',',')));
+            let totalsell = (totalbatch / conversion);
+            $('#qty_sell').val(formatRupiahIni(totalsell.toFixed(3).toString().replace('.',',')));
         }
     }
 
@@ -1133,8 +1147,64 @@
         }
     }
 
+    function getChildFg(){
+        if($('#production_order_detail_id').val() && $('#pallet_id').val() && $('#grade_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_child_fg',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    pod_id: $('#production_order_detail_id').val(),
+                    pallet_id: $('#pallet_id').val(),
+                    grade_id: $('#grade_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+
+                    if(response.status == 500){
+                        swal({
+                            title: 'Ups!',
+                            text: response.message,
+                            icon: 'warning'
+                        });
+                        if(response.errors){
+                            $.each(response.errors, function(i, val) {
+                                M.toast({
+                                    html: val
+                                });
+                            });
+                        }
+                    }else{
+                        $('#item_name_child').val(response.name);
+                        $('#qty-unit-sell').text(response.unit);
+                        $('#qty_sell').data('conversion',response.conversion);
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            $('#item_name_child').val('');
+            $('#qty-unit-sell').text('-');
+            $('#qty_sell').data('conversion','0');
+        }
+    }
+
     function generateBarcode(){
-        if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#post_date').val()){
+        if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#shading').val() && $('#post_date').val()){
             let arrNo = [];
             $('input[name^="arr_pallet_no[]"]').each(function(index){
                 arrNo.push($(this).val());
@@ -1231,7 +1301,6 @@
                                         <input type="hidden" name="arr_code_head_ref[]" value="` + count + `">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
-                                        <input type="hidden" name="arr_group[]" value="` + $('#group').val() + `">
                                         <input type="hidden" name="arr_pallet_id[]" value="` + $('#pallet_id').val() + `">
                                         <input type="hidden" name="arr_grade_id[]" value="` + $('#grade_id').val() + `">
                                         <td class="center-align">
@@ -1247,10 +1316,10 @@
                                             ` + val.item_name + `
                                         </td>
                                         <td>
-                                            <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="-">
+                                            <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + $('#shading').val() + `" readonly>
                                         </td>
                                         <td class="right-align">
-                                            <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
+                                            <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + $('#qty_sell').val() + `" readonly>
                                         </td>
                                         <td class="center-align">
                                             ` + val.sell_unit + `
@@ -1263,15 +1332,6 @@
                                         </td>
                                         <td class="center-align">
                                             ` + val.uom_unit + `
-                                        </td>
-                                        <td class="right-align">
-                                            <input name="arr_qty_used[]" id="arr_qty_used` + count + `" type="text" value="` + val.qty_used + `" readonly>
-                                        </td>
-                                        <td class="right-align">
-                                            <input name="arr_qty_balance[]" id="arr_qty_balance` + count + `" type="text" value="` + val.qty_balance + `" readonly>
-                                        </td>
-                                        <td class="center-align" id="list-bom-` + count + `">
-                                            ` + material + `
                                         </td>
                                         <td class="center-align">
                                             ` + val.plant + `
@@ -1293,10 +1353,12 @@
                             $('.modal-content').scrollTop($("#body-item").offset().top);
                         }
 
-                        $('#group').val('');
                         $('#pallet_id').empty(); 
                         $('#grade_id').empty();
-                        $('#qty').val('0,000');
+                        $('#qty,#qty_sell').val('0,000');
+                        $('#shading').val('-');
+                        $('#item_name_child').val('');
+                        $('#qty_sell').data('conversion','0');
                     }
                 },
                 error: function() {
@@ -1560,18 +1622,12 @@
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'production_order_detail_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_issue_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'line_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'shift_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'pallet_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'shading', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'grade_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'qty', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'uom_unit', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'qty_convert', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'item_unit_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1653,7 +1709,7 @@
                 
                 var formData = new FormData($('#form_data')[0]);
 
-                let passedInput = true ;
+                let passedInput = true, passedQty = true, totalBatch = 0, totalUsed = 0;
 
                 $('select[name^="arr_production_batch_id[]"]').each(function(index){
                     if(!$(this).val()){
@@ -1662,11 +1718,29 @@
                     if(parseFloat($('input[name^="arr_qty_batch[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0 || !$('input[name^="arr_qty_batch[]"]').eq(index).val()){
                         passedInput = false;
                     }
+                    /* totalBatch += parseFloat($('input[name^="arr_qty_batch[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")); */
                 });
+
+                /* $('input[name^="arr_qty_uom[]"]').each(function(index){
+                    totalUsed += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                });
+
+                if(totalBatch !== totalUsed){
+                    passedQty = false;
+                } */
 
                 if($('.row_item').length == 0){
                     passedInput = false;
                 }
+
+                /* if(!passedQty){
+                    swal({
+                        title: 'Ups! Maaf.',
+                        text: 'Total batch dan terpakai tidak sama.',
+                        icon: 'error'
+                    });
+                    return false;
+                } */
 
                 if(!passedInput){
                     swal({

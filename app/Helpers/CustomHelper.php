@@ -4280,8 +4280,10 @@ class CustomHelper {
 		}elseif($table_name == 'production_fg_receives'){
 
 			$pir = ProductionFgReceive::find($table_id);
+
+			$pir->createProductionIssue();
 			
-			$query = Journal::create([
+			/* $query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -4296,28 +4298,28 @@ class CustomHelper {
 
 			$total = 0;
 
-			foreach($pir->productionFgReceiveDetail as $row){
+			foreach($pir->productionBatchUsage as $row){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->item->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'line_id'		=> $row->productionReceive->line_id,
-					'item_id'		=> $row->item_id,
-					'warehouse_id'	=> $row->warehouse_id,
+					'coa_id'		=> $row->productionBatch->item->itemGroup->coa_id,
+					'place_id'		=> $pir->place_id,
+					'line_id'		=> $pir->line_id,
+					'item_id'		=> $row->productionBatch->item_id,
+					'warehouse_id'	=> $row->productionBatch->item->warehouse(),
 					'type'			=> '2',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> $row->total,
+					'nominal'		=> $row->total_batch,
+					'nominal_fc'	=> $row->total_batch,
 					'note'			=> $pir->code,
 				]);
 
 				self::sendCogs($table_name,
 					$pir->id,
 					$pir->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
+					$pir->place_id,
+					$row->productionBatch->item->warehouse(),
+					$row->productionBatch->item_id,
 					$row->qty,
-					$row->total,
+					$row->total_batch,
 					'OUT',
 					$pir->post_date,
 					NULL,
@@ -4349,7 +4351,7 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
-			]);
+			]); */
 
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);

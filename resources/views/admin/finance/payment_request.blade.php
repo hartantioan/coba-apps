@@ -2080,6 +2080,7 @@
                                         }else{
                                             $('#pay_date').val(val.raw_due_date);
                                         }
+                                        alert(val.raw_due_date);
                                     }
                                 });
                                 

@@ -3071,8 +3071,8 @@
 
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowbobot = rownominal / subtotal;
-            rowdiscount = discount * Math.round(rowbobot);
+            rowbobot = (rownominal / subtotal).toFixed(2);
+            rowdiscount = discount * rowbobot;
             rownominal -= rowdiscount;
 
             if($('select[name^="arr_tax"]').eq(index).val() !== '0'){

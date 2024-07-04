@@ -22,6 +22,7 @@ use App\Models\ProductionBatchUsage;
 use App\Models\ProductionFgReceive;
 use App\Models\productionFgReceiveDetail;
 use App\Models\ProductionFgReceiveMaterial;
+use App\Models\ProductionHandover;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
@@ -68,163 +69,9 @@ class ProductionHandoverController extends Controller
     }
 
     public function getCode(Request $request){
-        $code = ProductionReceive::generateCode($request->val);
+        $code = ProductionHandover::generateCode($request->val);
         				
 		return response()->json($code);
-    }
-
-    public function getPalletBarcode(Request $request){
-
-        $plant = Place::find($request->place_id);
-        $line = Line::find($request->line_id);
-        $pod = ProductionOrderDetail::find($request->pod_id);
-        $shift = Shift::find($request->shift_id);
-        $group = strtoupper($request->group);
-        $pallet = Pallet::find($request->pallet_id);
-        $grade = Grade::find($request->grade_id);
-        $qty = str_replace(',','.',str_replace('.','',$request->qty));
-        $date = $request->date;
-
-        $itemChild = Item::whereHas('parentFg',function($query)use($pod){
-            $query->where('parent_id',$pod->productionScheduleDetail->item_id);
-        })
-        ->where('pallet_id',$pallet->id)
-        ->where('grade_id',$grade->id)
-        ->where('status','1')
-        ->first();
-
-        if($itemChild){
-            if($itemChild->bom()->exists()){
-                $bomAlternative = BomAlternative::whereHas('bom',function($query)use($itemChild){
-                    $query->where('item_id',$itemChild->id)->orderByDesc('created_at');
-                })->whereNotNull('is_default')->first();
-                
-                if($bomAlternative){
-                    $bobot = round($qty / $bomAlternative->bom->qty_output,3);
-                    $arrStockError = [];
-                    foreach($bomAlternative->bomDetail()->where('lookable_type','items')->get() as $row){
-                        $stock = $row->lookable->getStockPlace($plant->id);
-                        if($stock <= 0){
-                            $arrStockError[] = 'Item '.$row->lookable->code.' - '.$row->lookable->name.'. Qty dibutuhkan : '.CustomHelper::formatConditionalQty(round($row->qty * $bobot,3)).'. Qty stock : '.CustomHelper::formatConditionalQty($stock).'.';
-                        }
-                    }
-
-                    if(count($arrStockError) == 0){
-
-                        $sellConvert = $itemChild->sellConversion();
-
-                        $result = [];
-                        $prefix = $pallet->prefix_code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
-                        $latestCode = ProductionBatch::getLatestCodeFg($prefix);
-                        $oldprefix = 0;
-                        if($request->listno){
-                            foreach($request->listno as $row){
-                                if(substr($row,0,17) == $prefix){
-                                    $oldprefix = intval(substr($row,(strlen($row)-5),5));
-                                }
-                            }
-                        }
-                        if($oldprefix > 0){
-                            $startNumber = $oldprefix + 1;
-                        }else{
-                            $startNumber = intval(substr($latestCode,(strlen($latestCode)-5),5));
-                        }
-                        $qtyRow = floor($qty / $sellConvert);
-                        $qtyUsed = $qtyRow * $sellConvert;
-                        $qtyBalance = $qty - $qtyUsed;
-                        $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
-                        $code = $prefix.$no;
-
-                        $listBom = [];
-
-                        foreach($bomAlternative->bomDetail as $row){
-                            $bobotbom = $row->qty / $row->bom->qty_output;
-                            $qtyneeded = round($qty * $bobotbom,2);
-                            $listBom[] = [
-                                'item_ref_id'   => $itemChild->id,
-                                'bom_detail_id' => $row->id,
-                                'name'          => $row->lookable->code.' - '.$row->lookable->name,
-                                'qty'           => CustomHelper::formatConditionalQty($qtyneeded),
-                                'qty_parent'    => CustomHelper::formatConditionalQty($row->bom->qty_output),
-                                'unit'          => $row->lookable->uomUnit->code,
-                                'list_stocks'   => $row->lookable_type == 'items' ? $row->lookable->currentStockPerPlace($plant->id) : [],
-                            ];
-                        }
-
-                        $result[] = [
-                            'item_id'       => $itemChild->id,
-                            'item_code'     => $itemChild->code,
-                            'item_name'     => $itemChild->name,
-                            'item_unit_id'  => $itemChild->itemUnitSellId(),
-                            'code'          => $code,
-                            'qty_convert'   => CustomHelper::formatConditionalQty($sellConvert),
-                            'qty_sell'      => CustomHelper::formatConditionalQty($qtyRow),
-                            'qty_uom'       => CustomHelper::formatConditionalQty($qty),
-                            'sell_unit'     => $itemChild->sellUnit(),
-                            'uom_unit'      => $itemChild->uomUnit->code,
-                            'plant'         => $plant->code,
-                            'shift'         => $shift->code,
-                            'group'         => $group,
-                            'list_materials'=> $listBom
-                        ];
-
-                        return response()->json($result);
-                    }else{
-                        return response()->json([
-                            'status'    => 500,
-                            'message'   => 'Bom alternatif '.$bomAlternative->name.' terdapat stock kurang dari kebutuhan.',
-                            'errors'    => $arrStockError,
-                        ]);
-                    }
-                    
-                }else{
-                    return response()->json([
-                        'status'    => 500,
-                        'message'   => 'Bom alternatif tidak ditemukan pada item '.$itemChild->code.' - '.$itemChild->name.'.'
-                    ]);
-                }
-                
-            }else{
-                return response()->json([
-                    'status'    => 500,
-                    'message'   => 'Bom tidak ditemukan pada item '.$itemChild->code.' - '.$itemChild->name.'.'
-                ]);
-            }
-        }else{
-            return response()->json([
-                'status'    => 500,
-                'message'   => 'Data item child dengan palet dan grade terpilih tidak ditemukan.'
-            ]);
-        }
-    }
-
-    public function getChildFg(Request $request){
-
-        $pod = ProductionOrderDetail::find($request->pod_id);
-        $pallet = Pallet::find($request->pallet_id);
-        $grade = Grade::find($request->grade_id);
-
-        $itemChild = Item::whereHas('parentFg',function($query)use($pod){
-            $query->where('parent_id',$pod->productionScheduleDetail->item_id);
-        })
-        ->where('pallet_id',$pallet->id)
-        ->where('grade_id',$grade->id)
-        ->where('status','1')
-        ->first();
-
-        if($itemChild){
-            return response()->json([
-                'status'    => 200,
-                'name'      => $itemChild->code.' - '.$itemChild->name,
-                'conversion'=> CustomHelper::formatConditionalQty($itemChild->sellConversion()),
-                'unit'      => $itemChild->sellUnit(),
-            ]);
-        }else{
-            return response()->json([
-                'status'    => 500,
-                'message'   => 'Data item child dengan palet dan grade terpilih tidak ditemukan.'
-            ]);
-        }
     }
 
     public function datatable(Request $request){
@@ -243,9 +90,9 @@ class ProductionHandoverController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ProductionFgReceive::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
+        $total_data = ProductionHandover::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
         
-        $query_data = ProductionFgReceive::where(function($query) use ($search, $request) {
+        $query_data = ProductionHandover::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -277,7 +124,7 @@ class ProductionHandoverController extends Controller
             ->orderBy($order, $dir)
             ->get();
 
-        $total_filtered = ProductionFgReceive::where(function($query) use ($search, $request) {
+        $total_filtered = ProductionHandover::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
@@ -321,13 +168,7 @@ class ProductionHandoverController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
-                    $val->productionOrderDetail->productionOrder->code,
-                    $val->productionIssue()->exists() ? $val->productionIssue->code : '-',
-                    $val->item->code.' - '.$val->item->name,
-                    $val->place->code,
-                    $val->line->code,
-                    $val->shift->code.' - '.$val->shift->name,
-                    $val->group,
+                    $val->productionFgReceive->code,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -346,7 +187,6 @@ class ProductionHandoverController extends Controller
                         )
                     ),
                     '
-                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Barcode" onclick="barcode(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">style</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>

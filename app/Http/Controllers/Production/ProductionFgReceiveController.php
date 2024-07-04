@@ -874,7 +874,7 @@ class ProductionFgReceiveController extends Controller
         $pr = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,300,150.),'portrait','admin.print.production.receive_fg_barcode');
+            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,300,200),'portrait','admin.print.production.receive_fg_barcode');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(0, 0, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             

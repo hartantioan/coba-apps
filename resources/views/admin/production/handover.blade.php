@@ -119,13 +119,13 @@
                                     <div class="row mt-2">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                        </div> 
+                                        <div class="col s12">
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-1" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
-                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
                                                 <span class="hide-on-small-onl">Export</span>
                                                 <i class="material-icons right">view_headline</i>
                                             </a>
@@ -138,15 +138,7 @@
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
                                                         <th>{{ __('translations.note') }}</th>
-                                                        <th>No.PROD</th>
-                                                        <th>No.Jadwal</th>
-                                                        <th>Shift</th>
-                                                        <th>Waktu Mulai Produksi</th>
-                                                        <th>Waktu Selesai Produksi</th>
-                                                        <th>{{ __('translations.line') }}</th>
-                                                        <th>Group</th>
-                                                        <th>{{ __('translations.plant') }}</th>
-                                                        <th>{{ __('translations.engine') }}</th>
+                                                        <th>No.Receive FG</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -203,33 +195,9 @@
                                         </select>
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="place_id" name="place_id">
-                                            @foreach ($place as $row)
-                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="place_id">{{ __('translations.plant') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="shift_id" name="shift_id" onchange="unlockProductionOrder();"></select>
-                                        <label class="active" for="shift_id">Shift</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="group" name="group" type="text" placeholder="Grup" onkeyup="unlockProductionOrder();">
-                                        <label class="active" for="group">Grup</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                         <label class="active" for="post_date">Tgl. Post</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="start_process_time" name="start_process_time" type="datetime-local" placeholder="Tgl. Mulai Produksi">
-                                        <label class="active" for="start_process_time">Tgl. Mulai Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="end_process_time" name="end_process_time" type="datetime-local" placeholder="Tgl. Selesai Produksi">
-                                        <label class="active" for="end_process_time">Tgl. Selesai Produksi</label>
                                     </div>
                                     <div class="file-field input-field col m3 s12 step5">
                                         <div class="btn">
@@ -244,63 +212,27 @@
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>2. Order Produksi</legend>
-                                    <div class="input-field col m4 s12 step6 disable-class">
-                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getProductionOrder();" tabindex="-1"></select>
-                                        <label class="active" for="production_order_detail_id">Daftar Order Produksi (Pilih Shift & Grup)</label>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id" onchange="getProductionFgReceive();"></select>
+                                        <label class="active" for="production_fg_receive_id">Daftar Receive FG</label>
                                     </div>
-                                    <div class="col m12">
-                                        <div class="row">
-                                            <div class="col m4 s12">
-                                                Line : <b id="output-line">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Target Item SFG/FG : <b id="output-fg">-</b>
-                                            </div>
-                                            <div class="col m4 s12">
-                                                Qty : <b id="output-qty">-</b>
-                                            </div>
-                                        </div>
+                                    <div class="col m6 s12">
+                                        <h6><b>Receive FG Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <fieldset style="min-width: 100%;">
-                                    <legend>3. Detail Issue Production Order</legend>
-                                    <div class="col m12 s12">
-                                        <div class="col s12" style="overflow:auto;min-width:100%;">
-                                            <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:500px !important;" id="table-detail-item">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="center">No.</th>
-                                                            <th class="center">No. Production Issue</th>
-                                                            <th class="center">Hapus</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody id="body-issue">
-                                                        <tr id="last-row-issue">
-                                                            <td class="center-align" colspan="3">
-                                                                Silahkan tambah dengan tombol dibawah
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                    <tfoot>
-                                                        <td colspan="3" class="center-align">
-                                                            <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addIssue();" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Issue</a>
-                                                        </td>
-                                                    </tfoot>
-                                                </table>
-                                            </p>
-                                        </div>
+                                <fieldset>
+                                    <legend>2. Opsi Palet/Curah</legend>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id"></select>
+                                        <label class="active" for="production_fg_receive_detail_id">Item Receive FG</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="area_id" name="area_id"></select>
+                                        <label class="active" for="area_id">Area</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -308,51 +240,46 @@
                         <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>4. Detail Item Receive</legend>
+                                    <legend>3. Detail Item Receive FG & Palet</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
-                                                <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
+                                                <p>Info : Nomor palet yang muncul adalah generate dari hasil kombinasi Shift, Group, dan Palet.</p>
                                             </div>
                                         </div>
-                                        <div class="card-alert card gradient-45deg-purple-amber">
-                                            <div class="card-content white-text">
-                                                <p>Info : Production Receive tipe item FG, tidak akan menjurnal dan membuat stok.</p>
+                                        <div class="card-alert card gradient-45deg-teal-cyan">
+                                            <div class="card-content">
+                                                <p>Info : Production Receive FG akan menerbitkan Production Issue secara otomatis dari BOM item FG Child.</p>
                                             </div>
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:2500px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
-                                                            <th class="center">No.</th>
-                                                            <th class="center">{{ __('translations.item') }}</th>
-                                                            <th class="center" width="150px">Qty Planned</th>
-                                                            <th class="center" width="150px">Qty Real</th>
-                                                            <th class="center" width="150px">Qty Reject (Jika ada)</th>
-                                                            <th class="center" width="300px">Satuan Produksi</th>
-                                                            <th class="center">Plant</th>
-                                                            <th class="center">Gudang</th>
-                                                            <th class="center" width="400px">Batch (*Nomor Sementara)</th>
-                                                            <th class="center">Hapus</th>
+                                                            <th class="center" width="25px">No.</th>
+                                                            <th class="center" width="250px">No.Batch Palet/Curah</th>
+                                                            <th class="center" width="150px">Kode Item</th>
+                                                            <th class="center" width="150px">Nama Item</th>
+                                                            <th class="center" width="100px">{{ __('translations.shading') }}</th>
+                                                            <th class="center" width="100px">Qty Diterima</th>
+                                                            <th class="center" width="100px">Satuan</th>
+                                                            <th class="center" width="100px">Konversi</th>
+                                                            <th class="center" width="100px">Qty Produksi</th>
+                                                            <th class="center" width="100px">Satuan</th>
+                                                            <th class="center" width="100px">{{ __('translations.plant') }}</th>
+                                                            <th class="center" width="100px">Shift</th>
+                                                            <th class="center" width="100px">Group</th>
+                                                            <th class="center" width="100px">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="10">
+                                                            <td class="center-align" colspan="14">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
-                                                    {{-- <tfoot>
-                                                        <tr>
-                                                            <th colspan="10">
-                                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
-                                                                    <i class="material-icons left">add</i> Tambah Reject
-                                                                </a>
-                                                            </th>
-                                                        </tr>
-                                                    </tfoot> --}}
                                                 </table>
                                             </p>
                                         </div>
@@ -722,8 +649,7 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#output-line,#output-fg,#output-qty').text('-');
-                $('#production_order_detail_id,#shift_id').empty();
+                $('#production_fg_receive_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td class="center-align" colspan="10">
@@ -731,8 +657,6 @@
                         </td>
                     </tr>
                 `);
-                $('.disable-class').css('pointer-events','none');
-                $('#production_order_detail_id').attr('tabindex','-1');
                 $('#body-issue').empty().append(`
                     <tr id="last-row-issue">
                         <td class="center-align" colspan="3">
@@ -743,35 +667,7 @@
             }
         });
         
-        $('#production_order_detail_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/production_order_detail_receive") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        place_id: $('#place_id').val(),
-                        line_id: $('#line_id').val(),
-                        group: $('#group').val(),
-                        shift_id: $('#shift_id').val(),
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            }
-        });
-
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#production_fg_receive_id', '{{ url("admin/select2/production_fg_receive") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
             let id = $(this).data('id');
@@ -783,16 +679,6 @@
             $(this).closest('tr').remove();
         });
     });
-
-    function unlockProductionOrder(){
-        if($('#shift_id').val() && $('#group').val()){
-            $('.disable-class').css('pointer-events','auto');
-            $('#production_order_detail_id').attr('tabindex','0');
-        }else{
-            $('.disable-class').css('pointer-events','none');
-            $('#production_order_detail_id').attr('tabindex','-1');
-        }
-    }
 
     function addLine(){
         if($('#production_order_detail_id').val()){
@@ -1438,15 +1324,7 @@
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'production_order_detail_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'shift', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'start_process_time', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'end_process_time', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'line', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'group', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'machine_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'production_fg_receive_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

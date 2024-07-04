@@ -75,6 +75,7 @@ use App\Models\Journal;
 use App\Models\Pallet;
 use App\Models\Pattern;
 use App\Models\ProductionBatch;
+use App\Models\ProductionFgReceive;
 use App\Models\ProductionIssue;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
@@ -3427,6 +3428,33 @@ class Select2Controller extends Controller {
                 'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code,
                 'table'         => $d->getTable(),
                 'code'          => $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionFgReceive(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionFgReceive::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhere('note', 'like', "%$search%");
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2'])
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Line : '.$d->line->code.' - '.$d->item->code.' - '.$d->item->name,
             ];
         }
 

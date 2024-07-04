@@ -106,7 +106,7 @@ class HomeController extends Controller
         if($user){
             return response()->json(['status' => 'success','status_user' => $user->statusRaw()], 200);
         }else{
-            return response()->json(['status' => 'failed'], 401);
+            return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
         }
     }
 

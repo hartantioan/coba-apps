@@ -120,7 +120,6 @@ class HomeController extends Controller
                 ]);
                 activity()
                     ->performedOn(new User())
-                    ->withProperties($user)
                     ->log('Add / edit user via api update status.');
                 return response()->json(['status' => 'success'], 200);
             }else{

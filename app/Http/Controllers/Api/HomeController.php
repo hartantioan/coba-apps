@@ -120,7 +120,7 @@ class HomeController extends Controller
                 ]);
                 return response()->json(['status' => 'success'], 200);
             }else{
-                return response()->json(['status' => 'accepted value status 1 or 2'], 500);
+                return response()->json(['status' => 'accepted value status 1 (active) or 2 (inactive)'], 500);
             }
         }else{
             return response()->json(['status' => 'failed'], 401);

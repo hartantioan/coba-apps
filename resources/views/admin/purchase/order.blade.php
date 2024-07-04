@@ -3070,7 +3070,7 @@
 		});
 
         $('.arr_subtotal').each(function(index){
-            let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
+            let rownominal = parseFloat($('.arr_subtotal').eq(index).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
             rowbobot = Math.round(((rownominal / subtotal) * 100) / 100);
             console.log(rowbobot);
             rowdiscount = discount * rowbobot;

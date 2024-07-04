@@ -24,3 +24,5 @@ Route::get('users', [HomeController::class, 'index'])->middleware('auth:api');
 Route::post('update_weight',[HomeController::class, 'updateWeight']);
 Route::post('update_attendance',[HomeController::class, 'updateAttendance']);
 Route::get('get_attendance', [HomeController::class, 'getAttendance']);
+Route::post('get_status_user', [HomeController::class, 'getStatusUser']);
+Route::post('update_status_user', [HomeController::class, 'UpdateStatusUser']);

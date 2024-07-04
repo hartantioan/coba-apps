@@ -123,7 +123,7 @@ class HomeController extends Controller
                 return response()->json(['status' => 'accepted value status 1 (active) or 2 (inactive)'], 500);
             }
         }else{
-            return response()->json(['status' => 'failed'], 401);
+            return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
         }
     }
 }

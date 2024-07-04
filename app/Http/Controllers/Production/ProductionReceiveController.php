@@ -775,15 +775,16 @@ class ProductionReceiveController extends Controller
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
-                    foreach($query->productionReceiveDetail as $row){
-                        if($row->productionBatch()->exists()){
-                            $row->productionBatch()->delete();
-                        }
-                    }
                     foreach($query->productionReceiveIssue as $row){
                         $row->productionIssue->update([
                             'status'	=> '2'
                         ]);
+                    }
+                }
+
+                foreach($query->productionReceiveDetail as $row){
+                    if($row->productionBatch()->exists()){
+                        $row->productionBatch()->delete();
                     }
                 }
 

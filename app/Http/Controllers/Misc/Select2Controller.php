@@ -78,6 +78,7 @@ use App\Models\ProductionBatch;
 use App\Models\ProductionIssue;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
+use App\Models\ProductionReceiveDetail;
 use App\Models\Resource;
 use App\Models\Size;
 use App\Models\Type;
@@ -4404,7 +4405,7 @@ class Select2Controller extends Controller {
                 ->where(function($query)use($request,$po_id){
                     if($request->pod_id){
                         $query->where('lookable_type','production_receive_details')
-                            ->whereHas('lookable',function($query)use($po_id){
+                            ->whereHasMorph('lookable',[ProductionReceiveDetail::class],function($query)use($po_id){
                                 $query->whereHas('productionReceive',function($query)use($po_id){
                                     $query->whereHas('productionOrderDetail',function($query)use($po_id){
                                         $query->where('production_order_id',$po_id);

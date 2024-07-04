@@ -29,6 +29,7 @@ class ProductionFgReceive extends Model
         'item_unit_id',
         'qty',
         'post_date',
+        'qty_reject',
         'document',
         'note',
         'status',

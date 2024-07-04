@@ -503,9 +503,15 @@ class ProductionFgReceiveController extends Controller
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
+                        $query->qty_reject = 0;
                         $query->status = '1';
 
                         $query->save();
+
+                        foreach($query->productionBatchUsage as $rowdetail){
+                            CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                            $rowdetail->delete();
+                        }
                         
                         foreach($query->productionFgReceiveDetail as $row){
                             if($row->productionBatch()->exists()){
@@ -545,6 +551,7 @@ class ProductionFgReceiveController extends Controller
                     
                     $totalCost = 0;
                     $totalQty = 0;
+                    $totalBatch = 0;
                     foreach($request->arr_qty_uom as $key => $row){
                         $totalQty += str_replace(',','.',str_replace('.','',$row));
                     }
@@ -560,8 +567,11 @@ class ProductionFgReceiveController extends Controller
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),
                             ]);
                             CustomHelper::updateProductionBatch($pb->id,str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),'OUT');
+                            $totalBatch += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
                         }
                     }
+
+                    $qtyReject = $totalBatch - $totalQty;
                     
                     foreach($request->arr_qty_uom as $key => $row){
                         $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
@@ -613,6 +623,13 @@ class ProductionFgReceiveController extends Controller
                             'total'         => $pfrd->total,
                         ]);
                     }
+
+                    if($qtyReject > 0){
+                        $updateReject = ProductionFgReceive::find($query->id);
+                        $updateReject->update([
+                            'qty_reject'    => $qtyReject,
+                        ]);
+                    }
                     
                     CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive FG No. '.$query->code);
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Receive FG No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
@@ -646,32 +663,51 @@ class ProductionFgReceiveController extends Controller
     public function show(Request $request){
         $detail_receive = [];
 
-        $po = ProductionReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
 
-        foreach($po->productionReceiveDetail()->orderBy('id')->get() as $key => $row){
-            $detail_receive[] = [
-                'id'                    => $row->production_order_id,
-                'bom_id'                => $row->bom_id ?? '',
-                'item_id'               => $row->item_id,
-                'item_name'             => $row->item->code.' - '.$row->item->name,
-                'unit'                  => $row->item->uomUnit->code,
-                'qty_planned'           => CustomHelper::formatConditionalQty($row->qty_planned),
+        $detail_batch = [];
+
+        foreach($po->productionBatchUsage as $row){
+            $detail_batch[] = [
+                'production_batch_id'   => $row->production_batch_id,
+                'production_batch_info' => $row->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($row->productionBatch->qty_real).' '.$row->productionBatch->item->uomUnit->code.' - Tangki : '.($row->productionBatch->tank()->exists() ? $row->productionBatch->tank->code : '-').' - Item : '.$row->productionBatch->lookable->item->code.' - '.$row->productionBatch->lookable->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'qty_reject'            => CustomHelper::formatConditionalQty($row->qty_reject),
-                'place_id'              => $row->place_id,
-                'warehouse_id'          => $row->warehouse_id,
-                'tank_id'               => $row->tank_id ?? '',
-                'batch_no'              => $row->batch_no,
-                'list_warehouse'        => $row->item->warehouseList(),
-                'is_powder'             => $row->is_powder ?? '0',
+                'qty_max'               => CustomHelper::formatConditionalQty($row->productionBatch->qty + $row->qty),
+                'unit'                  => $row->productionBatch->item->uomUnit->code,
+            ];
+        }
+
+        foreach($po->productionFgReceiveDetail()->orderBy('id')->get() as $key => $row){
+            $detail_receive[] = [
+                'item_id'               => $row->item_id,
+                'item_code'             => $row->item->code,
+                'item_name'             => $row->item->name,
+                'unit'                  => $row->item->uomUnit->code,
+                'item_unit_id'          => $row->item_unit_id,
+                'sell_unit'             => $row->itemUnit->unit->code,
+                'code'                  => $row->pallet_no,
+                'pallet_id'             => $row->pallet_id,
+                'pallet_code'           => $row->pallet->code,
+                'grade_id'              => $row->grade_id,
+                'grade_code'            => $row->grade->code,
+                'shading'               => $row->shading,
+                'qty_sell'              => CustomHelper::formatConditionalQty($row->qty_sell),
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'conversion'            => CustomHelper::formatConditionalQty($row->conversion),
+                'place'                 => $row->productionFgReceive->place->code,
+                'shift'                 => $row->productionFgReceive->shift->code,
+                'group'                 => $row->productionFgReceive->group,
             ];
         }
 
         $po['code_place_id']                    = substr($po->code,7,2);
-        $po['production_order_code']            = $po->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrder->post_date)).' - Plant : '.$po->productionOrder->productionSchedule->place->code;
-        $po['table']                            = $po->productionOrder->getTable();
-        $po['po_code']                          = $po->productionOrder->code;
+        $po['item_parent_name']                 = $po->item->code.' - '.$po->item->name;
+        $po['unit']                             = $po->item->uomUnit->code;
+        $po['production_order_detail_code']     = $po->productionOrderDetail->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($po->productionOrderDetail->productionOrder->post_date)).' - Plant : '.$po->productionOrderDetail->productionScheduleDetail->productionSchedule->place->code;
+        $po['table']                            = $po->productionOrderDetail->getTable();
+        $po['po_code']                          = $po->productionOrderDetail->code;
         $po['details']                          = $detail_receive;
+        $po['batches']                          = $detail_batch;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         
 		return response()->json($po);
@@ -816,10 +852,10 @@ class ProductionFgReceiveController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Issue','a4','portrait','admin.print.production.receive_individual');
+            $pdf = PrintHelper::print($pr,'Production Receive FG','a4','portrait','admin.print.production.receive_fg_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
@@ -834,7 +870,7 @@ class ProductionFgReceiveController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -843,7 +879,7 @@ class ProductionFgReceiveController extends Controller
                     'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                 ]);
             }
-            foreach($query->productionReceiveDetail as $row){
+            foreach($query->productionFgReceiveDetail as $row){
                 if($row->productionBatch->productionBatchUsage()->exists()){
                     return response()->json([
                         'status'  => 500,
@@ -865,10 +901,17 @@ class ProductionFgReceiveController extends Controller
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
-                    foreach($query->productionReceiveDetail as $row){
-                        if($row->productionBatch()->exists()){
-                            $row->productionBatch()->delete();
-                        }
+                }
+
+                foreach($query->productionFgReceiveDetail as $row){
+                    if($row->productionBatch()->exists()){
+                        $row->productionBatch()->delete();
+                    }
+                }
+                if($query->productionBatchUsage()->exists()){
+                    foreach($query->productionBatchUsage as $rowdetail){
+                        CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                        $rowdetail->delete();
                     }
                 }
 
@@ -880,12 +923,12 @@ class ProductionFgReceiveController extends Controller
                 ]);
 
                 activity()
-                    ->performedOn(new ProductionReceive())
+                    ->performedOn(new ProductionFgReceive())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the production receive data');
+                    ->log('Void the production receive fg data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Production Receive No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Production Receive FG No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -904,7 +947,7 @@ class ProductionFgReceiveController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -944,19 +987,25 @@ class ProductionFgReceiveController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->productionReceiveDetail as $row){
+            foreach($query->productionFgReceiveDetail as $row){
                 if($row->productionBatch()->exists()){
                     $row->productionBatch()->delete();
+                }
+            }
+            if($query->productionBatchUsage()->exists()){
+                foreach($query->productionBatchUsage as $rowdetail){
+                    CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                    $rowdetail->delete();
                 }
             }
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new ProductionReceive())
+                ->performedOn(new ProductionFgReceive())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the production receive data');
+                ->log('Delete the production receive fg data');
 
             $response = [
                 'status'  => 200,

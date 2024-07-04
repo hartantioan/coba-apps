@@ -3071,7 +3071,7 @@
 
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowbobot = rownominal / subtotal;
+            rowbobot = Math.round(((rownominal / subtotal) * 100) / 100);
             rowdiscount = discount * rowbobot;
             rownominal -= rowdiscount;
 

@@ -595,7 +595,7 @@ class GoodReceiptPOController extends Controller
 
                     $rowprice = 0;
 
-                    $bobot = $pod->subtotal / $subtotal;
+                    $bobot = round($pod->subtotal / $subtotal,4);
                     $rowprice = round($pod->subtotal / $pod->qty,2);
 
                     $total = round(($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount),2);

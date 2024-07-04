@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Storage;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
-class ProductionFgReceiveController extends Controller
+class ProductionHandoverController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
@@ -53,11 +53,10 @@ class ProductionFgReceiveController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Receive FG',
-            'content'       => 'admin.production.receive_fg',
+            'title'         => 'Serah Terima',
+            'content'       => 'admin.production.handover',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
-            'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -858,25 +857,6 @@ class ProductionFgReceiveController extends Controller
             $pdf = PrintHelper::print($pr,'Production Receive FG','a4','portrait','admin.print.production.receive_fg_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
-            $content = $pdf->download()->getOriginalContent();
-            
-            $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
-    
-            return $document_po;
-        }else{
-            abort(404);
-        }
-    }
-
-    public function printBarcode(Request $request,$id){
-        
-        $pr = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
-                
-        if($pr){
-            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,300,150.),'portrait','admin.print.production.receive_fg_barcode');
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(0, 0, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             

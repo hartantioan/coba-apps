@@ -130,8 +130,6 @@ class NotificationController extends Controller
         $notifnew = count($notifs->where('status','1'));
         $version = ChangeLog::where('status','1')->orderByDesc('id')->first();
 
-        $user = User::find(session('bo_id'));
-
         $approvals = ApprovalMatrix::where('user_id',session('bo_id'))->where('status','1')->count();
         $unreadchat = Chat::where('to_user_id',session('bo_id'))->where('message_status','Not Send')->count();
 
@@ -155,7 +153,6 @@ class NotificationController extends Controller
             'link_list'         => $arrlink,
             'notif_count'       => $notifnew,
             'approval_count'    => $approvals,
-            'need_change_pass'  => $user->needChangePassword() ? '1' : '',
             'version'           => $version ? $version->version : '...',
             'unread_chats'      => $unreadchat > 0 ? 'Anda memiliki '.$unreadchat.' percakapan yang baru dan belum dibaca.' : '',
         ];

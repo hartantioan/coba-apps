@@ -197,6 +197,7 @@ use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\MasterData\TankController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
+use App\Http\Controllers\Production\ProductionHandoverController;
 use App\Http\Controllers\Production\ProductionIssueController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 
@@ -2150,6 +2151,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionFgReceiveController::class, 'done'])->middleware('operation.access:production_fg_receive,update');
                     Route::post('print_by_range',[ProductionFgReceiveController::class, 'printByRange']);
                     Route::get('export',[ProductionFgReceiveController::class, 'export']);
+                    Route::get('print_barcode/{id}',[ProductionFgReceiveController::class, 'printBarcode']);
                     Route::get('viewstructuretree',[ProductionFgReceiveController::class, 'viewStructureTree']);
                     Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [ProductionFgReceiveController::class, 'removeUsedData']);
@@ -2160,6 +2162,30 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionFgReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionFgReceiveController::class, 'voidStatus'])->middleware('operation.access:production_fg_receive,void');
                     Route::post('destroy', [ProductionFgReceiveController::class, 'destroy'])->middleware('operation.access:production_fg_receive,delete');
+                });
+
+                Route::prefix('production_handover')->middleware(['operation.access:production_handover,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionHandoverController::class, 'index']);
+                    Route::get('datatable',[ProductionHandoverController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionHandoverController::class, 'rowDetail']);
+                    Route::post('show', [ProductionHandoverController::class, 'show']);
+                    Route::post('get_code', [ProductionHandoverController::class, 'getCode']);
+                    Route::post('get_pallet_barcode', [ProductionHandoverController::class, 'getPalletBarcode']);
+                    Route::post('get_child_fg', [ProductionHandoverController::class, 'getChildFg']);
+                    Route::post('print',[ProductionHandoverController::class, 'print']);
+                    Route::post('done',[ProductionHandoverController::class, 'done'])->middleware('operation.access:production_handover,update');
+                    Route::post('print_by_range',[ProductionHandoverController::class, 'printByRange']);
+                    Route::get('export',[ProductionHandoverController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionHandoverController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionHandoverController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [ProductionHandoverController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionHandoverController::class, 'create'])->middleware('operation.access:production_handover,update');
+                    Route::post('send_used_data',[ProductionHandoverController::class, 'sendUsedData'])->middleware('operation.access:production_handover,update');
+                    Route::get('view_journal/{id}',[ProductionHandoverController::class, 'viewJournal'])->middleware('operation.access:production_handover,journal');
+                    Route::get('approval/{id}',[ProductionHandoverController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionHandoverController::class, 'voidStatus'])->middleware('operation.access:production_handover,void');
+                    Route::post('destroy', [ProductionHandoverController::class, 'destroy'])->middleware('operation.access:production_handover,delete');
                 });
             });
 

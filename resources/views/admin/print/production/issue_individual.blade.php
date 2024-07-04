@@ -274,7 +274,7 @@
                                             :
                                         </td>
                                         <td width="65%">
-                                            {{ $data->machine->name }}
+                                            {{ $data->machine()->exists() ? $data->machine->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>

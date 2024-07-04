@@ -227,12 +227,6 @@ function cekNotif(url){
 					});
 				}
 
-				if(response.need_change_pass){
-					M.toast({
-						html: 'Anda harus merubah password, karena sudah lebih dari 2 bulan.'
-					});
-				}
-
 				if(response.unread_chats){
 					M.toast({
 						html: response.unread_chats

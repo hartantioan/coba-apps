@@ -3071,9 +3071,9 @@
 
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowbobot = rownominal / subtotal;
+            rowbobot = roundTo((rownominal / subtotal),2);
             rowdiscount = discount * rowbobot;
-            rownominal -= rowdiscount.toFixed(2);
+            rownominal -= rowdiscount;
 
             if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
                 let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
@@ -3646,4 +3646,16 @@
     
         angka.value = sign == '-' ? sign + rupiah : rupiah;
     }
+
+    function roundTo(n, digits) {
+        if (digits === undefined) {
+            digits = 0;
+        }
+
+        var multiplicator = Math.pow(10, digits);
+        n = parseFloat((n * multiplicator).toFixed(11));
+        var test =(Math.round(n) / multiplicator);
+        return +(test.toFixed(digits));
+    }
+
 </script>

@@ -120,7 +120,10 @@ class HomeController extends Controller
                 ]);
                 activity()
                     ->performedOn(new User())
-                    ->withProperties($request)
+                    ->withProperties([
+                        'nik'       => $request->nik,
+                        'status'    => $request->status,
+                    ])
                     ->log('Add / edit user via api update status.');
                 return response()->json(['status' => 'success'], 200);
             }else{

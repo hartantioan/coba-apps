@@ -17,7 +17,11 @@
                 page-break-inside: avoid;
             }
 
-            @page { margin: 0.75em 0.75em 0.75em 0.75em; }
+            td {
+                font-weight: 700;
+            }
+
+            @page { margin: 1em 0.75em 0.5em 0.75em; }
         </style>
     </head>
     <body>
@@ -25,11 +29,15 @@
             @foreach($data->productionFgReceiveDetail as $key => $row)
             <tr class="{{ $key == (count($data->productionFgReceiveDetail) - 1) ? 'last-row' : 'break-row' }}">
                 <td align="center">
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;" height="30px" />
+                    {{-- <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;" height="25px" />
                     <div style="margin-top:-15px;">
                         <h3>{{ $row->pallet_no }}</h3>
+                    </div> --}}
+                    <div style="margin-top:-25px;">
+                        <h3>{{ $row->pallet_no }}</h3>
                     </div>
-                    <table border="0" style="font-size:10px;margin-top:-15px;" width="100%">
+                    <div align="center" style="font-size:9px;margin-top:-20px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
+                    <table border="0" width="100%">
                         <tr>
                             <td width="30%" align="center">
                                 <div>{{ date('d/m/Y',strtotime($data->post_date)) }}</div>
@@ -63,17 +71,16 @@
                                         <td>{{ 'SHADE : '.$row->shading }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ 'PALET : '.$row->pallet->name.' QTY : '.CustomHelper::formatConditionalQty($row->qty_sell).' '.$row->itemUnit->unit->code }}</td>
+                                        <td>{{ 'PALET : '.$row->pallet->name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>{{ 'QTY : '.CustomHelper::formatConditionalQty($row->qty_sell).' '.$row->itemUnit->unit->code }}</td>
                                     </tr>
                                 </table>
                             </td>
                         </tr>
                     </table>
-                    <div style="margin-top:-15px;">
-                        <h3>{{ $row->pallet_no }}</h3>
-                    </div>
-                    <div align="center" style="font-size:9px;margin-top:-20px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:5px;" height="30px" />
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:5px;" height="75px" />
                 </td>
             </tr>
             @endforeach

@@ -18,6 +18,7 @@ class ProductionFgReceiveDetail extends Model
     protected $fillable = [
         'production_fg_receive_id',
         'item_id',
+        'bom_id',
         'item_unit_id',
         'pallet_no',
         'shading',
@@ -49,6 +50,11 @@ class ProductionFgReceiveDetail extends Model
     public function pallet()
     {
         return $this->belongsTo('App\Models\Pallet', 'pallet_id', 'id')->withTrashed();
+    }
+
+    public function bom()
+    {
+        return $this->belongsTo('App\Models\Bom', 'bom_id', 'id')->withTrashed();
     }
 
     public function grade()

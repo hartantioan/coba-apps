@@ -576,6 +576,7 @@ class ProductionFgReceiveController extends Controller
                     foreach($request->arr_qty_uom as $key => $row){
                         $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
                         $rowtotalmaterial = 0;
+                        $bom_id = NULL;
 
                         $bomAlternative = BomAlternative::whereHas('bom',function($query)use($request,$key){
                             $query->where('item_id',$request->arr_item_id[$key])->orderByDesc('created_at');
@@ -593,6 +594,7 @@ class ProductionFgReceiveController extends Controller
                                     $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
                                 }
                             }
+                            $bom_id = $bomAlternative->bom_id;
                         }
 
                         $rowtotal = $rowtotalbatch + $rowtotalmaterial;
@@ -600,6 +602,7 @@ class ProductionFgReceiveController extends Controller
                         $pfrd = ProductionFgReceiveDetail::create([
                             'production_fg_receive_id'  => $query->id,
                             'item_id'                   => $request->arr_item_id[$key],
+                            'bom_id'                    => $bom_id ?? NULL,
                             'item_unit_id'              => $request->arr_item_unit_id[$key],
                             'pallet_no'                 => $request->arr_pallet_no[$key],
                             'shading'                   => $request->arr_shading[$key],
@@ -874,9 +877,7 @@ class ProductionFgReceiveController extends Controller
         $pr = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,300,200),'portrait','admin.print.production.receive_fg_barcode');
-            $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(0, 0, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
+            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,264.57,188.98),'portrait','admin.print.production.receive_fg_barcode');
             
             $content = $pdf->download()->getOriginalContent();
             

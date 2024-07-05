@@ -32,6 +32,7 @@ class ProductionIssueDetail extends Model
         'nominal_planned',
         'total_planned',
         'from_item_stock_id',
+        'is_wip',
     ];
 
     public function productionBatchUsage(){

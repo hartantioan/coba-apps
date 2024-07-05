@@ -4092,45 +4092,66 @@ class CustomHelper {
 			]);
 
 			$total = 0;
+			$parentFg = false;
+			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
+
+			foreach($pir->productionIssueDetail as $row){
+				if($row->lookable_type == 'items' && $row->is_wip){
+					$parentFg = true;
+				}
+			}
 
 			foreach($pir->productionIssueDetail as $row){
 				if($row->lookable_type == 'items'){
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->lookable->itemGroup->coa_id,
-						'place_id'		=> $row->itemStock->place_id,
-						'line_id'		=> $row->productionIssue->line_id,
-						'item_id'		=> $row->itemStock->item_id,
-						'warehouse_id'	=> $row->itemStock->warehouse_id,
-						'type'			=> '2',
-						'nominal'		=> $row->total,
-						'nominal_fc'	=> $row->total,
-						'note'			=> $pir->code,
-					]);
-	
-					self::sendCogs($table_name,
-						$pir->id,
-						$pir->company_id,
-						$row->itemStock->place_id,
-						$row->itemStock->warehouse_id,
-						$row->itemStock->item_id,
-						$row->qty,
-						$row->total,
-						'OUT',
-						$pir->post_date,
-						NULL,
-						NULL,
-					);
-	
-					self::sendStock(
-						$row->itemStock->place_id,
-						$row->itemStock->warehouse_id,
-						$row->itemStock->item_id,
-						$row->qty,
-						'OUT',
-						NULL,
-						NULL,
-					);
+					if($row->is_wip){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $coawip->id,
+							'place_id'		=> $row->itemStock->place_id,
+							'line_id'		=> $row->productionIssue->line_id,
+							'type'			=> '2',
+							'nominal'		=> $row->total,
+							'nominal_fc'	=> $row->total,
+							'note'			=> $pir->code,
+						]);
+					}else{
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->lookable->itemGroup->coa_id,
+							'place_id'		=> $row->itemStock->place_id,
+							'line_id'		=> $row->productionIssue->line_id,
+							'item_id'		=> $row->itemStock->item_id,
+							'warehouse_id'	=> $row->itemStock->warehouse_id,
+							'type'			=> '2',
+							'nominal'		=> $row->total,
+							'nominal_fc'	=> $row->total,
+							'note'			=> $pir->code,
+						]);
+		
+						self::sendCogs($table_name,
+							$pir->id,
+							$pir->company_id,
+							$row->itemStock->place_id,
+							$row->itemStock->warehouse_id,
+							$row->itemStock->item_id,
+							$row->qty,
+							$row->total,
+							'OUT',
+							$pir->post_date,
+							NULL,
+							NULL,
+						);
+		
+						self::sendStock(
+							$row->itemStock->place_id,
+							$row->itemStock->warehouse_id,
+							$row->itemStock->item_id,
+							$row->qty,
+							'OUT',
+							NULL,
+							NULL,
+						);
+					}
 				}elseif($row->lookable_type == 'resources'){
 					if($row->bomDetail()->exists()){
 						if($row->bomDetail->cost_distribution_id){
@@ -4176,11 +4197,9 @@ class CustomHelper {
 				$total += $row->total;
 			}
 
-			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
-
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
-				'coa_id'		=> $coawip->id,
+				'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id,
 				'line_id'		=> $pir->line_id,
 				'place_id'		=> $pir->place_id,
 				'machine_id'	=> $pir->machine_id,
@@ -4190,9 +4209,11 @@ class CustomHelper {
 				'note'			=> $pir->code,
 			]);
 
-			/* $pir->update([
-				'status'	=> '3'
-			]); */
+			if($parentFg){
+				$pir->update([
+					'status'	=> '3'
+				]);
+			}
 		}elseif($table_name == 'production_receives'){
 
 			$pir = ProductionReceive::find($table_id);
@@ -4280,10 +4301,8 @@ class CustomHelper {
 		}elseif($table_name == 'production_fg_receives'){
 
 			$pir = ProductionFgReceive::find($table_id);
-
-			$pir->createProductionIssue();
 			
-			/* $query = Journal::create([
+			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -4299,6 +4318,8 @@ class CustomHelper {
 			$total = 0;
 
 			foreach($pir->productionBatchUsage as $row){
+				$price = $row->productionBatch->price();
+				$rowtotal = round($price * $row->qty,2);
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $row->productionBatch->item->itemGroup->coa_id,
@@ -4307,8 +4328,8 @@ class CustomHelper {
 					'item_id'		=> $row->productionBatch->item_id,
 					'warehouse_id'	=> $row->productionBatch->item->warehouse(),
 					'type'			=> '2',
-					'nominal'		=> $row->total_batch,
-					'nominal_fc'	=> $row->total_batch,
+					'nominal'		=> $rowtotal,
+					'nominal_fc'	=> $rowtotal,
 					'note'			=> $pir->code,
 				]);
 
@@ -4319,7 +4340,7 @@ class CustomHelper {
 					$row->productionBatch->item->warehouse(),
 					$row->productionBatch->item_id,
 					$row->qty,
-					$row->total_batch,
+					$rowtotal,
 					'OUT',
 					$pir->post_date,
 					NULL,
@@ -4336,7 +4357,7 @@ class CustomHelper {
 					NULL,
 				);
 
-				$total += $row->total;
+				$total += $rowtotal;
 			}
 
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
@@ -4351,7 +4372,9 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
-			]); */
+			]);
+
+			$pir->createProductionIssue();
 
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);

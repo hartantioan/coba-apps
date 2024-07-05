@@ -1305,7 +1305,7 @@ class ProductionFgReceiveController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

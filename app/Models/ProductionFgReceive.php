@@ -288,6 +288,7 @@ class ProductionFgReceive extends Model
                 'nominal_planned'               => 0,
                 'total_planned'                 => 0,
                 'from_item_stock_id'            => $itemStock->id,
+                'is_wip'                        => '1',
             ]);
         }
 

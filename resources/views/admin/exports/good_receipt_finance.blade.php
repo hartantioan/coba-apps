@@ -13,10 +13,11 @@
             <th>Harga Satuan</th>
             <th>{{ __('translations.unit') }}</th>
             <th>{{ __('translations.total') }}</th>
+            <th>QTY BAYAR</th>
             <th>Total Bayar</th>
             <th>{{ __('translations.plant') }}</th>
-            <th>Nomor PO</th>
             <th>No. Dokumen</th>
+            <th>Nomor PO</th>
             <th>Based On</th>
             <th>Keterangan 1</th>
             <th>{{ __('translations.status') }}</th>
@@ -43,15 +44,16 @@
                 <td>{{ $row->delivery_no }}</td>
                 <td>{{ $rowdetail->item->name }}</td>
                 <td align="center">{{ $rowdetail->goodScale()->exists() ? $rowdetail->goodScale->qty_balance : '0' }}</td>
-                <td align="center">{{ CustomHelper::formatConditionalQty($rowdetail->water_content) }}</td>
+                <td align="center">{{ $rowdetail->water_content }}</td>
                 <td align="center">{{ $rowdetail->qty }}</td>
                 <td>{{$rowdetail->purchaseOrderDetail->price}}</td>
                 <td align="center">{{ $rowdetail->itemUnit->unit->code }}</td>
                 <td align="center">{{ $nominal ? round($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total,2) : '' }}</td>
                 <td></td>
+                <td></td>
                 <td align="center">{{ $rowdetail->place->code }}</td>
-                <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->code }}</td>
                 <td>{{ $row->code }}</td>
+                <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->code }}</td>
                 <td>{{ $rowdetail->goodScale->code ?? '-' }}</td>
                 <td>{{ $rowdetail->note }}</td>
                 <td>{!! $row->statusRaw() !!}</td>

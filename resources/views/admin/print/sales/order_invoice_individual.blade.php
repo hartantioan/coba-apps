@@ -213,16 +213,16 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>{{ __('translations.no') }}.</th>
-                                    <th>{{ __('translations.item') }}</th>
-                                    <th>NO.MOD</th>
-                                    <th>NO.SJ</th>
-                                    <th>{{ __('translations.qty') }}</th>
-                                    <th>{{ __('translations.unit') }}</th>
-                                    <th>{{ __('translations.price') }}</th>
-                                    <th>{{ __('translations.total') }}</th>
-                                    <th>{{ __('translations.tax') }}</th>
-                                    <th>{{ __('translations.grandtotal') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">NO.MOD</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">NO.SJ</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.price') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -351,12 +351,12 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>{{ __('translations.no') }}.</th>
-                                    <th>Dokumen</th>
-                                    <th>{{ __('translations.note') }}</th>
-                                    <th>{{ __('translations.total') }}</th>
-                                    <th>{{ __('translations.tax') }}</th>
-                                    <th>{{ __('translations.grandtotal') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dokumen</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

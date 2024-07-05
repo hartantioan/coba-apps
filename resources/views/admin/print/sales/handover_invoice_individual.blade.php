@@ -210,11 +210,11 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th align="center">{{ __('translations.no') }}.</th>
-                                    <th align="center">No.AR Invoice</th>
-                                    <th align="center">{{ __('translations.customer') }}</th>
-                                    <th align="center">Tgl.Post</th>
-                                    <th align="center">Tagihan</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.AR Invoice</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tagihan</th>
                                 </tr>
                             </thead>
                             <tbody>

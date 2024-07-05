@@ -135,13 +135,13 @@
                     <table border="1" width="100%" style="border-collapse: collapse;">
                         <thead>
                             <tr>
-                                <th width="5%">No</th>
+                                <th width="5%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}</th>
                                 <th width="20%">Kwitansi</th>
-                                <th width="20%">{{ __('translations.name') }}</th>
-                                <th width="10%">{{ __('translations.date') }}</th>
-                                <th width="15%">{{ __('translations.grandtotal') }}</th>
-                                <th width="10%">{{ __('translations.status') }}</th>
-                                <th width="20%">{{ __('translations.note') }}</th>
+                                <th width="20%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.name') }}</th>
+                                <th width="10%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.date') }}</th>
+                                <th width="15%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                <th width="10%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
+                                <th width="20%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -229,12 +229,12 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>{{ __('translations.no') }}.</th>
-                                    <th>Surat Jalan</th>
-                                    <th>{{ __('translations.item') }}</th>
-                                    <th>{{ __('translations.qty') }}</th>
-                                    <th>{{ __('translations.unit') }}</th>
-                                    <th>Tujuan</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Surat Jalan</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.destination') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

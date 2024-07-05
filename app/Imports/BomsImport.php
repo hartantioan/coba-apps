@@ -132,7 +132,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                     $total = $row['total'];
                     $cost_distribution_code = explode('#', $row['distribusi_biaya'])[0];
                     $cost_distribution = CostDistribution::where('code', $cost_distribution_code)->first();
-                    $cost_distribution_id = $cost_distribution->id;
+                    $cost_distribution_id = $cost_distribution ? $cost_distribution->id : NULL;
                 }
                 $method = explode('#', $row['metode'])[1];
          

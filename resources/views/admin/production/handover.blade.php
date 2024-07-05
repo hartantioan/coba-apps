@@ -213,7 +213,7 @@
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id" onchange="getProductionFgReceive();"></select>
+                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id"></select>
                                         <label class="active" for="production_fg_receive_id">Daftar Receive FG</label>
                                     </div>
                                     <div class="col m6 s12">
@@ -225,7 +225,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Opsi Palet/Curah</legend>
+                                    <legend>2. Detail Item dan Area</legend>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id"></select>
                                         <label class="active" for="production_fg_receive_detail_id">Item Receive FG</label>
@@ -233,6 +233,9 @@
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="area_id" name="area_id"></select>
                                         <label class="active" for="area_id">Area</label>
+                                    </div>
+                                    <div class="col m3 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="getItem();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                     </div>
                                 </fieldset>
                             </div>
@@ -668,6 +671,32 @@
         });
         
         select2ServerSide('#production_fg_receive_id', '{{ url("admin/select2/production_fg_receive") }}');
+        select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
+
+        $('#production_fg_receive_detail_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/production_fg_receive_detail") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        fgr_id: $('#production_fg_receive_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#body-item').on('click', '.delete-data-item', function() {
             let id = $(this).data('id');
@@ -888,7 +917,7 @@
         }
     }
 
-    function getProductionOrder(){
+    function getItem(){
         if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
                 let datakuy = $('#production_order_detail_id').select2('data')[0];

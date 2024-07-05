@@ -31,14 +31,9 @@
                     </div>
                     <table border="0" style="font-size:10px;margin-top:-15px;" width="100%">
                         <tr>
-                            <td width="35%">
-                                {{ date('d/m/Y',strtotime($data->post_date)) }}
+                            <td width="30%" align="center">
+                                <div>{{ date('d/m/Y',strtotime($data->post_date)) }}</div>
                                 <table border="0">
-                                    <tr>
-                                        <td>PLANT</td>
-                                        <td>:</td>
-                                        <td>{{ $data->place->code }}</td>
-                                    </tr>
                                     <tr>
                                         <td>LINE</td>
                                         <td>:</td>
@@ -56,7 +51,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="65%" align="center">
+                            <td width="70%" align="center">
                                 <table border="0">
                                     <tr>
                                         <td>{{ $row->item->code }}</td>
@@ -65,7 +60,7 @@
                                         <td>{{ $row->item->name }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ $row->grade->name.' SIZE : '.$row->item->size->name.' SHADE : '.$row->shading }}</td>
+                                        <td>{{ 'SHADE : '.$row->shading }}</td>
                                     </tr>
                                     <tr>
                                         <td>{{ 'PALET : '.$row->pallet->name.' QTY : '.CustomHelper::formatConditionalQty($row->qty_sell).' '.$row->itemUnit->unit->code }}</td>
@@ -77,7 +72,8 @@
                     <div style="margin-top:-15px;">
                         <h3>{{ $row->pallet_no }}</h3>
                     </div>
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:-15px;" height="30px" />
+                    <div align="center" style="font-size:9px;margin-top:-20px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:5px;" height="30px" />
                 </td>
             </tr>
             @endforeach

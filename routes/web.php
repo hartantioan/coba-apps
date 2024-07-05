@@ -391,6 +391,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('production_order_detail_receive', [Select2Controller::class, 'productionOrderDetailReceive']);
                 Route::get('production_order_receive_fg', [Select2Controller::class, 'productionOrderReceiveFg']);
                 Route::get('production_fg_receive', [Select2Controller::class, 'productionFgReceive']);
+                Route::get('production_fg_receive_detail', [Select2Controller::class, 'productionFgReceiveDetail']);
                 Route::get('production_order_detail_receive_fg', [Select2Controller::class, 'productionOrderDetailReceiveFg']);
                 Route::get('journal', [Select2Controller::class, 'journal']);
                 Route::get('user_bank_by_account', [Select2Controller::class, 'userBankByAccount']);

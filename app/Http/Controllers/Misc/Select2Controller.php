@@ -76,6 +76,7 @@ use App\Models\Pallet;
 use App\Models\Pattern;
 use App\Models\ProductionBatch;
 use App\Models\ProductionFgReceive;
+use App\Models\ProductionFgReceiveDetail;
 use App\Models\ProductionIssue;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
@@ -3455,6 +3456,31 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Line : '.$d->line->code.' - '.$d->item->code.' - '.$d->item->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionFgReceiveDetail(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = ProductionFgReceiveDetail::where(function($query) use($search){
+            $query->where('pallet_no', 'like', "%$search%")
+                ->orWhereHas('item',function($query) use ($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhere('name','like',"%$search%");
+                })
+                ->orWhere('shading', 'like', "%$search%");
+        })
+        ->where('production_fg_receive_id',$request->fgr_id)
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> 'Item : '.$d->item->code.' - '.$d->item->name.' Palet : '.$d->pallet_no.' Shading : '.$d->shading.' Qty : '.CustomHelper::formatConditionalQty($d->qty_sell).' '.$d->itemUnit->unit->code,
             ];
         }
 

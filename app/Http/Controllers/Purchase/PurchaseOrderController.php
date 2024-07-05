@@ -883,6 +883,8 @@ class PurchaseOrderController extends Controller
                         $query->status = '1';
 
                         $query->save();
+
+                        $query->updateRootDocumentStatusProcess();
                         
                         foreach($query->PurchaseOrderDetail as $row){
                             $row->delete();
@@ -1085,10 +1087,6 @@ class PurchaseOrderController extends Controller
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
-
-                if($request->temp){
-                    $query->updateRootDocumentStatusProcess();
                 }
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);

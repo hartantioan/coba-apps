@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ApprovalMatrix;
 use App\Models\GoodIssueRequest;
 use App\Models\LockPeriod;
 use App\Models\LockPeriodDetail;
@@ -9,6 +10,7 @@ use App\Models\PurchaseRequest;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AllCustomScript extends Command
 {
@@ -121,5 +123,8 @@ class AllCustomScript extends Command
                     ->log('Close good issue request by system.');
             }
         }
+
+        #reset approvalmatrix
+        DB::delete('DELETE FROM approval_matrixs WHERE approval_source_id NOT IN (SELECT id FROM approval_sources)');
     }
 }

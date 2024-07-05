@@ -222,10 +222,10 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.type') }}</th>
                                                         <th class="center">Item/Resource</th>
-                                                        <th class="center">Qty</th>
+                                                        <th class="center">{{ __('translations.qty') }}</th>
                                                         <th class="center">Satuan (Produksi)</th>
                                                         <th class="center">{{ __('translations.nominal') }}</th>
-                                                        <th class="center">Total</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">Deskripsi</th>
                                                         <th class="center">Issue Method</th>
@@ -566,10 +566,10 @@
                             <tr>
                                 <th class="center">{{ __('translations.type') }}</th>
                                 <th class="center">Item/Resource</th>
-                                <th class="center">Qty</th>
+                                <th class="center">{{ __('translations.qty') }}</th>
                                 <th class="center">Satuan (Produksi)</th>
                                 <th class="center">{{ __('translations.nominal') }}</th>
-                                <th class="center">Total</th>
+                                <th class="center">{{ __('translations.total') }}</th>
                                 <th class="center">Dist.Biaya</th>
                                 <th class="center">Deskripsi</th>
                                 <th class="center">Issue Method</th>
@@ -1007,10 +1007,10 @@
                                         <tr>
                                             <th class="center">{{ __('translations.type') }}</th>
                                             <th class="center">Item/Resource</th>
-                                            <th class="center">Qty</th>
+                                            <th class="center">{{ __('translations.qty') }}</th>
                                             <th class="center">Satuan (Produksi)</th>
                                             <th class="center">{{ __('translations.nominal') }}</th>
-                                            <th class="center">Total</th>
+                                            <th class="center">{{ __('translations.total') }}</th>
                                             <th class="center">Dist.Biaya</th>
                                             <th class="center">Deskripsi</th>
                                             <th class="center">Issue Method</th>

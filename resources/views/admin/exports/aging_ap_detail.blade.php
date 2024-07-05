@@ -1,7 +1,7 @@
 <table>
     <thead>
         <tr>
-            <th rowspan="2" align="center">No.</th>
+            <th rowspan="2" align="center">{{ __('translations.no') }}.</th>
             <th rowspan="2" align="center">Supplier</th>
             <th rowspan="2" align="center">Invoice</th>
             <th rowspan="2" align="center">{{ __('translations.nominal') }}</th>

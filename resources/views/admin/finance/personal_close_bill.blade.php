@@ -93,10 +93,10 @@
                                                         <th rowspan="2">Tgl.Bukti Potong</th>
                                                         <th rowspan="2">No.SPK</th>
                                                         <th rowspan="2">No.Invoice</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>

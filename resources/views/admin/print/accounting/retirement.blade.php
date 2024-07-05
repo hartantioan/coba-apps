@@ -156,9 +156,9 @@
                                     <thead>
                                         <tr align="center">
                                             <th></th>
-                                            <th>No.</th>
+                                            <th>{{ __('translations.no') }}.</th>
                                             <th>Aset</th>
-                                            <th>Qty</th>
+                                            <th>{{ __('translations.qty') }}</th>
                                             <th>{{ __('translations.unit') }}</th>
                                             <th>Nominal Aset</th>
                                             <th>Nominal Retirement</th>

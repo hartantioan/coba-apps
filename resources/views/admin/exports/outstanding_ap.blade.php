@@ -1,7 +1,7 @@
 <table>
     <thead>
         <tr>
-            <th align="center">No.</th>
+            <th align="center">{{ __('translations.no') }}.</th>
             <th align="center">No Invoice</th>
             <th align="center">Supplier/Vendor</th>
             <th align="center">Tgl.Post</th>
@@ -11,7 +11,7 @@
             <th align="center">{{ __('translations.note') }}</th>
             <th align="center">Kurs</th>
             <th align="center">Sisa FC</th>
-            <th align="center">Total</th>
+            <th align="center">{{ __('translations.total') }}</th>
             <th align="center">Dibayar</th>
             <th align="center">Sisa RP</th>
         </tr>

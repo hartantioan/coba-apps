@@ -229,10 +229,10 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
+                                    <th>{{ __('translations.no') }}.</th>
                                     <th>Surat Jalan</th>
                                     <th>{{ __('translations.item') }}</th>
-                                    <th>Qty</th>
+                                    <th>{{ __('translations.qty') }}</th>
                                     <th>{{ __('translations.unit') }}</th>
                                     <th>Tujuan</th>
                                 </tr>

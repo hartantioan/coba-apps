@@ -193,13 +193,13 @@
                                                         <th rowspan="2">Tgl.Bukti Potong</th>
                                                         <th rowspan="2">No.SPK</th>
                                                         <th rowspan="2">No.Invoice</th>
-                                                        <th rowspan="2">Subtotal</th>
+                                                        <th rowspan="2">{{ __('translations.subtotal') }}</th>
                                                         <th colspan="2" class="center-align">Diskon</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
                                                         <th rowspan="2">Pembulatan</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
@@ -398,13 +398,13 @@
                                                                             <th class="center">Harga@</th>
                                                                             <th class="center">Tgl.Post</th>
                                                                             <th class="center">Tgl.Tenggat</th>
-                                                                            <th class="center">Total</th>
+                                                                            <th class="center">{{ __('translations.total') }}</th>
                                                                             <th class="center">PPN (%)</th>
                                                                             <th class="center">Termasuk PPN</th>
                                                                             <th class="center">PPN (Rp)</th>
                                                                             <th class="center">PPh (%)</th>
                                                                             <th class="center">PPh (Rp)</th>
-                                                                            <th class="center">Grandtotal</th>
+                                                                            <th class="center">{{ __('translations.grandtotal') }}</th>
                                                                             
                                                                             <th class="center">{{ __('translations.plant') }}</th>
                                                                             <th class="center">{{ __('translations.line') }}</th>
@@ -442,14 +442,14 @@
                                                                 <thead>
                                                                     <tr>
                                                                         <th class="center">Coa</th>
-                                                                        <th class="center">Qty</th>
+                                                                        <th class="center">{{ __('translations.qty') }}</th>
                                                                         <th class="center">Harga Satuan</th>
-                                                                        <th class="center">Total</th>
+                                                                        <th class="center">{{ __('translations.total') }}</th>
                                                                         <th class="center">ID PPN</th>
-                                                                        <th class="center">PPN</th>
+                                                                        <th class="center">{{ __('translations.tax') }}</th>
                                                                         <th class="center">ID PPh</th>
-                                                                        <th class="center">PPh</th>
-                                                                        <th class="center">Grandtotal</th>
+                                                                        <th class="center">{{ __('translations.wtax') }}</th>
+                                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
                                                                         <th class="center">Ket.1</th>
                                                                         <th class="center">Ket.2</th>
                                                                         <th class="center">{{ __('translations.plant') }}</th>
@@ -634,13 +634,13 @@
                                     <table id="table_multi" class="display" width="100%">
                                         <thead>
                                             <tr>
-                                                <th class="center-align">GR/LC/PO/FR No.</th>
-                                                <th class="center-align">Detail Item</th>
-                                                <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Total</th>
-                                                <th class="center-align">Ter-Invoice</th>
-                                                <th class="center-align">Sisa</th>
-                                                <th class="center-align">{{ __('translations.note') }}</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">GR/LC/PO/FR No.</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Detail Item</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Ter-Invoice</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-detail-multi"></tbody>
@@ -835,10 +835,10 @@
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
                         <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
                     
                 </thead>

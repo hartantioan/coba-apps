@@ -282,7 +282,7 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
-                                <th class="center">No.</th>
+                                <th class="center">{{ __('translations.no') }}.</th>
                                 <th class="center">Nama Aset</th>
                                 <th class="center">Kode Aset</th>
                                 <th class="center">Dep. Ke</th>

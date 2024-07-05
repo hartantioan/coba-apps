@@ -96,11 +96,11 @@
 							<th colspan="2">{{ __('translations.currency') }}</th>
 							<th rowspan="2">{{ __('translations.note') }}</th>
 							<th rowspan="2">{{ __('translations.status') }}</th>
-							<th rowspan="2">Subtotal</th>
+							<th rowspan="2">{{ __('translations.subtotal') }}</th>
 							<th rowspan="2">Diskon</th>
-							<th rowspan="2">Total</th>
+							<th rowspan="2">{{ __('translations.total') }}</th>
 							<th rowspan="2">Pajak</th>
-							<th rowspan="2" >Grandtotal</th>
+							<th rowspan="2" >{{ __('translations.grandtotal') }}</th>
 							
 						</tr>
 						<tr align="center">

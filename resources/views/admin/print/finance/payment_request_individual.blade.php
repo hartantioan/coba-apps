@@ -379,15 +379,15 @@
                                     <th colspan="9" align="center">Daftar Biaya</th>
                                 </tr>
                                 <tr>
-                                    <th class="center-align">No.</th>
-                                    <th class="center-align">Coa</th>
-                                    <th class="center-align">{{ __('translations.plant') }}</th>
-                                    <th class="center-align">{{ __('translations.line') }}</th>
-                                    <th class="center-align">{{ __('translations.engine') }}</th>
-                                    <th class="center-align">{{ __('translations.division') }}</th>
-                                    <th class="center-align">Proyek</th>
-                                    <th class="center-align">Debit</th>
-                                    <th class="center-align">Kredit</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Coa</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.engine') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.division') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Proyek</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                                 </tr>
                             </thead>
                             <tbody>

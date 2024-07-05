@@ -166,10 +166,10 @@
                     <table border="1" width="100%" style="border-collapse: collapse;">
                         <thead>
                             <tr>
-                                <th>No</th>
+                                <th>{{ __('translations.no') }}</th>
                                 <th>No.Invoice</th>
                                 <th>{{ __('translations.date') }}</th>
-                                <th>Grandtotal</th>
+                                <th>{{ __('translations.grandtotal') }}</th>
                                 <th>Surat Jalan</th>
                             </tr>
                         </thead>

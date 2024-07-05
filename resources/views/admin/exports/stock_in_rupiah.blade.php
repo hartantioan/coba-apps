@@ -2,7 +2,7 @@
     <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
         <thead>
             <tr align="center">
-                <th align="center">No.</th>
+                <th align="center">{{ __('translations.no') }}.</th>
                 <th align="center">{{ __('translations.date') }}</th>
                 <th align="center">{{ __('translations.plant') }}</th>
                 <th align="center">{{ __('translations.warehouse') }}</th>
@@ -10,9 +10,9 @@
                 <th align="center">Nama Item</th>
                 <th align="center">{{ __('translations.unit') }}</th>
                 <th align="center">No. Dokumen</th>
-                <th align="center">Qty</th>
+                <th align="center">{{ __('translations.qty') }}</th>
                 <th align="center">Harga </th>
-                <th align="center">Total</th>
+                <th align="center">{{ __('translations.total') }}</th>
                 <th align="center">Cumulative Qty.</th>
                 <th align="center">Cumulative Value</th>
             </tr>
@@ -75,7 +75,7 @@
     <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
         <thead>
             <tr align="center">
-                <th align="center">No.</th>
+                <th align="center">{{ __('translations.no') }}.</th>
                 <th align="center">{{ __('translations.plant') }}</th>
                 <th align="center">{{ __('translations.warehouse') }}</th>
                 <th align="center">{{ __('translations.code') }}</th>

@@ -353,7 +353,7 @@
                                         <table class="bordered" style="font-size:10px;zoom:0.8;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">No.</th>
+                                                    <th class="center-align">{{ __('translations.no') }}.</th>
                                                     <th class="center-align">Item (dari Stok)</th>
                                                     <th class="center-align">{{ __('translations.shading') }}</th>
                                                     <th class="center-align">{{ __('translations.plant') }}</th>
@@ -386,7 +386,7 @@
                                         <table class="bordered" style="font-size:10px;">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">No.</th>
+                                                    <th class="center-align">{{ __('translations.no') }}.</th>
                                                     <th class="center-align">Referensi</th>
                                                     <th class="center-align">{{ __('translations.item') }}</th>
                                                     <th class="center-align">{{ __('translations.plant') }}</th>

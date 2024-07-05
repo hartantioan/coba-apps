@@ -80,7 +80,7 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.item') }}</th>
-                                                        <th>Qty</th>
+                                                        <th>{{ __('translations.qty') }}</th>
                                                         <th>Spesifikasi</th>
                                                         <th>Deskripsi</th>
                                                         <th>File</th>

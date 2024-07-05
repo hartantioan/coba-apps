@@ -18,9 +18,9 @@
             <th>Ket.Void</th>
             <th>Aset</th>
             <th>{{ __('translations.price') }}</th>
-            <th>Qty</th>
+            <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>{{ __('translations.note') }}</th>
         </tr>
     </thead>

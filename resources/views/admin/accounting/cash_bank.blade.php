@@ -128,14 +128,14 @@
                 <table class="bordered">
                     <thead>
                         <tr>
-                            <th class="center-align">No.</th>
+                            <th class="center-align">{{ __('translations.no') }}.</th>
                             <th class="center-align">No Invoice</th>
                             <th class="center-align">Supplier/Vendor</th>
                             <th class="center-align">TGL Post</th>
                             <th class="center-align">TGL Terima</th>
                             <th class="center-align">TGL Jatuh Tempo</th>
                             <th class="center-align">Jatuh Tempo (Hari)</th>
-                            <th class="center-align">Grandtotal</th>
+                            <th class="center-align">{{ __('translations.grandtotal') }}</th>
                             <th class="center-align">Memo</th>
                             <th class="center-align">Dibayar</th>
                             <th class="center-align">Sisa</th>

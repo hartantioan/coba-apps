@@ -228,13 +228,13 @@
                                                         <th>% DP</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
-                                                        <th>Subtotal</th>
+                                                        <th>{{ __('translations.subtotal') }}</th>
                                                         <th>Diskon</th>
-                                                        <th>Total</th>
-                                                        <th>PPN</th>
+                                                        <th>{{ __('translations.total') }}</th>
+                                                        <th>{{ __('translations.tax') }}</th>
                                                         <th>Total Stlh PPN</th>
                                                         <th>Rounding</th>
-                                                        <th>Grandtotal</th>
+                                                        <th>{{ __('translations.grandtotal') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -472,7 +472,7 @@
                                                         <th class="center">Disc3(Rp)</th>
                                                         <th class="center">Biaya Lain</th>
                                                         <th class="center">{{ __('translations.final_price') }}</th>
-                                                        <th class="center">Total</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>

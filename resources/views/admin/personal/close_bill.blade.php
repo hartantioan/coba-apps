@@ -97,10 +97,10 @@
                                                         <th rowspan="2">Tgl.Bukti Potong</th>
                                                         <th rowspan="2">No.SPK</th>
                                                         <th rowspan="2">No.Invoice</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">Lampiran</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -252,7 +252,7 @@
                                             <tr>
                                                 <th class="center">Referensi</th>
                                                 <th class="center">Tgl.Post</th>
-                                                <th class="center">Total</th>
+                                                <th class="center">{{ __('translations.total') }}</th>
                                                 <th class="center">Dipakai</th>
                                                 <th class="center">Sisa</th>
                                                 <th class="center">{{ __('translations.note') }}</th>
@@ -281,14 +281,14 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">Uraian Barang</th>
-                                                    <th class="center">Qty</th>
+                                                    <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">{{ __('translations.unit') }}</th>
                                                     <th class="center">Harga Satuan</th>
-                                                    <th class="center">Subtotal</th>
-                                                    <th class="center">PPN</th>
+                                                    <th class="center">{{ __('translations.subtotal') }}</th>
+                                                    <th class="center">{{ __('translations.tax') }}</th>
                                                     <th class="center">Incl.PPN</th>
-                                                    <th class="center">PPh</th>
-                                                    <th class="center">Total</th>
+                                                    <th class="center">{{ __('translations.wtax') }}</th>
+                                                    <th class="center">{{ __('translations.total') }}</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
                                                     <th class="center">{{ __('translations.engine') }}</th>
@@ -408,7 +408,7 @@
                                 <tr>
                                     <th class="center-align">Kode Dokumen</th>
                                     <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">Total</th>
+                                    <th class="center-align">{{ __('translations.total') }}</th>
                                     <th class="center-align">Terpakai</th>
                                     <th class="center-align">Sisa</th>
                                     <th class="center-align">{{ __('translations.note') }}</th>

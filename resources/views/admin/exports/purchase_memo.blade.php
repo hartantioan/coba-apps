@@ -7,10 +7,10 @@
             <th>{{ __('translations.bussiness_partner') }}</th>
             <th>{{ __('translations.company') }}</th>
             <th>Tgl.Post</th>
-            <th>Total</th>
-            <th>PPN</th>
-            <th>PPh</th>
-            <th>Grandtotal</th>
+            <th>{{ __('translations.total') }}</th>
+            <th>{{ __('translations.tax') }}</th>
+            <th>{{ __('translations.wtax') }}</th>
+            <th>{{ __('translations.grandtotal') }}</th>
             <th>Dok.</th>
             <th>Ket.</th>
             <th>{{ __('translations.status') }}</th>

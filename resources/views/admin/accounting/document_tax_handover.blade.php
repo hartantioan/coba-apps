@@ -195,7 +195,7 @@
                                             <th align="center" colspan="2" style="background-color: navy; color: white;border: 1px solid white;">Faktur Pajak</th>
                                             <th align="center" colspan="3" style="background-color: navy; color: white;border: 1px solid white;">Supplier</th>
                                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
-                                            <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
+                                            <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.tax') }}</th>
                                             <th align="center" rowspan="2" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
                                         </tr>
                                         <tr>

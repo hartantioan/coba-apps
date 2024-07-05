@@ -84,26 +84,26 @@
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center-align">No.</th>
-                                                        <th class="center-align">No Invoice</th>
-                                                        <th class="center-align">{{ __('translations.customer') }}</th>
-                                                        <th class="center-align">Tgl.Post</th>
-                                                        <th class="center-align">TOP</th>
-                                                        <th class="center-align">Note</th>
-                                                        <th class="center-align">Subtotal</th>
-                                                        <th class="center-align">Discount</th>
-                                                        <th class="center-align">Total</th>
-                                                        <th class="center-align">PPN</th>
-                                                        <th class="center-align">Total+PPN</th>
-                                                        <th class="center-align">Pembulatan</th>
-                                                        <th class="center-align">Grandtotal</th>
-                                                        <th class="center-align">Terjadwal</th>
-                                                        <th class="center-align">Terkirim</th>
-                                                        <th class="center-align">Retur</th>
-                                                        <th class="center-align">Invoice</th>
-                                                        <th class="center-align">Memo</th>
-                                                        <th class="center-align">Dibayar</th>
-                                                        <th class="center-align">Sisa</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.customer') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TOP</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Note</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Discount</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total+PPN</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Pembulatan</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terjadwal</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terkirim</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Retur</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Invoice</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">

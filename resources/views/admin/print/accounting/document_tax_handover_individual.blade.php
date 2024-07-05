@@ -257,9 +257,9 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
-                                <th class="center">No.</th>
+                                <th class="center">{{ __('translations.no') }}.</th>
                                 <th class="center">Kode Faktur</th>
-                                <th class="center">Total</th>
+                                <th class="center">{{ __('translations.total') }}</th>
                                 <th class="center">{{ __('translations.company') }}</th>
                                 <th class="center">{{ __('translations.status') }}</th>
                             </tr>

@@ -253,11 +253,11 @@
                                                         <th class="center">No.AR Invoice</th>
                                                         <th class="center">{{ __('translations.customer') }}</th>
                                                         <th class="center">Tgl.Post</th>
-                                                        <th class="center">Total</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">Tax</th>
                                                         <th class="center">Total Stlh Pajak</th>
                                                         <th class="center">Pembulatan</th>
-                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center">Downpayment</th>
                                                         <th class="center">Tagihan</th>
                                                         <th class="center">Dibayar</th>

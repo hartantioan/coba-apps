@@ -205,7 +205,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No.</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">Coa</th>
                         <th class="center">Debit</th>
                         <th class="center">Kredit</th>

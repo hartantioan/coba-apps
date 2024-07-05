@@ -12,7 +12,7 @@
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama </th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Alamat Lengkap</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">DPP</th>
-            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">PPN</th>
+            <th align="center" style="background-color: navy; color: white;border: 1px solid white;">{{ __('translations.tax') }}</th>
             <th align="center" style="background-color: navy; color: white;border: 1px solid white;">Nama Barang</th>
         </tr>
     </thead>

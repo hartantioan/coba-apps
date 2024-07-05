@@ -247,17 +247,17 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th align="center" rowspan="2">{{ __('translations.item') }}</th>
-                                    <th align="center" colspan="4">{{ __('translations.origin') }}</th>
-                                    <th align="center" rowspan="2">Jum.Keluar</th>
-                                    <th align="center" rowspan="2">Jum.Kembali</th>
-                                    <th align="center" rowspan="2">{{ __('translations.unit') }}</th>
+                                    <th align="center" rowspan="2" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th align="center" colspan="4" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.origin') }}</th>
+                                    <th align="center" rowspan="2" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jum.Keluar</th>
+                                    <th align="center" rowspan="2" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jum.Kembali</th>
+                                    <th align="center" rowspan="2" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
                                 </tr>
                                 <tr>
-                                    <th align="center">{{ __('translations.plant') }}</th>
-                                    <th align="center">{{ __('translations.warehouse') }}</th>
-                                    <th align="center">{{ __('translations.area') }}</th>
-                                    <th align="center">{{ __('translations.shading') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.warehouse') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.area') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.shading') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

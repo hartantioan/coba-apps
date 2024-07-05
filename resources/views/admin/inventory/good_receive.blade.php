@@ -238,11 +238,11 @@
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center" width="150px">Stok Skrg</th>
                                                     <th class="center" width="150px">Tujuan</th>
-                                                    <th class="center">Qty</th>
+                                                    <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan Stock</th>
                                                     <th class="center" width="250px">Nomor Serial (Jika ada)</th>
                                                     <th class="center">{{ __('translations.price') }}</th>
-                                                    <th class="center" width="150px">Total</th>
+                                                    <th class="center" width="150px">{{ __('translations.total') }}</th>
                                                     <th class="center" width="150px">{{ __('translations.note') }}</th>
                                                     <th class="center">Tipe Penerimaan</th>
                                                     <th class="center">Coa</th>

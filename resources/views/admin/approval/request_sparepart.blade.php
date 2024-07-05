@@ -177,7 +177,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No.</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">SparePart</th>
                         <th class="center">Qty Request</th>
                         <th class="center">Qty Usage</th>

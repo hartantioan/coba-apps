@@ -284,10 +284,10 @@
                                     <th class="center" colspan="4">Daftar Dokumen Terpakai</th>
                                 </tr>
                                 <tr>
-                                    <th class="center">No</th>
-                                    <th class="center">No.Dokumen</th>
-                                    <th class="center">{{ __('translations.note') }}</th>
-                                    <th class="center">Grandtotal</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document_no') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -310,14 +310,14 @@
                                     <th class="center" colspan="8">Daftar Biaya</th>
                                 </tr>
                                 <tr>
-                                    <th class="center">{{ __('translations.item') }}</th>
-                                    <th class="center">Jum.</th>
-                                    <th class="center">Sat.</th>
-                                    <th class="center">Harga @</th>
-                                    <th class="center">Subtotal</th>
-                                    <th class="center">PPN</th>
-                                    <th class="center">PPh</th>
-                                    <th class="center">Grandtotal</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jum.</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sat.</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Harga @</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
+                                    <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

@@ -348,7 +348,7 @@
                                 <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item/Coa Issue (Terpakai)</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
+                                <th align="center">{{ __('translations.no') }}.</th>
                                 <th align="center">Item/Resource</th>
                                 <th align="center">Qty Planned</th>
                                 <th align="center">Qty Real</th>
@@ -386,7 +386,7 @@
                                 <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item Receive (Diterima)</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
+                                <th align="center">{{ __('translations.no') }}.</th>
                                 <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty Planned (Prod.)</th>
                                 <th align="center">Qty Real (Prod.)</th>

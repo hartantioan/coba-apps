@@ -8,7 +8,7 @@
             <th>Tipe Denda</th>
             <th>Freq</th>
             <th>{{ __('translations.date') }}</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             
         </tr>
     </thead>

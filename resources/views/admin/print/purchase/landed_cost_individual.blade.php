@@ -244,15 +244,15 @@
                                     <th align="center" colspan="9">Daftar Item</th>
                                 </tr>
                                 <tr>
-                                    <th class="center">No</th>
-                                    <th class="center">{{ __('translations.item') }}</th>
-                                    <th class="center">{{ __('translations.plant') }}</th>
-                                    <th class="center">{{ __('translations.warehouse') }}</th>
-                                    <th class="center">Qty</th>
-                                    <th class="center">{{ __('translations.unit') }}</th>
-                                    <th class="center">Surat Jalan</th>
-                                    <th class="center">Landed Cost</th>
-                                    <th class="center">Grandtotal</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.warehouse') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Surat Jalan</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Landed Cost</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -283,10 +283,10 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Deskripsi</th>
-                                    <th>Total</th>
-                                    <th>PPN</th>
-                                    <th>PPh</th>
-                                    <th>Grandtotal</th>
+                                    <th>{{ __('translations.total') }}</th>
+                                    <th>{{ __('translations.tax') }}</th>
+                                    <th>{{ __('translations.wtax') }}</th>
+                                    <th>{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

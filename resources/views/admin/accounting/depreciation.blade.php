@@ -204,7 +204,7 @@
                             <table class="bordered" id="table-detail">
                                 <thead>
                                     <tr>
-                                        <th class="center">No.</th>
+                                        <th class="center">{{ __('translations.no') }}.</th>
                                         <th class="center">Kode Aset</th>
                                         <th class="center">Nama Aset</th>
                                         <th class="center">{{ __('translations.plant') }}</th>

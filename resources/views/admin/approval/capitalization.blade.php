@@ -197,7 +197,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No.</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">Kode Aset</th>
                         <th class="center">Nama Aset</th>
                         <th class="center-align">{{ __('translations.plant') }}</th>
@@ -208,9 +208,9 @@
                         <th class="center-align">Proyek</th>
                         <th class="center-align">Dist.Biaya</th>
                         <th class="center">{{ __('translations.price') }}</th>
-                        <th class="center">Qty</th>
+                        <th class="center">{{ __('translations.qty') }}</th>
                         <th class="center">{{ __('translations.unit') }}</th>
-                        <th class="center">Total</th>
+                        <th class="center">{{ __('translations.total') }}</th>
                         <th class="center">{{ __('translations.note') }}</th>
                     </tr>
                 </thead>

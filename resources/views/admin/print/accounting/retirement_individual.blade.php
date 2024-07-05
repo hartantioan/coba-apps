@@ -274,9 +274,9 @@
                     <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                         <thead>
                             <tr>
-                                <th class="center">No.</th>
+                                <th class="center">{{ __('translations.no') }}.</th>
                                 <th class="center">Aset</th>
-                                <th class="center">Qty</th>
+                                <th class="center">{{ __('translations.qty') }}</th>
                                 <th class="center">{{ __('translations.unit') }}</th>
                                 <th class="center">Nominal Aset</th>
                                 <th class="center">Nominal Retirement</th>

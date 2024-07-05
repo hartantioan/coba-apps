@@ -30,7 +30,7 @@
             <th>{{ __('translations.warehouse') }}</th>
             <th>{{ __('translations.area') }}</th>
             <th>{{ __('translations.shading') }}</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>Based On</th>
         </tr>
     </thead>

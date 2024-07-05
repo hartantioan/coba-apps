@@ -318,13 +318,13 @@
                                 <th align="center" colspan="7">DAFTAR ITEM</th>
                             </tr>
                             <tr>
-                                <th class="center-align" width="5%">No.</th>
-                                <th class="center-align" width="35%">Referensi/Item/Jasa</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align" width="10%" style="max-width:10%">Total</th>
-                                <th class="center-align" width="10%" style="max-width:10%">PPN</th>
-                                <th class="center-align" width="10%" style="max-width:10%">PPh</th>
-                                <th class="center-align" width="15%" style="max-width:15%">Grandtotal</th>
+                                <th class="center-align" width="5%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                <th class="center-align" width="35%" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Referensi/Item/Jasa</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                <th class="center-align" width="10%" style="max-width:10%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
+                                <th class="center-align" width="15%" style="max-width:15%;@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -366,7 +366,7 @@
                                     <th align="center" colspan="4">DAFTAR DOWNPAYMENT</th>
                                 </tr>
                                 <tr>
-                                    <th align="center" width="5%">No.</th>
+                                    <th align="center" width="5%">{{ __('translations.no') }}.</th>
                                     <th align="center">No. AP Down Payment</th>
                                     <th align="center">No. Payment Request</th>
                                     <th align="center">Nominal Terpakai</th>

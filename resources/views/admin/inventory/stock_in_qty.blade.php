@@ -131,12 +131,12 @@
                     <table class="bordered" style="font-size:10px;">
                         <thead>
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">Plant.</th>
                                 <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
-                                <th class="center-align">Qty</th>
+                                <th class="center-align">{{ __('translations.qty') }}</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                             </tr>
                         </thead>

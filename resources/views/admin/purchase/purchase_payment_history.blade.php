@@ -163,12 +163,12 @@
                                                         <th rowspan="2">Tgl.Bukti Potong</th>
                                                         <th rowspan="2">No.SPK</th>
                                                         <th rowspan="2">No.Invoice</th>
-                                                        <th rowspan="2">Subtotal</th>
+                                                        <th rowspan="2">{{ __('translations.subtotal') }}</th>
                                                         <th colspan="2" class="center-align">Diskon</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">Balance</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
@@ -345,11 +345,11 @@
                 <table class="bordered Highlight striped" id="table_history">
                     <thead>
                             <tr>
-                                <th class="center-align">No</th>
-                                <th class="center-align">Code Outgoing Payment</th>
-                                <th class="center-align">Date</th>
-                                <th class="center-align">Code Payment Request</th>
-                                <th class="center-align">{{ __('translations.nominal') }}</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Code Outgoing Payment</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Date</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Code Payment Request</th>
+                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.nominal') }}</th>
                             </tr>                  
                     </thead>
                     <tbody id="body_history_table">

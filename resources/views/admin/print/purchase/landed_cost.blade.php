@@ -140,10 +140,10 @@
                         <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">Lampiran</th>
                         <th rowspan="2">{{ __('translations.status') }}</th>
-                        <th rowspan="2">Total</th>
-                        <th rowspan="2">PPN</th>
-						<th rowspan="2">PPh</th>
-                        <th rowspan="2">Grandtotal</th>
+                        <th rowspan="2">{{ __('translations.total') }}</th>
+                        <th rowspan="2">{{ __('translations.tax') }}</th>
+						<th rowspan="2">{{ __('translations.wtax') }}</th>
+                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
 					</tr>
                     <tr align="center">
                         <th>{{ __('translations.code') }}</th>
@@ -180,7 +180,7 @@
 											<th>{{ __('translations.division') }}</th>
 											<th>{{ __('translations.warehouse') }}</th>
                                             <th>{{ __('translations.item') }}</th>
-                                            <th>Qty</th>
+                                            <th>{{ __('translations.qty') }}</th>
                                             <th>{{ __('translations.unit') }}</th>
                                             <th>Harga Total</th>
                                             <th>Harga Satuan</th>

@@ -285,10 +285,10 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
-                                    <th>{{ __('translations.item') }}</th>
-                                    <th>Qty</th>
-                                    <th>{{ __('translations.unit') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -307,8 +307,8 @@
                                         <table border="1" style="border-collapse:collapse">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
-                                                    <th class="center-align">Qty Kirim</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Asal Plant - Gudang - Area - Shading</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Kirim</th>
                                                 </tr>
                                             </thead>
                                             <tbody>

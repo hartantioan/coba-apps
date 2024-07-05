@@ -233,9 +233,9 @@
 												<tr align="center">
 													<th>Item/Resource</th>
 													<th>Description</th>
-													<th>Qty</th>
+													<th>{{ __('translations.qty') }}</th>
 													<th>{{ __('translations.nominal') }}</th>
-													<th>Total</th>
+													<th>{{ __('translations.total') }}</th>
 												</tr>
 											</thead>
 											<tbody>

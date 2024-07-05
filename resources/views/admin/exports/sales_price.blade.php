@@ -2,7 +2,7 @@
     <thead>
         <tr align="center">
             <tr>
-            <th class="center-align">No.</th>
+            <th class="center-align">{{ __('translations.no') }}.</th>
             <th class="center-align">{{ __('translations.item') }}</th>
             <th class="center-align">{{ __('translations.customer') }}</th>
             <th class="center-align">Dokumen</th>

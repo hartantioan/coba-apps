@@ -298,15 +298,15 @@ use App\Helpers\PrintHelper;
                         <table class="bordered table-with-breaks" border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead style="border-collapse:collapse;border:1px solid black;">
                                 <tr>
-                                    <th class="center-align">No.</th>
-                                    <th class="center-align">Item/Jasa</th>
-                                    <th class="center-align">Qty</th>
-                                    <th class="center-align">{{ __('translations.unit') }}</th>
-                                    <th class="center-align">{{ __('translations.price') }}</th>
-                                    <th class="center-align">Disc.1 (%)</th>
-                                    <th class="center-align">Disc.2 (%)</th>
-                                    <th class="center-align">Disc.3 ({{ $data->currency->code }})</th>
-                                    <th class="center-align">Subtotal</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Item/Jasa</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.price') }}</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.disc') }}.1 (%)</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.disc') }}.2 (%)</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.disc') }}.3 ({{ $data->currency->code }})</th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
                                 </tr>
                             </thead>
                             
@@ -314,7 +314,7 @@ use App\Helpers\PrintHelper;
                                 @foreach($data->purchaseOrderDetail as $key => $row)
                                     @if($row->item()->exists())
                                         <tr>
-                                            <td align="center" rowspan="3">{{ ($key + 1) }}</td>
+                                            <td align="center" rowspan="3">{{ ($key + 1) }} {{ __('translations.unit') }}</td>
                                             <td align="left">{{ $row->item->code.' - '.$row->item->name.' - '.$row->item->other_name }}</td>
                                             <td align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                             <td align="center">{{ $row->itemUnit()->exists() ? $row->itemUnit->unit->code : '-' }}</td>

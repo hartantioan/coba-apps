@@ -286,13 +286,13 @@
                         <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead>
                                 <tr>
-                                    <th>Referensi</th>
-                                    <th>{{ __('translations.type') }}</th>
-                                    <th>Dist.Biaya</th>
-                                    <th>{{ __('translations.note') }}</th>
-                                    <th>Total</th>
-                                    <th>Pembulatan</th>
-                                    <th>Subtotal</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Referensi</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.type') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dist.Biaya</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Pembulatan</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -310,7 +310,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <th colspan="6" align="right">Total</th>
+                                    <th colspan="6" align="right">{{ __('translations.total') }}</th>
                                     <th align="right">{{ number_format($data->grandtotal,2,',','.') }}</th>
                                 </tr>
                                 <tr>

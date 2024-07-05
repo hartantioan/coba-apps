@@ -132,23 +132,23 @@
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>{{ __('translations.code') }}</th>
-                                                        <th>{{ __('translations.user') }}</th>
-                                                        <th>{{ __('translations.company') }}</th>
-                                                        <th>Tgl.Post</th>
-                                                        <th>{{ __('translations.note') }}</th>
-                                                        <th>No.PROD</th>
-                                                        <th>No.Production Issue</th>
-                                                        <th>{{ __('translations.item') }}</th>
-                                                        <th>{{ __('translations.plant') }}</th>
-                                                        <th>{{ __('translations.line') }}</th>
-                                                        <th>Shift</th>
-                                                        <th>Group</th>
-                                                        <th>Dokumen</th>
-                                                        <th>{{ __('translations.status') }}</th>
-                                                        <th>By</th>
-                                                        <th>Operasi</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">#</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.code') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.user') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.company') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.PROD</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Production Issue</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Shift</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Group</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.by') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Operasi</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -259,7 +259,7 @@
                                                 <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
-                                                            <th class="center">No.</th>
+                                                            <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">No. Batch</th>
                                                             <th class="center">Qty Terpakai</th>
                                                             <th class="center">Satuan</th>
@@ -348,7 +348,7 @@
                                                 <table class="bordered" style="border: 1px solid;min-width:2500px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
-                                                            <th class="center" width="25px">No.</th>
+                                                            <th class="center" width="25px">{{ __('translations.no') }}.</th>
                                                             <th class="center" width="250px">No.Batch Palet/Curah</th>
                                                             <th class="center" width="150px">Kode Item</th>
                                                             <th class="center" width="150px">Nama Item</th>
@@ -569,10 +569,10 @@
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
                         <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
                     
                 </thead>

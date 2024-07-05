@@ -1,7 +1,7 @@
 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:10px;">
     <thead>
         <tr align="center">
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
@@ -16,9 +16,9 @@
             <th>{{ __('translations.post_date') }}</th>
             <th>Kas/Bank</th>
             <th>{{ __('translations.note') }}</th>
-            <th>Subtotal</th>
+            <th>{{ __('translations.subtotal') }}</th>
             <th>Pembulatan</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>Ket. Detail</th>
             <th>Based On</th>
         </tr>

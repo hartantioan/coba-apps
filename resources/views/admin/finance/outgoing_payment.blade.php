@@ -158,7 +158,7 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
                                                         <th rowspan="2">Admin</th>
-                                                        <th rowspan="2">Total</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>

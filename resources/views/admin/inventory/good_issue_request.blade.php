@@ -204,7 +204,7 @@
                                                 <th class="center">{{ __('translations.item') }}</th>
                                                 <th class="center">Stok (Satuan UoM)</th>
                                                 <th class="center">Outstanding Req.(Satuan UoM)</th>
-                                                <th class="center">Qty</th>
+                                                <th class="center">{{ __('translations.qty') }}</th>
                                                 <th class="center">{{ __('translations.unit') }}</th>
                                                 <th class="center">Keterangan 1</th>
                                                 <th class="center">Keterangan 2</th>

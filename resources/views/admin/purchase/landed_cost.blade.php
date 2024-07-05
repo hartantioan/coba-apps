@@ -174,10 +174,10 @@
                                                         <th colspan="2" class="center">{{ __('translations.currency') }}</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">Dokumen</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -299,13 +299,13 @@
                                                 <tr>
                                                     <th class="center">No</th>
                                                     <th class="center" width="15%">Deskripsi</th>
-                                                    <th class="center" width="15%">Total</th>
+                                                    <th class="center" width="15%">{{ __('translations.total') }}</th>
                                                     <th class="center">Termasuk PPN</th>
                                                     <th class="center">PPN(%)</th>
                                                     <th class="center">PPN(Rp)</th>
                                                     <th class="center">PPh(%)</th>
                                                     <th class="center">PPh(Rp)</th>
-                                                    <th class="center" width="15%">Grandtotal</th>
+                                                    <th class="center" width="15%">{{ __('translations.grandtotal') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -453,7 +453,7 @@
                                                 <tr>
                                                     <th class="center">Ref.No</th>
                                                     <th class="center">{{ __('translations.item') }}</th>
-                                                    <th class="center">Qty</th>
+                                                    <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan (UOM)</th>
                                                     <th class="center">{{ __('translations.plant') }}</th>
                                                     <th class="center">{{ __('translations.line') }}</th>
@@ -561,15 +561,15 @@
                                         <table id="table_goods_receipt" class="display" width="100%">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">No. GRPO</th>
-                                                    <th class="center-align">No. SJ</th>
-                                                    <th class="center-align">Tgl.Post</th>
-                                                    <th class="center-align">Total</th>
-                                                    <th class="center-align">PPN</th>
-                                                    <th class="center-align">PPh</th>
-                                                    <th class="center-align">Grandtotal</th>
-                                                    <th class="center-align">{{ __('translations.note') }}</th>
-                                                    <th class="center-align">Landed Cost</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. GRPO</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. SJ</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Landed Cost</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail-goods-receipt"></tbody>
@@ -586,14 +586,14 @@
                                         <table id="table_landed_cost" class="display" width="100%">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">No. LC</th>
-                                                    <th class="center-align">Tgl.Post</th>
-                                                    <th class="center-align">Total</th>
-                                                    <th class="center-align">PPN</th>
-                                                    <th class="center-align">PPh</th>
-                                                    <th class="center-align">Grandtotal</th>
-                                                    <th class="center-align">{{ __('translations.note') }}</th>
-                                                    <th class="center-align">Landed Cost</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. LC</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Landed Cost</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail-landed-cost"></tbody>
@@ -610,10 +610,10 @@
                                         <table id="table_inventory_transfer_in" class="display" width="100%">
                                             <thead>
                                                 <tr>
-                                                    <th class="center-align">No. ITI</th>
-                                                    <th class="center-align">No. ITO</th>
-                                                    <th class="center-align">Tgl.Post</th>
-                                                    <th class="center-align">{{ __('translations.note') }}</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. ITI</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. ITO</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-detail-inventory-transfer-in"></tbody>
@@ -771,10 +771,10 @@
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
                         <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
                     
                 </thead>

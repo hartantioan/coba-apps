@@ -142,10 +142,10 @@
                         <th rowspan="2">Pemilik Rekening</th>
                         <th rowspan="2">{{ __('translations.note') }}</th>
                         <th rowspan="2">{{ __('translations.status') }}</th>
-						<th rowspan="2">Total</th>
+						<th rowspan="2">{{ __('translations.total') }}</th>
 						<th rowspan="2">Pembulatan</th>
                         <th rowspan="2">Admin</th>
-						<th rowspan="2">Grandtotal</th>
+						<th rowspan="2">{{ __('translations.grandtotal') }}</th>
                         <th rowspan="2">Bayar</th>
 						<th rowspan="2">Sisa</th>
 					</tr>

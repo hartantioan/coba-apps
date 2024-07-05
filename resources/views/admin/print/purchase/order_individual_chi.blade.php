@@ -353,15 +353,15 @@ use App\Helpers\PrintHelper;
                         <table class="bordered table-with-breaks" border="1" style="border-collapse:collapse;" width="100%"  >
                             <thead style="border-collapse:collapse;border:1px solid black;">
                                 <tr>
-                                    <th class="center-align">No.<div style="font-weight:normal !important">数字</div></th>
-                                    <th class="center-align">Items/Services<div style="font-weight:normal !important">项目/服务</div></th>
-                                    <th class="center-align">Qty<div style="font-weight:normal !important">数量</div></th>
-                                    <th class="center-align">Unit<div style="font-weight:normal !important">单元</div></th>
-                                    <th class="center-align">Price<div style="font-weight:normal !important">价格</div></th>
-                                    <th class="center-align">Disc.1 (%)<div style="font-weight:normal !important">折扣1</div></th>
-                                    <th class="center-align">Disc.2 (%)<div style="font-weight:normal !important">折扣2</div></th>
-                                    <th class="center-align">Disc.3 ({{ $data->currency->code }})<div style="font-weight:normal !important">折扣3</div></th>
-                                    <th class="center-align">Subtotal<div style="font-weight:normal !important">小计</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.<div style="font-weight:normal !important">数字</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Items/Services<div style="font-weight:normal !important">项目/服务</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty<div style="font-weight:normal !important">数量</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Unit<div style="font-weight:normal !important">单元</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Price<div style="font-weight:normal !important">价格</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Disc.1 (%)<div style="font-weight:normal !important">折扣1</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Disc.2 (%)<div style="font-weight:normal !important">折扣2</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Disc.3 ({{ $data->currency->code }})<div style="font-weight:normal !important">折扣3</div></th>
+                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Subtotal<div style="font-weight:normal !important">小计</div></th>
                                 </tr>
                             </thead>
                             

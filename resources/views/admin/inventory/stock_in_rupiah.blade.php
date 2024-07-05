@@ -144,7 +144,7 @@
                     <table class="bordered" style="font-size:10px;">
                         <thead id="t_head">
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">{{ __('translations.date') }}</th>
                                 <th class="center-align">{{ __('translations.plant') }}</th>
                                 <th class="center-align">{{ __('translations.warehouse') }}</th>
@@ -152,9 +152,9 @@
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">No. Dokumen</th>
-                                <th class="center-align">Qty</th>
+                                <th class="center-align">{{ __('translations.qty') }}</th>
                                 <th class="center-align">Harga </th>
-                                <th class="center-align">Total</th>
+                                <th class="center-align">{{ __('translations.total') }}</th>
                                 <th class="center-align">Cumulative Qty.</th>
                                 <th class="center-align">Cumulative Value</th>
                             </tr>
@@ -220,7 +220,7 @@
                             $('#t_head').empty();
                             $('#t_head').append(`
                                 <tr>
-                                    <th class="center-align">No.</th>
+                                    <th class="center-align">{{ __('translations.no') }}.</th>
                                     <th class="center-align">{{ __('translations.plant') }}</th>
                                     <th class="center-align">{{ __('translations.warehouse') }}</th>
                                     <th class="center-align">{{ __('translations.code') }}</th>
@@ -256,7 +256,7 @@
                             $('#t_head').empty();
                             $('#t_head').append(`
                                 <tr>
-                                    <th class="center-align">No.</th>
+                                    <th class="center-align">{{ __('translations.no') }}.</th>
                                     <th class="center-align">{{ __('translations.date') }}</th>
                                     <th class="center-align">{{ __('translations.plant') }}</th>
                                     <th class="center-align">{{ __('translations.warehouse') }}</th>
@@ -264,9 +264,9 @@
                                     <th class="center-align">Nama Item</th>
                                     <th class="center-align">{{ __('translations.unit') }}</th>
                                     <th class="center-align">No. Dokumen</th>
-                                    <th class="center-align">Qty</th>
+                                    <th class="center-align">{{ __('translations.qty') }}</th>
                                     <th class="center-align">Harga </th>
-                                    <th class="center-align">Total</th>
+                                    <th class="center-align">{{ __('translations.total') }}</th>
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);

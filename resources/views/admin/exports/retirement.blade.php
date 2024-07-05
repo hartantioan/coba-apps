@@ -18,7 +18,7 @@
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
             <th>Aset</th>
-            <th>Qty</th>
+            <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Nominal Aset</th>
             <th>Nominal Retirement</th>

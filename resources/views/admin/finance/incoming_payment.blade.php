@@ -170,7 +170,7 @@
                                                         <th rowspan="2" class="center-align">Kas/Bank</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
-                                                        <th rowspan="2" class="center-align">Grandtotal</th>
+                                                        <th rowspan="2" class="center-align">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.note') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.status') }}</th>
@@ -301,9 +301,9 @@
                                                         <th class="center">Referensi</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Tgl.Jatuh Tempo</th>
-                                                        <th class="center">Subtotal</th>
+                                                        <th class="center">{{ __('translations.subtotal') }}</th>
                                                         <th class="center">Pembulatan</th>
-                                                        <th class="center">Total</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center" width="500">{{ __('translations.note') }}</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
@@ -431,8 +431,8 @@
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">Coa Kas/Bank</th>
                                                 <th class="center">Admin</th>
-                                                <th class="center">Total</th>
-                                                <th class="center">Grandtotal</th>
+                                                <th class="center">{{ __('translations.total') }}</th>
+                                                <th class="center">{{ __('translations.grandtotal') }}</th>
                                                 <th class="center">Terpakai</th>
                                                 <th class="center">Sisa</th>
                                             </tr>

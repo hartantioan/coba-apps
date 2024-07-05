@@ -1,7 +1,7 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr align="center">
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>Nama Supplier</th>
             <th>Tgl. Terima</th>
             <th>Tgl. SJ</th>
@@ -12,7 +12,7 @@
             <th>Qty. Diterima</th>
             <th>Harga Satuan</th>
             <th>{{ __('translations.unit') }}</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>Total Bayar</th>
             <th>{{ __('translations.plant') }}</th>
             <th>Nomor PO</th>

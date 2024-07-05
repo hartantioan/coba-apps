@@ -80,15 +80,15 @@
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center-align">No.</th>
-                                                        <th class="center-align">No.GRPO</th>
-                                                        <th class="center-align">Supplier/Vendor</th>
-                                                        <th class="center-align">Tgl.Post</th>
-                                                        <th class="center-align">No.Surat Jalan</th>
-                                                        <th class="center-align">{{ __('translations.note') }}</th>
-                                                        <th class="center-align">Total Diterima</th>
-                                                        <th class="center-align">Total Invoice</th>
-                                                        <th class="center-align">Total Sisa</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.GRPO</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Supplier/Vendor</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Surat Jalan</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Diterima</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Invoice</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total Sisa</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail_invoice">

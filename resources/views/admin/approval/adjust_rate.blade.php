@@ -197,7 +197,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No.</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">{{ __('translations.number') }}/th>
                         <th class="center">Coa</th>
                         <th class="center">Nominal Sisa (FC)</th>
@@ -229,7 +229,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="7" class="right-align">TOTAL</th>
+                        <th colspan="7" class="right-align">{{ __('translations.total') }}</th>
                         <td class="right-align">{{ number_format($total,2,',','.') }}</td>
                     </tr>
                 </tfoot>

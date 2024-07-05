@@ -129,7 +129,7 @@
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center-align fixed">No.</th>
+                                                        <th class="center-align fixed">{{ __('translations.no') }}.</th>
                                                         <th class="center-align fixed2">NIK</th>
                                                         <th class="center-align fixed1">{{ __('translations.name') }}</th>
                                                         <th class="center-align">{{ __('translations.date') }}</th>

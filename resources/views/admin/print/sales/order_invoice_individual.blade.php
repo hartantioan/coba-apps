@@ -213,16 +213,16 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
+                                    <th>{{ __('translations.no') }}.</th>
                                     <th>{{ __('translations.item') }}</th>
                                     <th>NO.MOD</th>
                                     <th>NO.SJ</th>
-                                    <th>Qty</th>
+                                    <th>{{ __('translations.qty') }}</th>
                                     <th>{{ __('translations.unit') }}</th>
                                     <th>{{ __('translations.price') }}</th>
-                                    <th>Total</th>
-                                    <th>PPN</th>
-                                    <th>Grandtotal</th>
+                                    <th>{{ __('translations.total') }}</th>
+                                    <th>{{ __('translations.tax') }}</th>
+                                    <th>{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -351,12 +351,12 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th>No.</th>
+                                    <th>{{ __('translations.no') }}.</th>
                                     <th>Dokumen</th>
                                     <th>{{ __('translations.note') }}</th>
-                                    <th>Total</th>
-                                    <th>PPN</th>
-                                    <th>Grandtotal</th>
+                                    <th>{{ __('translations.total') }}</th>
+                                    <th>{{ __('translations.tax') }}</th>
+                                    <th>{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

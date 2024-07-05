@@ -198,7 +198,7 @@
                                 <thead>
                                     <tr>
                                         <th class="center">{{ __('translations.delete') }}</th>
-                                        <th class="center">No.</th>
+                                        <th class="center">{{ __('translations.no') }}.</th>
                                         <th class="center">{{ __('translations.number') }}/th>
                                         <th class="center">{{ __('translations.type') }}</th>
                                         <th class="center">Nominal Sisa (FC)</th>
@@ -680,7 +680,7 @@
                             });
                             $('#body-detail').append(`
                                 <tr>
-                                    <th class="right-align" colspan="8">TOTAL</th>
+                                    <th class="right-align" colspan="8">{{ __('translations.total') }}</th>
                                     <th class="right-align" id="total_balance">0,00</th>
                                 </tr>
                             `);
@@ -1173,7 +1173,7 @@
                 });
                 $('#body-detail').append(`
                     <tr>
-                        <th class="right-align" colspan="8">TOTAL</th>
+                        <th class="right-align" colspan="8">{{ __('translations.total') }}</th>
                         <th class="right-align" id="total_balance">` + response.total + `</th>
                     </tr>
                 `);

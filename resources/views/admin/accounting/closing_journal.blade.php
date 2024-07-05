@@ -332,7 +332,7 @@
                             <table class="bordered" id="table-detail">
                                 <thead>
                                     <tr>
-                                        <th class="center" width="5%">No.</th>
+                                        <th class="center" width="5%">{{ __('translations.no') }}.</th>
                                         <th class="center" width="45%">Coa</th>
                                         <th class="center" width="25%">Debit</th>
                                         <th class="center" width="25%">Kredit</th>
@@ -905,7 +905,7 @@
                             });
                             $('#body-detail').append(`
                                 <tr>
-                                    <th class="right-align" colspan="2">TOTAL</th>
+                                    <th class="right-align" colspan="2">{{ __('translations.total') }}</th>
                                     <th class="right-align">` + formatRupiahIni(totalDebit.toFixed(2).toString().replace('.',',')) + `</th>
                                     <th class="right-align">` + formatRupiahIni(totalCredit.toFixed(2).toString().replace('.',',')) + `</th>
                                 </tr>

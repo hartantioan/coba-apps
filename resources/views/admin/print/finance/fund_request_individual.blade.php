@@ -341,10 +341,10 @@
                                     <th class="center">Jum.</th>
                                     <th class="center">Sat.</th>
                                     <th class="center">Harga @</th>
-                                    <th class="center">Subtotal</th>
-                                    <th class="center">PPN</th>
-                                    <th class="center">PPh</th>
-                                    <th class="center">Grandtotal</th>
+                                    <th class="center">{{ __('translations.subtotal') }}</th>
+                                    <th class="center">{{ __('translations.tax') }}</th>
+                                    <th class="center">{{ __('translations.wtax') }}</th>
+                                    <th class="center">{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

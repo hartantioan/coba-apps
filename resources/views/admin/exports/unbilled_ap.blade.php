@@ -1,7 +1,7 @@
 <table class="bordered" style="font-size:10px;">
     <thead>
         <tr>
-            <th align="center">No.</th>
+            <th align="center">{{ __('translations.no') }}.</th>
             <th align="center">No.GRPO</th>
             <th align="center">Supplier/Vendor</th>
             <th align="center">Tgl.Post</th>

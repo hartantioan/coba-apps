@@ -182,11 +182,11 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th colspan="4" class="center-align">Pajak</th>
-                                                        <th rowspan="2">Subtotal</th>
+                                                        <th rowspan="2">{{ __('translations.subtotal') }}</th>
                                                         <th rowspan="2">Diskon</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -357,7 +357,7 @@
                                                         <th class="center">No. Sales Order</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
-                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
@@ -518,10 +518,10 @@
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
                         <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
                     
                 </thead>

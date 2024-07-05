@@ -349,7 +349,7 @@
                                 <th align="center" colspan="9" style="font-size:16px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
+                                <th align="center">{{ __('translations.no') }}.</th>
                                 <th align="center">{{ __('translations.item') }}</th>
                                 <th align="center">Qty Planned</th>
                                 <th align="center">Qty Real</th>

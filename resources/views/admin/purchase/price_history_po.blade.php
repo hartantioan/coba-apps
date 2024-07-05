@@ -78,7 +78,7 @@
                                                         <th >Supplier</th>
                                                         <th >{{ __('translations.code') }}</th>
                                                         <th >{{ __('translations.item') }}</th>
-                                                        <th class="center-align">{{ __('translations.date') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.date') }}</th>
                                                         <th> Harga Awal  </th>
                                                         <th >Discount 1  </th>
                                                         <th >Discount 2  </th>

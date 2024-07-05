@@ -262,7 +262,7 @@
                         <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">No.Batch</th>
                         <th class="center">Item</th>
-                        <th class="center">Qty</th>
+                        <th class="center">{{ __('translations.qty') }}</th>
                         <th class="center">Satuan</th>
                     </tr>
                 </thead>

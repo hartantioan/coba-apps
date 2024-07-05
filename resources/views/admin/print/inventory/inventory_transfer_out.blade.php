@@ -158,7 +158,7 @@
                                     <thead>
                                         <tr align="center">
                                             <th>{{ __('translations.item') }}</th>
-                                            <th>Qty</th>
+                                            <th>{{ __('translations.qty') }}</th>
                                             <th>{{ __('translations.unit') }}</th>
                                             <th>{{ __('translations.note') }}</th>
                                         </tr>

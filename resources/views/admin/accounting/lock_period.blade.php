@@ -195,7 +195,7 @@
                                 <table class="bordered">
                                     <thead>
                                         <tr>
-                                            <th class="center" width="15%">No.</th>
+                                            <th class="center" width="15%">{{ __('translations.no') }}.</th>
                                             <th class="center" width="55%">{{ __('translations.name') }}</th>
                                             <th class="center" width="30%">{{ __('translations.delete') }}</th>
                                         </tr>

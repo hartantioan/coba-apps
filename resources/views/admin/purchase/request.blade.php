@@ -270,7 +270,7 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">{{ __('translations.item') }}</th>
-                                                    <th class="center">Qty</th>
+                                                    <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan PO</th>
                                                     <th class="center" width="100px">Qty Stok</th>
                                                     <th class="center" width="100px">Satuan Stok</th>

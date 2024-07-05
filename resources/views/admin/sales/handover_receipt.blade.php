@@ -263,7 +263,7 @@
                                                         <th class="center">Kab./Kota</th>
                                                         <th class="center">{{ __('translations.province') }}</th>
                                                         <th class="center">Tgl.Post</th>
-                                                        <th class="center">Total</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item"></tbody>

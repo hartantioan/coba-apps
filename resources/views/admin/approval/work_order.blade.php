@@ -223,7 +223,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center">No.</th>
+                        <th class="center">{{ __('translations.no') }}.</th>
                         <th class="center">{{ __('translations.code') }}</th>
                         <th class="center">{{ __('translations.name') }}</th>
                         <th class="center">Spesifikasi</th>

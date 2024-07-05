@@ -204,7 +204,7 @@
                     <th class="center-align" colspan="6">Daftar Outgoing Payment (BS)</th>
                 </tr>
                 <tr>
-                    <th class="center-align">No.</th>
+                    <th class="center-align">{{ __('translations.no') }}.</th>
                     <th class="center-align">OP No.</th>
                     <th class="center-align">{{ __('translations.bussiness_partner') }}</th>
                     <th class="center-align">Tgl.Bayar</th>

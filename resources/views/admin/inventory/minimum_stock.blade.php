@@ -131,7 +131,7 @@
                     <table class="bordered" style="font-size:10px;">
                         <thead>
                             <tr>
-                                <th rowspan="2" class="center-align">No.</th>
+                                <th rowspan="2" class="center-align">{{ __('translations.no') }}.</th>
                                 <th rowspan="2" class="center-align">{{ __('translations.plant') }}</th>
                                 <th rowspan="2" class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th rowspan="2" class="center-align">Kode Item</th>
@@ -144,7 +144,7 @@
                             <tr>
                                 <th class="center-align">Minimum</th>
                                 <th class="center-align">Maximum</th>
-                                <th class="center-align">Qty</th>
+                                <th class="center-align">{{ __('translations.qty') }}</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">
@@ -164,7 +164,7 @@
                 <table class="bordered" style="font-size:10px;">
                     <thead>
                         <tr>
-                            <th class="center-align">No.</th>
+                            <th class="center-align">{{ __('translations.no') }}.</th>
                             <th class="center-align">{{ __('translations.plant') }}</th>
                             <th class="center-align">{{ __('translations.warehouse') }}</th>
                             <th class="center-align">{{ __('translations.stock') }}</th>

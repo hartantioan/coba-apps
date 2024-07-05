@@ -292,13 +292,13 @@
                                 <table border="1" style="border-collapse:collapse" width="100%">
                                     <thead>
                                         <tr>
-                                            <th class="center-align">PO/FR No.</th>
-                                            <th class="center-align">PR No.</th>
-                                            <th class="center-align">Tgl.Post</th>
-                                            <th class="center-align">Tgl.Kirim/Tgl.Pakai</th>
-                                            <th class="center-align">{{ __('translations.note') }}</th>
-                                            <th class="center-align">Total</th>
-                                            <th class="center-align">DP Total</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">PO/FR No.</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">PR No.</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Kirim/Tgl.Pakai</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">DP {{ __('translations.total') }}</th>
                                         </tr>
                                     </thead>
                                 @foreach($data->purchaseDownPaymentDetail as $key => $row)
@@ -542,13 +542,13 @@
                                 <table border="1" style="border-collapse:collapse" width="100%">
                                     <thead>
                                         <tr>
-                                            <th class="center-align">PO/FR No.</th>
-                                            <th class="center-align">PR No.</th>
-                                            <th class="center-align">Tgl.Post</th>
-                                            <th class="center-align">Tgl.Kirim</th>
-                                            <th class="center-align">{{ __('translations.note') }}</th>
-                                            <th class="center-align">Total</th>
-                                            <th class="center-align">DP Total</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">PO/FR No.</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">PR No.</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Kirim</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">DP Total</th>
                                            
                                         </tr>
                                         

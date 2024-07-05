@@ -139,7 +139,7 @@
                                 <th width="20%">Kwitansi</th>
                                 <th width="20%">{{ __('translations.name') }}</th>
                                 <th width="10%">{{ __('translations.date') }}</th>
-                                <th width="15%">Grandtotal</th>
+                                <th width="15%">{{ __('translations.grandtotal') }}</th>
                                 <th width="10%">{{ __('translations.status') }}</th>
                                 <th width="20%">{{ __('translations.note') }}</th>
                             </tr>

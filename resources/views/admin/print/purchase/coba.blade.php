@@ -257,12 +257,12 @@
             <table class="bordered table-with-breaks table-data-item " border="1" style="border-collapse:collapse;" width="100%"  >
                 <thead>
                     <tr>
-                        <th class="center-align">No.</th>
-                        <th class="center-align">Penerimaan Barang / Landed Cost / Purchase Order</th>
-                        <th class="center-align">Total</th>
-                        <th class="center-align">PPN</th>
-                        <th class="center-align">PPh</th>
-                        <th class="center-align">Grandtotal</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Penerimaan Barang / Landed Cost / Purchase Order</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.wtax') }}</th>
+                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                     </tr>
                 </thead>
                 <tbody>

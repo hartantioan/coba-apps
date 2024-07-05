@@ -155,12 +155,12 @@
                                 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:13px;">
                                     <thead>
                                         <tr align="center">
-                                            <th>No.</th>
+                                            <th>{{ __('translations.no') }}.</th>
                                             <th>Aset</th>
                                             <th>{{ __('translations.price') }}</th>
-                                            <th>Qty</th>
+                                            <th>{{ __('translations.qty') }}</th>
                                             <th>{{ __('translations.unit') }}</th>
-                                            <th>Total</th>
+                                            <th>{{ __('translations.total') }}</th>
                                             <th>{{ __('translations.note') }}</th>
                                         </tr>
                                     </thead>

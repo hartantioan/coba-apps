@@ -1,19 +1,19 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr>
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>No Invoice</th>
             <th>{{ __('translations.customer') }}</th>
             <th>Tgl.Post</th>
             <th>TOP</th>
             <th>Note</th>
-            <th>Subtotal</th>
+            <th>{{ __('translations.subtotal') }}</th>
             <th>Discount</th>
-            <th>Total</th>
-            <th>PPN</th>
+            <th>{{ __('translations.total') }}</th>
+            <th>{{ __('translations.tax') }}</th>
             <th>Total+PPN</th>
             <th>Pembulatan</th>
-            <th>Grandtotal</th>
+            <th>{{ __('translations.grandtotal') }}</th>
             <th>Terjadwal</th>
             <th>Terkirim</th>
             <th>Retur</th>

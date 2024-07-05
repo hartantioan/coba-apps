@@ -137,7 +137,7 @@
                                                         <th rowspan="1">Tipe Punish</th>
                                                         <th rowspan="1">Frekuensi</th>
                                                         <th rowspan="1">{{ __('translations.date') }}</th>
-                                                        <th rowspan="1">Total</th>
+                                                        <th rowspan="1">{{ __('translations.total') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>

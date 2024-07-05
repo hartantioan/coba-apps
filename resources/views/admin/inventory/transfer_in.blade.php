@@ -246,7 +246,7 @@
                                                 <tr>
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center">Ambil Dari</th>
-                                                    <th class="center">Qty</th>
+                                                    <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan Stock</th>
                                                     <th class="center">Serial</th>
                                                     <th class="center">{{ __('translations.note') }}</th>

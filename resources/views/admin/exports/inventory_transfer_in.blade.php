@@ -23,7 +23,7 @@
             <th>Kode Item</th>
             
             <th>Nama Item</th>
-            <th>Qty</th>
+            <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
             <th>{{ __('translations.note') }}</th>
             <th>Serial</th>

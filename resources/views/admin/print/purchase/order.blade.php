@@ -117,12 +117,12 @@
 								<th colspan="2">{{ __('translations.currency') }}</th>
 								<th rowspan="2">{{ __('translations.note') }}</th>
 								<th rowspan="2">{{ __('translations.status') }}</th>
-								<th rowspan="2">Subtotal</th>
+								<th rowspan="2">{{ __('translations.subtotal') }}</th>
 								<th rowspan="2">Diskon</th>
-								<th rowspan="2">Total</th>
-								<th rowspan="2">PPN</th>
-								<th rowspan="2">PPh</th>
-								<th rowspan="2">Grandtotal</th>
+								<th rowspan="2">{{ __('translations.total') }}</th>
+								<th rowspan="2">{{ __('translations.tax') }}</th>
+								<th rowspan="2">{{ __('translations.wtax') }}</th>
+								<th rowspan="2">{{ __('translations.grandtotal') }}</th>
 							</tr>
 							<tr align="center">
 								<th>Pengajuan</th>
@@ -172,14 +172,14 @@
 											<thead>
 												<tr align="center">
 													<th>{{ __('translations.item') }}</th>
-													<th>Qty</th>
+													<th>{{ __('translations.qty') }}</th>
 													<th>{{ __('translations.unit') }}</th>
 													<th>{{ __('translations.note') }}</th>
 													<th>Price</th>
 													<th>Discount 1 (%)</th>
 													<th>Discount 2 (%)</th>
 													<th>Discount 3 (Rp)</th>
-													<th>Subtotal</th>
+													<th>{{ __('translations.subtotal') }}</th>
 													<th>{{ __('translations.plant') }}</th>
 													<th>Departemen</th>
 													<th>{{ __('translations.warehouse') }}</th>

@@ -82,16 +82,16 @@
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead id="head_detail">
                                                     <tr>
-                                                        <th class="center-align">No.</th>
+                                                        <th class="center-align">{{ __('translations.no') }}.</th>
                                                         <th class="center-align">No.FREQ</th>
                                                         <th class="center-align">Karyawan</th>
                                                         <th class="center-align">Tgl.Pengajuan</th>
                                                         <th class="center-align">Tgl.Req.Bayar</th>
                                                         <th class="center-align">{{ __('translations.note') }}</th>
-                                                        <th class="center-align">Total</th>
-                                                        <th class="center-align">PPN</th>
-                                                        <th class="center-align">PPh</th>
-                                                        <th class="center-align">Grandtotal</th>
+                                                        <th class="center-align">{{ __('translations.total') }}</th>
+                                                        <th class="center-align">{{ __('translations.tax') }}</th>
+                                                        <th class="center-align">{{ __('translations.wtax') }}</th>
+                                                        <th class="center-align">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center-align">Diterima</th>
                                                         <th class="center-align">Dipakai</th>
                                                         <th class="center-align">Sisa</th>

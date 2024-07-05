@@ -206,13 +206,13 @@
                                                         <th colspan="3" class="center">Penerima</th>
                                                         <th rowspan="2">Tgl.Diterima</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
-                                                        <th rowspan="2">Subtotal</th>
+                                                        <th rowspan="2">{{ __('translations.subtotal') }}</th>
                                                         <th rowspan="2">Diskon</th>
-                                                        <th rowspan="2">Total</th>
-                                                        <th rowspan="2">PPN</th>
-                                                        <th rowspan="2">PPh</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.wtax') }}</th>
                                                         <th rowspan="2">Pembulatan</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -421,7 +421,7 @@
                                     <table class="bordered" style="width:4000px;font-size:0.9rem !important;" id="table-detail">
                                         <thead>
                                             <tr>
-                                                <th>No.</th>
+                                                <th>{{ __('translations.no') }}.</th>
                                                 <th>{{ __('translations.delete') }}</th>
                                                 <th>Item / Coa Jasa</th>
                                                 <th>Keterangan 1</th>
@@ -450,11 +450,11 @@
                                                 <th>Disc1(%)</th>
                                                 <th>Disc2(%)</th>
                                                 <th>Disc3(Rp)</th>
-                                                <th>Subtotal</th>
-                                                <th>Total</th>
-                                                <th>PPN</th>
-                                                <th>PPh</th>
-                                                <th>Grandtotal</th>
+                                                <th>{{ __('translations.subtotal') }}</th>
+                                                <th>{{ __('translations.total') }}</th>
+                                                <th>{{ __('translations.tax') }}</th>
+                                                <th>{{ __('translations.wtax') }}</th>
+                                                <th>{{ __('translations.grandtotal') }}</th>
                                                 <th>{{ __('translations.plant') }}</th>
                                                 <th>{{ __('translations.line') }}</th>
                                                 <th>{{ __('translations.engine') }}</th>

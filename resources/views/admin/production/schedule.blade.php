@@ -112,17 +112,17 @@
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>{{ __('translations.code') }}</th>
-                                                        <th>{{ __('translations.user') }}</th>
-                                                        <th>{{ __('translations.company') }}</th>
-                                                        <th>{{ __('translations.plant') }}</th>
-                                                        <th>Tgl.Post</th>
-                                                        <th>{{ __('translations.note') }}</th>
-                                                        <th>Dokumen</th>
-                                                        <th>{{ __('translations.status') }}</th>
-                                                        <th>By</th>
-                                                        <th>Operasi</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">#</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.code') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.user') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.company') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.by') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.operation') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -284,7 +284,7 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                         <th class="center">Target</th>
-                                                        <th>Data Shift & BOM</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Data Shift & BOM</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-item-detail-normal" id="body-item-detail-normal">
@@ -314,7 +314,7 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                         <th class="center">Target</th>
-                                                        <th>Data Shift & BOM</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Data Shift & BOM</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-item-detail-green" id="body-item-detail-green">
@@ -344,7 +344,7 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                         <th class="center">Target</th>
-                                                        <th>Data Shift & BOM</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Data Shift & BOM</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="body-item-detail-powder" id="body-item-detail-powder">
@@ -1066,7 +1066,7 @@
                         <thead>
                             <tr>
                                 <th class="center" style="min-width:150px !important;">Item</th>
-                                <th class="center" style="min-width:150px !important;">Qty</th>
+                                <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                 <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                 <th class="center" style="min-width:150px !important;">BOM</th>
                                 <th class="center" style="min-width:150px !important;">Line</th>
@@ -1227,7 +1227,7 @@
                             
                             let datanormal = `<table class="bordered"><thead><tr>
                                         <th class="center" style="min-width:150px !important;">Item</th>
-                                        <th class="center" style="min-width:150px !important;">Qty</th>
+                                        <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                         <th class="center" style="min-width:150px !important;">BOM</th>
                                         <th class="center" style="min-width:150px !important;">Line</th>
@@ -1936,7 +1936,7 @@
                                     <td>
                                         <table class="bordered"><thead><tr>
                                             <th class="center" style="min-width:150px !important;">Item</th>
-                                            <th class="center" style="min-width:150px !important;">Qty</th>
+                                            <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                             <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                             <th class="center" style="min-width:150px !important;">BOM</th>
                                             <th class="center" style="min-width:150px !important;">Line</th>

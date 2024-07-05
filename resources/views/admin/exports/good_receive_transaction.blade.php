@@ -1,7 +1,7 @@
 <table border="1" cellpadding="3" cellspacing="0" style="width:100%; font-size:10px;">
     <thead>
         <tr align="center">
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>

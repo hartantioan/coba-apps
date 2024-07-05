@@ -115,16 +115,16 @@
                 <table class="bordered">
                     <thead>
                         <tr>
-                            <th class="center-align">No.</th>
-                            <th class="center-align">No Invoice</th>
-                            <th class="center-align">Supplier/Vendor</th>
-                            <th class="center-align">TGL Post</th>
-                            <th class="center-align">TGL Jatuh Tempo</th>
-                            <th class="center-align">Jatuh Tempo (Hari)</th>
-                            <th class="center-align">Grandtotal</th>
-                            <th class="center-align">Memo</th>
-                            <th class="center-align">Dibayar</th>
-                            <th class="center-align">Sisa</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Invoice</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Supplier/Vendor</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Post</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TGL Jatuh Tempo</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Jatuh Tempo (Hari)</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dibayar</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa</th>
                         </tr>
                     </thead>
                     <tbody id="show_detail"></tbody>

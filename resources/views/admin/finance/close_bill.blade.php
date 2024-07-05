@@ -134,10 +134,10 @@
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>{{ __('translations.conversion') }}</th>
-                                                        <th>Total</th>
-                                                        <th>PPN</th>
-                                                        <th>PPh</th>
-                                                        <th>Grandtotal</th>
+                                                        <th>{{ __('translations.total') }}</th>
+                                                        <th>{{ __('translations.tax') }}</th>
+                                                        <th>{{ __('translations.wtax') }}</th>
+                                                        <th>{{ __('translations.grandtotal') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -237,7 +237,7 @@
                                                     <th class="center">Referensi</th>
                                                     <th class="center">{{ __('translations.bussiness_partner') }}</th>
                                                     <th class="center">Tgl.Post</th>
-                                                    <th class="center">Total</th>
+                                                    <th class="center">{{ __('translations.total') }}</th>
                                                     <th class="center">Dipakai</th>
                                                     <th class="center">Sisa</th>
                                                     <th class="center">{{ __('translations.note') }}</th>
@@ -388,7 +388,7 @@
                                     <th class="center-align">Kode Dokumen</th>
                                     <th class="center-align">{{ __('translations.bussiness_partner') }}</th>
                                     <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">Total</th>
+                                    <th class="center-align">{{ __('translations.total') }}</th>
                                     <th class="center-align">Terpakai</th>
                                     <th class="center-align">Sisa</th>
                                     <th class="center-align">{{ __('translations.note') }}</th>

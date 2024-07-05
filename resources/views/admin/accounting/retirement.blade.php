@@ -222,10 +222,10 @@
                             <table class="bordered" style="width:1500px;" id="table-detail">
                                 <thead>
                                     <tr>
-                                        <th class="center">No.</th>
+                                        <th class="center">{{ __('translations.no') }}.</th>
                                         <th class="center">Kode Aset</th>
                                         <th class="center">Nama Aset</th>
-                                        <th class="center">Qty</th>
+                                        <th class="center">{{ __('translations.qty') }}</th>
                                         <th class="center">Unit</th>
                                         <th class="center">Nominal Aset</th>
                                         <th class="center">Nominal Retirement/Jual</th>

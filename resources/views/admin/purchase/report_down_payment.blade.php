@@ -82,20 +82,20 @@
                                             <table class="bordered" style="font-size:10px;">
                                                 <thead id="head_detail">
                                                     <tr>
-                                                        <th class="center-align">No.</th>
-                                                        <th class="center-align">No.PODP</th>
-                                                        <th class="center-align">Supplier</th>
-                                                        <th class="center-align">{{ __('translations.type') }}</th>
-                                                        <th class="center-align">Tgl.Post</th>
-                                                        <th class="center-align">Tgl.Jatuh Tempo</th>
-                                                        <th class="center-align">{{ __('translations.note') }}</th>
-                                                        <th class="center-align">Subtotal</th>
-                                                        <th class="center-align">Diskon</th>
-                                                        <th class="center-align">Grandtotal</th>
-                                                        <th class="center-align">Dipakai</th>
-                                                        <th class="center-align">Memo</th>
-                                                        <th class="center-align">Sisa RP</th>
-                                                        <th class="center-align">Sisa FC</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.PODP</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Supplier</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.type') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Jatuh Tempo</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Diskon</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dipakai</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Memo</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa RP</th>
+                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa FC</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail-result">

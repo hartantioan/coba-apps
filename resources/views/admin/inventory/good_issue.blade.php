@@ -261,7 +261,7 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">Stok</th>
-                                                        <th class="center">Qty</th>
+                                                        <th class="center">{{ __('translations.qty') }}</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center" width="300px">No.Serial</th>
                                                         <th class="center">Ket.1</th>

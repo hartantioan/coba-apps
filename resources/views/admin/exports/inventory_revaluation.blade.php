@@ -16,7 +16,7 @@
             <th>{{ __('translations.note') }}</th>
             <th>Kode Item</th>
             <th>Nama Item</th>
-            <th>Qty</th>
+            <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
             <th>{{ __('translations.origin') }}</th>
             <th>{{ __('translations.nominal') }}</th>

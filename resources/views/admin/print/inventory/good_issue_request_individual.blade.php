@@ -244,20 +244,20 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th align="center">No</th>
-                                <th align="center">{{ __('translations.item') }}</th>
-                                <th align="center">Jum.</th>
-                                <th align="center">Stok</th>
-                                <th align="center">Outstanding</th>
-                                <th align="center">Sat.</th>
-                                <th align="center">Tgl.Dipakai</th>
-                                <th align="center">{{ __('translations.plant') }}</th>
-                                <th align="center">{{ __('translations.warehouse') }}</th>
-                                <th align="center">{{ __('translations.line') }}</th>
-                                <th align="center">Machine</th>
-                                <th align="center">{{ __('translations.division') }}</th>
-                                <th align="center">Proyek</th>
-                                <th align="center-">Requester</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}.</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.stock') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Outstanding</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}.</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.used_date') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.warehouse') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.engine') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.division') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.project') }}</th>
+                                <th align="center" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.requester') }}</th>
                             </tr>
                         </thead>
                         <tbody>

@@ -11,10 +11,10 @@
             <th>Tgl.Tenggat</th>
             <th>Tgl.Dokumen</th>
             <th>{{ __('translations.type') }}</th>
-            <th>Total</th>
-            <th>PPN</th>
-            <th>PPh</th>
-            <th>Grandtotal</th>
+            <th>{{ __('translations.total') }}</th>
+            <th>{{ __('translations.tax') }}</th>
+            <th>{{ __('translations.wtax') }}</th>
+            <th>{{ __('translations.grandtotal') }}</th>
             <th>DP</th>
             <th>Sisa</th>
             <th>Dok.</th>

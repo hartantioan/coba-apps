@@ -147,7 +147,7 @@
                     <table class="bordered" style="font-size:10px;">
                         <thead id="t_head">
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">Tanggal.</th>
                                 <th class="center-align">Plant.</th>
                                 <th class="center-align">Gudang.</th>
@@ -218,7 +218,7 @@
                         $('#t_head').empty();
                         $('#t_head').append(`
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">{{ __('translations.plant') }}</th>
                                 <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">{{ __('translations.code') }}</th>
@@ -245,7 +245,7 @@
                         $('#t_head').empty();
                         $('#t_head').append(`
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">Tanggal.</th>
                                 <th class="center-align">Plant.</th>
                                 <th class="center-align">Gudang.</th>

@@ -278,7 +278,7 @@
                                     <th align="center" colspan="6">Daftar Dokumen Terpakai</th>
                                 </tr>
                                 <tr>
-                                    <th align="center">No.</th>
+                                    <th align="center">{{ __('translations.no') }}.</th>
                                     <th align="center">OP/CREQ No.</th>
                                     <th align="center">{{ __('translations.bussiness_partner') }}</th>
                                     <th align="center">Tgl.Bayar</th>

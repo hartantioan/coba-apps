@@ -1,7 +1,7 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr align="center">
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
             <th>{{ __('translations.type') }}</th>
             <th>{{ __('translations.status') }}</th>
@@ -32,7 +32,7 @@
             <th>Qty Konversi</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Kurs</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>{{ __('translations.line') }}</th>
             <th>{{ __('translations.engine') }}</th>
             <th>{{ __('translations.division') }}</th>

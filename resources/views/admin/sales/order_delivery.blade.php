@@ -265,7 +265,7 @@
                                             <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center">No.</th>
+                                                        <th class="center">{{ __('translations.no') }}.</th>
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">{{ __('translations.stock') }}</th>
                                                         <th class="center">Qty Pesanan</th>

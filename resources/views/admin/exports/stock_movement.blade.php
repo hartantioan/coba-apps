@@ -2,7 +2,7 @@
     <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
         <thead>
             <tr align="center">
-                <th class="center-align">No.</th>
+                <th class="center-align">{{ __('translations.no') }}.</th>
                 <th class="center-align">Tanggal.</th>
                 <th class="center-align">Plant.</th>
                 <th class="center-align">Gudang.</th>
@@ -67,7 +67,7 @@
     <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
         <thead>
             <tr align="center">
-                <th align="center">No.</th>
+                <th align="center">{{ __('translations.no') }}.</th>
                 <th align="center">{{ __('translations.plant') }}</th>
                 <th align="center">{{ __('translations.warehouse') }}</th>
                 <th align="center">{{ __('translations.code') }}</th>

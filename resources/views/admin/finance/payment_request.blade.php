@@ -172,10 +172,10 @@
                                                         <th rowspan="2">No.Cek/BG</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
-                                                        <th rowspan="2">Total</th>
+                                                        <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">Pembulatan</th>
                                                         <th rowspan="2">Admin</th>
-                                                        <th rowspan="2">Grandtotal</th>
+                                                        <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">Bayar</th>
                                                         <th rowspan="2">Sisa</th>
                                                         <th rowspan="2">Dokumen</th>
@@ -369,10 +369,10 @@
                                                                 <th class="center">Tgl.Post</th>
                                                                 <th class="center">Tgl.Jatuh Tempo</th>
                                                                 <th class="center">{{ __('translations.currency') }}</th>
-                                                                <th class="center">Total</th>
-                                                                <th class="center">PPN</th>
-                                                                <th class="center">PPh</th>
-                                                                <th class="center">Grandtotal</th>
+                                                                <th class="center">{{ __('translations.total') }}</th>
+                                                                <th class="center">{{ __('translations.tax') }}</th>
+                                                                <th class="center">{{ __('translations.wtax') }}</th>
+                                                                <th class="center">{{ __('translations.grandtotal') }}</th>
                                                                 <th class="center">Potongan/Memo</th>
                                                                 <th class="center">Bayar</th>
                                                                 <th class="center">{{ __('translations.note') }}</th>
@@ -449,8 +449,8 @@
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Coa Kas/Bank</th>
                                                         <th class="center">Admin</th>
-                                                        <th class="center">Total</th>
-                                                        <th class="center">Grandtotal</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
+                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center">Digunakan</th>
                                                     </tr>
                                                 </thead>
@@ -699,10 +699,10 @@
                                             <tr>
                                                 <th class="center-align">Kode Dokumen</th>
                                                 <th class="center-align">Tgl.Post</th>
-                                                <th class="center-align">Total</th>
-                                                <th class="center-align">PPN</th>
-                                                <th class="center-align">PPh</th>
-                                                <th class="center-align">Grandtotal</th>
+                                                <th class="center-align">{{ __('translations.total') }}</th>
+                                                <th class="center-align">{{ __('translations.tax') }}</th>
+                                                <th class="center-align">{{ __('translations.wtax') }}</th>
+                                                <th class="center-align">{{ __('translations.grandtotal') }}</th>
                                                 <th class="center-align">Downpayment</th>
                                                 <th class="center-align">Rounding</th>
                                                 <th class="center-align">Sisa</th>
@@ -732,8 +732,8 @@
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">Coa Kas/Bank</th>
                                                 <th class="center">Admin</th>
-                                                <th class="center">Total</th>
-                                                <th class="center">Grandtotal</th>
+                                                <th class="center">{{ __('translations.total') }}</th>
+                                                <th class="center">{{ __('translations.grandtotal') }}</th>
                                                 <th class="center">Terpakai</th>
                                                 <th class="center">Sisa</th>
                                             </tr>

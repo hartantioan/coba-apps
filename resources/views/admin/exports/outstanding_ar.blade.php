@@ -1,7 +1,7 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr>
-            <th>No.</th>
+            <th>{{ __('translations.no') }}.</th>
             <th>No Invoice</th>
             <th>{{ __('translations.customer') }}</th>
             <th>TGL Post</th>
@@ -12,11 +12,11 @@
             <th>Qty Invoice</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Harga Satuan</th>
-            <th>Total</th>
-            <th>PPN</th>
+            <th>{{ __('translations.total') }}</th>
+            <th>{{ __('translations.tax') }}</th>
             <th>Total Stl PPN</th>
             <th>Pembulatan</th>
-            <th>Grandtotal</th>
+            <th>{{ __('translations.grandtotal') }}</th>
             <th>Memo</th>
             <th>Dibayar</th>
             <th>Sisa</th>

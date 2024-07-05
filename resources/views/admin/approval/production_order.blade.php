@@ -199,12 +199,12 @@
                         <th colspan="6" class="center-align">Daftar Komposisi dari BOM Terbaru</th>
                     </tr>
                     <tr>
-                        <th class="center-align">No.</th>
+                        <th class="center-align">{{ __('translations.no') }}.</th>
                         <th class="center-align">Bahan/Biaya</th>
-                        <th class="center-align">Qty</th>
+                        <th class="center-align">{{ __('translations.qty') }}</th>
                         <th class="center-align">Satuan (Produksi)</th>
                         <th class="center-align">{{ __('translations.nominal') }}</th>
-                        <th class="center-align">Total</th>
+                        <th class="center-align">{{ __('translations.total') }}</th>
                     </tr>
                 </thead>
                 <tbody>

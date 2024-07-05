@@ -21,7 +21,7 @@
             <th class="center-align">{{ __('translations.plant') }}</th>
             <th class="center-align">Ket. 1</th>
             <th class="center-align">Ket. 2</th>
-            <th class="center-align">Qty</th>
+            <th class="center-align">{{ __('translations.qty') }}</th>
             <th class="center-align">{{ __('translations.unit') }}</th>
             <th class="center-align">Qty Pr</th>
             <th class="center-align">Satuan Pr</th>

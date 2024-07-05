@@ -132,25 +132,25 @@
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
-                                                        <th>#</th>
-                                                        <th>{{ __('translations.code') }}</th>
-                                                        <th>{{ __('translations.user') }}</th>
-                                                        <th>{{ __('translations.company') }}</th>
-                                                        <th>Tgl.Post</th>
-                                                        <th>{{ __('translations.note') }}</th>
-                                                        <th>No.PROD</th>
-                                                        <th>No.Jadwal</th>
-                                                        <th>Shift</th>
-                                                        <th>Waktu Mulai Produksi</th>
-                                                        <th>Waktu Selesai Produksi</th>
-                                                        <th>{{ __('translations.line') }}</th>
-                                                        <th>Group</th>
-                                                        <th>{{ __('translations.plant') }}</th>
-                                                        <th>{{ __('translations.engine') }}</th>
-                                                        <th>Dokumen</th>
-                                                        <th>{{ __('translations.status') }}</th>
-                                                        <th>By</th>
-                                                        <th>Operasi</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">#</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.code') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.user') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.company') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.post_date') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.PROD</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Jadwal</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Shift</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Waktu Mulai Produksi</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Waktu Selesai Produksi</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Group</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.engine') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.by') }}</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.operation') }}</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -307,7 +307,7 @@
                                                 <table class="bordered" style="border: 1px solid;width:1800px !important;" id="table-detail-item-issue">
                                                     <thead>
                                                         <tr>
-                                                            <th class="center">No.</th>
+                                                            <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">Item/Resource</th>
                                                             <th class="center">Qty Planned</th>
                                                             <th class="center">Qty Real</th>
@@ -535,10 +535,10 @@
                             <th class="center-align" colspan="2">Mata Uang Konversi</th>
                         </tr>
                         <tr>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
-                            <th class="center-align">Debit</th>
-                            <th class="center-align">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
                     
                 </thead>
@@ -842,10 +842,10 @@
                                         <table class="bordered" style="width:500px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th>No.Batch</th>
-                                                    <th>Tangki</th>
-                                                    <th>Qty Dipakai</th>
-                                                    <th>{{ __('translations.delete') }}</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="table-batch` + val + `"></tbody>
@@ -1116,10 +1116,10 @@
                                     <table class="bordered" style="width:500px !important;">
                                         <thead>
                                             <tr>
-                                                <th>No.Batch</th>
-                                                <th>Tangki</th>
-                                                <th>Qty Dipakai</th>
-                                                <th>{{ __('translations.delete') }}</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
                                         <tbody id="table-batch` + count + `"></tbody>
@@ -1784,10 +1784,10 @@
                                         <table class="bordered" style="width:500px !important;">
                                             <thead>
                                                 <tr>
-                                                    <th>No.Batch</th>
-                                                    <th>Tangki</th>
-                                                    <th>Qty Dipakai</th>
-                                                    <th>{{ __('translations.delete') }}</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="table-batch` + count + `"></tbody>

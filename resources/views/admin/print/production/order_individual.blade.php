@@ -255,9 +255,9 @@
                                 <th colspan="6" class="center-align">Daftar Target Produksi</th>
                             </tr>
                             <tr>
-                                <th align="center">No.</th>
+                                <th align="center">{{ __('translations.no') }}.</th>
                                 <th align="center">{{ __('translations.item') }}</th>
-                                <th align="center">Qty</th>
+                                <th align="center">{{ __('translations.qty') }}</th>
                                 <th align="center">{{ __('translations.unit') }}</th>
                                 <th align="center">{{ __('translations.line') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>

@@ -130,7 +130,7 @@
                     <table class="bordered" style="font-size:10px;">
                         <thead>
                             <tr>
-                                <th class="center-align">No.</th>
+                                <th class="center-align">{{ __('translations.no') }}.</th>
                                 <th class="center-align">{{ __('translations.plant') }}</th>
                                 <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">Kode Item</th>

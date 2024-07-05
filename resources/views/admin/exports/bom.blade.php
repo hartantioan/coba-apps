@@ -28,9 +28,9 @@
                     <th>{{ $rowalt->name.' '.($rowalt->is_default ? '(*)' : '') }}</th>
                     <th>Item/Resource</th>
                     <th>Description</th>
-                    <th>Qty</th>
+                    <th>{{ __('translations.qty') }}</th>
                     <th>{{ __('translations.nominal') }}</th>
-                    <th>Total</th>
+                    <th>{{ __('translations.total') }}</th>
                     <th>Dist.Biaya</th>
                 </tr>
                 @foreach ($rowalt->bomDetail as $key => $m)

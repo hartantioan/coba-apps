@@ -1,16 +1,16 @@
 <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
     <thead>
         <tr align="center">
-            <th class="center-align">No.</th>
+            <th class="center-align">{{ __('translations.no') }}.</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">{{ __('translations.customer') }}</th>
             <th class="center-align">{{ __('translations.type') }}</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Tgl.Tenggat</th>
             <th class="center-align">{{ __('translations.note') }}</th>
-            <th class="center-align">Subtotal</th>
+            <th class="center-align">{{ __('translations.subtotal') }}</th>
             <th class="center-align">Diskon</th>
-            <th class="center-align">Total</th>
+            <th class="center-align">{{ __('translations.total') }}</th>
             <th class="center-align">Dipakai</th>
             <th class="center-align">Memo</th>
             <th class="center-align">Sisa</th>   

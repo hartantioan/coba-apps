@@ -137,7 +137,7 @@
 						<th>No Pembeli NPWP</th>
 						<th>Nama Pembeli NPWP</th>
 						<th>Alamat Pembeli NPWP</th>
-						<th>Total</th>
+						<th>{{ __('translations.total') }}</th>
 						<th>Pajak</th>
 						<th>Harga setelah Pajak</th>
 						<th>Status Approval</th>

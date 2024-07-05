@@ -23,7 +23,7 @@
             <th>Tipe Pengeluaran</th>
             <th>COA</th>
             <th>Distribusi Biaya</th>
-            <th>Qty</th>
+            <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
             <th>{{ __('translations.line') }}</th>
             <th>{{ __('translations.engine') }}</th>
@@ -32,7 +32,7 @@
             <th>Proyek</th>
             <th>Requester</th>
             <th>Qty Kembali</th>
-            <th>Total</th>
+            <th>{{ __('translations.total') }}</th>
             <th>Based On</th>
         </tr>
     </thead>

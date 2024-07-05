@@ -1011,6 +1011,7 @@
                 $('#supplier_id').empty();
                 $('#grandtotal,#total,#tax,#wtax').text('0,00');
                 $('#subtotal').val('0,00');
+                $('#subtotal').attr('readonly',false);
                 window.onbeforeunload = function() {
                     return null;
                 };
@@ -1675,7 +1676,7 @@
                                             ` + val.grandtotal + `
                                         </td>
                                         <td class="center">
-                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countRow()" style="text-align:right;width:100%;" id="rowNominal` + count + `">
+                                            <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.grandtotal + `" onkeyup="formatRupiah(this);countRow()" style="text-align:right;width:100%;" id="rowNominal` + count + `" readonly>
                                         </td>
                                     </tr>
                                 `);
@@ -1694,6 +1695,8 @@
                                         });
                                     });
                                 }
+
+                                $('#subtotal').attr('readonly',true);
 
                                 $('#currency_rate').val(val.currency_rate);
                                 $('#currency_id').val(val.currency_id).formSelect();

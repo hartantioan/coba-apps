@@ -117,6 +117,16 @@ class PurchaseOrder extends Model
         return $type;
     }
 
+    public function inventoryTypeChi(){
+        $type = match ($this->inventory_type) {
+          '1' => '存货',
+          '2' => '等等',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function paymentType(){
         $type = match ($this->payment_type) {
           '1' => 'Cash',

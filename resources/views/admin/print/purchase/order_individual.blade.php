@@ -276,6 +276,15 @@ use App\Helpers\PrintHelper;
                                             {{ $data->shippingType() }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td style="vertical-align:top;">
+                                            Tipe
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->inventoryType() }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="25%" class="left-align">

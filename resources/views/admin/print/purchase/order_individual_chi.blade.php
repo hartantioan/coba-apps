@@ -331,6 +331,20 @@ use App\Helpers\PrintHelper;
                                             送货
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td style="vertical-align:top;">
+                                            Type
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->inventoryTypeChi() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td  width="20%">
+                                            类型
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                             <td width="25%" class="left-align">

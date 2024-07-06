@@ -128,8 +128,8 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                     $item_code = explode('#', $row['resource_code'])[0];
                     $item_output = Resource::where('code', $item_code)->first();
                    
-                    $nominal =$row['nominal'];
-                    $total = $row['total'];
+                    $nominal =$item_output->cost;
+                    $total = $row['qty'] * $item_output->cost;
                     $cost_distribution_code = explode('#', $row['distribusi_biaya'])[0];
                     $cost_distribution = CostDistribution::where('code', $cost_distribution_code)->first();
                     $cost_distribution_id = $cost_distribution ? $cost_distribution->id : NULL;

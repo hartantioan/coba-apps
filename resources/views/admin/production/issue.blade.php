@@ -140,6 +140,7 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.PROD</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Jadwal</th>
+                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Item</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Shift</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Waktu Mulai Produksi</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Waktu Selesai Produksi</th>
@@ -1441,6 +1442,7 @@
                 { name: 'note', className: '' },
                 { name: 'production_order_detail_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'production_schedule_id', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'item_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'shift', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'start_process_time', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'end_process_time', searchable: false, orderable: false, className: 'center-align' },

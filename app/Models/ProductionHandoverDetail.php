@@ -20,15 +20,18 @@ class ProductionHandoverDetail extends Model
         'production_fg_receive_detail_id',
         'item_id',
         'qty',
+        'qty_reject',
+        'qty_received',
         'shading',
         'place_id',
         'warehouse_id',
         'area_id',
         'total',
+        'item_shading_id',
     ];
 
     public function productionBatchUsage(){
-        return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasOne('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function productionHandover()
@@ -44,6 +47,11 @@ class ProductionHandoverDetail extends Model
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function itemShading()
+    {
+        return $this->belongsTo('App\Models\ItemShading', 'item_shading_id', 'id')->withTrashed();
     }
 
     public function warehouse()

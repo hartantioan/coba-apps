@@ -71,6 +71,7 @@ use App\Models\ItemStock;
 use App\Models\MaterialRequest;
 use App\Models\ProductionBatch;
 use App\Models\ProductionFgReceive;
+use App\Models\ProductionHandover;
 use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionSchedule;
@@ -4348,9 +4349,9 @@ class CustomHelper {
 				);
 
 				self::sendStock(
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
+					$pir->place_id,
+					$row->productionBatch->item->warehouse(),
+					$row->productionBatch->item_id,
 					$row->qty,
 					'OUT',
 					NULL,
@@ -4375,6 +4376,81 @@ class CustomHelper {
 			]);
 
 			$pir->createProductionIssue();
+
+		}elseif($table_name == 'production_handovers'){
+
+			$pir = ProductionHandover::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pir->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note ?? '',
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			$total = 0;
+
+			foreach($pir->productionHandoverDetail as $row){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'line_id'		=> $pir->productionFgReceive->line_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> $row->total,
+					'note'			=> $pir->code,
+				]);
+
+				self::sendCogs($table_name,
+					$pir->id,
+					$pir->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty * $row->productionFgReceiveDetail->conversion,
+					$row->total,
+					'IN',
+					$pir->post_date,
+					$row->area_id,
+					$row->item_shading_id,
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_id,
+					$row->qty * $row->productionFgReceiveDetail->conversion,
+					'IN',
+					$row->area_id,
+					$row->item_shading_id,
+				);
+
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->productionFgReceiveDetail->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'line_id'		=> $pir->productionFgReceive->line_id,
+					'item_id'		=> $row->item_id,
+					'warehouse_id'	=> $row->productionFgReceiveDetail->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> $row->total,
+					'note'			=> $pir->code,
+				]);
+			}
+
+			$pir->productionFgReceive->update([
+				'status'	=> '3'
+			]);
 
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
@@ -5197,9 +5273,7 @@ class CustomHelper {
 	public static function removeApproval($table_name = null, $table_id = null){
 		$datasource = ApprovalSource::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 		foreach($datasource as $row){
-			foreach($row->approvalMatrix as $rowdetail){
-				$rowdetail->delete();
-			}
+			$row->approvalMatrix()->delete();
 			$row->delete();
 		}
 	}

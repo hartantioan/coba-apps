@@ -19,7 +19,7 @@ class ProductionHandover extends Model
         'code',
         'user_id',
         'company_id',
-        'productio_fg_receive_id',
+        'production_fg_receive_id',
         'post_date',
         'document',
         'note',
@@ -61,7 +61,7 @@ class ProductionHandover extends Model
 
     public function productionFgReceive()
     {
-        return $this->belongsTo('App\Models\ProductionFgReceive', 'productio_fg_receive_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ProductionFgReceive', 'production_fg_receive_id', 'id')->withTrashed();
     }
 
     public function used(){

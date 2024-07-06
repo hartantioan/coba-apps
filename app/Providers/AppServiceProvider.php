@@ -105,6 +105,8 @@ class AppServiceProvider extends ServiceProvider
             'production_fg_receives'                => 'App\Models\ProductionFgReceive',
             'production_fg_receive_details'         => 'App\Models\ProductionFgReceiveDetail',
             'production_batches'                    => 'App\Models\ProductionBatch',
+            'production_handovers'                  => 'App\Models\ProductionHandover',
+            'production_handover_details'           => 'App\Models\ProductionHandoverDetail',
         ]);
     }
 }

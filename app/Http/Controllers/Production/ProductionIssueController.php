@@ -165,6 +165,7 @@ class ProductionIssueController extends Controller
                     $val->note,
                     $val->productionOrderDetail->productionOrder->code,
                     $val->productionOrderDetail->productionScheduleDetail->productionSchedule->code,
+                    $val->productionOrderDetail->productionScheduleDetail->item->code.' - '.$val->productionOrderDetail->productionScheduleDetail->item->name,
                     $val->shift->code.' - '.$val->shift->name,
                     $val->start_process_time ? date('d/m/Y H:i',strtotime($val->start_process_time)) : '-',
                     $val->end_process_time ? date('d/m/Y H:i',strtotime($val->end_process_time)) : '-',

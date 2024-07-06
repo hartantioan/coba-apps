@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Illuminate\Support\Str;
 
 class BomsImport implements WithMultipleSheets
 {
@@ -88,10 +89,9 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
             $check = Bom::where('code', $row['kode_bom_header'])->first();
             $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->first();
             if ($check) {
-            
                 $query = BomAlternative::create([
-                    'code' => $row['kode_alternative'],
-                    'name' => $row['nama_alternative'],
+                    'code' => $row['kode_alternative'] ? $row['kode_alternative'] : strtoupper(Str::random(25)),
+                    'name' => $row['nama_alternative'] ? $row['nama_alternative'] : strtoupper(Str::random(25)),
                     'is_default' => $row['is_default'],
                     'bom_id' => $check->id,
                 ]);

@@ -371,7 +371,7 @@ class BomController extends Controller
                     'uom_unit'                  => $m->lookable->uomUnit->code,
                     'nominal'                   => number_format($m->nominal,2,',','.'),
                     'total'                     => number_format($m->total,2,',','.'),
-                    'description'               => $m->description,
+                    'description'               => $m->description ?? '',
                     'cost_distribution_id'      => $m->cost_distribution_id ?? '',
                     'cost_distribution_name'    => $m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '',
                     'issue_method'              => $m->issue_method ?? '',

@@ -264,7 +264,7 @@ class ProductionHandoverController extends Controller
                 ];
             } else {
                 
-                $pod = ProductionFgReceive::find($request->production_fg_receive_id);
+                $pod = ProductionHandover::find($request->production_fg_receive_id);
 
                 if($request->temp){
                     $query = ProductionHandover::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -591,10 +591,10 @@ class ProductionHandoverController extends Controller
 
     public function printIndividual(Request $request,$id){
         
-        $pr = ProductionFgReceive::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionHandover::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Serah Terima Produksi','a4','portrait','admin.print.production.receive_fg_individual');
+            $pdf = PrintHelper::print($pr,'Serah Terima Produksi','a4','portrait','admin.print.production.handover_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
@@ -609,7 +609,7 @@ class ProductionHandoverController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -662,7 +662,7 @@ class ProductionHandoverController extends Controller
                 ]);
 
                 activity()
-                    ->performedOn(new ProductionFgReceive())
+                    ->performedOn(new ProductionHandover())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the Serah Terima Produksi data');
@@ -686,7 +686,7 @@ class ProductionHandoverController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -741,7 +741,7 @@ class ProductionHandoverController extends Controller
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new ProductionFgReceive())
+                ->performedOn(new ProductionHandover())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the Serah Terima Produksi data');
@@ -780,7 +780,7 @@ class ProductionHandoverController extends Controller
                 $pr = ProductionReceive::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'Production Receive','a4','portrait','admin.print.production.receive_individual');
+                    $pdf = PrintHelper::print($pr,'Production Receive','a4','portrait','admin.print.production.handover_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -855,7 +855,7 @@ class ProductionHandoverController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = ProductionReceive::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.receive_individual');
+                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.handover_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -909,7 +909,7 @@ class ProductionHandoverController extends Controller
                     foreach($merged as $code){
                         $query = ProductionReceive::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.receive_individual');
+                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.handover_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

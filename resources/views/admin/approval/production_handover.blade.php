@@ -191,7 +191,7 @@
             <table class="bordered" style="min-width:1400px !important;">
                 <thead>
                     <tr>
-                        <th colspan="12" class="center-align">Daftar Item Receive</th>
+                        <th colspan="12" class="center-align">Daftar Item Diterima</th>
                     </tr>
                     <tr>
                         <th class="center">No.</th>
@@ -221,7 +221,7 @@
                             <td class="center-align">{{ $row->productionFgReceiveDetail->itemUnit->unit->code }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->productionFgReceiveDetail->conversion) }}</td>
                             <td class="">{{ $row->place->code }}</td>
-                            <td class="">{{ $row->warehouse->code }}</td>
+                            <td class="">{{ $row->warehouse->name }}</td>
                             <td class="">{{ $row->area->code }}</td>
                         </tr>
                     @endforeach

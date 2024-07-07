@@ -31,6 +31,8 @@ class ProductionOrder extends Model
         'planned_qty',
         'completed_qty',
         'rejected_qty',
+        'real_time_start',
+        'real_time_end',
         'total_production_time',
         'total_additional_time',
         'total_run_time',

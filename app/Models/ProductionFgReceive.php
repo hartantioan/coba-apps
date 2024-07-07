@@ -107,6 +107,11 @@ class ProductionFgReceive extends Model
         return $this->hasMany('App\Models\ProductionFgReceiveDetail');
     }
 
+    public function productionHandover()
+    {
+        return $this->hasMany('App\Models\ProductionHandover')->whereIn('status',['1','2','3']);
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -208,6 +213,10 @@ class ProductionFgReceive extends Model
         $hasRelation = false;
 
         if($this->productionIssue()->exists()){
+            $hasRelation = true;
+        }
+
+        if($this->productionHandover()->exists()){
             $hasRelation = true;
         }
 

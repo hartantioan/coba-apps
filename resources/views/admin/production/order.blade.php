@@ -151,31 +151,9 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend align="left">1. Biaya-biaya / Costs</legend>
+                                    <legend align="left">1. Waktu Produksi / Times</legend>
                                     <div class="input-field col m3 s12">
                                         <input type="hidden" id="tempClose" name="tempClose">
-                                        <input id="actual_item_cost" name="actual_item_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback">IDR</div>
-                                        <label class="active" for="actual_item_cost">Total Aktual Biaya Komponen Item</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="actual_resource_cost" name="actual_resource_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback">IDR</div>
-                                        <label class="active" for="actual_resource_cost">Total Aktual Biaya Komponen Resource</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="total_product_cost" name="total_product_cost" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback">IDR</div>
-                                        <label class="active" for="total_product_cost">Total Aktual Biaya Produk</label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend align="left">2. Waktu Produksi / Times</legend>
-                                    <div class="input-field col m3 s12">
                                         <input id="real_time_start" name="real_time_start" type="datetime-local" placeholder="Aktual Tgl. Mulai Produksi">
                                         <label class="active" for="real_time_start">Tgl. Mulai Produksi (Aktual)</label>
                                     </div>
@@ -183,28 +161,13 @@
                                         <input id="real_time_end" name="real_time_end" type="datetime-local" placeholder="Aktual Tgl. Akhir Produksi">
                                         <label class="active" for="real_time_end">Tgl. Berakhir Produksi (Aktual)</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="total_production_time" name="total_production_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback">Jam</div>
-                                        <label class="active" for="total_production_time">Total Aktual Waktu Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="total_additional_time" name="total_additional_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);">
-                                        <div class="form-control-feedback">Jam</div>
-                                        <label class="active" for="total_additional_time">Total Waktu Tambahan Produksi</label>
-                                    </div>
-                                    <div class="input-field col m6 s12">
-                                        <input id="total_run_time" name="total_run_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <div class="form-control-feedback">Jam</div>
-                                        <label class="active" for="total_run_time">Total Waktu Jalan Produksi (Aktual + Tambahan)</label>
-                                    </div>
                                 </fieldset>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend align="left">3. Nilai Item</legend>
+                                    <legend align="left">2. Nilai Item</legend>
                                     <div class="col s12 m12" style="overflow:auto;min-width:100%;">
                                         <table style="min-width:1400px !important;" class="bordered">
                                             <thead>
@@ -519,12 +482,8 @@
                     $('#modal6').modal('open');
                     $('#close-form-code').text(response.data.code);
                     $('#tempClose').val(response.data.encrypt_code);
-                    $('#actual_item_cost').val(response.data.actual_item_cost);
-                    $('#actual_resource_cost').val(response.data.actual_resource_cost);
-                    $('#total_product_cost').val(response.data.total_product_cost);
-                    $('#plan_qty').val(response.data.plan_qty);
-                    $('#complete_qty').val(response.data.complete_qty);
-                    $('#reject_qty').val(response.data.reject_qty);
+                    $('#real_time_start').val(response.data.real_time_start);
+                    $('#real_time_end').val(response.data.real_time_end);
                     $('#body-close').empty();
 
                     $.each(response.data.details, function(i, val) {
@@ -989,9 +948,9 @@
         });
 	}
 
-    function save(){
+    function saveCalculate(){
 		swal({
-            title: "Apakah anda yakin ingin simpan?",
+            title: "Apakah anda yakin ingin tutup POD?",
             text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
             icon: 'warning',
             dangerMode: true,
@@ -1002,24 +961,10 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]);
-
-                formData.delete('arr_urgent[]');
-
-                $('input[name^="arr_urgent[]"]').each(function(index){
-                    formData.append('arr_urgent[]',($(this).is(':checked') ? $(this).val() : '' ));
-                });
-                var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
-
-                    
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-                
-                    formData.append('lastsegment',lastSegment);
+                var formData = new FormData($('#form_data_calculate')[0]);
                     
                 $.ajax({
-                    url: '{{ Request::url() }}/create',
+                    url: '{{ Request::url() }}/done',
                     type: 'POST',
                     dataType: 'JSON',
                     data: formData,
@@ -1030,40 +975,14 @@
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
                     beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
+                        loadingOpen('#modal6');
                     },
                     success: function(response) {
-                        loadingClose('.modal-content');
+                        loadingClose('#modal6');
                         if(response.status == 200) {
                             success();
                             M.toast({
                                 html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
-
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
                             });
                         } else {
                             M.toast({
@@ -1073,7 +992,7 @@
                     },
                     error: function() {
                         $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
+                        loadingClose('#modal6');
                         swal({
                             title: 'Ups!',
                             text: 'Check your internet connection.',

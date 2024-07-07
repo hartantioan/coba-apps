@@ -260,12 +260,8 @@ class ProductionOrderController extends Controller
             $query = [
                 'code'                      => $data->code,
                 'encrypt_code'              => CustomHelper::encrypt($data->code),
-                'actual_item_cost'          => '0,00',
-                'actual_resource_cost'      => '0,00',
-                'total_product_cost'        => '0,00',
-                'plan_qty'                  => CustomHelper::formatConditionalQty($data->planned_qty),
-                'complete_qty'              => '0,000',
-                'reject_qty'                => '0,000',
+                'real_time_start'           => $data->real_time_start,
+                'real_time_end'             => $data->real_time_end,
                 'details'                   => $details,
             ];
             $response = [
@@ -899,22 +895,26 @@ class ProductionOrderController extends Controller
     }
 
     public function done(Request $request){
-        $query_done = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
+        $query_done = ProductionOrder::where('code',CustomHelper::decrypt($request->tempClose))->first();
 
         if($query_done){
 
-            if(in_array($query_done->status,['1','2'])){
+            if(in_array($query_done->status,['2'])){
                 $query_done->update([
-                    'status'     => '3',
-                    'done_id'    => session('bo_id'),
-                    'done_date'  => date('Y-m-d H:i:s'),
+                    'real_time_start'   => $request->real_time_start,
+                    'real_time_end'     => $request->real_time_end,
+                    'status'            => '3',
+                    'done_id'           => session('bo_id'),
+                    'done_date'         => date('Y-m-d H:i:s'),
                 ]);
     
                 activity()
-                        ->performedOn(new ProductionOrder())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query_done)
-                        ->log('Done the Production Order data');
+                    ->performedOn(new ProductionOrder())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query_done)
+                    ->log('Done the Production Order data');
+                
+                CustomHelper::sendNotification($query_done->getTable(),$query_done->id,'Penutupan Production Order Produksi No. '.$query_done->code,'Penutupan Production Order No. '.$query_done->code.' oleh user '.session('bo_name'),$query_done->user_id);
     
                 $response = [
                     'status'  => 200,
@@ -923,7 +923,7 @@ class ProductionOrderController extends Controller
             }else{
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan PROSES.'
                 ];
             }
 

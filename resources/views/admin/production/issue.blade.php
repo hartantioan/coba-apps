@@ -305,7 +305,7 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:1800px !important;" id="table-detail-item-issue">
+                                                <table class="bordered" style="border: 1px solid;width:1500px !important;" id="table-detail-item-issue">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">{{ __('translations.no') }}.</th>

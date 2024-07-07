@@ -138,130 +138,6 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content" style="overflow:auto !important;">
-        <div class="row">
-            <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                <form class="row" id="form_data" onsubmit="return false;">
-                    <div class="col s12">
-                        <div id="validation_alert" style="display:none;"></div>
-                    </div>
-                    <div class="col s12">
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>1. {{ __('translations.main_info') }}</legend>
-                                    <div class="input-field col m2 s12 step1">
-                                        <input type="hidden" id="temp" name="temp">
-                                        <input type="hidden" id="isSalesItem" name="isSalesItem">
-                                        <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
-                                        <label class="active" for="code">No. Dokumen</label>
-                                    </div>
-                                    <div class="input-field col m1 s12 step2">
-                                        <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
-                                            <option value="">--Pilih--</option>
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <select class="form-control" id="company_id" name="company_id">
-                                            @foreach ($company as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="company_id">{{ __('translations.company') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step4">
-                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
-                                        <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step5">
-                                        <input id="note" name="note" type="text" placeholder="Keterangan...">
-                                        <label class="active" for="note">{{ __('translations.note') }}</label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend>2. Detail Item</legend>
-                                    <div class="input-field col m3 s12 step6">
-                                        <select class="browser-default" id="production_schedule_id" name="production_schedule_id" onchange="resetProductionSchedule();"></select>
-                                        <label class="active" for="production_schedule_id">Jadwal Produksi</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step7">
-                                        <select class="browser-default" id="production_schedule_detail_id" name="production_schedule_detail_id" onchange="getProductionSchedule();"></select>
-                                        <label class="active" for="production_schedule_detail_id">Daftar Item</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step8">
-                                        <select class="browser-default" id="warehouse_id" name="warehouse_id">
-                                            <option value="">Silahkan pilih Jadwal Produksi</option>
-                                        </select>
-                                        <label class="active" for="warehouse_id">{{ __('translations.warehouse') }}</label>
-                                    </div>
-                                    <div class="col m12">
-                                        <div class="row">
-                                            <div class="col m3 s12">
-                                                Qty Planned : <b id="output-qty">-</b>
-                                            </div>
-                                            <div class="col m3 s12">
-                                                Shift : <b id="output-shift">-</b>
-                                            </div>
-                                            <div class="col m3 s12">
-                                                Grup : <b id="output-group">-</b>
-                                            </div>
-                                            <div class="col m3 s12">
-                                                Line : <b id="output-line">-</b>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col m12 s12 step9" style="overflow:auto;width:100% !important;">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" id="table-bom">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">No</th>
-                                                        <th class="center">Item/Coa</th>
-                                                        <th class="center">Qty (BOM)</th>
-                                                        <th class="center">Satuan (Produksi)</th>
-                                                        <th class="center">{{ __('translations.warehouse') }}</th>
-                                                        <th class="center">Stok (Produksi)</th>
-                                                        <th class="center">{{ __('translations.delete') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item">
-                                                    <tr id="last-row-item">
-                                                        <td colspan="7">
-                                                            Silahkan pilih Jadwal Produksi & Item Target ...
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </p>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
-    </div>
-</div>
-
 <div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
     <div class="modal-content" style="overflow:auto !important;">
         <div class="row">
@@ -298,34 +174,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend align="left">2. Penerimaan Hasil Produksi / Quantities</legend>
-                                    <div class="input-field col m3 s12">
-                                        <input id="plan_qty" name="plan_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <label class="active" for="plan_qty">Jumlah Perencanaan</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="complete_qty" name="complete_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <label class="active" for="complete_qty">Jumlah Selesai</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="reject_qty" name="reject_qty" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" readonly>
-                                        <label class="active" for="reject_qty">Jumlah Rusak</label>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col s12">
-                                <fieldset>
-                                    <legend align="left">3. Waktu Produksi / Times</legend>
-                                    <div class="input-field col m3 s12">
-                                        <input id="schedule_time_start" name="schedule_time_start" type="datetime-local" placeholder="Jadwal Tgl. Mulai Produksi" readonly>
-                                        <label class="active" for="schedule_time_start">Tgl. Mulai Produksi (Jadwal)</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <input id="schedule_time_end" name="schedule_time_end" type="datetime-local" placeholder="Jadwal Tgl. Akhir Produksi" readonly>
-                                        <label class="active" for="schedule_time_end">Tgl. Berakhir Produksi (Jadwal)</label>
-                                    </div>
+                                    <legend align="left">2. Waktu Produksi / Times</legend>
                                     <div class="input-field col m3 s12">
                                         <input id="real_time_start" name="real_time_start" type="datetime-local" placeholder="Aktual Tgl. Mulai Produksi">
                                         <label class="active" for="real_time_start">Tgl. Mulai Produksi (Aktual)</label>
@@ -348,6 +197,38 @@
                                         <input id="total_run_time" name="total_run_time" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);" readonly>
                                         <div class="form-control-feedback">Jam</div>
                                         <label class="active" for="total_run_time">Total Waktu Jalan Produksi (Aktual + Tambahan)</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset style="min-width: 100%;">
+                                    <legend align="left">3. Nilai Item</legend>
+                                    <div class="col s12 m12" style="overflow:auto;min-width:100%;">
+                                        <table style="min-width:1400px !important;" class="bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align" colspan="9">Daftar Item Produksi</th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="center-align">No.</th>
+                                                    <th class="center-align">Kode Item</th>
+                                                    <th class="center-align">Nama Item</th>
+                                                    <th class="center-align">Kode BOM</th>
+                                                    <th class="center-align">Qty Planned</th>
+                                                    <th class="center-align">Satuan</th>
+                                                    <th class="center-align">Total Biaya Issue Item</th>
+                                                    <th class="center-align">Total Biaya Issue Resource</th>
+                                                    <th class="center-align">Total Biaya Receive</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-close">
+                                                <tr>
+                                                    <td class="center-align" colspan="9">Data tidak ditemukan</td>
+                                                </t>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </fieldset>
                             </div>
@@ -496,12 +377,6 @@
     </div>
 </div>
 
-{{-- <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
-        <i class="material-icons">add</i>
-    </a>
-</div> --}}
-
 <div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
         <i class="material-icons">view_comfy</i>
@@ -617,64 +492,11 @@
                 $('#tempClose').val('');
                 $('#close-form-code').text('');
                 M.updateTextFields();
-            }
-        });
-
-        $('#modal1').modal({
-            dismissible: false,
-            onOpenStart: function(modal,trigger) {
-                $('#post_date').attr('min','{{ $minDate }}');
-                $('#post_date').attr('max','{{ $maxDate }}');
-            },
-            onOpenEnd: function(modal, trigger) {
-                $('#name').focus();
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                M.updateTextFields();
-                window.onbeforeunload = function() {
-                    return 'You will lose all changes made since your last save';
-                };
-            },
-            onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
-                $('#temp,#isSalesItem').val('');
-                M.updateTextFields();
-                $('#production_schedule_id').empty();
-                resetProductionSchedule();
-                window.onbeforeunload = function() {
-                    return null;
-                };
-            }
-        });
-
-        $('#body-item').on('click', '.delete-data-item', function() {
-            $(this).closest('tr').remove();
-        });
-
-        select2ServerSide('#production_schedule_id', '{{ url("admin/select2/production_schedule") }}');
-
-        $('#production_schedule_detail_id').select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/production_schedule_detail") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        production_schedule_id: $('#production_schedule_id').val(),
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
+                $('#body-close').empty().append(`
+                    <tr>
+                        <td class="center-align" colspan="9">Data tidak ditemukan</td>
+                    </t>
+                `);
             }
         });
     });
@@ -703,6 +525,41 @@
                     $('#plan_qty').val(response.data.plan_qty);
                     $('#complete_qty').val(response.data.complete_qty);
                     $('#reject_qty').val(response.data.reject_qty);
+                    $('#body-close').empty();
+
+                    $.each(response.data.details, function(i, val) {
+                        $('#body-close').append(`
+                            <tr class="row_close">
+                                <td class="center-align">
+                                    ` + (i+1) + `
+                                </td>
+                                <td class="">
+                                    ` + val.item_code + `
+                                </td>
+                                <td class="">
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="">
+                                    ` + val.bom_code + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_planned + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.unit + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.total_issue_item + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.total_issue_resource + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.total_item + `
+                                </td>
+                            </tr>
+                        `);
+                    });
                 }
                 M.toast({
                     html: response.message
@@ -840,91 +697,6 @@
             nodeDataArray: data,
             linkDataArray: link
         });
-    }
-
-    function resetProductionSchedule(){
-        $('#production_schedule_detail_id').empty().trigger('change');
-    }
-
-    function getProductionSchedule(){
-        $('#body-item').empty();
-        $('#warehouse_id').empty();
-        $('#output-qty,#output-shift,#output-group,#output-line').text('-');
-        if($('#production_schedule_detail_id').val()){
-            let datakuy = $('#production_schedule_detail_id').select2('data')[0];
-            $.each(datakuy.details, function(i, val) {
-                var count = makeid(10);
-                let no = $('.row_item').length + 1;
-                $('#body-item').append(`
-                    <tr class="row_item">
-                        <input type="hidden" name="arr_bom_detail_id[]" value="` + val.id + `">
-                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
-                        <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                        <input type="hidden" name="arr_qty[]" value="` + val.qty + `">
-                        <input type="hidden" name="arr_nominal[]" value="` + val.nominal + `">
-                        <input type="hidden" name="arr_total[]" value="` + val.total + `">
-                        <td class="center-align">
-                            ` + no + `.
-                        </td>
-                        <td>
-                            ` + val.lookable_code + ' - ' + val.lookable_name + `
-                        </td>
-                        <td class="right-align">
-                            ` + val.qty + `
-                        </td>
-                        <td class="center-align">
-                            ` + val.unit + `
-                        </td>
-                        <td>
-                            ` + val.warehouse + `
-                        </td>
-                        <td class="right-align">
-                            ` + val.stock + `
-                        </td>
-                        <td class="center">
-                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item btn-small" href="javascript:void(0);">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        </td>
-                    </tr>
-                `);
-            });
-            
-            if(datakuy.is_sales_item){
-                $('#isSalesItem').val(datakuy.is_sales_item);
-                @if($warehouse)
-                    $('#warehouse_id').append(`
-                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                    `);
-                @else
-                    $('#warehouse_id').append(`
-                        <option value="">Gudang transit tidak ditemukan.</option>
-                    `);
-                @endif
-            }else{
-                $.each(datakuy.warehouses, function(i, val) {
-                    $('#warehouse_id').append(`
-                        <option value="` + val.id + `">` + val.name + `</option>
-                    `);
-                });
-            }
-            $('#output-qty').text(datakuy.qty);
-            $('#output-shift').text(datakuy.shift);
-            $('#output-group').text(datakuy.group);
-            $('#output-line').text(datakuy.line);
-        }else{
-            $('#body-item').append(`
-                <tr id="last-row-item">
-                    <td colspan="7">
-                        Silahkan pilih Jadwal Produksi & Item Target ...
-                    </td>
-                </tr>
-            `);
-            $('#warehouse_id').append(`
-                <option value="">Silahkan pilih Jadwal Produksi</option>
-            `);
-            $('#isSalesItem').val('');
-        }
     }
 
     function printMultiSelect(){
@@ -1315,7 +1087,7 @@
 
     function success(){
         loadDataTable();
-        $('#modal1').modal('close');
+        $('#modal6').modal('close');
     }
 
     String.prototype.replaceAt = function(index, replacement) {

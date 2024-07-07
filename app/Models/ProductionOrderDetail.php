@@ -39,6 +39,11 @@ class ProductionOrderDetail extends Model
         return $this->hasMany('App\Models\ProductionReceive')->whereIn('status',['1','2','3']);
     }
 
+    public function productionFgReceive()
+    {
+        return $this->hasMany('App\Models\ProductionFgReceive')->whereIn('status',['1','2','3']);
+    }
+
     public function qtyReceiveFg(){
         $qty = 0;
         
@@ -57,6 +62,48 @@ class ProductionOrderDetail extends Model
         if($this->productionIssue()->exists()){
             foreach($this->productionIssue as $rowissue){
                 $total += $rowissue->total();
+            }
+        }
+        
+        return $total;
+    }
+
+    public function totalIssueItem(){
+        $total = 0;
+        
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $rowissue){
+                $total += $rowissue->totalItem();
+            }
+        }
+        
+        return $total;
+    }
+
+    public function totalIssueResource(){
+        $total = 0;
+        
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $rowissue){
+                $total += $rowissue->totalResource();
+            }
+        }
+        
+        return $total;
+    }
+
+    public function totalItem(){
+        $total = 0;
+        
+        if($this->productionReceive()->exists()){
+            foreach($this->productionReceive as $rowreceive){
+                $total += $rowreceive->total();
+            }
+        }
+
+        if($this->productionFgReceive()->exists()){
+            foreach($this->productionFgReceive as $rowreceive){
+                $total += $rowreceive->total();
             }
         }
         

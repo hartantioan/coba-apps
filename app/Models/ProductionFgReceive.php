@@ -125,6 +125,11 @@ class ProductionFgReceive extends Model
         return $status;
     }
 
+    public function total(){
+        $total = $this->productionFgReceiveDetail()->sum('total');
+        return $total;
+    }
+
     public function statusRaw(){
         $status = match ($this->status) {
             '1' => 'Menunggu',

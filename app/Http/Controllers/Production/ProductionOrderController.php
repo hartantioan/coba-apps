@@ -241,6 +241,22 @@ class ProductionOrderController extends Controller
     public function getCloseData(Request $request){
         $data = ProductionOrder::where('code',CustomHelper::decrypt($request->id))->first();
         if($data){
+
+            $details = [];
+
+            foreach($data->productionOrderDetail as $row){
+                $details[] = [
+                    'item_code'             => $row->productionScheduleDetail->item->code,
+                    'item_name'             => $row->productionScheduleDetail->item->name,
+                    'bom_code'              => $row->productionScheduleDetail->bom->code,
+                    'qty_planned'           => CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty),
+                    'unit'                  => $row->productionScheduleDetail->item->uomUnit->code,
+                    'total_issue_item'      => CustomHelper::formatConditionalQty($row->totalIssueItem()),
+                    'total_issue_resource'  => CustomHelper::formatConditionalQty($row->totalIssueResource()),
+                    'total_item'            => CustomHelper::formatConditionalQty($row->totalItem()),
+                ];
+            }
+
             $query = [
                 'code'                      => $data->code,
                 'encrypt_code'              => CustomHelper::encrypt($data->code),
@@ -250,6 +266,7 @@ class ProductionOrderController extends Controller
                 'plan_qty'                  => CustomHelper::formatConditionalQty($data->planned_qty),
                 'complete_qty'              => '0,000',
                 'reject_qty'                => '0,000',
+                'details'                   => $details,
             ];
             $response = [
                 'status'    => 200,

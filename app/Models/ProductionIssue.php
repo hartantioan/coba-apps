@@ -107,6 +107,16 @@ class ProductionIssue extends Model
         return $total;
     }
 
+    public function totalItem(){
+        $total = $this->productionIssueDetail()->where('lookable_type','items')->sum('total');
+        return $total;
+    }
+
+    public function totalResource(){
+        $total = $this->productionIssueDetail()->where('lookable_type','resources')->sum('total');
+        return $total;
+    }
+
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

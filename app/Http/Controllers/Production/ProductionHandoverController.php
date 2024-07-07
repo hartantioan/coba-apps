@@ -618,14 +618,6 @@ class ProductionHandoverController extends Controller
                     'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                 ]);
             }
-            foreach($query->productionFgReceiveDetail as $row){
-                if($row->productionBatch->productionBatchUsage()->exists()){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, nomor batch telah digunakan pada dokumen lainnya.'
-                    ]);
-                }
-            }
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -642,16 +634,11 @@ class ProductionHandoverController extends Controller
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                 }
 
-                foreach($query->productionFgReceiveDetail as $row){
-                    if($row->productionBatch()->exists()){
-                        $row->productionBatch()->delete();
+                foreach($query->productionHandoverDetail as $row){
+                    if($row->productionBatchUsage()->exists()){
+                        CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
                     }
-                }
-                if($query->productionBatchUsage()->exists()){
-                    foreach($query->productionBatchUsage as $rowdetail){
-                        CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
-                        $rowdetail->delete();
-                    }
+                    $row->delete();
                 }
 
                 $query->update([
@@ -726,16 +713,11 @@ class ProductionHandoverController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->productionFgReceiveDetail as $row){
-                if($row->productionBatch()->exists()){
-                    $row->productionBatch()->delete();
+            foreach($query->productionHandoverDetail as $row){
+                if($row->productionBatchUsage()->exists()){
+                    CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
                 }
-            }
-            if($query->productionBatchUsage()->exists()){
-                foreach($query->productionBatchUsage as $rowdetail){
-                    CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
-                    $rowdetail->delete();
-                }
+                $row->delete();
             }
 
             CustomHelper::removeApproval($query->getTable(),$query->id);

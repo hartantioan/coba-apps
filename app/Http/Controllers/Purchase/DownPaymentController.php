@@ -83,20 +83,31 @@ class DownPaymentController extends Controller
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
                 ),0) AS adjust_nominal,
+                IFNULL((SELECT
+                        '1'
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date4
+                            AND cd.lookable_type = 'purchase_down_payments'
+                            AND cd.lookable_id = pi.id
+                            AND cd.deleted_at IS NULL
+                    ),'0') AS status_cancel,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pdp
                 LEFT JOIN users u
                     ON u.id = pdp.account_id
                 WHERE 
-                    pdp.post_date <= :date4
+                    pdp.post_date <= :date5
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7')
+                    AND status_cancel = '0'
             ",array(
                 'date1' => $date,
                 'date2' => $date,
                 'date3' => $date,
                 'date4' => $date,
+                'date5' => $date,
             ));
 
         $results = [];

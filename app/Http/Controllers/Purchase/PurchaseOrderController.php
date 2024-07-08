@@ -979,7 +979,7 @@ class PurchaseOrderController extends Controller
                 
                                 $finalpricedisc1 = floatval($price) - (floatval($price) * ($disc1 / 100));
                                 $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
-                                $finalpricedisc3 = $finalpricedisc2 - $disc3;
+                                $finalpricedisc3 = $finalpricedisc2 - floatval($disc3);
                 
                                 $rowsubtotal = round($finalpricedisc3 * $qty,2);
                                 

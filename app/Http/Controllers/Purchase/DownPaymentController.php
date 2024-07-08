@@ -98,7 +98,7 @@ class DownPaymentController extends Controller
                         WHERE 
                             cd.post_date <= :date5
                             AND cd.lookable_type = 'purchase_down_payments'
-                            AND cd.lookable_id = pi.id
+                            AND cd.lookable_id = pdp.id
                             AND cd.deleted_at IS NULL
                     ),'0') = '0'
             ",array(

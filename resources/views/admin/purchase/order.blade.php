@@ -218,7 +218,7 @@
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
                                                     </tr>
                                                     <tr>
-                                                        <th>{{ __('translations.number') }}/th>
+                                                        <th>{{ __('translations.number') }}</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.type') }}</th>
                                                         <th>Termin</th>

@@ -333,7 +333,7 @@
                                             Catatan
                                          </td>
                                          <td>
-                                            adsfasdfadsfasdfasdf{{ $data->note }}
+                                           {{ $data->note }}
                                           </td>
                                     </tr>
                                 </table>

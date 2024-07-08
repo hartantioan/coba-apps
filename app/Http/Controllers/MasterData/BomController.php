@@ -49,7 +49,7 @@ class BomController extends Controller
             'place_id',
             'warehouse_id',
             'qty_output',
-            'is_powder',
+            'group',
             'status'
         ];
 
@@ -118,7 +118,7 @@ class BomController extends Controller
                     $val->place->code,
                     $val->warehouse->name,
                     CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
-                    $val->isPowder(),
+                    $val->group(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -152,6 +152,7 @@ class BomController extends Controller
             'qty_output'                => 'required',
             'place_id'                  => 'required',
             'warehouse_id'              => 'required',
+            'group'                     => 'required',
             'arr_type'                  => 'required|array',
             'arr_detail'                => 'required|array',
             'arr_qty'                   => 'required|array',
@@ -168,6 +169,7 @@ class BomController extends Controller
             'qty_output.required'           => 'Jumlah output produksi tidak boleh kosong',
             'place_id.required'             => 'Plant tidak boleh kosong',
             'warehouse_id.required'         => 'Gudang tidak boleh kosong',
+            'group.required'                => 'Grup tidak boleh kosong',
             'arr_type.required'             => 'Tipe tidak boleh kosong',
             'arr_type.array'                => 'Tipe haruslah dalam bentuk array',
             'arr_detail.required'           => 'Detail item/biaya tidak boleh kosong',
@@ -206,6 +208,7 @@ class BomController extends Controller
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->is_powder           = $request->is_powder ?? NULL;
+                    $query->group               = $request->group;
                     $query->save();
 
                     $query->bomDetail()->delete();
@@ -229,6 +232,7 @@ class BomController extends Controller
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
                         'status'            => $request->status ? $request->status : '2',
                         'is_powder'         => $request->is_powder ?? NULL,
+                        'group'             => $request->group,
                     ]);
 
                     DB::commit();

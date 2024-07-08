@@ -58,7 +58,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     'place_id' => $place->id,
                     'warehouse_id' => $warehouse->id,
                     'qty_output' => $row['qty_output'],
-                    'is_powder' => $row['powder'],
+                    'group' => $row['group'],
                     'status' => '1',
                 ]);
 

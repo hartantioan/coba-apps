@@ -94,6 +94,17 @@ class Bom extends Model
           return $ispowder;
     }
 
+    public function group(){
+        $group = match ($this->group) {
+            '1' => 'Powder',
+            '2' => 'Green Tile',
+            '3' => 'Finished Goods',
+            default => 'Undefined',
+        };
+  
+          return $group;
+    }
+
     public function type(){
         switch($this->type) {
             case '1':

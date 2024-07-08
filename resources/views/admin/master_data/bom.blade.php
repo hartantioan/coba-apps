@@ -104,7 +104,7 @@
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.warehouse') }}</th>
                                                         <th>{{ __('translations.item') }}</th>
-                                                        <th>Bom Powder</th>
+                                                        <th>Group</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -173,15 +173,12 @@
                         </div>
                         <div class="col s12 m12"></div>
                         <div class="input-field col s12 m3">
-                            <div class="switch mb-1">
-                                <label for="status">BOM Powder</label>
-                                <label class="right">
-                                    Tidak
-                                    <input type="checkbox" id="is_powder" name="is_powder" value="1">
-                                    <span class="lever"></span>
-                                    Ya
-                                </label>
-                            </div>
+                            <select class="form-control" id="group" name="group">
+                                <option value="1">Powder</option>
+                                <option value="2">Green Tile</option>
+                                <option value="3">Finished Good</option>
+                            </select>
+                            <label class="" for="group">Kelompok</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <div class="switch mb-1">
@@ -794,7 +791,7 @@
                 { name: 'place', className: 'center-align' },
                 { name: 'warehouse', className: 'center-align' },
                 { name: 'qty_output', className: 'center-align' },
-                { name: 'is_powder', className: 'center-align' },
+                { name: 'group', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -961,6 +958,7 @@
                     `);
                 }
                 $('#company_id').val(response.company_id).formSelect();
+                $('#group').val(response.group).formSelect();
                 $('#place_id').val(response.place_id).formSelect();
                 $('#warehouse_id').val(response.warehouse_id).formSelect();
                 $('#qty_output').val(response.qty_output);
@@ -969,12 +967,6 @@
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
-                }
-
-                if(response.is_powder == '1'){
-                    $('#is_powder').prop( "checked", true);
-                }else{
-                    $('#is_powder').prop( "checked", false);
                 }
 
                 resetDetailForm();

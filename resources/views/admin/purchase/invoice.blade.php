@@ -245,7 +245,7 @@
                         </div>
                         <div class="col s12">
                             <div class="row">
-                                <div class="input-field col m2 s12 step1">
+                                <div class="input-field col m3 s12 step1">
                                     <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                     <label class="active" for="code">No. Dokumen</label>
                                 </div>
@@ -257,12 +257,20 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="input-field col m3 s12 step3">
+                                <div class="input-field col m4 s12 step3">
                                     <select class="form-control" id="type_detail" name="type_detail" onchange="viewDetail();">
                                         <option value="1">Normal</option>
                                         <option value="2">Multi dari Excel</option>
                                     </select>
                                     <label class="" for="type_detail">Tipe Detail</label>
+                                </div>
+                                <div class="input-field col m4 s12 step6">
+                                    <select class="form-control" id="company_id" name="company_id">
+                                        @foreach ($company as $rowcompany)
+                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    <label class="" for="company_id">{{ __('translations.company') }}</label>
                                 </div>
                                 <div class="input-field col m2 s12 step4">
                                     <input type="hidden" id="temp" name="temp">
@@ -281,14 +289,9 @@
                                     </select>
                                     <label class="" for="type">{{ __('translations.type') }}</label>
                                 </div>
-                                <div class="input-field col m3 s12 step6">
-                                    <select class="form-control" id="company_id" name="company_id">
-                                        @foreach ($company as $rowcompany)
-                                            <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
-                                        @endforeach
-                                    </select>
-                                    <label class="" for="company_id">{{ __('translations.company') }}</label>
-                                </div>
+                                <div class="col s12 m12 l12"></div>
+                                
+                               
                                 <div class="input-field col m3 s12 step7">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
@@ -301,40 +304,42 @@
                                     <input id="top" name="top" min="0" type="number" value="0" onchange="addDays();">
                                     <label class="active" for="top">TOP (hari) Autofill dari GRPO</label>
                                 </div>
-                                <div class="col m12 s12 l12"></div>
                                 <div class="input-field col m3 s12 step10">
                                     <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
                                     <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                 </div>
+                                <div class="col s12 m12 l12"></div>
                                 <div class="input-field col m3 s12 step11">
                                     <input id="document_date" name="document_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
-                                    <label class="active" for="document_date">Tgl. Dokumen</label>
-                                </div>
-                                <div class="input-field col m3 s12 step12">
-                                    <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
-                                    <label class="active" for="tax_no">No. Faktur Pajak</label>
-                                </div>
-                                <div class="input-field col m3 s12 step13">
-                                    <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
-                                    <label class="active" for="tax_cut_no">No. Bukti Potong</label>
-                                </div>
-                                <div class="input-field col m3 s12 step14">
-                                    <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
-                                    <label class="active" for="cut_date">Tgl. Bukti Potong</label>
-                                </div>
-                                <div class="input-field col m3 s12 step15">
-                                    <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
-                                    <label class="active" for="spk_no">No. SPK</label>
-                                </div>
-                                <div class="input-field col m3 s12 stepdokumen">
-                                    <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen...">
-                                    <label class="active" for="document_no">No. Dokumen</label>
+                                    <label class="active" for="document_date">Tgl. Invoice</label>
                                 </div>
                                 <div class="input-field col m3 s12 step16">
                                     <input id="invoice_no" name="invoice_no" type="text" placeholder="Nomor Invoice dari Suppplier/Vendor">
                                     <label class="active" for="invoice_no">No. Invoice</label>
                                 </div>
-                                <div class="input-field col m3 s12 stepcurrency">
+                                <div class="col s12 m12 l12"></div>
+                                <div class="input-field col m4 s12 step12">
+                                    <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak...">
+                                    <label class="active" for="tax_no">No. Faktur Pajak</label>
+                                </div>
+                                <div class="input-field col m4 s12 step13">
+                                    <input id="tax_cut_no" name="tax_cut_no" type="text" placeholder="Nomor bukti potong...">
+                                    <label class="active" for="tax_cut_no">No. Bukti Potong</label>
+                                </div>
+                                <div class="input-field col m4 s12 step14">
+                                    <input id="cut_date" name="cut_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Bukti potong">
+                                    <label class="active" for="cut_date">Tgl. Bukti Potong</label>
+                                </div>
+                                <div class="input-field col m6 s12 step15">
+                                    <input id="spk_no" name="spk_no" type="text" placeholder="Nomor SPK...">
+                                    <label class="active" for="spk_no">No. SPK</label>
+                                </div>
+                                <div class="input-field col m6 s12 stepdokumen">
+                                    <input id="document_no" name="document_no" type="text" placeholder="Nomor Dokumen...">
+                                    <label class="active" for="document_no">No. Dokumen</label>
+                                </div>
+                                <div class="col s12 m12 l12"></div>
+                                <div class="input-field col m4 s12 stepcurrency">
                                     <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -342,12 +347,12 @@
                                     </select>
                                     <label class="" for="currency_id">{{ __('translations.currency') }}</label>
                                 </div>
-                                <div class="input-field col m3 s12 stepconversion">
+                                <div class="input-field col m4 s12 stepconversion">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                                     <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                 </div>
                                 
-                                <div class="input-field col m3 s12 step18">
+                                <div class="input-field col m4 s12 step18">
                                     <input id="scan_barcode" name="scan_barcode" type="text" placeholder="Ketik nomor dokumen dan tekan Enter...">
                                     <label class="active" for="scan_barcode">Scan Barcode (Single Input)</label>
                                 </div>

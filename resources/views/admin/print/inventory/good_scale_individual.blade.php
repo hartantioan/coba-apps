@@ -54,36 +54,33 @@
                     font-size:11px !important;
                 }
 
-                table > thead > tr > th {
-                    font-size:13px !important;
-                    font-weight: 800 !important;
-                }
+                
                 td{
-                    font-size:1em !important;
+                    font-size:1.001em !important;
                 }
                 .tb-header td{
-                    font-size:1em !important;
+                    font-size:1.2em !important;
                 }
                 .tbl-info td{
-                    font-size:1em !important;
+                    font-size:12px !important;
                 }
                 .table-data-item td{
-                    font-size:1em !important;
+                    font-size:1.001em !important;
                 }
                 .table-data-item th{
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:1em !important;
+                    font-size:1.001em !important;
                 }
                 .table-bot1 td{
-                    font-size:1em !important;
+                    font-size:1.001em !important;
                 }
             }
         
             @media print {
                 .invoice-print-area {
-                    font-size:13px !important;
+                    font-size:200px !important;
                 }
         
                 table > thead > tr > th {
@@ -186,7 +183,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 1px solid black; margin-top:-15px">
+            <hr style="border-top: 1px solid black; margin-top:-29px">
         </header>
         <main style="margin-top:15px;">
             <div class="card">
@@ -336,7 +333,7 @@
                                             Catatan
                                          </td>
                                          <td>
-                                            {{ $data->note }}
+                                            adsfasdfadsfasdfasdf{{ $data->note }}
                                           </td>
                                     </tr>
                                 </table>
@@ -408,8 +405,9 @@
                                 <td class="center-align">
                                     <br>
                                     <br>
-                                    Supir,
-                                    <div class="mt-5">{{ $data->driver }}</div>
+                                    <br>
+                                    <br>
+                                    <div class="mt-4">  Supir, {{ $data->driver }}</div>
                                 </td>
                             </tr>
                         </table>  

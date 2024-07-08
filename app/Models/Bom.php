@@ -26,6 +26,7 @@ class Bom extends Model
         'warehouse_id',
         'qty_output',
         'is_powder',
+        'group',
         'status',
     ];
 

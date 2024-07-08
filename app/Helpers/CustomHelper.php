@@ -3557,7 +3557,7 @@ class CustomHelper {
 			} */
 			
 		}elseif($table_name == 'purchase_invoices'){
-			/* self::removeJournal($table_name,$table_id); */
+			self::removeJournal($table_name,$table_id);
 			#start untuk po tipe biaya / jasa
 			$totalOutSide = 0;
 

@@ -59,7 +59,7 @@ class DownPaymentController extends Controller
                     WHERE 
                         pid.purchase_down_payment_id = pdp.id
                         AND pi.post_date <= :date1
-                        AND pi.status IN ('2','3','7')
+                        AND pi.status IN ('2','3','7','8')
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
@@ -70,7 +70,7 @@ class DownPaymentController extends Controller
                         WHERE pmd.lookable_type = 'purchase_down_payments'
                         AND pmd.lookable_id = pdp.id
                         AND pm.post_date <= :date2
-                        AND pm.status IN ('2','3','7')
+                        AND pm.status IN ('2','3','7','8')
                 ),0) AS total_memo,
                 IFNULL((SELECT
                     SUM(ROUND(ard.nominal,2))
@@ -91,7 +91,7 @@ class DownPaymentController extends Controller
                 WHERE 
                     pdp.post_date <= :date4
                     AND pdp.grandtotal > 0
-                    AND pdp.status IN ('2','3','7')
+                    AND pdp.status IN ('2','3','7','8')
                     AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd

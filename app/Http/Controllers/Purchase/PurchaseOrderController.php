@@ -977,7 +977,7 @@ class PurchaseOrderController extends Controller
                                 $disc2 = str_replace(',','.',str_replace('.','',$request->arr_disc2[$key]));
                                 $disc3 = str_replace(',','.',str_replace('.','',$request->arr_disc3[$key]));
                 
-                                $finalpricedisc1 = $price - ($price * ($disc1 / 100));
+                                $finalpricedisc1 = floatval($price) - (floatval($price) * ($disc1 / 100));
                                 $finalpricedisc2 = $finalpricedisc1 - ($finalpricedisc1 * ($disc2 / 100));
                                 $finalpricedisc3 = $finalpricedisc2 - $disc3;
                 

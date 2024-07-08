@@ -445,6 +445,9 @@ class CustomHelper {
 	}
 
 	public static function sendApproval($table_name,$table_id,$note){
+		#delete approvalsource yang tidak punya matrix
+		/* ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete(); */
+
 		$resetdata = ApprovalSource::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
 		foreach($resetdata as $rowreset){
@@ -722,9 +725,6 @@ class CustomHelper {
 				self::sendJournal($table_name,$table_id,null);
 			}
 		}
-
-		#delete approvalsource yang tidak punya matrix
-		ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete();
 	}
 
 	public static function sendNotification($table_name = null, $table_id = null, $title = null, $note = null, $to = null){
@@ -3557,7 +3557,7 @@ class CustomHelper {
 			} */
 			
 		}elseif($table_name == 'purchase_invoices'){
-			self::removeJournal($table_name,$table_id);
+			/* self::removeJournal($table_name,$table_id); */
 			#start untuk po tipe biaya / jasa
 			$totalOutSide = 0;
 
@@ -4171,7 +4171,7 @@ class CustomHelper {
 									'coa_id'						=> $row->lookable->coa_id,
 									'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
 									'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
-									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : ($pir->machine_id ?? NULL),
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
 									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
 									'type'                          => '2',
 									'nominal'						=> $nominal,
@@ -4186,7 +4186,6 @@ class CustomHelper {
 							'coa_id'		=> $row->lookable->coa_id,
 							'line_id'		=> $pir->line_id,
 							'place_id'		=> $pir->place_id,
-							'machine_id'	=> $pir->machine_id,
 							'type'			=> '2',
 							'nominal'		=> $row->total,
 							'nominal_fc'	=> $row->total,
@@ -4282,7 +4281,6 @@ class CustomHelper {
 				'coa_id'		=> $coawip->id,
 				'line_id'		=> $pir->line_id,
 				'place_id'		=> $pir->place_id,
-				'machine_id'	=> $pir->machine_id,
 				'type'			=> '2',
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,

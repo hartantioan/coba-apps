@@ -77,11 +77,21 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         pdp.post_date <= :date4
                         AND pdp.grandtotal > 0
                         AND pdp.status IN ('2','3','7')
+                        AND IFNULL((SELECT
+                        '1'
+                        FROM cancel_documents cd
+                        WHERE 
+                            cd.post_date <= :date5
+                            AND cd.lookable_type = 'purchase_down_payments'
+                            AND cd.lookable_id = pdp.id
+                            AND cd.deleted_at IS NULL
+                    ),'0') = '0'
                 ", array(
                     'date1' => $this->date,
                     'date2' => $this->date,
                     'date3' => $this->date,
                     'date4' => $this->date,
+                    'date5' => $this->date,
                 ));
 
             foreach($query_data as $row_invoice){

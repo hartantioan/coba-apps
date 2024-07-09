@@ -246,6 +246,7 @@ class ProductionOrderController extends Controller
 
             foreach($data->productionOrderDetail as $row){
                 $detailIssue = $row->htmlContentIssue();
+                $detailReceive = $row->htmlHandover();
                 $details[] = [
                     'item_code'             => $row->productionScheduleDetail->item->code,
                     'item_name'             => $row->productionScheduleDetail->item->name,
@@ -254,7 +255,7 @@ class ProductionOrderController extends Controller
                     'qty_received'          => CustomHelper::formatConditionalQty($row->qtyReceive()),
                     'unit'                  => $row->productionScheduleDetail->item->uomUnit->code,
                     'detail_issue'          => $detailIssue,
-                    'detail_receive'        => '',
+                    'detail_receive'        => $detailReceive,
                     /* 'total_issue_item'      => CustomHelper::formatConditionalQty($row->totalIssueItem()),
                     'total_issue_resource'  => CustomHelper::formatConditionalQty($row->totalIssueResource()),
                     'total_item'            => CustomHelper::formatConditionalQty($row->totalItem()), */

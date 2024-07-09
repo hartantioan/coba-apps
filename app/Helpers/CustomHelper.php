@@ -4245,6 +4245,12 @@ class CustomHelper {
 						NULL,
 					);
 				}
+			}else{
+				if($pir->productionFgReceive()->exists()){
+					$pir->update([
+						'status'	=> '3'
+					]);
+				}
 			}
 		}elseif($table_name == 'production_receives'){
 
@@ -4333,7 +4339,7 @@ class CustomHelper {
 
 			$pir = ProductionFgReceive::find($table_id);
 			
-			$query = Journal::create([
+			/* $query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -4403,7 +4409,7 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
-			]);
+			]); */
 
 			$pir->createProductionIssue();
 

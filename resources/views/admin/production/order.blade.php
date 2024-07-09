@@ -175,7 +175,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend align="left">2. Nilai Item</legend>
+                                    <legend align="left">2. Daftar Item</legend>
                                     <div class="col s12 m12" style="overflow:auto;min-width:100%;">
                                         <table class="bordered">
                                             <thead>
@@ -518,7 +518,7 @@
                                 </td>
                             </tr>
                             <tr class="row_close">
-                                <td colspan="6">` + val.detail_issue + `</td>
+                                <td colspan="6">` + val.detail_issue + val.detail_receive + `</td>
                             </tr>
                         `);
                     });

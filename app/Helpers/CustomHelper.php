@@ -4215,6 +4215,36 @@ class CustomHelper {
 				$pir->update([
 					'status'	=> '3'
 				]);
+
+				if($pir->productionFgReceive()->exists()){
+					$qtyWip5 = 0;
+					foreach($pir->productionFgReceive->productionFgReceiveDetail as $row){
+						$qtyWip5 += $row->qty;
+					}
+					self::sendCogs($table_name,
+						$pir->id,
+						$pir->company_id,
+						$pir->place_id,
+						$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+						$pir->productionOrderDetail->productionScheduleDetail->item_id,
+						$qtyWip5,
+						$total,
+						'IN',
+						$pir->post_date,
+						NULL,
+						NULL,
+					);
+
+					self::sendStock(
+						$pir->place_id,
+						$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+						$pir->productionOrderDetail->productionScheduleDetail->item_id,
+						$qtyWip5,
+						'IN',
+						NULL,
+						NULL,
+					);
+				}
 			}
 		}elseif($table_name == 'production_receives'){
 
@@ -4446,6 +4476,30 @@ class CustomHelper {
 					'nominal_fc'	=> $row->total,
 					'note'			=> $pir->code,
 				]);
+
+				self::sendCogs($table_name,
+					$pir->id,
+					$pir->company_id,
+					$pir->productionFgReceive->place_id,
+					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
+					$row->qty * $row->productionFgReceiveDetail->conversion,
+					$row->total,
+					'OUT',
+					$pir->post_date,
+					NULL,
+					NULL,
+				);
+
+				self::sendStock(
+					$pir->productionFgReceive->place_id,
+					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
+					$row->qty * $row->productionFgReceiveDetail->conversion,
+					'OUT',
+					NULL,
+					NULL,
+				);
 			}
 
 			$pir->productionFgReceive->update([

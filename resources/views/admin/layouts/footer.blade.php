@@ -38,8 +38,17 @@
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
                 var sessionLifetime = {{  config('session.lifetime') }};
-                
-                function resetSession() {
+                async function triggerClick() {
+                    return new Promise((resolve) => {
+                        if ($('.data-used').length > 0) {
+                            $('.data-used').trigger('click');
+                        }
+                        resolve();
+                    });
+                }
+                async function resetSession() {
+                    
+                    await triggerClick();
                     fetch('/admin/flush-session', {
                         method: 'POST',
                         headers: {
@@ -58,10 +67,11 @@
                     .catch(error => {
                         console.error('An error occurred:', error);
                     });
+                    
                     location.reload();
                 }
                 function trackActivity() {
-                    setTimeout(resetSession, sessionLifetime * 60 * 1000);
+                    setTimeout(resetSession, sessionLifetime  * 60 * 1000);
                 }
 
                 document.addEventListener("mousemove", trackActivity);

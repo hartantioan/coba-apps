@@ -4524,7 +4524,6 @@ class CustomHelper {
 				]);
 				
 				$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$ar->company_id)->first();
-				$coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$ar->company_id)->first();
 
 				foreach($ar->adjustRateDetail as $row){
 					$nominal = abs($row->nominal);
@@ -4532,7 +4531,7 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
-							'type'			=> $row->nominal > 0 ? '2' : '1',
+							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
@@ -4541,32 +4540,13 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $coaselisihkurs->id,
-							'type'			=> $row->nominal > 0 ? '1' : '2',
+							'type'			=> $row->nominal > 0 ? '2' : '1',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 							'note'			=> $ar->code,
 						]);
 					}
 					if($row->type == '2'){
-						if($row->lookable_type == 'purchase_down_payments'){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coauangmukapembelian->id,
-								'type'			=> $row->nominal > 0 ? '1' : '2',
-								'account_id'	=> $coauangmukapembelian->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
-								'nominal'		=> $nominal,
-								'nominal_fc'	=> 0,
-								'note'			=> $ar->code,
-							]);
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaselisihkurs->id,
-								'type'			=> $row->nominal > 0 ? '2' : '1',
-								'nominal'		=> $nominal,
-								'nominal_fc'	=> 0,
-								'note'			=> $ar->code,
-							]);
-						}
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,

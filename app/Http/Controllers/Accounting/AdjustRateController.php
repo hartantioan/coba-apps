@@ -238,6 +238,7 @@ class AdjustRateController extends Controller
             }
 
             $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$request->company_id)->first();
+            $coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$request->company_id)->first();
             $coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$request->company_id)->first();
 
             foreach($datagr as $row){
@@ -260,18 +261,36 @@ class AdjustRateController extends Controller
 
             foreach($dataapdp as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceInvoice();
+                $total = $row->balancePayment();
                 if($total > 0){
                     $result[] = [
                         'coa_id'        => $coahutangusaha->id,
                         'lookable_type' => $row->getTable(),
                         'lookable_id'   => $row->id,
                         'code'          => $row->code,
-                        'type_document' => 'APDP',
+                        'type_document' => 'APDP HUTANG',
                         'nominal_fc'    => number_format($total,2,',','.'),
                         'latest_rate'   => number_format($latest_rate,2,',','.'),
                         'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
                         'type'          => '2',
+                    ];
+                }
+            }
+
+            foreach($dataapdp as $row){
+                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
+                $total = $row->balanceInvoice();
+                if($total > 0){
+                    $result[] = [
+                        'coa_id'        => $coauangmukapembelian->id,
+                        'lookable_type' => $row->getTable(),
+                        'lookable_id'   => $row->id,
+                        'code'          => $row->code,
+                        'type_document' => 'APDP UANG MUKA',
+                        'nominal_fc'    => number_format($total,2,',','.'),
+                        'latest_rate'   => number_format($latest_rate,2,',','.'),
+                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
+                        'type'          => '1',
                     ];
                 }
             }

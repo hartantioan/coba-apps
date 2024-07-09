@@ -122,6 +122,12 @@ class UnbilledAPController extends Controller
                     AND ar.status IN ('2','3')
                     AND ard.lookable_type = 'good_receipts'
                     AND ard.lookable_id = gr.id
+                    AND (
+                        CASE 
+                            WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
+                            WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
+                        END
+                    )
             ),0) AS adjust_nominal
             FROM good_receipts gr
             LEFT JOIN users u

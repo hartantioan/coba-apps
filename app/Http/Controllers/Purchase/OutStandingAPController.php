@@ -121,6 +121,12 @@ class OutStandingAPController extends Controller
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
+                            AND (
+                                CASE 
+                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
+                                    WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
+                                END
+                            )
                     ),0) AS adjust_nominal,
                     IFNULL((SELECT
                         '1'
@@ -236,6 +242,12 @@ class OutStandingAPController extends Controller
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_down_payments'
                             AND ard.lookable_id = pi.id
+                            AND (
+                                CASE 
+                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
+                                    WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
+                                END
+                            )
                     ),0) AS adjust_nominal,
                     IFNULL((SELECT
                         '1'

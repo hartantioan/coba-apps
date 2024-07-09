@@ -61,6 +61,12 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_down_payments'
                             AND ard.lookable_id = pdp.id
+                            AND (
+                                CASE 
+                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
+                                    WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
+                                END
+                            )
                     ),0) AS adjust_nominal,
                     u.name AS account_name,
                     u.employee_no AS account_code,
@@ -76,7 +82,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     WHERE 
                         pdp.post_date <= :date4
                         AND pdp.grandtotal > 0
-                        AND pdp.status IN ('2','3','7')
+                        AND pdp.status IN ('2','3','7','8')
                         AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd

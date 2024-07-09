@@ -199,7 +199,7 @@
                                     <tr>
                                         <th class="center">{{ __('translations.delete') }}</th>
                                         <th class="center">{{ __('translations.no') }}.</th>
-                                        <th class="center">{{ __('translations.number') }}/th>
+                                        <th class="center">{{ __('translations.number') }}</th>
                                         <th class="center">{{ __('translations.type') }}</th>
                                         <th class="center">Nominal Sisa (FC)</th>
                                         <th class="center">Kurs Terakhir</th>

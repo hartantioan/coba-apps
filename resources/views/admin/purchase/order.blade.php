@@ -1493,13 +1493,13 @@
                                                 </select>
                                             </td>
                                             <td class="center">
-                                                <input name="arr_disc1[]" onfocus="emptyThis(this);" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                                                <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
                                             </td>
                                             <td class="center">
-                                                <input name="arr_disc2[]" onfocus="emptyThis(this);" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                                                <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
                                             </td>
                                             <td class="center">
-                                                <input name="arr_disc3[]" onfocus="emptyThis(this);" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                                                <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                             </td>
                                             <td class="center">
                                                 <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
@@ -1857,13 +1857,13 @@
                         </select>
                     </td>
                     <td class="center">
-                        <input name="arr_disc1[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
                     </td>
                     <td class="center">
-                        <input name="arr_disc2[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
                     </td>
                     <td class="center">
-                        <input name="arr_disc3[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                     </td>
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
@@ -1990,13 +1990,13 @@
                         </select>
                     </td>
                     <td class="center">
-                        <input name="arr_disc1[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
                     </td>
                     <td class="center">
-                        <input name="arr_disc2[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
                     </td>
                     <td class="center">
-                        <input name="arr_disc3[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                     </td>
                     <td class="center">
                         <span id="arr_subtotal` + count + `" class="arr_subtotal">0</span>
@@ -2640,13 +2640,13 @@
                                         </select>
                                     </td>
                                     <td class="center">
-                                        <input name="arr_disc1[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                                        <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
                                     </td>
                                     <td class="center">
-                                        <input name="arr_disc2[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.disc2 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                                        <input name="arr_disc2[]" class="browser-default" type="text" value="` + val.disc2 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
                                     </td>
                                     <td class="center">
-                                        <input name="arr_disc3[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                                        <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                     </td>
                                     <td class="center">
                                         <span id="arr_subtotal` + count + `" class="arr_subtotal">` + val.subtotal + `</span>

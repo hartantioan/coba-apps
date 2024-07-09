@@ -245,15 +245,19 @@ class ProductionOrderController extends Controller
             $details = [];
 
             foreach($data->productionOrderDetail as $row){
+                $detailIssue = $row->htmlContentIssue();
                 $details[] = [
                     'item_code'             => $row->productionScheduleDetail->item->code,
                     'item_name'             => $row->productionScheduleDetail->item->name,
                     'bom_code'              => $row->productionScheduleDetail->bom->code,
                     'qty_planned'           => CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty),
+                    'qty_received'          => CustomHelper::formatConditionalQty($row->qtyReceive()),
                     'unit'                  => $row->productionScheduleDetail->item->uomUnit->code,
-                    'total_issue_item'      => CustomHelper::formatConditionalQty($row->totalIssueItem()),
+                    'detail_issue'          => $detailIssue,
+                    'detail_receive'        => '',
+                    /* 'total_issue_item'      => CustomHelper::formatConditionalQty($row->totalIssueItem()),
                     'total_issue_resource'  => CustomHelper::formatConditionalQty($row->totalIssueResource()),
-                    'total_item'            => CustomHelper::formatConditionalQty($row->totalItem()),
+                    'total_item'            => CustomHelper::formatConditionalQty($row->totalItem()), */
                 ];
             }
 

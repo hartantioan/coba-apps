@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -54,6 +55,54 @@ class ProductionOrderDetail extends Model
         }
         
         return $qty;
+    }
+
+    public function qtyReceive(){
+        $qty = 0;
+        
+        if($this->productionReceive()->exists()){
+            foreach($this->productionReceive as $rowreceive){
+                $qty += $rowreceive->qty();
+            }
+        }
+
+        if($this->productionFgReceive()->exists()){
+            foreach($this->productionFgReceive as $rowreceive){
+                $qty += $rowreceive->qty();
+            }
+        }
+        
+        return $qty;
+    }
+
+    public function htmlContentIssue(){
+        $html = '<table class="bordered"><thead>
+                    <tr>
+                        <th colspan="4">Daftar Item & Resource Issue</th>
+                    </tr>
+                    <tr>
+                        <th>No.</th>
+                        <th>Item/Resource</th>
+                        <th>Qty</th>
+                        <th>Satuan</th>
+                    </tr>
+                </thead><tbody>';
+        $no = 1;
+        foreach($this->productionIssue as $rowissue){
+            foreach($rowissue->productionIssueDetail as $key => $row){
+                $html .= '<tr>
+                            <td class="center-align">'.$no.'</td>
+                            <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                            <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                            <td>'.$row->lookable->uomUnit->code.'</td>
+                        </tr>';
+                $no++;
+            }
+        }
+
+        $html .= '</tbody></table>';
+
+        return $html;
     }
 
     public function totalFg(){

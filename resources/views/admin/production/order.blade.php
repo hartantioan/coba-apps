@@ -20,6 +20,14 @@
     .modal table.bordered th, table.bordered td {
         padding: 5px !important;
     }
+
+    table.bordered th {
+        border:1px solid black !important;
+    }
+
+    table.bordered td {
+        border:1px solid black !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -169,7 +177,7 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend align="left">2. Nilai Item</legend>
                                     <div class="col s12 m12" style="overflow:auto;min-width:100%;">
-                                        <table style="min-width:1400px !important;" class="bordered">
+                                        <table class="bordered">
                                             <thead>
                                                 <tr>
                                                     <th class="center-align" colspan="9">Daftar Item Produksi</th>
@@ -180,15 +188,13 @@
                                                     <th class="center-align">Nama Item</th>
                                                     <th class="center-align">Kode BOM</th>
                                                     <th class="center-align">Qty Planned</th>
+                                                    <th class="center-align">Qty Real</th>
                                                     <th class="center-align">Satuan</th>
-                                                    <th class="center-align">Total Biaya Issue Item</th>
-                                                    <th class="center-align">Total Biaya Issue Resource</th>
-                                                    <th class="center-align">Total Biaya Receive</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-close">
                                                 <tr>
-                                                    <td class="center-align" colspan="9">Data tidak ditemukan</td>
+                                                    <td class="center-align" colspan="7">Data tidak ditemukan</td>
                                                 </t>
                                             </tbody>
                                         </table>
@@ -489,7 +495,7 @@
                     $.each(response.data.details, function(i, val) {
                         $('#body-close').append(`
                             <tr class="row_close">
-                                <td class="center-align">
+                                <td class="center-align" rowspan="2">
                                     ` + (i+1) + `
                                 </td>
                                 <td class="">
@@ -504,18 +510,15 @@
                                 <td class="right-align">
                                     ` + val.qty_planned + `
                                 </td>
+                                <td class="right-align">
+                                    ` + val.qty_received + `
+                                </td>
                                 <td class="center-align">
                                     ` + val.unit + `
                                 </td>
-                                <td class="right-align">
-                                    ` + val.total_issue_item + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total_issue_resource + `
-                                </td>
-                                <td class="right-align">
-                                    ` + val.total_item + `
-                                </td>
+                            </tr>
+                            <tr class="row_close">
+                                <td colspan="6">` + val.detail_issue + `</td>
                             </tr>
                         `);
                     });

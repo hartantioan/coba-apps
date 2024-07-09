@@ -307,4 +307,16 @@ class PurchaseOrderDetail extends Model
         }
         return $code;
     }
+
+    public function getParentUsedData(){
+        $parent = null;
+        if($this->purchaseRequestDetail()->exists()){
+            $parent = $this->purchaseRequestDetail->purchaseRequest;
+        }elseif($this->goodIssueDetail()->exists()){
+            $parent = $this->goodIssueDetail->goodIssue;
+        }elseif($this->marketingOrderDeliveryProcess()->exists()){
+            $parent = $this->marketingOrderDeliveryProcess;
+        }
+        return $parent;
+    }
 }

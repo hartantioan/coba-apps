@@ -783,6 +783,7 @@ class PurchaseRequestController extends Controller
 
         $arr = [];
 
+        $arr_used = [];
         foreach($pr->purchaseRequestDetail as $row){
             $arr[] = [
                 'item_id'           => $row->item_id,
@@ -808,9 +809,20 @@ class PurchaseRequestController extends Controller
                 'unit_stock'        => $row->item->uomUnit->code,
                 'qty_stock'         => CustomHelper::formatConditionalQty($row->qty * $row->qty_conversion),
             ];
+            $arr_used_codes = array_column($arr_used, 'code');
+
+            if ($row->lookable_id && !in_array($row->lookable->materialRequest->code, $arr_used_codes)) {
+                CustomHelper::sendUsedData($row->lookable->materialRequest->getTable(), $row->lookable->materialRequest->id, 'Form Purchase Request');
+                $arr_used[] = [
+                    'code' => $row->lookable->materialRequest->code,
+                    'table' => $row->lookable->materialRequest->getTable(),
+                    'id' => $row->lookable->materialRequest->id,
+                ];
+            }
         }
 
         $pr['details'] = $arr;
+        $pr['used_datas'] = $arr_used;
         				
 		return response()->json($pr);
     }

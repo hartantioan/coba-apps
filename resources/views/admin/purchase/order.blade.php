@@ -2577,7 +2577,7 @@
                         var count = makeid(10);
                         if(response.inventory_type == '1'){
                             $('#last-row-item').before(`
-                                <tr class="row_item">
+                                <tr class="row_item" data-id="` + val.id + `">
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <td class="center">
@@ -2889,6 +2889,18 @@
 
                         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
                     });
+                    if(response.used_datas.length > 0){
+                        $.each(response.used_datas, function(i, val) {
+                            var count = makeid(10);
+                            $('#list-used-data').append(`
+                                <div class="chip purple darken-4 gradient-shadow white-text">
+                                    ` + val.code + `
+                                    <i class="material-icons close data-used" onclick="removeUsedData('` + val.id + `','` + val.table + `')">close</i>
+                                </div>
+                            `);
+                        });
+                        
+                    }
                 }
 
                 $('#inventory_type').trigger('change');

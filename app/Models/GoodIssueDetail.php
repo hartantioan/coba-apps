@@ -252,4 +252,12 @@ class GoodIssueDetail extends Model
 
         return $qty;
     }
+
+    public function getParentUsedData(){
+        $parent = null;
+        if($this->goodIssueRequestDetail()){
+            $parent = $this->lookable->goodIssueRequest;
+        }
+        return $parent;
+    }
 }

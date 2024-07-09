@@ -1818,6 +1818,19 @@
                     });
                 }
 
+                if(response.used_datas.length > 0){
+                    $.each(response.used_datas, function(i, val) {
+                        var count = makeid(10);
+                        $('#list-used-data').append(`
+                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                ` + val.code + `
+                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.table + `','` + val.id + `')">close</i>
+                            </div>
+                        `);
+                    });
+                    
+                }
+
                 if(response.document){
                     const baseUrl = 'http://127.0.0.1:8000/storage/';
                     const filePath = response.document.replace('public/', '');

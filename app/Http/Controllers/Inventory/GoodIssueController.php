@@ -838,7 +838,7 @@ class GoodIssueController extends Controller
         $gr['code_place_id'] = substr($gr->code,7,2);
 
         $arr = [];
-        
+        $arr_used = [];
         foreach($gr->goodIssueDetail as $row){
             $arr[] = [
                 'item_id'                   => $row->itemStock->item_id,
@@ -874,10 +874,20 @@ class GoodIssueController extends Controller
                 'cost_distribution_id'      => $row->cost_distribution_id ? $row->cost_distribution_id : '',
                 'cost_distribution_name'    => $row->cost_distribution_id ? $row->costDistribution->code.' - '.$row->costDistribution->name : '',
             ];
+            $used_datas = $row->getParentUsedData();
+            $arr_used_codes = array_column($arr_used, 'code');
+            if ($used_datas && !in_array($used_datas->code, $arr_used_codes)) {
+                CustomHelper::sendUsedData($used_datas->getTable(), $used_datas->id, 'Form Good Issue');
+                $arr_used[] = [
+                    'code' => $used_datas->code,
+                    'table' => $used_datas->getTable(),
+                    'id' => $used_datas->id,
+                ];
+            }
         }
 
         $gr['details'] = $arr;
-        				
+        $gr['used_datas'] = $arr_used;
 		return response()->json($gr);
     }
 

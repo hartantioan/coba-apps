@@ -1308,7 +1308,8 @@ class PurchaseOrderController extends Controller
         $po['rounding_convert'] = number_format($rounding,2,',','.');
 
         $arr = [];
-        
+        $arr_used = [];
+
         foreach($po->purchaseOrderDetail as $row){
             $arr[] = [
                 'id'                                => $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchase_request_id : ($row->goodIssueDetail()->exists() ? $row->goodIssueDetail->good_issue_id : '0'),
@@ -1356,10 +1357,21 @@ class PurchaseOrderController extends Controller
                 'project_name'                      => $row->purchaseRequestDetail()->exists() ? ($row->purchaseRequestDetail->project()->exists() ? $row->purchaseRequestDetail->project->name : '-') : '-',
                 'buy_units'                         => $row->item_id ? $row->item->arrBuyUnits() : [],
             ];
+            $used_datas = $row->getParentUsedData();
+            $arr_used_codes = array_column($arr_used, 'code');
+
+            if ($used_datas && !in_array($used_datas->code, $arr_used_codes)) {
+                CustomHelper::sendUsedData($used_datas->getTable(), $used_datas->id, 'Form Purchase Orders');
+                $arr_used[] = [
+                    'code' => $used_datas->code,
+                    'table' => $used_datas->getTable(),
+                    'id' => $used_datas->id,
+                ];
+            }
         }
 
         $po['details'] = $arr;
-        				
+        $po['used_datas'] = $arr_used;
 		return response()->json($po);
     }
 
@@ -1925,11 +1937,12 @@ class PurchaseOrderController extends Controller
     }
 
     public function removeUsedData(Request $request){
-        if($request->type == 'po'){
+        
+        if($request->type == 'po' || $request->type == 'purchase_requests'){
             CustomHelper::removeUsedData('purchase_requests',$request->id);
-        }elseif($request->type == 'gi'){
+        }elseif($request->type == 'gi'|| $request->type == 'good_issues'){
             CustomHelper::removeUsedData('good_issues',$request->id);
-        }elseif($request->type == 'sj'){
+        }elseif($request->type == 'sj' || $request->type == 'marketing_order_delivery_processes'){
             CustomHelper::removeUsedData('marketing_order_delivery_processes',$request->id);
         }
         

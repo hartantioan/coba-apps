@@ -259,7 +259,7 @@ class ProductionReceive extends Model
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
                 'post_date'                 => date('Y-m-d'),
-                'note'                      => 'Dibuat otomatis dari Production Receive No. '.$this->code,
+                'note'                      => 'Dibuat otomatis dari Production Receive No. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->code.' )',
                 'status'                    => '1',
             ]);
 

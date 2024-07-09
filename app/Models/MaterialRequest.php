@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\Storage;
 class MaterialRequest extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
@@ -22,6 +22,7 @@ class MaterialRequest extends Model
         'note',
         'status',
         'grandtotal',
+        'document',
         'void_id',
         'void_note',
         'void_date',
@@ -114,6 +115,23 @@ class MaterialRequest extends Model
 
         return substr($prefix,0,9).'-'.$no;
     }
+
+    public function attachment() 
+    {
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
+        } else {
+            $document = asset('website/empty.png');
+        }
+
+        return $document;
+    }
+
+    public function deleteFile(){
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
+        }
+	}
 
     public function approval(){
         $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();

@@ -248,6 +248,7 @@ class MaterialRequestController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -595,6 +596,17 @@ class MaterialRequestController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','2','6'])){
+                        if($request->has('file')) {
+                            if($query->document){
+                                if(Storage::exists($query->document)){
+                                    Storage::delete($query->document);
+                                }
+                            }
+                            $document = $request->file('file')->store('public/material_requests');
+                        } else {
+                            $document = $query->document;
+                        }
+                        $query->document = $document;
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->post_date = $request->post_date;
@@ -631,6 +643,7 @@ class MaterialRequestController extends Controller
                         'status'        => '1',
                         'post_date'     => $request->post_date,
                         'note'          => $request->note,
+                        'document'      => $request->file('file') ? $request->file('file')->store('public/material_requests') : NULL,
                     ]);
 
                     DB::commit();

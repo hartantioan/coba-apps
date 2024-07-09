@@ -20,6 +20,14 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    table.bordered th {
+        border:1px solid black !important;
+    }
+
+    table.bordered td {
+        border:1px solid black !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">

@@ -592,21 +592,19 @@ class ProductionScheduleController extends Controller
 
             $adabutton = false;
             foreach($data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$row['mopd_id'])->orderBy('id')->get() as $keydetail => $rowdetail){
-                $randomColor = CustomHelper::randomColor(150,255);
-                
                 $htmlDetail .= '<tr>
-                    <td class="center-align" style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->status().'</td>           
-                    <td class="center-align pod-3'.CustomHelper::encrypt($row['mopd_id']).'" style="min-width:150px !important;background-color:'.$randomColor.';">'.($rowdetail->productionOrderDetail()->exists() ? $rowdetail->productionOrderDetail->productionOrder->code : '-').'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->code.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->name.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->bom->code.' - '.$rowdetail->bom->name.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->line->code.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->warehouse->name.'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->type().'</td>
-                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->note.'</td></tr>';
+                    <td class="center-align" style="min-width:150px !important;">'.$rowdetail->status().'</td>           
+                    <td class="center-align pod-3'.CustomHelper::encrypt($row['mopd_id']).'" style="min-width:150px !important;">'.($rowdetail->productionOrderDetail()->exists() ? $rowdetail->productionOrderDetail->productionOrder->code : '-').'</td>
+                    <td style="min-width:150px !important;">'.$rowdetail->item->code.'</td>
+                    <td style="min-width:150px !important;">'.$rowdetail->item->name.'</td>
+                    <td style="min-width:150px !important;">'.$rowdetail->bom->code.' - '.$rowdetail->bom->name.'</td>
+                    <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
+                    <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
+                    <td style="min-width:150px !important;" class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
+                    <td style="min-width:150px !important;" class="center-align">'.$rowdetail->line->code.'</td>
+                    <td style="min-width:150px !important;" class="center-align">'.$rowdetail->warehouse->name.'</td>
+                    <td style="min-width:150px !important;" class="center-align">'.$rowdetail->type().'</td>
+                    <td style="min-width:150px !important;">'.$rowdetail->note.'</td></tr>';
                     if($rowdetail->productionOrderDetail()->exists()){
                         $adabutton = true;
                     }
@@ -643,22 +641,20 @@ class ProductionScheduleController extends Controller
                     <th class="center-align">Gudang</th>
                     <th class="center-align">Tipe</th>
                     <th class="center-align">Keterangan</th></tr></thead><tbody>';
-
-            $randomColor = CustomHelper::randomColor(150,255);
             
             $htmlDetail .= '<tr>
-                <td class="center-align" style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->status().'</td>           
-                <td class="center-align pod-'.$row->type.CustomHelper::encrypt($row->id).'" style="min-width:150px !important;background-color:'.$randomColor.';">'.($row->productionOrderDetail()->exists() ? $row->productionOrderDetail->productionOrder->code : '-').'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->item->code.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->item->name.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->bom->code.' - '.$row->bom->name.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';" class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->item->uomUnit->code.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->line->code.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->warehouse->name.'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->type().'</td>
-                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->note.'</td></tr>';
+                <td class="center-align" style="min-width:150px !important;">'.$row->status().'</td>           
+                <td class="center-align pod-'.$row->type.CustomHelper::encrypt($row->id).'" style="min-width:150px !important;">'.($row->productionOrderDetail()->exists() ? $row->productionOrderDetail->productionOrder->code : '-').'</td>
+                <td style="min-width:150px !important;">'.$row->item->code.'</td>
+                <td style="min-width:150px !important;">'.$row->item->name.'</td>
+                <td style="min-width:150px !important;">'.$row->bom->code.' - '.$row->bom->name.'</td>
+                <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
+                <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->line->code.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->warehouse->name.'</td>
+                <td style="min-width:150px !important;" class="center-align">'.$row->type().'</td>
+                <td style="min-width:150px !important;">'.$row->note.'</td></tr>';
 
             $htmlDetail .= '</tbody></table>';
 

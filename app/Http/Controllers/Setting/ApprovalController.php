@@ -26,6 +26,7 @@ use App\Exports\ExportCoa;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\ApprovalSource;
 use App\Models\GoodIssueRequestDetail;
 use App\Models\ProductionScheduleDetail;
 

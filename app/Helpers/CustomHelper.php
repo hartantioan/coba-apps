@@ -448,6 +448,8 @@ class CustomHelper {
 		#delete approvalsource yang tidak punya matrix
 		/* ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete(); */
 
+		ApprovalSource::whereDoesntHave('lookable')->delete();
+		
 		$resetdata = ApprovalSource::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
 		foreach($resetdata as $rowreset){

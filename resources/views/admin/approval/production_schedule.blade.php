@@ -202,6 +202,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @php
+                        $arrmop = [];
+                    @endphp
                     @foreach($data->productionScheduleTarget as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
@@ -214,6 +217,9 @@
                     <tr>
                         <td colspan="5">{{ __('translations.note') }}: {{ $row->marketingOrderPlanDetail->note }}</td>
                     </tr>
+                    @php
+                        $arrmop[] = $row->marketing_order_plan_detail_id;
+                    @endphp
                     @endforeach
                 </tbody>
             </table>
@@ -242,7 +248,40 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->productionScheduleDetail()->orderBy('id')->get() as $key => $row)
+                    @foreach($arrmop as $rowmop)
+                        @foreach($data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$rowmop)->orderBy('id')->get() as $key => $row)
+                        <tr>
+                            @if($key == 0)
+                                <td class="center-align" rowspan="{{ $data->productionScheduleDetail()->where('marketing_order_plan_detail_id',$rowmop)->count() * 2 }}">
+                                    @if ($row->status == '2')
+                                        {!! $row->status() !!}
+                                    @else
+                                        <label>
+                                            <input type="checkbox" id="arr_status_production_schedule{{ $key }}" name="arr_status_production_schedule[]" value="{{ $row->id }}" {{ $row->status == '1' ? 'checked' : '' }}>
+                                            <span>{{ __('translations.select') }}</span>
+                                        </label>
+                                    @endif
+                                </td>
+                            @endif
+                            <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
+                            <td>{{ $row->item->code }}</td>
+                            <td>{{ $row->item->name }}</td>
+                            <td>{{ $row->bom->code.' - '.$row->bom->name }}</td>
+                            <td class="center-align">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
+                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                            <td class="center-align">{{ $row->item->uomUnit->code }}</td>
+                            <td class="center-align">{{ $row->line->code }}</td>
+                            <td class="center-align">{{ $row->warehouse->name }}</td>
+                            <td class="center-align">{{ $row->status() }}</td>           
+                            <td class="center-align">{{ ($row->productionOrderDetail()->exists() ? $row->productionOrderDetail->productionOrder->code : '-') }}</td>
+                            <td class="center-align">{{ $row->type() }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="12">Keterangan : {{ $row->note }}</td>
+                        </tr>
+                        @endforeach
+                    @endforeach
+                    @foreach($data->productionScheduleDetail()->whereNull('marketing_order_plan_detail_id')->orderBy('id')->get() as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">
                             @if ($row->status == '2')

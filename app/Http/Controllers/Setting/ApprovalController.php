@@ -442,9 +442,15 @@ class ApprovalController extends Controller
                             'status'    => '2'
                         ]);
                         foreach($request->arr_status_production_schedule as $key => $row){
-                            ProductionScheduleDetail::find(intval($row))->update([
+                            $querydetail = ProductionScheduleDetail::find(intval($row));
+                            $querydetail->update([
                                 'status'    => '1'
                             ]);
+                            if($querydetail->marketing_order_plan_detail_id){
+                                ProductionScheduleDetail::where('id','<>',$querydetail->id)->where('marketing_order_plan_detail_id',$querydetail->marketing_order_plan_detail_id)->update([
+                                    'status'    => '1'
+                                ]);
+                            }
                         }
                     }
                 }

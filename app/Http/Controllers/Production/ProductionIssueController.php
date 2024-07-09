@@ -13,7 +13,6 @@ use App\Models\Area;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
-use App\Models\Machine;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionIssue;
@@ -49,9 +48,6 @@ class ProductionIssueController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
-                $query->whereIn('place_id',$this->dataplaces);
-            })->get(),
             'area'          => Area::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
@@ -172,7 +168,6 @@ class ProductionIssueController extends Controller
                     $val->line->code,
                     $val->group,
                     $val->place->code,
-                    $val->machine()->exists() ? $val->machine->name : '-',
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -230,7 +225,6 @@ class ProductionIssueController extends Controller
                 'shift_id'                  => 'required',
                 'group'                     => 'required',
                 'line_id'                   => 'required',
-                'machine_id'                => 'required',
                 'post_date'		            => 'required',
                 'production_order_detail_id'=> 'required',
                 'start_process_time'        => 'required',
@@ -243,7 +237,6 @@ class ProductionIssueController extends Controller
                 'shift_id'                          => 'Shift tidak boleh kosong.',
                 'group'                             => 'Grup tidak boleh kosong.',
                 'line_id'                           => 'Line tidak boleh kosong.',
-                'machine_id'                        => 'Mesin tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
                 'production_order_detail_id.required'=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
@@ -327,7 +320,6 @@ class ProductionIssueController extends Controller
                         $query->shift_id = $request->shift_id;
                         $query->group = $request->group;
                         $query->line_id = $request->line_id;
-                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
                         $query->start_process_time = $request->start_process_time;
                         $query->end_process_time = $request->end_process_time;
@@ -365,7 +357,6 @@ class ProductionIssueController extends Controller
                         'shift_id'                  => $request->shift_id,
                         'group'                     => $request->group,
                         'line_id'                   => $request->line_id,
-                        'machine_id'                => $request->machine_id,
                         'post_date'                 => $request->post_date,
                         'start_process_time'        => $request->start_process_time,
                         'end_process_time'          => $request->end_process_time,
@@ -423,9 +414,6 @@ class ProductionIssueController extends Controller
                                     $nominal = $item->itemStock->priceDate($query->post_date);
                                     $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
                                 }
-                            }elseif($request->arr_lookable_type[$key] == 'resources'){
-                                $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
-                                $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
                             }
                         }
                         $querydetail = ProductionIssueDetail::create([

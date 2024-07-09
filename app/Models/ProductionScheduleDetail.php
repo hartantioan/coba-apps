@@ -19,6 +19,7 @@ class ProductionScheduleDetail extends Model
         'marketing_order_plan_detail_id',
         'item_id',
         'bom_id',
+        'production_date',
         'qty',
         'line_id',
         'warehouse_id',

@@ -25,7 +25,6 @@ class ProductionIssue extends Model
         'shift_id',
         'group',
         'line_id',
-        'machine_id',
         'post_date',
         'start_process_time',
         'end_process_time',
@@ -90,11 +89,6 @@ class ProductionIssue extends Model
     public function shift()
     {
         return $this->belongsTo('App\Models\Shift', 'shift_id', 'id')->withTrashed();
-    }
-
-    public function machine()
-    {
-        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
     }
 
     public function productionIssueDetail()

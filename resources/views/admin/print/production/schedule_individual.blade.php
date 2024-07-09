@@ -288,7 +288,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="6" class="center-align">Daftar Shift & Target Produksi</th>
+                                <th colspan="7" class="center-align">Daftar Shift & Target Produksi</th>
                             </tr>
                             <tr>
                                 <th align="center">{{ __('translations.no') }}.</th>
@@ -297,6 +297,7 @@
                                 <th align="center">{{ __('translations.unit') }}</th>
                                 <th align="center">{{ __('translations.line') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>
+                                <th align="center">Tgl.Produksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -308,9 +309,10 @@
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->line->code }}</td>
                                 <td align="center">{{ $row->warehouse->name }}</td>
+                                <td align="center">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                             </tr>
                             <tr>
-                                <td colspan="6">Keterangan : {{ $row->note }}</td>
+                                <td colspan="7">Keterangan : {{ $row->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

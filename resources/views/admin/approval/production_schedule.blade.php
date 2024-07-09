@@ -223,7 +223,7 @@
             <table class="bordered" width="100%">
                 <thead>
                     <tr>
-                        <th colspan="12" class="center-align">Daftar Jadwal Produksi</th>
+                        <th colspan="13" class="center-align">Daftar Jadwal Produksi</th>
                     </tr>
                     <tr>
                         <th class="center-align">{{ __('translations.process') }}</th>
@@ -231,6 +231,7 @@
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.item_code') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.item_name') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.BOM_code') }}</th>
+                        <th class="center-align" style="min-width:150px !important;">Tgl.Produksi</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.uom_unit') }}</th>
                         <th class="center-align" style="min-width:150px !important;">{{ __('translations.line') }}</th>
@@ -257,6 +258,7 @@
                         <td>{{ $row->item->code }}</td>
                         <td>{{ $row->item->name }}</td>
                         <td>{{ $row->bom->code.' - '.$row->bom->name }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                         <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->item->uomUnit->code }}</td>
                         <td class="center-align">{{ $row->line->code }}</td>

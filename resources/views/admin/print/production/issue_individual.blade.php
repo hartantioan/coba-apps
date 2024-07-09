@@ -251,6 +251,10 @@
                                             {{ $data->place->code }}
                                         </td>
                                     </tr>
+                                </table>
+                            </td>
+                            <td width="40%" class="left-align" style="vertical-align: top;">
+                                <table border="0" width="100%">
                                     <tr>
                                         <td>
                                             Line
@@ -260,21 +264,6 @@
                                         </td>
                                         <td>
                                             {{ $data->line->code }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="40%" class="left-align" style="vertical-align: top;">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="34%">
-                                            Mesin
-                                        </td>
-                                        <td width="1%">
-                                            :
-                                        </td>
-                                        <td width="65%">
-                                            {{ $data->machine()->exists() ? $data->machine->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>

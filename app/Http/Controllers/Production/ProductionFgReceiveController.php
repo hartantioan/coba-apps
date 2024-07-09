@@ -923,16 +923,16 @@ class ProductionFgReceiveController extends Controller
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                 }
 
+                foreach($query->productionBatchUsage as $rowdetail){
+                    CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                    $rowdetail->delete();
+                }
+                
                 foreach($query->productionFgReceiveDetail as $row){
                     if($row->productionBatch()->exists()){
                         $row->productionBatch()->delete();
                     }
-                }
-                if($query->productionBatchUsage()->exists()){
-                    foreach($query->productionBatchUsage as $rowdetail){
-                        CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
-                        $rowdetail->delete();
-                    }
+                    $row->delete();
                 }
 
                 $query->update([

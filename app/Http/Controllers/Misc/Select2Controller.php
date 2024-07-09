@@ -348,13 +348,15 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $type = $request->type == 'powder' ? '1' : ($request->type == 'green' ? '2' : '3');
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
-                })->where('status','1')->whereHas('bom',function($query){
+                })->where('status','1')->whereHas('bom',function($query)use($type){
                     $query->whereHas('bomAlternative',function($query){
                         $query->whereNotNull('is_default');
-                    });
+                    })
+                    ->where('group',$type);
                 })->get();
 
         foreach($data as $d) {
@@ -4123,7 +4125,7 @@ class Select2Controller extends Controller {
             $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
             foreach($d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
                 $query->whereNotNull('is_default');
-            })->get() as $row){
+            })->where('issue_method','1')->get() as $row){
                 $qty_planned = $row->qty * $qtyBobotOutput;
                 $bomdetail[] = [
                     'bom_id'            => $row->bom->id,
@@ -4149,7 +4151,7 @@ class Select2Controller extends Controller {
 
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'table'                         => $d->productionOrder->getTable(),
                 'code'                          => $d->productionOrder->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
@@ -4206,7 +4208,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'code'                          => $d->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
@@ -4269,9 +4271,12 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
+            $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
+                $query->whereNotNull('is_default');
+            })->where('issue_method','2')->count();
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'code'                          => $d->productionOrder->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
@@ -4291,6 +4296,7 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
+                'has_backflush'                 => $countbackflush > 0 ? '1' : '',
             ];
         }
 
@@ -4323,7 +4329,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'        => $d->id,
-                'text' 	    => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 	    => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
                 'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
@@ -4373,7 +4379,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'        => $d->id,
-                'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
                 'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 

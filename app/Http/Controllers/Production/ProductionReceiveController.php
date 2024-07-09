@@ -14,7 +14,6 @@ use App\Models\Bom;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
-use App\Models\Machine;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionIssue;
@@ -56,9 +55,6 @@ class ProductionReceiveController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'machine'       => Machine::where('status','1')->whereHas('line',function($query){
-                $query->whereIn('place_id',$this->dataplaces);
-            })->get(),
             'tank'          => Tank::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
@@ -186,7 +182,6 @@ class ProductionReceiveController extends Controller
                     $val->line->code,
                     $val->group,
                     $val->place->code,
-                    $val->machine->name,
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -244,7 +239,6 @@ class ProductionReceiveController extends Controller
                 'shift_id'                  => 'required',
                 'group'                     => 'required',
                 'line_id'                   => 'required',
-                'machine_id'                => 'required',
                 'post_date'		            => 'required',
                 'production_order_detail_id'=> 'required',
                 'start_process_time'        => 'required',
@@ -258,7 +252,6 @@ class ProductionReceiveController extends Controller
                 'shift_id'                          => 'Shift tidak boleh kosong.',
                 'group'                             => 'Grup tidak boleh kosong.',
                 'line_id'                           => 'Line tidak boleh kosong.',
-                'machine_id'                        => 'Mesin tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
                 'production_order_detail_id.required'=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
@@ -364,7 +357,6 @@ class ProductionReceiveController extends Controller
                         $query->shift_id = $request->shift_id;
                         $query->group = $request->group;
                         $query->line_id = $request->line_id;
-                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
                         $query->start_process_time = $request->start_process_time;
                         $query->end_process_time = $request->end_process_time;
@@ -402,7 +394,6 @@ class ProductionReceiveController extends Controller
                         'shift_id'                  => $request->shift_id,
                         'group'                     => $request->group,
                         'line_id'                   => $request->line_id,
-                        'machine_id'                => $request->machine_id,
                         'post_date'                 => $request->post_date,
                         'start_process_time'        => $request->start_process_time,
                         'end_process_time'          => $request->end_process_time,
@@ -413,24 +404,16 @@ class ProductionReceiveController extends Controller
                 }
                 
                 if($query) {
-                    $totalIssue = 0;
                     foreach($request->arr_production_issue_id as $key => $row){
-                        $pi = ProductionIssue::find($row);
-                        if($pi){
-                            $totalIssue += $pi->total();
-                        }
                         ProductionReceiveIssue::create([
                             'production_receive_id' => $query->id,
                             'production_issue_id'   => $row,
                         ]);
                     }
-                    $arrTotal = [];
+
                     $totalQty = 0;
                     foreach($request->arr_qty as $key => $row){
                         $totalQty += str_replace(',','.',str_replace('.','',$row));
-                    }
-                    foreach($request->arr_qty as $key => $row){
-                        $arrTotal[] = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalIssue,2);
                     }
 
                     foreach($request->arr_qty as $key => $row){
@@ -446,6 +429,7 @@ class ProductionReceiveController extends Controller
                             'qty_reject'                    => str_replace(',','.',str_replace('.','',$request->arr_qty_reject[$key])),
                             'place_id'                      => $request->arr_place[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
+                            'total'                         => 0,
                         ]);
                         $type = $querydetail->is_powder ? 'powder' : 'normal';
                         foreach($request->arr_count_detail as $keydetail => $rowdetail){
@@ -460,13 +444,31 @@ class ProductionReceiveController extends Controller
                                     'lookable_id'   => $querydetail->id,
                                     'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
                                     'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
-                                    'total'         => round((str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])) / $querydetail->qty) * $arrTotal[$key],2)
+                                    'total'         => 0
                                 ]);
                             }
                         }
-                        $updaterow = ProductionReceiveDetail::find($querydetail->id);
-                        $updaterow->update([
-                            'total'                 => $arrTotal[$key],
+                    }
+
+                    $queryupdate = ProductionReceive::find($query->id);
+                    
+                    $queryupdate->createProductionIssue();
+
+                    $totalIssue = 0;
+                    foreach($queryupdate->productionReceiveIssue as $key => $row){
+                        $totalIssue += $row->productionIssue->total();
+                    }
+
+                    foreach($queryupdate->productionReceiveDetail as $row){
+                        $rowtotal = round(($row->qty / $totalQty) * $totalIssue,2);
+                        foreach($row->productionBatch as $rowbatch){
+                            $totalbatch = round(($rowbatch->qty_real / $row->qty) * $rowtotal,2);
+                            $rowbatch->update([
+                                'total' => $totalbatch,
+                            ]);
+                        }
+                        $row->update([
+                            'total' => $rowtotal,
                         ]);
                     }
                     

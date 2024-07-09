@@ -399,6 +399,7 @@ class ProductionScheduleController extends Controller
                             'marketing_order_plan_detail_id'=> $row ?? NULL,
                             'item_id'                       => $request->arr_item_detail_id[$key],
                             'bom_id'                        => $request->arr_bom[$key],
+                            'production_date'               => $request->arr_production_date[$key],
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_detail_qty[$key])),
                             'line_id'                       => $request->arr_line[$key],
                             'warehouse_id'                  => $request->arr_warehouse[$key],
@@ -471,6 +472,7 @@ class ProductionScheduleController extends Controller
                 'mopd_id'           => $rowdetail->marketing_order_plan_detail_id ?? '',
                 'bom_id'            => $rowdetail->bom_id ?? '',
                 'bom_code'          => $rowdetail->bom->code.' - '.$rowdetail->bom->name,
+                'production_date'   => $rowdetail->production_date,
                 'item_id'           => $rowdetail->item_id,
                 'item_code'         => $rowdetail->item->code.' - '.$rowdetail->item->name,
                 'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
@@ -580,6 +582,7 @@ class ProductionScheduleController extends Controller
                     <th class="center-align">Kode Item</th>
                     <th class="center-align">Nama Item</th>
                     <th class="center-align">Kode BOM</th>
+                    <th class="center-align">Tgl.Produksi</th>
                     <th class="center-align">Qty</th>
                     <th class="center-align">Satuan UoM</th>
                     <th class="center-align">Line</th>
@@ -597,6 +600,7 @@ class ProductionScheduleController extends Controller
                     <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->code.'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->item->name.'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$rowdetail->bom->code.' - '.$rowdetail->bom->name.'</td>
+                    <td style="min-width:150px !important;background-color:'.$randomColor.';">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';" class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
                     <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$rowdetail->line->code.'</td>
@@ -632,6 +636,7 @@ class ProductionScheduleController extends Controller
                     <th class="center-align">Kode Item</th>
                     <th class="center-align">Nama Item</th>
                     <th class="center-align">Kode BOM</th>
+                    <th class="center-align">Tgl.Produksi</th>
                     <th class="center-align">Qty</th>
                     <th class="center-align">Satuan UoM</th>
                     <th class="center-align">Line</th>
@@ -647,6 +652,7 @@ class ProductionScheduleController extends Controller
                 <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->item->code.'</td>
                 <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->item->name.'</td>
                 <td style="min-width:150px !important;background-color:'.$randomColor.';">'.$row->bom->code.' - '.$row->bom->name.'</td>
+                <td style="min-width:150px !important;background-color:'.$randomColor.';">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
                 <td style="min-width:150px !important;background-color:'.$randomColor.';" class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td style="min-width:150px !important;background-color:'.$randomColor.';" class="center-align">'.$row->line->code.'</td>

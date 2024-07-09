@@ -756,6 +756,11 @@
             $(this).closest('tr').remove();
         });
 
+        $('.body-item-detail-green').on('click', '.delete-data-item-detail-green', function() {
+            $('#list-bom-' + $(this).data('id')).remove();
+            $(this).closest('tr').remove();
+        });
+
         $('.body-item-detail-powder').on('click', '.delete-data-item-detail-powder', function() {
             $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
@@ -1049,12 +1054,11 @@
 
     function addLine(type){
         var count = makeid(10);
-        let randomColor = getRandomColor();
         $('.last-row-item-detail-' + type).remove();
         $('#body-item-detail-' + type).append(`
             <tr class="row_detail_item" data-id="">
                 <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-normal" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
@@ -1069,6 +1073,7 @@
                                 <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                 <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                 <th class="center" style="min-width:150px !important;">BOM</th>
+                                <th class="center" style="min-width:150px !important;">Tgl.Produksi</th>
                                 <th class="center" style="min-width:150px !important;">Line</th>
                                 <th class="center" style="min-width:150px !important;">Gudang</th>
                                 <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1078,19 +1083,22 @@
                             <tr>
                                 <input type="hidden" name="arr_type[]" value="` + type + `">
                                 <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="">
-                                <td style="background-color:` + randomColor + `;">
+                                <td>
                                     <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
                                 </td>
-                                <td style="background-color:` + randomColor + `;" class="right-align">
+                                <td class="right-align">
                                     <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                 </td>
-                                <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                <td class="center-align" id="arr_unit` + count + `">
                                     -
                                 </td>
-                                <td style="background-color:` + randomColor + `;" class="">
+                                <td class="">
                                     <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                 </td>
-                                <td style="background-color:` + randomColor + `;">
+                                <td class="">
+                                    <input name="arr_production_date[]" type="date" value="{{ date('Y-m-d') }}" required>
+                                </td>
+                                <td>
                                     <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($line as $rowline)
@@ -1098,12 +1106,12 @@
                                         @endforeach
                                     </select>    
                                 </td>
-                                <td style="background-color:` + randomColor + `;">
+                                <td>
                                     <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
                                         <option value="">--Silahkan pilih item--</option>
                                     </select>
                                 </td>
-                                <td style="background-color:` + randomColor + `;" class="">
+                                <td class="">
                                     <input name="arr_note[]" type="text" required>
                                 </td>
                             </tr>
@@ -1112,7 +1120,30 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
+        $('#arr_item_detail_id' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_has_bom") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        type: type,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
         $('#arr_bom' + count).select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1230,6 +1261,7 @@
                                         <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                         <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                         <th class="center" style="min-width:150px !important;">BOM</th>
+                                        <th class="center" style="min-width:150px !important;">Tgl.Produksi</th>
                                         <th class="center" style="min-width:150px !important;">Line</th>
                                         <th class="center" style="min-width:150px !important;">Gudang</th>
                                         <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1242,25 +1274,26 @@
                                     var count = makeid(10);
                                     arrCountNormal.push(count);
                                     arrDataNormal.push(detail);
-                                    let randomColor = getRandomColor();
                                     qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
                                     datanormal += `<tr>
                                         <input type="hidden" name="arr_type[]" value="normal">
                                         <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
-                                        
-                                        <td style="background-color:` + randomColor + `;">
+                                        <td>
                                             <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                         </td>
-                                        <td style="background-color:` + randomColor + `;" class="right-align">
+                                        <td class="right-align">
                                             <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + formatRupiahIni(qtyRow.toFixed(3).toString().replace('.',',')) + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                         </td>
-                                        <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                        <td class="center-align" id="arr_unit` + count + `">
                                             -
                                         </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
+                                        <td class="">
                                             <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                         </td>
-                                        <td style="background-color:` + randomColor + `;">
+                                        <td class="">
+                                            <input name="arr_production_date[]" type="date" value="{{ date('Y-m-d') }}" required>
+                                        </td>
+                                        <td>
                                             <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
                                                 <option value="">--{{ __('translations.empty') }}--</option>
                                                 @foreach ($line as $rowline)
@@ -1268,12 +1301,12 @@
                                                 @endforeach
                                             </select>    
                                         </td>
-                                        <td style="background-color:` + randomColor + `;">
+                                        <td>
                                             <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
                                                 <option value="">--Silahkan pilih item--</option>
                                             </select>
                                         </td>
-                                        <td style="background-color:` + randomColor + `;" class="">
+                                        <td class="">
                                             <input name="arr_note[]" type="text" required>
                                         </td>
                                     </tr>`;
@@ -1885,26 +1918,28 @@
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
-                        let randomColor = getRandomColor();
                         if(val.mopd_id && $('.row_detail_item[data-id="' + val.mopd_id + '"]').length > 0){
                             $('.row_detail_item[data-id="' + val.mopd_id + '"] tbody').append(`
                                 <tr>
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
                                     
-                                    <td style="background-color:` + randomColor + `;">
+                                    <td>
                                         <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="right-align">
+                                    <td class="right-align">
                                         <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                    <td class="center-align" id="arr_unit` + count + `">
                                         ` + val.uom + `
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
+                                    <td class="">
                                         <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                     </td>
-                                    <td style="background-color:` + randomColor + `;">
+                                    <td class="">
+                                        <input name="arr_production_date[]" type="date" value="` + val.production_date + `" required>
+                                    </td>
+                                    <td>
                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
                                             <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($line as $rowline)
@@ -1912,12 +1947,12 @@
                                             @endforeach
                                         </select>    
                                     </td>
-                                    <td style="background-color:` + randomColor + `;">
+                                    <td>
                                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
                                             <option value="">--Silahkan pilih item--</option>
                                         </select>
                                     </td>
-                                    <td style="background-color:` + randomColor + `;" class="">
+                                    <td class="">
                                         <input name="arr_note[]" type="text" required value="` + val.note + `">
                                     </td>
                                 </tr>
@@ -1939,6 +1974,7 @@
                                             <th class="center" style="min-width:150px !important;">{{ __('translations.qty') }}</th>
                                             <th class="center" style="min-width:150px !important;">Satuan UoM</th>
                                             <th class="center" style="min-width:150px !important;">BOM</th>
+                                            <th class="center" style="min-width:150px !important;">Tgl.Produksi</th>
                                             <th class="center" style="min-width:150px !important;">Line</th>
                                             <th class="center" style="min-width:150px !important;">Gudang</th>
                                             <th class="center" style="min-width:150px !important;">Remark</th>
@@ -1948,19 +1984,22 @@
                                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                                     <input type="hidden" name="arr_detail_id[]" id="arr_detail_id` + count + `" value="` + val.mopd_id + `">
                                                     
-                                                    <td style="background-color:` + randomColor + `;">
+                                                    <td>
                                                         <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','normal')" required></select>
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;" class="right-align">
+                                                    <td class="right-align">
                                                         <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;" class="center-align" id="arr_unit` + count + `">
+                                                    <td class="center-align" id="arr_unit` + count + `">
                                                         ` + val.uom + `
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;" class="">
+                                                    <td class="">
                                                         <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;">
+                                                    <td class="">
+                                                        <input name="arr_production_date[]" type="date" value="` + val.production_date + `" required>
+                                                    </td>
+                                                    <td>
                                                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]">
                                                             <option value="">--{{ __('translations.empty') }}--</option>
                                                             @foreach ($line as $rowline)
@@ -1968,12 +2007,12 @@
                                                             @endforeach
                                                         </select>    
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;">
+                                                    <td>
                                                         <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
                                                             <option value="">--Silahkan pilih item--</option>
                                                         </select>
                                                     </td>
-                                                    <td style="background-color:` + randomColor + `;" class="">
+                                                    <td class="">
                                                         <input name="arr_note[]" type="text" required value="` + val.note + `">
                                                     </td>
                                                 </tr>

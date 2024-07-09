@@ -146,7 +146,6 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Group</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
-                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.engine') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.by') }}</th>
@@ -218,14 +217,6 @@
                                             @endforeach
                                         </select>
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="machine_id" name="machine_id">
-                                            @foreach ($machine as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="machine_id">{{ __('translations.engine') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id" onchange="unlockProductionOrder();"></select>
@@ -371,6 +362,9 @@
                                                     </tfoot> --}}
                                                 </table>
                                             </p>
+                                        </div>
+                                        <div class="col s12" id="alert-method">
+                                            -
                                         </div>
                                     </div>
                                 </fieldset>
@@ -756,6 +750,7 @@
                         </td>
                     </tr>
                 `);
+                $('#alert-method').html('-');
             }
         });
         
@@ -1029,7 +1024,14 @@
     function getProductionOrder(){
         if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
+                $('#alert-method').html('-');
                 let datakuy = $('#production_order_detail_id').select2('data')[0];
+                if(datakuy.has_backflush){
+                    $('#alert-method').empty().append(`
+                        <div class="red darken-4 white-text">Item yang akan diterima akan membuat Production Issue secara otomatis karena Material BOM terdapat item / resource dengan tipe BACKFLUSH.</div>
+                    `);
+                }
+
                 $('#last-row-item').remove();
 
                 var count = makeid(10);
@@ -1478,7 +1480,6 @@
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'machine_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1725,7 +1726,6 @@
                 $('#post_date').val(response.post_date);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#line_id').val(response.line_id).formSelect();
-                $('#machine_id').val(response.machine_id).formSelect(); 
                 $('#shift_id').empty().append(`
                     <option value="` + response.shift_id + `">` + response.shift_name + `</option>
                 `);

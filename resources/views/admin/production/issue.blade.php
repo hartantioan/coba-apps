@@ -147,7 +147,6 @@
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.line') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Group</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.plant') }}</th>
-                                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.engine') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.document') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.status') }}</th>
                                                         <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.by') }}</th>
@@ -219,14 +218,6 @@
                                             @endforeach
                                         </select>
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="form-control" id="machine_id" name="machine_id">
-                                            @foreach ($machine as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="" for="machine_id">{{ __('translations.engine') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
@@ -313,22 +304,20 @@
                                                             <th class="center">Qty Planned</th>
                                                             <th class="center">Qty Real</th>
                                                             <th class="center">Satuan Produksi</th>
-                                                            <th class="center">Nominal Real</th>
-                                                            <th class="center">Total Real</th>
                                                             <th class="center">Plant & Gudang</th>
                                                             <th class="center">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="9">
+                                                            <td class="center-align" colspan="7">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="9">
+                                                            <th colspan="7">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -712,7 +701,7 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="9">
+                        <td class="center-align" colspan="7">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -762,16 +751,10 @@
                         0,000
                     </td>
                     <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center" id="arr_unit` + count + `">
                         -
-                    </td>
-                    <td class="center">
-                        <input name="arr_nominal[]" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;" id="arr_nominal` + count + `" ` + (type == 'items' ? 'readonly' : '') + `>
-                    </td>
-                    <td class="center">
-                        <input name="arr_total[]" type="text" value="0,00" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_total` + count + `" readonly>
                     </td>
                     <td class="center" id="arr_stock` + count + `">
                         -
@@ -1079,16 +1062,10 @@
                             ` + val.qty_planned + `
                         </td>
                         <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);checkQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                         </td>
                         <td class="center" id="arr_unit` + count + `">
                             ` + val.unit + `
-                        </td>
-                        <td class="center">
-                            <input name="arr_nominal[]" type="text" value="` + val.nominal_planned + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;` + (val.lookable_type == 'items' ? 'border-bottom: none;' : (val.issue_method == '1' ? '' : 'border-bottom: none;')) + `" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : (val.issue_method == '1' ? '' : 'readonly')) + `>
-                        </td>
-                        <td class="center">
-                            <input name="arr_total[]" type="text" value="` + val.total_planned + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;border-bottom: none;" id="arr_total` + count + `" readonly>
                         </td>
                         <td class="center" id="arr_stock` + count + `">
                             ` + optionStock + `
@@ -1168,7 +1145,7 @@
             $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item-issue').empty().append(`
                 <tr id="last-row-item-issue">
-                    <td class="center-align" colspan="9">
+                    <td class="center-align" colspan="7">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
@@ -1220,15 +1197,6 @@
                 (qtyMax >= 0 ? '' : '-') + formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',','))
             );
         }
-    }
-
-    function countRow(code){
-        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let nominal = parseFloat($('#arr_nominal' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let total = qty * nominal;
-        $('#arr_total' + code).val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-        );
     }
 
     function printMultiSelect(){
@@ -1449,7 +1417,6 @@
                 { name: 'line', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'group', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'plant_id', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'machine_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1698,7 +1665,6 @@
                 $('#post_date').val(response.post_date);
                 $('#place_id').val(response.place_id).formSelect();
                 $('#line_id').val(response.line_id).formSelect();
-                $('#machine_id').val(response.machine_id).formSelect(); 
                 $('#shift_id').empty().append(`
                     <option value="` + response.shift_id + `">` + response.shift_name + `</option>
                 `);
@@ -1748,16 +1714,10 @@
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();countRow('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `
-                            </td>
-                            <td class="center">
-                                <input name="arr_nominal[]" type="text" value="` + val.nominal + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `');" style="text-align:right;` + (val.lookable_type == 'items' ? 'border-bottom: none;' : (val.issue_method == '1' ? '' : 'border-bottom: none;')) + `" id="arr_nominal` + count + `" ` + (val.lookable_type == 'items' ? 'readonly' : (val.issue_method == '1' ? '' : 'readonly')) + `>
-                            </td>
-                            <td class="center">
-                                <input name="arr_total[]" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);" style="text-align:right;border-bottom: none;" id="arr_total` + count + `" readonly>
                             </td>
                             <td class="center" id="arr_stock` + count + `">
                                 ` + optionStock + `

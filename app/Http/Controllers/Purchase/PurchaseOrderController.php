@@ -890,6 +890,8 @@ class PurchaseOrderController extends Controller
                             $row->delete();
                         }
 
+                        CustomHelper::removeApproval($query->getTable(),$query->id);
+
                         DB::commit();
                     }else{
                         return response()->json([

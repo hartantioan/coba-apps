@@ -2063,7 +2063,30 @@
                         $('#arr_item_detail_id' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_code + `</option> 
                         `);
-                        select2ServerSide('#arr_item_detail_id' + count, '{{ url("admin/select2/item_has_bom") }}');
+                        $('#arr_item_detail_id' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/item_has_bom") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        type: val.type,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                     });
 
                     countTarget();

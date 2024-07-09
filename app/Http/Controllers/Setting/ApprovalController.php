@@ -325,6 +325,7 @@ class ApprovalController extends Controller
             $nomor = $start + 1;
             $special = ['material_requests','good_issue_requests'];
             foreach($query_data as $val) {
+                info($val->code);
                 $response['data'][] = [
                     $val->status == '1' && !in_array($val->approvalSource->lookable_type,$special) ? '<span class="pick" data-id="'.CustomHelper::encrypt($val->code).'">'.$nomor.'</span>' : $nomor,
                     $val->approvalSource->getAccountInfo() ?? '',

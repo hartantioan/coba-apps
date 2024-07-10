@@ -152,6 +152,7 @@
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>By</th>
                                                         <th>Operasi</th>
                                                     </tr>
                                                 </thead>
@@ -894,6 +895,7 @@
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

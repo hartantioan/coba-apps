@@ -39,15 +39,15 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
         $row = $row->toArray();
         if (isset($row['code']) && $row['code']) {
             $check = Bom::where('code', $row['code'])->first();
+            $item_output_code = explode('#', $row['item_output'])[0];
+            $item_output = Item::where('code', $item_output_code)->first();
 
+            $item_reject_code = explode('#', $row['item_reject'])[0];
+            $item_reject_id = Item::where('code', $item_reject_code)->first();
+            $place = Place::where('code', explode('#', $row['plant'])[0])->first();
+            $warehouse = Warehouse::where('code', explode('#', $row['gudang'])[0])->first();
             if (!$check) {
-                $item_output_code = explode('#', $row['item_output'])[0];
-                $item_output = Item::where('code', $item_output_code)->first();
-
-                $item_reject_code = explode('#', $row['item_reject'])[0];
-                $item_reject_id = Item::where('code', $item_reject_code)->first();
-                $place = Place::where('code', explode('#', $row['plant'])[0])->first();
-                $warehouse = Warehouse::where('code', explode('#', $row['gudang'])[0])->first();
+                
 
                 $query = Bom::create([
                     'code' => $row['code'],
@@ -67,6 +67,20 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit from excel bom data.');
+            }else{
+                $check->bomDetail()->delete();
+                $check->bomAlternative()->delete();
+
+                $check->name = $row['name'];
+                $check->user_id = session('bo_id');
+                $check->item_id = $item_output->id;
+                $check->item_reject_id = $item_reject_id->id;
+                $check->place_id = $place->id;
+                $check->warehouse_id = $warehouse->id;
+                $check->qty_output = $row['qty_output'];
+                $check->group = $row['group'];
+
+                $check->save();
             }
         }else{
             return null;

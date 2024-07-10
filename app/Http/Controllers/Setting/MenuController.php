@@ -70,7 +70,9 @@ class MenuController extends Controller
         foreach($journal->journalDetail as $row){
             foreach($journal->lookable->adjustRateDetail as $rowadjust){
                 if(abs($rowadjust->nominal) == $row->nominal){
-                    echo $rowadjust->lookable->code;
+                    $row->update([
+                        'note'  => $rowadjust->lookable->code
+                    ]);
                 }
             }
         }

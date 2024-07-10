@@ -4541,7 +4541,7 @@ class CustomHelper {
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4549,7 +4549,7 @@ class CustomHelper {
 							'type'			=> $row->nominal > 0 ? '2' : '1',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 					}
 					if($row->type == '2'){
@@ -4560,7 +4560,7 @@ class CustomHelper {
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4568,7 +4568,7 @@ class CustomHelper {
 							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 					}
 				}

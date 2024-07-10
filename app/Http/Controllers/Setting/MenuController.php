@@ -57,15 +57,15 @@ class MenuController extends Controller
             ]);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        $journal = Journal::find(13394);
+        /* $journal = Journal::find(13394);
 
         foreach($journal->journalDetail as $row){
             foreach($journal->lookable->adjustRateDetail as $rowadjust){
@@ -75,7 +75,7 @@ class MenuController extends Controller
                     ]);
                 }
             }
-        }
+        } */
 
         /* User::where('type','1')->update([
             'count_limit_credit'    => 0,

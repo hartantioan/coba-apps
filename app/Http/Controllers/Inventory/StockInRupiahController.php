@@ -322,7 +322,9 @@ class StockInRupiahController extends Controller
                 ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
                 ->first();
-                $query_no[]=$first;
+                if($first){
+                    $query_no[]=$first;
+                }
             }
     
             foreach($query_no as $row_tidak_ada){

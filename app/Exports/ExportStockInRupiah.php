@@ -273,7 +273,9 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
                 ->get();
-                $query_no[]=$first;
+                if($first){
+                    $query_no[]=$first;
+                }
             }
             
     

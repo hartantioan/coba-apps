@@ -68,7 +68,7 @@
                                             <div class="col m2 s6 ">
                                                 <label for="level" style="font-size:1rem;">Level :</label>
                                                 <select class="form-control" id="level" name="level">
-                                                    {{-- <option value="1">1</option> --}}
+                                                    <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
                                                     <option value="4">4</option>

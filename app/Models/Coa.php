@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 use Staudenmeir\LaravelAdjacencyList\Eloquent\HasRecursiveRelationships;
+use Illuminate\Support\Facades\DB;
 
 class Coa extends Model
 {
@@ -101,27 +102,52 @@ class Coa extends Model
         $totalBalanceBeforeCredit = 0;
         $totalDebit = 0;
         $totalCredit = 0;
+
+        $date = $month.'-01';
+
         foreach($child as $row){
             $dataBalanceBeforeDebit = NULL;
             $dataBalanceBeforeCredit = NULL;
             $dataDebit = NULL;
             $dataCredit = NULL;
 
-            $dataBalanceBeforeDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
-                $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
-            })->get();
+            $dataBalanceBeforeDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $date,
+            ));
 
-            $dataBalanceBeforeCredit = $row->journalCredit()->whereHas('journal',function($query)use($month){
-                $query->whereIn('status',['2','3'])->whereRaw("post_date < '$month-01'");
-            })->get();
+            $dataBalanceBeforeCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '2'
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $date,
+            ));
+            
+            $totalBalanceBeforeDebit += $dataBalanceBeforeDebit[0]->total;
 
-            foreach($dataBalanceBeforeDebit as $rowbefore1){
-                $totalBalanceBeforeDebit += round(round($rowbefore1->nominal,3),2);
-            }
-
-            foreach($dataBalanceBeforeCredit as $rowbefore2){
-                $totalBalanceBeforeCredit += round(round($rowbefore2->nominal,3),2);
-            }       
+            $totalBalanceBeforeCredit += $dataBalanceBeforeCredit[0]->total;
 
             $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){
                 $query->whereIn('status',['2','3'])->whereRaw("post_date LIKE '$month%'");
@@ -141,7 +167,7 @@ class Coa extends Model
         }
 
         $arr = [
-            'totalBalanceBefore'    => round($totalBalanceBeforeDebit - $totalBalanceBeforeCredit,2),
+            'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,
             'totalDebit'            => $totalDebit,
             'totalCredit'           => $totalCredit,
             'totalBalance'          => $totalDebit - $totalCredit,

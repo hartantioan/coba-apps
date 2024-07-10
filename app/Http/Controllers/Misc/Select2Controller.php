@@ -1098,7 +1098,7 @@ class Select2Controller extends Controller {
                             'warehouse_name'=> $row->itemStock->warehouse->name,
                             'area_name'     => $row->itemStock->area()->exists() ? $row->itemStock->area->code : '-',
                             'shading_name'  => $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-',
-                            'qty_balance'   => $row->qtyBalanceReturn(),
+                            'qty_balance'   => CustomHelper::formatConditionalQty($row->qtyBalanceReturn()),
                             'unit'          => $row->itemStock->item->uomUnit->code,
                         ];
                     }

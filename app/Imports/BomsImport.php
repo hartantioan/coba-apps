@@ -37,8 +37,8 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
 {
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $row = $row->toArray();
             if (isset($row['code']) && $row['code']) {
                 $check = Bom::where('code', $row['code'])->first();
@@ -88,10 +88,10 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
             }else{
                 return null;
             } 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
     }
     
     public function startRow(): int
@@ -104,8 +104,8 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
 {
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $row = $row->toArray();
 
             if ($row['kode_bom_header']) {
@@ -122,10 +122,10 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
             }else{
                 return null;
             } 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
     }
    
     public function startRow(): int
@@ -137,8 +137,8 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
 {
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $row = $row->toArray();
 
             if ($row['kode_bom_header']) {
@@ -181,10 +181,10 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
             }else{
                 return null;
             }  
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
     }
 
     

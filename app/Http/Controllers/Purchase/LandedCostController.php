@@ -676,7 +676,7 @@ class LandedCostController extends Controller
                             'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(!CustomHelper::checkLockAcc($query->post_date)){
+                    if(!CustomHelper::checkLockAcc($request->post_date)){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'

@@ -153,7 +153,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                         $nominal = 0;
                         $total = 0;
                         $cost_distribution_id = null;
-                    }else{
+                    }elseif($row['type']=='resources'){
                         $item_code = explode('#', $row['resource_code'])[0];
                         $item_output = Resource::where('code', $item_code)->first();
                     

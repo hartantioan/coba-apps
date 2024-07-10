@@ -116,11 +116,11 @@ class Coa extends Model
             })->get();
 
             foreach($dataBalanceBeforeDebit as $rowbefore1){
-                $totalBalanceBeforeDebit += round(round($rowbefore1->nominal,2),2);
+                $totalBalanceBeforeDebit += round(round($rowbefore1->nominal,3),2);
             }
 
             foreach($dataBalanceBeforeCredit as $rowbefore2){
-                $totalBalanceBeforeCredit += round(round($rowbefore2->nominal,2),2);
+                $totalBalanceBeforeCredit += round(round($rowbefore2->nominal,3),2);
             }       
 
             $dataDebit = $row->journalDebit()->whereHas('journal',function($query)use($month){

@@ -115,7 +115,7 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
                     $query = BomAlternative::create([
                         'code' => $row['kode_alternative'] ? $row['kode_alternative'] : strtoupper(Str::random(25)),
                         'name' => $row['nama_alternative'] ? $row['nama_alternative'] : strtoupper(Str::random(25)),
-                        'is_default' => $row['is_default'],
+                        'is_default' => $row['is_default'] == '0' || $row['is_default'] == '' ? NULL : $row['is_default'],
                         'bom_id' => $check->id,
                     ]);
                 }

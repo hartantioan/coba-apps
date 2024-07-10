@@ -269,7 +269,60 @@ class ProductionFgReceive extends Model
     public function createProductionIssue(){
         $lastSegment = 'production_issue';
         $menu = Menu::where('url', $lastSegment)->first();
-        $newCode=ProductionIssue::generateCode($menu->document_code.date('y',strtotime($this->post_date)).substr($this->code,7,2));
+
+        foreach($this->productionBatchUsage as $row){
+            $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
+
+            $query = ProductionIssue::create([
+                'code'			            => $newCode,
+                'user_id'		            => session('bo_id'),
+                'company_id'                => $this->company_id,
+                'production_order_detail_id'=> $this->production_order_detail_id,
+                'production_fg_receive_id'  => $this->id,
+                'place_id'                  => $this->place_id,
+                'shift_id'                  => $this->shift_id,
+                'group'                     => $this->group,
+                'line_id'                   => $this->line_id,
+                'post_date'                 => date('Y-m-d'),
+                'note'                      => 'Dibuat otomatis dari Production Receive FG No. '.$this->code,
+                'status'                    => '1',
+            ]);
+            $price = $row->productionBatch->price();
+            $rowtotal = round($price * $row->qty,2);
+            $itemStock = ItemStock::where('item_id',$row->productionBatch->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$row->productionBatch->item->warehouse())->first();
+            $querydetail = ProductionIssueDetail::create([
+                'production_issue_id'           => $query->id,
+                'production_order_detail_id'    => $this->production_order_detail_id,
+                'lookable_type'                 => 'items',
+                'lookable_id'                   => $row->productionBatch->item_id,
+                'bom_id'                        => NULL,
+                'bom_detail_id'                 => NULL,
+                'qty'                           => $row->qty,
+                'nominal'                       => $price,
+                'total'                         => $rowtotal,
+                'qty_bom'                       => 0,
+                'nominal_bom'                   => 0,
+                'total_bom'                     => 0,
+                'qty_planned'                   => 0,
+                'nominal_planned'               => 0,
+                'total_planned'                 => 0,
+                'from_item_stock_id'            => $itemStock->id,
+            ]);
+            if($query){
+                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+    
+                activity()
+                    ->performedOn(new ProductionIssue())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit issue production.');
+            }
+        }
+
+        $query = null;
+        
+        $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
         
         $query = ProductionIssue::create([
             'code'			            => $newCode,
@@ -281,7 +334,7 @@ class ProductionFgReceive extends Model
             'shift_id'                  => $this->shift_id,
             'group'                     => $this->group,
             'line_id'                   => $this->line_id,
-            'post_date'                 => $this->post_date,
+            'post_date'                 => date('Y-m-d'),
             'note'                      => 'Dibuat otomatis dari Production Receive FG No. '.$this->code,
             'status'                    => '1',
         ]);

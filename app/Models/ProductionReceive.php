@@ -258,8 +258,8 @@ class ProductionReceive extends Model
                 'shift_id'                  => $this->shift_id,
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
-                'post_date'                 => $this->post_date,
-                'note'                      => 'Dibuat otomatis dari Production Receive No. '.$this->code,
+                'post_date'                 => date('Y-m-d'),
+                'note'                      => 'Dibuat otomatis dari Production Receive No. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->code.' )',
                 'status'                    => '1',
             ]);
 

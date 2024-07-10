@@ -65,6 +65,18 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]);
 
+        /* $journal = Journal::find(13394);
+
+        foreach($journal->journalDetail as $row){
+            foreach($journal->lookable->adjustRateDetail as $rowadjust){
+                if(abs($rowadjust->nominal) == $row->nominal){
+                    $row->update([
+                        'note'  => $rowadjust->lookable->code
+                    ]);
+                }
+            }
+        } */
+
         /* User::where('type','1')->update([
             'count_limit_credit'    => 0,
         ]);

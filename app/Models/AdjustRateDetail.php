@@ -44,7 +44,7 @@ class AdjustRateDetail extends Model
     public function getType(){
         $type = match ($this->lookable_type) {
             'good_receipts'             => 'GRPO',
-            'purchase_down_payments'    => 'APDP',
+            'purchase_down_payments'    => $this->type == '1' ? 'APDP UANG MUKA' : 'APDP HUTANG',
             default                     => 'Kosong',
         };
   

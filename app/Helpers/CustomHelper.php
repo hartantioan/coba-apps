@@ -4245,6 +4245,12 @@ class CustomHelper {
 						NULL,
 					);
 				}
+			}else{
+				if($pir->productionFgReceive()->exists()){
+					$pir->update([
+						'status'	=> '3'
+					]);
+				}
 			}
 		}elseif($table_name == 'production_receives'){
 
@@ -4333,7 +4339,7 @@ class CustomHelper {
 
 			$pir = ProductionFgReceive::find($table_id);
 			
-			$query = Journal::create([
+			/* $query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -4403,7 +4409,7 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
-			]);
+			]); */
 
 			$pir->createProductionIssue();
 
@@ -4524,7 +4530,6 @@ class CustomHelper {
 				]);
 				
 				$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$ar->company_id)->first();
-				$coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$ar->company_id)->first();
 
 				foreach($ar->adjustRateDetail as $row){
 					$nominal = abs($row->nominal);
@@ -4532,41 +4537,22 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
-							'type'			=> $row->nominal > 0 ? '2' : '1',
+							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $coaselisihkurs->id,
-							'type'			=> $row->nominal > 0 ? '1' : '2',
+							'type'			=> $row->nominal > 0 ? '2' : '1',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 					}
 					if($row->type == '2'){
-						if($row->lookable_type == 'purchase_down_payments'){
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coauangmukapembelian->id,
-								'type'			=> $row->nominal > 0 ? '1' : '2',
-								'account_id'	=> $coauangmukapembelian->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
-								'nominal'		=> $nominal,
-								'nominal_fc'	=> 0,
-								'note'			=> $ar->code,
-							]);
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaselisihkurs->id,
-								'type'			=> $row->nominal > 0 ? '2' : '1',
-								'nominal'		=> $nominal,
-								'nominal_fc'	=> 0,
-								'note'			=> $ar->code,
-							]);
-						}
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -4574,7 +4560,7 @@ class CustomHelper {
 							'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4582,7 +4568,7 @@ class CustomHelper {
 							'type'			=> $row->nominal > 0 ? '1' : '2',
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
-							'note'			=> $ar->code,
+							'note'			=> $row->lookable->code,
 						]);
 					}
 				}

@@ -65,7 +65,7 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]); */
 
-        $journal = Journal::find(13393);
+        $journal = Journal::find(13394);
 
         foreach($journal->journalDetail as $row){
             foreach($journal->lookable->adjustRateDetail as $rowadjust){

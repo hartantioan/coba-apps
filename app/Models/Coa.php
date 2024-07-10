@@ -141,7 +141,7 @@ class Coa extends Model
         }
 
         $arr = [
-            'totalBalanceBefore'    => $totalBalanceBeforeDebit - $totalBalanceBeforeCredit,
+            'totalBalanceBefore'    => round($totalBalanceBeforeDebit - $totalBalanceBeforeCredit,2),
             'totalDebit'            => $totalDebit,
             'totalCredit'           => $totalCredit,
             'totalBalance'          => $totalDebit - $totalCredit,

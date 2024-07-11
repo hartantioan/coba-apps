@@ -346,7 +346,7 @@ class OutStandingAPController extends Controller
 
             foreach($results2 as $row){
                 $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal,2);
-                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2) + $row->total_journal;
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2) + ($row->total_journal_credit - $row->total_journal_debit);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [
                     'code'      => $row->code,

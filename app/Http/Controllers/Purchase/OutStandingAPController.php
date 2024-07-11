@@ -261,7 +261,12 @@ class OutStandingAPController extends Controller
                     ),0) AS status_cancel,
                     IFNULL((
                         SELECT
-                            SUM(jd.nominal)
+                            SUM((
+                                CASE 
+                                    WHEN ard.type = '1' THEN jd.nominal
+                                    WHEN ard.type = '2' THEN -1 * jd.nominal
+                                END
+                            ))
                             FROM journal_details jd
                             JOIN journals j
                                 ON j.id = jd.journal_id

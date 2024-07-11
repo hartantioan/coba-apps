@@ -89,20 +89,34 @@ class DownPaymentController extends Controller
                             END
                         )
                 ),0) AS adjust_nominal,
+                IFNULL((
+                    SELECT
+                        SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '100.01.07.01.01'
+                        AND jd.note = CONCAT('REVERSE*',pdp.code)
+                        AND j.post_date <= :date4
+                        AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
+                ),0) AS total_journal,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pdp
                 LEFT JOIN users u
                     ON u.id = pdp.account_id
                 WHERE 
-                    pdp.post_date <= :date4
+                    pdp.post_date <= :date5
                     AND pdp.grandtotal > 0
                     AND pdp.status IN ('2','3','7','8')
                     AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date5
+                            cd.post_date <= :date6
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pdp.id
                             AND cd.deleted_at IS NULL
@@ -113,6 +127,7 @@ class DownPaymentController extends Controller
                 'date3' => $date,
                 'date4' => $date,
                 'date5' => $date,
+                'date6' => $date,
             ));
 
         $results = [];
@@ -122,7 +137,7 @@ class DownPaymentController extends Controller
         foreach($data as $row){
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->currency_rate;
-            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal;
+            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,

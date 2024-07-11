@@ -68,6 +68,20 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                                 END
                             )
                     ),0) AS adjust_nominal,
+                    IFNULL((
+                        SELECT
+                            SUM(jd.nominal)
+                            FROM journal_details jd
+                            JOIN journals j
+                                ON j.id = jd.journal_id
+                            JOIN coas c
+                                ON jd.coa_id = c.id
+                            WHERE c.code = '100.01.07.01.01'
+                            AND jd.note = CONCAT('REVERSE*',pdp.code)
+                            AND j.post_date <= :date4
+                            AND j.status IN ('2','3')
+                            AND jd.deleted_at IS NULL
+                    ),0) AS total_journal,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     uvoid.name AS void_name,
@@ -80,14 +94,14 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     LEFT JOIN users udelete
                         ON udelete.id = pdp.void_id
                     WHERE 
-                        pdp.post_date <= :date4
+                        pdp.post_date <= :date5
                         AND pdp.grandtotal > 0
                         AND pdp.status IN ('2','3','7','8')
                         AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date5
+                            cd.post_date <= :date6
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pdp.id
                             AND cd.deleted_at IS NULL
@@ -98,12 +112,13 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     'date3' => $this->date,
                     'date4' => $this->date,
                     'date5' => $this->date,
+                    'date6' => $this->date,
                 ));
 
             foreach($query_data as $row_invoice){
                 $balance = round($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo,2);
                 $currency_rate = $row_invoice->currency_rate;
-                $balance_rp = round($balance * $currency_rate,2) + $row_invoice->adjust_nominal;
+                $balance_rp = round($balance * $currency_rate,2) + $row_invoice->adjust_nominal - $row_invoice->total_journal;
                 if($balance > 0){
                     $pdp = PurchaseDownPayment::where('code',$row_invoice->code)->first();
                     $array_filter[] = [

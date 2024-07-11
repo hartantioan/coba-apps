@@ -264,6 +264,18 @@ class PurchaseDownPayment extends Model
         return $total;
     }
 
+    public function balanceInvoiceByDate($date){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->purchaseInvoiceDp()->whereHas('purchaseInvoice',function($query) use ($date){
+            $query->whereDate('post_date','<=',$date);
+        })->get() as $row){
+            $total -= $row->nominal;
+        }
+
+        return $total;
+    }
+
     public function totalInvoice(){
         $total = 0;
 

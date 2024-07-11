@@ -114,6 +114,7 @@
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
+                                                        <th>Tgl.Balik</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>Kurs</th>
                                                         <th>{{ __('translations.note') }}</th>
@@ -186,6 +187,10 @@
                         <div class="input-field col s3">
                             <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
                             <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
+                        </div>
+                        <div class="input-field col s3 step4">
+                            <input id="reverse_date" name="reverse_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
+                            <label class="active" for="reverse_date">Tgl.Balik (Hutang APDP)</label>
                         </div>
                         <div class="input-field col s3 step8">
                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="preview();" href="javascript:void(0);">
@@ -380,6 +385,7 @@
                 <thead>
                     <tr>
                         <th class="center-align" rowspan="2">No</th>
+                        <th class="center-align" rowspan="2">Tgl</th>
                         <th class="center-align" rowspan="2">Coa</th>
                         <th class="center-align" rowspan="2">{{ __('translations.bussiness_partner') }}</th>
                         <th class="center-align" rowspan="2">{{ __('translations.plant') }}</th>
@@ -809,6 +815,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
+                { name: 'reverse_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'right-align' },
                 { name: 'note', className: 'center-align' },

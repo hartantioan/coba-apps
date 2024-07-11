@@ -2253,7 +2253,7 @@ class PaymentRequestController extends Controller
 
                     $lastSegment = 'outgoing_payment';
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=OutgoingPayment::generateCode($menu->document_code.date('y').substr($cek->code,7,2));
+                    $newCode = OutgoingPayment::generateCode($menu->document_code.date('y').substr($cek->code,7,2));
 
                     $query = OutgoingPayment::create([
                         'code'			            => $newCode,

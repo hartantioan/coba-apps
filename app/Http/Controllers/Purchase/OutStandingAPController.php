@@ -284,7 +284,7 @@ class OutStandingAPController extends Controller
                                 ON jd.coa_id = c.id
                             WHERE c.code = '200.01.03.01.01'
                             AND jd.note = CONCAT('REVERSE*',pi.code)
-                            AND j.post_date <= :date6
+                            AND j.post_date <= :date7
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'
@@ -304,7 +304,7 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date <= :date7
+                        pi.post_date <= :date8
                         AND pi.grandtotal > 0
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
@@ -320,6 +320,7 @@ class OutStandingAPController extends Controller
             'date5' => $date,
             'date6' => $date,
             'date7' => $date,
+            'date8' => $date,
         ));
 
         $totalAll = 0;

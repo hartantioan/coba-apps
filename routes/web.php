@@ -12,6 +12,7 @@ use App\Http\Controllers\HR\OvertimeRequestController;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\AdjustRateController;
+use App\Http\Controllers\Production\BomCalculatorController;
 use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
@@ -2039,6 +2040,24 @@ Route::prefix('admin')->group(function () {
             });
 
             Route::prefix('production')->middleware('direct.access')->group(function () {
+                Route::prefix('bom_calculator')->middleware(['operation.access:bom_calculator,view','lockacc'])->group(function () {
+                    Route::get('/',[BomCalculatorController::class, 'index']);
+                    Route::get('datatable',[BomCalculatorController::class, 'datatable']);
+                    Route::get('row_detail',[BomCalculatorController::class, 'rowDetail']);
+                    Route::post('show', [BomCalculatorController::class, 'show']);
+                    Route::post('get_code', [BomCalculatorController::class, 'getCode']);
+                    Route::post('print',[BomCalculatorController::class, 'print']);
+                    Route::post('done',[BomCalculatorController::class, 'done'])->middleware('operation.access:bom_calculator,update');
+                    Route::post('print_by_range',[BomCalculatorController::class, 'printByRange']);
+                    Route::get('export',[BomCalculatorController::class, 'export']);
+                    Route::get('viewstructuretree',[BomCalculatorController::class, 'viewStructureTree']);
+                    Route::post('create',[BomCalculatorController::class, 'create'])->middleware('operation.access:bom_calculator,update');
+                    Route::get('approval/{id}',[BomCalculatorController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[BomCalculatorController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [BomCalculatorController::class, 'voidStatus'])->middleware('operation.access:bom_calculator,void');
+                    Route::post('destroy', [BomCalculatorController::class, 'destroy'])->middleware('operation.access:bom_calculator,delete');
+                });
+
                 Route::prefix('marketing_order_production')->middleware(['operation.access:marketing_order_production,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderPlanController::class, 'index']);
                     Route::get('datatable',[MarketingOrderPlanController::class, 'datatable']);

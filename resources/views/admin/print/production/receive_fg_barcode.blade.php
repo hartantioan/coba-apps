@@ -19,6 +19,7 @@
 
             td {
                 font-weight: 700;
+                font-size:12px;
             }
 
             @page { margin: 1em 0.75em 0.5em 0.75em; }
@@ -36,7 +37,7 @@
                     <div style="margin-top:-25px;">
                         <h3>{{ $row->pallet_no }}</h3>
                     </div>
-                    <div align="center" style="font-size:9px;margin-top:-20px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
+                    <div align="center" style="font-size:9px;margin-top:-10px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
                     <table border="0" width="100%">
                         <tr>
                             <td width="30%" align="center">

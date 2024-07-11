@@ -290,6 +290,25 @@ class PurchaseDownPayment extends Model
         return $totalAfterMemo;
     }
 
+    public function balancePaymentByDate($date){
+        $total = $this->grandtotal - $this->totalMemoByDate($date);
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use ($date){
+            $query->whereHas('outgoingPayment',function ($query) use ($date){
+                $query->whereDate('pay_date','<=',$date);
+            });
+        })->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query) use($date){
+            $query->where('payment_type','5')->whereIn('status',['2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id')->whereDate('post_date','<=',$date);
+        })->get() as $rowpayment){
+            $total -= $rowpayment->nominal;
+        }
+        return $total;
+    }
+
     public function balancePaymentRequest(){
         $total = $this->grandtotal;
         $totalAfterMemo = $total - $this->totalMemo();

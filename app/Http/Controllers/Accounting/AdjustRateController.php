@@ -74,6 +74,7 @@ class AdjustRateController extends Controller
             'user_id',
             'company_id',
             'post_date',
+            'reverse_date',
             'currency_id',
             'currency_rate',
             'note',
@@ -153,6 +154,7 @@ class AdjustRateController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->reverse_date ? date('d/m/Y',strtotime($val->reverse_date)) : '-',
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
                     $val->note,
@@ -261,7 +263,7 @@ class AdjustRateController extends Controller
 
             foreach($dataapdp as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balancePayment();
+                $total = $row->balancePaymentByDate($request->post_date);
                 if($total > 0){
                     $result[] = [
                         'coa_id'        => $coahutangusaha->id,
@@ -347,6 +349,7 @@ class AdjustRateController extends Controller
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
                 'post_date'			        => 'required',
+                'reverse_date'			    => 'required',
                 'company_id'		        => 'required',
                 'currency_id'               => 'required',
                 'currency_rate'             => 'required',
@@ -362,6 +365,7 @@ class AdjustRateController extends Controller
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
+                'reverse_date.required' 			=> 'Tanggal balik tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'currency_id.required' 			    => 'Mata Uang tidak boleh kosong.',
                 'currency_rate.required' 			=> 'Kurs tidak boleh kosong.',
@@ -423,6 +427,7 @@ class AdjustRateController extends Controller
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
                         $query->post_date = $request->post_date;
+                        $query->reverse_date = $request->reverse_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
@@ -446,6 +451,7 @@ class AdjustRateController extends Controller
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
                         'post_date'	    => $request->post_date,
+                        'reverse_date'	=> $request->reverse_date,
                         'currency_id'   => $request->currency_id,
                         'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'status'        => '1',
@@ -958,47 +964,52 @@ class AdjustRateController extends Controller
                 'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
-            foreach($rowmain->journalDetail()->where(function($query){
-                $query->whereHas('coa',function($query){
-                    $query->orderBy('code');
-                })
-                ->orderBy('type');
-            })->get() as $key => $row){
-
-                if($row->type == '1'){
-                    $total_debit_asli += $row->nominal_fc;
-                    $total_debit_konversi += $row->nominal;
+            foreach($query->journal as $rowmain){
+                foreach($rowmain->journalDetail()->where(function($query){
+                    $query->whereHas('coa',function($query){
+                        $query->orderBy('code');
+                    })
+                    ->orderBy('type');
+                })->get() as $key => $row){
+    
+                    if($row->type == '1'){
+                        $total_debit_asli += $row->nominal_fc;
+                        $total_debit_konversi += $row->nominal;
+                    }
+                    if($row->type == '2'){
+                        $total_kredit_asli += $row->nominal_fc;
+                        $total_kredit_konversi += $row->nominal;
+                    }
+    
+                    $string .= '<tr>
+                        <td class="center-align">'.($key + 1).'</td>
+                        <td class="center-align">'.date('d/m/Y',strtotime($rowmain->post_date)).'</td>
+                        <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                        <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                        <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                        <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                        <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                        <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                        <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                        <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                        <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                        <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                        <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    </tr>';
                 }
-                if($row->type == '2'){
-                    $total_kredit_asli += $row->nominal_fc;
-                    $total_kredit_konversi += $row->nominal;
-                }
-
-                $string .= '<tr>
-                    <td class="center-align">'.($key + 1).'</td>
-                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
-                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
-                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
-                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
-                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
-                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
-                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
-                    <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
-                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
-                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
-                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
-                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
-                </tr>';
             }
+            
             $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="12"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
+
             $response["tbody"] = $string; 
         }else{
             $response = [

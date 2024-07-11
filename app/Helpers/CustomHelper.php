@@ -4570,6 +4570,40 @@ class CustomHelper {
 							'nominal_fc'	=> 0,
 							'note'			=> $row->lookable->code,
 						]);
+						if($row->lookable_type == 'purchase_down_payments'){
+							if($row->lookable->balancePayment() <= 0){
+								$queryreverse = Journal::create([
+									'user_id'		=> session('bo_id'),
+									'company_id'	=> $ar->company_id,
+									'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($ar->reverse_date)).'00'),
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'post_date'		=> $ar->reverse_date,
+									'note'			=> $ar->code.' - '.$row->lookable->code,
+									'currency_id'	=> 1,
+									'currency_rate'	=> 1,
+									'status'		=> '3'
+								]);
+
+								JournalDetail::create([
+									'journal_id'	=> $queryreverse->id,
+									'coa_id'		=> $row->coa_id,
+									'type'			=> $row->nominal > 0 ? '1' : '2',
+									'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
+									'nominal'		=> $nominal,
+									'nominal_fc'	=> 0,
+									'note'			=> 'REVERSE*'.$row->lookable->code,
+								]);
+								JournalDetail::create([
+									'journal_id'	=> $queryreverse->id,
+									'coa_id'		=> $coaselisihkurs->id,
+									'type'			=> $row->nominal > 0 ? '2' : '1',
+									'nominal'		=> $nominal,
+									'nominal_fc'	=> 0,
+									'note'			=> $row->lookable->code,
+								]);
+							}
+						}
 					}
 				}
 			}

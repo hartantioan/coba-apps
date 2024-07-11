@@ -19,6 +19,7 @@ class AdjustRate extends Model
         'user_id',
         'company_id',
         'post_date',
+        'reverse_date',
         'currency_id',
         'currency_rate',
         'note',

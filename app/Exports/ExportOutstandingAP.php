@@ -209,6 +209,20 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
                         AND cd.lookable_id = pi.id
                         AND cd.deleted_at IS NULL
                 ),0) AS status_cancel,
+                IFNULL((
+                    SELECT
+                        SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '200.01.03.01.01'
+                        AND jd.note = CONCAT('REVERSE*',pi.code)
+                        AND j.post_date <= :date6
+                        AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
+                ),0) AS total_journal,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -225,7 +239,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date6
+                    pi.post_date <= :date7
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
@@ -237,6 +251,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
             'date4' => $this->date,
             'date5' => $this->date,
             'date6' => $this->date,
+            'date7' => $this->date,
         ));
 
         foreach($results as $row){
@@ -271,7 +286,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2);
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal;
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0 && $row->status_cancel == '0'){
                 $data_tempura = [

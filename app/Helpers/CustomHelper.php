@@ -4567,7 +4567,7 @@ class CustomHelper {
 								]);
 
 								JournalDetail::create([
-									'journal_id'	=> $query->id,
+									'journal_id'	=> $queryreverse->id,
 									'coa_id'		=> $row->coa_id,
 									'type'			=> $row->nominal > 0 ? '2' : '1',
 									'account_id'	=> $row->coa->bp_journal ? ($row->lookable->account_id ?? NULL) : NULL,
@@ -4576,7 +4576,7 @@ class CustomHelper {
 									'note'			=> 'REVERSE*'.$row->lookable->code,
 								]);
 								JournalDetail::create([
-									'journal_id'	=> $query->id,
+									'journal_id'	=> $queryreverse->id,
 									'coa_id'		=> $coaselisihkurs->id,
 									'type'			=> $row->nominal > 0 ? '1' : '2',
 									'nominal'		=> $nominal,

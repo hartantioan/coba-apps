@@ -208,7 +208,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 ),0) AS status_cancel,
                 IFNULL((
                     SELECT
-                        SUM(jd.nominal)
+                        SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id
@@ -223,7 +223,7 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 ),0) AS total_journal_debit,
                 IFNULL((
                     SELECT
-                        -1 * SUM(jd.nominal)
+                        -1 * SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id

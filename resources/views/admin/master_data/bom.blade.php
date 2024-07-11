@@ -610,8 +610,59 @@
         $('.row_alternative').remove();
         if($('#body-alternative').children().length == 0){
             $('#body-alternative').append(`
-                <tr id="empty-alternative">
-                    <td class="center-align" colspan="3">Data alternatif tidak ditemukan, silahkaan tambah manual alternatif menggunakan tombol hijau.</td>
+                <tr class="row_alternative header_alternative" id="main-alternative0">
+                    <input name="arr_main_alternative[]" value="0" type="hidden">
+                    <td>
+                        <input id="arr_alternative_name0" name="arr_alternative_name[]" type="text" placeholder="Nama Alternatif">
+                    </td>
+                    <td class="center-align">
+                        <label>
+                            <input type="radio" id="arr_alternative_default0" name="arr_alternative_default" value="1" checked>
+                            <span>Default Alternatif</span>
+                        </label>
+                    </td>
+                    <td>
+                        
+                    </td>
+                </tr>
+                <tr class="row_alternative" id="detail-alternative0">
+                    <td colspan="3">
+                        <table class="bordered">
+                            <thead>
+                                <tr>
+                                    <th class="center">{{ __('translations.type') }}</th>
+                                    <th class="center">Item/Resource</th>
+                                    <th class="center">{{ __('translations.qty') }}</th>
+                                    <th class="center">Satuan (Produksi)</th>
+                                    <th class="center">{{ __('translations.nominal') }}</th>
+                                    <th class="center">{{ __('translations.total') }}</th>
+                                    <th class="center">Dist.Biaya</th>
+                                    <th class="center">Deskripsi</th>
+                                    <th class="center">Issue Method</th>
+                                    <th class="center">{{ __('translations.delete') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail0">
+                                <tr id="empty-row-detail0">
+                                    <td colspan="10" class="center">
+                                        <i>Silahkan tambahkan item / resource...</i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="10" class="center-align">
+                                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','0')" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Bahan
+                                        </a>
+                                        <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','0')" href="javascript:void(0);">
+                                            <i class="material-icons left">add</i> Resource
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </td>
                 </tr>
             `);
         }

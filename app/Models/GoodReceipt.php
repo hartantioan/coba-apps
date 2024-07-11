@@ -346,7 +346,7 @@ class GoodReceipt extends Model
     public function latestCurrencyRateByDate($date){
         $currency_rate = $this->journal()->exists() ? $this->journal->currency_rate : 1;
         foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
-            $query->where('post_date','<=',$date)->orderBy('post_date');
+            $query->where('post_date','<=',$date)->whereIn('status',['2','3'])->orderBy('post_date');
         })->get() as $row){
             $currency_rate = $row->adjustRate->currency_rate;
         }

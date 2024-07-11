@@ -192,7 +192,8 @@ class OutStandingAPController extends Controller
                 rs.total_memo,
                 rs.total_reconcile,
                 rs.status_cancel,
-                rs.total_journal
+                rs.total_journal_debit,
+                rs.total_journal_credit,
             FROM
                 (SELECT
                     pi.top AS topdp,

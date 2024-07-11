@@ -2224,15 +2224,15 @@ class PaymentRequestController extends Controller
 
     public function createPay(Request $request){
         $validation = Validator::make($request->all(), [
-            'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code',
+            /* 'codePay'			        => 'required|string|min:18|unique:outgoing_payments,code', */
             'pay_date_pay'              => 'required',
             'currency_id_pay'           => 'required',
             'currency_rate_pay'         => 'required',
 		], [
-            'codePay.required' 	        => 'Kode tidak boleh kosong.',
+            /* 'codePay.required' 	        => 'Kode tidak boleh kosong.',
             'codePay.string'            => 'Kode harus dalam bentuk string.',
             'codePay.min'               => 'Kode harus minimal 18 karakter.',
-            'codePay.unique'            => 'Kode telah dipakai.',
+            'codePay.unique'            => 'Kode telah dipakai.', */
             'pay_date_pay.required'     => 'Tanggal bayar tidak boleh kosong.',
             'currency_id_pay.required'  => 'Mata uang tidak boleh kosong.',
             'currency_rate_pay.required'=> 'Konversi mata uang tidak boleh kosong.',
@@ -2248,10 +2248,15 @@ class PaymentRequestController extends Controller
 			if($request->tempPay){
                 DB::beginTransaction();
                 try {
+                    
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
+                    $lastSegment = 'outgoing_payment';
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=OutgoingPayment::generateCode($menu->document_code.date('y').substr($cek->code,7,2));
+
                     $query = OutgoingPayment::create([
-                        'code'			            => $request->codePay,
+                        'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $cek->company_id,
                         'account_id'                => $cek->account_id,

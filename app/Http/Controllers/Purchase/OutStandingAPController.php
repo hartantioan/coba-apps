@@ -261,12 +261,7 @@ class OutStandingAPController extends Controller
                     ),0) AS status_cancel,
                     IFNULL((
                         SELECT
-                            SUM((
-                                CASE 
-                                    WHEN ard.type = '2' THEN jd.nominal
-                                    WHEN ard.type = '1' THEN -1 * jd.nominal
-                                END
-                            ))
+                            SUM(jd.nominal)
                             FROM journal_details jd
                             JOIN journals j
                                 ON j.id = jd.journal_id
@@ -277,7 +272,23 @@ class OutStandingAPController extends Controller
                             AND j.post_date <= :date6
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
-                    ),0) AS total_journal,
+                            AND jd.type = '1'
+                    ),0) AS total_journal_debit,
+                    IFNULL((
+                        SELECT
+                            -1 * SUM(jd.nominal)
+                            FROM journal_details jd
+                            JOIN journals j
+                                ON j.id = jd.journal_id
+                            JOIN coas c
+                                ON jd.coa_id = c.id
+                            WHERE c.code = '200.01.03.01.01'
+                            AND jd.note = CONCAT('REVERSE*',pi.code)
+                            AND j.post_date <= :date6
+                            AND j.status IN ('2','3')
+                            AND jd.deleted_at IS NULL
+                            AND jd.type = '2'
+                    ),0) AS total_journal_credit,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     pi.code,

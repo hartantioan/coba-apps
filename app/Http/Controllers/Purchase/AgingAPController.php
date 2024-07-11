@@ -226,7 +226,23 @@ class AgingAPController extends Controller
                         AND j.post_date <= :date6
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
-                ),0) AS total_journal,
+                        AND jd.type = '1'
+                ),0) AS total_journal_debit,
+                IFNULL((
+                    SELECT
+                        -1 * SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '200.01.03.01.01'
+                        AND jd.note = CONCAT('REVERSE*',pi.code)
+                        AND j.post_date <= :date7
+                        AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
+                        AND jd.type = '2'
+                ),0) AS total_journal_credit,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -242,7 +258,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date7
+                    pi.post_date <= :date8
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
@@ -254,6 +270,7 @@ class AgingAPController extends Controller
             'date5' => $date,
             'date6' => $date,
             'date7' => $date,
+            'date8' => $date,
         ));
 
         $countPeriod = 1;
@@ -344,7 +361,7 @@ class AgingAPController extends Controller
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal;
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal_debit + $row->total_journal_credit;
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0 && $row->status_cancel == '0'){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);
@@ -652,7 +669,23 @@ class AgingAPController extends Controller
                         AND j.post_date <= :date6
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
-                ),0) AS total_journal,
+                        AND jd.type = '1'
+                ),0) AS total_journal_debit,
+                IFNULL((
+                    SELECT
+                        -1 * SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '200.01.03.01.01'
+                        AND jd.note = CONCAT('REVERSE*',pi.code)
+                        AND j.post_date <= :date7
+                        AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
+                        AND jd.type = '2'
+                ),0) AS total_journal_credit,
                 u.name AS account_name,
                 u.employee_no AS account_code,
                 pi.code,
@@ -668,7 +701,7 @@ class AgingAPController extends Controller
                 LEFT JOIN users u
                     ON u.id = pi.account_id
                 WHERE 
-                    pi.post_date <= :date7
+                    pi.post_date <= :date8
                     AND pi.grandtotal > 0
                     AND pi.status IN ('2','3','7','8')
                     AND pi.deleted_at IS NULL
@@ -680,6 +713,7 @@ class AgingAPController extends Controller
             'date5' => $date,
             'date6' => $date,
             'date7' => $date,
+            'date8' => $date,
         ));
 
         $countPeriod = 1;
@@ -757,7 +791,7 @@ class AgingAPController extends Controller
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
             $total_received_after_adjust = round(($row->grandtotal * $currency_rate) + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal;
+            $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal_debit + $row->total_journal_credit;
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             if($balance > 0 && $row->status_cancel == '0'){
                 $daysDiff = $this->dateDiffInDays($due_date,$date);

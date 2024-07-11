@@ -195,21 +195,19 @@
                             <h6>Item & Resource Output</h6>
                             <table class="mt-2">
                                 <tbody id="body-alternative">
-                                    <tr class="row_alternative" id="main-alternative0">
+                                    <tr class="row_alternative header_alternative" id="main-alternative0">
                                         <input name="arr_main_alternative[]" value="0" type="hidden">
                                         <td>
                                             <input id="arr_alternative_name0" name="arr_alternative_name[]" type="text" placeholder="Nama Alternatif">
                                         </td>
                                         <td class="center-align">
                                             <label>
-                                                <input type="radio" id="arr_alternative_default0" name="arr_alternative_default" value="1">
+                                                <input type="radio" id="arr_alternative_default0" name="arr_alternative_default" value="1" checked>
                                                 <span>Default Alternatif</span>
                                             </label>
                                         </td>
                                         <td>
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeAlternative('0')">
-                                                <i class="material-icons">delete</i>
-                                            </a>
+                                           
                                         </td>
                                     </tr>
                                     <tr class="row_alternative" id="detail-alternative0">
@@ -525,7 +523,7 @@
         $('#empty-alternative').remove();
         var count = makeid(10);
         $('#body-alternative').append(`
-            <tr class="row_alternative" id="main-alternative` + count + `">
+            <tr class="row_alternative header_alternative" id="main-alternative` + count + `">
                 <input name="arr_main_alternative[]" value="` + count + `" type="hidden">
                 <td>
                     <input id="arr_alternative_name` + count + `" name="arr_alternative_name[]" type="text" placeholder="Nama Alternatif">
@@ -585,13 +583,26 @@
     }
 
     function removeAlternative(id){
-        $('#detail-alternative' + id +',#main-alternative' + id).remove();
-        if($('#body-alternative').children().length == 0){
-            $('#body-alternative').append(`
-                <tr id="empty-alternative">
-                    <td class="center-align" colspan="3">Data alternatif tidak ditemukan, silahkaan tambah manual alternatif menggunakan tombol hijau.</td>
-                </tr>
-            `);
+        console.log($('#body-alternative').children().length);
+        if($('#body-alternative').children('.header_alternative').length > 1){
+            
+            $('#detail-alternative' + id +',#main-alternative' + id).remove();
+            if($('#body-alternative').children().length == 0){
+                $('#body-alternative').append(`
+                    <tr id="empty-alternative">
+                        <td class="center-align" colspan="3">Data alternatif tidak ditemukan, silahkaan tambah manual alternatif menggunakan tombol hijau.</td>
+                    </tr>
+                `);
+            }
+        }else{
+            M.toast({
+                html: 'Minimal terdapat 1 default alternatif'
+            });
+        }
+
+        if ($('#body-alternative').children('.header_alternative').length == 1) {
+        
+            $('[name="arr_alternative_default"]:last').prop('checked', true);
         }
     }
 
@@ -961,7 +972,7 @@
 
                 $.each(response.details, function(i, val) {
                     $('#body-alternative').append(`
-                        <tr class="row_alternative" id="main-alternative` + val.code + `">
+                        <tr class="row_alternative header_alternative" id="main-alternative` + val.code + `">
                             <input name="arr_main_alternative[]" value="` + val.code + `" type="hidden">
                             <td>
                                 <input id="arr_alternative_name` + val.code + `" name="arr_alternative_name[]" type="text" placeholder="Nama Alternatif" value="` + val.name + `">

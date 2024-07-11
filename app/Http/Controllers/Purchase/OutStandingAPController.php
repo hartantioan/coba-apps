@@ -263,8 +263,8 @@ class OutStandingAPController extends Controller
                         SELECT
                             SUM((
                                 CASE 
-                                    WHEN ard.type = '1' THEN jd.nominal
-                                    WHEN ard.type = '2' THEN -1 * jd.nominal
+                                    WHEN ard.type = '2' THEN jd.nominal
+                                    WHEN ard.type = '1' THEN -1 * jd.nominal
                                 END
                             ))
                             FROM journal_details jd

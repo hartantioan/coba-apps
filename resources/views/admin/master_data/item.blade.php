@@ -746,7 +746,8 @@
                                     </div>
                                 `);
                         });
-                    }else if(response.status == 432) {
+                    }else if(response.status == 500) {
+                        
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
                         
@@ -762,12 +763,17 @@
                                     </div>
                                 `);
                         });
+                    }  else if(response.status == 422) {
+
                     } else {
                         console.log(response);
                     }
                     loadingClose('.modal-content');
                 },
                 error: function(response) {
+                    
+                    loadingClose('.modal-content');
+                    console.log(response);
                     var errors = response.responseJSON.errors;
                     var errorMessage = '';
                     if(response.status == 422) {
@@ -789,7 +795,6 @@
 
                         errorMessage += errors.file;
                     });
-
                     $('#validation_alertImport').html(`
                         <div class="card-alert card red">
                             <div class="card-content white-text">

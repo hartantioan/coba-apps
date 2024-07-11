@@ -25,15 +25,16 @@ class ExportTemplateMasterItem implements WithEvents
     {
         $event->writer->reopen(new \Maatwebsite\Excel\Files\LocalTemporaryFile(storage_path('app/public/format_imports/format_item_import.xlsx')),Excel::XLSX);
         $event->writer->getSheetByIndex(0); #main
-        $event->writer->getSheetByIndex(1); #item group
-        $event->writer->getSheetByIndex(2); #unit
-        $event->writer->getSheetByIndex(3);
+        $event->writer->getSheetByIndex(1); #uom
+        $event->writer->getSheetByIndex(2); #item group
+        $event->writer->getSheetByIndex(3); #unit
         $event->writer->getSheetByIndex(4);
         $event->writer->getSheetByIndex(5);
         $event->writer->getSheetByIndex(6);
         $event->writer->getSheetByIndex(7);
         $event->writer->getSheetByIndex(8);
         $event->writer->getSheetByIndex(9);
+        $event->writer->getSheetByIndex(10);
     
         $item_group = ItemGroup::where('status','1')->whereDoesntHave('childSub')->orderBy('code')->get();
         $unit = Unit::where('status','1')->get();
@@ -47,66 +48,67 @@ class ExportTemplateMasterItem implements WithEvents
         
         $startRow = 2;
         foreach($item_group as $row){
-            $event->getWriter()->getSheetByIndex(1)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(1)->setCellValue('B'.$startRow,$row->name);
-            $startRow++;
-        }
-
-        $startRow = 2;
-        foreach($unit as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($type as $row){
+        foreach($unit as $row){
             $event->getWriter()->getSheetByIndex(3)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(3)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($size as $row){
+        foreach($type as $row){
             $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->name);
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($variety as $row){
+        foreach($size as $row){
             $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($pattern as $row){
+        foreach($variety as $row){
             $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($pallet as $row){
+        foreach($pattern as $row){
             $event->getWriter()->getSheetByIndex(7)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(7)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($grade as $row){
+        foreach($pallet as $row){
             $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 
         $startRow = 2;
-        foreach($brand as $row){
+        foreach($grade as $row){
             $event->getWriter()->getSheetByIndex(9)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(9)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
+
+        $startRow = 2;
+        foreach($brand as $row){
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
 
         return $event->getWriter()->getSheetByIndex(0);
     }

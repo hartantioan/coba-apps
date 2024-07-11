@@ -26,90 +26,141 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Events\BeforeImport;
 
-class ImportItem implements OnEachRow, WithHeadingRow, WithBatchInserts,WithMultipleSheets
+class ImportItem implements WithMultipleSheets
 {
     public function sheets(): array
     {
         return [
-            0 => $this,
+            0 => new handleItemSheet(),
+            1 => new handleConversionSheet(),
         ];
+    }
+    
+}
+
+class handleItemSheet implements OnEachRow, WithHeadingRow
+{
+    public function onRow(Row $row)
+    {
+       
+            $row = $row->toArray();
+            if(isset($row['code']) && $row['code']){
+                $check = Item::where('code',$row['code'])->first();
+               
+                if(!$check){
+                    $item_group_code = explode('#',$row['item_group'])[0];
+                    $item_group_id = ItemGroup::where('code',$item_group_code)->first();
+                    
+                    $item_unit_code = explode('#',$row['unit'])[0];
+                    $item_unit_id= Unit::where('code',$item_unit_code)->first();
+                    $type = Type::where('code',explode('#',$row['type_fg'])[0])->first();
+                    $size = Size::where('code',explode('#',$row['size_fg'])[0])->first();
+                    $variety = Variety::where('code',explode('#',$row['variety_fg'])[0])->first();
+                    $pattern = Pattern::where('code',explode('#',$row['pattern_fg'])[0])->first();
+                    $pallet = Pallet::where('code',explode('#',$row['pallet_fg'])[0])->first();
+                    $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
+                    $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
+                    
+                    $query = Item::create([
+                        'code' => $row['code'],
+                        'name' => $row['name'],
+                        'other_name' => $row['other_name'],
+                        'item_group_id' =>$item_group_id->id,
+                        'uom_unit' => $item_unit_id->id,
+                        'tolerance_gr' => $row['toleransi_gr'],
+                        'is_inventory_item' => $row['is_invent_item'],
+                        'is_sales_item' => $row['is_sales_item'],
+                        'is_purchase_item' => $row['is_purchase'],
+                        'is_service' => $row['is_service'],
+                        'is_production' => $row['is_production'],
+                        'is_quality_check' => $row['is_quality_check'],
+                        'is_hide_supplier' => $row['is_top_secret'],
+                        'type_id' => $type ? $type->id : NULL,
+                        'size_id' => $size ? $size->id : NULL,
+                        'variety_id' => $variety ? $variety->id : NULL,
+                        'pattern_id' => $pattern ? $pattern->id : NULL,
+                        'pallet_id' => $pallet ? $pallet->id : NULL,
+                        'grade' => $grade ? $grade->id : NULL,
+                        'brand_id' => $brand ? $brand->id : NULL,
+                        'note' => $row['note'],
+                        'min_stock' => $row['min_stock'],
+                        'max_stock' => $row['max_stock'],
+                        'status' => '1',
+                    ]);
+        
+                    foreach($query->itemGroup->itemGroupWarehouse as $row){
+                        ItemStock::create([
+                            'place_id'      => 1,
+                            'warehouse_id'  => $row->warehouse_id,
+                            'item_id'       => $query->id,
+                            'qty'           => 0
+                        ]);
+                    }
+                    
+        
+                    activity()
+                        ->performedOn(new Item())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit from excel item data.');
+                        
+                    DB::commit();
+                }
+            }
+            else{
+                return null;
+            }  
+        
+    }
+    
+    public function startRow(): int
+    {
+        return 2; // If you want to skip the first row (heading row)
+    }
+}
+
+class handleConversionSheet implements OnEachRow, WithHeadingRow{
+    
+    public static function beforeImport(BeforeImport $event)
+    {
+        $worksheet = $event->getReader()->getActiveSheet();
+        $rowCount = $worksheet->getHighestRow();
+
+        if ($rowCount < 2) {
+            return null;
+        }
     }
     public function onRow(Row $row)
     {
-        $row = $row->toArray();
-      
-        if($row['code']){
-            $check = Item::where('code',$row['code'])->first();
-            
-            if(!$check){
-                $item_group_code = explode('#',$row['item_group'])[0];
-                $item_group_id = ItemGroup::where('code',$item_group_code)->first();
-                
-                $item_unit_code = explode('#',$row['unit'])[0];
-                $item_unit_id= Unit::where('code',$item_unit_code)->first();
-                $type = Type::where('code',explode('#',$row['type_fg'])[0])->first();
-                $size = Size::where('code',explode('#',$row['size_fg'])[0])->first();
-                $variety = Variety::where('code',explode('#',$row['variety_fg'])[0])->first();
-                $pattern = Pattern::where('code',explode('#',$row['pattern_fg'])[0])->first();
-                $pallet = Pallet::where('code',explode('#',$row['pallet_fg'])[0])->first();
-                $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
-                $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
-                
-                $query = Item::create([
-                    'code' => $row['code'],
-                    'name' => $row['name'],
-                    'other_name' => $row['other_name'],
-                    'item_group_id' =>$item_group_id->id,
-                    'uom_unit' => $item_unit_id->id,
-                    'tolerance_gr' => $row['toleransi_gr'],
-                    'is_inventory_item' => $row['is_invent_item'],
-                    'is_sales_item' => $row['is_sales_item'],
-                    'is_purchase_item' => $row['is_purchase'],
-                    'is_service' => $row['is_service'],
-                    'is_quality_check' => $row['is_quality_check'],
-                    'is_hide_supplier' => $row['is_top_secret'],
-                    'type_id' => $type ? $type->id : NULL,
-                    'size_id' => $size ? $size->id : NULL,
-                    'variety_id' => $variety ? $variety->id : NULL,
-                    'pattern_id' => $pattern ? $pattern->id : NULL,
-                    'pallet_id' => $pallet ? $pallet->id : NULL,
-                    'grade' => $grade ? $grade->id : NULL,
-                    'brand_id' => $brand ? $brand->id : NULL,
-                    'note' => $row['note'],
-                    'min_stock' => $row['min_stock'],
-                    'max_stock' => $row['max_stock'],
-                    'status' => '1',
-                ]);
-
-                foreach($query->itemGroup->itemGroupWarehouse as $row){
-                    ItemStock::create([
-                        'place_id'      => 1,
-                        'warehouse_id'  => $row->warehouse_id,
-                        'item_id'       => $query->id,
-                        'qty'           => 0
+        
+            $row = $row->toArray();
+            if(isset($row['item_code']) && $row['item_code']){
+                $check = Item::where('code',$row['item_code'])->first();
+                $code_unit = explode('#', $row['unit'])[0];
+                $unit = Unit::where('code',$code_unit)->first();
+                if ($check) {
+                    $x=ItemUnit::create([
+                        'item_id'       => $check->id,
+                        'unit_id'       => $unit->id,
+                        'conversion'    => $row['konversi'],
+                        'is_buy_unit'   => $row['beli'],
+                        'is_sell_unit'   => $row['jual'],
+                        'is_default'    => $row['default'],
                     ]);
                 }
                 
-                ItemUnit::create([
-                    'item_id'       => $query->id,
-                    'unit_id'       => $item_unit_id->id,
-                    'conversion'    => 1,
-                    'is_buy_unit'   => '1',
-                    'is_default'    => '1',
-                ]);
-
-                activity()
-                    ->performedOn(new Item())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit from excel item data.');
+             
             }
-        }
+            else{
+                return null;
+            }  
+       
     }
-
-    public function batchSize(): int
+    public function startRow(): int
     {
-        return 1000;
+        return 2; // If you want to skip the first row (heading row)
     }
 }

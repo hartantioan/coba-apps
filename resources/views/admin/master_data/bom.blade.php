@@ -425,93 +425,79 @@
                     loadingOpen('.modal-content');
                 },
                 success: function(response) {
-                    if(response.status == 200) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 200) {
                         successImport();
                         M.toast({
                             html: response.message
                         });
-                    } else if(response.status == 422) {
+                    } else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p> Line <b>` + val.row + `</b> in column <b>` + val.attribute + `</b> </p>
-                                            <p> `+val.errors[0]+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
-                    }else if(response.status == 432) {
-                        $('#validation_alertImport').show();
-                        $('.modal-content').scrollTop(0);
-
-                        $.each(response.error, function(i, val) {
-                            $('#validation_alertImport').append(`
-                                    <div class="card-alert card red">
-                                        <div class="card-content white-text">
-                                            <p>` +val+`</p>
-                                        </div>
-                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
-                                `);
-                        });
+                        
+                       
                     } else {
                         M.toast({
                             html: response.message
                         });
                     }
-                    loadingClose('.modal-content');
                 },
                 error: function(response) {
-                    var errors = response.responseJSON.errors;
-                    var errorMessage = '';
-                    if(response.status == 422) {
+                    loadingClose('.modal-content');
+
+                    if(response.status === 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        
+
                         swal({
                             title: 'Ups! Validation',
                             text: 'Check your form.',
                             icon: 'warning'
                         });
 
-                        $.each(errors, function(index, error) {
-                        var message = '';
-
-                        $.each(error.errors, function(index, value) {
-                            message += value + '\n';
+                        let errorMessage = '';
+                        response.responseJSON.errors.forEach(function(error) {
+                            errorMessage += error.errors.join('\n') + '\n';
                         });
 
-                        errorMessage += errors.file;
-                    });
-
-                    $('#validation_alertImport').html(`
-                        <div class="card-alert card red">
-                            <div class="card-content white-text">
-                                <p>` + errorMessage + `</p>
+                        $('#validation_alertImport').html(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>${errorMessage}</p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
                             </div>
-                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">×</span>
-                            </button>
-                        </div>
-                    `).show();
+                        `).show();
+                    }else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                       
+                        let errorMessage = response.status === 400 ? 
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                            `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
 
+                        $('#validation_alertImport').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    ${errorMessage}
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
                     }
-                    
-                   
                 }
             });
-
         });
+
         
         select2ServerSide('#item_id', '{{ url("admin/select2/bom_item") }}');
         select2ServerSide('#item_reject_id', '{{ url("admin/select2/bom_item") }}');

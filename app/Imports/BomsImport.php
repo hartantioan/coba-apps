@@ -10,6 +10,7 @@ use App\Models\Item;
 use App\Models\Place;
 use App\Models\Resource;
 use App\Models\Warehouse;
+use App\Exceptions\RowImportException;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -22,7 +23,7 @@ use Illuminate\Support\Facades\DB;
 
 class BomsImport implements WithMultipleSheets
 {
-    protected $currentSheetIndex = 0;
+    protected $error = '';
 
     public function sheets(): array
     {
@@ -35,20 +36,29 @@ class BomsImport implements WithMultipleSheets
 }
 class handleBomSheet implements OnEachRow, WithHeadingRow
 {
+    public $error = null;
     public function onRow(Row $row)
     {
         DB::beginTransaction();
         try {
-            $row = $row->toArray();
             if (isset($row['code']) && $row['code']) {
                 $check = Bom::where('code', $row['code'])->first();
                 $item_output_code = explode('#', $row['item_output'])[0];
                 $item_output = Item::where('code', $item_output_code)->first();
-
                 $item_reject_code = explode('#', $row['item_reject'])[0];
                 $item_reject_id = Item::where('code', $item_reject_code)->first();
                 $place = Place::where('code', explode('#', $row['plant'])[0])->first();
                 $warehouse = Warehouse::where('code', explode('#', $row['gudang'])[0])->first();
+                if(!$item_output && $this->error ==null){
+                    $this->error = "output.";
+                }elseif(!$item_reject_id && $this->error ==null){
+                    $this->error = "reject.";
+                }elseif(!$place && $this->error ==null){
+                    $this->error = "plant.";
+                }elseif(!$warehouse && $this->error ==null){
+                    $this->error = "Warehouse.";
+                }
+
                 if (!$check) {
                     
 
@@ -89,8 +99,10 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                 return null;
             } 
             DB::commit();
-        }catch(\Exception $e){
+        }catch (\Exception $e) {
             DB::rollback();
+            $sheet='BOM';
+            throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }
     
@@ -102,15 +114,19 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
 
 class handleAlternativeSheet implements OnEachRow, WithHeadingRow
 {
+    public $error = null;
     public function onRow(Row $row)
     {
         DB::beginTransaction();
         try {
-            $row = $row->toArray();
+            
 
             if ($row['kode_bom_header']) {
                 $check = Bom::where('code', $row['kode_bom_header'])->first();
                 $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->first();
+                if(!$check && $this->error ==null){
+                    $this->error = "KODE BOM.";
+                }
                 if ($check) {
                     $query = BomAlternative::create([
                         'code' => $row['kode_alternative'] ? $row['kode_alternative'] : strtoupper(Str::random(25)),
@@ -123,8 +139,10 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
                 return null;
             } 
             DB::commit();
-        }catch(\Exception $e){
+        }catch (\Exception $e) {
             DB::rollback();
+            $sheet='Alternative';
+            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
    
@@ -135,11 +153,12 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
 }
 class handleDetailSheet implements OnEachRow, WithHeadingRow
 {
+    public $error = null;
     public function onRow(Row $row)
     {
         DB::beginTransaction();
         try {
-            $row = $row->toArray();
+           
 
             if ($row['kode_bom_header']) {
                 $check = Bom::where('code', $row['kode_bom_header'])->first();
@@ -151,7 +170,9 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                     if($row['type']=='items'){
                         $item_code = explode('#', $row['item_code'])[0];
                         $item_output = Item::where('code', $item_code)->first();
-                        
+                        if(!$item_output && $this->error ==null){
+                            $this->error = "item";
+                        }
                         $nominal = 0;
                         $total = 0;
                         $cost_distribution_id = null;
@@ -176,6 +197,11 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                         $cost_distribution_code = explode('#', $row['distribusi_biaya'])[0];
                         $cost_distribution = CostDistribution::where('code', $cost_distribution_code)->first();
                         $cost_distribution_id = $cost_distribution ? $cost_distribution->id : NULL;
+                        if(!$item_output && $this->error ==null){
+                            $this->error = "Resource.";
+                        }elseif(!$cost_distribution && $this->error ==null){
+                            $this->error = "Disribusi Biaya.";
+                        }
                         BomDetail::create([
                             'bom_id'       => $check->id,
                             'bom_alternative_id' => $checkalternative->id,
@@ -194,8 +220,10 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                 return null;
             }  
             DB::commit();
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
+            $sheet='Detail';
             DB::rollback();
+            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }
 

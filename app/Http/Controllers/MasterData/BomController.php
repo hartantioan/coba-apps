@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportBom;
 use App\Imports\BomsImport;
+use App\Exceptions\RowImportException;
 use App\Models\BomAlternative;
 use App\Models\Line;
 use App\Models\Machine;
@@ -291,12 +292,26 @@ class BomController extends Controller
 
     public function import(Request $request)
     {
-        Excel::import(new BomsImport, $request->file('file'));
+        // Excel::import(new BomsImport, $request->file('file'));
 
-        return response()->json([
-            'status'    => 200,
-            'message'   => 'Import sukses!'
-        ]);
+        // return response()->json([
+        //     'status'    => 200,
+        //     'message'   => 'Import sukses!'
+        // ]);
+        try {
+            Excel::import(new BomsImport, $request->file('file'));
+            return response()->json(['message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
     }
 
     public function getImportExcel(){

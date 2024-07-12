@@ -74,9 +74,6 @@
                                     <tr>
                                         <td>{{ 'PALET : '.$row->pallet->name }}</td>
                                     </tr>
-                                    <tr>
-                                        <td>{{ 'QTY : '.CustomHelper::formatConditionalQty($row->qty_sell).' '.$row->itemUnit->unit->code }}</td>
-                                    </tr>
                                 </table>
                             </td>
                         </tr>

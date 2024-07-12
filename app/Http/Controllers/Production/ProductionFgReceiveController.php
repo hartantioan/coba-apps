@@ -390,6 +390,7 @@ class ProductionFgReceiveController extends Controller
                 'line_id'                   => 'required',
                 'post_date'		            => 'required',
                 'production_order_detail_id'=> 'required',
+                'arr_pallet_no'             => 'required|array',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -400,6 +401,8 @@ class ProductionFgReceiveController extends Controller
                 'line_id'                           => 'Line tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
                 'production_order_detail_id.required'=> 'Production Order Detail tidak boleh kosong.',
+                'arr_pallet_no.required'            => 'Batch tidak boleh kosong.',
+                'arr_pallet_no.array'               => 'Batch harus dalam bentuk array.',
             ]);
 
             if($validation->fails()) {

@@ -38,7 +38,6 @@ use Illuminate\Support\Facades\Storage;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Models\UsedData;
 class ProductionHandoverController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -71,11 +70,53 @@ class ProductionHandoverController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-   public function getCode(Request $request){
-        UsedData::where('user_id', session('bo_id'))->delete();
+    public function getCode(Request $request){
         $code = ProductionHandover::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getScanBarcode(Request $request){
+        $code = $request->code;
+        $data = ProductionFgReceiveDetail::where('production_fg_receive_id',$request->fgr_id)
+        ->where('pallet_no', $code)
+        ->first();
+
+        if($data){
+            if($data->balanceHandover() > 0){
+                $arr = [
+                    'id'            => $data->id,
+                    'pallet_no'     => $data->pallet_no,
+                    'item_id'       => $data->item_id,
+                    'item_code'     => $data->item->code,
+                    'item_name'     => $data->item->name,
+                    'shading'       => $data->shading,
+                    'qty'           => CustomHelper::formatConditionalQty($data->qty_sell),
+                    'unit'          => $data->itemUnit->unit->code,
+                    'list_warehouse'=> $data->item->warehouseList(),
+                    'place_id'      => $data->productionFgReceive->place_id,
+                    'place_code'    => $data->productionFgReceive->place->code,
+                ];
+                
+                $response = [
+                    'status'    => 200,
+                    'data'      => $arr,
+                    'message'   => 'Data berhasil ditarik.'
+                ];
+            }else{
+                $response = [
+                    'status'    => 500,
+                    'message'   => 'Outstanding qty yang bisa diterima adalah 0. Data tidak bisa ditarik.'
+                ];
+            }
+        }else{
+            $response = [
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.',
+            ];
+        }
+        				
+		return response()->json($response);
     }
 
     public function datatable(Request $request){
@@ -266,7 +307,45 @@ class ProductionHandoverController extends Controller
                 ];
             } else {
                 
-                $pod = ProductionHandover::find($request->production_fg_receive_id);
+                $passedQty = true;
+                
+                $arrQty = [];
+                foreach($request->arr_qty_received as $key => $row){
+                    $index = -1;
+                    foreach($arrQty as $z => $rowqty){
+                        if($rowqty['prfd_id'] == $request->arr_prfd_id[$key]){
+                            $index = $z;
+                        }
+                    }
+                    if($index >= 0){
+                        $arrQty[$index]['qty'] += str_replace(',','.',str_replace('.','',$row));
+                    }else{
+                        $arrQty[] = [
+                            'prfd_id'   => $request->arr_prfd_id[$key],
+                            'qty'       => str_replace(',','.',str_replace('.','',$row)),
+                        ];
+                    }
+                }
+
+                $arrMessageQty = [];
+                
+                foreach($arrQty as $row){
+                    $data = ProductionFgReceiveDetail::find($row['prfd_id']);
+                    if($data){
+                        $max = $data->balanceHandover();
+                        if($row['qty'] > $max){
+                            $balance = CustomHelper::formatConditionalQty($row['qty'] - $max);
+                            $arrMessageQty[] = 'Item '.$data->item->code.' - '.$data->item->name.' nomor batch '.$data->pallet_no.' kelebihan penerimaan sebesar '.$balance.' dari sisa penerimaan seharusnya '.CustomHelper::formatConditionalQty($max);
+                        }
+                    }
+                }
+
+                if(count($arrMessageQty) > 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => implode('. ',$arrMessageQty),
+                    ]);
+                }
 
                 if($request->temp){
                     $query = ProductionHandover::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -634,6 +713,11 @@ class ProductionHandoverController extends Controller
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
+                    if($query->productionFgReceive()->exists()){
+                        $query->productionFgReceive->update([
+                            'status'    => '2'
+                        ]);
+                    }
                 }
 
                 foreach($query->productionHandoverDetail as $row){

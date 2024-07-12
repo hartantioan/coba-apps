@@ -37,6 +37,20 @@ class ProductionFgReceiveDetail extends Model
         return $this->belongsTo('App\Models\ProductionFgReceive', 'production_fg_receive_id', 'id')->withTrashed();
     }
 
+    public function balanceHandover(){
+        $total = $this->qty_sell;
+        foreach($this->productionHandoverDetail as $row){
+            $total -= $row->qty_received;
+        }
+        return $total;
+    }
+
+    public function productionHandoverDetail(){
+        return $this->hasMany('App\Models\ProductionHandoverDetail')->whereHas('productionHandover',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

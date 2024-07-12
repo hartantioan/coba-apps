@@ -161,7 +161,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
-    <div class="modal-content" style="overflow:auto !important;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
@@ -223,24 +223,33 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s12">
+                            <div class="col s6">
                                 <fieldset>
-                                    <legend>2. Detail Item dan Area</legend>
-                                    <div class="input-field col m3 s12">
+                                    <legend>2a. Dari Item dan Area</legend>
+                                    <div class="input-field col m6 s12">
                                         <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id" onchange="getItemInformation();"></select>
                                         <label class="active" for="production_fg_receive_detail_id">Item Receive FG</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m6 s12">
                                         <select class="browser-default" id="area_id" name="area_id"></select>
                                         <label class="active" for="area_id">Area</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="input-field col m6 s12">
                                         <div class="form-control-feedback" id="qty-unit">-</div>
                                         <input id="qty" name="qty" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyMax();">
                                         <label class="active" for="qty">Qty Input</label>
                                     </div>
-                                    <div class="col m3 s12">
+                                    <div class="col m6 s12">
                                         <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="getItem();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col s6">
+                                <fieldset>
+                                    <legend>2b. Dari Scan Barcode</legend>
+                                    <div class="input-field col m12 s12">
+                                        <input id="text-barcode" name="text-barcode" type="text" value="" placeholder="Silahkan arahkan cursor disini dan mulai scan...">
+                                        <label class="active" for="text-barcode">Scan disini</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -711,6 +720,126 @@
             }
         });
 
+        $("#text-barcode").on( "keypress", function(e) {
+            var key = e.which;
+            if(key == 13){
+                if($(this).val()){
+                    let code = $(this).val();
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_scan_barcode',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            code: code,
+                            fgr_id: $('#production_fg_receive_id').val(),
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('#modal1');
+                        },
+                        success: function(response) {
+                            loadingClose('#modal1');
+                            if(response.status == 200){
+                                if($('#last-row-item').length > 0){
+                                    $('#last-row-item').remove();
+                                }
+                                let no = $('.row_item').length + 1;
+                                let count = makeid(10);
+                                $('#body-item').append(`
+                                    <tr class="row_item">
+                                        <input type="hidden" name="arr_prfd_id[]" value="` + response.data.id + `">
+                                        <input type="hidden" name="arr_item_id[]" value="` + response.data.item_id + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td class="center-align">
+                                            ` + no + `
+                                        </td>
+                                        <td>
+                                            ` + response.data.pallet_no + `
+                                        </td>
+                                        <td>
+                                            ` + response.data.item_code + `
+                                        </td>
+                                        <td>
+                                            ` + response.data.item_name + `
+                                        </td>
+                                        <td>
+                                            ` + response.data.shading + `
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_qty[]" type="text" value="` + response.data.qty + `" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="arr_qty_reject`+ count +`" required>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_qty_received[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty_received`+ count +`" required readonly>
+                                        </td>
+                                        <td class="center-align">
+                                            ` + response.data.unit + `
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                <option value="">--Silahkan pilih item--</option>
+                                            </select>
+                                        </td>
+                                        <td class="center-align">
+                                            <select class="browser-default" id="arr_area_id` + count + `" name="arr_area_id[]"></select>
+                                        </td>
+                                    </tr>
+                                `);
+
+                                if(response.data.list_warehouse.length > 0){
+                                    $('#arr_warehouse' + count).empty();
+                                    $.each(response.data.list_warehouse, function(i, val) {
+                                        $('#arr_warehouse' + count).append(`
+                                            <option value="` + val.id + `">` + val.name + `</option>
+                                        `);
+                                    });
+                                }
+
+                                select2ServerSide('#arr_area_id' + count, '{{ url("admin/select2/area") }}');
+
+                                $('#arr_qty_reject' + count).trigger('keyup');
+
+                                $('.modal-content').scrollTop(400);
+                                M.updateTextFields();
+
+                            }else{
+                                swal({
+                                    title: 'Ups!',
+                                    text: response.message,
+                                    icon: 'error'
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('#modal1');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+                e.preventDefault();
+            }
+            $('#text-barcode').val('');
+        });
     });
 
     function getItemInformation(){
@@ -1325,6 +1454,7 @@
                 var formData = new FormData($('#form_data')[0]);
 
                 let passedQty = true;
+                let passedInput = true;
 
                 $('input[name^="arr_qty_received[]"]').each(function(index){
                     if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) <= 0){
@@ -1336,12 +1466,25 @@
                     if(!$('input[name^="arr_qty_reject[]"]').eq(index).val()){
                         passedQty = false;
                     }
+                    if(!$('*[name^="arr_area_id[]"]').eq(index).val()){
+                        passedInput = false;
+                    }
                 });
                 
                 if(!passedQty){
                     swal({
                         title: 'Ups! Maaf.',
                         text: 'Qty diterima tidak boleh kosong.',
+                        icon: 'error'
+                    });
+
+                    return false;
+                }
+
+                if(!passedInput){
+                    swal({
+                        title: 'Ups! Maaf.',
+                        text: 'Area tidak boleh kosong.',
                         icon: 'error'
                     });
 

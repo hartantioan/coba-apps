@@ -18,7 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-
+use App\Models\UsedData;
 class LeaveRequestController extends Controller
 {
     public function index()
@@ -569,7 +569,8 @@ class LeaveRequestController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = LeaveRequest::generateCode($request->val);
        
 		return response()->json($code);

@@ -15,7 +15,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\UsedData;
 class OvertimeRequestController extends Controller
 {
     public function index()
@@ -198,7 +198,8 @@ class OvertimeRequestController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = OvertimeRequest::generateCode($request->val);
        
 		return response()->json($code);

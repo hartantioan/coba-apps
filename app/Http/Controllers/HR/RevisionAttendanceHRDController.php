@@ -16,7 +16,7 @@ use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\UsedData;
 class RevisionAttendanceHRDController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -180,7 +180,8 @@ class RevisionAttendanceHRDController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = RevisionAttendanceHRD::generateCode($request->val);
         				
 		return response()->json($code);

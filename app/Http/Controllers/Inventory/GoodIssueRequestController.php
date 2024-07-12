@@ -56,7 +56,7 @@ use App\Exports\ExportOutstandingMaterialRequest;
 use App\Models\GoodIssueRequest;
 use App\Models\GoodIssueRequestDetail;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class GoodIssueRequestController extends Controller
 {
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
@@ -760,7 +760,8 @@ class GoodIssueRequestController extends Controller
         }
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodIssueRequest::generateCode($request->val);
         				
 		return response()->json($code);

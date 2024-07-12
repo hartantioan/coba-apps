@@ -44,7 +44,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
-
+use App\Models\UsedData;
 class MarketingOrderController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -82,7 +82,8 @@ class MarketingOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrder::generateCode($request->val);
         				
 		return response()->json($code);

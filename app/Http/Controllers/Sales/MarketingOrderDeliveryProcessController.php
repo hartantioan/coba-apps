@@ -37,7 +37,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Contracts\Process\ProcessResult;
-
+use App\Models\UsedData;
 class MarketingOrderDeliveryProcessController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -71,7 +71,8 @@ class MarketingOrderDeliveryProcessController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderDeliveryProcess::generateCode($request->val);
         				
 		return response()->json($code);

@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Validation\Rule;
-
+use App\Models\UsedData;
 class GoodScaleController extends Controller
 {
     protected $dataplaces, $datawarehouses, $dataplacecode;
@@ -65,7 +65,8 @@ class GoodScaleController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodScale::generateCode($request->val);
         				
 		return response()->json($code);

@@ -32,7 +32,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Models\Warehouse;
-
+use App\Models\UsedData;
 class CapitalizationController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -69,7 +69,8 @@ class CapitalizationController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = Capitalization::generateCode($request->val);
         				
 		return response()->json($code);

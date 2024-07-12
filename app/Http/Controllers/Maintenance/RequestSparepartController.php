@@ -22,7 +22,7 @@ use App\Models\WorkOrder;
 use App\Models\Place;
 use App\Models\Area;
 use App\Models\Activity;
-
+use App\Models\UsedData;
 class RequestSparepartController extends Controller
 {
     protected $dataplaces,$datawarehouses,$dataplacecode;
@@ -52,7 +52,8 @@ class RequestSparepartController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = RequestSparepart::generateCode($request->val);
         				
 		return response()->json($code);

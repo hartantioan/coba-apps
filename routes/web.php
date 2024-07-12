@@ -43,6 +43,7 @@ use App\Http\Controllers\Personal\CheckInController;
 use App\Http\Controllers\Personal\PersonalCloseBillController;
 use App\Http\Controllers\Purchase\OutStandingAPController;
 use App\Http\Controllers\Purchase\PriceHistoryPOController;
+use App\Http\Controllers\Purchase\OutstandingPurchaseOrderController;
 use App\Http\Controllers\Purchase\PurchasePaymentHistoryController;
 use App\Http\Controllers\Purchase\PurchaseReportController;
 use App\Http\Controllers\Setting\ChangeLogController;
@@ -1530,6 +1531,13 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable',[PriceHistoryPOController::class, 'datatable']);
                         Route::post('print',[PriceHistoryPOController::class, 'print']);
                         Route::get('export',[PriceHistoryPOController::class, 'export']);
+                    });
+
+                    Route::prefix('outstanding_po')->middleware('operation.access:outstanding_po,view')->group(function () {
+                        Route::get('/',[OutstandingPurchaseOrderController::class, 'index']);
+                      
+                        Route::post('get_outstanding', [OutstandingPurchaseOrderController::class, 'getOutstanding']);
+                        Route::get('export_outstanding_po',[OutstandingPurchaseOrderController::class, 'exportOutstandingPO']);
                     });
                 });
 

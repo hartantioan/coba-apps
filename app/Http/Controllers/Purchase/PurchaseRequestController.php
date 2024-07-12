@@ -57,7 +57,7 @@ use App\Models\Division;
 use App\Models\ItemBuffer;
 use App\Models\ItemUnit;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class PurchaseRequestController extends Controller
 {
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
@@ -827,7 +827,8 @@ class PurchaseRequestController extends Controller
 		return response()->json($pr);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = PurchaseRequest::generateCode($request->val);
         				
 		return response()->json($code);

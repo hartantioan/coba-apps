@@ -17,7 +17,7 @@ use App\Models\MenuUser;
 use App\Models\Place;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\UsedData;
 class DocumentTaxHandoverController extends Controller
 {
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
@@ -519,7 +519,8 @@ class DocumentTaxHandoverController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = DocumentTaxHandover::generateCode($request->val);
         				
 		return response()->json($code);

@@ -33,7 +33,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class GoodReturnIssueController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -66,7 +66,8 @@ class GoodReturnIssueController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodReturnIssue::generateCode($request->val);
         				
 		return response()->json($code);

@@ -63,7 +63,7 @@ use App\Helpers\TreeHelper;
 use App\Models\CancelDocument;
 use App\Models\Tax;
 use Illuminate\Database\Eloquent\Builder;
-
+use App\Models\UsedData;
 class PurchaseInvoiceController extends Controller
 {
 
@@ -105,7 +105,8 @@ class PurchaseInvoiceController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = PurchaseInvoice::generateCode($request->val);
         				
 		return response()->json($code);

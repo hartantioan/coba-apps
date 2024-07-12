@@ -29,6 +29,7 @@ use App\Models\ItemSerial;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use Illuminate\Support\Str;
+use App\Models\UsedData;
 class InventoryTransferOutController extends Controller
 {
     protected $dataplaces, $datawarehouses, $dataplacecode;
@@ -62,7 +63,8 @@ class InventoryTransferOutController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = InventoryTransferOut::generateCode($request->val);
         				
 		return response()->json($code);

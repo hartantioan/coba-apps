@@ -52,7 +52,7 @@ use App\Exports\ExportGoodReturnPOTransactionPage;
 use App\Models\ItemSerial;
 use App\Models\Menu;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class GoodReturnPOController extends Controller
 {
     protected $dataplaces, $dataplacecode;
@@ -337,7 +337,8 @@ class GoodReturnPOController extends Controller
         return response()->json($data);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodReturnPO::generateCode($request->val);
         				
 		return response()->json($code);

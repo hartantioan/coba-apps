@@ -28,6 +28,7 @@ use iio\libmergepdf\Merger;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use App\Models\UsedData;
 class MarketingOrderPlanController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -86,7 +87,8 @@ class MarketingOrderPlanController extends Controller
         ]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderPlan::generateCode($request->val);
         				
 		return response()->json($code);

@@ -28,7 +28,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\Menu;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class RetirementController extends Controller
 {
     protected $dataplaces, $dataplacecode;
@@ -61,7 +61,8 @@ class RetirementController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = Retirement::generateCode($request->val);
         				
 		return response()->json($code);

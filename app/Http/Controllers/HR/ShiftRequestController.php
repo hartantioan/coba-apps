@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Storage;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\UsedData;
 class ShiftRequestController extends Controller
 {
     public function index()
@@ -372,7 +372,8 @@ class ShiftRequestController extends Controller
         return response()->json($response);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = ShiftRequest::generateCode($request->val);
         				
 		return response()->json($code);

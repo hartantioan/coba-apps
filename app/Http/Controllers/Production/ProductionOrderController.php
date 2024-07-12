@@ -31,7 +31,7 @@ use App\Models\ProductionScheduleDetail;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
-
+use App\Models\UsedData;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Helpers\TreeHelper;
@@ -70,7 +70,8 @@ class ProductionOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = ProductionOrder::generateCode($request->val);
         				
 		return response()->json($code);

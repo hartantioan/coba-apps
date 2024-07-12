@@ -57,7 +57,7 @@ use App\Models\PersonalCloseBill;
 use App\Models\PersonalCloseBillDetail;
 use App\Models\Tax;
 use Faker\Provider\ar_EG\Person;
-
+use App\Models\UsedData;
 class PersonalCloseBillController extends Controller
 {
     protected $dataplaces, $datauser, $dataplacecode, $menu;
@@ -84,7 +84,8 @@ class PersonalCloseBillController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = PersonalCloseBill::generateCode($request->val);
         				
 		return response()->json($code);

@@ -49,7 +49,7 @@ use App\Models\OutgoingPayment;
 use App\Models\PersonalCloseBill;
 use App\Models\Place;
 use Illuminate\Database\Eloquent\Builder;
-
+use App\Models\UsedData;
 class CloseBillController extends Controller
 {
 
@@ -710,7 +710,8 @@ class CloseBillController extends Controller
 		return response()->json($cb);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = CloseBill::generateCode($request->val);
         				
 		return response()->json($code);

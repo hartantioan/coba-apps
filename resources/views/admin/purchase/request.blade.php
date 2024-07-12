@@ -51,11 +51,11 @@
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
             <!-- Search for small screen-->
             <div class="container">
-                <a href="{{ url('locale/en') }}">English</a> | <a href="{{ url('locale/chi') }}">Chinese</a>
+                {{-- <a href="{{ url('locale/en') }}">English</a> | <a href="{{ url('locale/chi') }}">Chinese</a> --}}
                 <div class="row">
                     <div class="col s8 m6 l6">
-                        {{ __('translations.email') }}
-                        <p>Current locale: {{ App::getLocale() }}</p>
+                        {{-- {{ __('translations.email') }}
+                        <p>Current locale: {{ App::getLocale() }}</p> --}}
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
                         <ol class="breadcrumbs mb-0">
                             <li class="breadcrumb-item"><a href="{{ url('admin/dashboard') }}">Dashboard</a>

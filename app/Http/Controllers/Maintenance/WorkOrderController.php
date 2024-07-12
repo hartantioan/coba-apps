@@ -24,7 +24,7 @@ use App\Models\Place;
 use App\Models\Area;
 use App\Models\Activity;
 use App\Models\EquipmentPart;
-
+use App\Models\UsedData;
 
 class WorkOrderController extends Controller
 {
@@ -54,7 +54,8 @@ class WorkOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = WorkOrder::generateCode($request->val);
         				
 		return response()->json($code);

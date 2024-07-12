@@ -58,7 +58,7 @@ use App\Exports\ExportLandedCost;
 use App\Models\MenuUser;
 use App\Models\User;
 use App\Helpers\TreeHelper;
-
+use App\Models\UsedData;
 class LandedCostController extends Controller
 {
     protected $dataplaces, $datawarehouses, $dataplacecode;
@@ -97,7 +97,8 @@ class LandedCostController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = LandedCost::generateCode($request->val);
         				
 		return response()->json($code);

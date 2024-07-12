@@ -53,7 +53,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\MenuUser;
 use App\Exports\ExportFundRequestTransactionPage;
-
+use App\Models\UsedData;
 class FundRequestController extends Controller
 {
     protected $dataplaces, $datauser, $dataplacecode, $menu;
@@ -86,7 +86,8 @@ class FundRequestController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = FundRequest::generateCode($request->val);
         				
 		return response()->json($code);

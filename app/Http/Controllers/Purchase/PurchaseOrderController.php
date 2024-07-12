@@ -106,7 +106,8 @@ class PurchaseOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = PurchaseOrder::generateCode($request->val);
         				
 		return response()->json($code);

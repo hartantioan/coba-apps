@@ -54,7 +54,7 @@ use App\Models\Menu;
 use App\Exports\ExportOutstandingMaterialRequest;
 use App\Exports\ExportMaterialRequestTransactionPage;
 use App\Models\MenuUser;
-
+use App\Models\UsedData;
 class MaterialRequestController extends Controller
 {
     protected $dataplaces, $lasturl, $mindate, $maxdate, $dataplacecode, $datawarehouses;
@@ -753,7 +753,8 @@ class MaterialRequestController extends Controller
 		return response()->json($pr);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = MaterialRequest::generateCode($request->val);
         				
 		return response()->json($code);

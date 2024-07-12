@@ -13,6 +13,8 @@ use App\Models\Place;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use App\Models\UsedData;
+
 class EmployeeRewardPunishmentController extends Controller
 {
     public function index(Request $request)
@@ -203,7 +205,8 @@ class EmployeeRewardPunishmentController extends Controller
         return response()->json($string);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = EmployeeRewardPunishment::generateCode($request->val);
         				
 		return response()->json($code);

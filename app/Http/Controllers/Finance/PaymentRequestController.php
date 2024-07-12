@@ -61,7 +61,7 @@ use App\Models\PaymentRequestCost;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Builder;
 use App\Exports\ExportPaymentRequestTransactionPage;
-
+use App\Models\UsedData;
 class PaymentRequestController extends Controller
 {
 
@@ -100,7 +100,8 @@ class PaymentRequestController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = PaymentRequest::generateCode($request->val);
         				
 		return response()->json($code);

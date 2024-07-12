@@ -39,6 +39,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\UsedData;
 use App\Exports\ExportProductionIssueReceiveTransactionPage;
 class ProductionIssueReceiveController extends Controller
 {
@@ -77,7 +78,8 @@ class ProductionIssueReceiveController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = ProductionIssueReceive::generateCode($request->val);
         				
 		return response()->json($code);

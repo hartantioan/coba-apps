@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Str;
+use App\Models\UsedData;
 class MarketingOrderReturnController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -59,7 +60,8 @@ class MarketingOrderReturnController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderReturn::generateCode($request->val);
         				
 		return response()->json($code);

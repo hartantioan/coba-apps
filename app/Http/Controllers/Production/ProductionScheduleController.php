@@ -33,7 +33,7 @@ use App\Exports\ExportProductionScheduleTransactionPage;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use Illuminate\Support\Facades\Date;
-
+use App\Models\UsedData;
 class ProductionScheduleController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -70,7 +70,8 @@ class ProductionScheduleController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-    public function getCode(Request $request){
+   public function getCode(Request $request){
+        UsedData::where('user_id', session('bo_id'))->delete();
         $code = ProductionSchedule::generateCode($request->val);
         				
 		return response()->json($code);

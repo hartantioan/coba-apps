@@ -1,0 +1,72 @@
+<?php
+
+namespace App\Exports;
+use Maatwebsite\Excel\Concerns\FromView;
+use Illuminate\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use App\Models\PurchaseOrderDetail;
+use App\Helpers\CustomHelper;
+use App\Helpers\PrintHelper;
+class ExportOutstandingPOHide implements FromView,ShouldAutoSize
+{
+    protected $start_date,$end_date,$mode;
+
+    public function __construct($start_date,string $end_date,string $mode)
+    {
+        $this->start_date = $start_date ? $start_date : '';
+        $this->end_date = $end_date ? $end_date : '';
+        $this->mode     = $mode ? $mode : '';
+    }
+    public function view(): View
+    {
+        $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query){
+            $query->whereIn('status',['2'])->where('inventory_type','1');
+            if($this->start_date && $this->end_date) {
+                $query->whereDate('post_date', '>=', $this->start_date)
+                    ->whereDate('post_date', '<=', $this->end_date);
+            } else if($this->start_date) {
+                $query->whereDate('post_date','>=', $this->start_date);
+            } else if($this->end_date) {
+                $query->whereDate('post_date','<=', $this->end_date);
+            }
+
+            if($this->mode == 1){
+                
+            }
+        })->whereNull('status')->get();
+        $array=[];
+        foreach($data as $row){
+            $entry = [];
+            $entry["code"]=$row->purchaseOrder->code;
+            $entry["post_date"] = date('d/m/Y',strtotime($row->purchaseOrder->post_date));
+            $entry["nama_supp"]=$row->item->is_hide_supplier ? '-' : $row->purchaseOrder->supplier->name;
+            $entry["note"] = $row->purchaseOrder->note;
+            $entry["status"] = $row->purchaseOrder->statusRaw();
+            $entry["user_name"] = $row->purchaseOrder->user->name ?? '';
+            $entry["group_item"] = $row->item->itemGroup->name;
+            $entry["item_code"] = $row->item->code;
+            $entry["item_name"] = $row->item->name;
+            $entry["note1"] = $row->note;
+            $entry["note2"] = $row->note2;
+            $entry["shipping_type"] = $row->purchaseOrder->shippingType();
+            $entry["satuan"] =$row->itemUnit->unit->code;
+            $entry["qty"] = $row->qty;
+            $entry["qty_gr"] = $row->qtyGR();
+            $entry["plant"] =$row->place->code;
+            $entry["warehouse"] =$row->warehouse->name;
+            $entry["qty_balance"] = $row->getBalanceReceipt();
+            if($row->getBalanceReceipt()> 0){
+                $array[] = $entry;
+            }
+            
+            
+        }
+        
+        
+        return view('admin.exports.outstanding_po', [
+            'data' => $array,
+            
+        ]);
+    }
+}

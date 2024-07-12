@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use App\Models\Task;
+use App\Models\UsedData;
 use Illuminate\Support\Carbon;
 use Redirect;
 
@@ -77,7 +78,7 @@ class AuthController extends Controller
                     'ip'            => $request->ip(),
                 
                 ]);
-
+                UsedData::where('user_id', session('bo_id'))->delete();
 
                 Auth::login($user);
 

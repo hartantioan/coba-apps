@@ -673,7 +673,7 @@ class LandedCostController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Purchase Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Landed Cost telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                     if(!CustomHelper::checkLockAcc($request->post_date)){
@@ -722,7 +722,7 @@ class LandedCostController extends Controller
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status landed cost sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){

@@ -17,7 +17,7 @@ function emptyThis(element){
 function initializeMasking(){
 	if($('.npwp').length > 0){
 		$('.npwp').formatter({
-			'pattern': '{{99}}.{{999}}.{{999}}.{{9}}-{{999}}.{{999}}',
+			'pattern': '{{999}}.{{999}}.{{999}}.{{9}}-{{999}}.{{999}}',
 			'persistent': true
 		});
 	}

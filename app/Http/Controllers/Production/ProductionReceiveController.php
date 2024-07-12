@@ -778,9 +778,11 @@ class ProductionReceiveController extends Controller
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                     foreach($query->productionReceiveIssue as $row){
-                        $row->productionIssue->update([
-                            'status'	=> '2'
-                        ]);
+                        if($row->productionIssue->status == '3'){
+                            $row->productionIssue->update([
+                                'status'	=> '2'
+                            ]);
+                        }
                     }
                 }
 

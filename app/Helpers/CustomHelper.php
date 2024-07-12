@@ -4201,7 +4201,8 @@ class CustomHelper {
 
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
-				'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id,
+				/* 'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id, */
+				'coa_id'		=> $coawip->id,
 				'line_id'		=> $pir->line_id,
 				'place_id'		=> $pir->place_id,
 				'machine_id'	=> $pir->machine_id,
@@ -4354,49 +4355,6 @@ class CustomHelper {
 
 			$total = 0;
 
-			foreach($pir->productionBatchUsage as $row){
-				$price = $row->productionBatch->price();
-				$rowtotal = round($price * $row->qty,2);
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->productionBatch->item->itemGroup->coa_id,
-					'place_id'		=> $pir->place_id,
-					'line_id'		=> $pir->line_id,
-					'item_id'		=> $row->productionBatch->item_id,
-					'warehouse_id'	=> $row->productionBatch->item->warehouse(),
-					'type'			=> '2',
-					'nominal'		=> $rowtotal,
-					'nominal_fc'	=> $rowtotal,
-					'note'			=> $pir->code,
-				]);
-
-				self::sendCogs($table_name,
-					$pir->id,
-					$pir->company_id,
-					$pir->place_id,
-					$row->productionBatch->item->warehouse(),
-					$row->productionBatch->item_id,
-					$row->qty,
-					$rowtotal,
-					'OUT',
-					$pir->post_date,
-					NULL,
-					NULL,
-				);
-
-				self::sendStock(
-					$pir->place_id,
-					$row->productionBatch->item->warehouse(),
-					$row->productionBatch->item_id,
-					$row->qty,
-					'OUT',
-					NULL,
-					NULL,
-				);
-
-				$total += $rowtotal;
-			}
-
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
 
 			JournalDetail::create([
@@ -4405,7 +4363,7 @@ class CustomHelper {
 				'line_id'		=> $pir->line_id,
 				'place_id'		=> $pir->place_id,
 				'machine_id'	=> $pir->machine_id,
-				'type'			=> '1',
+				'type'			=> '2',
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,

@@ -246,7 +246,7 @@ class LandedCostController extends Controller
                 $data = LandedCost::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
                 $data['account_name'] = $data->vendor->name;
-                $data['from_address'] = $data->supplier->city->name.' - '.$data->supplier->subdistrict->name;
+                $data['from_address'] = ($data->supplier->city()->exists() ? $data->supplier->city->name : '').' - '.($data->supplier->subdistrict()->exists() ? $data->supplier->subdistrict->name : '');
                 $data['subdistrict_from_id'] = $data->supplier->subdistrict_id;
             
                 if($data->used()->exists()){

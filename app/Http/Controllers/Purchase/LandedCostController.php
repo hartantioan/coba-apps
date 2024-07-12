@@ -1170,7 +1170,7 @@ class LandedCostController extends Controller
             CustomHelper::removeJournal('landed_costs',$query->id);
 
             activity()
-                ->performedOn(new PurchaseOrder())
+                ->performedOn(new LandedCost())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Delete the purchase order data');

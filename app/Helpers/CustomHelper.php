@@ -4227,36 +4227,6 @@ class CustomHelper {
 				$pir->update([
 					'status'	=> '3'
 				]);
-
-				if($pir->productionFgReceive()->exists()){
-					$qtyWip5 = 0;
-					foreach($pir->productionFgReceive->productionFgReceiveDetail as $row){
-						$qtyWip5 += $row->qty;
-					}
-					self::sendCogs($table_name,
-						$pir->id,
-						$pir->company_id,
-						$pir->place_id,
-						$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-						$pir->productionOrderDetail->productionScheduleDetail->item_id,
-						$qtyWip5,
-						$total,
-						'IN',
-						$pir->post_date,
-						NULL,
-						NULL,
-					);
-
-					self::sendStock(
-						$pir->place_id,
-						$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-						$pir->productionOrderDetail->productionScheduleDetail->item_id,
-						$qtyWip5,
-						'IN',
-						NULL,
-						NULL,
-					);
-				}
 			}else{
 				if($pir->productionFgReceive()->exists()){
 					$pir->update([
@@ -4351,7 +4321,7 @@ class CustomHelper {
 
 			$pir = ProductionFgReceive::find($table_id);
 			
-			/* $query = Journal::create([
+			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
 				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
@@ -4368,6 +4338,48 @@ class CustomHelper {
 
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
 
+			$qtyWip5 = 0;
+			foreach($pir->productionFgReceiveDetail as $row){
+				$qtyWip5 += $row->qty;
+				$total += $row->total;
+			}
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'warehouse_id'	=> $pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+				'type'			=> '1',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+			]);
+
+			self::sendCogs($table_name,
+				$pir->id,
+				$pir->company_id,
+				$pir->place_id,
+				$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+				$pir->productionOrderDetail->productionScheduleDetail->item_id,
+				$qtyWip5,
+				$total,
+				'IN',
+				$pir->post_date,
+				NULL,
+				NULL,
+			);
+
+			self::sendStock(
+				$pir->place_id,
+				$pir->productionOrderDetail->productionScheduleDetail->item->warehouse(),
+				$pir->productionOrderDetail->productionScheduleDetail->item_id,
+				$qtyWip5,
+				'IN',
+				NULL,
+				NULL,
+			);
+
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
 				'coa_id'		=> $coawip->id,
@@ -4378,7 +4390,7 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
-			]); */
+			]);
 
 			$pir->createProductionIssue();
 

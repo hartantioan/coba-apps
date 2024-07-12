@@ -323,7 +323,7 @@ class ProductionFgReceiveController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->note,
                     $val->productionOrderDetail->productionOrder->code,
-                    $val->productionIssue()->exists() ? $val->productionIssue->code : '-',
+                    $val->productionIssue()->exists() ? $val->productionIssueList() : '-',
                     $val->item->code.' - '.$val->item->name,
                     $val->place->code,
                     $val->line->code,
@@ -437,7 +437,7 @@ class ProductionFgReceiveController extends Controller
                     if($item){
                         $stock = $item->getStockPlace($request->place_id);
                         if($stock < $arrQty[$key]){
-                            $arrItemMore[] = $item->code.' - '.$item->name;
+                            $arrItemMore[] = $item->code.' - '.$item->name.' Stok : '.CustomHelper::formatConditionalQty($stock).' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
                             $passedStockMaterial = false;
                         }
                     }

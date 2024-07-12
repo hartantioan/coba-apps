@@ -64,7 +64,15 @@ class ProductionFgReceive extends Model
     }
 
     public function productionIssue(){
-        return $this->hasOne('App\Models\ProductionIssue','production_fg_receive_id','id')->whereIn('status',['2','3']);
+        return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['2','3']);
+    }
+
+    public function productionIssueList(){
+        $arr = [];
+        foreach($this->productionIssue as $row){
+            $arr[] = $row->code;
+        }
+        return implode(',',$arr);
     }
 
     public function company()

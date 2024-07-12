@@ -2191,7 +2191,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionHandoverController::class, 'rowDetail']);
                     Route::post('show', [ProductionHandoverController::class, 'show']);
                     Route::post('get_code', [ProductionHandoverController::class, 'getCode']);
-                    Route::post('get_pallet_barcode', [ProductionHandoverController::class, 'getPalletBarcode']);
+                    Route::post('get_scan_barcode', [ProductionHandoverController::class, 'getScanBarcode']);
                     Route::post('get_child_fg', [ProductionHandoverController::class, 'getChildFg']);
                     Route::post('print',[ProductionHandoverController::class, 'print']);
                     Route::post('done',[ProductionHandoverController::class, 'done'])->middleware('operation.access:production_handover,update');

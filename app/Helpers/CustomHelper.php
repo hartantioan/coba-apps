@@ -4181,6 +4181,17 @@ class CustomHelper {
 									'note'							=> $pir->code,
 								]);
 							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->coa_id,
+								'line_id'		=> $pir->line_id,
+								'place_id'		=> $pir->place_id,
+								'type'			=> '2',
+								'nominal'		=> $row->total,
+								'nominal_fc'	=> $row->total,
+								'note'			=> $pir->code,
+							]);
 						}
 					}else{
 						JournalDetail::create([

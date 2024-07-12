@@ -262,7 +262,7 @@
                             <tr>
                                 <td align="center" rowspan="2">{{ $key+1 }}.</td>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
-                                <td align="right">{{ $row->qty }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                 <td align="center">{{ $row->itemUnit->unit->code }}</td>
                                 <td>{{ $row->note }}</td>
                                 <td>{{ $row->note2 }}</td>

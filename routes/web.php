@@ -2221,6 +2221,9 @@ Route::prefix('admin')->group(function () {
                 Route::prefix('production_report')->middleware('direct.access')->group(function () {
                     Route::prefix('production_batch')->middleware('operation.access:production_batch,view')->group(function () {
                         Route::get('/',[ProductionBatchController::class, 'index']);
+                        Route::get('datatable',[ProductionBatchController::class, 'datatable']);
+                        Route::get('row_detail',[ProductionBatchController::class, 'rowDetail']);
+                        Route::get('export', [ProductionBatchController::class, 'export']);
                     });
                 });
             });

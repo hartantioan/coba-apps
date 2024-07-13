@@ -2150,7 +2150,13 @@
                 
             },
             success: function(response) {
+                if(type !=null){
+                    
+                $('.row_item[data-id-header="' + id + '"]').remove();
+                }else{
+                    
                 $('.row_item[data-id="' + id + '"]').remove();
+                }
                 countAll();
                 if($('.row_item').length == 0){
                     mode = '';
@@ -2577,7 +2583,7 @@
                         var count = makeid(10);
                         if(response.inventory_type == '1'){
                             $('#last-row-item').before(`
-                                <tr class="row_item" data-id="` + val.id + `">
+                                <tr class="row_item" data-id="` + val.reference_id + `" data-id-header="` + val.id + `">
                                     <input type="hidden" name="arr_data[]" value="` + val.reference_id + `">
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
                                     <td class="center">

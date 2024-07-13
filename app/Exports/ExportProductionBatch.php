@@ -1,0 +1,120 @@
+<?php
+
+namespace App\Exports;
+
+use App\Helpers\CustomHelper;
+use App\Models\ProductionBatch;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+
+class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
+{
+    /**
+    * @return \Illuminate\Support\Collection
+    */
+
+    protected $start_date, $end_date, $item_parent_id, $search;
+
+    public function __construct(string $start_date, string $end_date, string $item_parent_id, string $search)
+    {
+        $this->start_date = $start_date ?? '';
+		$this->end_date = $end_date ?? '';
+        $this->item_parent_id = $item_parent_id ?? '';
+        $this->search = $search ?? '';
+    }
+
+
+    private $headings = [
+        'No',
+        'No.Batch',
+        'Item',
+        'Tgl.Dibuat',
+        'Tangki',
+        'Qty Awal',
+        'Qty Terpakai',
+        'Qty Sisa',
+        'Satuan',
+        'Nilai Rupiah Awal',
+        'Nilai Rupiah Terpakai',
+        'Nilai Rupiah Sisa',
+        'Dokumen Ref.'
+    ];
+
+    public function collection()
+    {
+        $query_data = ProductionBatch::where(function($query) {
+            if($this->search) {
+                $query->where(function($query){
+                    $query->where('code', 'like', "%$this->search%")
+                        ->orWhereHas('item',function($query){
+                            $query->where('name','like',"%$this->search%")
+                                ->orWhere('code','like',"%$this->search%");
+                        })
+                        ->orWhereHas('tank',function($query){
+                            $query->where('name','like',"%$this->search%")
+                                ->orWhere('code','like',"%$this->search%");
+                        });
+                });
+            }
+
+            if($this->item_parent_id){
+                $query->whereHas('item',function($query){
+                    $query->whereHas('parentFg',function($query){
+                        $query->where('parent_id',$this->item_parent_id);
+                    });
+                });
+            }
+
+            if($this->start_date && $this->end_date) {
+                $query->whereDate('created_at', '>=', $this->start_date)
+                    ->whereDate('created_at', '<=', $this->end_date);
+            } else if($this->start_date) {
+                $query->whereDate('created_at','>=', $this->start_date);
+            } else if($this->end_date) {
+                $query->whereDate('created_at','<=', $this->end_date);
+            }
+        })
+        ->get();
+
+        $arr = [];
+
+        foreach($query_data as $key => $row){
+            $arr[] = [
+                'id'            => ($key + 1),
+                'code'          => $row->code,
+                'item'          => $row->item->code.' - '.$row->item->name,
+                'date'          => date('d/m/Y H:i:s',strtotime($row->created_at)),
+                'tank'          => $row->tank()->exists() ? $row->tank->code.' - '.$row->tank->name : '-',
+                'qty_real'      => CustomHelper::formatConditionalQty($row->qty_real),
+                'qty_used'      => CustomHelper::formatConditionalQty($row->qtyUsed()),
+                'qty_balance'   => CustomHelper::formatConditionalQty($row->qtyBalance()),
+                'unit'          => $row->item->uomUnit->code,
+                'value_total'   => CustomHelper::formatConditionalQty($row->total),
+                'value_used'    => CustomHelper::formatConditionalQty($row->price() * $row->qtyUsed()),
+                'value_balance' => CustomHelper::formatConditionalQty($row->price() * $row->qtyBalance()),
+                'ref_code'      => $row->lookable->parent->code,
+            ];
+        }
+
+        return collect($arr);
+    }
+
+    public function title(): string
+    {
+        return 'Laporan Batch Produksi';
+    }
+
+    public function startCell(): string
+    {
+        return 'A1';
+    }
+	/**
+	 * @return array
+	 */
+	public function headings() : array
+	{
+		return $this->headings;
+	}
+}

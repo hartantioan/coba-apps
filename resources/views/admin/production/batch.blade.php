@@ -95,6 +95,7 @@
                                                         <th>Qty Awal</th>
                                                         <th>Qty Terpakai</th>
                                                         <th>Qty Sisa</th>
+                                                        <th>Satuan</th>
                                                         <th>Nilai Rupiah Awal</th>
                                                         <th>Nilai Rupiah Terpakai</th>
                                                         <th>Nilai Rupiah Sisa</th>
@@ -194,8 +195,8 @@
     });
 
     function exportExcel(){
-        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), coa_id = ($('#coa').val() ? $('#coa').val() : ''), company_id = ($('#company').val() ? $('#company').val() : ''), search = window.table.search();
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&coa_id=" + coa_id + "&company_id=" + company_id + "&search=" + search;
+        var start_date = $('#start_date').val(), finish_date = $('#finish_date').val(), item_parent_id = ($('#item_parent_id').val() ? $('#item_parent_id').val() : ''), search = window.table.search();
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + finish_date + "&item_parent_id=" + item_parent_id + "&search=" + search;
     }
 
     function reset(){
@@ -270,6 +271,7 @@
                 { name: 'qty_start', searchable: false, orderable: false, className: '' },
                 { name: 'qty_used', searchable: false, orderable: false, className: '' },
                 { name: 'qty_balance', searchable: false, orderable: false, className: '' },
+                { name: 'unit', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'value_start', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'value_used', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'value_balance', searchable: false, orderable: false, className: 'right-align' },

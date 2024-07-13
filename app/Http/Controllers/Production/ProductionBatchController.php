@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Production;
 
+use App\Exports\ExportProductionBatch;
 use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -138,6 +139,7 @@ class ProductionBatchController extends Controller
                     CustomHelper::formatConditionalQty($val->qty_real),
                     CustomHelper::formatConditionalQty($val->qtyUsed()),
                     CustomHelper::formatConditionalQty($val->qtyBalance()),
+                    $val->item->uomUnit->code,
                     CustomHelper::formatConditionalQty($val->total),
                     CustomHelper::formatConditionalQty($val->price() * $val->qtyUsed()),
                     CustomHelper::formatConditionalQty($val->price() * $val->qtyBalance()),
@@ -201,5 +203,14 @@ class ProductionBatchController extends Controller
         $string .= '</tbody></table></div></div>';
 		
         return response()->json($string);
+    }
+
+    public function export(Request $request){
+        $start_date = $request->start_date ? $request->start_date : date('Y-m-d');
+        $end_date = $request->end_date ? $request->end_date : date('Y-m-d');
+        $item_parent_id = $request->item_parent_id ? $request->item_parent_id : '';
+        $search = $request->search ? $request->search : '';
+
+		return Excel::download(new ExportProductionBatch($start_date,$end_date,$item_parent_id,$search), 'production_batch_'.uniqid().'.xlsx');
     }
 }

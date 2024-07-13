@@ -20,7 +20,7 @@ use App\Models\Pallet;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionFgReceive;
-use App\Models\productionFgReceiveDetail;
+use App\Models\ProductionFgReceiveDetail;
 use App\Models\ProductionFgReceiveMaterial;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;

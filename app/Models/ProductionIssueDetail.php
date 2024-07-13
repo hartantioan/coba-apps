@@ -44,6 +44,11 @@ class ProductionIssueDetail extends Model
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
+    }
+
     public function productionOrderDetail()
     {
         return $this->belongsTo('App\Models\ProductionOrderDetail', 'production_order_detail_id', 'id')->withTrashed();

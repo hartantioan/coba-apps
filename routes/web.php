@@ -198,6 +198,7 @@ use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\MasterData\TankController;
+use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionHandoverController;
 use App\Http\Controllers\Production\ProductionIssueController;
@@ -2215,6 +2216,12 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionHandoverController::class, 'voidStatus'])->middleware('operation.access:production_handover,void');
                     Route::post('destroy', [ProductionHandoverController::class, 'destroy'])->middleware('operation.access:production_handover,delete');
+                });
+
+                Route::prefix('production_report')->middleware('direct.access')->group(function () {
+                    Route::prefix('production_batch')->middleware('operation.access:production_batch,view')->group(function () {
+                        Route::get('/',[ProductionBatchController::class, 'index']);
+                    });
                 });
             });
 

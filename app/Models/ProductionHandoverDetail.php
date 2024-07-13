@@ -39,6 +39,11 @@ class ProductionHandoverDetail extends Model
         return $this->belongsTo('App\Models\ProductionHandover');
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\ProductionHandover');
+    }
+
     public function productionFgReceiveDetail()
     {
         return $this->belongsTo('App\Models\ProductionFgReceiveDetail');

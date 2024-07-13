@@ -42,6 +42,11 @@ class ProductionReceiveDetail extends Model
         return $this->belongsTo('App\Models\ProductionReceive', 'production_receive_id', 'id')->withTrashed();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\ProductionReceive', 'production_receive_id', 'id')->withTrashed();
+    }
+
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();

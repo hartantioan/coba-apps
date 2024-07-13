@@ -253,6 +253,7 @@ class ProductionReceive extends Model
                 'user_id'		            => session('bo_id'),
                 'company_id'                => $this->company_id,
                 'production_order_detail_id'=> $this->production_order_detail_id,
+                'production_receive_id'     => $this->id,
                 'place_id'                  => $this->place_id,
                 'shift_id'                  => $this->shift_id,
                 'group'                     => $this->group,

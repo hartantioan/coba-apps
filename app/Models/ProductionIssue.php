@@ -21,6 +21,7 @@ class ProductionIssue extends Model
         'company_id',
         'production_order_detail_id',
         'production_fg_receive_id',
+        'production_receive_id',
         'place_id',
         'shift_id',
         'group',
@@ -74,6 +75,11 @@ class ProductionIssue extends Model
     public function productionFgReceive()
     {
         return $this->belongsTo('App\Models\ProductionFgReceive', 'production_fg_receive_id', 'id')->withTrashed();
+    }
+
+    public function productionReceive()
+    {
+        return $this->belongsTo('App\Models\ProductionReceive', 'production_receive_id', 'id')->withTrashed();
     }
 
     public function place()

@@ -30,6 +30,16 @@ class ProductionBatch extends Model
         return $price;
     }
 
+    public function qtyUsed(){
+        $total = $this->productionBatchUsage()->sum('qty');
+        return $total;
+    }
+
+    public function qtyBalance(){
+        $total = $this->qty_real - $this->qtyUsed();
+        return $total;
+    }
+
     public function lookable(){
         return $this->morphTo();
     }

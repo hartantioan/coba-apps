@@ -36,17 +36,17 @@ class ProductionHandoverDetail extends Model
 
     public function productionHandover()
     {
-        return $this->belongsTo('App\Models\ProductionHandover');
+        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id');
     }
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\ProductionHandover');
+        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id');
     }
 
     public function productionFgReceiveDetail()
     {
-        return $this->belongsTo('App\Models\ProductionFgReceiveDetail');
+        return $this->belongsTo('App\Models\ProductionFgReceiveDetail','production_fg_receive_detail_id','id');
     }
 
     public function place()

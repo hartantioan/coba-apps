@@ -9,9 +9,6 @@
     .select-wrapper, .select2-container {
         height:3rem !important;
     }
-    .btn-small {
-        padding: 0 1rem !important;
-    }
     #data_detail > table > tbody > td{
         padding:2px !important;
     }
@@ -51,19 +48,19 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m2 s6 ">
+                                            <div class="col m3 s6 ">
                                                 <label for="item_parent_id" style="font-size:1rem;">Item Parent FG :</label>
                                                 <select class="browser-default" id="item_parent_id" name="item_parent_id" onchange="loadDataTable();"></select>
                                             </div>
-                                            <div class="col m2 s6 ">
+                                            <div class="col m3 s6 ">
                                                 <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m'.'-01') }}" onchange="loadDataTable();">
                                             </div>
-                                            <div class="col m2 s6 ">
+                                            <div class="col m3 s6 ">
                                                 <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}" onchange="loadDataTable();">
                                             </div>
-                                            <div class="col m2 s6 pt-2">
+                                            <div class="col m3 s6 pt-2">
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="reset();">
                                                     <i class="material-icons center">loop</i>
                                                 </a>
@@ -83,8 +80,7 @@
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
-                                                <i class="material-icons hide-on-med-and-up">refresh</i>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
@@ -193,6 +189,8 @@
         });
 
         loadDataTable();
+
+        select2ServerSide('#item_parent_id', '{{ url("admin/select2/item_parent_fg") }}');
     });
 
     function exportExcel(){
@@ -201,9 +199,9 @@
     }
 
     function reset(){
-        $('#company').val($("#company option:first").val()).formSelect();
-        $('#coa').empty();
-        $('#start_date,#finish_date').val('{{ date("Y-m-d") }}');
+        $('#item_parent_id').empty();
+        $('#finish_date').val('{{ date("Y-m-d") }}');
+        $('#start_date').val('{{ date('Y-m'.'-01') }}');
         loadDataTable();
     }
 
@@ -213,7 +211,7 @@
             "scrollY": '400px',
             "responsive": false,
             "scrollX": true,
-            /* "stateSave": true, */
+            "stateSave": true,
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
@@ -223,8 +221,7 @@
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
-                    coa : $('#coa').val(),
-                    company : $('#company').val(),
+                    item_parent_id : $('#item_parent_id').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
                 },
@@ -270,9 +267,9 @@
                 { name: 'item_id', className: '' },
                 { name: 'created_at', className: '' },
                 { name: 'tank_id', className: '' },
-                { name: 'qty_start', className: '' },
-                { name: 'qty_used', className: '' },
-                { name: 'qty_balance', className: '' },
+                { name: 'qty_start', searchable: false, orderable: false, className: '' },
+                { name: 'qty_used', searchable: false, orderable: false, className: '' },
+                { name: 'qty_balance', searchable: false, orderable: false, className: '' },
                 { name: 'value_start', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'value_used', searchable: false, orderable: false, className: 'right-align' },
                 { name: 'value_balance', searchable: false, orderable: false, className: 'right-align' },

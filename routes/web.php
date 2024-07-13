@@ -282,6 +282,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item', [Select2Controller::class, 'item']);
                 Route::get('bom_item', [Select2Controller::class, 'bomItem']);
                 Route::get('item_has_bom', [Select2Controller::class, 'itemHasBom']);
+                Route::get('item_parent_fg', [Select2Controller::class, 'itemParentFg']);
                 Route::get('resource', [Select2Controller::class, 'resource']);
                 Route::get('item_receive', [Select2Controller::class, 'itemReceive']);
                 Route::get('item_issue', [Select2Controller::class, 'itemIssue']);

@@ -47,14 +47,14 @@
                                                     </select>
                                                     <label class="" for="mode">Mode Data</label>
                                                 </div>
-                                                <div class="input-field col m3 s12">
+                                                {{-- <div class="input-field col m3 s12">
                                                     <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                                     <label class="active" for="start_date">Tanggal Awal</label>
                                                 </div>
                                                 <div class="input-field col m3 s12">
                                                     <input id="end_date" name="end_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                                     <label class="active" for="end_date">Tanggal Akhir</label>
-                                                </div>
+                                                </div> --}}
                                                 <div class="col s12 mt-3">
                                                     <button class="btn waves-effect waves-light right submit" onclick="exportExcel();">Download Rekap <i class="material-icons right">file_download</i></button>
                                                     <button class="btn waves-effect waves-light right cyan submit mr-2" onclick="getOutstanding();">Lihat Tunggakan Qty <i class="material-icons right">list</i></button>
@@ -107,8 +107,8 @@
             type: 'POST',
             dataType: 'JSON',
             data: {
-                startDate: startDatekuy,
-                endDate: endDatekuy,
+                startDate: null,
+                endDate: null,
                 mode:modes,
             },
             headers: {

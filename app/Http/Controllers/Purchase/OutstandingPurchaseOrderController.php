@@ -83,7 +83,6 @@ class OutstandingPurchaseOrderController extends Controller
         foreach($data as $key => $row){
            
             if($row->getBalanceReceipt()> 0){
-                info($row->item->is_hide_supplier);
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td class="center-align">'.$row->purchaseOrder->code.'</td>

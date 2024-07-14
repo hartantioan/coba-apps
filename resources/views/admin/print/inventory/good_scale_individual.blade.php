@@ -153,7 +153,7 @@
                 min-height: auto;
             }
 
-            @page { margin: 6em 3em 6em 3em; }
+            @page { margin: 6em 3em 3em 3em; }
             header { position: fixed; top: -95px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
                 
             td {
@@ -273,10 +273,10 @@
                             <td width="40%" class="left-align">
                                 <table border="0" width="100%" class="tbl-info">
                                     <tr>
-                                        <td>
+                                        <td width="40%">
                                             Item
                                         </td>
-                                        <td>
+                                        <td width="60%">
                                              {{ $data->item->code.' - '.$data->item->name }}
                                         </td>
                                     </tr>

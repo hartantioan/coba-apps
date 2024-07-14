@@ -1045,7 +1045,7 @@
                 $('#body-item-issue').append(`
                     <tr class="row_item_issue" data-id="` + $('#production_order_detail_id').val() + `">
                         <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `">
                         <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
                         <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
                         <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
@@ -1160,8 +1160,39 @@
         }
     }
 
-    function removeBatch(element){
+    function removeBatch(element,code){
         $(element).parent().parent().remove();
+        let arr_batch_id = [];
+
+        $('input[name^="arr_batch_id[]"]').each(function(index){
+            arr_batch_id.push($(this).val());
+        });
+
+        $('#arr_batch' + code).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/production_batch") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_id: $('input[name^="arr_lookable_id[]"][data-id="' + code + '"]').val(),
+                        arr_batch_id: arr_batch_id,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function addBatch(code){
@@ -1177,13 +1208,45 @@
                         <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="` + data.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `')" data-qty="` + data.qty + `" data-id="` + count + `" class="" id="rowBatch`+ count +`" style="text-align:right;">    
                     </td>
                     <td>
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" onclick="removeBatch(this);">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatch(this,'` + code + `');">
                             <i class="material-icons">delete</i>
                         </a> 
                     </td>
                 </tr>
             `);
             $('#arr_batch' + code).empty();
+
+            let arr_batch_id = [];
+
+            $('input[name^="arr_batch_id[]"]').each(function(index){
+                arr_batch_id.push($(this).val());
+            });
+
+            $('#arr_batch' + code).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/production_batch") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            item_id: $('input[name^="arr_lookable_id[]"][data-id="' + code + '"]').val(),
+                            arr_batch_id: arr_batch_id,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
         }else{
             
         }
@@ -1697,7 +1760,7 @@
                     $('#body-item-issue').append(`
                         <tr class="row_item_issue" data-id="` + val.id + `">
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `">
                             <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
                             <input type="hidden" name="arr_bom_id[]" value="` + (val.bom_id ? val.bom_id : '0' ) + `">
                             <input type="hidden" name="arr_bom_detail_id[]" value="` + (val.bom_detail_id ? val.bom_detail_id : '0' ) + `">
@@ -1800,7 +1863,7 @@
                                     <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + countdetail + `')" data-qty="` + value.max_qty + `" data-id="` + countdetail + `" class="" id="rowBatch`+ countdetail +`" style="text-align:right;">    
                                 </td>
                                 <td>
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" onclick="removeBatch(this);">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatch(this,'` + count + `');">
                                         <i class="material-icons">delete</i>
                                     </a> 
                                 </td>

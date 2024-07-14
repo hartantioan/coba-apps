@@ -4458,8 +4458,11 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = ProductionBatch::where(function($query) use($search){
+        $data = ProductionBatch::where(function($query) use($search,$request){
                     $query->where('code', 'like', "%$search%");
+                    if($request->arr_batch_id){
+                        $query->whereNotIn('id',$request->arr_batch_id);
+                    }
                 })
                 ->where('item_id',$request->item_id)
                 /* ->whereHas('lookable',function($query)use($search){

@@ -57,6 +57,16 @@ class ProductionOrderDetail extends Model
         return $qty;
     }
 
+    public function getItemIdBomChild(){
+        $arr = [];
+        foreach($this->productionScheduleDetail->bom->bomDetail()->where('lookable_type','items')->get() as $rowbom){
+            if($rowbom->lookable->bom()->exists()){
+                $arr[] = $rowbom->lookable_id;
+            }
+        }
+        return $arr;
+    }
+
     public function qtyReceive(){
         $qty = 0;
         

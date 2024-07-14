@@ -947,6 +947,8 @@ class ProductionFgReceiveController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
+                $query->voidProductionIssue();
+
                 activity()
                     ->performedOn(new ProductionFgReceive())
                     ->causedBy(session('bo_id'))

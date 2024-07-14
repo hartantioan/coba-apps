@@ -801,6 +801,8 @@ class ProductionReceiveController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
+                $query->voidProductionIssue();
+
                 activity()
                     ->performedOn(new ProductionReceive())
                     ->causedBy(session('bo_id'))

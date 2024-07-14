@@ -67,18 +67,23 @@ class ResetCogs implements ShouldQueue
 					}
 
 					$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-					
-					$row->update([
-						'price_final'	=> $price_final,
-						'qty_final'		=> $qty_final,
-						'total_final'	=> $total_final,
-					]);
 				}else{
-					$total_final = $row->total_final;
-					$qty_final = $row->qty_final;
-				}
-			}else{
+					if($row->type == 'IN'){
+						$total_final = $row->total_in;
+						$qty_final = $row->qty_in;
+					}elseif($row->type == 'OUT'){
+						$total_final = 0 - $row->total_out;
+						$qty_final = 0 - $row->qty_out;
+					}
 
+					$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+				}
+				$row->update([
+					'price_final'	=> $price_final,
+					'qty_final'		=> $qty_final,
+					'total_final'	=> $total_final,
+				]);
+			}else{
 				if($row->type == 'IN'){
 					$total_final += $row->total_in;
 					$qty_final += $row->qty_in;
@@ -86,9 +91,7 @@ class ResetCogs implements ShouldQueue
 					$total_final -= $row->total_out;
 					$qty_final -= $row->qty_out;
 				}
-
 				$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-
 				$row->update([
 					'price_final'	=> $price_final,
 					'qty_final'		=> $qty_final,

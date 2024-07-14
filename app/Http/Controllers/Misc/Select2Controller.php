@@ -4489,7 +4489,8 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $po_id = ProductionOrderDetail::find($request->pod_id)->production_order_id;
+        $pod = ProductionOrderDetail::find($request->pod_id);
+        $po_id = $pod->production_order_id;
         $data = ProductionBatch::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%");
                 })
@@ -4505,6 +4506,7 @@ class Select2Controller extends Controller {
                             });
                     }
                 })
+                ->whereIn('item_id',$pod->getItemIdBomChild())
                 ->whereDoesntHave('used')
                 ->where('qty','>',0)
                 ->orderBy('created_at')

@@ -1132,6 +1132,16 @@
     }
 
     function getItemProductionOrder(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
+        $('#body-batch').empty().append(`
+            <tr id="last-row-batch">
+                <td class="center-align" colspan="5">
+                    Silahkan tambah dengan tombol dibawah
+                </td>
+            </tr>
+        `);
         if($('#production_order_detail_id').val()){
             $('#item_name').val($('#production_order_detail_id').select2('data')[0].item_name);
             $('#conversion').val($('#production_order_detail_id').select2('data')[0].conversion);

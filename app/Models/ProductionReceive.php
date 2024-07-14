@@ -91,6 +91,11 @@ class ProductionReceive extends Model
         return $this->hasMany('App\Models\ProductionReceiveDetail');
     }
 
+    public function productionIssue()
+    {
+        return $this->hasMany('App\Models\ProductionIssue','production_receive_id','id')->whereIn('status',['1','2','3']);
+    }
+
     public function productionReceiveIssue()
     {
         return $this->hasMany('App\Models\ProductionReceiveIssue');
@@ -322,6 +327,40 @@ class ProductionReceive extends Model
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Add / edit issue production.');
+            }
+        }
+    }
+
+    public function voidProductionIssue(){
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $row){
+                if(in_array($row->status,['2','3'])){
+                    CustomHelper::removeJournal($row->getTable(),$row->id);
+                    CustomHelper::removeCogs($row->getTable(),$row->id);
+                }
+
+                $row->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => 'Ditutup otomatis dari Production Receive '.$this->code,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                foreach($row->productionIssueDetail as $rowdetail){
+                    foreach($rowdetail->productionBatchUsage as $rowdetailkuy){
+                        CustomHelper::updateProductionBatch($rowdetailkuy->production_batch_id,$rowdetailkuy->qty,'IN');
+                        $rowdetailkuy->delete();
+                    }
+                }
+    
+                activity()
+                    ->performedOn(new ProductionIssue())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($row)
+                    ->log('Void the production issue data from production receive');
+    
+                CustomHelper::sendNotification($row->getTable(),$row->id,'Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive '.$this->code.'.','Production Issue No. '.$row->code.' telah ditutup otomatis dari Production Receive '.$this->code.'.',$row->user_id);
+                CustomHelper::removeApproval($row->getTable(),$row->id);
             }
         }
     }

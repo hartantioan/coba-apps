@@ -1035,6 +1035,16 @@
     }
 
     function getProductionOrder(){
+        if($('.row_issue').length > 0){
+            $('.row_issue').remove();
+            $('#body-issue').append(`
+                <tr id="last-row-issue">
+                    <td class="center-align" colspan="3">
+                        Silahkan tambah dengan tombol dibawah
+                    </td>
+                </tr>
+            `);
+        }
         if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
                 $('#alert-method').html('-');

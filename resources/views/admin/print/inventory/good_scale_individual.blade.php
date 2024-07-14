@@ -51,18 +51,18 @@
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.8;
-                    font-size:11px !important;
+                    font-size:10px !important;
                 }
 
                 
                 td{
-                    font-size:1.001em !important;
+                    font-size:0.9em !important;
                 }
                 .tb-header td{
                     font-size:1.2em !important;
                 }
                 .tbl-info td{
-                    font-size:12px !important;
+                    font-size:10.5px !important;
                 }
                 .table-data-item td{
                     font-size:1.001em !important;
@@ -71,10 +71,10 @@
                     border:0.6px solid black;
                 }
                 .table-bot td{
-                    font-size:1.001em !important;
+                    font-size:0.9em !important;
                 }
                 .table-bot1 td{
-                    font-size:1.001em !important;
+                    font-size:0.9em !important;
                 }
             }
         
@@ -183,7 +183,7 @@
                 </tr>
                 
             </table>
-            <hr style="border-top: 1px solid black; margin-top:-29px">
+            <hr style="border-top: 1px solid black; margin-top:-35px">
         </header>
         <main style="margin-top:15px;">
             <div class="card">

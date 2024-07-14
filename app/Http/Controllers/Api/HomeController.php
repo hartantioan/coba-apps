@@ -7,6 +7,7 @@ use App\Models\Weight;
 use App\Models\AttendanceTemp;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\WeightHistory;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,14 @@ class HomeController extends Controller
                 $weight = Weight::create([
                     'code'      => Str::random(25),
                     'place_id'  => $request->place_id,
+                    'nominal'   => str_replace(',','',$request->nominal),
+                    'rawdata'   => $request->rawdata,
+                ]);
+            }
+            $now = date('Y-m-d H:i');
+            $updateHistory = WeightHistory::where('created_at','like',"$now%")->first();
+            if(!$updateHistory){
+                WeightHistory::create([
                     'nominal'   => str_replace(',','',$request->nominal),
                     'rawdata'   => $request->rawdata,
                 ]);

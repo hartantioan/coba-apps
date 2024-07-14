@@ -365,7 +365,7 @@
                                 </tr>
                                 @if($row->productionBatchUsage()->exists())
                                     <tr>
-                                        <td colspan="10">Batch terpakai {{ $row->listBatchUsed() }}</td>
+                                        <td colspan="10">Batch terpakai <br>{!! $row->listBatchUsed() !!}</td>
                                     </tr>
                                 @endif
                             @endforeach

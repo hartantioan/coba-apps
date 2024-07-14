@@ -596,7 +596,7 @@ class ProductionIssueController extends Controller
             </tr>';
             if($row->productionBatchUsage()->exists()){
                 $string .= '<tr>
-                    <td class="gradient-45deg-yellow-green" colspan="10">Batch Terpakai : '.$row->listBatchUsed().'</td>
+                    <td class="gradient-45deg-yellow-green" colspan="10">Batch Terpakai : <br>'.$row->listBatchUsed().'</td>
                 </tr>';
             }
         }

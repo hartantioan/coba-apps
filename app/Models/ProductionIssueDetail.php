@@ -97,10 +97,10 @@ class ProductionIssueDetail extends Model
     }
 
     public function listBatchUsed(){
-        $arr = [];
+        $arr = '';
         foreach($this->productionBatchUsage as $row){
-            $arr[] = $row->productionBatch->code.' - '.CustomHelper::formatConditionalQty($row->qty);
+            $arr .= $row->productionBatch->code.' - '.CustomHelper::formatConditionalQty($row->qty).'<br>';
         }
-        return implode(', ',$arr);
+        return $arr;
     }
 }

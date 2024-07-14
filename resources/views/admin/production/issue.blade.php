@@ -1827,6 +1827,13 @@
                     }
                     $('#rowQty' + count).trigger('keyup');
                     if(val.has_bom){
+
+                        let arr_batch_id = [];
+
+                        $.each(val.list_batch, function(i, value) {
+                            arr_batch_id.push(value.production_batch_id);
+                        });
+
                         $('#arr_batch' + count).select2({
                             placeholder: '-- Kosong --',
                             minimumInputLength: 1,
@@ -1842,6 +1849,7 @@
                                     return {
                                         search: params.term,
                                         item_id: val.lookable_id,
+                                        arr_batch_id: arr_batch_id,
                                     };
                                 },
                                 processResults: function(data) {

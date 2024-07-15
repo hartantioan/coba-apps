@@ -291,6 +291,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('purchase_item_scale', [Select2Controller::class, 'purchaseItemScale']);
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
+                Route::get('sales_item_parent', [Select2Controller::class, 'salesItemParent']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);

@@ -590,7 +590,7 @@
         });
 
         $('#arr_place0,#arr_department0').formSelect();
-        select2ServerSide('#arr_item0', '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#arr_item0', '{{ url("admin/select2/sales_item_parent") }}');
         select2ServerSide('#marketing_order_id', '{{ url("admin/select2/marketing_order_form_plan") }}');
     });
 
@@ -1299,7 +1299,7 @@
                             $('#arr_item' + count).append(`
                                 <option value="` + val.item_id + `">` + val.item_code + ' - ' + val.item_name + `</option>
                             `);
-                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item_parent") }}');
                         }
                     });
                 }
@@ -1411,7 +1411,7 @@
                                     $('#arr_item' + count).append(`
                                         <option value="` + val.item_id + `">` + val.item_name + `</option>
                                     `);
-                                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                                    select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item_parent") }}');
                                 }
                             });
                         }
@@ -1516,7 +1516,7 @@
                 </td>
             </tr>
         `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item_parent") }}');
     }
 
     String.prototype.replaceAt = function(index, replacement) {

@@ -839,6 +839,40 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function salesItemParent(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->where(function($query) use($search){
+                    $query->whereNotNull('is_sales_item');
+                })
+                ->whereHas('fgGroup')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'old_prices'        => $d->oldSalePrices($this->dataplaces),
+                'list_warehouse'    => $d->warehouseList(),
+                'list_outletprice'  => $d->listOutletPrice(),
+                'list_area'         => Area::where('status','1')->get(),
+                'sell_units'        => $d->arrSellUnits(),
+                'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
+                'stock_com'         => '0,000',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function asset(Request $request)
     {
         $response = [];

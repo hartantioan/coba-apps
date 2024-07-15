@@ -413,9 +413,35 @@ class ProductionFgReceiveController extends Controller
             } else {
 
                 $passedStockMaterial = true;
+                $passedBatchUsed = true;
+                $arrBatch = [];
+                $arrBatchQty = [];
+                $arrBatchError = [];
                 $arrItemMore = [];
                 $arrItem = [];
                 $arrQty = [];
+
+                if($request->arr_production_batch_id){
+                    foreach($request->arr_production_batch_id as $key => $row){
+                        if(!in_array($row,$arrBatch)){
+                            $arrBatch[] = $row;
+                            $arrBatchQty[] = str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
+                        }else{
+                            $index = array_search($row,$arrBatch);
+                            $arrBatchQty[$index] += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
+                        }
+                    }
+                }
+                
+                foreach($arrBatch as $key => $row){
+                    $pb = ProductionBatch::find($row);
+                    if($pb){
+                        if($arrBatchQty[$index] > $pb->qty){
+                            $arrBatchError[] = 'Terdapat batch melebihi pemakaian stock : '.CustomHelper::formatConditionalQty($pb->qty).' sedangkan pemakaian : '.CustomHelper::formatConditionalQty($arrBatchQty[$key]).'.';
+                            $passedBatchUsed = false;
+                        }
+                    }
+                }
 
                 if($request->arr_item_id){
                     foreach($request->arr_item_id as $key => $row){
@@ -452,6 +478,13 @@ class ProductionFgReceiveController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Mohon maaf terdapat permintaan item : '.implode(', ',$arrItemMore).' melebihi stok yang ada.'
+                    ]);
+                }
+
+                if(!$passedBatchUsed){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf! '.implode(', ',$arrBatchError),
                     ]);
                 }
                 

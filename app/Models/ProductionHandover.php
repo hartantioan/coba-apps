@@ -166,7 +166,7 @@ class ProductionHandover extends Model
 
         foreach($this->productionHandoverDetail as $row){
             if($row->productionBatch()->exists()){
-                if($row->productionBatch->productionBatchUsage()->exist()){
+                if($row->productionBatch->productionBatchUsage()->exists()){
                     $hasRelation = true;
                 }
             }

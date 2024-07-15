@@ -469,10 +469,12 @@ class ProductionHandoverController extends Controller
                             CustomHelper::updateProductionBatch($prfgd->productionBatch->id,$qtyuom,'OUT');
 
                             ProductionBatch::create([
-                                'code'          => $request->arr_pallet_no[$key],
+                                'code'          => $querydetail->productionFgReceiveDetail->pallet_no,
                                 'item_id'       => $querydetail->item_id,
-                                'place_id'      => $query->place_id,
+                                'place_id'      => $request->arr_place[$key],
                                 'warehouse_id'  => $request->arr_warehouse[$key],
+                                'area_id'       => $request->arr_area_id[$key],
+                                'item_shading_id'=> $itemShading->id,
                                 'lookable_type' => $querydetail->getTable(),
                                 'lookable_id'   => $querydetail->id,
                                 'qty'           => $qtyuom,

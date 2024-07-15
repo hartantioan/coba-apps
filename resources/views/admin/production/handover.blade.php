@@ -224,7 +224,7 @@
                         </div>
                         <div class="row">
                             <div class="col s6">
-                                <fieldset>
+                                <fieldset style="min-width: 100%;">
                                     <legend>2a. Dari Item dan Area</legend>
                                     <div class="input-field col m6 s12">
                                         <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id" onchange="getItemInformation();"></select>

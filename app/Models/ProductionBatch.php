@@ -30,7 +30,7 @@ class ProductionBatch extends Model
     ];
 
     public function itemShading(){
-        return $this->belongsTo('App\Models\Item', 'item_shading_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemShading', 'item_shading_id', 'id')->withTrashed();
     }
 
     public function place(){

@@ -257,6 +257,7 @@
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">{{ __('translations.note') }}</label>
+                                <div id="charCount"></div>
                             </div>
                             <div class="col m12 s12"></div>
                             <div class="col m6 s12 step6">
@@ -467,6 +468,20 @@
     $(function() {
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
+        });
+
+        const noteTextarea = document.getElementById('note');
+        const charCountDiv = document.getElementById('charCount');
+        const maxChars = 50;
+
+        noteTextarea.addEventListener('input', function() {
+            const currentLength = noteTextarea.value.length;
+            
+            if (currentLength > maxChars) {
+                noteTextarea.value = noteTextarea.value.substring(0, maxChars);
+            }
+
+            charCountDiv.textContent = `Characters remaining: ${maxChars - currentLength}`;
         });
 
         loadDataTable();

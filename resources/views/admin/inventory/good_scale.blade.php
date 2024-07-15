@@ -258,6 +258,7 @@
                                 <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Supplier</label>
                             </div>
+                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="place_id" name="place_id">
                                     @foreach ($place as $rowplace)
@@ -280,6 +281,7 @@
                                 <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_po">Qty PO</label>
                             </div>
+                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m2 s9">
                                 <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_in">Qty Bruto</label>
@@ -313,6 +315,7 @@
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">{{ __('translations.note') }}</label>
+                                <div id="charCount"></div>
                             </div>
                             <div class="input-field col m3 s12">
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
@@ -326,6 +329,7 @@
                                 <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Kendaraan">
                                 <label class="active" for="vehicle_no">Nomor Kendaraan</label>
                             </div>
+                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <input id="driver" name="driver" type="text" placeholder="Nama Supir">
                                 <label class="active" for="driver">Nama Supir</label>
@@ -809,6 +813,20 @@
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             
+        });
+
+        const noteTextarea = document.getElementById('note');
+        const charCountDiv = document.getElementById('charCount');
+        const maxChars = 50;
+
+        noteTextarea.addEventListener('input', function() {
+            const currentLength = noteTextarea.value.length;
+            
+            if (currentLength > maxChars) {
+                noteTextarea.value = noteTextarea.value.substring(0, maxChars);
+            }
+
+            charCountDiv.textContent = `Characters remaining: ${maxChars - currentLength}`;
         });
 
         loadDataTable();

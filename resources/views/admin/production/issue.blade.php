@@ -1825,7 +1825,7 @@
                     if(val.item_stock_id){
                         $('#arr_item_stock_id' + count).val(val.item_stock_id);
                     }
-                    $('#rowQty' + count).trigger('keyup');
+                    /* $('#rowQty' + count).trigger('keyup'); */
                     if(val.has_bom){
 
                         let arr_batch_id = [];

@@ -442,6 +442,8 @@ class ProductionReceiveController extends Controller
                                     'code'          => $code_batch,
                                     'item_id'       => $querydetail->item_id,
                                     'tank_id'       => $request->arr_tank[$keydetail],
+                                    'place_id'      => $request->arr_place[$key],
+                                    'warehouse_id'  => $request->arr_warehouse[$key],
                                     'lookable_type' => $querydetail->getTable(),
                                     'lookable_id'   => $querydetail->id,
                                     'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),

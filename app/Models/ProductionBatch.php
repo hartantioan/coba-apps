@@ -18,12 +18,32 @@ class ProductionBatch extends Model
         'code',
         'item_id',
         'tank_id',
+        'place_id',
+        'warehouse_id',
+        'area_id',
+        'item_shading_id',
         'lookable_type',
         'lookable_id',
         'qty',
         'qty_real',
         'total'
     ];
+
+    public function itemShading(){
+        return $this->belongsTo('App\Models\Item', 'item_shading_id', 'id')->withTrashed();
+    }
+
+    public function place(){
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function warehouse(){
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function area(){
+        return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
+    }
 
     public function price(){
         $price = $this->total / $this->qty_real;

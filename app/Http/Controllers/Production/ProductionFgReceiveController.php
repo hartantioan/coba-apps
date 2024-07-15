@@ -624,6 +624,8 @@ class ProductionFgReceiveController extends Controller
                         ProductionBatch::create([
                             'code'          => $request->arr_pallet_no[$key],
                             'item_id'       => $pfrd->item_id,
+                            'place_id'      => $query->place_id,
+                            'warehouse_id'  => $pfrd->item->warehouse(),
                             'lookable_type' => $pfrd->getTable(),
                             'lookable_id'   => $pfrd->id,
                             'qty'           => $pfrd->qty,

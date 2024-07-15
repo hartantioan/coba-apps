@@ -465,6 +465,18 @@ class ProductionHandoverController extends Controller
                             ]);
 
                             CustomHelper::updateProductionBatch($prfgd->productionBatch->id,$qtyuom,'OUT');
+
+                            ProductionBatch::create([
+                                'code'          => $request->arr_pallet_no[$key],
+                                'item_id'       => $querydetail->item_id,
+                                'place_id'      => $query->place_id,
+                                'warehouse_id'  => $request->arr_warehouse[$key],
+                                'lookable_type' => $querydetail->getTable(),
+                                'lookable_id'   => $querydetail->id,
+                                'qty'           => $qtyuom,
+                                'qty_real'      => $qtyuom,
+                                'total'         => $rowcost,
+                            ]);
                         }
                     }
                     

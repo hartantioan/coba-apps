@@ -4097,88 +4097,211 @@ class CustomHelper {
 			$total = 0;
 			$parentFg = false;
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
-
+			$arrBom = [];
+			
 			foreach($pir->productionIssueDetail as $row){
 				if($row->lookable_type == 'items' && $row->is_wip){
 					$parentFg = true;
 				}
+				if($row->bom()->exists()){
+					if(!in_array($row->bom_id,$arrBom)){
+						$arrBom[] = $row->bom_id;
+					}
+				}
 			}
 
-			foreach($pir->productionIssueDetail as $row){
-				if($row->lookable_type == 'items'){
-					if($row->is_wip){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coawip->id,
-							'place_id'		=> $row->itemStock->place_id,
-							'line_id'		=> $row->productionIssue->line_id,
-							'type'			=> '2',
-							'nominal'		=> $row->total,
-							'nominal_fc'	=> $row->total,
-							'note'			=> $pir->code,
-						]);
-					}else{
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->lookable->itemGroup->coa_id,
-							'place_id'		=> $row->itemStock->place_id,
-							'line_id'		=> $row->productionIssue->line_id,
-							'item_id'		=> $row->itemStock->item_id,
-							'warehouse_id'	=> $row->itemStock->warehouse_id,
-							'type'			=> '2',
-							'nominal'		=> $row->total,
-							'nominal_fc'	=> $row->total,
-							'note'			=> $pir->code,
-						]);
-		
-						self::sendCogs($table_name,
-							$pir->id,
-							$pir->company_id,
-							$row->itemStock->place_id,
-							$row->itemStock->warehouse_id,
-							$row->itemStock->item_id,
-							$row->qty,
-							$row->total,
-							'OUT',
-							$pir->post_date,
-							NULL,
-							NULL,
-						);
-		
-						self::sendStock(
-							$row->itemStock->place_id,
-							$row->itemStock->warehouse_id,
-							$row->itemStock->item_id,
-							$row->qty,
-							'OUT',
-							NULL,
-							NULL,
-						);
-					}
-				}elseif($row->lookable_type == 'resources'){
-					if($row->bomDetail()->exists()){
-						if($row->bomDetail->cost_distribution_id){
-							$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
-							$accumulation = 0;
-							foreach($row->bomDetail->costDistribution->costDistributionDetail as $key => $rowcost){
-								if($key == $lastIndex){
-									$nominal = $row->total - $accumulation;
-								}else{
-									$nominal = round(($rowcost->percentage / 100) * $row->total);
-									$accumulation += $nominal;
-								}
+			#lek misal item receive fg kelompokkan
+			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
+				foreach($arrBom as $row){
+					$totalrow = $pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->sum('total');
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coawip->id,
+						'line_id'		=> $pir->line_id,
+						'place_id'		=> $pir->place_id,
+						'machine_id'	=> $pir->machine_id,
+						'type'			=> '1',
+						'nominal'		=> $totalrow,
+						'nominal_fc'	=> $totalrow,
+						'note'			=> $pir->code,
+					]);
+					
+					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->orderBy('id')->get() as $row){
+						if($row->lookable_type == 'items'){
+							if($row->is_wip){
+								//do nothing
+							}else{
 								JournalDetail::create([
-									'journal_id'                    => $query->id,
-									'cost_distribution_detail_id'   => $rowcost->id,
-									'coa_id'						=> $row->lookable->coa_id,
-									'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
-									'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
-									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
-									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
-									'type'                          => '2',
-									'nominal'						=> $nominal,
-									'nominal_fc'					=> $nominal,
-									'note'							=> $pir->code,
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->itemGroup->coa_id,
+									'place_id'		=> $row->itemStock->place_id,
+									'line_id'		=> $row->productionIssue->line_id,
+									'item_id'		=> $row->itemStock->item_id,
+									'warehouse_id'	=> $row->itemStock->warehouse_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->code,
+								]);
+				
+								self::sendCogs($table_name,
+									$pir->id,
+									$pir->company_id,
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									$row->total,
+									'OUT',
+									$pir->post_date,
+									NULL,
+									NULL,
+								);
+				
+								self::sendStock(
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									'OUT',
+									NULL,
+									NULL,
+								);
+							}
+						}elseif($row->lookable_type == 'resources'){
+							if($row->bomDetail()->exists()){
+								if($row->bomDetail->cost_distribution_id){
+									$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
+									$accumulation = 0;
+									foreach($row->bomDetail->costDistribution->costDistributionDetail as $key => $rowcost){
+										if($key == $lastIndex){
+											$nominal = $row->total - $accumulation;
+										}else{
+											$nominal = round(($rowcost->percentage / 100) * $row->total);
+											$accumulation += $nominal;
+										}
+										JournalDetail::create([
+											'journal_id'                    => $query->id,
+											'cost_distribution_detail_id'   => $rowcost->id,
+											'coa_id'						=> $row->lookable->coa_id,
+											'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
+											'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
+											'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+											'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+											'type'                          => '2',
+											'nominal'						=> $nominal,
+											'nominal_fc'					=> $nominal,
+											'note'							=> $pir->code,
+										]);
+									}
+								}else{
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'coa_id'		=> $row->lookable->coa_id,
+										'line_id'		=> $pir->line_id,
+										'place_id'		=> $pir->place_id,
+										'type'			=> '2',
+										'nominal'		=> $row->total,
+										'nominal_fc'	=> $row->total,
+										'note'			=> $pir->code,
+									]);
+								}
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->coa_id,
+									'line_id'		=> $pir->line_id,
+									'place_id'		=> $pir->place_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->code,
+								]);
+							}
+						}
+					}
+				}
+			}else{
+	
+				foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
+					if($row->lookable_type == 'items'){
+						if($row->is_wip){
+							//do nothing
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->itemGroup->coa_id,
+								'place_id'		=> $row->itemStock->place_id,
+								'line_id'		=> $row->productionIssue->line_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '2',
+								'nominal'		=> $row->total,
+								'nominal_fc'	=> $row->total,
+								'note'			=> $pir->code,
+							]);
+			
+							self::sendCogs($table_name,
+								$pir->id,
+								$pir->company_id,
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								$row->total,
+								'OUT',
+								$pir->post_date,
+								NULL,
+								NULL,
+							);
+			
+							self::sendStock(
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								'OUT',
+								NULL,
+								NULL,
+							);
+						}
+					}elseif($row->lookable_type == 'resources'){
+						if($row->bomDetail()->exists()){
+							if($row->bomDetail->cost_distribution_id){
+								$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
+								$accumulation = 0;
+								foreach($row->bomDetail->costDistribution->costDistributionDetail as $key => $rowcost){
+									if($key == $lastIndex){
+										$nominal = $row->total - $accumulation;
+									}else{
+										$nominal = round(($rowcost->percentage / 100) * $row->total);
+										$accumulation += $nominal;
+									}
+									JournalDetail::create([
+										'journal_id'                    => $query->id,
+										'cost_distribution_detail_id'   => $rowcost->id,
+										'coa_id'						=> $row->lookable->coa_id,
+										'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
+										'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
+										'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+										'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+										'type'                          => '2',
+										'nominal'						=> $nominal,
+										'nominal_fc'					=> $nominal,
+										'note'							=> $pir->code,
+									]);
+								}
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->coa_id,
+									'line_id'		=> $pir->line_id,
+									'place_id'		=> $pir->place_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->code,
 								]);
 							}
 						}else{
@@ -4193,35 +4316,26 @@ class CustomHelper {
 								'note'			=> $pir->code,
 							]);
 						}
-					}else{
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->lookable->coa_id,
-							'line_id'		=> $pir->line_id,
-							'place_id'		=> $pir->place_id,
-							'type'			=> '2',
-							'nominal'		=> $row->total,
-							'nominal_fc'	=> $row->total,
-							'note'			=> $pir->code,
-						]);
+					}
+	
+					if(!$row->is_wip){
+						$total += $row->total;
 					}
 				}
-
-				$total += $row->total;
+	
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					/* 'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id, */
+					'coa_id'		=> $coawip->id,
+					'line_id'		=> $pir->line_id,
+					'place_id'		=> $pir->place_id,
+					'machine_id'	=> $pir->machine_id,
+					'type'			=> '1',
+					'nominal'		=> $total,
+					'nominal_fc'	=> $total,
+					'note'			=> $pir->code,
+				]);
 			}
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				/* 'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id, */
-				'coa_id'		=> $coawip->id,
-				'line_id'		=> $pir->line_id,
-				'place_id'		=> $pir->place_id,
-				'machine_id'	=> $pir->machine_id,
-				'type'			=> '1',
-				'nominal'		=> $total,
-				'nominal_fc'	=> $total,
-				'note'			=> $pir->code,
-			]);
 
 			if($parentFg){
 				$pir->update([

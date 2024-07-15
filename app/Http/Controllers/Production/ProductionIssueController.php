@@ -1103,12 +1103,7 @@ class ProductionIssueController extends Controller
                 'post_date' => date('d/m/Y',strtotime($query->post_date)),
             ];
             $string='';
-            foreach($query->journal->journalDetail()->where(function($query){
-            $query->whereHas('coa',function($query){
-                $query->orderBy('code');
-            })
-            ->orderBy('type');
-        })->get() as $key => $row){
+            foreach($query->journal->journalDetail()->orderBy('id')->get() as $key => $row){
                 if($row->type == '1'){
                     $total_debit_asli += $row->nominal_fc;
                     $total_debit_konversi += $row->nominal;

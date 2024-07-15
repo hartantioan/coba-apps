@@ -1261,6 +1261,8 @@
                             $.each(response, function(i, val) {
                                 let count = makeid(10);
 
+                                let no = $('.row_item').length + 1;
+
                                 $('#body-item').append(`
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
@@ -1268,7 +1270,7 @@
                                         <input type="hidden" name="arr_pallet_id[]" value="` + $('#pallet_id').val() + `">
                                         <input type="hidden" name="arr_grade_id[]" value="` + $('#grade_id').val() + `">
                                         <td class="center-align">
-                                            ` + (i+1) + `
+                                            ` + no + `
                                         </td>
                                         <td>
                                             <input name="arr_pallet_no[]" id="arr_pallet_no` + count + `" type="text" value="` + val.code + `" readonly>

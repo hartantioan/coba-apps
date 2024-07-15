@@ -34,6 +34,10 @@ class ProductionHandoverDetail extends Model
         return $this->hasOne('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function productionBatch(){
+        return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function productionHandover()
     {
         return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id');

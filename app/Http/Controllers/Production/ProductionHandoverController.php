@@ -737,6 +737,7 @@ class ProductionHandoverController extends Controller
                         CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
                     }
                     $row->productionBatchUsage()->delete();
+                    $row->productionBatch()->delete();
                 }
 
                 $query->update([
@@ -816,6 +817,7 @@ class ProductionHandoverController extends Controller
                     CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
                 }
                 $row->productionBatchUsage()->delete();
+                $row->productionBatch()->delete();
                 $row->delete();
             }
 

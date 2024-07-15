@@ -164,6 +164,14 @@ class ProductionHandover extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        foreach($this->productionHandoverDetail as $row){
+            if($row->productionBatch()->exists()){
+                if($row->productionBatch->productionBatchUsage()->exist()){
+                    $hasRelation = true;
+                }
+            }
+        }
+
         return $hasRelation;
     }
 

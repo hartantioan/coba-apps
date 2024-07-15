@@ -22,14 +22,14 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
     {
         $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query){
             $query->whereIn('status',['2'])->where('inventory_type','1');
-            if($this->start_date && $this->end_date) {
-                $query->whereDate('post_date', '>=', $this->start_date)
-                    ->whereDate('post_date', '<=', $this->end_date);
-            } else if($this->start_date) {
-                $query->whereDate('post_date','>=', $this->start_date);
-            } else if($this->end_date) {
-                $query->whereDate('post_date','<=', $this->end_date);
-            }
+            // if($this->start_date && $this->end_date) {
+            //     $query->whereDate('post_date', '>=', $this->start_date)
+            //         ->whereDate('post_date', '<=', $this->end_date);
+            // } else if($this->start_date) {
+            //     $query->whereDate('post_date','>=', $this->start_date);
+            // } else if($this->end_date) {
+            //     $query->whereDate('post_date','<=', $this->end_date);
+            // }
 
             if($this->mode == 1){
                 

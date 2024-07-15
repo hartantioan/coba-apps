@@ -68,7 +68,9 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
                     $query->whereHas('parentFg',function($query){
                         $query->where('parent_id',$this->item_parent_id);
                     });
-                });
+                })
+                ->whereDoesntHave('area')
+                ->whereDoesntHave('itemShading');
             }
 
             if($this->start_date && $this->end_date) {
@@ -95,13 +97,13 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
                 'area'          => $row->area()->exists() ? $row->area->code : '-',
                 'shading'       => $row->itemShading()->exists() ? $row->itemShading->code : '-',
                 'tank'          => $row->tank()->exists() ? $row->tank->code.' - '.$row->tank->name : '-',
-                'qty_real'      => CustomHelper::formatConditionalQty($row->qty_real),
-                'qty_used'      => CustomHelper::formatConditionalQty($row->qtyUsed()),
-                'qty_balance'   => CustomHelper::formatConditionalQty($row->qtyBalance()),
+                'qty_real'      => $row->qty_real,
+                'qty_used'      => $row->qtyUsed(),
+                'qty_balance'   => $row->qtyBalance(),
                 'unit'          => $row->item->uomUnit->code,
-                'value_total'   => CustomHelper::formatConditionalQty($row->total),
-                'value_used'    => CustomHelper::formatConditionalQty($row->price() * $row->qtyUsed()),
-                'value_balance' => CustomHelper::formatConditionalQty($row->price() * $row->qtyBalance()),
+                'value_total'   => $row->total,
+                'value_used'    => $row->price() * $row->qtyUsed(),
+                'value_balance' => $row->price() * $row->qtyBalance(),
                 'ref_code'      => $row->lookable->parent->code,
             ];
         }

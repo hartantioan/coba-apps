@@ -77,7 +77,9 @@ class ProductionBatchController extends Controller
                         $query->whereHas('parentFg',function($query) use ($search, $request){
                             $query->where('parent_id',$request->item_parent_id);
                         });
-                    });
+                    })
+                    ->whereDoesntHave('area')
+                    ->whereDoesntHave('itemShading');
                 }
 
                 if($request->start_date && $request->finish_date) {
@@ -115,7 +117,9 @@ class ProductionBatchController extends Controller
                         $query->whereHas('parentFg',function($query) use ($search, $request){
                             $query->where('parent_id',$request->item_parent_id);
                         });
-                    });
+                    })
+                    ->whereDoesntHave('area')
+                    ->whereDoesntHave('itemShading');
                 }
 
                 if($request->start_date && $request->finish_date) {

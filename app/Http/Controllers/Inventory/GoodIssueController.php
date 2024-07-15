@@ -440,7 +440,7 @@ class GoodIssueController extends Controller
                 foreach ($arr_item_stock as $key_arr => $row_stock) {
                     // Remove commas and convert qty to int
                     $qty = str_replace(',','.',str_replace('.','',$arr_qty[$key_arr]));
-                    $qty = (int)$qty;
+                    $qty = floatval($qty);
                     
                     // If the current item matches the previous one, accumulate the quantity
                     if ($key_arr > 0 && $row_stock == $arr_item_stock[$key_arr - 1]) {

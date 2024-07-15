@@ -457,7 +457,7 @@ class GoodIssueController extends Controller
                 
                 
                 foreach($unique_array as $key => $row){
-                    if(str_replace(',','.',str_replace('.','',$cumulative_qty[$key])) <= 0){
+                    if($cumulative_qty[$key] <= 0){
                         $passedZeroQty = false;
                     }
                     $rowprice = NULL;

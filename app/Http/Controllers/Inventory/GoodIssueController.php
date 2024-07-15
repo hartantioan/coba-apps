@@ -463,10 +463,10 @@ class GoodIssueController extends Controller
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
                     $rowprice = $item_stock->priceNow();
-                    $grandtotal += round($rowprice * str_replace(',','.',str_replace('.','',$cumulative_qty[$key])),2);
+                    $grandtotal += round($rowprice * $cumulative_qty[$key],2);
                     if($item_stock){
 
-                        $qtyout = str_replace(',','.',str_replace('.','',$cumulative_qty[$key]));
+                        $qtyout = $cumulative_qty[$key];
 
                         $itemCogsBefore = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                         $itemCogsAfter = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();

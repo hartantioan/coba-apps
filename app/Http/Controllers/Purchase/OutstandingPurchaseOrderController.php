@@ -32,7 +32,7 @@ class OutstandingPurchaseOrderController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
         $modedata = $menuUser->mode ?? '';
-		return Excel::download(new ExportOutstandingPOHide($post_date,$end_date,$mode,$modedata), 'good_receipt_'.uniqid().'.xlsx');
+		return Excel::download(new ExportOutstandingPOHide($post_date,$end_date,$mode,$modedata), 'outstanding_po'.uniqid().'.xlsx');
     }
 
     public function getOutstanding(Request $request)

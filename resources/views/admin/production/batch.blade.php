@@ -91,6 +91,10 @@
                                                         <th>No.Batch</th>
                                                         <th>Item</th>
                                                         <th>Tgl.Dibuat</th>
+                                                        <th>Plant</th>
+                                                        <th>Gudang</th>
+                                                        <th>Area</th>
+                                                        <th>Shading</th>
                                                         <th>Tangki</th>
                                                         <th>Qty Awal</th>
                                                         <th>Qty Terpakai</th>
@@ -267,6 +271,10 @@
                 { name: 'code', className: '' },
                 { name: 'item_id', className: '' },
                 { name: 'created_at', className: '' },
+                { name: 'place_id', className: 'center-align' },
+                { name: 'warehouse_id', className: 'center-align' },
+                { name: 'area_id', className: 'center-align' },
+                { name: 'item_shading_id', className: 'center-align' },
                 { name: 'tank_id', className: '' },
                 { name: 'qty_start', searchable: false, orderable: false, className: '' },
                 { name: 'qty_used', searchable: false, orderable: false, className: '' },

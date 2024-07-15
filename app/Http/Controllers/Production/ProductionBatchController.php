@@ -42,6 +42,10 @@ class ProductionBatchController extends Controller
             'code',
             'item_id',
             'created_at',
+            'place_id',
+            'warehouse_id',
+            'area_id',
+            'item_shading_id',
             'tank_id',
         ];
 
@@ -134,6 +138,10 @@ class ProductionBatchController extends Controller
                     $val->code,
                     $val->item->code.' - '.$val->item->name,
                     date('d/m/Y H:i:s',strtotime($val->created_at)),
+                    $val->place()->exists() ? $val->place->code : '-',
+                    $val->warehouse()->exists() ? $val->warehouse->name : '-',
+                    $val->area()->exists() ? $val->area->code : '-',
+                    $val->itemShading()->exists() ? $val->itemShading->code : '-',
                     $val->tank()->exists() ? $val->tank->code.' - '.$val->tank->name : '-',
                     CustomHelper::formatConditionalQty($val->qty_real),
                     CustomHelper::formatConditionalQty($val->qtyUsed()),

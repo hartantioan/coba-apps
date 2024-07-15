@@ -488,7 +488,7 @@ class ProductionFgReceiveController extends Controller
                     ]);
                 }
                 
-                /* $pod = ProductionOrderDetail::find($request->production_order_detail_id);
+                $pod = ProductionOrderDetail::find($request->production_order_detail_id);
 
                 if($request->temp){
                     $query = ProductionFgReceive::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -692,7 +692,7 @@ class ProductionFgReceiveController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                } */
+                }
             }
         
             /* DB::commit();

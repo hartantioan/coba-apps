@@ -6,7 +6,7 @@ use App\Models\ApprovalMatrix;
 use App\Models\GoodIssueRequest;
 use App\Models\LockPeriod;
 use App\Models\LockPeriodDetail;
-use App\Models\PurchaseRequest;
+use App\Models\WeightHistory;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
@@ -126,5 +126,9 @@ class AllCustomScript extends Command
 
         #reset approvalmatrix
         DB::delete('DELETE FROM approval_matrixs WHERE approval_source_id NOT IN (SELECT id FROM approval_sources)');
+
+        #delete weight history 7 day
+        $dateThreshold = Carbon::now()->subDays(7);
+        WeightHistory::where('created_at', '<', $dateThreshold)->delete();
     }
 }

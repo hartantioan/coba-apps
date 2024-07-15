@@ -22,8 +22,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('customscript:run')
                 ->everyMinute()->withoutOverlapping();
         $schedule->command('app:fetch-currency-rates')->dailyAt('06:00');
-        $schedule->command('weight-histories:delete-old')
-                ->dailyAt('00:00')->withoutOverlapping(); 
         // $schedule->command('inspire')->hourly();
         /* $schedule->command('queue:work')->everyMinute()->withoutOverlapping()->runInBackground(); */
         $schedule->command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();

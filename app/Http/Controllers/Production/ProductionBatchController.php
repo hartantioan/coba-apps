@@ -40,10 +40,9 @@ class ProductionBatchController extends Controller
         $column = [
             'id',
             'code',
-            'user_id',
-            'company_id',
-            'post_date',
-            'note',
+            'item_id',
+            'created_at',
+            'tank_id',
         ];
 
         $start  = $request->start;

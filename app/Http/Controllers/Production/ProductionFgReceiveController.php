@@ -974,7 +974,7 @@ class ProductionFgReceiveController extends Controller
                     if($row->productionBatch()->exists()){
                         $row->productionBatch()->delete();
                     }
-                    $row->delete();
+                    /* $row->delete(); */
                 }
 
                 $query->update([

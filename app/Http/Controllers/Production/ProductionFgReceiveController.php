@@ -610,11 +610,12 @@ class ProductionFgReceiveController extends Controller
                     }
 
                     $qtyReject = $totalBatch - $totalQty;
+
+                    $totalCostAll = $totalCost;
                     
                     foreach($request->arr_qty_uom as $key => $row){
                         $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
-                        $totalCost -= $rowtotalbatch;
-                        $rowtotalbatch = $totalCost >= $rowtotalbatch ? $rowtotalbatch : $totalCost;
+                        $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
                         $rowtotalmaterial = 0;
                         $bom_id = NULL;
 
@@ -667,6 +668,8 @@ class ProductionFgReceiveController extends Controller
                             'qty_real'      => $pfrd->qty,
                             'total'         => $pfrd->total,
                         ]);
+
+                        $totalCostAll -= $rowtotalbatch;
                     }
 
                     if($qtyReject > 0){

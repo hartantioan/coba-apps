@@ -613,6 +613,8 @@ class ProductionFgReceiveController extends Controller
                     
                     foreach($request->arr_qty_uom as $key => $row){
                         $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
+                        $totalCost -= $rowtotalbatch;
+                        $rowtotalbatch = $totalCost >= $rowtotalbatch ? $rowtotalbatch : $totalCost;
                         $rowtotalmaterial = 0;
                         $bom_id = NULL;
 

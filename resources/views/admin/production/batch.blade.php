@@ -47,6 +47,11 @@
                                 <li class="active">
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
+                                        <div class="card-alert card gradient-45deg-yellow-green">
+                                            <div class="card-content">
+                                                <p>Info : Untuk mencari batch WP / WIP 5, silahkan filter dari item parent yang disediakan.</p>
+                                            </div>
+                                        </div>
                                         <div class="row">
                                             <div class="col m3 s6 ">
                                                 <label for="item_parent_id" style="font-size:1rem;">Item Parent FG :</label>

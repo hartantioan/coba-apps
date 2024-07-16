@@ -311,9 +311,9 @@ class ProductionFgReceive extends Model
                 'qty_bom'                       => 0,
                 'nominal_bom'                   => 0,
                 'total_bom'                     => 0,
-                'qty_planned'                   => 0,
-                'nominal_planned'               => 0,
-                'total_planned'                 => 0,
+                'qty_planned'                   => $row->qty,
+                'nominal_planned'               => $price,
+                'total_planned'                 => $rowtotal,
                 'from_item_stock_id'            => $itemStock->id,
             ]);
             if($query){
@@ -364,9 +364,9 @@ class ProductionFgReceive extends Model
                 'qty_bom'                       => 0,
                 'nominal_bom'                   => 0,
                 'total_bom'                     => 0,
-                'qty_planned'                   => 0,
-                'nominal_planned'               => 0,
-                'total_planned'                 => 0,
+                'qty_planned'                   => $row->qty,
+                'nominal_planned'               => $price,
+                'total_planned'                 => $total,
                 'from_item_stock_id'            => $itemStock->id,
                 'is_wip'                        => '1',
             ]);
@@ -408,9 +408,9 @@ class ProductionFgReceive extends Model
                         'qty_bom'                       => 0,
                         'nominal_bom'                   => 0,
                         'total_bom'                     => 0,
-                        'qty_planned'                   => 0,
-                        'nominal_planned'               => 0,
-                        'total_planned'                 => 0,
+                        'qty_planned'                   => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                        'nominal_planned'               => $nominal,
+                        'total_planned'                 => $total,
                         'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                     ]);
                 }

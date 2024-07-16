@@ -51,8 +51,9 @@
                 <td>{{ $row->materialRequest->deleteUser()->exists() ? date('d/m/Y',strtotime($row->materialRequest->deleted_at)) : '' }}</td>
                 <td>{{ $row->materialRequest->deleteUser()->exists() ? $row->materialRequest->delete_note : '' }}</td>
                 <td>{{($row->materialRequest->status == 3 && is_null($row->materialRequest->done_id)) ? 'sistem' : (($row->materialRequest->status == 3 && !is_null($row->materialRequest->done_id)) ? $row->materialRequest->doneUser->name : null)}}</td>
-                <td>{{$row->materialRequest->doneUser()->exists() ? $row->materialRequest->done_date}} </td> 
-                <td>{{ $row->materialRequest->doneUser()->exists() ? $row->materialRequest->done_note }}</td> 
+                <td>{{ $row->materialRequest->doneUser ? $row->materialRequest->done_date : '' }}</td>
+                <td>{{ $row->materialRequest->doneUser ? $row->materialRequest->done_note : '' }}</td>
+                
                 <td>{{ $row->materialRequest->user->employee_no }}</td>
                 <td>{{ $row->materialRequest->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->materialRequest->post_date)) }}</td>

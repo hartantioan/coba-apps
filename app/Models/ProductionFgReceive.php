@@ -292,7 +292,7 @@ class ProductionFgReceive extends Model
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
                 'post_date'                 => date('Y-m-d'),
-                'note'                      => 'Dibuat otomatis dari Production Receive FG No. '.$this->code,
+                'note'                      => 'DIBUAT OTOMATIS DARI PRODUCTION RECEIVE FG NO. '.$this->code,
                 'status'                    => '1',
             ]);
             $price = $row->productionBatch->price();
@@ -343,7 +343,7 @@ class ProductionFgReceive extends Model
             'group'                     => $this->group,
             'line_id'                   => $this->line_id,
             'post_date'                 => date('Y-m-d'),
-            'note'                      => 'Dibuat otomatis dari Production Receive FG No. '.$this->code,
+            'note'                      => 'DIBUAT OTOMATIS DARI PRODUCTION RECEIVE FG NO. '.$this->code,
             'status'                    => '1',
         ]);
 

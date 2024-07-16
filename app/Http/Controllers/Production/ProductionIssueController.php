@@ -562,7 +562,7 @@ class ProductionIssueController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
+                                <th class="center-align" colspan="6" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
@@ -570,10 +570,6 @@ class ProductionIssueController extends Controller
                                 <th class="center">Qty Planned</th>
                                 <th class="center">Qty Real</th>
                                 <th class="center">Satuan UoM</th>
-                                <th class="center">Nominal Planned</th>
-                                <th class="center">Nominal Real</th>
-                                <th class="center">Total Planned</th>
-                                <th class="center">Total Real</th>
                                 <th class="center">Plant & Gudang</th>
                             </tr>
                         </thead><tbody>';
@@ -588,10 +584,6 @@ class ProductionIssueController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->lookable->uomUnit->code.'</td>
-                <td class="right-align">'.number_format($row->nominal_planned,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total_planned,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
             </tr>';
             if($row->productionBatchUsage()->exists()){

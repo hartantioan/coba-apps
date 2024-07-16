@@ -9,6 +9,8 @@
                 <th align="center">{{ __('translations.code') }}</th>
                 <th align="center">Nama Item</th>
                 <th align="center">{{ __('translations.unit') }}</th>
+                <th align="center">Area</th>
+                <th align="center">Shading</th>
                 <th align="center">No. Dokumen</th>
                 <th align="center">{{ __('translations.qty') }}</th>
                 <th align="center">Harga </th>
@@ -31,6 +33,8 @@
                         <td align="center">{{ $row['kode'] }}</td>
                         <td align="center">{{ $row['item'] }}</td>
                         <td align="center">{{ $row['satuan'] }}</td>
+                        <td align="center">{{ $row['area'] }}</td>
+                        <td align="center">{{ $row['shading'] }}</td>
                         <td align="center">Saldo Awal</td>
                         <td align="center"></td>
                         <td align="center"></td>
@@ -50,6 +54,8 @@
                         <td align="center">{{ $row['kode'] }}</td>
                         <td align="center">{{ $row['item'] }}</td>
                         <td align="center">{{ $row['satuan'] }}</td>
+                        <td align="center">{{ $row['area'] }}</td>
+                        <td align="center">{{ $row['shading'] }}</td>
                         <td align="center">{{ $row['document'] }}</td>
                         <td  align="right">{{ $row['qty'] }}</td>
                         <td  align="right">{{ $row['final'] }}</td>
@@ -81,6 +87,8 @@
                 <th align="center">{{ __('translations.code') }}</th>
                 <th align="center">Nama Item</th>
                 <th align="center">{{ __('translations.unit') }}</th>
+                <td align="center">Area</td>
+                <td align="center">Shading</td>
                 <th align="center">Cumulative Qty.</th>
                 <th align="center">Cumulative Value</th>
             </tr>
@@ -94,6 +102,8 @@
                 <td align="center">{{$row['kode']}}</td>
                 <td align="center">{{$row['item']}}</td>
                 <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{ $row['area'] }}</td>
+                <td align="center">{{ $row['shading'] }}</td>
                 <td align="center">{{$row['cum_qty']}}</td>
                 <td align="center">{{$row['cum_val']}}</td>
             </tr>

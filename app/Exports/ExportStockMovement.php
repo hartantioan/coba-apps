@@ -130,6 +130,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,
                 'satuan' => $row->item->uomUnit->code,
+                'area'         => $row->area->code ?? '-',
+                'shading'      => $row->shading->code ?? '-',
                 'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
                 'total'=>number_format($cum_val,2,',','.'),
@@ -170,6 +172,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                     'item'         => $row->item->name,
                     'satuan'       => $row->item->uomUnit->code,
+                    'area'         => $row->area->code ?? '-',
+                    'shading'      => $row->shading->code ?? '-',
                     'kode'         => $row->item->code,
                     'last_qty'     => $query_first ? $query_first->qty_final : 0,
                 ];
@@ -282,6 +286,8 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
                         'item'         => $row_tidak_ada->item->name,
                         'satuan'       => $row_tidak_ada->item->uomUnit->code,
+                        'area'         => $row_tidak_ada->area->code ?? '-',
+                        'shading'      => $row_tidak_ada->shading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
                     ]; 

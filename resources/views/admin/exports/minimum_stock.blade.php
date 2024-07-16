@@ -9,7 +9,9 @@
             <th class="center-align">Minimum Stock</th>
             <th class="center-align">{{ __('translations.qty') }}</th>
             <th class="center-align">Required</th>
-            <th class="center-align">{{ __('translations.unit') }}</th>  
+            <th class="center-align">{{ __('translations.unit') }}</th> 
+            <th class="center-align">Area</th>
+            <th class="center-align">Shading</th> 
         </tr>
     </thead>
     <tbody>
@@ -24,6 +26,8 @@
             <td align="center">{{$row['final']}}</td>
             <td align="center">{{$row['needed']}}</td>
             <td align="center">{{$row['satuan']}}</td>
+            <td align="center">{{$row['area']}}</td>
+            <td align="center">{{$row['shading']}}</td>
         </tr>
         @endforeach
         @if(count($data) == 0)

@@ -138,6 +138,8 @@
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.qty') }}</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">
@@ -194,6 +196,8 @@
                                     <td >`+val.item+`</td>
                                     <td >`+val.final+`</td>
                                     <td >`+val.satuan+`</td>
+                                    <td >`+val.area+`</td>
+                                    <td >`+val.shading+`</td>
                                 </tr>
                             `);
                         });

@@ -151,6 +151,8 @@
                                 <th class="center-align">{{ __('translations.code') }}</th>
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
                                 <th class="center-align">No. Dokumen</th>
                                 <th class="center-align">{{ __('translations.qty') }}</th>
                                 <th class="center-align">Harga </th>
@@ -226,6 +228,8 @@
                                     <th class="center-align">{{ __('translations.code') }}</th>
                                     <th class="center-align">Nama Item</th>
                                     <th class="center-align">{{ __('translations.unit') }}</th>
+                                    <th class="center-align">Area</th>
+                                    <th class="center-align">Shading</th>
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
@@ -239,6 +243,8 @@
                                         <td >`+val.kode+`</td>
                                         <td >`+val.item+`</td>
                                         <td class="center-align">`+val.satuan+`</td>
+                                        <td class="center-align">`+val.area+`</td>
+                                        <td class="center-align">`+val.shading+`</td>
                                         <td class="right-align">`+val.cum_qty+`</td>
                                         <td class="right-align">`+val.cum_val+`</td>
                                     </tr>
@@ -263,6 +269,8 @@
                                     <th class="center-align">{{ __('translations.code') }}</th>
                                     <th class="center-align">Nama Item</th>
                                     <th class="center-align">{{ __('translations.unit') }}</th>
+                                    <th class="center-align">Area</th>
+                                    <th class="center-align">Shading</th>
                                     <th class="center-align">No. Dokumen</th>
                                     <th class="center-align">{{ __('translations.qty') }}</th>
                                     <th class="center-align">Harga </th>
@@ -282,6 +290,8 @@
                                             <td class="center-align">` + val.kode + `</td>
                                             <td class="">` + val.item + `</td>
                                             <td class="center-align">` + val.satuan + `</td>
+                                            <td class="center-align">` + val.area + `</td>
+                                            <td class="center-align">` + val.shading + `</td>
                                             <td class="center-align">Saldo Awal</td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
@@ -301,6 +311,8 @@
                                             <td >`+val.kode+`</td>
                                             <td >`+val.item+`</td>
                                             <td class="center-align">`+val.satuan+`</td>
+                                            <td class="center-align">`+val.area+`</td>
+                                            <td class="center-align">`+val.shading+`</td>
                                             <td >`+val.document+`</td>
                                             <td class="right-align">`+val.qty+`</td>
                                             <td class="right-align">`+val.final+`</td>

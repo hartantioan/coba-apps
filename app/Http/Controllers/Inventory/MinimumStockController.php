@@ -92,6 +92,8 @@ class MinimumStockController extends Controller
                 'gudang' => $row->warehouse->name ?? '',
                 'kode' => $row->item->code,
                 'item' => $row->item->name,
+                'area'         => $row->area->code ?? '-',
+                'shading'      => $row->shading->code ?? '-',
                 'minimum'=>CustomHelper::formatConditionalQty($row->item->min_stock),
                 'needed'=>CustomHelper::formatConditionalQty($row->item->min_stock-$row->qty),
                 'maximum'=>CustomHelper::formatConditionalQty($row->item->max_stock),

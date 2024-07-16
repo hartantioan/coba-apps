@@ -135,6 +135,9 @@
                                 <th class="center-align">{{ __('translations.warehouse') }}</th>
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
+                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Shading</th>
                                 <th class="center-align">{{ __('translations.note') }}</th>
                                 <th class="center-align">Tgl Terakhir</th>
                                 <th class="center-align">Lama Hari</th>
@@ -184,6 +187,9 @@
                                     <td >`+val.gudang+`</td>
                                     <td >`+val.kode+`</td>
                                     <td >`+val.item+`</td>
+                                    <td >`+val.satuan+`</td>
+                                    <td >`+val.area+`</td>
+                                    <td >`+val.shading+`</td>
                                     <td >`+val.keterangan+`</td>
                                     <td >`+val.date+`</td>
                                     <td >`+val.lamahari+`</td>

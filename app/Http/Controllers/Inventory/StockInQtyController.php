@@ -104,6 +104,8 @@ class StockInQtyController extends Controller
                         'item' => $row->item->name,
                         'final'=>CustomHelper::formatConditionalQty($row->qty),
                         'satuan'=>$row->item->uomUnit->code,
+                        'area'         => $row->area->code ?? '-',
+                        'shading'      => $row->shading->code ?? '-',
                         'perlu' =>1,
                     ];
                     $array_filter[]=$data_tempura;

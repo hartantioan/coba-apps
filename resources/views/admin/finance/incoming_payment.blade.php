@@ -231,21 +231,22 @@
                                     </select>
                                     <label class="" for="company_id">{{ __('translations.company') }}</label>
                                 </div>
-                                <div class="input-field col m3 s12 step4">
+                                <div class="input-field col m6 s12 step4">
                                     <select class="browser-default" id="account_id" name="account_id" onchange="getAccountInfo();"></select>
                                     <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
                                 </div>
-                                <div class="input-field col m3 s12 step5">
+                                <div class="input-field col m6 s12 step5">
                                     <select class="browser-default" id="coa_id" name="coa_id"></select>
                                     <label class="active" for="coa_id">Kas / Bank</label>
                                 </div>
-                                <div class="col m12 s12 l12"></div>
                                 <div class="input-field col m3 s12 step6">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                                 </div>
+                                <div class="col m12 s12 l12"></div>
+                                
             
-                                <div class="input-field col m6 s12 stepcurrency">
+                                <div class="input-field col m4 s12 stepcurrency">
                                     <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -253,7 +254,7 @@
                                     </select>
                                     <label class="" for="currency_id">{{ __('translations.currency') }}</label>
                                 </div>
-                                <div class="input-field col m3 s12 stepconversion">
+                                <div class="input-field col m2 s12 stepconversion">
                                     <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                     <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                 </div>

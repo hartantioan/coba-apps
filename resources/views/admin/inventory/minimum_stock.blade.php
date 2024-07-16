@@ -139,6 +139,8 @@
                                 <th colspan="3" class="center-align">{{ __('translations.stock') }}</th>
                                 <th rowspan="2" class="center-align">Required</th>
                                 <th rowspan="2" class="center-align">{{ __('translations.unit') }}</th>
+                                <th rowspan="2" class="center-align">Area</th>
+                                <th rowspan="2" class="center-align">Shading</th>
                                 <th rowspan="2" class="center-align">Detail</th>
                             </tr>
                             <tr>
@@ -259,6 +261,8 @@
                                     <td >`+val.final+`</td>
                                     <td >`+val.needed+`</td>
                                     <td >`+val.satuan+`</td>
+                                    <td >`+val.area+`</td>
+                                    <td >`+val.shading+`</td>
                                     `+butn+`
                                 </tr>
                             `);

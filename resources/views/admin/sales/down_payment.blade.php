@@ -843,6 +843,13 @@
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="5">
+                            Silahkan pilih Sales Order...
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -921,6 +928,7 @@
 
         $('#body-item').on('click', '.delete-data-item', function() {
             $('.row_used' + $(this).closest('tr').data('id')).trigger('click');
+            $(this).closest('tr').remove();
             if($('.row_item').length == 0){
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">

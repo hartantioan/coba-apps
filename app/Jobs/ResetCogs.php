@@ -27,13 +27,13 @@ class ResetCogs implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     
-    protected $company_id, $date,$place_id,$item_id,$area_id,$item_shading_id;
+    protected $company_id, $date,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(string $date = null, int $company_id = null, int $place_id = null, int $item_id = null, int $area_id = null, int $item_shading_id = null)
+    public function __construct(string $date = null, int $company_id = null, int $place_id = null, int $item_id = null, int $area_id = null, int $item_shading_id = null, int $production_batch_id = null)
     {
 		$this->company_id = $company_id;
         $this->date = $date;
@@ -41,6 +41,7 @@ class ResetCogs implements ShouldQueue
 		$this->item_id = $item_id;
 		$this->area_id = $area_id;
 		$this->item_shading_id = $item_shading_id;
+		$this->production_batch_id = $production_batch_id;
     }
 
     /**
@@ -50,8 +51,8 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-		$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderBy('date')->orderBy('id')->get();
-		$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderByDesc('date')->orderByDesc('id')->first();
+		$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderBy('date')->orderBy('id')->get();
+		$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderByDesc('date')->orderByDesc('id')->first();
 		$total_final = 0;
 		$qty_final = 0;
 		$price_final = 0;

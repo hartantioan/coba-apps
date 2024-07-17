@@ -32,6 +32,8 @@ class ProductionIssueDetail extends Model
         'nominal_planned',
         'total_planned',
         'from_item_stock_id',
+        'place_id',
+        'warehouse_id',
         'is_wip',
     ];
 
@@ -47,6 +49,16 @@ class ProductionIssueDetail extends Model
     public function parent()
     {
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
+    }
+
+    public function place()
+    {
+        return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
+    }
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
     }
 
     public function productionOrderDetail()

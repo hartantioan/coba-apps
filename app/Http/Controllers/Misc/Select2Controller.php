@@ -4226,7 +4226,7 @@ class Select2Controller extends Controller {
                 'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
-                'bom_group'                     => $d->productionScheduleDetail->bom->group(),
+                'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
             ];
         }
 

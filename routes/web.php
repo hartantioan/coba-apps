@@ -1037,6 +1037,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[HardwareItemController::class, 'export']);
                         Route::post('create',[HardwareItemController::class, 'create'])->middleware('operation.access:hardware_item,update');
                         Route::post('edit',[HardwareItemController::class, 'edit'])->middleware('operation.access:hardware_item,update');
+                        Route::get('get_import_excel',[HardwareItemController::class, 'getImportExcel']);
+                        Route::post('import',[HardwareItemController::class, 'import'])->middleware('operation.access:hardware_item,update');
                         Route::post('destroy', [HardwareItemController::class, 'destroy'])->middleware('operation.access:hardware_item,delete');
                     });
                     

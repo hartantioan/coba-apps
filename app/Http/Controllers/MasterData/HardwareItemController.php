@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use App\Helpers\PrintHelper;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportTemplateMasterHardwareItem;
+use App\Imports\HardwareItemImport;
+use App\Exceptions\RowImportException;
 class HardwareItemController extends Controller
 {
     protected $dataplaces;
@@ -208,6 +212,11 @@ class HardwareItemController extends Controller
 		
 		return response()->json($response);
     }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateMasterHardwareItem(), 'format_master_hardware_item'.uniqid().'.xlsx');
+    }
+
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
@@ -521,5 +530,23 @@ class HardwareItemController extends Controller
             abort(404);
         }
 
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new HardwareItemImport, $request->file('file'));
+            return response()->json(['message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
     }
 }

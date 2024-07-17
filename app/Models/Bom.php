@@ -23,10 +23,10 @@ class Bom extends Model
         'item_id',
         'item_reject_id',
         'place_id',
-        'warehouse_id',
         'qty_output',
         'is_powder',
         'group',
+        'bom_standard_id',
         'status',
     ];
 
@@ -46,8 +46,8 @@ class Bom extends Model
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
 
-    public function warehouse(){
-        return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    public function bomStandard(){
+        return $this->belongsTo('App\Models\BomStandard', 'bom_standard_id', 'id')->withTrashed();
     }
 
     public function line(){

@@ -29,10 +29,9 @@ class BomController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Bill of Material',
+            'title'     => 'Bill of Material (Alternatif)',
             'content'   => 'admin.master_data.bom',
             'place'     => Place::where('status','1')->get(),
-            'warehouse' => Warehouse::where('status','1')->get(),
             'line'      => Line::where('status','1')->get(),
             'machine'   => Machine::where('status','1')->get(),
         ];
@@ -48,9 +47,9 @@ class BomController extends Controller
             'item_id',
             'item_reject_id',
             'place_id',
-            'warehouse_id',
             'qty_output',
             'group',
+            'bom_standard_id',
             'status'
         ];
 
@@ -117,9 +116,9 @@ class BomController extends Controller
                     $val->item->name,
                     $val->itemReject()->exists() ? $val->itemReject->name : '-',
                     $val->place->code,
-                    $val->warehouse->name,
                     CustomHelper::formatConditionalQty($val->qty_output).' Satuan '.$val->item->uomUnit->code,
                     $val->group(),
+                    $val->bomStandard()->exists() ? $val->bomStandard->code.' - '.$val->bomStandard->name : '-',
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -205,7 +204,7 @@ class BomController extends Controller
                     $query->item_id             = $request->item_id;
                     $query->item_reject_id      = $request->item_reject_id;
                     $query->place_id            = $request->place_id;
-                    $query->warehouse_id        = $request->warehouse_id;
+                    $query->bom_standard_id     = $request->bom_standard_id;
                     $query->qty_output          = str_replace(',','.',str_replace('.','',$request->qty_output));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->is_powder           = $request->is_powder ?? NULL;
@@ -229,7 +228,7 @@ class BomController extends Controller
                         'item_id'           => $request->item_id,
                         'item_reject_id'    => $request->item_reject_id,
                         'place_id'          => $request->place_id,
-                        'warehouse_id'      => $request->warehouse_id,
+                        'bom_standard_id'   => $request->bom_standard_id,
                         'qty_output'        => str_replace(',','.',str_replace('.','',$request->qty_output)),
                         'status'            => $request->status ? $request->status : '2',
                         'is_powder'         => $request->is_powder ?? NULL,
@@ -300,7 +299,7 @@ class BomController extends Controller
         // ]);
         try {
             Excel::import(new BomsImport, $request->file('file'));
-            return response()->json(['message' => 'Import successful']);
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
         } catch (RowImportException $e) {
             return response()->json([
                 'message' => 'Import failed',
@@ -375,6 +374,8 @@ class BomController extends Controller
         $bom['item_name'] = $bom->item->name;
         $bom['item_reject_id'] = $bom->itemReject()->exists() ? $bom->item_reject_id : '';
         $bom['item_reject_name'] = $bom->itemReject()->exists() ? $bom->itemReject->code.' - '.$bom->itemReject->name : '';
+        $bom['bom_standard_id'] = $bom->bomStandard()->exists() ? $bom->bom_standard_id : '';
+        $bom['bom_standard_name'] = $bom->bomStandard()->exists() ? $bom->bomStandard->code.' - '.$bom->bomStandard->name : '';
         $bom['qty_output'] = CustomHelper::formatConditionalQty($bom->qty_output);
 
         $details = [];
@@ -411,6 +412,7 @@ class BomController extends Controller
 		
         if($query->delete()) {
             $query->bomDetail()->delete();
+            $query->bomAlternative()->delete();
 
             activity()
                 ->performedOn(new Bom())

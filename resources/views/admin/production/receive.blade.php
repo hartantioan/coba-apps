@@ -376,6 +376,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
@@ -751,6 +752,7 @@
                     </tr>
                 `);
                 $('#alert-method').html('-');
+                $('#title-modal').text('-');
             }
         });
         
@@ -1049,6 +1051,9 @@
             if($('#shift_id').val() && $('#group').val()){
                 $('#alert-method').html('-');
                 let datakuy = $('#production_order_detail_id').select2('data')[0];
+
+                $('#title-modal').text(datakuy.bom_group);
+
                 if(datakuy.has_backflush){
                     $('#alert-method').empty().append(`
                         <div class="red darken-4 white-text">Item yang akan diterima akan membuat Production Issue secara otomatis karena Material BOM terdapat item / resource dengan tipe BACKFLUSH.</div>
@@ -1156,6 +1161,7 @@
                 $('#production_order_detail_id').empty();
             }
         }else{
+            $('#title-modal').text('-');
             $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item').empty().append(`
                 <tr id="last-row-item">

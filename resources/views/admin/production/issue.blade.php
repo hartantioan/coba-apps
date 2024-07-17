@@ -1021,6 +1021,20 @@
     }
 
     function getProductionOrder(){
+        $('#body-item-issue').empty().append(`
+            <tr id="last-row-item-issue">
+                <td class="center-align" colspan="8">
+                    Silahkan tambahkan Order Produksi untuk memulai...
+                </td>
+            </tr>
+        `);
+        $('#body-item-receive').empty().append(`
+            <tr id="last-row-item-receive">
+                <td colspan="11">
+                    Silahkan tambahkan Order Produksi untuk memulai...
+                </td>
+            </tr>
+        `);
         if($('#production_order_detail_id').val()){
             let datakuy = $('#production_order_detail_id').select2('data')[0];
 
@@ -1154,20 +1168,6 @@
         }else{
             $('#title-modal').text('-');
             $('#output-line,#output-fg,#output-qty').text('-');
-            $('#body-item-issue').empty().append(`
-                <tr id="last-row-item-issue">
-                    <td class="center-align" colspan="8">
-                        Silahkan tambahkan Order Produksi untuk memulai...
-                    </td>
-                </tr>
-            `);
-            $('#body-item-receive').empty().append(`
-                <tr id="last-row-item-receive">
-                    <td colspan="11">
-                        Silahkan tambahkan Order Produksi untuk memulai...
-                    </td>
-                </tr>
-            `);
         }
     }
 

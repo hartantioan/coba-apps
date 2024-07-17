@@ -194,6 +194,7 @@ use App\Http\Controllers\Misc\NotificationController;
 use App\Http\Controllers\Maintenance\WorkOrderController;
 use App\Http\Controllers\Maintenance\RequestSparepartController;
 use App\Http\Controllers\MasterData\BomMapController;
+use App\Http\Controllers\MasterData\BomStandardController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
@@ -280,6 +281,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('province', [Select2Controller::class, 'province']);
                 Route::get('country', [Select2Controller::class, 'country']);
                 Route::get('item', [Select2Controller::class, 'item']);
+                Route::get('bom_standard', [Select2Controller::class, 'bomStandard']);
                 Route::get('bom_item', [Select2Controller::class, 'bomItem']);
                 Route::get('item_has_bom', [Select2Controller::class, 'itemHasBom']);
                 Route::get('item_parent_fg', [Select2Controller::class, 'itemParentFg']);
@@ -808,6 +810,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('import',[ResourceController::class, 'import'])->middleware('operation.access:resource,update');
                         Route::post('create',[ResourceController::class, 'create'])->middleware('operation.access:resource,update');
                         Route::post('destroy', [ResourceController::class, 'destroy'])->middleware('operation.access:resource,delete');
+                    });
+
+                    Route::prefix('bom_standard')->middleware('operation.access:bom_standard,view')->group(function () {
+                        Route::get('/',[BomStandardController::class, 'index']);
+                        Route::get('datatable',[BomStandardController::class, 'datatable']);
+                        Route::get('row_detail',[BomStandardController::class, 'rowDetail']);
+                        Route::post('show', [BomStandardController::class, 'show']);
+                        Route::post('print',[BomStandardController::class, 'print']);
+                        Route::get('export',[BomStandardController::class, 'export']);
+                        Route::post('import',[BomStandardController::class, 'import'])->middleware('operation.access:resource,update');
+                        Route::get('get_import_excel',[BomStandardController::class, 'getImportExcel']);
+                        Route::post('create',[BomStandardController::class, 'create'])->middleware('operation.access:bom_standard,update');
+                        Route::post('destroy', [BomStandardController::class, 'destroy'])->middleware('operation.access:bom_standard,delete');
                     });
 
                     Route::prefix('bom')->middleware('operation.access:bom,view')->group(function () {

@@ -64,6 +64,7 @@ use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Bom;
+use App\Models\BomStandard;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodIssueRequest;
@@ -357,6 +358,25 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomStandard(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = BomStandard::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
             ];
         }
 

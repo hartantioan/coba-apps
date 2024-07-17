@@ -1022,8 +1022,8 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			        => $d->id,
                 'text' 			        => $d->employee_no.' - '.$d->name,
-                'top_customer'          => $d->top,
-                'top_internal'          => $d->top_internal,
+                'top_customer'          => $d->top ?? 0,
+                'top_internal'          => $d->top_internal ?? 0,
                 'limit_credit'          => number_format($d->limit_credit,2,',','.'),
                 'count_limit_credit'    => number_format($d->count_limit_credit,2,',','.'),
                 'billing_address'       => $d->getBillingAddress()
@@ -4197,6 +4197,7 @@ class Select2Controller extends Controller {
                     'description'       => $row->description ?? '',
                     'type'              => $row->type(),
                     'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
+                    'list_warehouse'    => $row->lookable_type == 'items' ? $row->item->warehouseList() : [],
                     'issue_method'      => $row->issue_method,
                     'has_bom'           => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
                     /* 'list_batch'        => $row->lookable_type == 'items' ? $row->lookable->listBatch() : [], */
@@ -4225,6 +4226,7 @@ class Select2Controller extends Controller {
                 'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
+                'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
             ];
         }
 

@@ -264,7 +264,7 @@ class ProductionReceive extends Model
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
                 'post_date'                 => date('Y-m-d'),
-                'note'                      => 'Dibuat otomatis dari Production Receive No. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->code.' )',
+                'note'                      => 'DIBUAT OTOMATIS DARI PRODUCTION RECEIVE NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->code.' )',
                 'status'                    => '1',
             ]);
 
@@ -308,6 +308,8 @@ class ProductionReceive extends Model
                             'nominal_planned'               => $rowbom->nominal,
                             'total_planned'                 => $total,
                             'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
+                            'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
+                            'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
                         ]);
                     }
                 }

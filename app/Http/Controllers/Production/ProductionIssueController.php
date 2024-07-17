@@ -257,12 +257,29 @@ class ProductionIssueController extends Controller
 
                 foreach($request->arr_qty as $key => $row){
                     if($request->arr_lookable_type[$key] == 'items'){
-                        $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
-                        $qty = str_replace(',','.',str_replace('.','',$row));
-                        if($itemstock){
-                            if(round($qty,3) > $itemstock->qty){
-                                $passedQty = false;
-                                $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                        $item = Item::find($request->arr_lookable_id[$key]);
+                        $itemstock = NULL;
+                        if($request->arr_batch_index && in_array($key,$request->arr_batch_index)){
+                            foreach($request->arr_batch_index as $keybatch => $rowbatch){
+                                if($key == $rowbatch){
+                                    $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->where('production_batch_id',$request->arr_batch_id[$keybatch])->first();
+                                    $qty = str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keybatch]));
+                                    if($itemstock){
+                                        if(round($qty,3) > $itemstock->qty){
+                                            $passedQty = false;
+                                            $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                                        }
+                                    }
+                                }
+                            }
+                        }else{
+                            $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->first();
+                            $qty = str_replace(',','.',str_replace('.','',$row));
+                            if($itemstock){
+                                if(round($qty,3) > $itemstock->qty){
+                                    $passedQty = false;
+                                    $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                                }
                             }
                         }
                     }
@@ -271,7 +288,7 @@ class ProductionIssueController extends Controller
                 if(!$passedQty){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Mohon maaf, item '.implode(', ',$arrNotPassedQty).' tidak mencukup stok yang ada. Silahkan atur qty yang ingin diproduksi.'
+                        'message' => 'Mohon maaf, item '.implode(', ',$arrNotPassedQty).' tidak mencukupi stok yang ada. Silahkan atur qty yang ingin diproduksi.'
                     ]);
                 }
                 
@@ -375,6 +392,7 @@ class ProductionIssueController extends Controller
                         $total_planned = 0;
                         $nominal = 0;
                         $total = 0;
+                        $itemstockkuy = NULL;
                         if($request->arr_bom_id[$key] !== '0'){
                             $bobot = round($query->productionOrderDetail->productionScheduleDetail->qty / $query->productionOrderDetail->productionScheduleDetail->bom->qty_output,2);
                             $qty_planned = $bobot * str_replace(',','.',str_replace('.','',$request->arr_qty_bom[$key]));
@@ -395,8 +413,9 @@ class ProductionIssueController extends Controller
                                     if($totalbatch > 0){
                                         $nominal_planned = $totalbatch / str_replace(',','.',str_replace('.','',$row));
                                     }else{
-                                        $itemstock = ItemStock::find($request->arr_item_stock_id[$key]);
+                                        $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->first();
                                         $nominal_planned = $itemstock->priceDate($query->post_date);
+                                        $itemstockkuy = $itemstock;
                                     }
                                     
                                     $nominal = $nominal_planned;
@@ -413,8 +432,10 @@ class ProductionIssueController extends Controller
                             if($request->arr_lookable_type[$key] == 'items'){
                                 $item = Item::find($request->arr_lookable_id[$key]);
                                 if($item){
-                                    $nominal = $item->itemStock->priceDate($query->post_date);
+                                    $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->first();
+                                    $nominal = $itemstock->priceDate($query->post_date);
                                     $total = round(str_replace(',','.',str_replace('.','',$row)) * $nominal,2);
+                                    $itemstockkuy = $itemstock;
                                 }
                             }
                         }
@@ -434,7 +455,9 @@ class ProductionIssueController extends Controller
                             'qty_planned'                   => $qty_planned,
                             'nominal_planned'               => $nominal_planned,
                             'total_planned'                 => $total_planned,
-                            'from_item_stock_id'            => $request->arr_item_stock_id[$key] == '0' ? NULL : $request->arr_item_stock_id[$key],
+                            'from_item_stock_id'            => $itemstockkuy->id ?? NULL,
+                            'place_id'                      => $request->arr_place[$key],
+                            'warehouse_id'                  => $request->arr_warehouse[$key],
                         ]);
 
                         if($request->arr_batch_index){
@@ -562,7 +585,7 @@ class ProductionIssueController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
+                                <th class="center-align" colspan="7" style="font-size:20px !important;">Daftar Item/Resource Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
@@ -570,11 +593,8 @@ class ProductionIssueController extends Controller
                                 <th class="center">Qty Planned</th>
                                 <th class="center">Qty Real</th>
                                 <th class="center">Satuan UoM</th>
-                                <th class="center">Nominal Planned</th>
-                                <th class="center">Nominal Real</th>
-                                <th class="center">Total Planned</th>
-                                <th class="center">Total Real</th>
-                                <th class="center">Plant & Gudang</th>
+                                <th class="center">Plant</th>
+                                <th class="center">Gudang</th>
                             </tr>
                         </thead><tbody>';
         $totalqtyplanned=0;
@@ -588,15 +608,12 @@ class ProductionIssueController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->lookable->uomUnit->code.'</td>
-                <td class="right-align">'.number_format($row->nominal_planned,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total_planned,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
-                <td>'.($row->item()->exists() ? $row->itemStock->fullName() : '-').'</td>
+                <td class="center-align">'.$row->place->code.'</td>
+                <td class="center-align">'.$row->warehouse->name.'</td>
             </tr>';
             if($row->productionBatchUsage()->exists()){
                 $string .= '<tr>
-                    <td class="gradient-45deg-yellow-green" colspan="10">Batch Terpakai : <br>'.$row->listBatchUsed().'</td>
+                    <td class="gradient-45deg-yellow-green" colspan="7">Batch Terpakai : <br>'.$row->listBatchUsed().'</td>
                 </tr>';
             }
         }
@@ -604,7 +621,7 @@ class ProductionIssueController extends Controller
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyplanned, 3, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyreal, 3, ',', '.') . '</td>
-                <td colspan="7"></td>
+                <td colspan="4"></td>
             </tr>  
         ';
 

@@ -18,9 +18,14 @@ class ItemStock extends Model
         'area_id',
         'item_id',
         'item_shading_id',
+        'production_batch_id',
         'location',
         'qty'
     ];
+
+    public function productionBatch(){
+        return $this->belongsTo('App\Models\ProductionBatch', 'production_batch_id', 'id')->withTrashed();
+    }
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();

@@ -304,20 +304,21 @@
                                                             <th class="center">Qty Planned</th>
                                                             <th class="center">Qty Real</th>
                                                             <th class="center">Satuan Produksi</th>
-                                                            <th class="center">Plant & Gudang</th>
+                                                            <th class="center">Plant</th>
+                                                            <th class="center">Gudang</th>
                                                             <th class="center">{{ __('translations.delete') }}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="7">
+                                                            <td class="center-align" colspan="8">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="7">
+                                                            <th colspan="8">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -340,6 +341,7 @@
         </div>
     </div>
     <div class="modal-footer">
+        <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
         <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light mr-1 submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
@@ -701,7 +703,7 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="7">
+                        <td class="center-align" colspan="8">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -713,6 +715,7 @@
                         </td>
                     </tr>
                 `);
+                $('#title-modal').text('-');
             }
         });
 
@@ -756,8 +759,17 @@
                     <td class="center" id="arr_unit` + count + `">
                         -
                     </td>
-                    <td class="center" id="arr_stock` + count + `">
-                        -
+                    <td class="center">
+                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                            @foreach ($place as $rowplace)
+                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="center">
+                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                            <option value="">--Silahkan pilih item--</option>
+                        </select>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -784,6 +796,9 @@
     function getRowUnit(val,type){
         $("#arr_unit" + val).empty();
         $("#arr_stock" + val).empty();
+        $('#arr_warehouse' + val).empty().append(`
+            <option value="">--Silahkan pilih item--</option>
+        `);
         $('.row_item_batch[data-code="' + val + '"]').remove();
         if($("#arr_lookable_id" + val).val()){
             $("#arr_unit" + val).text($("#arr_lookable_id" + val).select2('data')[0].uom);
@@ -1004,25 +1019,12 @@
             linkDataArray: link
         });
     }
-    
-    function checkQty(){
-        $('*[name^="arr_qty[]"]').each(function(index){
-            let qty = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let max = 0;
-            if($('*[name^="arr_item_stock_id[]"]').eq(index).val() !== '0'){
-                max = parseFloat($('*[name^="arr_item_stock_id[]"]').eq(index).find(':selected').data('qty').toString().replaceAll(".", "").replaceAll(",","."));
-            }
-            if(max > 0){
-                if(qty > max){
-                    $(this).val(formatRupiahIni(max.toFixed(3).toString().replace('.',',')));
-                }
-            }
-        });
-    }
 
     function getProductionOrder(){
         if($('#production_order_detail_id').val()){
             let datakuy = $('#production_order_detail_id').select2('data')[0];
+
+            $('#title-modal').text(datakuy.bom_group);
 
             $('#last-row-item-issue,#last-row-item-receive').remove();
 
@@ -1032,15 +1034,16 @@
 
             $.each(datakuy.bom_detail, function(i, val) {
                 var count = makeid(10);
-                let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
-                if(val.list_stock.length > 0){
-                    $.each(val.list_stock, function(i, valkuy) {
-                        optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty + `</option>`;
+
+                let warehouse = `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">`;
+                if(val.list_warehouse.length > 0){
+                    $.each(val.list_warehouse, function(i, valkuy) {
+                        warehouse += `<option value="` + valkuy.id + `">` + valkuy.name + `</option>`;
                     });
                 }else{
-                    optionStock += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
+                    warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
                 }
-                optionStock += `</select>`;
+                warehouse += `</select>`;
 
                 $('#body-item-issue').append(`
                     <tr class="row_item_issue" data-id="` + $('#production_order_detail_id').val() + `">
@@ -1062,13 +1065,20 @@
                             ` + val.qty_planned + `
                         </td>
                         <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);checkQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                         </td>
                         <td class="center" id="arr_unit` + count + `">
                             ` + val.unit + `
                         </td>
-                        <td class="center" id="arr_stock` + count + `">
-                            ` + optionStock + `
+                        <td class="center">
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td class="center">
+                            ` + warehouse + `
                         </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -1142,10 +1152,11 @@
             M.updateTextFields();
                     
         }else{
+            $('#title-modal').text('-');
             $('#output-line,#output-fg,#output-qty').text('-');
             $('#body-item-issue').empty().append(`
                 <tr id="last-row-item-issue">
-                    <td class="center-align" colspan="7">
+                    <td class="center-align" colspan="8">
                         Silahkan tambahkan Order Produksi untuk memulai...
                     </td>
                 </tr>
@@ -1777,7 +1788,7 @@
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkQty();" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `

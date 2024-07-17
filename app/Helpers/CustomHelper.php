@@ -145,8 +145,8 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){
-		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->orderByDesc('date')->orderByDesc('id')->first();
+	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null){
+		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->orderByDesc('date')->orderByDesc('id')->first();
 		if($type == 'IN'){
 			ItemCogs::create([
 				'lookable_type'		=> $lookable_type,
@@ -157,6 +157,7 @@ class CustomHelper {
 				'area_id'			=> $area_id,
 				'item_id'			=> $item_id,
 				'item_shading_id'	=> $shading ? $shading : NULL,
+				'production_batch_id'=> $batch ?? NULL,
 				'qty_in'			=> $qty,
 				'price_in'			=> $qty > 0 ? $total / $qty : 0,
 				'total_in'			=> $total,
@@ -182,6 +183,7 @@ class CustomHelper {
 						'area_id'			=> $area_id,
 						'item_id'			=> $item_id,
 						'item_shading_id'	=> $shading ? $shading : NULL,
+						'production_batch_id'=> $batch ?? NULL,
 						'qty_out'			=> $qty,
 						'price_out'			=> $priceout,
 						'total_out'			=> $total,
@@ -205,6 +207,7 @@ class CustomHelper {
 						'area_id'			=> $area_id,
 						'item_id'			=> $item_id,
 						'item_shading_id'	=> $shading ? $shading : NULL,
+						'production_batch_id'=> $batch ?? NULL,
 						'qty_out'			=> $qty,
 						'price_out'			=> round($priceeach,2),
 						'total_out'			=> $totalout,
@@ -228,6 +231,7 @@ class CustomHelper {
 						'area_id'			=> $area_id,
 						'item_id'			=> $item_id,
 						'item_shading_id'	=> $shading ? $shading : NULL,
+						'production_batch_id'=> $batch ?? NULL,
 						'qty_out'			=> $qty,
 						'price_out'			=> round($priceeach,2),
 						'total_out'			=> $totalout,
@@ -251,6 +255,7 @@ class CustomHelper {
 						'area_id'			=> $area_id,
 						'item_id'			=> $item_id,
 						'item_shading_id'	=> $shading ? $shading : NULL,
+						'production_batch_id'=> $batch ?? NULL,
 						'qty_out'			=> $qty,
 						'price_out'			=> $priceeach,
 						'total_out'			=> $totalout,
@@ -265,7 +270,7 @@ class CustomHelper {
 		}
 
 		/* ResetCogs::dispatch($date,$place_id,$item_id); */
-		ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading);
+		ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
 	}
 
 	public static function sendCogs2($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){
@@ -388,8 +393,8 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null){
-		$old_data = ItemStock::where('place_id',$place_id)->where('item_id',$item_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->where('item_shading_id',$shading)->first();
+	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null, $batch = null){
+		$old_data = ItemStock::where('place_id',$place_id)->where('item_id',$item_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->first();
 		if($old_data){
 			$old_data->update([
 				'qty' => $type == 'IN' ? $old_data->qty + $qty : $old_data->qty - $qty,
@@ -401,6 +406,7 @@ class CustomHelper {
 				'area_id'			=> $area_id,
 				'item_id'			=> $item_id,
 				'item_shading_id'	=> $shading ? $shading : NULL,
+				'production_batch_id'=> $batch ?? NULL,
 				'qty'				=> $type == 'IN' ? $qty : 0 - $qty,
 			]);
 		}
@@ -1080,6 +1086,7 @@ class CustomHelper {
 					$gr->post_date,
 					NULL,
 					NULL,
+					NULL,
 				);
 
 				self::sendStock(
@@ -1088,6 +1095,7 @@ class CustomHelper {
 					$rowdetail->item_id,
 					$rowdetail->qtyConvert(),
 					'IN',
+					NULL,
 					NULL,
 					NULL,
 				);
@@ -1926,6 +1934,7 @@ class CustomHelper {
 					$gr->post_date,
 					$row->area_id,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
+					NULL,
 				);
 
 				self::sendStock(
@@ -1936,6 +1945,7 @@ class CustomHelper {
 					'IN',
 					$row->area_id ? $row->area_id : NULL,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
+					NULL,
 				);
 			}
 
@@ -1996,6 +2006,7 @@ class CustomHelper {
 					$mor->post_date,
 					NULL,
 					NULL,
+					NULL,
 				);
 
 				self::sendStock(
@@ -2004,6 +2015,7 @@ class CustomHelper {
 					$row->item_id,
 					$row->qty * $row->item->sell_convert,
 					'IN',
+					NULL,
 					NULL,
 					NULL,
 				);
@@ -2082,6 +2094,7 @@ class CustomHelper {
 					$gr->post_date,
 					NULL,
 					NULL,
+					NULL,
 				);
 
 				self::sendStock(
@@ -2090,6 +2103,7 @@ class CustomHelper {
 					$row->item_id,
 					$row->qtyConvert(),
 					'OUT',
+					NULL,
 					NULL,
 					NULL,
 				);
@@ -2196,6 +2210,7 @@ class CustomHelper {
 					$gr->post_date,
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
+					$row->itemStock->production_batch_id ? $row->itemStock->production_batch_id : NULL,
 				);
 
 				self::sendStock(
@@ -2206,6 +2221,7 @@ class CustomHelper {
 					'OUT',
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
+					$row->itemStock->production_batch_id ? $row->itemStock->production_batch_id : NULL,
 				);
 
 				$row->update([
@@ -2305,6 +2321,7 @@ class CustomHelper {
 					$gr->post_date,
 					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
 					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
+					$row->goodIssueDetail->itemStock->production_batch_id ? $row->goodIssueDetail->itemStock->production_batch_id : NULL,
 				);
 
 				self::sendStock(
@@ -2314,7 +2331,7 @@ class CustomHelper {
 					$row->qty,
 					'IN',
 					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
-					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
+					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,$row->goodIssueDetail->itemStock->production_batch_id ? $row->goodIssueDetail->itemStock->production_batch_id : NULL,
 				);
 			}
 
@@ -2361,6 +2378,7 @@ class CustomHelper {
 								round($rowdetail->nominal * $lc->currency_rate,2),
 								'IN',
 								$lc->post_date,
+								NULL,
 								NULL,
 								NULL,
 							);
@@ -2452,6 +2470,7 @@ class CustomHelper {
 						$ir->post_date,
 						$rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area_id : NULL,
 						$rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->item_shading_id : NULL,
+						$rowdetail->itemStock->productionBatch()->exists() ? $rowdetail->itemStock->production_batch_id : NULL,
 					);
 					
 					if($rowdetail->nominal < 0){
@@ -2693,6 +2712,7 @@ class CustomHelper {
 					$ito->post_date,
 					$rowdetail->itemStock->area_id,
 					$rowdetail->itemStock->item_shading_id,
+					$rowdetail->itemStock->production_batch_id,
 				);
 
 				self::sendStock(
@@ -2703,6 +2723,7 @@ class CustomHelper {
 					'OUT',
 					$rowdetail->itemStock->area_id,
 					$rowdetail->itemStock->item_shading_id,
+					$rowdetail->itemStock->production_batch_id,
 				);
 			}
 			
@@ -2765,6 +2786,7 @@ class CustomHelper {
 					$iti->post_date,
 					$rowdetail->area_id,
 					$rowdetail->itemStock->item_shading_id,
+					$rowdetail->itemStock->production_batch_id,
 				);
 
 				self::sendStock(
@@ -2775,6 +2797,7 @@ class CustomHelper {
 					'IN',
 					$rowdetail->area_id,
 					$rowdetail->itemStock->item_shading_id,
+					$rowdetail->itemStock->production_batch_id,
 				);
 			}
 
@@ -2985,6 +3008,7 @@ class CustomHelper {
 								$pm->post_date,
 								NULL,
 								NULL,
+								NULL,
 							);
 
 							self::sendStock(
@@ -2993,6 +3017,7 @@ class CustomHelper {
 								$row->lookable->lookable->item_id,
 								round($row->qty * $row->lookable->lookable->qty_conversion,3),
 								'OUT',
+								NULL,
 								NULL,
 								NULL,
 							);
@@ -3510,6 +3535,7 @@ class CustomHelper {
 							$mom->post_date,
 							$row->lookable->lookable->area_id,
 							NULL,
+							NULL,
 						);
 	
 						self::sendStock(
@@ -3519,7 +3545,8 @@ class CustomHelper {
 							$row->qty * $row->lookable->lookable->item->sell_convert,
 							'IN',
 							$row->lookable->lookable->area_id,
-							NULL
+							NULL,
+							NULL,
 						);
 					}
 				}
@@ -4229,42 +4256,89 @@ class CustomHelper {
 						if($row->is_wip){
 							//do nothing
 						}else{
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $row->lookable->itemGroup->coa_id,
-								'place_id'		=> $row->itemStock->place_id,
-								'line_id'		=> $row->productionIssue->line_id,
-								'item_id'		=> $row->itemStock->item_id,
-								'warehouse_id'	=> $row->itemStock->warehouse_id,
-								'type'			=> '2',
-								'nominal'		=> $row->total,
-								'nominal_fc'	=> $row->total,
-								'note'			=> $pir->code,
-							]);
-			
-							self::sendCogs($table_name,
-								$pir->id,
-								$pir->company_id,
-								$row->itemStock->place_id,
-								$row->itemStock->warehouse_id,
-								$row->itemStock->item_id,
-								$row->qty,
-								$row->total,
-								'OUT',
-								$pir->post_date,
-								NULL,
-								NULL,
-							);
-			
-							self::sendStock(
-								$row->itemStock->place_id,
-								$row->itemStock->warehouse_id,
-								$row->itemStock->item_id,
-								$row->qty,
-								'OUT',
-								NULL,
-								NULL,
-							);
+							if($row->productionBatchUsage()->exists()){
+								foreach($row->productionBatchUsage as $rowbatchusage){
+									$price = $rowbatchusage->productionBatch->price();
+									$rowtotal = round($rowbatchusage->qty * $price,2);
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'coa_id'		=> $rowbatchusage->productionBatch->item->itemGroup->coa_id,
+										'place_id'		=> $rowbatchusage->productionBatch->place_id,
+										'line_id'		=> $row->productionIssue->line_id,
+										'item_id'		=> $rowbatchusage->productionBatch->item_id,
+										'warehouse_id'	=> $rowbatchusage->productionBatch->warehouse_id,
+										'type'			=> '2',
+										'nominal'		=> $rowtotal,
+										'nominal_fc'	=> $rowtotal,
+										'note'			=> $pir->code.' - '.$rowbatchusage->productionBatch->code,
+									]);
+					
+									self::sendCogs($table_name,
+										$pir->id,
+										$pir->company_id,
+										$rowbatchusage->productionBatch->place_id,
+										$rowbatchusage->productionBatch->warehouse_id,
+										$rowbatchusage->productionBatch->item_id, #sampek sini
+										$rowbatchusage->qty,
+										$rowtotal,
+										'OUT',
+										$pir->post_date,
+										NULL,
+										NULL,
+										$rowbatchusage->production_batch_id,
+									);
+					
+									self::sendStock(
+										$rowbatchusage->productionBatch->place_id,
+										$rowbatchusage->productionBatch->warehouse_id,
+										$rowbatchusage->productionBatch->item_id,
+										$rowbatchusage->qty,
+										'OUT',
+										NULL,
+										NULL,
+										$rowbatchusage->production_batch_id,
+									);
+								}
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->itemGroup->coa_id,
+									'place_id'		=> $row->itemStock->place_id,
+									'line_id'		=> $row->productionIssue->line_id,
+									'item_id'		=> $row->itemStock->item_id,
+									'warehouse_id'	=> $row->itemStock->warehouse_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->code,
+								]);
+				
+								self::sendCogs($table_name,
+									$pir->id,
+									$pir->company_id,
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									$row->total,
+									'OUT',
+									$pir->post_date,
+									NULL,
+									NULL,
+									NULL,
+								);
+				
+								self::sendStock(
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									'OUT',
+									NULL,
+									NULL,
+									NULL,
+								);
+							}
 						}
 					}elseif($row->lookable_type == 'resources'){
 						if($row->bomDetail()->exists()){
@@ -4368,44 +4442,48 @@ class CustomHelper {
 			$total = 0;
 
 			foreach($pir->productionReceiveDetail as $row){
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->item->itemGroup->coa_id,
-					'place_id'		=> $row->place_id,
-					'line_id'		=> $row->productionReceive->line_id,
-					'item_id'		=> $row->item_id,
-					'warehouse_id'	=> $row->warehouse_id,
-					'type'			=> '1',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> $row->total,
-					'note'			=> $pir->note,
-				]);
-
-				self::sendCogs($table_name,
-					$pir->id,
-					$pir->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
-					$row->qty,
-					$row->total,
-					'IN',
-					$pir->post_date,
-					NULL,
-					NULL,
-				);
-
-				self::sendStock(
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
-					$row->qty,
-					'IN',
-					NULL,
-					NULL,
-				);
-
-				$total += $row->total;
+				foreach($row->productionBatch as $rowbatch){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->item->itemGroup->coa_id,
+						'place_id'		=> $row->place_id,
+						'line_id'		=> $row->productionReceive->line_id,
+						'item_id'		=> $row->item_id,
+						'warehouse_id'	=> $row->warehouse_id,
+						'type'			=> '1',
+						'nominal'		=> $rowbatch->total,
+						'nominal_fc'	=> $rowbatch->total,
+						'note'			=> $pir->note.' - '.$rowbatch->code,
+					]);
+	
+					self::sendCogs($table_name,
+						$pir->id,
+						$pir->company_id,
+						$row->place_id,
+						$row->warehouse_id,
+						$row->item_id,
+						$rowbatch->qty_real,
+						$rowbatch->total,
+						'IN',
+						$pir->post_date,
+						NULL,
+						NULL,
+						$rowbatch->id,
+					);
+	
+					self::sendStock(
+						$row->place_id,
+						$row->warehouse_id,
+						$row->item_id,
+						$rowbatch->qty_real,
+						'IN',
+						NULL,
+						NULL,
+						$rowbatch->id,
+					);
+	
+					$total += $rowbatch->total;
+				}
 			}
 
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
@@ -5492,18 +5570,19 @@ class CustomHelper {
 				$warehouse_id = $row->warehouse_id;
 				$area_id = $row->area_id ? $row->area_id : NULL;
 				$item_shading_id = $row->item_shading_id ? $row->item_shading_id : NULL;
+				$production_batch_id = $row->production_batch_id ? $row->production_batch_id : NULL;
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
-				ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id);
-				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$qty,$type);
+				ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
+				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}
 		}
 	}
 
-	public static function resetStock($place_id,$warehouse_id,$area_id,$item_id,$shading,$qty,$type){
-		$data = ItemStock::where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->where('item_id',$item_id)->where('item_shading_id',$shading)->first();
+	public static function resetStock($place_id,$warehouse_id,$area_id,$item_id,$shading,$batch,$qty,$type){
+		$data = ItemStock::where('place_id',$place_id)->where('warehouse_id',$warehouse_id)->where('area_id',$area_id)->where('item_id',$item_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->first();
 
 		if($data){
 			$data->update([
@@ -5516,6 +5595,7 @@ class CustomHelper {
                 'area_id'           => $area_id,
 				'item_id'		    => $item_id,
                 'item_shading_id'   => $shading,
+				'production_batch_id'=> $batch,
 				'qty'			    => $type == 'IN' ? 0 - $qty : $qty,
 			]);
 		}

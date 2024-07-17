@@ -22,6 +22,7 @@ class ItemCogs extends Model
         'area_id',
         'item_id',
         'item_shading_id',
+        'production_batch_id',
         'qty_in',
         'price_in',
         'total_in',
@@ -49,6 +50,10 @@ class ItemCogs extends Model
 
     public function company(){
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
+    }
+
+    public function productionBatch(){
+        return $this->belongsTo('App\Models\ProductionBatch', 'production_batch_id', 'id')->withTrashed();
     }
 
     public function place(){

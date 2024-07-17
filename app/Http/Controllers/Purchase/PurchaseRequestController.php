@@ -868,12 +868,6 @@ class PurchaseRequestController extends Controller
             ]);
         }
         
-        if($query->purchaseOrderDetailComposition()->exists()){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Data telah digunakan pada Purchase Order.'
-            ]);
-        }
 
         if($query->delete()) {
             $query->update([

@@ -79,11 +79,20 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
             ->get();
         }elseif($this->mode == '2'){
             $data = PurchaseRequestDetail::withTrashed()->whereHas('purchaseRequest', function($query) {
-                $query->withTrashed()->where('post_date', '>=',$this->start_date)
+                $query->where(function ($query) {
+                    $query->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
-                    if(!$this->modedata){
-                        $query->where('user_id',session('bo_id'));
-                    }
+                });
+                if(!$this->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
+            })
+            ->where(function ($query) {
+                    
+                $query->whereNull('deleted_at')
+                      ->orWhereHas('purchaseRequest', function ($query) {
+                          $query->withTrashed()->whereNotNull('deleted_at');
+                      });
             })
             ->whereIn('warehouse_id',$this->warehouses)
             ->get();

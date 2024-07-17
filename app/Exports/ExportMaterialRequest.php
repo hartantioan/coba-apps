@@ -52,6 +52,13 @@ class ExportMaterialRequest implements FromView
                         $query->where('user_id',session('bo_id'));
                     }
                 })
+                ->where(function ($query) {
+                    
+                    $query->whereNull('deleted_at')
+                          ->orWhereHas('materialRequest', function ($query) {
+                              $query->withTrashed()->whereNotNull('deleted_at');
+                          });
+                })
                 ->whereIn('warehouse_id',$this->warehouses)
                 ->get()
             ]);

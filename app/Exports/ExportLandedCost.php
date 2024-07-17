@@ -59,8 +59,17 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
             ->get();
         }elseif($this->mode == '2'){
             $data = LandedCostDetail::withTrashed()->whereHas('landedCost',function ($query) {
-                $query->withTrashed()->where('post_date', '>=',$this->start_date)
-                ->where('post_date', '<=', $this->end_date);
+                $query->where(function ($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+                });
+            })
+            ->where(function ($query) {
+                    
+                $query->whereNull('deleted_at')
+                      ->orWhereHas('landedCost', function ($query) {
+                          $query->withTrashed()->whereNotNull('deleted_at');
+                      });
             })
             ->get();
         }

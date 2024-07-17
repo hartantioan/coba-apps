@@ -5,7 +5,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 class PrintHelper {
-    public static function print($pr , $title = null , $size , $orientation , $blade ){
+    public static function print($pr , $title = null , $size , $orientation , $blade , $modedata = null){
         $data = [
             'title'     => $title,
             'data'      => $pr
@@ -16,7 +16,9 @@ class PrintHelper {
             "verify_peer_name"=>false,
             ),
         );
-        CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+        if($modedata != 'all'){
+            CustomHelper::addNewPrinterCounter($pr->getTable(),$pr->id);
+        }
         $img_path = 'website/logo_web_fix.png';
         $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
         $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));

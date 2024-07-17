@@ -1429,14 +1429,14 @@ document.addEventListener('focusin', function (event) {
                 formData.delete("arr_qty[]");
                 formData.delete("arr_note[]");
                 
-                if($('input[name^="arr_modi"]').length > 0){
-                    $('input[name^="arr_modi"]').each(function(index){
+                if($('input[name^="arr_modi[]"]').length > 0){
+                    $('input[name^="arr_modi[]"]').each(function(index){
                         formData.append('arr_modi[]',$(this).val());
-                        formData.append('arr_item[]',$('input[name^="arr_item"]').eq(index).val());
-                        formData.append('arr_place[]',$('input[name^="arr_place"]').eq(index).val());
-                        formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
+                        formData.append('arr_item[]',$('input[name^="arr_item[]"]').eq(index).val());
+                        formData.append('arr_place[]',$('input[name^="arr_place[]"]').eq(index).val());
+                        formData.append('arr_qty[]',$('input[name^="arr_qty[]"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
-                        if(!$('input[name^="arr_modi"]').eq(index).val()){
+                        if(!$('input[name^="arr_modi[]"]').eq(index).val()){
                             passed = false;
                         }
                     });

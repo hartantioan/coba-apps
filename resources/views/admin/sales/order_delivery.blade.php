@@ -740,7 +740,7 @@ document.addEventListener('focusin', function (event) {
                                     </tr>
                                     <tr class="btn_stock" data-id="` + response.id + `">
                                         <td>
-                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
+                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Asal Item
                                             </a>
                                         </td>

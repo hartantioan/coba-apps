@@ -406,6 +406,7 @@ class MarketingOrderDeliveryController extends Controller
                     }
                     if($qtystock < $qtysell){
                         $passedQty = false;
+                        info($qtystock.' - '.$qtysell);
                     }
                     if($qtystock > $qtysell){
                         $passedSentMore = false;

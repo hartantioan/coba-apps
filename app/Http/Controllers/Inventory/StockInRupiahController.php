@@ -150,8 +150,8 @@ class StockInRupiahController extends Controller
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('id')
             ->orderBy('date')
+            ->orderBy('id')
             ->get();
         }
         $cum_qty = 0;

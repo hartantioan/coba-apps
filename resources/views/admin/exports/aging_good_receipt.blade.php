@@ -59,7 +59,6 @@
                 <td>{{ $row['unit'] }}</td>
                 <td>{{ $row['qty_conversion'] }}</td>
                 <td>{{ $row['unit_conversion'] }}</td>
-                <td>{{ $row['unit_conversion'] }}</td>
                 <td>{{ $row['line'] }}</td>
                 <td>{{ $row['engine'] }}</td>
                 <td>{{ $row['division'] }}</td>

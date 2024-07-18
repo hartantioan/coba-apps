@@ -124,7 +124,7 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <input id="date" name="date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="" value="{{ date('Y-m-d') }}">
-                                            <label class="active" for="date">Masukkan Tanggal</label>
+                                            <label class="active" for="date">Tanggal Aging</label>
                                         </div>
                                         
                                         

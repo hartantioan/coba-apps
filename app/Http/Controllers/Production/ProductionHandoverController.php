@@ -272,8 +272,6 @@ class ProductionHandoverController extends Controller
                 'arr_item_id'               => 'required|array',
                 'arr_area_id'               => 'required|array',
                 'arr_qty'                   => 'required|array',
-                'arr_qty_reject'            => 'required|array',
-                'arr_qty_received'          => 'required|array',
                 'arr_place'                 => 'required|array',
                 'arr_warehouse'             => 'required|array',
             ], [
@@ -290,10 +288,6 @@ class ProductionHandoverController extends Controller
                 'arr_area_id.array'                 => 'Area harus array.',
                 'arr_qty.required'                  => 'Qty input tidak boleh kosong.',
                 'arr_qty.array'                     => 'Qty input harus array.',
-                'arr_qty_reject.required'           => 'Qty reject tidak boleh kosong.',
-                'arr_qty_reject.array'              => 'Qty reject harus array.',
-                'arr_qty_received.required'         => 'Qty diterima tidak boleh kosong.',
-                'arr_qty_received.array'            => 'Qty diterima harus array.',
                 'arr_place.required'                => 'Plant tidak boleh kosong.',
                 'arr_place.array'                   => 'Plant harus array.',
                 'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
@@ -310,7 +304,7 @@ class ProductionHandoverController extends Controller
                 $passedQty = true;
                 
                 $arrQty = [];
-                foreach($request->arr_qty_received as $key => $row){
+                foreach($request->arr_qty as $key => $row){
                     $index = -1;
                     foreach($arrQty as $z => $rowqty){
                         if($rowqty['prfd_id'] == $request->arr_prfd_id[$key]){
@@ -449,8 +443,6 @@ class ProductionHandoverController extends Controller
                                 'production_fg_receive_detail_id'   => $prfgd->id,
                                 'item_id'                           => $request->arr_item_id[$key],
                                 'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                'qty_reject'                        => str_replace(',','.',str_replace('.','',$request->arr_qty_reject[$key])),
-                                'qty_received'                      => str_replace(',','.',str_replace('.','',$request->arr_qty_received[$key])),
                                 'shading'                           => $prfgd->shading,
                                 'place_id'                          => $request->arr_place[$key],
                                 'warehouse_id'                      => $request->arr_warehouse[$key],
@@ -569,15 +561,13 @@ class ProductionHandoverController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item Receive</th>
+                                <th class="center-align" colspan="10" style="font-size:20px !important;">Daftar Item Receive</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
                                 <th class="center">No.Batch Palet/Curah</th>
                                 <th class="center">Item</th>
                                 <th class="center">'.__('translations.shading').'</th>
-                                <th class="center">Qty Input</th>
-                                <th class="center">Qty Reject</th>
                                 <th class="center">Qty Diterima</th>
                                 <th class="center">Satuan</th>
                                 <th class="center">Konversi</th>
@@ -593,8 +583,6 @@ class ProductionHandoverController extends Controller
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td>'.$row->shading.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_reject).'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_received).'</td>
                 <td class="center-align">'.$row->productionFgReceiveDetail->itemUnit->unit->code.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionFgReceiveDetail->conversion).'</td>
                 <td class="">'.$row->place->code.'</td>

@@ -275,8 +275,6 @@
                                                             <th class="center" width="150px">Kode Item</th>
                                                             <th class="center" width="150px">Nama Item</th>
                                                             <th class="center" width="100px">{{ __('translations.shading') }}</th>
-                                                            <th class="center" width="100px">Qty Input</th>
-                                                            <th class="center" width="100px">Qty Reject</th>
                                                             <th class="center" width="100px">Qty Diterima</th>
                                                             <th class="center" width="100px">Satuan</th>
                                                             <th class="center" width="100px">{{ __('translations.plant') }}</th>
@@ -286,7 +284,7 @@
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="13">
+                                                            <td class="center-align" colspan="11">
                                                                 Silahkan tambahkan Receive FG untuk memulai...
                                                             </td>
                                                         </tr>
@@ -663,7 +661,7 @@
                 $('#production_fg_receive_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="13">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Receive FG untuk memulai...
                         </td>
                     </tr>
@@ -712,7 +710,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="13">
+                        <td class="center-align" colspan="11">
                             Silahkan tambahkan Receive FG untuk memulai...
                         </td>
                     </tr>
@@ -772,13 +770,7 @@
                                             ` + response.data.shading + `
                                         </td>
                                         <td class="center">
-                                            <input name="arr_qty[]" type="text" value="` + response.data.qty + `" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');">
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="arr_qty_reject`+ count +`" required>
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_qty_received[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty_received`+ count +`" required readonly>
+                                            <input name="arr_qty[]" type="text" value="` + response.data.qty + `" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);">
                                         </td>
                                         <td class="center-align">
                                             ` + response.data.unit + `
@@ -1004,15 +996,6 @@
         }
     }
 
-    function checkQtyReject(code){
-        let qtyMax = parseFloat($('#arr_qty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let qtyReject = parseFloat($('#arr_qty_reject' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let qtyReceived = qtyMax - qtyReject;
-        $('#arr_qty_received' + code).val(
-            (qtyReceived >= 0 ? '' : '-') + formatRupiahIni(qtyReceived.toFixed(3).toString().replace('.',','))
-        );
-    }
-
     function getItem(){
         if($('#production_fg_receive_detail_id').val() && $('#area_id').val() && parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")) > 0){
             let datakuy = $('#production_fg_receive_detail_id').select2('data')[0];
@@ -1052,12 +1035,6 @@
                     <td class="center">
                         <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + $('#qty').val() + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + datakuy.item_id + `">
                     </td>
-                    <td class="center">
-                        <input name="arr_qty_reject[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="arr_qty_reject`+ count +`" required>
-                    </td>
-                    <td class="center">
-                        <input name="arr_qty_received[]" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty_received`+ count +`" required readonly>
-                    </td>
                     <td class="center-align">
                         ` + datakuy.unit + `
                     </td>
@@ -1095,7 +1072,7 @@
         }else{
             $('#body-item').empty().append(`
                 <tr id="last-row-item">
-                    <td class="center-align" colspan="13">
+                    <td class="center-align" colspan="11">
                         Silahkan tambahkan Receive FG untuk memulai...
                     </td>
                 </tr>
@@ -1639,12 +1616,6 @@
                             </td>
                             <td class="center">
                                 <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + val.item_id + `">
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty_reject[]" type="text" value="` + val.qty_reject + `" onkeyup="formatRupiahNoMinus(this);checkQtyReject('` + count + `');" style="text-align:right;width:100%;" id="arr_qty_reject`+ count +`" required>
-                            </td>
-                            <td class="center">
-                                <input name="arr_qty_received[]" type="text" value="` + val.qty_received + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty_received`+ count +`" required readonly>
                             </td>
                             <td class="center-align">
                                 ` + val.unit + `

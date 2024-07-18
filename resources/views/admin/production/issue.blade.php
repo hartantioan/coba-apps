@@ -1148,6 +1148,8 @@
                                 return {
                                     search: params.term,
                                     item_id: val.lookable_id,
+                                    place_id: $('#arr_place' + count).val(),
+                                    warehouse_id: $('#arr_warehouse' + count).val(),
                                 };
                             },
                             processResults: function(data) {
@@ -1249,6 +1251,8 @@
                             search: params.term,
                             item_id: $('input[name^="arr_lookable_id[]"][data-id="' + code + '"]').val(),
                             arr_batch_id: arr_batch_id,
+                            place_id: $('#arr_place' + code).val(),
+                            warehouse_id: $('#arr_warehouse' + code).val(),
                         };
                     },
                     processResults: function(data) {

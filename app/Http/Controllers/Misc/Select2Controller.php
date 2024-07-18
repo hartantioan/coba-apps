@@ -4350,6 +4350,7 @@ class Select2Controller extends Controller {
             $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
                 $query->whereNotNull('is_default');
             })->where('issue_method','2')->count();
+            $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
                 'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
@@ -4372,7 +4373,7 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
-                'has_backflush'                 => $countbackflush > 0 ? '1' : '',
+                'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
             ];
         }
 
@@ -4519,6 +4520,12 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%");
                     if($request->arr_batch_id){
                         $query->whereNotIn('id',$request->arr_batch_id);
+                    }
+                    if($request->place_id){
+                        $query->where('place_id',$request->place_id);
+                    }
+                    if($request->warehouse_id){
+                        $query->where('warehouse_id',$request->warehouse_id);
                     }
                 })
                 ->where('item_id',$request->item_id)

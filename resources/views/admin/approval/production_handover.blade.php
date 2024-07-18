@@ -191,15 +191,13 @@
             <table class="bordered" style="min-width:1400px !important;">
                 <thead>
                     <tr>
-                        <th colspan="12" class="center-align">Daftar Item Diterima</th>
+                        <th colspan="10" class="center-align">Daftar Item Diterima</th>
                     </tr>
                     <tr>
                         <th class="center">No.</th>
                         <th class="center">No.Batch Palet/Curah</th>
                         <th class="center">Item</th>
                         <th class="center">{{ __('translations.shading') }}</th>
-                        <th class="center">Qty Input</th>
-                        <th class="center">Qty Reject</th>
                         <th class="center">Qty Diterima</th>
                         <th class="center">Satuan</th>
                         <th class="center">Konversi</th>
@@ -216,8 +214,6 @@
                             <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                             <td>{{ $row->shading }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty_reject) }}</td>
-                            <td class="right-align">{{ CustomHelper::formatConditionalQty($row->qty_received) }}</td>
                             <td class="center-align">{{ $row->productionFgReceiveDetail->itemUnit->unit->code }}</td>
                             <td class="right-align">{{ CustomHelper::formatConditionalQty($row->productionFgReceiveDetail->conversion) }}</td>
                             <td class="">{{ $row->place->code }}</td>

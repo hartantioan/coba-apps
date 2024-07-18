@@ -204,6 +204,7 @@ use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionHandoverController;
 use App\Http\Controllers\Production\ProductionIssueController;
+use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 
 /*
@@ -2242,6 +2243,28 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionHandoverController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionHandoverController::class, 'voidStatus'])->middleware('operation.access:production_handover,void');
                     Route::post('destroy', [ProductionHandoverController::class, 'destroy'])->middleware('operation.access:production_handover,delete');
+                });
+
+                Route::prefix('production_recalculate')->middleware(['operation.access:production_recalculate,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionRecalculateController::class, 'index']);
+                    Route::get('datatable',[ProductionRecalculateController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionRecalculateController::class, 'rowDetail']);
+                    Route::post('show', [ProductionRecalculateController::class, 'show']);
+                    Route::post('get_code', [ProductionRecalculateController::class, 'getCode']);
+                    Route::post('print',[ProductionRecalculateController::class, 'print']);
+                    Route::post('done',[ProductionRecalculateController::class, 'done'])->middleware('operation.access:production_recalculate,update');
+                    Route::post('print_by_range',[ProductionRecalculateController::class, 'printByRange']);
+                    Route::get('export',[ProductionRecalculateController::class, 'export']);
+                    Route::get('viewstructuretree',[ProductionRecalculateController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionRecalculateController::class, 'sendUsedData']);
+                    Route::post('remove_used_data', [ProductionRecalculateController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionRecalculateController::class, 'create'])->middleware('operation.access:production_recalculate,update');
+                    Route::post('send_used_data',[ProductionRecalculateController::class, 'sendUsedData'])->middleware('operation.access:production_recalculate,update');
+                    Route::get('view_journal/{id}',[ProductionRecalculateController::class, 'viewJournal'])->middleware('operation.access:production_recalculate,journal');
+                    Route::get('approval/{id}',[ProductionRecalculateController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionRecalculateController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionRecalculateController::class, 'voidStatus'])->middleware('operation.access:production_recalculate,void');
+                    Route::post('destroy', [ProductionRecalculateController::class, 'destroy'])->middleware('operation.access:production_recalculate,delete');
                 });
 
                 Route::prefix('production_report')->middleware('direct.access')->group(function () {

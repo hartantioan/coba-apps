@@ -11,7 +11,8 @@
             <th class="center-align">Required</th>
             <th class="center-align">{{ __('translations.unit') }}</th> 
             <th class="center-align">Area</th>
-            <th class="center-align">Shading</th> 
+            <th class="center-align">Shading</th>
+            <th class="center-align">Batch Produksi</th> 
         </tr>
     </thead>
     <tbody>
@@ -28,6 +29,7 @@
             <td align="center">{{$row['satuan']}}</td>
             <td align="center">{{$row['area']}}</td>
             <td align="center">{{$row['shading']}}</td>
+            <td align="center">{{$row['production_batch']}}</td>
         </tr>
         @endforeach
         @if(count($data) == 0)

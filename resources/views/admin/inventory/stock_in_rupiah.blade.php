@@ -153,6 +153,7 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Batch Produksi</th>
                                 <th class="center-align">No. Dokumen</th>
                                 <th class="center-align">{{ __('translations.qty') }}</th>
                                 <th class="center-align">Harga </th>
@@ -230,6 +231,7 @@
                                     <th class="center-align">{{ __('translations.unit') }}</th>
                                     <th class="center-align">Area</th>
                                     <th class="center-align">Shading</th>
+                                    <th class="center-align">Batch Produksi</th>
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
@@ -245,6 +247,7 @@
                                         <td class="center-align">`+val.satuan+`</td>
                                         <td class="center-align">`+val.area+`</td>
                                         <td class="center-align">`+val.shading+`</td>
+                                        <td class="center-align">`+val.production_batch+`</td>
                                         <td class="right-align">`+val.cum_qty+`</td>
                                         <td class="right-align">`+val.cum_val+`</td>
                                     </tr>
@@ -271,6 +274,7 @@
                                     <th class="center-align">{{ __('translations.unit') }}</th>
                                     <th class="center-align">Area</th>
                                     <th class="center-align">Shading</th>
+                                    <th class="center-align">Batch Produksi</th>
                                     <th class="center-align">No. Dokumen</th>
                                     <th class="center-align">{{ __('translations.qty') }}</th>
                                     <th class="center-align">Harga </th>
@@ -292,6 +296,7 @@
                                             <td class="center-align">` + val.satuan + `</td>
                                             <td class="center-align">` + val.area + `</td>
                                             <td class="center-align">` + val.shading + `</td>
+                                            <td class="center-align">`+val.production_batch+`</td>
                                             <td class="center-align">Saldo Awal</td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
@@ -313,6 +318,7 @@
                                             <td class="center-align">`+val.satuan+`</td>
                                             <td class="center-align">`+val.area+`</td>
                                             <td class="center-align">`+val.shading+`</td>
+                                            <td class="center-align">`+val.production_batch+`</td>
                                             <td >`+val.document+`</td>
                                             <td class="right-align">`+val.qty+`</td>
                                             <td class="right-align">`+val.final+`</td>

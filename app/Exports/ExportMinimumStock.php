@@ -64,6 +64,7 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
                 'item' => $row->item->name,
                 'area'         => $row->area->code ?? '-',
                 'shading'      => $row->shading->code ?? '-',
+                'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'minimum'=>number_format($row->item->min_stock),
                 'needed'=>number_format($row->item->min_stock-$row->qty),
                 'maximum'=>number_format($row->item->max_stock),

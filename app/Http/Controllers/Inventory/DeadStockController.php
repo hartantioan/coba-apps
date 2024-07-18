@@ -82,6 +82,7 @@ class DeadStockController extends Controller
                         'item'=>$row->item->name,
                         'satuan' => $row->item->uomUnit->code,
                         'area'         => $row->area->code ?? '-',
+                        'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                         'shading'      => $row->shading->code ?? '-',
                         'keterangan'=>$row->lookable->code.'-'.$row->lookable->name,
                         'date'=>$row->date,

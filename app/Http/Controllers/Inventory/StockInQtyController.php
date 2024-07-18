@@ -106,6 +106,7 @@ class StockInQtyController extends Controller
                         'satuan'=>$row->item->uomUnit->code,
                         'area'         => $row->area->code ?? '-',
                         'shading'      => $row->shading->code ?? '-',
+                        'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                         'perlu' =>1,
                     ];
                     $array_filter[]=$data_tempura;

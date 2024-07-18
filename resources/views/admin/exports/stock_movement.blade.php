@@ -11,6 +11,7 @@
                 <th class="center-align">{{ __('translations.unit') }}</th>
                 <th class="center-align">Area</th>
                 <th class="center-align">Shading</th>
+                <th class="center-align">Batch Produksi</th>
                 <th class="center-align">No Dokumen</th>
                 <th class="center-align">Mutasi</th>
                 <th class="center-align">Balance</th>
@@ -32,6 +33,7 @@
                         <td align="center">{{ $row['satuan'] }}</td>
                         <td align="center">{{$row['area']}}</td>
                         <td align="center">{{$row['shading']}}</td>
+                        <td align="center">{{$row['production_batch']}}</td>
                         <td align="center">Saldo Awal</td>
                         <td align="center"></td>
                         <td align="right">{{ $row['last_qty'] }}</td>

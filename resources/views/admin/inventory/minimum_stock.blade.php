@@ -141,6 +141,7 @@
                                 <th rowspan="2" class="center-align">{{ __('translations.unit') }}</th>
                                 <th rowspan="2" class="center-align">Area</th>
                                 <th rowspan="2" class="center-align">Shading</th>
+                                <th rowspan="2" class="center-align">Batch Produksi</th>
                                 <th rowspan="2" class="center-align">Detail</th>
                             </tr>
                             <tr>
@@ -263,6 +264,7 @@
                                     <td >`+val.satuan+`</td>
                                     <td >`+val.area+`</td>
                                     <td >`+val.shading+`</td>
+                                    <td >`+val.production_batch+`</td>
                                     `+butn+`
                                 </tr>
                             `);

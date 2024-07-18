@@ -156,6 +156,7 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Batch Produksi</th>
                                 <th class="center-align">No Dokumen</th>
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
@@ -228,6 +229,7 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Batch Produksi</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
                         $.each(response.message, function(i, val) { 
@@ -242,6 +244,7 @@
                                     <td >`+val.satuan+`</td>
                                     <td >`+val.area+`</td>
                                     <td >`+val.shading+`</td>
+                                    <td >`+val.production_batch+`</td>
                                     <td class="right-align">`+val.cum_qty+`</td>
                                 </tr>
                             `);
@@ -260,6 +263,7 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Batch Produksi</th>
                                 <th class="center-align">No Dokumen</th>
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
@@ -279,6 +283,7 @@
                                         <td class="">` + val.item + `</td>
                                         <td >`+val.area+`</td>
                                         <td >`+val.shading+`</td>
+                                        <td >`+val.production_batch+`</td>
                                         <td>Saldo Awal</td>
                                         <td class="right-align"></td>
                                         <td class="right-align">` + val.last_qty +  `</td>
@@ -297,6 +302,7 @@
                                         <td >`+val.satuan+`</td>
                                         <td >`+val.area+`</td>
                                         <td >`+val.shading+`</td>
+                                        <td >`+val.production_batch+`</td>
                                         <td>`+val.document+`</td>
                                         <td class="right-align">`+val.qty+`</td>
                                         <td class="right-align">`+val.cum_qty+`</td>

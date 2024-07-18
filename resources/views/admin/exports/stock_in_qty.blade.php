@@ -8,6 +8,9 @@
             <th class="center-align">{{ __('translations.code') }}</th>
             <th class="center-align">Nama Item</th>
             <th class="center-align">{{ __('translations.unit') }}</th>
+            <th align="center">Area</th>
+            <th align="center">Shading</th>
+            <th align="center">Batch Produksi</th>
             <th class="center-align">{{ __('translations.qty') }}</th>
         </tr>
     </thead>
@@ -20,6 +23,9 @@
             <td align="center">{{$row['kode']}}</td>
             <td align="center">{{$row['item']}}</td>
             <td align="center">{{$row['satuan']}}</td>
+            <td align="center">{{$row['area']}}</td>
+            <td align="center">{{$row['shading']}}</td>
+            <td align="center">{{$row['production_batch']}}</td>
             <td align="right-align">{{$row['final']}}</td>
         </tr>
         @endforeach

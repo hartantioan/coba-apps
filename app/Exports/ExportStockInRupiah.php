@@ -64,6 +64,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
             })
             ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         }else{
             $perlu = 1;
@@ -103,8 +104,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('id')
             ->orderBy('date')
+            ->orderBy('id')
             ->get();
         }
       
@@ -166,8 +167,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         });
                     }
                 })
-                ->orderBy('id','desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->orderBy('id','desc')
                 ->first();
 
                 $array_last_item[] = [
@@ -235,8 +236,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
             }else{
                 $query_no = [];
@@ -274,8 +275,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
                 if($first){
                     $query_no[]=$first;

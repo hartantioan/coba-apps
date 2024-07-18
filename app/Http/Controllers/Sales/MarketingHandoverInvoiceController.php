@@ -32,6 +32,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use App\Models\UsedData;
+use App\Models\MenuUser;
 class MarketingHandoverInvoiceController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -604,12 +605,16 @@ class MarketingHandoverInvoiceController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = MarketingOrderHandoverInvoice::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             
-            $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual');
+            $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             

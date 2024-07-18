@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-
+use App\Models\MenuUser;
 class EmployeeTransferController extends Controller
 {
     public function index(Request $request)
@@ -682,6 +682,10 @@ class EmployeeTransferController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = EmployeeTransfer::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();

@@ -18,6 +18,7 @@ use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\HR\RevisionAttendanceHRDController;
 use App\Http\Controllers\Inventory\DeadStockController;
+use App\Http\Controllers\Inventory\AgingGRPOController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\QualityControlController;
 
@@ -2063,6 +2064,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[DeadStockController::class, 'index']);
                         Route::post('filter',[DeadStockController::class, 'filter']);
                         Route::get('export',[DeadStockController::class, 'export']);
+                    });
+
+                    Route::prefix('aging_good_receipt')->middleware('operation.access:aging_good_receipt,view')->group(function () {
+                        Route::get('/',[AgingGRPOController::class, 'index']);
+                        Route::post('filter',[AgingGRPOController::class, 'filter']);
+                        Route::get('export',[AgingGRPOController::class, 'export']);
                     });
                 });
             });

@@ -919,11 +919,15 @@ class MaterialRequestController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = MaterialRequest::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Item Request','a5','landscape','admin.print.inventory.request_individual');
+            $pdf = PrintHelper::print($pr,'Item Request','a5','landscape','admin.print.inventory.request_individual',$menuUser->mode);
             
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");

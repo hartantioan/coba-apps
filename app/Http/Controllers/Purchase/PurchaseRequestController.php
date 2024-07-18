@@ -980,6 +980,10 @@ class PurchaseRequestController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($id))->first();
                 

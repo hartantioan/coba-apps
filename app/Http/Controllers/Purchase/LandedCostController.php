@@ -1424,11 +1424,15 @@ class LandedCostController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = LandedCost::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Landed Cost','a4','portrait','admin.print.purchase.landed_cost_individual');
+            $pdf = PrintHelper::print($pr,'Landed Cost','a4','portrait','admin.print.purchase.landed_cost_individual',$menuUser->mode);
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));

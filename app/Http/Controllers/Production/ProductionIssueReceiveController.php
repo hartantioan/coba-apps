@@ -26,6 +26,7 @@ use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Line;
+use App\Models\MenuUser;
 use App\Models\Machine;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
@@ -727,11 +728,15 @@ class ProductionIssueReceiveController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = ProductionIssueReceive::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Issue Receive','a4','portrait','admin.print.production.issue_receive_individual');
+            $pdf = PrintHelper::print($pr,'Issue Receive','a4','portrait','admin.print.production.issue_receive_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             

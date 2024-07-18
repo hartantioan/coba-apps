@@ -19,6 +19,7 @@ use App\Models\MarketingOrderReturn;
 use App\Models\MarketingOrderReceiptDetail;
 use Illuminate\Support\Str;
 use App\Models\Place;
+use App\Models\MenuUser;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
@@ -648,6 +649,10 @@ class MarketingOrderReceiptController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = MarketingOrderReceipt::where('code',CustomHelper::decrypt($id))->first();
         $formattedDate = date('d/m/Y H:i:s');

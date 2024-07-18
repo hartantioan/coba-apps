@@ -175,12 +175,16 @@ class DocumentTaxHandoverController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = DocumentTaxHandover::with(['documentTaxHandoverDetail.documentTax' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->where('code',CustomHelper::decrypt($id))->first();        
         if($pr){
-            $pdf = PrintHelper::print($pr,'Document Tax Handover','a4','portrait','admin.print.accounting.document_tax_handover_individual');
+            $pdf = PrintHelper::print($pr,'Document Tax Handover','a4','portrait','admin.print.accounting.document_tax_handover_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             // $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             // $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

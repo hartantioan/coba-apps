@@ -54,15 +54,14 @@ class ImportEmployeeSchedule implements ToCollection
             $dateFormatted = $dateTime->format('d/m/Y');
             $dates[] = $dateFormatted;
         }
-       
+        
         $data_shift_schedule = [];
+        // info($dataFormatted[166]);
         foreach($dataFormatted as $keyd =>$data_employee){
-            
-            // if ($key === 0) {
-            //     info($key);
-            //     break;
-            // }
+          
+           
             if($keyd > 0){
+               
                 foreach($dates as $index=>$datee){
                     
                     $data_shift_schedule[]=[
@@ -70,13 +69,11 @@ class ImportEmployeeSchedule implements ToCollection
                         "shift_code" => $data_employee["E-Z"][$index],
                         "date" => $datee,
                     ];
-                   
                 }
             }
-            
+            // info($keyd);
             
         }
-       
         foreach($data_shift_schedule as $data_masuk){
             $query_employee=User::where('employee_no',$data_masuk["user_code"])->first();
             $query_shift=Shift::where('code','like','%'.$data_masuk["shift_code"])->first();

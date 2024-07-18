@@ -33,6 +33,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UsedData;
+use App\Models\MenuUser;
 class ProductionReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -704,6 +705,10 @@ class ProductionReceiveController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = ProductionReceive::where('code',CustomHelper::decrypt($id))->first();
                 

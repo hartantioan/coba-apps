@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Process;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Str;
 use App\Models\UsedData;
+use App\Models\MenuUser;
 class MarketingOrderReturnController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -608,12 +609,16 @@ class MarketingOrderReturnController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = MarketingOrderReturn::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             
-            $pdf = PrintHelper::print($pr,'Print AR Retur','a5','landscape','admin.print.sales.order_return_individual');
+            $pdf = PrintHelper::print($pr,'Print AR Retur','a5','landscape','admin.print.sales.order_return_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             

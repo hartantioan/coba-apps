@@ -1109,13 +1109,17 @@ class GoodReceiveController extends Controller
     }
 
     public function printIndividual(Request $request,$id){
+        $lastSegment = request()->segment(count(request()->segments())-2);
+       
+        $menu = Menu::where('url', $lastSegment)->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
         $pr = GoodReceive::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
 
-            $pdf = PrintHelper::print($pr,'Good Receive','a5','landscape','admin.print.inventory.good_receive_individual');
+            $pdf = PrintHelper::print($pr,'Good Receive','a5','landscape','admin.print.inventory.good_receive_individual',$menuUser->mode);
     
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

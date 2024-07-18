@@ -78,7 +78,7 @@ class AuthController extends Controller
                     'ip'            => $request->ip(),
                 
                 ]);
-                UsedData::where('user_id', session('bo_id'))->delete();
+                UsedData::where('user_id', $user->id)->delete();
 
                 Auth::login($user);
 

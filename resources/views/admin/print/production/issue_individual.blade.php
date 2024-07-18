@@ -334,7 +334,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th align="center" colspan="10" style="font-size:16px !important;">Daftar Item/Resource Issue (Terpakai)</th>
+                                <th align="center" colspan="11" style="font-size:16px !important;">Daftar Item/Resource Issue (Terpakai)</th>
                             </tr>
                             <tr>
                                 <th align="center">{{ __('translations.no') }}.</th>
@@ -346,7 +346,8 @@
                                 <th align="center">Nominal Real</th>
                                 <th align="center">Total Planned</th>
                                 <th align="center">Total Real</th>
-                                <th align="center">Plant & Gudang</th>
+                                <th align="center">Plant</th>
+                                <th align="center">Gudang</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -361,11 +362,12 @@
                                     <td align="right">{{ number_format($row->nominal,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total_planned,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td>{{ $row->item()->exists() ? $row->itemStock->fullName() : '-' }}</td>
+                                    <td>{{ $row->place()->exists() ? $row->place->code : '-' }}</td>
+                                    <td>{{ $row->warehouse()->exists() ? $row->warehouse->name : '-' }}</td>
                                 </tr>
                                 @if($row->productionBatchUsage()->exists())
                                     <tr>
-                                        <td colspan="10">Batch terpakai <br>{!! $row->listBatchUsed() !!}</td>
+                                        <td colspan="11">Batch terpakai <br>{!! $row->listBatchUsed() !!}</td>
                                     </tr>
                                 @endif
                             @endforeach

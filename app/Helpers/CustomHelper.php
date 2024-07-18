@@ -4137,7 +4137,7 @@ class CustomHelper {
 				}
 			}
 
-			#lek misal item receive fg kelompokkan
+			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
 				foreach($arrBom as $row){
 					$totalrow = $pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->sum('total');
@@ -4184,6 +4184,7 @@ class CustomHelper {
 									$pir->post_date,
 									NULL,
 									NULL,
+									NULL,
 								);
 				
 								self::sendStock(
@@ -4192,6 +4193,7 @@ class CustomHelper {
 									$row->itemStock->item_id,
 									$row->qty,
 									'OUT',
+									NULL,
 									NULL,
 									NULL,
 								);
@@ -4300,44 +4302,93 @@ class CustomHelper {
 									);
 								}
 							}else{
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $row->lookable->itemGroup->coa_id,
-									'place_id'		=> $row->itemStock->place_id,
-									'line_id'		=> $row->productionIssue->line_id,
-									'item_id'		=> $row->itemStock->item_id,
-									'warehouse_id'	=> $row->itemStock->warehouse_id,
-									'type'			=> '2',
-									'nominal'		=> $row->total,
-									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->code,
-								]);
-				
-								self::sendCogs($table_name,
-									$pir->id,
-									$pir->company_id,
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									$row->total,
-									'OUT',
-									$pir->post_date,
-									NULL,
-									NULL,
-									NULL,
-								);
-				
-								self::sendStock(
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									'OUT',
-									NULL,
-									NULL,
-									NULL,
-								);
+								#jika wip sebelum final ke wip final jurnal batchnya disini
+								if($pir->productionFgReceive()->exists()){
+									foreach($pir->productionFgReceive->productionBatchUsage()->whereHas('productionBatch',function($querykuy)use($row){
+										$querykuy->where('item_id',$row->lookable_id);
+									})->get() as $rowbatchusage){
+										$totalCost = round(($rowbatchusage->productionBatch->total / $rowbatchusage->productionBatch->qty_real) * $rowbatchusage->qty,2);
+
+										JournalDetail::create([
+											'journal_id'	=> $query->id,
+											'coa_id'		=> $rowbatchusage->productionBatch->item->itemGroup->coa_id,
+											'place_id'		=> $rowbatchusage->productionBatch->place_id,
+											'line_id'		=> $pir->productionFgReceive->line_id,
+											'item_id'		=> $rowbatchusage->productionBatch->item_id,
+											'warehouse_id'	=> $rowbatchusage->productionBatch->warehouse_id,
+											'type'			=> '2',
+											'nominal'		=> $totalCost,
+											'nominal_fc'	=> $totalCost,
+											'note'			=> $pir->code.' - '.$rowbatchusage->productionBatch->code,
+										]);
+						
+										self::sendCogs($table_name,
+											$pir->id,
+											$pir->company_id,
+											$rowbatchusage->productionBatch->place_id,
+											$rowbatchusage->productionBatch->warehouse_id,
+											$rowbatchusage->productionBatch->item_id,
+											$rowbatchusage->qty,
+											$totalCost,
+											'OUT',
+											$pir->post_date,
+											NULL,
+											NULL,
+											$rowbatchusage->productionBatch->id,
+										);
+						
+										self::sendStock(
+											$rowbatchusage->productionBatch->place_id,
+											$rowbatchusage->productionBatch->warehouse_id,
+											$rowbatchusage->productionBatch->item_id,
+											$rowbatchusage->qty,
+											'OUT',
+											NULL,
+											NULL,
+											$rowbatchusage->productionBatch->id,
+										);
+									}
+								}else{
+									#jika production issue biasa
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'coa_id'		=> $row->lookable->itemGroup->coa_id,
+										'place_id'		=> $row->itemStock->place_id,
+										'line_id'		=> $row->productionIssue->line_id,
+										'item_id'		=> $row->itemStock->item_id,
+										'warehouse_id'	=> $row->itemStock->warehouse_id,
+										'type'			=> '2',
+										'nominal'		=> $row->total,
+										'nominal_fc'	=> $row->total,
+										'note'			=> $pir->code,
+									]);
+					
+									self::sendCogs($table_name,
+										$pir->id,
+										$pir->company_id,
+										$row->itemStock->place_id,
+										$row->itemStock->warehouse_id,
+										$row->itemStock->item_id,
+										$row->qty,
+										$row->total,
+										'OUT',
+										$pir->post_date,
+										NULL,
+										NULL,
+										NULL,
+									);
+					
+									self::sendStock(
+										$row->itemStock->place_id,
+										$row->itemStock->warehouse_id,
+										$row->itemStock->item_id,
+										$row->qty,
+										'OUT',
+										NULL,
+										NULL,
+										NULL,
+									);
+								}
 							}
 						}
 					}elseif($row->lookable_type == 'resources'){
@@ -4560,6 +4611,7 @@ class CustomHelper {
 				$pir->post_date,
 				NULL,
 				NULL,
+				NULL,
 			);
 
 			self::sendStock(
@@ -4568,6 +4620,7 @@ class CustomHelper {
 				$pir->productionOrderDetail->productionScheduleDetail->item_id,
 				$qtyWip5,
 				'IN',
+				NULL,
 				NULL,
 				NULL,
 			);
@@ -4625,22 +4678,24 @@ class CustomHelper {
 					$row->place_id,
 					$row->warehouse_id,
 					$row->item_id,
-					$row->qty * $row->productionFgReceiveDetail->conversion,
+					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					$row->total,
 					'IN',
 					$pir->post_date,
 					$row->area_id,
 					$row->item_shading_id,
+					$row->productionBatch->id,
 				);
 
 				self::sendStock(
 					$row->place_id,
 					$row->warehouse_id,
 					$row->item_id,
-					$row->qty * $row->productionFgReceiveDetail->conversion,
+					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					'IN',
 					$row->area_id,
 					$row->item_shading_id,
+					$row->productionBatch->id,
 				);
 
 				JournalDetail::create([
@@ -4656,16 +4711,18 @@ class CustomHelper {
 					'note'			=> $pir->code,
 				]);
 
+
 				self::sendCogs($table_name,
 					$pir->id,
 					$pir->company_id,
 					$pir->productionFgReceive->place_id,
 					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
 					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
-					$row->qty * $row->productionFgReceiveDetail->conversion,
+					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					$row->total,
 					'OUT',
 					$pir->post_date,
+					NULL,
 					NULL,
 					NULL,
 				);
@@ -4674,8 +4731,9 @@ class CustomHelper {
 					$pir->productionFgReceive->place_id,
 					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
 					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
-					$row->qty * $row->productionFgReceiveDetail->conversion,
+					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					'OUT',
+					NULL,
 					NULL,
 					NULL,
 				);

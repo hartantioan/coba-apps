@@ -487,7 +487,7 @@ class PaymentRequestController extends Controller
             }
 
             foreach($data->purchaseDownPayment as $row){
-                if(!$row->used()->exists() && $row->balancePaymentRequest() > 0){
+                if(!$row->used()->exists() && $row->balancePaymentRequestPreq() > 0){
                     $memo = 0;
                     $final = $row->grandtotal - $memo;
                     $details[] = [

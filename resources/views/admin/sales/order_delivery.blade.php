@@ -740,7 +740,7 @@ document.addEventListener('focusin', function (event) {
                                     </tr>
                                     <tr class="btn_stock" data-id="` + response.id + `">
                                         <td>
-                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + response.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
+                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
                                                 <i class="material-icons left">add</i> Tambah Asal Item
                                             </a>
                                         </td>
@@ -1429,14 +1429,14 @@ document.addEventListener('focusin', function (event) {
                 formData.delete("arr_qty[]");
                 formData.delete("arr_note[]");
                 
-                if($('input[name^="arr_modi"]').length > 0){
-                    $('input[name^="arr_modi"]').each(function(index){
+                if($('input[name^="arr_modi[]"]').length > 0){
+                    $('input[name^="arr_modi[]"]').each(function(index){
                         formData.append('arr_modi[]',$(this).val());
-                        formData.append('arr_item[]',$('input[name^="arr_item"]').eq(index).val());
-                        formData.append('arr_place[]',$('input[name^="arr_place"]').eq(index).val());
-                        formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
+                        formData.append('arr_item[]',$('input[name^="arr_item[]"]').eq(index).val());
+                        formData.append('arr_place[]',$('input[name^="arr_place[]"]').eq(index).val());
+                        formData.append('arr_qty[]',$('input[name^="arr_qty[]"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
-                        if(!$('input[name^="arr_modi"]').eq(index).val()){
+                        if(!$('input[name^="arr_modi[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1631,7 +1631,7 @@ document.addEventListener('focusin', function (event) {
                             </tr>
                             <tr class="btn_stock" data-id="` + val.mo + `">
                                 <td>
-                                    <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.mo + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');" href="javascript:void(0);">
+                                    <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');" href="javascript:void(0);">
                                         <i class="material-icons left">add</i> Tambah Asal Item
                                     </a>
                                 </td>

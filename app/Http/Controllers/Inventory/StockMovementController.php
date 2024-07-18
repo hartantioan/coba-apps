@@ -86,6 +86,7 @@ class StockMovementController extends Controller
                 }
             })
             ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
         }else{
             $perlu = 1;
@@ -124,8 +125,8 @@ class StockMovementController extends Controller
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('id')
             ->orderBy('date')
+            ->orderBy('id')
             ->get();
         }
      
@@ -187,8 +188,8 @@ class StockMovementController extends Controller
                         });
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                ->orderBy('id', 'desc')
                 ->first();
 
                 $array_last_item[] = [
@@ -255,8 +256,8 @@ class StockMovementController extends Controller
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
             }else{
                 $query_no=[];
@@ -293,8 +294,8 @@ class StockMovementController extends Controller
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->first();
                 if($first){
                     $query_no[]=$first;

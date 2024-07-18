@@ -68,6 +68,12 @@ class PurchaseDownPayment extends Model
         });
     }
 
+    public function hasPaymentRequestDetailPreq(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3','6']);
+        });
+    }
+
     public function realPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
             $query->whereIn('status',['1','2','3']);
@@ -319,6 +325,20 @@ class PurchaseDownPayment extends Model
             $total -= $rowpayment->nominal;
         }
         return $total;
+    }
+
+    public function balancePaymentRequestPreq(){
+        $total = $this->grandtotal;
+        $totalAfterMemo = $total - $this->totalMemo();
+        foreach($this->hasPaymentRequestDetailPreq as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        foreach($this->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+            $query->where('payment_type','5')->whereIn('status',['1','2','3'])->whereDoesntHave('outgoingPayment')->whereNull('coa_source_id');
+        })->get() as $rowpayment){
+            $totalAfterMemo -= $rowpayment->nominal;
+        }
+        return $totalAfterMemo;
     }
 
     public function balancePaymentRequest(){

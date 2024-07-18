@@ -64,6 +64,7 @@ use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Bom;
+use App\Models\BomStandard;
 use App\Models\Color;
 use App\Models\DeliveryCost;
 use App\Models\GoodIssueRequest;
@@ -357,6 +358,25 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomStandard(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = BomStandard::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
             ];
         }
 
@@ -4330,6 +4350,7 @@ class Select2Controller extends Controller {
             $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
                 $query->whereNotNull('is_default');
             })->where('issue_method','2')->count();
+            $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
                 'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
@@ -4352,7 +4373,7 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
-                'has_backflush'                 => $countbackflush > 0 ? '1' : '',
+                'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
             ];
         }
 
@@ -4499,6 +4520,12 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%");
                     if($request->arr_batch_id){
                         $query->whereNotIn('id',$request->arr_batch_id);
+                    }
+                    if($request->place_id){
+                        $query->where('place_id',$request->place_id);
+                    }
+                    if($request->warehouse_id){
+                        $query->where('warehouse_id',$request->warehouse_id);
                     }
                 })
                 ->where('item_id',$request->item_id)

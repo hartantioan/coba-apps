@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\BomStandard;
 use App\Models\CostDistribution;
 use App\Models\Item;
 use App\Models\Place;
@@ -25,12 +26,13 @@ class ExportTemplateMasterBom implements WithEvents
         $event->writer->getSheetByIndex(3);
         $event->writer->getSheetByIndex(4);
         $event->writer->getSheetByIndex(5);
+        $event->writer->getSheetByIndex(10);
     
         $items = Item::where('status','1')->orderBy('code')->get();
         $plant = Place::where('status','1')->get();
-        $warehouse = Warehouse::where('status','1')->get();
         $resources = Resource::where('status','1')->orderBy('code')->get();
         $costdist = CostDistribution::where('status','1')->orderBy('code')->get();
+        $bomStandard = BomStandard::where('status','1')->orderBy('code')->get();
         $startRow = 2;
         foreach($items as $row){
             $event->getWriter()->getSheetByIndex(3)->setCellValue('A'.$startRow,$row->code);
@@ -44,12 +46,6 @@ class ExportTemplateMasterBom implements WithEvents
             $startRow++;
         }
         $startRow = 2;
-        foreach($warehouse as $row){
-            $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
-            $startRow++;
-        }
-        $startRow = 2;
         foreach($resources as $row){
             $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
@@ -59,6 +55,12 @@ class ExportTemplateMasterBom implements WithEvents
         foreach($costdist as $row){
             $event->getWriter()->getSheetByIndex(7)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(7)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+        $startRow = 2;
+        foreach($bomStandard as $row){
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(10)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
         

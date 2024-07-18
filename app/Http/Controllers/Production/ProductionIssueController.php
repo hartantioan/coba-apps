@@ -608,8 +608,8 @@ class ProductionIssueController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_planned).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->lookable->uomUnit->code.'</td>
-                <td class="center-align">'.$row->place->code.'</td>
-                <td class="center-align">'.$row->warehouse->name.'</td>
+                <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
+                <td class="center-align">'.($row->warehouse()->exists() ? $row->warehouse->name : '-').'</td>
             </tr>';
             if($row->productionBatchUsage()->exists()){
                 $string .= '<tr>

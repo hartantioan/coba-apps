@@ -11,6 +11,7 @@ use App\Models\Place;
 use App\Models\Resource;
 use App\Models\Warehouse;
 use App\Exceptions\RowImportException;
+use App\Models\BomStandard;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Validators\ValidationException;
@@ -48,15 +49,13 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                 $item_reject_code = explode('#', $row['item_reject'])[0];
                 $item_reject_id = Item::where('code', $item_reject_code)->first();
                 $place = Place::where('code', explode('#', $row['plant'])[0])->first();
-                $warehouse = Warehouse::where('code', explode('#', $row['gudang'])[0])->first();
+                $bomStandard = $row['bom_standard'] ? BomStandard::where('code', explode('#', $row['bom_standard'])[0])->first() : '';
                 if(!$item_output && $this->error ==null){
                     $this->error = "output.";
                 }elseif(!$item_reject_id && $this->error ==null){
                     $this->error = "reject.";
                 }elseif(!$place && $this->error ==null){
                     $this->error = "plant.";
-                }elseif(!$warehouse && $this->error ==null){
-                    $this->error = "Warehouse.";
                 }
 
                 if (!$check) {
@@ -69,7 +68,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                         'item_id' => $item_output->id,
                         'item_reject_id' => $item_reject_id->id,
                         'place_id' => $place->id,
-                        'warehouse_id' => $warehouse->id,
+                        'bom_standard_id' => $bomStandard ? $bomStandard->id : NULL,
                         'qty_output' => $row['qty_output'],
                         'group' => $row['group'],
                         'status' => '1',
@@ -89,7 +88,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     $check->item_id = $item_output->id;
                     $check->item_reject_id = $item_reject_id->id;
                     $check->place_id = $place->id;
-                    $check->warehouse_id = $warehouse->id;
+                    $check->warehouse_id = $bomStandard ? $bomStandard->id : NULL;
                     $check->qty_output = $row['qty_output'];
                     $check->group = $row['group'];
 

@@ -150,8 +150,8 @@ class StockInRupiahController extends Controller
                 }
             })
             ->orderBy('item_id')
-            ->orderBy('id')
             ->orderBy('date')
+            ->orderBy('id')
             ->get();
         }
         $cum_qty = 0;
@@ -285,8 +285,8 @@ class StockInRupiahController extends Controller
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->get();
             }else{
                 $query_no=[];
@@ -323,8 +323,8 @@ class StockInRupiahController extends Controller
                         $query->whereNotIn('item_id', $excludeIds);
                     }
                 })
-                ->orderBy('id', 'desc')
                 ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
                 ->first();
                 if($first){
                     $query_no[]=$first;

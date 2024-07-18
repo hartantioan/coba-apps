@@ -302,6 +302,7 @@
                                                             <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">Item/Resource</th>
                                                             <th class="center">Qty Planned</th>
+                                                            <th class="center" width="150px">Persen (%)</th>
                                                             <th class="center">Qty Real</th>
                                                             <th class="center">Satuan Produksi</th>
                                                             <th class="center">Plant</th>
@@ -311,14 +312,14 @@
                                                     </thead>
                                                     <tbody id="body-item-issue">
                                                         <tr id="last-row-item-issue">
-                                                            <td class="center-align" colspan="8">
+                                                            <td class="center-align" colspan="9">
                                                                 Silahkan tambahkan Order Produksi untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
                                                         <tr>
-                                                            <th colspan="8">
+                                                            <th colspan="9">
                                                                 <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('items')" href="javascript:void(0);">
                                                                     <i class="material-icons left">add</i> Tambah Item
                                                                 </a>
@@ -703,7 +704,7 @@
                 $('#production_order_detail_id,#shift_id').empty();
                 $('#body-item-issue').empty().append(`
                     <tr id="last-row-item-issue">
-                        <td class="center-align" colspan="8">
+                        <td class="center-align" colspan="9">
                             Silahkan tambahkan Order Produksi untuk memulai...
                         </td>
                     </tr>
@@ -751,6 +752,9 @@
                         <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + type +`')"></select>
                     </td>
                     <td class="right-align">
+                        0,000
+                    </td>
+                    <td class="center">
                         0,000
                     </td>
                     <td class="center">
@@ -1023,7 +1027,7 @@
     function getProductionOrder(){
         $('#body-item-issue').empty().append(`
             <tr id="last-row-item-issue">
-                <td class="center-align" colspan="8">
+                <td class="center-align" colspan="9">
                     Silahkan tambahkan Order Produksi untuk memulai...
                 </td>
             </tr>
@@ -1075,11 +1079,14 @@
                         <td>
                             ` + val.name + `
                         </td>
-                        <td class="right-align">
+                        <td class="right-align" id="rowPlanned` + count + `">
                             ` + val.qty_planned + `
                         </td>
                         <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                            <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);convertPercentToQty('` + count + `');" style="text-align:right;width:100%;" id="rowPercent`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                         </td>
                         <td class="center" id="arr_unit` + count + `">
                             ` + val.unit + `
@@ -1265,6 +1272,24 @@
         }else{
             
         }
+    }
+
+    function convertQtyToPercent(code){
+        let max = parseFloat($('#rowPlanned' + code).text().replaceAll(".", "").replaceAll(",","."));
+        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let percent = (qty / max) * 100;
+        $('#rowPercent' + code).val(
+            (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toFixed(3).toString().replace('.',','))
+        );
+    }
+
+    function convertPercentToQty(code){
+        let max = parseFloat($('#rowPlanned' + code).text().replaceAll(".", "").replaceAll(",","."));
+        let percent = parseFloat($('#rowPercent' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let qty = (percent / 100) * max;
+        $('#rowQty' + code).val(
+            (qty >= 0 ? '' : '-') + formatRupiahIni(qty.toFixed(3).toString().replace('.',','))
+        );
     }
 
     function checkQtyBatch(code){
@@ -1788,11 +1813,14 @@
                             <td>
                                 ` + val.lookable_code + ` - ` + val.lookable_name + `
                             </td>
-                            <td class="right-align">
+                            <td class="right-align" id="rowPlanned` + count + `">
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
+                                <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);convertPercentToQty('` + count + `');" style="text-align:right;width:100%;" id="rowPercent`+ count +`">
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `
@@ -1840,7 +1868,7 @@
                     if(val.item_stock_id){
                         $('#arr_item_stock_id' + count).val(val.item_stock_id);
                     }
-                    /* $('#rowQty' + count).trigger('keyup'); */
+                    $('#rowQty' + count).trigger('keyup');
                     if(val.has_bom){
 
                         let arr_batch_id = [];

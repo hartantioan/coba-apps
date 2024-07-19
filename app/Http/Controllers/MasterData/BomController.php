@@ -151,16 +151,13 @@ class BomController extends Controller
             'name'                      => 'required',
             'qty_output'                => 'required',
             'place_id'                  => 'required',
-            'warehouse_id'              => 'required',
             'group'                     => 'required',
-            'arr_type'                  => 'required|array',
+            /* 'arr_type'                  => 'required|array',
             'arr_detail'                => 'required|array',
             'arr_qty'                   => 'required|array',
             'arr_description'           => 'required|array',
-            'arr_nominal'               => 'required|array',
-            'arr_total'                 => 'required|array',
             'arr_alternative'           => 'required|array',
-            'arr_issue_method'          => 'required|array',
+            'arr_issue_method'          => 'required|array', */
         ], [
             'code.required'                 => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai',
@@ -168,9 +165,8 @@ class BomController extends Controller
             'name.required'                 => 'Nama resep tidak boleh kosong.',
             'qty_output.required'           => 'Jumlah output produksi tidak boleh kosong',
             'place_id.required'             => 'Plant tidak boleh kosong',
-            'warehouse_id.required'         => 'Gudang tidak boleh kosong',
             'group.required'                => 'Grup tidak boleh kosong',
-            'arr_type.required'             => 'Tipe tidak boleh kosong',
+            /* 'arr_type.required'             => 'Tipe tidak boleh kosong',
             'arr_type.array'                => 'Tipe haruslah dalam bentuk array',
             'arr_detail.required'           => 'Detail item/biaya tidak boleh kosong',
             'arr_detail.array'              => 'Detail item/biaya haruslah dalam bentuk array',
@@ -178,14 +174,10 @@ class BomController extends Controller
             'arr_qty.array'                 => 'Jumlah material haruslah dalam bentuk array',
             'arr_description.required'      => 'Deskripsi biaya tidak boleh kosong',
             'arr_description.array'         => 'Deskripsi biaya haruslah dalam bentuk array',
-            'arr_nominal.required'          => 'Nominal biaya tidak boleh kosong',
-            'arr_nominal.array'             => 'Nominal biaya haruslah dalam bentuk array',
-            'arr_total.required'            => 'Total tidak boleh kosong',
-            'arr_total.array'               => 'Total haruslah dalam bentuk array',
             'arr_alternative.required'      => 'Alternatif tidak boleh kosong',
             'arr_alternative.array'         => 'Alternatif haruslah dalam bentuk array',
             'arr_issue_method.required'     => 'Issue method tidak boleh kosong',
-            'arr_issue_method.array'        => 'Issue method haruslah dalam bentuk array',
+            'arr_issue_method.array'        => 'Issue method haruslah dalam bentuk array', */
         ]);
 
         if($validation->fails()) {
@@ -250,20 +242,22 @@ class BomController extends Controller
                         'name'          => $request->arr_alternative_name[$key] ?? '',
                         'is_default'    => $request->arr_alternative_default[$key] ?? NULL,
                     ]);
-                    foreach($request->arr_type as $keydetail => $rowdetail){
-                        if($request->arr_alternative[$keydetail] == $row){
-                            BomDetail::create([
-                                'bom_id'                => $query->id,
-                                'bom_alternative_id'    => $queryA->id,
-                                'lookable_type'         => $rowdetail,
-                                'lookable_id'           => $request->arr_detail[$keydetail],
-                                'cost_distribution_id'  => $request->arr_cost_distribution[$keydetail] ?? NULL,
-                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$keydetail])),
-                                'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_nominal[$keydetail])),
-                                'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$keydetail])),
-                                'description'           => $request->arr_description[$keydetail],
-                                'issue_method'          => $request->arr_issue_method[$keydetail],
-                            ]);
+                    if($request->arr_type){
+                        foreach($request->arr_type as $keydetail => $rowdetail){
+                            if($request->arr_alternative[$keydetail] == $row){
+                                BomDetail::create([
+                                    'bom_id'                => $query->id,
+                                    'bom_alternative_id'    => $queryA->id,
+                                    'lookable_type'         => $rowdetail,
+                                    'lookable_id'           => $request->arr_detail[$keydetail],
+                                    'cost_distribution_id'  => $request->arr_cost_distribution[$keydetail] ?? NULL,
+                                    'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$keydetail])),
+                                    'nominal'               => 0,
+                                    'total'                 => 0,
+                                    'description'           => $request->arr_description[$keydetail],
+                                    'issue_method'          => $request->arr_issue_method[$keydetail],
+                                ]);
+                            }
                         }
                     }
                 }

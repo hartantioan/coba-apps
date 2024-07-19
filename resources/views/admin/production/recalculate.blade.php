@@ -137,8 +137,9 @@
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
+                                                        <th>Tgl.Mulai Periode</th>
+                                                        <th>Tgl.Akhir Periode</th>
                                                         <th>{{ __('translations.note') }}</th>
-                                                        <th>No.Receive FG</th>
                                                         <th>Dokumen</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -212,10 +213,6 @@
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id"></select>
-                                        <label class="active" for="production_fg_receive_id">Daftar Receive FG</label>
-                                    </div>
                                     <div class="col m6 s12">
                                         <h6><b>Receive FG Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                                     </div>
@@ -223,33 +220,25 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s6">
+                            <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>2a. Dari Item dan Area</legend>
-                                    <div class="input-field col m6 s12">
-                                        <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id" onchange="getItemInformation();"></select>
-                                        <label class="active" for="production_fg_receive_detail_id">Item Receive FG</label>
+                                    <legend>2. Pilih Periode Kalkulasi Produksi</legend>
+                                    <div class="col m8 s12">
+                                        <div class="input-field col m6 s12">
+                                            <input id="start_date_period" name="start_date_period" type="date" placeholder="Tgl. mulai periode" value="{{ date('Y-m-'.'01') }}">
+                                            <label class="active" for="start_date_period">Tgl. Mulai Periode</label>
+                                        </div>
+                                        <div class="input-field col m6 s12">
+                                            <input id="end_date_period" name="end_date_period" type="date" placeholder="Tgl. akhir periode" value="{{ date('Y-m-d') }}">
+                                            <label class="active" for="end_date_period">Tgl. Akhir Periode</label>
+                                        </div>
+                                        <div class="input-field col m12 s12">
+                                            <select class="browser-default" id="resource_id" name="resource_id" multiple="multiple" style="width:100% !important;"></select>
+                                            <label class="active" for="resource_id">Filter Resource (Pilih untuk mem-filter resource sesuai daftar terpilih.)</label>
+                                        </div>
                                     </div>
-                                    <div class="input-field col m6 s12">
-                                        <select class="browser-default" id="area_id" name="area_id"></select>
-                                        <label class="active" for="area_id">Area</label>
-                                    </div>
-                                    <div class="input-field col m6 s12">
-                                        <div class="form-control-feedback" id="qty-unit">-</div>
-                                        <input id="qty" name="qty" type="text" data-max="0,000" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyMax();">
-                                        <label class="active" for="qty">Qty Input</label>
-                                    </div>
-                                    <div class="col m6 s12">
-                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="getItem();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="col s6">
-                                <fieldset>
-                                    <legend>2b. Dari Scan Barcode</legend>
-                                    <div class="input-field col m12 s12">
-                                        <input id="text-barcode" name="text-barcode" type="text" value="" placeholder="Silahkan arahkan cursor disini dan mulai scan...">
-                                        <label class="active" for="text-barcode">Scan disini</label>
+                                    <div class="col m4 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-3 mr-1" onclick="getData();" href="javascript:void(0);"><i class="material-icons left">add</i> Tarik Data</a>
                                     </div>
                                 </fieldset>
                             </div>
@@ -257,35 +246,34 @@
                         <div class="row">
                             <div class="col s12 step9">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Detail Item Receive FG & Palet</legend>
+                                    <legend>3. Detail Batch & Item</legend>
                                     <div class="col m12 s12">
                                         <div class="card-alert card gradient-45deg-purple-amber">
                                             <div class="card-content white-text">
-                                                <p>Info : Qty diterima adalah otomatis perhitungan dari Qty input dikurangi Qty reject. Silahkan isi qty reject jika anda ingin nilai barang qty reject ditambahkan ke nilai Qty diterima.</p>
+                                                <p>Info : Biaya resource yang muncul adalah nilai kalkulasi dari tiap batch pada periode terpilih. Jika ada lebih dari 1 batch pada saat barang diterima (Production Receive), maka biaya yang muncul adalah nilai proporsional masing-masing batch.</p>
                                             </div>
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:1500px;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center" width="25px">{{ __('translations.delete') }}</th>
                                                             <th class="center" width="25px">No.</th>
                                                             <th class="center" width="150px">No.Batch Palet/Curah</th>
-                                                            <th class="center" width="150px">Kode Item</th>
-                                                            <th class="center" width="150px">Nama Item</th>
-                                                            <th class="center" width="100px">{{ __('translations.shading') }}</th>
-                                                            <th class="center" width="100px">Qty Diterima</th>
+                                                            <th class="center" width="100px">Kode Item</th>
+                                                            <th class="center" width="100px">Nama Item</th>
+                                                            <th class="center" width="100px">Qty</th>
                                                             <th class="center" width="100px">Satuan</th>
-                                                            <th class="center" width="100px">{{ __('translations.plant') }}</th>
-                                                            <th class="center" width="100px">{{ __('translations.warehouse') }}</th>
-                                                            <th class="center" width="100px">{{ __('translations.area') }}</th>
+                                                            <th class="center" width="200px">Resource</th>
+                                                            <th class="center" width="100px">Total Lama</th>
+                                                            <th class="center" width="100px">Total Rekalkulasi</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="11">
-                                                                Silahkan tambahkan Receive FG untuk memulai...
+                                                            <td class="center-align" colspan="10">
+                                                                Silahkan Tarik Data untuk memulai...
                                                             </td>
                                                         </tr>
                                                     </tbody>
@@ -661,24 +649,17 @@
                 $('#production_fg_receive_id').empty();
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="11">
-                            Silahkan tambahkan Receive FG untuk memulai...
+                        <td class="center-align" colspan="10">
+                            Silahkan Tarik Data untuk memulai...
                         </td>
                     </tr>
                 `);
-                $('#body-issue').empty().append(`
-                    <tr id="last-row-issue">
-                        <td class="center-align" colspan="3">
-                            Silahkan tambah dengan tombol dibawah
-                        </td>
-                    </tr>
-                `);
-                $('#qty').data('max','0,000');
             }
         });
         
         select2ServerSide('#production_fg_receive_id', '{{ url("admin/select2/production_fg_receive") }}');
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
+        select2ServerSide('#resource_id', '{{ url("admin/select2/resource") }}');
 
         $('#production_fg_receive_detail_id').select2({
             placeholder: '-- Kosong --',
@@ -710,8 +691,8 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td class="center-align" colspan="11">
-                            Silahkan tambahkan Receive FG untuk memulai...
+                        <td class="center-align" colspan="10">
+                            Silahkan Tarik Data untuk memulai...
                         </td>
                     </tr>
                 `);
@@ -833,36 +814,6 @@
             $('#text-barcode').val('');
         });
     });
-
-    function getItemInformation(){
-        if($("#production_fg_receive_detail_id").val()){
-            $("#qty-unit").text($("#production_fg_receive_detail_id").select2('data')[0].unit);
-            let originalTotal = parseFloat($("#production_fg_receive_detail_id").select2('data')[0].qty.toString().replaceAll(".", "").replaceAll(",","."));
-            let item_id = $("#production_fg_receive_detail_id").select2('data')[0].item_id;
-            $('input[name^="arr_qty[]"][data-item="' + item_id + '"]').each(function(index){
-                originalTotal -= parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            });
-            if(originalTotal > 0){
-                $('#qty').val(
-                    (originalTotal >= 0 ? '' : '-') + formatRupiahIni(originalTotal.toFixed(3).toString().replace('.',','))
-                );
-                $('#qty').data('max',(originalTotal >= 0 ? '' : '-') + formatRupiahIni(originalTotal.toFixed(3).toString().replace('.',',')));
-            }else{
-                $("#qty-unit").text('-');
-                $('#qty').val('0,000');
-                $('#qty').data('max','0,000');
-                swal({
-                    title: 'Ups!',
-                    text: 'Qty telah 100% dipakai.',
-                    icon: 'warning'
-                });
-            }
-        }else{
-            $("#qty-unit").text('-');
-            $('#qty').val('0,000');
-            $('#qty').data('max','0,000');
-        }
-    }
 
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -996,87 +947,90 @@
         }
     }
 
-    function getItem(){
-        if($('#production_fg_receive_detail_id').val() && $('#area_id').val() && parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")) > 0){
-            let datakuy = $('#production_fg_receive_detail_id').select2('data')[0];
-            $('#last-row-item').remove();
+    function getData(){
+        if($('#start_date_period').val() && $('#end_date_period').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    start_date: $('#start_date_period').val(),
+                    end_date: $('#end_date_period').val(),
+                    'resource_id[]' : $('#resource_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    $('.row_item').remove();
+                    $('#last-row-item').remove();
+                    $.each(response.data, function(i, val) {
+                        var count = makeid(10);
 
-            var count = makeid(10);
+                        $('#body-item').append(`
+                            <tr class="row_item">
+                                <input type="hidden" name="arr_production_batch_id[]" value="` + val.production_batch_id + `">
+                                <input type="hidden" name="arr_resource_id[]" value="` + val.resource_id + `">
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                                <td class="center-align">
+                                    ` + (i+1) + `
+                                </td>
+                                <td>
+                                    ` + val.production_batch_code + `
+                                </td>
+                                <td>
+                                    ` + val.item_code + `
+                                </td>
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.qty + `
+                                </td>
+                                <td class="center-align">
+                                    ` + val.unit + `
+                                </td>
+                                <td>
+                                    ` + val.data_name + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.total + `
+                                </td>
+                                <td class="right-align">
+                                    <input name="arr_nominal[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiahNominal(this);" style="text-align:right;" id="arr_nominal`+ count +`">
+                                </td>
+                            </tr>
+                        `);
+                    });
 
-            let no = $('.row_item').length + 1;
+                    M.updateTextFields();
+                    $('#body-item').scrollTop(0);
 
-            var count = makeid(10);
-
-            $('#body-item').append(`
-                <tr class="row_item">
-                    <input type="hidden" name="arr_prfd_id[]" value="` + $('#production_fg_receive_detail_id').val() + `">
-                    <input type="hidden" name="arr_item_id[]" value="` + datakuy.item_id + `">
-                    <input type="hidden" name="arr_area_id[]" value="` + $('#area_id').val() + `">
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                    <td class="center-align">
-                        ` + no + `
-                    </td>
-                    <td>
-                        ` + datakuy.pallet_no + `
-                    </td>
-                    <td>
-                        ` + datakuy.item_code + `
-                    </td>
-                    <td>
-                        ` + datakuy.item_name + `
-                    </td>
-                    <td>
-                        ` + datakuy.shading + `
-                    </td>
-                    <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + $('#qty').val() + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + datakuy.item_id + `">
-                    </td>
-                    <td class="center-align">
-                        ` + datakuy.unit + `
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                            @foreach ($place as $rowplace)
-                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                            <option value="">--Silahkan pilih item--</option>
-                        </select>
-                    </td>
-                    <td class="center-align">
-                        ` + $('#area_id').select2('data')[0].text + `
-                    </td>
-                </tr>
-            `);
-
-            if(datakuy.list_warehouse.length > 0){
-                $('#arr_warehouse' + count).empty();
-                $.each(datakuy.list_warehouse, function(i, val) {
-                    $('#arr_warehouse' + count).append(`
-                        <option value="` + val.id + `">` + val.name + `</option>
-                    `);
-                });
-            }
-
-            $('#arr_qty_reject' + count).trigger('keyup');
-
-            $('#production_fg_receive_detail_id,#area_id').empty();
-            $('#qty').val('0,000');
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
         }else{
-            $('#body-item').empty().append(`
-                <tr id="last-row-item">
-                    <td class="center-align" colspan="11">
-                        Silahkan tambahkan Receive FG untuk memulai...
-                    </td>
-                </tr>
-            `);
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih tanggal periode awal dan akhir.',
+                icon: 'warning'
+            });
         }
     }
 
@@ -1347,8 +1301,9 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'end_date', className: 'center-align' },
                 { name: 'note', className: '' },
-                { name: 'production_fg_receive_id', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

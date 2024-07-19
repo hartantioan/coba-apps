@@ -26,12 +26,11 @@ class ExportTemplateMasterBom implements WithEvents
         $event->writer->getSheetByIndex(3);
         $event->writer->getSheetByIndex(4);
         $event->writer->getSheetByIndex(5);
-        $event->writer->getSheetByIndex(10);
+        $event->writer->getSheetByIndex(6);
+        $event->writer->getSheetByIndex(7);
     
         $items = Item::where('status','1')->orderBy('code')->get();
         $plant = Place::where('status','1')->get();
-        $resources = Resource::where('status','1')->orderBy('code')->get();
-        $costdist = CostDistribution::where('status','1')->orderBy('code')->get();
         $bomStandard = BomStandard::where('status','1')->orderBy('code')->get();
         $startRow = 2;
         foreach($items as $row){
@@ -46,21 +45,9 @@ class ExportTemplateMasterBom implements WithEvents
             $startRow++;
         }
         $startRow = 2;
-        foreach($resources as $row){
-            $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
-            $startRow++;
-        }
-        $startRow = 2;
-        foreach($costdist as $row){
+        foreach($bomStandard as $row){
             $event->getWriter()->getSheetByIndex(7)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(7)->setCellValue('B'.$startRow,$row->name);
-            $startRow++;
-        }
-        $startRow = 2;
-        foreach($bomStandard as $row){
-            $event->getWriter()->getSheetByIndex(10)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(10)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
         

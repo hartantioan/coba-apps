@@ -88,7 +88,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     $check->item_id = $item_output->id;
                     $check->item_reject_id = $item_reject_id->id;
                     $check->place_id = $place->id;
-                    $check->warehouse_id = $bomStandard ? $bomStandard->id : NULL;
+                    $check->bom_standard_id = $bomStandard ? $bomStandard->id : NULL;
                     $check->qty_output = $row['qty_output'];
                     $check->group = $row['group'];
 

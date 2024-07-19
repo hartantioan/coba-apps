@@ -155,7 +155,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        if ($row['kode_bom_header'] == 'null') {
+        if ($row['item_code'] == 'null') {
             return null;
         }else{
             if ($row['kode_bom_header']) {

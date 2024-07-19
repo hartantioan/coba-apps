@@ -50,20 +50,20 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
             $row = $row->toArray();
             if(isset($row['code']) && $row['code']){
                 $check = Item::where('code',$row['code'])->first();
-               
+                $item_group_code = explode('#',$row['item_group'])[0];
+                $item_group_id = ItemGroup::where('code',$item_group_code)->first();
+                
+                $item_unit_code = explode('#',$row['unit'])[0];
+                $item_unit_id= Unit::where('code',$item_unit_code)->first();
+                $type = Type::where('code',explode('#',$row['type_fg'])[0])->first();
+                $size = Size::where('code',explode('#',$row['size_fg'])[0])->first();
+                $variety = Variety::where('code',explode('#',$row['variety_fg'])[0])->first();
+                $pattern = Pattern::where('code',explode('#',$row['pattern_fg'])[0])->first();
+                $pallet = Pallet::where('code',explode('#',$row['pallet_fg'])[0])->first();
+                $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
+                $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
                 if(!$check){
-                    $item_group_code = explode('#',$row['item_group'])[0];
-                    $item_group_id = ItemGroup::where('code',$item_group_code)->first();
-                    
-                    $item_unit_code = explode('#',$row['unit'])[0];
-                    $item_unit_id= Unit::where('code',$item_unit_code)->first();
-                    $type = Type::where('code',explode('#',$row['type_fg'])[0])->first();
-                    $size = Size::where('code',explode('#',$row['size_fg'])[0])->first();
-                    $variety = Variety::where('code',explode('#',$row['variety_fg'])[0])->first();
-                    $pattern = Pattern::where('code',explode('#',$row['pattern_fg'])[0])->first();
-                    $pallet = Pallet::where('code',explode('#',$row['pallet_fg'])[0])->first();
-                    $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
-                    $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
+                   
                     
                     $query = Item::create([
                         'code' => $row['code'],
@@ -109,6 +109,30 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         ->log('Add / edit from excel item data.');
                         
                     DB::commit();
+                }else{
+                    $check->ItemUnit()->delete();
+
+                    $check->name = $row['name'];
+                    $check->other_name=$row['other_name'];
+                    $check->item_group_id=$item_group_id->id;
+                    $check->uom_unit=$item_unit_id->id;
+                    $check->tolerance_gr=$row['toleransi_gr'];
+                    $check->is_inventory_item=$row['is_invent_item'];
+                    $check->is_sales_item=$row['is_sales_item'];
+                    $check->is_purchase_item=$row['is_purchase'];
+                    $check->is_service=$row['is_service'];
+                    $check->is_hide_supplier = $row['is_production'];
+                    $check->type_id= $type ? $type->id : NULL;
+                    $check->size_id = $size ? $size->id : NULL;
+                    $check->variety_id = $variety ? $variety->id : NULL;
+                    $check->pattern_id = $pattern ? $pattern->id : NULL;
+                    $check->pallet_id = $pallet ? $pallet->id : NULL;
+                    $check->grade = $grade ? $grade->id : NULL;
+                    $check->brand_id = $brand ? $brand->id : NULL;
+                    $check->note =  $row['note'];
+                    $check->min_stock = $row['min_stock'];
+                    $check->max_stock = $ $row['max_stock'];
+                    $check->save();
                 }
             }
             else{

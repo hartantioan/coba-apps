@@ -664,14 +664,6 @@
             $('#empty-row-detail' + id).remove();
         }
         var count = makeid(10);
-        var nominal = ``, total = ``;
-        if(param == 'items'){
-            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="0,00">`;
-            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="0,00" readonly>`;
-        }else if(param == 'resources'){
-            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);countAll()">`;
-            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>`;
-        }
         $('#body-detail' + id).append(`
             <tr class="row_detail" id="row_detail` + count + `">
                 <input name="arr_alternative[]" value="` + id + `" type="hidden">
@@ -687,16 +679,6 @@
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    ` + nominal + `
-                </td>
-                <td>
-                    ` + total + `
-                </td>
-                <td class="center">
-                    ` + (param == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
-                    
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
@@ -997,7 +979,7 @@
 
                 resetDetailForm();
 
-                $('#empty-alternative').remove();
+                $('#body-alternative').empty();
 
                 $.each(response.details, function(i, val) {
                     $('#body-alternative').append(`

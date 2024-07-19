@@ -155,15 +155,14 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
-           
-
+        if ($row['kode_bom_header'] == 'null') {
+            return null;
+        }else{
             if ($row['kode_bom_header']) {
                 $check = Bom::where('code', $row['kode_bom_header'])->first();
                 $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
                 if ($check) {
-
+    
                     $method = explode('#', $row['metode'])[1];
                 
                     if($row['type']=='items'){
@@ -215,14 +214,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                         ]);
                     }
                 }
-            }else{
-                return null;
-            }  
-            DB::commit();
-        } catch (\Exception $e) {
-            $sheet='Detail';
-            DB::rollback();
-            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
+            }
         }
     }
 

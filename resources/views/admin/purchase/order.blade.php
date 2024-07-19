@@ -3538,21 +3538,18 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                // Optional: Any action to perform after request completes
+                
             },
             success: function(data) {
                 loadingClose('.modal-content');
 
-                // Open a new window
                 var newWindow = window.open('', '_blank', 'toolbar=no,scrollbars=yes,resizable=yes,width=800,height=600');
 
-                // Write an iframe into the new window
                 newWindow.document.write('<iframe id="pdfFrame" src="' + data + '#toolbar=0" style="width:100%; height:100vh; border:none;"></iframe>');
 
                 newWindow.onload = function() {
                     var iframe = newWindow.document.getElementById('pdfFrame');
 
-                    // Disable right-click in the new window
                     newWindow.document.addEventListener('contextmenu', function(e) {
                         e.preventDefault();
                     });
@@ -3560,13 +3557,11 @@
                     iframe.contentDocument.oncontextmenu = function(){
                         return false; 
                     };
-                    // Disable right-click in the iframe
                     iframe.onload = function() {
                         iframe.contentWindow.document.addEventListener('contextmenu', function(e) {
                             e.preventDefault();
                         });
 
-                        // Disable Ctrl+P in the iframe
                         iframe.contentWindow.document.addEventListener('keydown', function(e) {
                             if (e.ctrlKey && e.key === 'p') {
                                 e.preventDefault();
@@ -3574,7 +3569,6 @@
                         });
                     };
 
-                    // Disable Ctrl+P in the new window
                     newWindow.addEventListener('keydown', function(e) {
                         if (e.ctrlKey && e.key === 'p') {
                             e.preventDefault();

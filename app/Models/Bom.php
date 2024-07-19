@@ -135,4 +135,32 @@ class Bom extends Model
         }
         return $qty;
     }
+
+    public function getMaterialData(){
+        $arr = [];
+        $bomalt = $this->bomAlternative()->whereNotNull('is_default')->first();
+        if($bomalt){
+            foreach($bomalt->bomDetail()->where('lookable_type','items')->get() as $row){
+                $arr[] = [
+                    'bom_id'    => $row->bom_id,
+                    'item_code' => $row->lookable->code,
+                    'item_name' => $row->lookable->name,
+                    'qty'       => $row->qty / $row->bom->qty_output,
+                    'unit'      => $row->lookable->uomUnit->code,
+                ];
+            }
+        }
+        if($this->bomStandard()->exists()){
+            foreach($this->bomStandard->bomStandardDetail()->where('lookable_type','items')->get() as $row){
+                $arr[] = [
+                    'bom_id'    => $this->id,
+                    'item_code' => $row->lookable->code,
+                    'item_name' => $row->lookable->name,
+                    'qty'       => $row->qty,
+                    'unit'      => $row->lookable->uomUnit->code,
+                ];
+            }
+        }
+        return $arr;
+    }
 }

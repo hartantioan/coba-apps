@@ -546,9 +546,12 @@ class ProductionIssueController extends Controller
                 'nominal_bom'           => number_format($row->nominal_bom,2,',','.'),
                 'total_bom'             => number_format($row->total_bom,2,',','.'),
                 'item_stock_id'         => $row->from_item_stock_id,
+                'place_id'              => $row->place_id,
+                'warehouse_id'          => $row->warehouse_id,
                 'list_batch'            => $arrBatch,
                 'has_bom'               => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
                 'issue_method'          => $row->bomDetail()->exists() ? $row->bomDetail->issue_method : '',
+                'list_warehouse'        => $row->item()->exists() ? $row->lookable->warehouseList() : [],
             ];
         }
 

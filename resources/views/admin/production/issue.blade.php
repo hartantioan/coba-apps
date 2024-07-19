@@ -751,11 +751,11 @@
                     <td>
                         <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `','` + type +`')"></select>
                     </td>
-                    <td class="right-align">
+                    <td class="right-align arr-planned">
                         0,000
                     </td>
                     <td class="center">
-                        0,000
+                        <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
                     </td>
                     <td class="center">
                         <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
@@ -1079,14 +1079,14 @@
                         <td>
                             ` + val.name + `
                         </td>
-                        <td class="right-align" id="rowPlanned` + count + `">
+                        <td class="right-align arr-planned" id="rowPlanned` + count + `">
                             ` + val.qty_planned + `
                         </td>
                         <td class="center">
-                            <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);convertPercentToQty('` + count + `');" style="text-align:right;width:100%;" id="rowPercent`+ count +`">
+                            <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
                         </td>
                         <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                         </td>
                         <td class="center" id="arr_unit` + count + `">
                             ` + val.unit + `
@@ -1274,22 +1274,18 @@
         }
     }
 
-    function convertQtyToPercent(code){
-        let max = parseFloat($('#rowPlanned' + code).text().replaceAll(".", "").replaceAll(",","."));
-        let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let percent = (qty / max) * 100;
-        $('#rowPercent' + code).val(
-            (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toFixed(3).toString().replace('.',','))
-        );
-    }
-
-    function convertPercentToQty(code){
-        let max = parseFloat($('#rowPlanned' + code).text().replaceAll(".", "").replaceAll(",","."));
-        let percent = parseFloat($('#rowPercent' + code).val().replaceAll(".", "").replaceAll(",","."));
-        let qty = (percent / 100) * max;
-        $('#rowQty' + code).val(
-            (qty >= 0 ? '' : '-') + formatRupiahIni(qty.toFixed(3).toString().replace('.',','))
-        );
+    function convertQtyToPercent(){
+        let total = 0;
+        $('input[name="arr_qty[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('input[name="arr_qty[]"]').each(function(index){
+            let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            let percent = (val / total) * 100;
+            $('input[name="arr_percentage[]"]').eq(index).val(
+                (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toFixed(2).toString().replace('.',','))
+            );
+        });
     }
 
     function checkQtyBatch(code){
@@ -1788,15 +1784,15 @@
 
                 $.each(response.detail_issue, function(i, val) {
                     var count = makeid(10);
-                    let optionStock = `<select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]">`;
-                    if(val.list_stock.length > 0){
-                        $.each(val.list_stock, function(i, valkuy) {
-                            optionStock += `<option value="` + valkuy.id + `" data-qty="` + valkuy.qty_raw + `">` + valkuy.warehouse + ` - ` + valkuy.qty + `</option>`;
+                    let warehouse = `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">`;
+                    if(val.list_warehouse.length > 0){
+                        $.each(val.list_warehouse, function(i, valkuy) {
+                            warehouse += `<option value="` + valkuy.id + `" ` + (valkuy.id == val.warehouse_id ? 'selected' : '') + `>` + valkuy.name + `</option>`;
                         });
                     }else{
-                        optionStock += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
+                        warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
                     }
-                    optionStock += `</select>`;
+                    warehouse += `</select>`;
                     $('#body-item-issue').append(`
                         <tr class="row_item_issue" data-id="` + val.id + `">
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
@@ -1817,16 +1813,23 @@
                                 ` + val.qty_planned + `
                             </td>
                             <td class="center">
-                                <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);convertPercentToQty('` + count + `');" style="text-align:right;width:100%;" id="rowPercent`+ count +`">
+                                <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent()" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" required data-id="` + count + `">
                             </td>
                             <td class="center" id="arr_unit` + count + `">
                                 ` + val.lookable_unit + `
                             </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
                             <td class="center" id="arr_stock` + count + `">
-                                ` + optionStock + `
+                                ` + warehouse + `
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
@@ -1865,9 +1868,6 @@
                             </td>
                         </tr>` : ``)
                     );
-                    if(val.item_stock_id){
-                        $('#arr_item_stock_id' + count).val(val.item_stock_id);
-                    }
                     $('#rowQty' + count).trigger('keyup');
                     if(val.has_bom){
 
@@ -1921,6 +1921,7 @@
                             </tr>
                         `);
                     });
+                    $('#arr_place' + count).val(val.place_id);
                     no_issue++;
                 });
 

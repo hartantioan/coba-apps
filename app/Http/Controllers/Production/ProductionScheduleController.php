@@ -587,6 +587,7 @@ class ProductionScheduleController extends Controller
                     <th class="center-align">Tgl.Produksi</th>
                     <th class="center-align">Qty</th>
                     <th class="center-align">Satuan UoM</th>
+                    <th class="center-align">Material</th>
                     <th class="center-align">Line</th>
                     <th class="center-align">Gudang</th>
                     <th class="center-align">Tipe</th>
@@ -603,6 +604,7 @@ class ProductionScheduleController extends Controller
                     <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
                     <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
                     <td style="min-width:150px !important;" class="center-align">'.$rowdetail->item->uomUnit->code.'</td>
+                    <td style="min-width:450px !important;">'.$rowdetail->getMaterialHtml().'</td>
                     <td style="min-width:150px !important;" class="center-align">'.$rowdetail->line->code.'</td>
                     <td style="min-width:150px !important;" class="center-align">'.$rowdetail->warehouse->name.'</td>
                     <td style="min-width:150px !important;" class="center-align">'.$rowdetail->type().'</td>
@@ -639,6 +641,7 @@ class ProductionScheduleController extends Controller
                     <th class="center-align">Tgl.Produksi</th>
                     <th class="center-align">Qty</th>
                     <th class="center-align">Satuan UoM</th>
+                    <th class="center-align" style="min-width:450px !important;">Material</th>
                     <th class="center-align">Line</th>
                     <th class="center-align">Gudang</th>
                     <th class="center-align">Tipe</th>
@@ -653,6 +656,7 @@ class ProductionScheduleController extends Controller
                 <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
                 <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td style="min-width:150px !important;" class="center-align">'.$row->item->uomUnit->code.'</td>
+                <td style="min-width:150px !important;">'.$row->getMaterialHtml().'</td>
                 <td style="min-width:150px !important;" class="center-align">'.$row->line->code.'</td>
                 <td style="min-width:150px !important;" class="center-align">'.$row->warehouse->name.'</td>
                 <td style="min-width:150px !important;" class="center-align">'.$row->type().'</td>

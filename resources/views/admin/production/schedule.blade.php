@@ -378,10 +378,10 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>5. Peta BOM</legend>
+                                    <legend>5. Summary Kebutuhan Rawmat</legend>
                                     <div class="card-alert card gradient-45deg-yellow-green">
                                         <div class="card-content">
-                                            <p>Info : Peta BOM diambil dari relasi BOM yang diatur pada master data. Jika ada lebih dari 1 bom yang ter-set, maka bom terbaru yang akan digunakan, dan jika ada lebih dari 1 alternatif, maka alternatif default yang akan dipakai.</p>
+                                            <p>Info : Kebutuhan Rawmat dihitung dari qty komponen material saja.</p>
                                         </div>
                                     </div>
                                     <div class="col m12 s12">
@@ -557,6 +557,9 @@
 
 <!-- END: Page Main-->
 <script>
+
+    var arrGreenTile = [], arrPowder = [];
+
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -746,6 +749,8 @@
                         </td>
                     </tr>
                 `);
+                arrGreenTile = [];
+                arrPowder = [];
             }
         });
 
@@ -767,11 +772,33 @@
         $('.body-item-detail-green').on('click', '.delete-data-item-detail-green', function() {
             $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
+            let id = $(this).data('id');
+            let index = -1;
+            $.each(arrGreenTile, function(i, val) {
+                if(val.code == id){
+                    index = i;
+                }
+            });
+            if(index >= 0){
+                arrGreenTile.splice(index,1);
+            }
+            generateSummaryRawmat();
         });
 
         $('.body-item-detail-powder').on('click', '.delete-data-item-detail-powder', function() {
             $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
+            let id = $(this).data('id');
+            let index = -1;
+            $.each(arrPowder, function(i, val) {
+                if(val.code == id){
+                    index = i;
+                }
+            });
+            if(index >= 0){
+                arrGreenTile.splice(index,1);
+            }
+            generateSummaryRawmat();
         });
 
         $('#marketing_order_plan_id').select2({
@@ -1045,9 +1072,12 @@
                 `);
             }
             $('#arr_unit' + val).text($("#arr_item_detail_id" + val).select2('data')[0].uom);
-            $('#list-bom-relation').append(
+            /* $('#list-bom-relation').append(
                 `<li id="list-bom-` + val + `">(` + type + `) ` + $("#arr_item_detail_id" + val).select2('data')[0].list_bom + `</li>`
-            );
+            ); */
+            if(type == 'powder'){
+
+            }
         }else{
             $("#arr_item_detail_id" + val).empty();
             $("#arr_warehouse" + val).append(`
@@ -1066,7 +1096,7 @@
         $('#body-item-detail-' + type).append(`
             <tr class="row_detail_item" data-id="">
                 <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);" data-id="` + count + `">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
@@ -1095,13 +1125,13 @@
                                     <select class="browser-default" id="arr_item_detail_id` + count + `" name="arr_item_detail_id[]" onchange="getRowUnit('` + count + `','` + type + `')" required></select>
                                 </td>
                                 <td class="right-align">
-                                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;">
+                                    <input name="arr_detail_qty[]" onfocus="emptyThis(this);" id="arr_detail_qty` + count + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);getBomMaterial('` + count + `','` + type + `')" required style="width:100%;text-align:right;">
                                 </td>
                                 <td class="center-align" id="arr_unit` + count + `">
                                     -
                                 </td>
                                 <td class="">
-                                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]"></select>
+                                    <select class="browser-default" id="arr_bom` + count + `" name="arr_bom[]" onchange="getBomMaterial('` + count + `','` + type + `');"></select>
                                 </td>
                                 <td class="">
                                     <input name="arr_production_date[]" type="date" value="{{ date('Y-m-d') }}" required>
@@ -1219,9 +1249,9 @@
                             </div>
                         `);
                         
-                        if(mop.details.length > 0){
+                        /* if(mop.details.length > 0){
                             $('#body-item-detail-normal').empty();
-                        }
+                        } */
                         
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10);
@@ -1400,6 +1430,68 @@
         }else{
 
         }
+    }
+
+    function getBomMaterial(code,type){
+        if(!$('#temp').val()){
+            let index = -1;
+            $.each(arrGreenTile, function(i, val) {
+                if(val.code == code){
+                    index = i;
+                }
+            });
+            if(index >= 0){
+                arrGreenTile.splice(index,1);
+            }
+            let index2 = -1;
+            $.each(arrPowder, function(i, val) {
+                if(val.code == code){
+                    index2 = i;
+                }
+            });
+            if(index2 >= 0){
+                arrPowder.splice(index2,1);
+            }
+            if($('#arr_bom' + code).val()){
+                let data = $('#arr_bom' + code).select2('data')[0];
+                let arr = [];
+                arr['code'] = code;
+                arr['item_output'] = $('#arr_item_detail_id' + code).select2('data')[0].text;
+                arr['qty'] = parseFloat($('#arr_detail_qty' + code).val().replaceAll(".", "").replaceAll(",","."));
+                arr['datas'] = data.materials;
+                if(type == 'green'){
+                    arrGreenTile.push(arr);
+                }else if(type == 'powder'){
+                    arrPowder.push(arr);
+                }
+            }
+            generateSummaryRawmat();
+        }
+    }
+
+    function generateSummaryRawmat(){
+        $('#list-bom-relation').empty();
+        $.each(arrPowder, function(i, val) {
+            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+            
+            for(let j = 0;j<val.datas.length;j++){
+                row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`
+            }
+
+            row += `</ul></li>`;
+            $('#list-bom-relation').append(row);
+        });
+        $.each(arrGreenTile, function(i, val) {
+            
+            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+
+            for(let j = 0;j<val.datas.length;j++){
+                row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`
+            }
+
+            row += `</ul></li>`;
+            $('#list-bom-relation').append(row);
+        });
     }
 
     function getRandomColor() {

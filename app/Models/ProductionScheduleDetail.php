@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\CustomHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -93,5 +94,19 @@ class ProductionScheduleDetail extends Model
         };
 
         return $type;
+    }
+
+    public function getMaterialHtml(){
+        $html = '<ol>';
+
+        $arr = $this->bom->getMaterialData();
+
+        foreach($arr as $row){
+            $html .= '<li>'.$row['item_code'].' - '.$row['item_name'].' Qty '.CustomHelper::formatConditionalQty(round($row['qty'] * $this->qty,3)).' '.$row['unit'].'</li>';
+        }
+
+        $html .= '</ol>';
+
+        return $html;
     }
 }

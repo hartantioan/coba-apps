@@ -1053,14 +1053,6 @@
 
                     $.each(val.details, function(i, value) {
                         var count = makeid(10);
-                        var nominal = ``, total = ``;
-                        if(value.lookable_type == 'items'){
-                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="` + value.nominal + `">`;
-                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="` + value.total + `" readonly>`;
-                        }else if(value.lookable_type == 'resources'){
-                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + value.nominal + `" onkeyup="formatRupiahNoMinus(this);countAll()">`;
-                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + value.total + `" readonly>`;
-                        }
                         $('#body-detail' + val.code).append(`
                             <tr class="row_detail" id="row_detail` + count + `">
                                 <input name="arr_alternative[]" value="` + val.code + `" type="hidden">
@@ -1077,15 +1069,6 @@
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + value.uom_unit + `</span>
-                                </td>
-                                <td>
-                                    ` + nominal + `
-                                </td>
-                                <td>
-                                    ` + total + `
-                                </td>
-                                <td class="center">
-                                    ` + (value.lookable_type == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
                                 </td>
                                 <td>
                                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + value.description + `">
@@ -1110,11 +1093,6 @@
                             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/bom_item") }}');
                         }else if(value.lookable_type == 'resources'){
                             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
-                        }
-                        if(value.cost_distribution_id){
-                            $('#arr_cost_distribution' + count).append(`
-                                <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
-                            `);
                         }
                         if(value.lookable_type == 'resources'){
                             select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');

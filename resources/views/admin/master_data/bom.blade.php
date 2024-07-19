@@ -212,12 +212,9 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">{{ __('translations.type') }}</th>
-                                                        <th class="center">Item/Resource</th>
+                                                        <th class="center">Item</th>
                                                         <th class="center">{{ __('translations.qty') }}</th>
                                                         <th class="center">Satuan (Produksi)</th>
-                                                        <th class="center">{{ __('translations.nominal') }}</th>
-                                                        <th class="center">{{ __('translations.total') }}</th>
-                                                        <th class="center">Dist.Biaya</th>
                                                         <th class="center">Deskripsi</th>
                                                         <th class="center">Issue Method</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
@@ -225,19 +222,16 @@
                                                 </thead>
                                                 <tbody id="body-detail0">
                                                     <tr id="empty-row-detail0">
-                                                        <td colspan="10" class="center">
-                                                            <i>Silahkan tambahkan item / resource...</i>
+                                                        <td colspan="7" class="center">
+                                                            <i>Silahkan tambahkan item...</i>
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colspan="10" class="center-align">
+                                                        <td colspan="7" class="center-align">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','0')" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Bahan
-                                                            </a>
-                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','0')" href="javascript:void(0);">
-                                                                <i class="material-icons left">add</i> Resource
                                                             </a>
                                                         </td>
                                                     </tr>
@@ -508,8 +502,8 @@
         if($('#body-detail' + head).children().length == 0){
             $('#body-detail' + head).append(`
                 <tr id="empty-row-detail` + head + `">
-                    <td colspan="10" class="center">
-                        <i>Silahkan tambahkan item / resource...</i>
+                    <td colspan="7" class="center">
+                        <i>Silahkan tambahkan item...</i>
                     </td>
                 </tr>
             `);
@@ -543,12 +537,9 @@
                         <thead>
                             <tr>
                                 <th class="center">{{ __('translations.type') }}</th>
-                                <th class="center">Item/Resource</th>
+                                <th class="center">Item</th>
                                 <th class="center">{{ __('translations.qty') }}</th>
                                 <th class="center">Satuan (Produksi)</th>
-                                <th class="center">{{ __('translations.nominal') }}</th>
-                                <th class="center">{{ __('translations.total') }}</th>
-                                <th class="center">Dist.Biaya</th>
                                 <th class="center">Deskripsi</th>
                                 <th class="center">Issue Method</th>
                                 <th class="center">{{ __('translations.delete') }}</th>
@@ -556,19 +547,16 @@
                         </thead>
                         <tbody id="body-detail` + count + `">
                             <tr id="empty-row-detail` + count + `">
-                                <td colspan="10" class="center">
-                                    <i>Silahkan tambahkan item / resource...</i>
+                                <td colspan="7" class="center">
+                                    <i>Silahkan tambahkan item...</i>
                                 </td>
                             </tr>
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="10" class="center-align">
+                                <td colspan="7" class="center-align">
                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + count + `')" href="javascript:void(0);">
                                         <i class="material-icons left">add</i> Bahan
-                                    </a>
-                                    <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','` + count + `')" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Resource
                                     </a>
                                 </td>
                             </tr>
@@ -628,12 +616,9 @@
                             <thead>
                                 <tr>
                                     <th class="center">{{ __('translations.type') }}</th>
-                                    <th class="center">Item/Resource</th>
+                                    <th class="center">Item</th>
                                     <th class="center">{{ __('translations.qty') }}</th>
                                     <th class="center">Satuan (Produksi)</th>
-                                    <th class="center">{{ __('translations.nominal') }}</th>
-                                    <th class="center">{{ __('translations.total') }}</th>
-                                    <th class="center">Dist.Biaya</th>
                                     <th class="center">Deskripsi</th>
                                     <th class="center">Issue Method</th>
                                     <th class="center">{{ __('translations.delete') }}</th>
@@ -641,19 +626,16 @@
                             </thead>
                             <tbody id="body-detail0">
                                 <tr id="empty-row-detail0">
-                                    <td colspan="10" class="center">
-                                        <i>Silahkan tambahkan item / resource...</i>
+                                    <td colspan="7" class="center">
+                                        <i>Silahkan tambahkan item...</i>
                                     </td>
                                 </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td colspan="10" class="center-align">
+                                    <td colspan="7" class="center-align">
                                         <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','0')" href="javascript:void(0);">
                                             <i class="material-icons left">add</i> Bahan
-                                        </a>
-                                        <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','0')" href="javascript:void(0);">
-                                            <i class="material-icons left">add</i> Resource
                                         </a>
                                     </td>
                                 </tr>
@@ -682,14 +664,6 @@
             $('#empty-row-detail' + id).remove();
         }
         var count = makeid(10);
-        var nominal = ``, total = ``;
-        if(param == 'items'){
-            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="0,00">`;
-            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="0,00" readonly>`;
-        }else if(param == 'resources'){
-            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);countAll()">`;
-            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="0,00" readonly>`;
-        }
         $('#body-detail' + id).append(`
             <tr class="row_detail" id="row_detail` + count + `">
                 <input name="arr_alternative[]" value="` + id + `" type="hidden">
@@ -705,16 +679,6 @@
                 </td>
                 <td class="center">
                     <span id="arr_satuan` + count + `">-</span>
-                </td>
-                <td>
-                    ` + nominal + `
-                </td>
-                <td>
-                    ` + total + `
-                </td>
-                <td class="center">
-                    ` + (param == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
-                    
                 </td>
                 <td>
                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material">
@@ -890,14 +854,9 @@
                 var formData = new FormData($('#form_data')[0]);
         
                 formData.delete("arr_alternative_default");
-                formData.delete("arr_cost_distribution[]");
 
                 $('input[name^="arr_alternative_default"]').each(function(index){
                     formData.append('arr_alternative_default[]',($(this).is(':checked') ? $(this).val() : ''));
-                });
-
-                $('*[name^="arr_cost_distribution[]"]').each(function(index){
-                    formData.append('arr_cost_distribution[]',($(this).val() ? $(this).val() : ''));
                 });
 
                 $.ajax({
@@ -1020,7 +979,7 @@
 
                 resetDetailForm();
 
-                $('#empty-alternative').remove();
+                $('#body-alternative').empty();
 
                 $.each(response.details, function(i, val) {
                     $('#body-alternative').append(`
@@ -1047,12 +1006,9 @@
                                     <thead>
                                         <tr>
                                             <th class="center">{{ __('translations.type') }}</th>
-                                            <th class="center">Item/Resource</th>
+                                            <th class="center">Item</th>
                                             <th class="center">{{ __('translations.qty') }}</th>
                                             <th class="center">Satuan (Produksi)</th>
-                                            <th class="center">{{ __('translations.nominal') }}</th>
-                                            <th class="center">{{ __('translations.total') }}</th>
-                                            <th class="center">Dist.Biaya</th>
                                             <th class="center">Deskripsi</th>
                                             <th class="center">Issue Method</th>
                                             <th class="center">{{ __('translations.delete') }}</th>
@@ -1060,16 +1016,14 @@
                                     </thead>
                                     <tbody id="body-detail` + val.code + `">
                                         <tr id="empty-row-detail` + val.code + `">
+                                            <i>Silahkan tambahkan item...</i>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="10" class="center-align">
+                                            <td colspan="7" class="center-align">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDetail('items','` + val.code + `')" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Bahan
-                                                </a>
-                                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addDetail('resources','` + val.code + `')" href="javascript:void(0);">
-                                                    <i class="material-icons left">add</i> Resource
                                                 </a>
                                             </td>
                                         </tr>
@@ -1081,14 +1035,6 @@
 
                     $.each(val.details, function(i, value) {
                         var count = makeid(10);
-                        var nominal = ``, total = ``;
-                        if(value.lookable_type == 'items'){
-                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="hidden" value="` + value.nominal + `">`;
-                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="hidden" value="` + value.total + `" readonly>`;
-                        }else if(value.lookable_type == 'resources'){
-                            nominal = `<input name="arr_nominal[]" id="arr_nominal` + count + `" type="text" value="` + value.nominal + `" onkeyup="formatRupiahNoMinus(this);countAll()">`;
-                            total = `<input name="arr_total[]" id="arr_total` + count + `" type="text" value="` + value.total + `" readonly>`;
-                        }
                         $('#body-detail' + val.code).append(`
                             <tr class="row_detail" id="row_detail` + count + `">
                                 <input name="arr_alternative[]" value="` + val.code + `" type="hidden">
@@ -1105,15 +1051,6 @@
                                 </td>
                                 <td class="center">
                                     <span id="arr_satuan` + count + `">` + value.uom_unit + `</span>
-                                </td>
-                                <td>
-                                    ` + nominal + `
-                                </td>
-                                <td>
-                                    ` + total + `
-                                </td>
-                                <td class="center">
-                                    ` + (value.lookable_type == 'resources' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]"></select>` : `` ) + `
                                 </td>
                                 <td>
                                     <input name="arr_description[]" type="text" placeholder="Deskripsi item material" value="` + value.description + `">
@@ -1138,11 +1075,6 @@
                             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/bom_item") }}');
                         }else if(value.lookable_type == 'resources'){
                             select2ServerSide('#arr_detail' + count, '{{ url("admin/select2/resource") }}');
-                        }
-                        if(value.cost_distribution_id){
-                            $('#arr_cost_distribution' + count).append(`
-                                <option value="` + value.cost_distribution_id + `">` + value.cost_distribution_name + `</option>
-                            `);
                         }
                         if(value.lookable_type == 'resources'){
                             select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');

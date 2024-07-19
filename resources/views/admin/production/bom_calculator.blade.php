@@ -95,11 +95,6 @@
                                     <h4 class="card-title">{{ __('translations.list_data') }}</h4>
                                     <div class="row">
                                         <div class="col s12">
-                                            <div class="card-alert card purple">
-                                                <div class="card-content white-text">
-                                                    <p>Info : Pembaruan Kurs (Adjust Kurs) akan menarik data inventori, hutang usaha belum ditagihkan, hutang usaha, dan kas dalam mata uang asing yang memiliki tunggakan sesuai tanggal posting terpilih.</p>
-                                                </div>
-                                            </div>
                                             <div id="datatable_buttons"></div>
                                             <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                 <i class="material-icons hide-on-med-and-up">refresh</i>
@@ -168,7 +163,7 @@
                             <label class="" for="company_id">{{ __('translations.company') }}</label>
                         </div>
                         <div class="input-field col s3 step4">
-                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
+                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                             <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                         </div>
                         <div class="input-field col s3 step7">
@@ -186,32 +181,94 @@
                             </a>
                         </div>
                         <div class="col s12 step9">
-                            <h5>Preview Tunggakan Dokumen</h5>
-                            <table class="bordered" id="table-detail">
+                            <h5>Rincian Item & Resource</h5>
+                            <table class="bordered" id="table-detail-body">
                                 <thead>
                                     <tr>
+                                        <th colspan="6"><h5>I. Body I</h5></th>
+                                    </tr>
+                                    <tr>
                                         <th class="center">{{ __('translations.delete') }}</th>
-                                        <th class="center">{{ __('translations.no') }}.</th>
-                                        <th class="center">{{ __('translations.number') }}</th>
-                                        <th class="center">{{ __('translations.type') }}</th>
-                                        <th class="center">Nominal Sisa (FC)</th>
-                                        <th class="center">Kurs Terakhir</th>
-                                        <th class="center">Nominal Sisa (Rp)</th>
-                                        <th class="center">Nominal Terbaru (Rp)</th>
-                                        <th class="center">Nominal Selisih (Rp)</th>
+                                        <th class="center">Item/Resource</th>
+                                        <th class="center">Qty</th>
+                                        <th class="center">Satuan</th>
+                                        <th class="center">Harga @</th>
+                                        <th class="center">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody id="body-detail">
-                                    <tr id="empty-detail">
-                                        <td colspan="9" class="center">
-                                            Tekan Ambil Data untuk melihat...
+                                <tbody id="body-detail-body">
+                                    <tr id="empty-detail-body">
+                                        <td colspan="6" class="center">
+                                            Tekan Tambah untuk menambahkan baris...
                                         </td>
                                     </tr>
                                 </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" class="right-align">
+                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('body')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Body I</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
                             </table>
-                        </div>
-                        <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit step10" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                            <table class="bordered mt-1" id="table-detail-glaze">
+                                <thead>
+                                    <tr>
+                                        <th colspan="6"><h5>II. Glaze</h5></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center">{{ __('translations.delete') }}</th>
+                                        <th class="center">Item/Resource</th>
+                                        <th class="center">Qty</th>
+                                        <th class="center">Satuan</th>
+                                        <th class="center">Harga @</th>
+                                        <th class="center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-detail-glaze">
+                                    <tr id="empty-detail-glaze">
+                                        <td colspan="6" class="center">
+                                            Tekan Tambah untuk menambahkan baris...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" class="right-align">
+                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('glaze')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Glaze</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                            <table class="bordered mt-1" id="table-detail-body2">
+                                <thead>
+                                    <tr>
+                                        <th colspan="6"><h5>III. Glaze</h5></th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center">{{ __('translations.delete') }}</th>
+                                        <th class="center">Item/Resource</th>
+                                        <th class="center">Qty</th>
+                                        <th class="center">Satuan</th>
+                                        <th class="center">Harga @</th>
+                                        <th class="center">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="body-detail-body">
+                                    <tr id="empty-detail-body">
+                                        <td colspan="6" class="center">
+                                            Tekan Tambah untuk menambahkan baris...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="6" class="right-align">
+                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('body')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Body I</a>
+                                        </td>
+                                    </tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </form>
@@ -219,7 +276,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light purple btn-panduan mr-1" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light mr-1" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -452,9 +510,6 @@
                 window.onbeforeunload = function() {
                     return 'You will lose all changes made since your last save';
                 };
-                if(!$('#temp').val()){
-                    loadCurrency();
-                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();

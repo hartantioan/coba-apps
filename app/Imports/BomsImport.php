@@ -88,7 +88,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     $check->item_id = $item_output->id;
                     $check->item_reject_id = $item_reject_id->id;
                     $check->place_id = $place->id;
-                    $check->warehouse_id = $bomStandard ? $bomStandard->id : NULL;
+                    $check->bom_standard_id = $bomStandard ? $bomStandard->id : NULL;
                     $check->qty_output = $row['qty_output'];
                     $check->group = $row['group'];
 
@@ -155,15 +155,14 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
-           
-
+        if ($row['item_code'] == 'null') {
+            return null;
+        }else{
             if ($row['kode_bom_header']) {
                 $check = Bom::where('code', $row['kode_bom_header'])->first();
                 $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
                 if ($check) {
-
+    
                     $method = explode('#', $row['metode'])[1];
                 
                     if($row['type']=='items'){
@@ -215,14 +214,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
                         ]);
                     }
                 }
-            }else{
-                return null;
-            }  
-            DB::commit();
-        } catch (\Exception $e) {
-            $sheet='Detail';
-            DB::rollback();
-            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
+            }
         }
     }
 

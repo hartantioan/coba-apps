@@ -2251,6 +2251,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionRecalculateController::class, 'rowDetail']);
                     Route::post('show', [ProductionRecalculateController::class, 'show']);
                     Route::post('get_code', [ProductionRecalculateController::class, 'getCode']);
+                    Route::post('get_data', [ProductionRecalculateController::class, 'getData']);
                     Route::post('print',[ProductionRecalculateController::class, 'print']);
                     Route::post('done',[ProductionRecalculateController::class, 'done'])->middleware('operation.access:production_recalculate,update');
                     Route::post('print_by_range',[ProductionRecalculateController::class, 'printByRange']);

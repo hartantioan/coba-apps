@@ -19,6 +19,7 @@ use App\Models\ProductionReceive;
 use App\Models\User;
 use App\Models\MenuUser;
 use App\Models\ProductionRecalculate;
+use App\Models\ProductionReceiveDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use iio\libmergepdf\Merger;
@@ -62,6 +63,60 @@ class ProductionRecalculateController extends Controller
 		return response()->json($code);
     }
 
+    public function getData(Request $request){
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+        $resources = $request->resource_id;
+
+        $data = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($start_date,$end_date){
+            $query->whereIn('status',['2','3'])->where(function($query)use($start_date,$end_date){
+                $query->whereDate('post_date', '>=', $start_date)
+                    ->whereDate('post_date', '<=', $end_date);
+            });
+        })
+        ->whereHas('productionReceive',function($query){
+            $query->orderBy('post_date')
+                ->orderBy('created_at');
+        })
+        ->get();
+
+        $arr = [];
+
+        foreach($data as $rowdata){
+            foreach($rowdata->productionBatch as $row){
+                $bobotReceive = round($row->lookable->total / $row->total,2);
+                foreach($row->lookable->productionReceive->productionIssue as $rowissue){
+                    foreach($rowissue->productionIssueDetail()->where('lookable_type','resources')->where(function($query)use($resources){
+                        if($resources){
+                            $query->whereIn('lookable_id',$resources);
+                        }
+                    })->get() as $rowcost){
+                        $arr[] = [
+                            'production_batch_id'   => $row->id,
+                            'production_batch_code' => $row->code,
+                            'item_code'             => $row->item->code,
+                            'item_name'             => $row->item->name,
+                            'qty'                   => CustomHelper::formatConditionalQty($row->qty_real),
+                            'unit'                  => $row->item->uomUnit->code,
+                            'lookable_id'           => $rowcost->lookable_id,
+                            'lookable_type'         => $rowcost->lookable_type,
+                            'data_name'             => $rowcost->lookable->code.' - '.$rowcost->lookable->name,
+                            'total'                 => CustomHelper::formatConditionalQty(round($rowcost->total * $bobotReceive,2)),
+                        ];
+                    }
+                }
+            }
+        }
+        
+        $response = [
+            'status'    => 200,
+            'message'   => 'Data berhasil dimuat',
+            'data'      => $arr,
+        ];
+        				
+		return response()->json($response);
+    }
+    
     public function datatable(Request $request){
         $column = [
             'id',
@@ -69,6 +124,8 @@ class ProductionRecalculateController extends Controller
             'user_id',
             'company_id',
             'post_date',
+            'start_date',
+            'end_date',
             'note',
         ];
 
@@ -155,8 +212,9 @@ class ProductionRecalculateController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->start_date)),
+                    date('d/m/Y',strtotime($val->end_date)),
                     $val->note,
-                    $val->productionFgReceive->code,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
@@ -210,31 +268,15 @@ class ProductionRecalculateController extends Controller
                 'code_place_id'             => 'required',
                 'company_id'			    => 'required',
                 'post_date'		            => 'required',
-                'production_fg_receive_id'  => 'required',
-                'arr_prfd_id'               => 'required|array',
-                'arr_item_id'               => 'required|array',
-                'arr_area_id'               => 'required|array',
-                'arr_qty'                   => 'required|array',
-                'arr_place'                 => 'required|array',
-                'arr_warehouse'             => 'required|array',
+                'start_date'		        => 'required',
+                'end_date'		            => 'required',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-                'production_fg_receive_id.required' => 'Serah Terima Produksi tidak boleh kosong.',
-                'arr_prfd_id.required'              => 'Receive FG detail tidak boleh kosong.',
-                'arr_prfd_id.array'                 => 'Receive FG detail harus array.',
-                'arr_item_id.required'              => 'Item tidak boleh kosong.',
-                'arr_item_id.array'                 => 'Item harus array.',
-                'arr_area_id.required'              => 'Area tidak boleh kosong.',
-                'arr_area_id.array'                 => 'Area harus array.',
-                'arr_qty.required'                  => 'Qty input tidak boleh kosong.',
-                'arr_qty.array'                     => 'Qty input harus array.',
-                'arr_place.required'                => 'Plant tidak boleh kosong.',
-                'arr_place.array'                   => 'Plant harus array.',
-                'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
-                'arr_warehouse.array'               => 'Gudang harus array.',
+                'start_date.required' 			    => 'Tanggal mulai periode tidak boleh kosong.',
+                'end_date.required' 			    => 'Tanggal akhir periode tidak boleh kosong.',
             ]);
 
             if($validation->fails()) {
@@ -243,46 +285,6 @@ class ProductionRecalculateController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                
-                $passedQty = true;
-                
-                $arrQty = [];
-                foreach($request->arr_qty as $key => $row){
-                    $index = -1;
-                    foreach($arrQty as $z => $rowqty){
-                        if($rowqty['prfd_id'] == $request->arr_prfd_id[$key]){
-                            $index = $z;
-                        }
-                    }
-                    if($index >= 0){
-                        $arrQty[$index]['qty'] += str_replace(',','.',str_replace('.','',$row));
-                    }else{
-                        $arrQty[] = [
-                            'prfd_id'   => $request->arr_prfd_id[$key],
-                            'qty'       => str_replace(',','.',str_replace('.','',$row)),
-                        ];
-                    }
-                }
-
-                $arrMessageQty = [];
-                
-                foreach($arrQty as $row){
-                    $data = ProductionFgReceiveDetail::find($row['prfd_id']);
-                    if($data){
-                        $max = $data->balanceHandover();
-                        if($row['qty'] > $max){
-                            $balance = CustomHelper::formatConditionalQty($row['qty'] - $max);
-                            $arrMessageQty[] = 'Item '.$data->item->code.' - '.$data->item->name.' nomor batch '.$data->pallet_no.' kelebihan penerimaan sebesar '.$balance.' dari sisa penerimaan seharusnya '.CustomHelper::formatConditionalQty($max);
-                        }
-                    }
-                }
-
-                if(count($arrMessageQty) > 0){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => implode('. ',$arrMessageQty),
-                    ]);
-                }
 
                 if($request->temp){
                     $query = ProductionHandover::where('code',CustomHelper::decrypt($request->temp))->first();

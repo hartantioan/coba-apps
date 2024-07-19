@@ -3320,8 +3320,6 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' '.$d->name,
-                'warehouse_id'  => $d->warehouse_id,
-                'warehouse'     => $d->warehouse->name,
             ];
         }
 
@@ -3349,8 +3347,6 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' '.$d->name,
-                'warehouse_id'  => $d->warehouse_id,
-                'warehouse'     => $d->warehouse->name,
             ];
         }
 

@@ -45,7 +45,8 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
 {
     public function onRow(Row $row)
     {
-       
+        DB::beginTransaction();
+        try {
             $row = $row->toArray();
             if(isset($row['code']) && $row['code']){
                 $check = Item::where('code',$row['code'])->first();
@@ -113,7 +114,11 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
             else{
                 return null;
             }  
-        
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+           
+        }
     }
     
     public function startRow(): int
@@ -135,7 +140,8 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
     }
     public function onRow(Row $row)
     {
-        
+        DB::beginTransaction();
+        try {
             $row = $row->toArray();
             if(isset($row['item_code']) && $row['item_code']){
                 $check = Item::where('code',$row['item_code'])->first();
@@ -156,7 +162,12 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
             }
             else{
                 return null;
-            }  
+            }
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+           
+        }  
        
     }
     public function startRow(): int

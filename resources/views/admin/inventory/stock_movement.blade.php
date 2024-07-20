@@ -154,6 +154,7 @@
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
+                                <th class="center-align">Requester</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Batch Produksi</th>
@@ -242,6 +243,7 @@
                                     <td >`+val.kode+`</td>
                                     <td >`+val.item+`</td>
                                     <td >`+val.satuan+`</td>
+                                    <td >`+val.requester+`</td>
                                     <td >`+val.area+`</td>
                                     <td >`+val.shading+`</td>
                                     <td >`+val.production_batch+`</td>
@@ -281,6 +283,7 @@
                                         <td class="">` + val.kode + `</td>
                                         <td class="">` + val.kode + `</td>
                                         <td class="">` + val.item + `</td>
+                                        <td >`+val.requester+`</td>
                                         <td >`+val.area+`</td>
                                         <td >`+val.shading+`</td>
                                         <td >`+val.production_batch+`</td>
@@ -300,6 +303,7 @@
                                         <td >`+val.kode+`</td>
                                         <td >`+val.item+`</td>
                                         <td >`+val.satuan+`</td>
+                                        <td >`+val.requester+`</td>
                                         <td >`+val.area+`</td>
                                         <td >`+val.shading+`</td>
                                         <td >`+val.production_batch+`</td>

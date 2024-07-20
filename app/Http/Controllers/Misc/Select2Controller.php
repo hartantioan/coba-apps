@@ -4187,6 +4187,13 @@ class Select2Controller extends Controller {
         ->whereHas('productionScheduleDetail',function($query){
             $query->whereHas('item',function($query){
                 $query->whereNull('is_sales_item');
+            })->whereHas('bom',function($query){
+                $query->whereHas('bomDetail',function($query){
+                    $query->whereHas('bomAlternative',function($query){
+                        $query->whereNotNull('is_default');
+                    })
+                    ->where('issue_method','1');
+                });
             });
         })
         ->get();

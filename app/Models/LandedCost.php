@@ -414,4 +414,16 @@ class LandedCost extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        $arr = [];
+        foreach($this->landedCostDetail()->get() as $row){
+            if($row->goodReceiptDetail()){
+                if($row->lookable->item_id == $item_id){
+                    $arr[] = $row->lookable->purchaseOrderDetail->requester;
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
 }

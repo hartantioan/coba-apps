@@ -1048,132 +1048,137 @@
 
             var count = makeid(10);
 
-            let no_issue = $('.row_item_issue').length + 1;
+            if(datakuy.bom_detail.length > 0){
+                let no_issue = $('.row_item_issue').length + 1;
 
-            $.each(datakuy.bom_detail, function(i, val) {
-                var count = makeid(10);
+                $.each(datakuy.bom_detail, function(i, val) {
+                    var count = makeid(10);
 
-                let warehouse = `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">`;
-                if(val.list_warehouse.length > 0){
-                    $.each(val.list_warehouse, function(i, valkuy) {
-                        warehouse += `<option value="` + valkuy.id + `">` + valkuy.name + `</option>`;
-                    });
-                }else{
-                    warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
-                }
-                warehouse += `</select>`;
+                    let warehouse = `<select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">`;
+                    if(val.list_warehouse.length > 0){
+                        $.each(val.list_warehouse, function(i, valkuy) {
+                            warehouse += `<option value="` + valkuy.id + `">` + valkuy.name + `</option>`;
+                        });
+                    }else{
+                        warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
+                    }
+                    warehouse += `</select>`;
 
-                $('#body-item-issue').append(`
-                    <tr class="row_item_issue" data-id="` + $('#production_order_detail_id').val() + `">
-                        <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `">
-                        <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
-                        <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
-                        <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
-                        <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_bom + `">
-                        <input type="hidden" name="arr_nominal_bom[]" value="` + val.nominal_bom + `">
-                        <input type="hidden" name="arr_total_bom[]" value="` + val.total_bom + `">
-                        <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
-                            ` + no_issue + `
-                        </td>
-                        <td>
-                            ` + val.name + `
-                        </td>
-                        <td class="right-align arr-planned" id="rowPlanned` + count + `">
-                            ` + val.qty_planned + `
-                        </td>
-                        <td class="center">
-                            <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
-                        </td>
-                        <td class="center">
-                            <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
-                        </td>
-                        <td class="center" id="arr_unit` + count + `">
-                            ` + val.unit + `
-                        </td>
-                        <td class="center">
-                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                        </td>
-                        <td class="center">
-                            ` + warehouse + `
-                        </td>
-                        <td class="center">
-                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
-                                <i class="material-icons">delete</i>
-                            </a>
-                        </td>
-                    </tr>
-                ` +
-                    (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
-                        <td colspan="2" class="right-align">
-                            Ambil dari Batch : 
-                        </td>
-                        <td colspan="6">
-                            <div class="row">
-                                <div class="input-field col m3 s12">
-                                    <select class="browser-default" id="arr_batch` + count + `" name="arr_batch[]" data-id="` + count + `"></select>
+                    $('#body-item-issue').append(`
+                        <tr class="row_item_issue" data-id="` + $('#production_order_detail_id').val() + `">
+                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `">
+                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
+                            <input type="hidden" name="arr_bom_id[]" value="` + datakuy.bom_id + `">
+                            <input type="hidden" name="arr_bom_detail_id[]" value="` + val.bom_detail_id + `">
+                            <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_bom + `">
+                            <input type="hidden" name="arr_nominal_bom[]" value="` + val.nominal_bom + `">
+                            <input type="hidden" name="arr_total_bom[]" value="` + val.total_bom + `">
+                            <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
+                                ` + no_issue + `
+                            </td>
+                            <td>
+                                ` + val.name + `
+                            </td>
+                            <td class="right-align arr-planned" id="rowPlanned` + count + `">
+                                ` + val.qty_planned + `
+                            </td>
+                            <td class="center">
+                                <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty_planned + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                            </td>
+                            <td class="center" id="arr_unit` + count + `">
+                                ` + val.unit + `
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="center">
+                                ` + warehouse + `
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);" data-id="` + count + `">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    ` +
+                        (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
+                            <td colspan="2" class="right-align">
+                                Ambil dari Batch : 
+                            </td>
+                            <td colspan="6">
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="arr_batch` + count + `" name="arr_batch[]" data-id="` + count + `"></select>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
+                                        <label class="active">&nbsp;</label>
+                                    </div>
+                                    <div class="col m12 s12">
+                                        <table class="bordered" style="width:500px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-batch` + count + `"></tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                                <div class="input-field col m3 s12">
-                                    <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show"><i class="material-icons right">add_circle_outline</i></a>
-                                    <label class="active">&nbsp;</label>
-                                </div>
-                                <div class="col m12 s12">
-                                    <table class="bordered" style="width:500px !important;">
-                                        <thead>
-                                            <tr>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
-                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-batch` + count + `"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>` : ``)
-                );
-                $('#rowQty' + count).trigger('keyup');
-                if(val.has_bom){
-                    $('#arr_batch' + count).select2({
-                        placeholder: '-- Kosong --',
-                        minimumInputLength: 1,
-                        allowClear: true,
-                        cache: true,
-                        width: 'resolve',
-                        dropdownParent: $('body').parent(),
-                        ajax: {
-                            url: '{{ url("admin/select2/production_batch") }}',
-                            type: 'GET',
-                            dataType: 'JSON',
-                            data: function(params) {
-                                return {
-                                    search: params.term,
-                                    item_id: val.lookable_id,
-                                    place_id: $('#arr_place' + count).val(),
-                                    warehouse_id: $('#arr_warehouse' + count).val(),
-                                };
-                            },
-                            processResults: function(data) {
-                                return {
-                                    results: data.items
+                            </td>
+                        </tr>` : ``)
+                    );
+                    $('#rowQty' + count).trigger('keyup');
+                    if(val.has_bom){
+                        $('#arr_batch' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/production_batch") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: val.lookable_id,
+                                        place_id: $('#arr_place' + count).val(),
+                                        warehouse_id: $('#arr_warehouse' + count).val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
                                 }
                             }
-                        }
-                    });
-                }
-                no_issue++;
-            });
-            $('#output-line').empty().text(datakuy.line);
-            $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
-            $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
-            M.updateTextFields();
-                    
+                        });
+                    }
+                    no_issue++;
+                });
+                $('#output-line').empty().text(datakuy.line);
+                $('#output-fg').empty().text(datakuy.item_receive_code + ' - ' + datakuy.item_receive_name);
+                $('#output-qty').empty().text(datakuy.item_receive_qty + ' - ' + datakuy.item_receive_unit_uom);
+                M.updateTextFields();
+            }else{
+                M.toast({
+                    html: 'Mohon maaf, PDO terpilih tidak memiliki bom material MANUAL.'
+                });
+            }
         }else{
             $('#title-modal').text('-');
             $('#output-line,#output-fg,#output-qty').text('-');

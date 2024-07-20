@@ -439,4 +439,12 @@ class GoodReceipt extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        $arr = [];
+        foreach($this->goodReceiptDetail()->where('item_id',$item_id)->get() as $row){
+            $arr[] = $row->purchaseOrderDetail->requester;
+        }
+        return implode(', ',$arr);
+    }
 }

@@ -195,4 +195,12 @@ class GoodReturnPO extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        $arr = [];
+        foreach($this->goodReturnPODetail()->where('item_id',$item_id)->get() as $row){
+            $arr[] = $row->goodReceiptDetail->purchaseOrderDetail->requester;
+        }
+        return implode(', ',$arr);
+    }
 }

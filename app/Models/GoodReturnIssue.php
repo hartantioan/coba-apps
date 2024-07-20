@@ -170,4 +170,12 @@ class GoodReturnIssue extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        $arr = [];
+        foreach($this->goodReturnIssueDetail()->where('item_id',$item_id)->get() as $row){
+            $arr[] = $row->goodIssueDetail->requester;
+        }
+        return implode(', ',$arr);
+    }
 }

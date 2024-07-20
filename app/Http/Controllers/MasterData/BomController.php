@@ -29,7 +29,7 @@ class BomController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Bill of Material (Alternatif)',
+            'title'     => 'Bill of Material',
             'content'   => 'admin.master_data.bom',
             'place'     => Place::where('status','1')->get(),
             'line'      => Line::where('status','1')->get(),

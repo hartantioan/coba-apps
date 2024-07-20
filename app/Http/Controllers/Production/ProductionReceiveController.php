@@ -407,11 +407,14 @@ class ProductionReceiveController extends Controller
                 }
                 
                 if($query) {
-                    foreach($request->arr_production_issue_id as $key => $row){
-                        ProductionReceiveIssue::create([
-                            'production_receive_id' => $query->id,
-                            'production_issue_id'   => $row,
-                        ]);
+
+                    if($request->arr_production_issue_id){
+                        foreach($request->arr_production_issue_id as $key => $row){
+                            ProductionReceiveIssue::create([
+                                'production_receive_id' => $query->id,
+                                'production_issue_id'   => $row,
+                            ]);
+                        }
                     }
 
                     $totalQty = 0;

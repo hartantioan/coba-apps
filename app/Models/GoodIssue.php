@@ -276,4 +276,14 @@ class GoodIssue extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        $arr = [];
+        foreach($this->goodIssueDetail()->whereHas('itemStock',function($query)use($item_id){
+            $query->where('item_id',$item_id);
+        })->get() as $row){
+            $arr[] = $row->requester;
+        }
+        return implode(', ',$arr);
+    }
 }

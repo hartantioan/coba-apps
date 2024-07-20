@@ -152,7 +152,7 @@ class StockMovementController extends Controller
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
-                'item_id'      => $row->item->id,
+                'requester'    => $row->lookable->getRequesterByItem($row->item_id),
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,
@@ -196,6 +196,7 @@ class StockMovementController extends Controller
                 $array_last_item[] = [
                     'perlu'        => 1,
                     'item_id'      => $row->item->id,
+                    'requester'    => '-',
                     'id'           => $query_first->id ?? null, 
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
@@ -310,6 +311,7 @@ class StockMovementController extends Controller
                     $array_first_item[] = [
                         'perlu'        => 1,
                         'item_id'      => $row_tidak_ada->item->id,
+                        'requester'    => '-',
                         'id'           => $row_tidak_ada->id, 
                         'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
                         'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,

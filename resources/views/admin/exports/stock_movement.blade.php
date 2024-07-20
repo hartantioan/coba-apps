@@ -9,6 +9,7 @@
                 <th class="center-align">Kode Item</th>
                 <th class="center-align">Nama Item</th>
                 <th class="center-align">{{ __('translations.unit') }}</th>
+                <th class="center-align">Requester</th>
                 <th class="center-align">Area</th>
                 <th class="center-align">Shading</th>
                 <th class="center-align">Batch Produksi</th>
@@ -31,6 +32,7 @@
                         <td align="center">{{ $row['kode'] }}</td>
                         <td align="center">{{ $row['item'] }}</td>
                         <td align="center">{{ $row['satuan'] }}</td>
+                        <td align="center">{{ $row['requester'] }}</td>
                         <td align="center">{{$row['area']}}</td>
                         <td align="center">{{$row['shading']}}</td>
                         <td align="center">{{$row['production_batch']}}</td>
@@ -50,6 +52,7 @@
                         <td align="center">{{$row['kode']}}</td>
                         <td align="center">{{$row['item']}}</td>
                         <td align="center">{{$row['satuan']}}</td>
+                        <td align="center">{{ $row['requester'] }}</td>
                         <td align="center">{{$row['area']}}</td>
                         <td align="center">{{$row['shading']}}</td>
                         <td align="center">{{$row['document']}}</td>
@@ -81,6 +84,7 @@
                 <th align="center">{{ __('translations.code') }}</th>
                 <th align="center">Nama Item</th>
                 <th align="center">{{ __('translations.unit') }}</th>
+                <th align="center">Requester</th>
                 <th class="center-align">Area</th>
                 <th class="center-align">Shading</th>
                 <th align="center">Balance</th>
@@ -95,6 +99,7 @@
                 <td align="center">{{$row['kode']}}</td>
                 <td align="center">{{$row['item']}}</td>
                 <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{$row['requester']}}</td>
                 <td align="center">{{$row['area']}}</td>
                 <td align="center">{{$row['shading']}}</td>
                 <td align="center">{{$row['cum_qty']}}</td>
@@ -102,7 +107,7 @@
             @endforeach
             @if(count($data) == 0)
                 <tr>
-                    <td colspan="13" align="center">
+                    <td colspan="14" align="center">
                         Data tidak ditemukan
                     </td>
                 </tr>

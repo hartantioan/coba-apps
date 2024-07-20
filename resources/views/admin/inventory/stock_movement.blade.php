@@ -228,6 +228,7 @@
                                 <th class="center-align">{{ __('translations.code') }}</th>
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
+                                <th class="center-align">Requester</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Batch Produksi</th>
@@ -263,6 +264,7 @@
                                 <th class="center-align">Kode Item</th>
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
+                                <th class="center-align">Requester</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
                                 <th class="center-align">Batch Produksi</th>

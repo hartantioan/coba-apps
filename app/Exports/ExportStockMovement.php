@@ -280,7 +280,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
            
     
             foreach($query_no as $row_tidak_ada){
-    
+                if($row_tidak_ada->qty_final)
                 if($row_tidak_ada->qty_final > 0){
                     $array_first_item[] = [
                         'perlu'        => 1,

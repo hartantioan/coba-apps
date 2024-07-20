@@ -276,21 +276,6 @@ class ProductionReceive extends Model
 
                 if($bomAlternative){
                     foreach($bomAlternative->bomDetail()->where('issue_method','2')->get() as $rowbom){
-                        $nominal = 0;
-                        $total = 0;
-                        $itemstock = NULL;
-                        if($rowbom->lookable_type == 'items'){
-                            $item = Item::find($rowbom->lookable_id);
-                            if($item){
-                                $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                                $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
-                                $nominal = $price;
-                                $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
-                            }
-                        }elseif($rowbom->lookable_type == 'resources'){
-                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
-                            $nominal = $rowbom->nominal;
-                        }
                         $querydetail = ProductionIssueDetail::create([
                             'production_issue_id'           => $query->id,
                             'production_order_detail_id'    => $this->production_order_detail_id,
@@ -298,6 +283,52 @@ class ProductionReceive extends Model
                             'lookable_id'                   => $rowbom->lookable_id,
                             'bom_id'                        => $rowbom->bom_id,
                             'bom_detail_id'                 => $rowbom->id,
+                        ]);
+                        $nominal = 0;
+                        $total = 0;
+                        $itemstock = NULL;
+                        if($rowbom->lookable_type == 'items'){
+                            $item = Item::find($rowbom->lookable_id);
+                            if($item){
+                                if($item->productionBatchMoreThanZero()->exists()){
+                                    $totalbatch = 0;
+                                    $totalneeded = round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                        $qtyused = 0;
+                                        if($totalneeded > $rowbatch->qty){
+                                            $qtyused = $rowbatch->qty;
+                                            $totalneeded -= $rowbatch->qty;
+                                        }else{
+                                            $qtyused = $totalneeded;
+                                        }
+                                        if($qtyused > 0){
+                                            $totalbatch += round($rowbatch->price() * $qtyused,2);
+                                            ProductionBatchUsage::create([
+                                                'production_batch_id'   => $rowbatch->id,
+                                                'lookable_type'         => $querydetail->getTable(),
+                                                'lookable_id'           => $querydetail->id,
+                                                'qty'                   => $qtyused,
+                                            ]);
+                                            CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
+                                        }else{
+                                            break;
+                                        }
+                                    }
+                                    $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    $total = $totalbatch;
+                                    $nominal = $price;
+                                }else{
+                                    $price = $item->priceNowProduction($this->place_id,$this->post_date);
+                                    $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
+                                    $nominal = $price;
+                                    $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                }
+                            }
+                        }elseif($rowbom->lookable_type == 'resources'){
+                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                            $nominal = $rowbom->nominal;
+                        }
+                        $querydetail->update([
                             'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
@@ -315,21 +346,6 @@ class ProductionReceive extends Model
 
                     if($bomAlternative->bom->bomStandard()->exists()){
                         foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
-                            $nominal = 0;
-                            $total = 0;
-                            $itemstock = NULL;
-                            if($rowbom->lookable_type == 'items'){
-                                $item = Item::find($rowbom->lookable_id);
-                                if($item){
-                                    $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                                    $total = round(round($rowbom->qty * $row->qty,3) * $price,2);
-                                    $nominal = $price;
-                                    $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
-                                }
-                            }elseif($rowbom->lookable_type == 'resources'){
-                                $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
-                                $nominal = $rowbom->nominal;
-                            }
                             $querydetail = ProductionIssueDetail::create([
                                 'production_issue_id'           => $query->id,
                                 'production_order_detail_id'    => $this->production_order_detail_id,
@@ -337,6 +353,52 @@ class ProductionReceive extends Model
                                 'lookable_id'                   => $rowbom->lookable_id,
                                 'bom_id'                        => $rowbom->bom_id,
                                 'bom_detail_id'                 => $rowbom->id,
+                            ]);
+                            $nominal = 0;
+                            $total = 0;
+                            $itemstock = NULL;
+                            if($rowbom->lookable_type == 'items'){
+                                $item = Item::find($rowbom->lookable_id);
+                                if($item){
+                                    if($item->productionBatchMoreThanZero()->exists()){
+                                        $totalbatch = 0;
+                                        $totalneeded = round($rowbom->qty * $row->qty,3);
+                                        foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                            $qtyused = 0;
+                                            if($totalneeded > $rowbatch->qty){
+                                                $qtyused = $rowbatch->qty;
+                                                $totalneeded -= $rowbatch->qty;
+                                            }else{
+                                                $qtyused = $totalneeded;
+                                            }
+                                            if($qtyused > 0){
+                                                $totalbatch += round($rowbatch->price() * $qtyused,2);
+                                                ProductionBatchUsage::create([
+                                                    'production_batch_id'   => $rowbatch->id,
+                                                    'lookable_type'         => $querydetail->getTable(),
+                                                    'lookable_id'           => $querydetail->id,
+                                                    'qty'                   => $qtyused,
+                                                ]);
+                                                CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
+                                            }else{
+                                                break;
+                                            }
+                                        }
+                                        $price = $totalbatch / round($rowbom->qty * $row->qty,3);
+                                        $total = $totalbatch;
+                                        $nominal = $price;
+                                    }else{
+                                        $price = $item->priceNowProduction($this->place_id,$this->post_date);
+                                        $total = round(round($rowbom->qty * $row->qty,3) * $price,2);
+                                        $nominal = $price;
+                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                    }
+                                }
+                            }elseif($rowbom->lookable_type == 'resources'){
+                                $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
+                                $nominal = $rowbom->nominal;
+                            }
+                            $querydetail->update([
                                 'qty'                           => round($rowbom->qty * $row->qty,3),
                                 'nominal'                       => $nominal,
                                 'total'                         => $total,

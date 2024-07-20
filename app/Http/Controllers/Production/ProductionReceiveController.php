@@ -11,6 +11,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\Area;
 use App\Models\Bom;
+use App\Models\BomAlternative;
 use App\Models\Item;
 use App\Models\ItemStock;
 use App\Models\Line;
@@ -232,8 +233,8 @@ class ProductionReceiveController extends Controller
     }
 
     public function create(Request $request){
-        /* DB::beginTransaction();
-        try { */
+        DB::beginTransaction();
+        try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -246,7 +247,6 @@ class ProductionReceiveController extends Controller
                 'production_order_detail_id'=> 'required',
                 'start_process_time'        => 'required',
                 'end_process_time'          => 'required',
-                'arr_production_issue_id'   => 'required|array',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -259,8 +259,6 @@ class ProductionReceiveController extends Controller
                 'production_order_detail_id.required'=> 'Production Order tidak boleh kosong.',
                 'start_process_time.required'       => 'Waktu mulai produksi tidak boleh kosong.',
                 'end_process_time.required'         => 'Waktu selesai produksi tidak boleh kosong.',
-                'arr_production_issue_id.required'  => 'Production issue tidak boleh kosong.',
-                'arr_production_issue_id.array'     => 'Production issue harus array.',
             ]);
 
             if($validation->fails()) {
@@ -311,6 +309,81 @@ class ProductionReceiveController extends Controller
                             'message' => 'Production order no. '.$datapod->code.' belum memiliki data Issue.'
                         ]);
                     }
+                }
+
+                $arrItemError = [];
+
+                foreach($request->arr_item_id as $key => $row){
+                    $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                        $query->where('item_id',$row)->orderByDesc('created_at');
+                    })->whereNotNull('is_default')->first();
+
+                    if($bomAlternative){
+                        foreach($bomAlternative->bomDetail()->where('issue_method','2')->get() as $rowbom){
+                            if($rowbom->lookable_type == 'items'){
+                                $item = Item::find($rowbom->lookable_id);
+                                $qty = round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) / $rowbom->bom->qty_output),3);
+                                if($item){
+                                    if($item->productionBatchMoreThanZero()->exists()){
+                                        $totalstock = 0;
+                                        foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                            $totalstock += $rowbatch->qty;
+                                        }
+                                        if($qty > $totalstock){
+                                            $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($totalstock).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
+                                        }
+                                    }else{
+                                        $itemstock = NULL;
+                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                        if($itemstock){
+                                            if($itemstock->qty < $qty){
+                                                $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
+                                            }
+                                        }else{
+                                            $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' data stok tidak ditemukan.';
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if($bomAlternative->bom->bomStandard()->exists()){
+                            foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                                if($rowbom->lookable_type == 'items'){
+                                    $item = Item::find($rowbom->lookable_id);
+                                    $qty = round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),3);
+                                    if($item){
+                                        if($item->productionBatchMoreThanZero()->exists()){
+                                            $totalstock = 0;
+                                            foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                                $totalstock += $rowbatch->qty;
+                                            }
+                                            if($qty > $totalstock){
+                                                $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($totalstock).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
+                                            }
+                                        }else{
+                                            $itemstock = NULL;
+                                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                            if($itemstock){
+                                                if($itemstock->qty < $qty){
+                                                    $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
+                                                }
+                                            }else{
+                                                $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' data stok tidak ditemukan.';
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if(count($arrItemError)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => implode(', ',$arrItemError),
+                    ]);
                 }
                 
                 if($request->temp){
@@ -501,10 +574,10 @@ class ProductionReceiveController extends Controller
                 }
             }
         
-            /* DB::commit();
+            DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        } */
+        }
 
 		return response()->json($response);
     }

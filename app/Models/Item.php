@@ -501,6 +501,11 @@ class Item extends Model
         return $this->hasMany('App\Models\ProductionBatch','item_id','id');
     }
 
+    public function productionBatchMoreThanZero()
+    {
+        return $this->hasMany('App\Models\ProductionBatch','item_id','id')->where('qty','>',0);
+    }
+
     public function productionScheduleDetail()
     {
         return $this->hasMany('App\Models\ProductionScheduleDetail');

@@ -272,7 +272,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 })
                 ->orderBy('date', 'desc')
                 ->orderBy('id', 'desc')
-                ->get();
+                ->first();
                 if($first){
                     $query_no[]=$first;
                 }

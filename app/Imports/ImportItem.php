@@ -50,6 +50,9 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
             $row = $row->toArray();
             if(isset($row['code']) && $row['code']){
                 $check = Item::where('code',$row['code'])->first();
+                if($check){
+                    $check->itemUnit()->delete();
+                }
                 $item_group_code = explode('#',$row['item_group'])[0];
                 $item_group_id = ItemGroup::where('code',$item_group_code)->first();
                 
@@ -131,9 +134,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                     $check->note =  $row['note'];
                     $check->min_stock = $row['min_stock'];
                     $check->max_stock = $ $row['max_stock'];
-                    $check->save();
-
-                    $check->itemUnit()->delete();
+                    $check->save();                    
                 }
             }
             else{

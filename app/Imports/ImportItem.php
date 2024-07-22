@@ -110,7 +110,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         
                     DB::commit();
                 }else{
-                    $check->ItemUnit()->delete();
+                    $check->itemUnit()->delete();
 
                     $check->name = $row['name'];
                     $check->other_name=$row['other_name'];

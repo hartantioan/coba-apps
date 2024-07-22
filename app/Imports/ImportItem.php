@@ -183,8 +183,6 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                         'is_default'    => $row['default'],
                     ]);
                 }
-                
-             
             }
             else{
                 return null;

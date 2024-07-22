@@ -621,9 +621,12 @@ class ProductionOrderController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                $query->productionScheduleDetail->update([
-                    'status_process'    => NULL,
-                ]);
+
+                foreach($query->productionOrderDetail as $row){
+                    $row->productionScheduleDetail->update([
+                        'status_process'    => NULL,
+                    ]);
+                }
 
                 $query->update([
                     'status'    => '5',

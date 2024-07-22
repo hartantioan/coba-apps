@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Inventory;
 
-use App\Exports\ExportGoodScale;
+use App\Exports\ExportQualityControl;
 use App\Exports\ExportQualityControlTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
@@ -417,5 +417,12 @@ class QualityControlController extends Controller
         $status_qc = $request->status_qc ? $request->status_qc : '';
 		$modedata = $request->modedata ? $request->modedata : '';
 		return Excel::download(new ExportQualityControlTransactionPage($search,$post_date,$end_date,$status,$status_qc,$modedata), 'quality_control'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportQualityControl($post_date,$end_date,$mode), 'good_scale_'.uniqid().'.xlsx');
     }
 }

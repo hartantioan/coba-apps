@@ -8,7 +8,7 @@ use App\Models\FundRequest;
 use App\Models\CloseBillDetail;
 use App\Models\CostDistribution;
 use App\Models\GoodReceipt;
-use App\Models\GoodReturnPO;
+use App\Models\CancelDocument;
 use App\Models\LandedCost;
 use App\Models\InventoryTransferOut;
 use App\Models\GoodScale;
@@ -183,6 +183,21 @@ class CloseBillController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
+                $dis = '';
+                $nodis = '';
+                if($val->isOpenPeriod()){
+                    $dis = 'style="cursor: default;
+                    pointer-events: none;
+                    color: #9f9f9f !important;
+                    background-color: #dfdfdf !important;
+                    box-shadow: none;"';
+                }else{
+                    $nodis = 'style="cursor: default;
+                    pointer-events: none;
+                    color: #9f9f9f !important;
+                    background-color: #dfdfdf !important;
+                    box-shadow: none;"';
+                }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -219,7 +234,8 @@ class CloseBillController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat cyan darken-4 white-text btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -1410,5 +1426,62 @@ class CloseBillController extends Controller
         $company = $request->company ? $request->company : '';
 		$modedata = $request->modedata ? $request->modedata : '';
 		return Excel::download(new ExportCloseBillTransactionPage($search,$company,$post_date,$end_date,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+    }
+
+    public function cancelStatus(Request $request){
+        $query = CloseBill::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($request->cancel_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }else{
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+               
+                $query->update([
+                    'status'    => '8',
+                ]);
+
+                $cd = CancelDocument::create([
+                    'code'          => CancelDocument::generateCode('CAPN',substr($query->code,7,2),$request->cancel_date),
+                    'user_id'       => session('bo_id'),
+                    'post_date'     => $request->cancel_date,
+                    'lookable_type' => $query->getTable(),
+                    'lookable_id'   => $query->id,
+                ]);
+
+                CustomHelper::cancelJournal($cd,$request->cancel_date);
+    
+                activity()
+                    ->performedOn(new CloseBill())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void cancel the Tutup BS data');
+    
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Tutup BS  No. '.$query->code.' telah ditutup dengan tombol cancel void.','Tutup BS  No. '.$query->code.' telah ditutup dengan tombol cancel void.',$query->user_id);
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

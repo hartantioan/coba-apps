@@ -1848,7 +1848,6 @@ class PurchaseInvoiceController extends Controller
                 ];
             }else{
                 
-                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::addDeposit($query->account_id,$query->downpayment);
 

@@ -817,12 +817,12 @@ class PurchaseOrderController extends Controller
                         ]);
                     }
 
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
+                    // if(!CustomHelper::checkLockAcc($request->post_date)){
+                    //     return response()->json([
+                    //         'status'  => 500,
+                    //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                    //     ]);
+                    // }
 
                     if(in_array($query->status,['1','2','6'])){
 

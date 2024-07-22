@@ -125,6 +125,8 @@ class CloseBill extends Model
           '4' => '<span class="red medium-small white-text padding-3">Ditolak</span>',
           '5' => '<span class="red darken-4 medium-small white-text padding-3">Ditutup</span>',
           '6' => '<span class="yellow darken-4 medium-small white-text padding-3">Revisi</span>',
+          '7' => '<span class="blue darken-4 medium-small white-text padding-3">Schedule</span>',
+          '8' => '<span class="pink darken-4 medium-small white-text padding-3">Ditutup Balik</span>',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 
@@ -139,6 +141,8 @@ class CloseBill extends Model
             '4' => 'Ditolak',
             '5' => 'Ditutup',
             '6' => 'Direvisi',
+            '7' => 'Schedule',
+            '8' => 'Ditutup Balik',
             default => 'Invalid',
         };
 
@@ -203,5 +207,20 @@ class CloseBill extends Model
             $total += $row->nominal;
         }
         return $total;
+    }
+
+    public function isOpenPeriod(){
+        $monthYear = substr($this->post_date, 0, 7); // '2023-02'
+
+        // Query the LockPeriod model
+        $see = LockPeriod::where('month', $monthYear)
+                        ->whereIn('status_closing', ['3'])
+                        ->get();
+       
+        if(count($see)>0){
+            return true;
+        }else{
+            return false;
+        }
     }
 }

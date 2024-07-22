@@ -1812,6 +1812,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('inspect', [QualityControlController::class, 'inspect']);
                     Route::post('create',[QualityControlController::class, 'create'])->middleware('operation.access:quality_control,update');
                     Route::post('remove_used_data', [QualityControlController::class, 'removeUsedData']);
+                    Route::get('export',[QualityControlController::class, 'export']);
                     Route::get('export_from_page',[QualityControlController::class, 'exportFromTransactionPage']);
                     Route::get('row_detail',[QualityControlController::class, 'rowDetail']);
                 });
@@ -2314,6 +2315,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[MarketingOrderDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderDownPaymentController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDownPaymentController::class, 'voidStatus'])->middleware('operation.access:sales_down_payment,void');
+                    Route::post('cancel_status', [MarketingOrderDownPaymentController::class, 'cancelStatus'])->middleware('operation.access:sales_down_payment,void');
                     Route::post('destroy', [MarketingOrderDownPaymentController::class, 'destroy'])->middleware('operation.access:sales_down_payment,delete');
                 });
 
@@ -2402,6 +2404,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderInvoiceController::class, 'voidStatus'])->middleware('operation.access:marketing_order_invoice,void');
+                    Route::post('cancel_status', [MarketingOrderInvoiceController::class, 'cancelStatus'])->middleware('operation.access:marketing_order_invoice,void');
                     Route::post('destroy', [MarketingOrderInvoiceController::class, 'destroy'])->middleware('operation.access:marketing_order_invoice,delete');
                 });
 
@@ -2606,6 +2609,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('void_status', [PurchaseMemoController::class, 'voidStatus'])->middleware('operation.access:purchase_memo,void');
                     Route::get('approval/{id}',[PurchaseMemoController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseMemoController::class, 'destroy'])->middleware('operation.access:purchase_memo,delete');
+                    Route::post('cancel_status', [PurchaseMemoController::class, 'cancelStatus'])->middleware('operation.access:purchase_memo,void');
                     Route::get('export_from_page',[PurchaseMemoController::class, 'exportFromTransactionPage']);
                 });
 
@@ -2772,6 +2776,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [CloseBillController::class, 'removeUsedData']);
                     Route::post('create',[CloseBillController::class, 'create'])->middleware('operation.access:close_bill,update');
                     Route::post('void_status', [CloseBillController::class, 'voidStatus'])->middleware('operation.access:close_bill,void');
+                    Route::post('cancel_status', [CloseBillController::class, 'cancelStatus'])->middleware('operation.access:close_bill,void');
                     Route::get('approval/{id}',[CloseBillController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [CloseBillController::class, 'destroy'])->middleware('operation.access:close_bill,delete');
                     Route::post('get_account_data', [CloseBillController::class, 'getAccountData']);

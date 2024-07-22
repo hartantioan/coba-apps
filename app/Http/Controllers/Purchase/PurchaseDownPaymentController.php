@@ -650,12 +650,12 @@ class PurchaseDownPaymentController extends Controller
                             }
                         }
                     }
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
+                    // if(!CustomHelper::checkLockAcc($request->post_date)){
+                    //     return response()->json([
+                    //         'status'  => 500,
+                    //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                    //     ]);
+                    // }
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
@@ -1037,12 +1037,12 @@ class PurchaseDownPaymentController extends Controller
         
         if($query) {
 
-            if(!CustomHelper::checkLockAcc($query->post_date)){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                ]);
-            }
+            // if(!CustomHelper::checkLockAcc($query->post_date)){
+            //     return response()->json([
+            //         'status'  => 500,
+            //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+            //     ]);
+            // }
 
             if(in_array($query->status,['4','5'])){
                 $response = [
@@ -1095,12 +1095,12 @@ class PurchaseDownPaymentController extends Controller
         
         if($query) {
 
-            if(!CustomHelper::checkLockAcc($request->cancel_date)){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
-                ]);
-            }
+            // if(!CustomHelper::checkLockAcc($request->cancel_date)){
+            //     return response()->json([
+            //         'status'  => 500,
+            //         'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+            //     ]);
+            // }
 
             if(in_array($query->status,['4','5','8'])){
                 $response = [

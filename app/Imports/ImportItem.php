@@ -131,7 +131,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                     $check->brand_id = $brand ? $brand->id : NULL;
                     $check->note =  $row['note'];
                     $check->min_stock = $row['min_stock'];
-                    $check->max_stock = $ $row['max_stock'];
+                    $check->max_stock = $row['max_stock'];
                     $check->save();                    
                 }
             }

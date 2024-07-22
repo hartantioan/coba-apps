@@ -234,4 +234,35 @@ class ProductionOrder extends Model
         
         return $qty;
     }
+
+    public function updateProductionScheduleDone(){
+        $status = true;
+
+        $productionSchedule = NULL;
+
+        foreach($this->productionOrderDetail as $row){
+            $productionSchedule = $row->productionScheduleDetail->productionSchedule;
+        }
+
+        foreach($productionSchedule->productionScheduleDetail as $row){
+            if($row->productionOrderDetail()->exists()){
+                if($row->productionOrderDetail->productionOrder->status !== '3'){
+                    $status = false;
+                }
+            }
+        }
+
+        if($status){
+            $productionSchedule->update([
+                'status'    => '3',
+                'done_date' => date('Y-m-d H:i:s'),
+            ]);
+
+            activity()
+                    ->performedOn(new ProductionSchedule())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($productionSchedule)
+                    ->log('Done the Production Schedule data from Production Order');
+        }
+    }
 }

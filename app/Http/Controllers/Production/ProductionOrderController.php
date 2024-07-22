@@ -913,6 +913,7 @@ class ProductionOrderController extends Controller
         if($query_done){
 
             if(in_array($query_done->status,['2'])){
+                
                 $query_done->update([
                     'real_time_start'   => $request->real_time_start,
                     'real_time_end'     => $request->real_time_end,
@@ -920,6 +921,8 @@ class ProductionOrderController extends Controller
                     'done_id'           => session('bo_id'),
                     'done_date'         => date('Y-m-d H:i:s'),
                 ]);
+
+                $query_done->updateProductionScheduleDone();
     
                 activity()
                     ->performedOn(new ProductionOrder())

@@ -110,7 +110,6 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         
                     DB::commit();
                 }else{
-                    $check->itemUnit()->delete();
 
                     $check->name = $row['name'];
                     $check->other_name=$row['other_name'];
@@ -133,6 +132,8 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                     $check->min_stock = $row['min_stock'];
                     $check->max_stock = $ $row['max_stock'];
                     $check->save();
+
+                    $check->itemUnit()->delete();
                 }
             }
             else{

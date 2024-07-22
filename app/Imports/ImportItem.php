@@ -86,7 +86,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         'variety_id' => $variety ? $variety->id : NULL,
                         'pattern_id' => $pattern ? $pattern->id : NULL,
                         'pallet_id' => $pallet ? $pallet->id : NULL,
-                        'grade' => $grade ? $grade->id : NULL,
+                        'grade_id' => $grade ? $grade->id : NULL,
                         'brand_id' => $brand ? $brand->id : NULL,
                         'note' => $row['note'],
                         'min_stock' => $row['min_stock'],
@@ -126,7 +126,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                     $check->variety_id = $variety ? $variety->id : NULL;
                     $check->pattern_id = $pattern ? $pattern->id : NULL;
                     $check->pallet_id = $pallet ? $pallet->id : NULL;
-                    $check->grade = $grade ? $grade->id : NULL;
+                    $check->grade_id = $grade ? $grade->id : NULL;
                     $check->brand_id = $brand ? $brand->id : NULL;
                     $check->note =  $row['note'];
                     $check->min_stock = $row['min_stock'];

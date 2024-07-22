@@ -184,7 +184,7 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                                 'is_default'    => $row['default'],
                             ]);
                         }else{
-                            $x=ItemUnit::create([
+                            ItemUnit::create([
                                 'item_id'       => $check->id,
                                 'unit_id'       => $unit->id,
                                 'conversion'    => $row['konversi'],

@@ -109,7 +109,6 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         ->withProperties($query)
                         ->log('Add / edit from excel item data.');
                         
-                    DB::commit();
                 }else{
 
                     $check->name = $row['name'];

@@ -561,6 +561,7 @@ class ProductionIssueController extends Controller
         $po['po_code']                          = $po->productionOrderDetail->productionOrder->code;
         $po['detail_issue']                     = $detail_issue;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
+        $po['bom_group']                        = strtoupper($po->productionOrderDetail->productionScheduleDetail->bom->group());
         
 		return response()->json($po);
     }

@@ -511,22 +511,24 @@ class ProductionReceiveController extends Controller
                             'total'                         => 0,
                         ]);
                         $type = $querydetail->is_powder ? 'powder' : 'normal';
-                        foreach($request->arr_count_detail as $keydetail => $rowdetail){
-                            if($request->arr_count_header[$key] == $rowdetail){
-                                $cekBatch = ProductionBatch::where('code',$request->arr_batch_no[$keydetail])->first();
-                                $code_batch = $cekBatch ? ProductionBatch::generateCode($type,$query->shift->code,$query->group) : $request->arr_batch_no[$keydetail];
-                                ProductionBatch::create([
-                                    'code'          => $code_batch,
-                                    'item_id'       => $querydetail->item_id,
-                                    'tank_id'       => $request->arr_tank[$keydetail],
-                                    'place_id'      => $request->arr_place[$key],
-                                    'warehouse_id'  => $request->arr_warehouse[$key],
-                                    'lookable_type' => $querydetail->getTable(),
-                                    'lookable_id'   => $querydetail->id,
-                                    'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
-                                    'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
-                                    'total'         => 0
-                                ]);
+                        if($request->arr_count_detail){
+                            foreach($request->arr_count_detail as $keydetail => $rowdetail){
+                                if($request->arr_count_header[$key] == $rowdetail){
+                                    $cekBatch = ProductionBatch::where('code',$request->arr_batch_no[$keydetail])->first();
+                                    $code_batch = $cekBatch ? ProductionBatch::generateCode($type,$query->shift->code,$query->group) : $request->arr_batch_no[$keydetail];
+                                    ProductionBatch::create([
+                                        'code'          => $code_batch,
+                                        'item_id'       => $querydetail->item_id,
+                                        'tank_id'       => $request->arr_tank[$keydetail],
+                                        'place_id'      => $request->arr_place[$key],
+                                        'warehouse_id'  => $request->arr_warehouse[$key],
+                                        'lookable_type' => $querydetail->getTable(),
+                                        'lookable_id'   => $querydetail->id,
+                                        'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
+                                        'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
+                                        'total'         => 0
+                                    ]);
+                                }
                             }
                         }
                     }
@@ -610,6 +612,7 @@ class ProductionReceiveController extends Controller
             $detail_receive[] = [
                 'id'                    => $row->production_order_detail_id,
                 'bom_id'                => $row->bom_id ?? '',
+                'group_bom'             => $row->bom()->exists() ? $row->bom->group : '',
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'unit'                  => $row->item->uomUnit->code,
@@ -631,6 +634,7 @@ class ProductionReceiveController extends Controller
         $po['details']                          = $detail_receive;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         $po['issues']                           = $issue;
+        $po['bom_group']                        = strtoupper($po->productionOrderDetail->productionScheduleDetail->bom->group());
         
 		return response()->json($po);
     }

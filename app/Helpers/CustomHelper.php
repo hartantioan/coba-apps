@@ -4493,7 +4493,50 @@ class CustomHelper {
 			$total = 0;
 
 			foreach($pir->productionReceiveDetail as $row){
-				foreach($row->productionBatch as $rowbatch){
+				if($row->productionBatch()->exists()){
+					foreach($row->productionBatch as $rowbatch){
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $row->item->itemGroup->coa_id,
+							'place_id'		=> $row->place_id,
+							'line_id'		=> $row->productionReceive->line_id,
+							'item_id'		=> $row->item_id,
+							'warehouse_id'	=> $row->warehouse_id,
+							'type'			=> '1',
+							'nominal'		=> $rowbatch->total,
+							'nominal_fc'	=> $rowbatch->total,
+							'note'			=> $pir->note.' - '.$rowbatch->code,
+						]);
+		
+						self::sendCogs($table_name,
+							$pir->id,
+							$pir->company_id,
+							$row->place_id,
+							$row->warehouse_id,
+							$row->item_id,
+							$rowbatch->qty_real,
+							$rowbatch->total,
+							'IN',
+							$pir->post_date,
+							NULL,
+							NULL,
+							$rowbatch->id,
+						);
+		
+						self::sendStock(
+							$row->place_id,
+							$row->warehouse_id,
+							$row->item_id,
+							$rowbatch->qty_real,
+							'IN',
+							NULL,
+							NULL,
+							$rowbatch->id,
+						);
+		
+						$total += $rowbatch->total;
+					}
+				}else{
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->item->itemGroup->coa_id,
@@ -4502,9 +4545,9 @@ class CustomHelper {
 						'item_id'		=> $row->item_id,
 						'warehouse_id'	=> $row->warehouse_id,
 						'type'			=> '1',
-						'nominal'		=> $rowbatch->total,
-						'nominal_fc'	=> $rowbatch->total,
-						'note'			=> $pir->note.' - '.$rowbatch->code,
+						'nominal'		=> $row->total,
+						'nominal_fc'	=> $row->total,
+						'note'			=> $pir->note,
 					]);
 	
 					self::sendCogs($table_name,
@@ -4513,27 +4556,27 @@ class CustomHelper {
 						$row->place_id,
 						$row->warehouse_id,
 						$row->item_id,
-						$rowbatch->qty_real,
-						$rowbatch->total,
+						$row->qty,
+						$row->total,
 						'IN',
 						$pir->post_date,
 						NULL,
 						NULL,
-						$rowbatch->id,
+						NULL,
 					);
 	
 					self::sendStock(
 						$row->place_id,
 						$row->warehouse_id,
 						$row->item_id,
-						$rowbatch->qty_real,
+						$row->qty,
 						'IN',
 						NULL,
 						NULL,
-						$rowbatch->id,
+						NULL,
 					);
 	
-					$total += $rowbatch->total;
+					$total += $row->total;
 				}
 			}
 

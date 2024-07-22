@@ -4223,6 +4223,7 @@ class Select2Controller extends Controller {
                     'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
                     'list_warehouse'    => $row->lookable_type == 'items' ? $row->item->warehouseList() : [],
                     'issue_method'      => $row->issue_method,
+                    'has_batch'         => $row->lookable_type == 'items' ? ($row->lookable->productionBatchMoreThanZero()->exists() ? '1' : '') : '',
                     'has_bom'           => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
                     /* 'list_batch'        => $row->lookable_type == 'items' ? $row->lookable->listBatch() : [], */
                 ];
@@ -4377,7 +4378,9 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
+                'group_bom'                     => $d->productionScheduleDetail->bom->group,
                 'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
+                'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
             ];
         }
 

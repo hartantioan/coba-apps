@@ -825,7 +825,7 @@
                         `);
                     });
                 }
-                if($("#arr_lookable_id" + val).select2('data')[0].has_bom){
+                if($("#arr_lookable_id" + val).select2('data')[0].group_bom == '3'){
                     $('#arr_lookable_id' + val).parent().prev().attr('rowspan','2');
                     $('#arr_lookable_id' + val).parent().parent().parent().append(`
                         <tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + val + `">
@@ -1074,7 +1074,7 @@
                             <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_bom + `">
                             <input type="hidden" name="arr_nominal_bom[]" value="` + val.nominal_bom + `">
                             <input type="hidden" name="arr_total_bom[]" value="` + val.total_bom + `">
-                            <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
+                            <td class="center-align" ` + (val.group_bom == '3' ? `rowspan="2"` : ``) + `>
                                 ` + no_issue + `
                             </td>
                             <td>
@@ -1109,7 +1109,7 @@
                             </td>
                         </tr>
                     ` +
-                        (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
+                        (val.group_bom == '3' ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
                             <td colspan="2" class="right-align">
                                 Ambil dari Batch : 
                             </td>
@@ -1140,7 +1140,7 @@
                         </tr>` : ``)
                     );
                     $('#rowQty' + count).trigger('keyup');
-                    if(val.has_bom){
+                    if(val.group_bom == '3'){
                         $('#arr_batch' + count).select2({
                             placeholder: '-- Kosong --',
                             minimumInputLength: 1,
@@ -1781,6 +1781,8 @@
                     <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
                 `);
 
+                $('#title-modal').text(response.bom_group);
+
                 $('.row_item_issue').remove();
                         
                 $('#last-row-item-issue').remove();
@@ -1808,7 +1810,7 @@
                             <input type="hidden" name="arr_qty_bom[]" value="` + (val.bom_id ? val.qty_bom : '0,000') + `">
                             <input type="hidden" name="arr_nominal_bom[]" value="` + (val.bom_id ? val.nominal_bom : '0,00') + `">
                             <input type="hidden" name="arr_total_bom[]" value="` + (val.bom_id ? val.total_bom : '0,00') + `">
-                            <td class="center-align" ` + (val.has_bom ? `rowspan="2"` : ``) + `>
+                            <td class="center-align" ` + (val.group_bom == '3' ? `rowspan="2"` : ``) + `>
                                 ` + no_issue + `
                             </td>
                             <td>
@@ -1843,7 +1845,7 @@
                             </td>
                         </tr>
                     ` +
-                        (val.has_bom ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
+                        (val.group_bom == '3' ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
                             <td colspan="2" class="right-align">
                                 Ambil dari Batch : 
                             </td>
@@ -1874,7 +1876,7 @@
                         </tr>` : ``)
                     );
                     $('#rowQty' + count).trigger('keyup');
-                    if(val.has_bom){
+                    if(val.group_bom == '3'){
 
                         let arr_batch_id = [];
 

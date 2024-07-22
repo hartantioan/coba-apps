@@ -27,8 +27,6 @@ class ProductionReceiveDetail extends Model
         'qty_reject',
         'place_id',
         'warehouse_id',
-        'batch_no',
-        'production_batch_id',
         'total',
     ];
 

@@ -339,7 +339,7 @@ class ProductionReceive extends Model
                             'nominal_planned'               => $rowbom->nominal,
                             'total_planned'                 => $total,
                             'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
-                            'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
+                            'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
                             'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
                         ]);
                     }
@@ -409,7 +409,7 @@ class ProductionReceive extends Model
                                 'nominal_planned'               => $rowbom->nominal,
                                 'total_planned'                 => $total,
                                 'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
-                                'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
+                                'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
                                 'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
                             ]);
                         }

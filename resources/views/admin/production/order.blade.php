@@ -158,7 +158,7 @@
                     <div class="col s12">
                         <div class="card-alert card gradient-45deg-purple-amber">
                             <div class="card-content white-text">
-                                <p>Tips : Jika seluruh Production Order pada satu Jadwal Produksi (Production Schedule) telah ditutup (dinyatakan selesai), maka Jadwal Produksi terkait akann ditutup secara otomatis.</p>
+                                <p>Tips : Jika seluruh Production Order pada satu Jadwal Produksi (Production Schedule) telah ditutup (dinyatakan selesai), maka Jadwal Produksi terkait akan ditutup secara otomatis.</p>
                             </div>
                         </div>
                         <div class="row">

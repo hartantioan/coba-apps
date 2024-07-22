@@ -111,27 +111,29 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         
                 }else{
 
-                    $check->name = $row['name'];
-                    $check->other_name=$row['other_name'];
-                    $check->item_group_id=$item_group_id->id;
-                    $check->uom_unit=$item_unit_id->id;
-                    $check->tolerance_gr=$row['toleransi_gr'];
-                    $check->is_inventory_item=$row['is_invent_item'];
-                    $check->is_sales_item=$row['is_sales_item'];
-                    $check->is_purchase_item=$row['is_purchase'];
-                    $check->is_service=$row['is_service'];
-                    $check->is_hide_supplier = $row['is_production'];
-                    $check->type_id= $type ? $type->id : NULL;
-                    $check->size_id = $size ? $size->id : NULL;
-                    $check->variety_id = $variety ? $variety->id : NULL;
-                    $check->pattern_id = $pattern ? $pattern->id : NULL;
-                    $check->pallet_id = $pallet ? $pallet->id : NULL;
-                    $check->grade_id = $grade ? $grade->id : NULL;
-                    $check->brand_id = $brand ? $brand->id : NULL;
-                    $check->note =  $row['note'];
-                    $check->min_stock = $row['min_stock'];
-                    $check->max_stock = $row['max_stock'];
-                    $check->save();                    
+                    if(!$check->hasChildDocument()){
+                        $check->name = $row['name'];
+                        $check->other_name=$row['other_name'];
+                        $check->item_group_id=$item_group_id->id;
+                        $check->uom_unit=$item_unit_id->id;
+                        $check->tolerance_gr=$row['toleransi_gr'];
+                        $check->is_inventory_item=$row['is_invent_item'];
+                        $check->is_sales_item=$row['is_sales_item'];
+                        $check->is_purchase_item=$row['is_purchase'];
+                        $check->is_service=$row['is_service'];
+                        $check->is_hide_supplier = $row['is_production'];
+                        $check->type_id= $type ? $type->id : NULL;
+                        $check->size_id = $size ? $size->id : NULL;
+                        $check->variety_id = $variety ? $variety->id : NULL;
+                        $check->pattern_id = $pattern ? $pattern->id : NULL;
+                        $check->pallet_id = $pallet ? $pallet->id : NULL;
+                        $check->grade_id = $grade ? $grade->id : NULL;
+                        $check->brand_id = $brand ? $brand->id : NULL;
+                        $check->note =  $row['note'];
+                        $check->min_stock = $row['min_stock'];
+                        $check->max_stock = $row['max_stock'];
+                        $check->save();
+                    }              
                 }
             }
             else{
@@ -172,14 +174,26 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                 $code_unit = explode('#', $row['unit'])[0];
                 $unit = Unit::where('code',$code_unit)->first();
                 if ($check) {
-                    $x=ItemUnit::create([
-                        'item_id'       => $check->id,
-                        'unit_id'       => $unit->id,
-                        'conversion'    => $row['konversi'],
-                        'is_buy_unit'   => $row['beli'],
-                        'is_sell_unit'   => $row['jual'],
-                        'is_default'    => $row['default'],
-                    ]);
+                    if(!$check->hasChildDocument()){
+                        $checkUnit = ItemUnit::where('item_id',$check->id)->where('unit_id',$unit->id)->first();
+                        if($checkUnit){
+                            $checkUnit->update([
+                                'conversion'    => $row['konversi'],
+                                'is_buy_unit'   => $row['beli'],
+                                'is_sell_unit'  => $row['jual'],
+                                'is_default'    => $row['default'],
+                            ]);
+                        }else{
+                            $x=ItemUnit::create([
+                                'item_id'       => $check->id,
+                                'unit_id'       => $unit->id,
+                                'conversion'    => $row['konversi'],
+                                'is_buy_unit'   => $row['beli'],
+                                'is_sell_unit'   => $row['jual'],
+                                'is_default'    => $row['default'],
+                            ]);    
+                        }
+                    }
                 }
             }
             else{

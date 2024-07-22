@@ -432,6 +432,10 @@ class ItemController extends Controller
 
                 if($request->arr_unit){
                     foreach($request->arr_unit as $key => $row){
+                        $cek2 = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->count();
+                        if($cek2 > 1){
+                            ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->delete();
+                        }
                         $cek = ItemUnit::where('item_id',$query->id)->where('unit_id',intval($row))->count();
                         if($cek == 0){
                             ItemUnit::create([

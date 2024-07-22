@@ -66,8 +66,6 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                 $grade = Grade::where('code',explode('#',$row['grade_fg'])[0])->first();
                 $brand = Brand::where('code',explode('#',$row['brand_fg'])[0])->first();
                 if(!$check){
-                   
-                    
                     $query = Item::create([
                         'code' => $row['code'],
                         'name' => $row['name'],
@@ -103,7 +101,6 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                             'qty'           => 0
                         ]);
                     }
-                    
         
                     activity()
                         ->performedOn(new Item())

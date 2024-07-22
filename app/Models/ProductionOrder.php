@@ -155,12 +155,18 @@ class ProductionOrder extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->productionIssue()->exists()){
-            $hasRelation = true;
-        }
+        foreach($this->productionOrderDetail as $row){
+            if($row->productionIssue()->exists()){
+                $hasRelation = true;
+            }
 
-        if($this->productionReceive()->exists()){
-            $hasRelation = true;
+            if($row->productionReceive()->exists()){
+                $hasRelation = true;
+            }
+
+            if($row->productionFgReceive()->exists()){
+                $hasRelation = true;
+            }
         }
 
         return $hasRelation;

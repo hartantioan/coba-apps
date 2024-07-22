@@ -47,6 +47,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
     {
         DB::beginTransaction();
         try {
+            $check = null;
             $row = $row->toArray();
             if(isset($row['code']) && $row['code']){
                 $check = Item::where('code',$row['code'])->first();
@@ -165,6 +166,7 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
     {
         DB::beginTransaction();
         try {
+            $check = null;
             $row = $row->toArray();
             if(isset($row['item_code']) && $row['item_code']){
                 $check = Item::where('code',$row['item_code'])->first();

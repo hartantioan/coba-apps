@@ -219,7 +219,7 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
         DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
-            $sheet='Alternative';
+            $sheet='Detail';
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }

@@ -29,6 +29,7 @@ class ReceptionHardwareItemsUsage extends Model
         'done_id',
         'done_date',
         'done_note',
+        'division',
         'reception_date',
         'return_date', 
         'user_return',

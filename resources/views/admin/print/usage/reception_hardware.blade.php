@@ -274,7 +274,7 @@
                                 :
                             </td>
                             <td>
-                                {{$data->account->position->division->name}}
+                                {{$data->division}}
                             </td>
                         </tr>
                     </table>

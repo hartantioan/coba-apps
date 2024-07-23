@@ -152,7 +152,7 @@
                             <label class="active" for="user_edit">User</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <input id="division" name="division" disabled></input>
+                            <input id="division" name="division"></input>
                             <label class="active" for="division">DIVISI</label>
                         </div>
                         <div class="input-field col s12 m6 step3">
@@ -260,7 +260,7 @@
                             <label class="active" for="user_id1" >Pilih User(jika ada)</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <input id="division1" name="division1" disabled></input>
+                            <input id="division1" name="division1" ></input>
                             <label class="active" for="division1">DIVISI</label>
                         </div>
                         <div class="input-field col s12 m6">
@@ -454,16 +454,19 @@
         }else{
             $('#detail1').val('');
         }
-        if($('#user_id').val()){
-            let paramsdivisi = $('#user_id').select2('data')[0].division;
-            $('#division').val(paramsdivisi);
+        if($('#tempes').val() != '' || $('#temp').val() != '' ){
+            if($('#user_id').val()){
+                let paramsdivisi = $('#user_id').select2('data')[0].division;
+                $('#division').val(paramsdivisi);
            
+            }
+            if($('#user_id1').val()){
+                let paramsdivisi = $('#user_id1').select2('data')[0].division;
+                $('#division1').val(paramsdivisi);
+            
+            }
         }
-        if($('#user_id1').val()){
-            let paramsdivisi = $('#user_id1').select2('data')[0].division;
-            $('#division1').val(paramsdivisi);
-           
-        }
+        
     }
 
     function excel(){
@@ -797,12 +800,12 @@
                 $('#date').val(response.date);
                 $('#location').val(response.location);
                 $('#tab_user').hide();
+                $('#division').val(response.division);
                 $('#tab_hardware').hide();
                 $('#tab_user_edit').show();
                 $('#tab_hardware_edit').show();
                 $('#item_edit').val(response.name);
                 $('#user_edit').val(response.user.name);
-                $('#division').val(response.division);
              
                 
                 $('.modal-content').scrollTop(0);

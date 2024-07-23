@@ -118,6 +118,7 @@ class ReceptionHardwareItemUsageController extends Controller
     }
 
     public function saveTargeted(Request $request){
+        info($request);
         $validation = Validator::make($request->all(), [
             'user_id1'                       => 'required',
             'date1'                          => 'required',
@@ -145,6 +146,7 @@ class ReceptionHardwareItemUsageController extends Controller
                 'hardware_item_id'  => $request->tempes,
                 'info'              => $request->info1,
                 'date'              => now(),
+                'division'          => $request->division1,
                 'reception_date'    => $request->date1,
                 'status'            => 1,
                 'status_item'       => 1,
@@ -316,8 +318,8 @@ class ReceptionHardwareItemUsageController extends Controller
         $reception['item']=$reception->hardwareItem;
         $reception['name']=$reception->hardwareItem->item;
         $reception['detail1']=$reception->hardwareItem->detail1;
-        $reception['user']=$reception->user;
-        $reception['division']=$reception->user->position->division->name;
+        $reception['user']=$reception->account;
+        $reception['division']=$reception->division ?? null;
 		return response()->json($reception);
     }
     public function showItem(Request $request){
@@ -376,19 +378,35 @@ class ReceptionHardwareItemUsageController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'hardware_item_id'              => 'required',
-            'user_id'                       => 'required',
-            'date'                          => 'required',
-            'info'                          => 'required',
-            'location'                      => 'required',
-        ], [
-            'hardware_item_id.required' 	        => 'Harap Pilih Item Terlebih dahulu',
-            'user_id.required'                      => 'Pilih User untuk Penyerahan',
-            'date.required'                         => 'Tanggal tidak boleh kosong.',
-            'info.required'                         => 'Keterangan tidak boleh kosong.',
-            'location.required'                     => 'Lokasi tidak boleh kosong.',
-        ]);
+        
+        if($request->tempe){
+            $validation = Validator::make($request->all(), [
+                
+                'date'                          => 'required',
+                'info'                          => 'required',
+                'location'                      => 'required',
+            ], [
+                
+                'date.required'                         => 'Tanggal tidak boleh kosong.',
+                'info.required'                         => 'Keterangan tidak boleh kosong.',
+                'location.required'                     => 'Lokasi tidak boleh kosong.',
+            ]);
+        }else{
+            $validation = Validator::make($request->all(), [
+                'hardware_item_id'              => 'required',
+                'user_id'                       => 'required',
+                'date'                          => 'required',
+                'info'                          => 'required',
+                'location'                      => 'required',
+            ], [
+                'hardware_item_id.required' 	        => 'Harap Pilih Item Terlebih dahulu',
+                'user_id.required'                      => 'Pilih User untuk Penyerahan',
+                'date.required'                         => 'Tanggal tidak boleh kosong.',
+                'info.required'                         => 'Keterangan tidak boleh kosong.',
+                'location.required'                     => 'Lokasi tidak boleh kosong.',
+            ]);
+        }
+        
 
         if($validation->fails()) {
             $response = [
@@ -396,12 +414,14 @@ class ReceptionHardwareItemUsageController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-			if($request->temp){
+			if($request->tempe){
                 DB::beginTransaction();
                 try {
-                    $query = ReceptionHardwareItemsUsage::find($request->temp);
+                    $query = ReceptionHardwareItemsUsage::find($request->tempe);
                     $query->date	            = $request->date;
                     $query->location	        = $request->location;
+                    $query->division	        = $request->division;
+                    $query->info	            = $request->info;
                     // $query->status              = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -418,6 +438,7 @@ class ReceptionHardwareItemUsageController extends Controller
                         'hardware_item_id'  => $request->hardware_item_id,
                         'info'              => $request->info,
                         'date'              => now(),
+                        'division'          => $request->division,
                         'reception_date'    => $request->date,
                         'status'            => 1,
                         'status_item'       => 1,

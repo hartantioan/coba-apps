@@ -80,7 +80,7 @@ class HardwareItem extends Model
         if($query->count() > 0) {
             $code = (int)$query[0]->code + 1;
         } else {
-            $code = '00000001';
+            $code = '0001';
         }
 
         $no = str_pad($code, 8, 0, STR_PAD_LEFT);

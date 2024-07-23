@@ -124,7 +124,7 @@
                             <label class="active" for="item_id">Pilih Item dari inventory</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment();getCode();" >&nbsp;</select>
+                            <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment();" >&nbsp;</select>
                             <label class="active" for="item_group_id">Group Departement</label>
                         </div>
                         <div class="input-field col s12 m12">
@@ -230,7 +230,7 @@
                             <label class="active" for="item">{{ __('translations.item') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment();getCode();">&nbsp;</select>
+                            <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment();">&nbsp;</select>
                             <label class="active" for="item_group_id_edit">Group Departement</label>
                         </div>
                         
@@ -368,7 +368,7 @@
 </div>
 
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
-    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modalEdit">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modalEdit" onclick="getCode();">
         <i class="material-icons">add</i>
     </a>
 </div>

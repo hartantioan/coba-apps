@@ -163,7 +163,18 @@ class IncomingPayment extends Model
         }
     }
 
-    
+    public function hasDetailMatrix(){
+        $ada = false;
+        if($this->approval()){
+            foreach($this->approval() as $row){
+                if($row->approvalMatrix()->exists()){
+                    $ada = true;
+                }
+            }
+        }
+
+        return $ada;
+    }
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);

@@ -155,8 +155,8 @@ class IncomingPayment extends Model
     }
 
     public function approval(){
-        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
-        if($source && $source->approvalMatrix()->exists()){
+        $source = ApprovalSource::where('lookable_type',$this->table)->where('lookable_id',$this->id)->whereHas('approvalMatrix')->get();
+        if($source){
             return $source;
         }else{
             return '';

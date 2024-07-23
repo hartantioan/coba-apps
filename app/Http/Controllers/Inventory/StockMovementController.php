@@ -318,7 +318,7 @@ class StockMovementController extends Controller
                         'item'         => $row_tidak_ada->item->name,
                         'satuan'       => $row_tidak_ada->item->uomUnit->code,
                         'area'         => $row_tidak_ada->area->code ?? '-',
-                        'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                        'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
                         'shading'      => $row_tidak_ada->shading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? CustomHelper::formatConditionalQty($row_tidak_ada->qty_final) : 0,

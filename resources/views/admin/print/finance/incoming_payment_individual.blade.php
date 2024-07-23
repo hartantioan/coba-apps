@@ -342,8 +342,6 @@
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
                                 <td class="center-align">
-                                    {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                    <br>
                                     Dibuat oleh,
                                     @if($data->user->signature)
                                         <div>{!! $data->user->signature() !!}</div>
@@ -367,8 +365,13 @@
                                         @endforeach
                                     @endforeach
                                 @endif
+                                <td class="center-align">
+                                    @if ($data->payment_type == '2')
+                                        <img src="{{ $e_banking }}" width="50%" style="position: absolute; width:25%; right:-6px;">
+                                    @endif
+                                </td>
                             </tr>
-                        </table>  
+                        </table>
                     </div>
                     
                 </div>

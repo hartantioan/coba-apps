@@ -301,15 +301,15 @@ class PaymentRequestController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                if($val->isOpenPeriod()){
+                // if($val->isOpenPeriod()){
 
-                    $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
+                //     $dis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
                    
-                }
+                // }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
                 }else{

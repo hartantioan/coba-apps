@@ -232,15 +232,15 @@ class MaterialRequestController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                if($val->isOpenPeriod()){
+                // if($val->isOpenPeriod()){
 
-                    $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
+                //     $dis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
                    
-                }
+                // }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,

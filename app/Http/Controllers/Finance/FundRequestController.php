@@ -222,15 +222,15 @@ class FundRequestController extends Controller
            
             foreach($query_data as $val) {
                 $dis = '';
-                if($val->isOpenPeriod()){
+                // if($val->isOpenPeriod()){
 
-                    $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
+                //     $dis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
                    
-                }
+                // }
                 
                 $totalReceivable = $val->totalReceivable();
                 $totalReceivableUsed = $val->totalReceivableUsedPaid();

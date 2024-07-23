@@ -404,15 +404,15 @@ class PurchaseOrderController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                if($val->isOpenPeriod()){
+                // if($val->isOpenPeriod()){
 
-                    $dis = 'style="cursor: default;
-                    pointer-events: none;
-                    color: #9f9f9f !important;
-                    background-color: #dfdfdf !important;
-                    box-shadow: none;"';
+                //     $dis = 'style="cursor: default;
+                //     pointer-events: none;
+                //     color: #9f9f9f !important;
+                //     background-color: #dfdfdf !important;
+                //     box-shadow: none;"';
                    
-                }
+                // }
                 $btn_close = /* $val->inventory_type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>' :  */'';
                 $btn_print = in_array($val->status,['2','3']) ? ' <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat  lime white-text btn-small" data-popup="tooltip" title="Preview Print Multi Language" onclick="whatPrintingChi(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>

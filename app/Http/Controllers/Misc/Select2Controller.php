@@ -2721,7 +2721,8 @@ class Select2Controller extends Controller {
             if($d->hasBalanceMod()){
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> $d->code,
+                    'text' 			=> $d->code.' - '.$d->account->name,
+                    'account_id' 	=> $d->account_id,
                     'outlet'        => $d->outlet->name,
                     'address'       => $d->destination_address,
                     'province'      => $d->province->name,
@@ -2733,6 +2734,7 @@ class Select2Controller extends Controller {
                     'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                     'code'          => $d->code,
                     'grandtotal'    => number_format($d->grandtotal,2,',','.'),
+                    'payment_type'  => $d->payment_type,
                 ];
             }
         }

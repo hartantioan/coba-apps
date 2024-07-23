@@ -461,6 +461,8 @@
 
 
 <script>
+    var tempAccount = null, paymentType = null;  
+
 document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -552,6 +554,8 @@ document.addEventListener('focusin', function (event) {
                 $('#info-city').text('-');
                 $('#info-district').text('-');
                 $('#info-subdistrict').text('-');
+                tempAccount = null;
+                paymentType = null;
             }
         });
 
@@ -682,6 +686,25 @@ document.addEventListener('focusin', function (event) {
 
                         $('#marketing_order_id').empty();
                     }else{
+                        let passed = true;
+                        if(tempAccount == null){
+                            tempAccount = $('#marketing_order_id').select2('data')[0].account_id;
+                            paymentType = $('#marketing_order_id').select2('data')[0].payment_type;
+                        }else{
+                            if(tempAccount == $('#marketing_order_id').select2('data')[0].account_id && paymentType == $('#marketing_order_id').select2('data')[0].payment_type){
+
+                            }else{
+                                passed = false;
+                            }
+                        }
+
+                        if(!passed){
+                            if($('.data-used').length > 0){
+                                $('.data-used').trigger('click');
+                            }
+                            $('#body-item').empty();
+                        }
+
                         $('#info-outlet').text($('#marketing_order_id').select2('data')[0].outlet);
                         $('#info-address').text($('#marketing_order_id').select2('data')[0].address);
                         $('#info-province').text($('#marketing_order_id').select2('data')[0].province);
@@ -696,7 +719,6 @@ document.addEventListener('focusin', function (event) {
                         $('#note_external').val(response.note_external);
 
                         if(response.details.length > 0){
-                            $('#body-item').empty();
                             $('#list-used-data').append(`
                                 <div class="chip purple darken-4 gradient-shadow white-text">
                                     ` + response.code + `
@@ -762,23 +784,6 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                     </tr>
                                 `);
-                                
-                                /* if(val.list_stock.length > 0){
-                                    $('#arr_item_stock' + count).append(`
-                                        <option value="">--Silahkan pilih stok--</option>
-                                    `);
-                                    $.each(val.list_stock, function(i, value) {
-                                        $('#arr_item_stock' + count).append(`
-                                            <option value="` + value.id + `" data-qty="` + value.qty_raw + `" data-warehouse="` + value.warehouse + `" data-p="` + value.place_id + `" data-w="` + value.warehouse_id + `" data-a="` + value.area_id + `" data-aname="` + value.area + `">` + value.warehouse + ` - ` + value.qty + `</option>
-                                        `);
-                                    });
-
-                                    $('#arr_item_stock' + count).val(val.item_stock_id);
-                                }else{
-                                    $('#arr_item_stock' + count).append(`
-                                        <option value="" disabled selected>--Data stok tidak ditemukan--</option>
-                                    `);
-                                } */
                             });
                         }
                     }

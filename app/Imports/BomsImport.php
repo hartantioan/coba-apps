@@ -40,8 +40,8 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             if (isset($row['code']) && $row['code']) {
                 $check = Bom::where('code', $row['code'])->first();
                 $item_output_code = explode('#', $row['item_output'])[0];
@@ -97,12 +97,12 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
             }else{
                 return null;
             } 
-            DB::commit();
+            /* DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
             $sheet='BOM';
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
-        }
+        } */
     }
     
     public function startRow(): int
@@ -116,8 +116,8 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             
 
             if ($row['kode_bom_header']) {
@@ -137,12 +137,12 @@ class handleAlternativeSheet implements OnEachRow, WithHeadingRow
             }else{
                 return null;
             } 
-            DB::commit();
+            /* DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
             $sheet='Alternative';
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
-        }
+        } */
     }
    
     public function startRow(): int
@@ -155,67 +155,75 @@ class handleDetailSheet implements OnEachRow, WithHeadingRow
     public $error = null;
     public function onRow(Row $row)
     {
-        if ($row['item_code'] == 'null') {
-            return null;
-        }else{
-            if ($row['kode_bom_header']) {
-                $check = Bom::where('code', $row['kode_bom_header'])->first();
-                $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
-                if ($check) {
-    
-                    $method = explode('#', $row['metode'])[1];
-                
-                    if($row['type']=='items'){
-                        $item_code = explode('#', $row['item_code'])[0];
-                        $item_output = Item::where('code', $item_code)->first();
-                        if(!$item_output && $this->error ==null){
-                            $this->error = "item";
-                        }
-                        $nominal = 0;
-                        $total = 0;
-                        $cost_distribution_id = null;
-                        BomDetail::create([
-                            'bom_id'       => $check->id,
-                            'bom_alternative_id' => $checkalternative->id,
-                            'lookable_type'=> $row['type'],
-                            'lookable_id'  => $item_output->id,
-                            'qty'          => $row['qty'],
-                            'nominal'      => $nominal,
-                            'total'        => $total,
-                            'description'  => $row['description'],
-                            'issue_method'       => $method,
-                            'cost_distribution_id'=> $cost_distribution_id,
-                        ]);
-                    }elseif($row['type']=='resources'){
-                        $item_code = explode('#', $row['resource_code'])[0];
-                        $item_output = Resource::where('code', $item_code)->first();
+        /* DB::beginTransaction();
+        try { */
+            if ($row['item_code'] == 'null') {
+                return null;
+            }else{
+                if ($row['kode_bom_header']) {
+                    $check = Bom::where('code', $row['kode_bom_header'])->first();
+                    $checkalternative = BomAlternative::where('code', $row['kode_alternative'])->where('bom_id',$check->id)->first();
+                    if ($check) {
+        
+                        $method = explode('#', $row['metode'])[1];
                     
-                        $nominal =$item_output->cost;
-                        $total = $row['qty'] * $item_output->cost;
-                        $cost_distribution_code = explode('#', $row['distribusi_biaya'])[0];
-                        $cost_distribution = CostDistribution::where('code', $cost_distribution_code)->first();
-                        $cost_distribution_id = $cost_distribution ? $cost_distribution->id : NULL;
-                        if(!$item_output && $this->error ==null){
-                            $this->error = "Resource.";
-                        }elseif(!$cost_distribution && $this->error ==null){
-                            $this->error = "Disribusi Biaya.";
+                        if($row['type']=='items'){
+                            $item_code = explode('#', $row['item_code'])[0];
+                            $item_output = Item::where('code', $item_code)->first();
+                            if(!$item_output && $this->error ==null){
+                                $this->error = "item";
+                            }
+                            $nominal = 0;
+                            $total = 0;
+                            $cost_distribution_id = null;
+                            BomDetail::create([
+                                'bom_id'       => $check->id,
+                                'bom_alternative_id' => $checkalternative->id,
+                                'lookable_type'=> $row['type'],
+                                'lookable_id'  => $item_output->id,
+                                'qty'          => $row['qty'],
+                                'nominal'      => $nominal,
+                                'total'        => $total,
+                                'description'  => $row['description'],
+                                'issue_method'       => $method,
+                                'cost_distribution_id'=> $cost_distribution_id,
+                            ]);
+                        }elseif($row['type']=='resources'){
+                            $item_code = explode('#', $row['resource_code'])[0];
+                            $item_output = Resource::where('code', $item_code)->first();
+                        
+                            $nominal =$item_output->cost;
+                            $total = $row['qty'] * $item_output->cost;
+                            $cost_distribution_code = explode('#', $row['distribusi_biaya'])[0];
+                            $cost_distribution = CostDistribution::where('code', $cost_distribution_code)->first();
+                            $cost_distribution_id = $cost_distribution ? $cost_distribution->id : NULL;
+                            if(!$item_output && $this->error ==null){
+                                $this->error = "Resource.";
+                            }elseif(!$cost_distribution && $this->error ==null){
+                                $this->error = "Disribusi Biaya.";
+                            }
+                            BomDetail::create([
+                                'bom_id'       => $check->id,
+                                'bom_alternative_id' => $checkalternative->id,
+                                'lookable_type'=> $row['type'],
+                                'lookable_id'  => $item_output->id,
+                                'qty'          => $row['qty'],
+                                'nominal'      => $nominal,
+                                'total'        => $total,
+                                'description'  => $row['description'],
+                                'issue_method'       => $method,
+                                'cost_distribution_id'=> $cost_distribution_id,
+                            ]);
                         }
-                        BomDetail::create([
-                            'bom_id'       => $check->id,
-                            'bom_alternative_id' => $checkalternative->id,
-                            'lookable_type'=> $row['type'],
-                            'lookable_id'  => $item_output->id,
-                            'qty'          => $row['qty'],
-                            'nominal'      => $nominal,
-                            'total'        => $total,
-                            'description'  => $row['description'],
-                            'issue_method'       => $method,
-                            'cost_distribution_id'=> $cost_distribution_id,
-                        ]);
                     }
                 }
             }
-        }
+        /* DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+            $sheet='Alternative';
+            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
+        } */
     }
 
     

@@ -71,7 +71,7 @@ class MarketingOrderInvoice extends Model
 
     public function type(){
         $type = match ($this->type) {
-          '1' => 'Cash',
+          '1' => 'Cash Before Delivery',
           '2' => 'Credit',
           default => 'Invalid',
         };

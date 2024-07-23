@@ -316,7 +316,6 @@ class ReceptionHardwareItemUsageController extends Controller
         $reception['item']=$reception->hardwareItem;
         $reception['name']=$reception->hardwareItem->item;
         $reception['detail1']=$reception->hardwareItem->detail1;
-        $reception['detail2']=$reception->hardwareItem->detail2;
         $reception['user']=$reception->user;
         $reception['division']=$reception->user->position->division->name;
 		return response()->json($reception);

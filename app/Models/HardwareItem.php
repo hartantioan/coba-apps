@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-
+use Carbon\Carbon;
 class HardwareItem extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
@@ -57,7 +57,34 @@ class HardwareItem extends Model
         return $this->hasMany('App\Models\HardwareItemDetail');
     }
 
+    public function asset(){
+        return $this->hasOne('App\Models\Asset');
+    }
+
+
     public function receptionHardwareItemsUsage(){
         return $this->hasMany('App\Models\ReceptionHardwareItemsUsage','hardware_item_id','id')->whereIn('status',['1','2','3']);
+    }
+
+    public static function generateCode()
+    {
+        $year = Carbon::now()->year;
+        $cek = 'IT'.$year;
+        $query = HardwareItem::selectRaw('RIGHT(code, 8) as code')
+            ->whereRaw("code LIKE '$cek%'")
+            ->withTrashed()
+            ->orderByDesc('id')
+            ->limit(1)
+            ->get();
+
+        if($query->count() > 0) {
+            $code = (int)$query[0]->code + 1;
+        } else {
+            $code = '00000001';
+        }
+
+        $no = str_pad($code, 8, 0, STR_PAD_LEFT);
+
+        return $cek.$no;
     }
 }

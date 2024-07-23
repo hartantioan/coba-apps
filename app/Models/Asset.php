@@ -28,6 +28,7 @@ class Asset extends Model
         'accumulation_total',
         'book_balance',
         'count_balance',
+        'hardware_item_id',
     ];
 
     public function status(){
@@ -63,6 +64,10 @@ class Asset extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+    public function hardwareItem()
+    {
+        return $this->belongsTo('App\Models\HardwareItem', 'hardware_item_id', 'id')->withTrashed();
     }
 
     public function place()

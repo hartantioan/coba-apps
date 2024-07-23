@@ -145,6 +145,7 @@ class AssetController extends Controller
                     number_format($val->count_balance,0,',','.'),
                     $val->method(),
                     $val->note,
+                    $val->hardwareItem->code ?? '-',
                     $val->status(),
                     $val->place()->exists() ? $val->place->code : '-',
                     '
@@ -205,6 +206,7 @@ class AssetController extends Controller
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->method          = $request->method;
                     $query->note            = $request->note;
+                    $query->hardware_item_id            = $request->item_id;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -224,6 +226,7 @@ class AssetController extends Controller
                         'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'method'            => $request->method,
                         'note'              => $request->note,
+                        'hardware_item_id'  => $request->item_id,
                         'status'            => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
@@ -258,7 +261,7 @@ class AssetController extends Controller
     public function show(Request $request){
         $asset = Asset::find($request->id);
         $asset['nominal'] = number_format($asset->nominal,2,',','.');
-        				
+        $asset['item'] = $asset->hardwareItem ?? null;				
 		return response()->json($asset);
     }
 

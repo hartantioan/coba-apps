@@ -137,15 +137,12 @@
                             <input id="item_edit" name="item_edit" disabled></input>
                             <label class="active" for="item_edit">Item dari inventory</label>
                         </div>
-                        <div class="input-field col s12 m3 ">
+                        <div class="input-field col s12 m6 ">
                             <input type="hidden" id="tempe" name="tempe"> 
                             <input id="detail1" name="detail1" disabled></input>
                             <label class="active" for="detail1">Detail 1</label>
                         </div>
-                        <div class="input-field col s12 m3 ">
-                            <input id="detail2" name="detail2" disabled></input>
-                            <label class="active" for="detail2">Detail 2</label>
-                        </div>
+                        
                         <div class="input-field col s12 m6 step2" id="tab_user">
                             <select class="browser-default" id="user_id" name="user_id" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id">Pilih User(jika ada)</label>
@@ -253,14 +250,11 @@
                             <input id="items" name="items" disabled></input>
                             <label class="active" for="items">{{ __('translations.item') }}</label>
                         </div>
-                        <div class="input-field col s12 m3 ">
+                        <div class="input-field col s12 m6 ">
                             <input id="detail1s" name="detail1s" disabled></input>
                             <label class="active" for="detail1s">Detail 1</label>
                         </div>
-                        <div class="input-field col s12 m3 ">
-                            <input id="detail2s" name="detail2s" disabled></input>
-                            <label class="active" for="detail2s">Detail 2</label>
-                        </div>
+                        
                         <div class="input-field col s12 m6">
                             <select class="browser-default" id="user_id1" name="user_id1" onchange="getDetail()">&nbsp;</select>
                             <label class="active" for="user_id1" >Pilih User(jika ada)</label>
@@ -456,12 +450,9 @@
     
         if($('#hardware_item_id').val()){
             let params = $('#hardware_item_id').select2('data')[0].detail1;
-            let params2 = $('#hardware_item_id').select2('data')[0].detail2;
             $('#detail1').val(params);
-            $('#detail2').val(params2);
         }else{
             $('#detail1').val('');
-            $('#detail2').val('');
         }
         if($('#user_id').val()){
             let paramsdivisi = $('#user_id').select2('data')[0].division;
@@ -765,7 +756,6 @@
                 loadingClose('#main');
                 $('#items').val(response['name']+'-'+response['code']);
                 $('#detail1s').val(response['detail1']);
-                $('#detail2s').val(response['detail2']);
                 M.updateTextFields();
             },
             error: function() {
@@ -803,7 +793,6 @@
                 $('#modal1').modal('open');
                 $('#tempe').val(id);
                 $('#detail1').val(response.detail1);
-                $('#detail2').val(response.detail2);
                 $('#info').val(response.info);
                 $('#date').val(response.date);
                 $('#location').val(response.location);

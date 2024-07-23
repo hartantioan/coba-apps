@@ -46,7 +46,10 @@ use App\Models\Retirement;
 use App\Models\ProductionSchedule;
 use App\Models\ProductionOrder;
 use App\Models\ProductionIssueReceive;
-
+use App\Models\ProductionIssue;
+use App\Models\ProductionReceive;
+use App\Models\ProductionFgReceive;
+use App\Models\ProductionHandover;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -94,7 +97,11 @@ class TreeHelper {
         
         $data_id_production_schedule=[];
         $data_id_production_order=[];
-        $data_id_production_issue_receive=[];
+        $data_id_production_issue=[];
+        $data_id_production_receive=[];
+        $data_id_production_fg_receive=[];
+        $data_id_production_handover=[];
+        $data_id_production_schedule_target=[];
 
         $finished_data_id_gr=[];
         $finished_data_id_gscale=[];
@@ -120,6 +127,10 @@ class TreeHelper {
         $finished_data_id_production_schedule=[];
         $finished_data_id_production_order=[];
         $finished_data_id_production_issue_receive=[];
+        $finished_data_id_production_issue=[];
+        $finished_data_id_production_receive=[];
+        $finished_data_id_production_fg_receive=[];
+        $finished_data_id_production_handover=[];
 
         if (!isset($$data_id) || !is_array($$data_id)) {
             
@@ -2770,33 +2781,270 @@ class TreeHelper {
                     }
                 }
             }
-
-            foreach($data_id_production_issue_receive as $row_id_production_issue_receive){
-                if(!in_array($row_id_production_issue_receive, $finished_data_id_production_issue_receive)){
-                    $finished_data_id_production_issue_receive[]=$row_id_production_issue_receive;
-                    $query_production_issue = ProductionIssueReceive::find($row_id_production_issue_receive);
-                    if($query_production_issue->productionOrder()->exists()){
-                        $production_order_tempura = [
-                            "name"=>$query_production_issue->productionOrder->code,
-                            "key" => $query_production_issue->productionOrder->code,
+            
+            foreach($data_id_production_handover as $row_id_handover){
+                if(!in_array($row_id_handover, $finished_data_id_production_handover)){
+                    $finished_data_id_production_handover[]=$row_id_handover;
+                    $query_production_handover = ProductionHandover::find($row_id_handover);
+                  
+                    
+                    if($query_production_handover->productionFgReceive()->exists()){
+                        $production_fg_receive = [
+                            "name"=>$query_production_handover->productionFgReceive->code,
+                            "key" => $query_production_handover->productionFgReceive->code,
                             'properties'=> [
-                                ['name'=> "Tanggal :".$query_production_issue->productionOrder->post_date],
+                                ['name'=> "Tanggal :".$query_production_handover->productionFgReceive->post_date],
                                 
                             ],
-                            'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query_production_issue->productionOrder->code),  
+                            'url'=>request()->root()."/admin/production/production_handover?code=".CustomHelper::encrypt($query_production_handover->productionFgReceive->code),  
                         ];
-                        $data_go_chart[]=$production_order_tempura;
+                        $data_go_chart[]=$production_fg_receive;
                         $data_link[]=[
-                            'from'=>$query_production_issue->productionOrder->code,
-                            'to'=>$query_production_issue->code,
-                            'string_link'=>$query_production_issue->productionOrder->code.$query_production_issue->code
+                            'from'=>$query_production_handover->productionFgReceive->code,
+                            'to'=>$query_production_handover->code,
+                            'string_link'=>$query_production_handover->productionFgReceive->code.$query_production_handover->code
                         ]; 
 
-                        if(!in_array($query_production_issue->productionOrder->id, $data_id_production_order)){
-                            $data_id_production_order[] = $query_production_issue->productionOrder->id; 
+                        if(!in_array($query_production_handover->productionFgReceive->id, $data_id_production_fg_receive)){
+                            $data_id_production_fg_receive[] = $query_production_handover->productionFgReceive->id; 
                             $added = true;
                         } 
                     }
+                }
+            }
+
+            // foreach($data_id_production_issue_receive as $row_id_production_issue_receive){
+            //     if(!in_array($row_id_production_issue_receive, $finished_data_id_production_issue_receive)){
+            //         $finished_data_id_production_issue_receive[]=$row_id_production_issue_receive;
+            //         $query_production_issue = ProductionIssueReceive::find($row_id_production_issue_receive);
+            //         if($query_production_issue->productionOrder()->exists()){
+            //             $production_order_tempura = [
+            //                 "name"=>$query_production_issue->productionOrder->code,
+            //                 "key" => $query_production_issue->productionOrder->code,
+            //                 'properties'=> [
+            //                     ['name'=> "Tanggal :".$query_production_issue->productionOrder->post_date],
+                                
+            //                 ],
+            //                 'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query_production_issue->productionOrder->code),  
+            //             ];
+            //             $data_go_chart[]=$production_order_tempura;
+            //             $data_link[]=[
+            //                 'from'=>$query_production_issue->productionOrder->code,
+            //                 'to'=>$query_production_issue->code,
+            //                 'string_link'=>$query_production_issue->productionOrder->code.$query_production_issue->code
+            //             ]; 
+
+            //             if(!in_array($query_production_issue->productionOrder->id, $data_id_production_order)){
+            //                 $data_id_production_order[] = $query_production_issue->productionOrder->id; 
+            //                 $added = true;
+            //             } 
+            //         }
+            //     }
+            // }
+
+            foreach($data_id_production_fg_receive as $row_id_production_fg_receive){
+                if(!in_array($row_id_production_fg_receive, $finished_data_id_production_fg_receive)){
+                    $finished_data_id_production_fg_receive[]=$row_id_production_fg_receive;
+                    $query_production_fg_receive = ProductionFgReceive::find($row_id_production_fg_receive);
+                    if($query_production_fg_receive->productionOrderDetail()->exists()){
+                        $production_order_tempura = [
+                            "name"=>$query_production_fg_receive->productionOrderDetail->productionOrder->code,
+                            "key" => $query_production_fg_receive->productionOrderDetail->productionOrder->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_production_fg_receive->productionOrderDetail->productionOrder->post_date],
+                                
+                            ],
+                            'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query_production_fg_receive->productionOrderDetail->productionOrder->code),  
+                        ];
+                        $data_go_chart[]=$production_order_tempura;
+                        $data_link[]=[
+                            'from'=>$query_production_fg_receive->productionOrderDetail->productionOrder->code,
+                            'to'=>$query_production_fg_receive->code,
+                            'string_link'=>$query_production_fg_receive->productionOrderDetail->productionOrder->code.$query_production_fg_receive->code
+                        ]; 
+
+                        if(!in_array($query_production_fg_receive->productionOrderDetail->productionOrder->id, $data_id_production_order)){
+                            $data_id_production_order[] = $query_production_fg_receive->productionOrderDetail->productionOrder->id; 
+                            $added = true;
+                        } 
+                    }
+                    // if($query_production_fg_receive->productionIssue()->exists()){
+                    //     foreach($query_production_fg_receive->productionIssue as $row_production_issue){
+                    //         $production_issue_tempura = [
+                    //             "name"=>$row_production_issue->code,
+                    //             "key" => $row_production_issue->code,
+                    //             'properties'=> [
+                    //                 ['name'=> "Tanggal :".$row_production_issue->post_date],
+                                    
+                    //             ],
+                    //             'url'=>request()->root()."/admin/production/production_issue?code=".CustomHelper::encrypt($row_production_issue->code),  
+                    //         ];
+                    //         $data_go_chart[]=$production_issue_tempura;
+                    //         $data_link[]=[
+                    //             'from'=>$row_production_issue->code,
+                    //             'to'=>$query_production_fg_receive->code,
+                    //             'string_link'=>$row_production_issue->code.$query_production_fg_receive->code
+                    //         ]; 
+    
+                    //         if(!in_array($row_production_issue->id, $data_id_production_issue)){
+                    //             $data_id_production_issue[] = $row_production_issue->id; 
+                    //             $added = true;
+                    //         }
+                    //     }
+                         
+                    // }
+                    if($query_production_fg_receive->productionHandover()->exists()){
+                        foreach($query_production_fg_receive->productionHandover as $row_production_handover){
+                            $production_fgr_tempura = [
+                                "name"=>$row_production_handover->code,
+                                "key" => $row_production_handover->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_production_handover->post_date],
+                                    
+                                ],
+                                'url'=>request()->root()."/admin/production/production_handover?code=".CustomHelper::encrypt($row_production_handover->code),  
+                            ];
+                            $data_go_chart[]=$production_fgr_tempura;
+                            $data_link[]=[
+                                'from'=>$query_production_fg_receive->code,
+                                'to'=>$row_production_handover->code,
+                                'string_link'=>$query_production_fg_receive->code.$row_production_handover->code
+                            ]; 
+    
+                            if(!in_array($row_production_handover->id, $data_id_production_handover)){
+                                $data_id_production_handover[] = $row_production_handover->id; 
+                                $added = true;
+                             
+                            } 
+                        }
+                    }
+                }
+            }
+
+            foreach($data_id_production_issue as $row_id_production_issue){
+                if(!in_array($row_id_production_issue, $finished_data_id_production_issue)){
+                    $finished_data_id_production_issue[]=$row_id_production_issue;
+                    $query_production_issue = ProductionIssue::find($row_id_production_issue);
+                    if($query_production_issue->productionOrderDetail()->exists()){
+                        $production_order_tempura = [
+                            "name"=>$query_production_issue->productionOrderDetail->productionOrder->code,
+                            "key" => $query_production_issue->productionOrderDetail->productionOrder->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_production_issue->productionOrderDetail->productionOrder->post_date],
+                                
+                            ],
+                            'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query_production_issue->productionOrderDetail->productionOrder->code),  
+                        ];
+                        $data_go_chart[]=$production_order_tempura;
+                        $data_link[]=[
+                            'from'=>$query_production_issue->productionOrderDetail->productionOrder->code,
+                            'to'=>$query_production_issue->code,
+                            'string_link'=>$query_production_issue->productionOrderDetail->productionOrder->code.$query_production_issue->code
+                        ]; 
+
+                        if(!in_array($query_production_issue->productionOrderDetail->productionOrder->id, $data_id_production_order)){
+                            $data_id_production_order[] = $query_production_issue->productionOrderDetail->productionOrder->id; 
+                            $added = true;
+                        } 
+                    }
+                   /*  if($query_production_issue->productionFgReceive()->exists()){
+                        $production_fgr_tempura = [
+                            "name"=>$query_production_issue->productionFgReceive->code,
+                            "key" => $query_production_issue->productionFgReceive->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_production_issue->productionFgReceive->post_date],
+                                
+                            ],
+                            'url'=>request()->root()."/admin/production/production_fg_receive?code=".CustomHelper::encrypt($query_production_issue->productionFgReceive->code),  
+                        ];
+                        $data_go_chart[]=$production_fgr_tempura;
+                        $data_link[]=[
+                            'from'=>$query_production_issue->productionFgReceive->code,
+                            'to'=>$query_production_issue->code,
+                            'string_link'=>$query_production_issue->productionFgReceive->code.$query_production_issue->code
+                        ]; 
+
+                        if(!in_array($query_production_issue->productionFgReceive->id, $data_id_production_fg_receive)){
+                            $data_id_production_fg_receive[] = $query_production_issue->productionFgReceive->id; 
+                            $added = true;
+                        } 
+                    }
+                    if($query_production_issue->productionReceive()->exists()){
+                        $production_receive_tempura = [
+                            "name"=>$query_production_issue->productionReceive->code,
+                            "key" => $query_production_issue->productionReceive->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_production_issue->productionReceive->post_date],
+                                
+                            ],
+                            'url'=>request()->root()."/admin/production/production_receive?code=".CustomHelper::encrypt($query_production_issue->productionReceive->code),  
+                        ];
+                        $data_go_chart[]=$production_receive_tempura;
+                        $data_link[]=[
+                            'from'=>$query_production_issue->productionReceive->code,
+                            'to'=>$query_production_issue->code,
+                            'string_link'=>$query_production_issue->productionReceive->code.$query_production_issue->code
+                        ]; 
+
+                        if(!in_array($query_production_issue->productionReceive->id, $data_id_production_receive)){
+                            $data_id_production_receive[] = $query_production_issue->productionReceive->id; 
+                            $added = true;
+                        } 
+                    } */
+                }
+            }
+
+            foreach($data_id_production_receive as $row_id_production_receive){
+                if(!in_array($row_id_production_receive, $finished_data_id_production_receive)){
+                    $finished_data_id_production_receive[]=$row_id_production_receive;
+                    $query_production_receive = ProductionReceive::find($row_id_production_receive);
+                    if($query_production_receive->productionOrderDetail()->exists()){
+                        $production_order_tempura = [
+                            "name"=>$query_production_receive->productionOrderDetail->productionOrder->code,
+                            "key" => $query_production_receive->productionOrderDetail->productionOrder->code,
+                            'properties'=> [
+                                ['name'=> "Tanggal :".$query_production_receive->productionOrderDetail->productionOrder->post_date],
+                                
+                            ],
+                            'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query_production_receive->productionOrderDetail->productionOrder->code),  
+                        ];
+                        $data_go_chart[]=$production_order_tempura;
+                        $data_link[]=[
+                            'from'=>$query_production_receive->productionOrderDetail->productionOrder->code,
+                            'to'=>$query_production_receive->code,
+                            'string_link'=>$query_production_receive->productionOrderDetail->productionOrder->code.$query_production_receive->code
+                        ]; 
+
+                        if(!in_array($query_production_receive->productionOrderDetail->productionOrder->id, $data_id_production_order)){
+                            $data_id_production_order[] = $query_production_receive->productionOrderDetail->productionOrder->id; 
+                            $added = true;
+                        } 
+                    }
+                    /* if($query_production_receive->productionIssue()->exists()){
+                        foreach($query_production_receive->productionIssue as $row_production_issue){
+                            $production_issue_tempura = [
+                                "name"=>$row_production_issue->code,
+                                "key" => $row_production_issue->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :".$row_production_issue->post_date],
+                                    
+                                ],
+                                'url'=>request()->root()."/admin/production/production_issue?code=".CustomHelper::encrypt($row_production_issue->code),  
+                            ];
+                            $data_go_chart[]=$production_issue_tempura;
+                            $data_link[]=[
+                                'from'=>$row_production_issue->code,
+                                'to'=>$query_production_receive->code,
+                                'string_link'=>$row_production_issue->code.$query_production_receive->code
+                            ]; 
+    
+                            if(!in_array($row_production_issue->id, $data_id_production_issue)){
+                                $data_id_production_issue[] = $row_production_issue->id; 
+                                $added = true;
+                            } 
+                        }
+                        
+                    } */
                 }
             }
 
@@ -2806,78 +3054,101 @@ class TreeHelper {
                     $finished_data_id_production_order[] = $row_id_production_order;
                     $query_production_order = ProductionOrder::find($row_id_production_order);
                     foreach($query_production_order->productionOrderDetail as $row_production_order){
-                     
-                        if($row_production_order->productionIssueReceive()->exists()){
+
+                        if($row_production_order->productionScheduleDetail()->exists()){
+                       
+                            $productionschedule  = [
+                                "name"=> $row_production_order->productionScheduleDetail->productionschedule->code,
+                                "key" =>  $row_production_order->productionScheduleDetail->productionschedule->code,
+                                'properties'=> [
+                                    ['name'=> "Tanggal :". $row_production_order->productionScheduleDetail->productionschedule->post_date],
+                                ],
+                                'url'=>request()->root()."/admin/production/production_schedule?code=".CustomHelper::encrypt( $row_production_order->productionScheduleDetail->productionschedule->code),  
+                            ];
+                            $data_go_chart[]=$productionschedule;
+                            $data_link[]=[
+                                'from'=>$row_production_order->productionScheduleDetail->productionschedule->code,
+                                'to'=> $query_production_order->code,
+                                'string_link'=>$row_production_order->productionScheduleDetail->productionschedule->code.$query_production_order->code
+                            ]; 
                             
-                            foreach($row_production_order->productionIssueReceive() as $row_production_issue_r){
+                            if(!in_array( $row_production_order->productionScheduleDetail->productionschedule->id, $data_id_production_schedule)){
+                               
+                                $data_id_production_schedule[] =  $row_production_order->productionScheduleDetail->productionSchedule->id; 
+                                $added = true;
+                            } 
+                        }
+                        if($row_production_order->productionIssue()->exists()){
+                            foreach($row_production_order->productionIssue as $row_production_issue){
                                 $productionissuerec  = [
-                                    "name"=> $row_production_issue_r->code,
-                                    "key" =>  $row_production_issue_r->code,
+                                    "name"=> $row_production_issue->code,
+                                    "key" =>  $row_production_issue->code,
                                     'properties'=> [
-                                        ['name'=> "Tanggal :". $row_production_issue_r->post_date],
+                                        ['name'=> "Tanggal :". $row_production_issue->post_date],
                                     ],
-                                    'url'=>request()->root()."/admin/production/production_issue_receive?code=".CustomHelper::encrypt( $row_production_issue_r->code),  
+                                    'url'=>request()->root()."/admin/production/production_issue?code=".CustomHelper::encrypt( $row_production_issue->code),  
                                 ];
                                 $data_go_chart[]=$productionissuerec;
                                 $data_link[]=[
                                     'from'=>$query_production_order->code,
-                                    'to'=> $row_production_issue_r->code,
-                                    'string_link'=>$query_production_order->code. $row_production_issue_r->code
+                                    'to'=> $row_production_issue->code,
+                                    'string_link'=>$query_production_order->code. $row_production_issue->code
                                 ]; 
     
-                                if(!in_array( $row_production_issue_r->id, $data_id_production_issue_receive)){
-                                    $data_id_production_issue_receive[] =  $row_production_issue_r->id; 
+                                if(!in_array( $row_production_issue->id, $data_id_production_issue)){
+                                    $data_id_production_issue_receive[] =  $row_production_issue->id; 
                                     $added = true;
                                 } 
                             }
                         }
-                    }
-                    if($query_production_order->productionSchedule()->exists()){
-                       
-                        $productionschedule  = [
-                            "name"=> $query_production_order->productionschedule->code,
-                            "key" =>  $query_production_order->productionschedule->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :". $query_production_order->productionschedule->post_date],
-                            ],
-                            'url'=>request()->root()."/admin/production/production_schedule?code=".CustomHelper::encrypt( $query_production_order->productionschedule->code),  
-                        ];
-                        $data_go_chart[]=$productionschedule;
-                        $data_link[]=[
-                            'from'=>$query_production_order->productionschedule->code,
-                            'to'=> $query_production_order->code,
-                            'string_link'=>$query_production_order->productionschedule->code.$query_production_order->code
-                        ]; 
-                        
-                        if(!in_array( $query_production_order->productionschedule->id, $data_id_production_schedule)){
-                           
-                            $data_id_production_schedule[] =  $query_production_order->productionSchedule->id; 
-                            $added = true;
-                        } 
-                    }
-                    if($query_production_order->productionIssueReceive()->exists()){
-                        foreach($query_production_order->productionIssueReceive as $row_production_issue_r){
-                            $productionissuerec  = [
-                                "name"=> $row_production_issue_r->code,
-                                "key" =>  $row_production_issue_r->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :". $row_production_issue_r->post_date],
-                                ],
-                                'url'=>request()->root()."/admin/production/production_issue_receive?code=".CustomHelper::encrypt( $row_production_issue_r->code),  
-                            ];
-                            $data_go_chart[]=$productionissuerec;
-                            $data_link[]=[
-                                'from'=>$query_production_order->code,
-                                'to'=> $row_production_issue_r->code,
-                                'string_link'=>$query_production_order->code. $row_production_issue_r->code
-                            ]; 
-
-                            if(!in_array( $row_production_issue_r->id, $data_id_production_issue_receive)){
-                                $data_id_production_issue_receive[] =  $row_production_issue_r->id; 
-                                $added = true;
+                        if($row_production_order->productionReceive()->exists()){
+                            foreach($row_production_order->productionReceive as $row_production_receive){
+                                $productionreceive  = [
+                                    "name"=> $row_production_receive->code,
+                                    "key" =>  $row_production_receive->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :". $row_production_receive->post_date],
+                                    ],
+                                    'url'=>request()->root()."/admin/production/production_receive?code=".CustomHelper::encrypt( $row_production_receive->code),  
+                                ];
+                                $data_go_chart[]=$productionreceive;
+                                $data_link[]=[
+                                    'from'=>$query_production_order->code,
+                                    'to'=> $row_production_receive->code,
+                                    'string_link'=>$query_production_order->code. $row_production_receive->code
+                                ]; 
+    
+                                if(!in_array( $row_production_receive->id, $data_id_production_receive)){
+                                    $data_id_production_receive[] =  $row_production_receive->id; 
+                                    $added = true;
+                                } 
                             }
                         }
+                        if($row_production_order->productionFgReceive()->exists()){
+                            foreach($row_production_order->productionFgReceive as $row_production_fg_receive){
+                                $productionfgreceive  = [
+                                    "name"=> $row_production_fg_receive->code,
+                                    "key" =>  $row_production_fg_receive->code,
+                                    'properties'=> [
+                                        ['name'=> "Tanggal :". $row_production_fg_receive->post_date],
+                                    ],
+                                    'url'=>request()->root()."/admin/production/production_fg_receive?code=".CustomHelper::encrypt( $row_production_fg_receive->code),  
+                                ];
+                                $data_go_chart[]=$productionfgreceive;
+                                $data_link[]=[
+                                    'from'=>$query_production_order->code,
+                                    'to'=> $row_production_fg_receive->code,
+                                    'string_link'=>$query_production_order->code. $row_production_fg_receive->code
+                                ]; 
+    
+                                if(!in_array( $row_production_fg_receive->id, $data_id_production_fg_receive)){
+                                    $data_id_production_fg_receive[] =  $row_production_fg_receive->id; 
+                                    $added = true;
+                                } 
+                            } 
+                        }
                     }
+                    
                 }
             }
 
@@ -2889,25 +3160,25 @@ class TreeHelper {
                     
                     foreach($query_prs->productionScheduleDetail as $row_production_schedule_detail){
                        
-                        if($row_production_schedule_detail->productionOrder()->exists()){
+                        if($row_production_schedule_detail->productionOrderDetail()->exists()){
                             $production_order_tempura = [
-                                "name"=>$row_production_schedule_detail->productionOrder->code,
-                                "key" => $row_production_schedule_detail->productionOrder->code,
+                                "name"=>$row_production_schedule_detail->productionOrderDetail->productionOrder->code,
+                                "key" => $row_production_schedule_detail->productionOrderDetail->productionOrder->code,
                                 'properties'=> [
-                                    ['name'=> "Tanggal :".$row_production_schedule_detail->productionOrder->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_production_schedule_detail->productionOrder->grandtotal,2,',','.')]
+                                    ['name'=> "Tanggal :".$row_production_schedule_detail->productionOrderDetail->productionOrder->post_date],
+                                    ['name'=> "Nominal : Rp.:".number_format($row_production_schedule_detail->productionOrderDetail->productionOrder->grandtotal,2,',','.')]
                                 ],
-                                'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($row_production_schedule_detail->productionOrder->code),  
+                                'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($row_production_schedule_detail->productionOrderDetail->productionOrder->code),  
                             ];
                             $data_go_chart[]=$production_order_tempura;
                             $data_link[]=[
                                 'from'=>$query_prs->code,
-                                'to'=>$row_production_schedule_detail->productionOrder->code,
-                                'string_link'=>$query_prs->code.$row_production_schedule_detail->productionOrder->code
+                                'to'=>$row_production_schedule_detail->productionOrderDetail->productionOrder->code,
+                                'string_link'=>$query_prs->code.$row_production_schedule_detail->productionOrderDetail->productionOrder->code
                             ]; 
 
-                            if(!in_array($row_production_schedule_detail->productionOrder->id, $data_id_production_order)){
-                                $data_id_production_order[] = $row_production_schedule_detail->productionOrder->id; 
+                            if(!in_array($row_production_schedule_detail->productionOrderDetail->productionOrder->id, $data_id_production_order)){
+                                $data_id_production_order[] = $row_production_schedule_detail->productionOrderDetail->productionOrder->id; 
                                 $added = true;
                             }  
                         }
@@ -3105,6 +3376,7 @@ class TreeHelper {
                             }
                         }
                     }
+                    
                 }
             }
         }

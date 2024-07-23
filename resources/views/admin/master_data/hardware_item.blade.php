@@ -89,7 +89,7 @@
                                                         <th>Group</th>
                                                     
                                                         <th>Detail 1</th>
-                                                        <th>Detail 2</th>
+                                                        
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -124,7 +124,7 @@
                             <label class="active" for="item_id">Pilih Item dari inventory</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment()">&nbsp;</select>
+                            <select class="browser-default" id="item_group_id" name="item_group_id" onchange="getDepartment();getCode();" >&nbsp;</select>
                             <label class="active" for="item_group_id">Group Departement</label>
                         </div>
                         <div class="input-field col s12 m12">
@@ -134,7 +134,6 @@
                                     <th>{{ __('translations.delete') }}</th>
                                     <th>{{ __('translations.code') }}</th>
                                     <th>Detail 1</th>
-                                    <th>Detail 2</th>
                                 </tr>
                             </thead>
                             <tbody id="body-item">
@@ -231,17 +230,13 @@
                             <label class="active" for="item">{{ __('translations.item') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
-                            <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment()">&nbsp;</select>
+                            <select class="browser-default" id="item_group_id_edit" name="item_group_id_edit" onchange="getDepartment();getCode();">&nbsp;</select>
                             <label class="active" for="item_group_id_edit">Group Departement</label>
                         </div>
                         
                         <div class="input-field col s12 m6">
                             <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan">
                             <label class="active" for="detail1_edit">Detail 1</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <input id="detail2_edit" name="detail2_edit" type="text" placeholder="Keterangan">
-                            <label class="active" for="detail2_edit">Detail 2</label>
                         </div>
 
                         <div class="input-field col s12 m6">
@@ -607,9 +602,6 @@
                     <td>
                         <input name="arr_detail1[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1...">
                     </td>
-                    <td>
-                        <input name="arr_detail2[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 2...">
-                    </td>
                 </tr>
             `);
             itemOnAdd++;
@@ -657,7 +649,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'item_id', className: 'center-align' },
                 { name: 'hardware_item_group_id', className: 'center-align' },
-                { name: 'nominal', className: 'center-align' },
+              
                 { name: 'info', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -851,8 +843,7 @@
                     <option value="` + response.group_item.id + `">` + response.group_item.code+`-`+response.group_item.name+`</option>
                 `);
                 $('#detail1_edit').val(response.detail1);
-                $('#detail2_edit').val(response.detail2);
-               
+                
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
@@ -1020,5 +1011,40 @@
                 window.open(data, '_blank');
             }
         });
+    }
+
+    function getCode(){
+      
+        if($('#temp').val()){
+            
+        }else{
+            
+            $.ajax({
+                url: '{{ Request::url() }}/get_code',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#code').val(response);
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+        
     }
 </script>

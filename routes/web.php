@@ -1052,6 +1052,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('print_barcode',[HardwareItemController::class, 'printBarcode']);
                         Route::post('history_usage',[HardwareItemController::class, 'historyUsage']);
                         Route::get('export',[HardwareItemController::class, 'export']);
+                        Route::post('get_code', [HardwareItemController::class, 'getCode']);
                         Route::post('create',[HardwareItemController::class, 'create'])->middleware('operation.access:hardware_item,update');
                         Route::post('edit',[HardwareItemController::class, 'edit'])->middleware('operation.access:hardware_item,update');
                         Route::get('get_import_excel',[HardwareItemController::class, 'getImportExcel']);

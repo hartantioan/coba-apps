@@ -52,7 +52,7 @@ class HardwareItemController extends Controller
             'user_id',
             'hardware_item_group_id',
             'detail1',
-            'detail2',
+          
             'status',
         ];
 
@@ -68,8 +68,7 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('item', 'like', "%$search%")
-                            ->orWhere('detail1', 'like', "%$search%")
-                            ->orWhere('detail2', 'like', "%$search%");
+                            ->orWhere('detail1', 'like', "%$search%");
                     });
                 }
 
@@ -86,8 +85,7 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('item', 'like', "%$search%")
-                            ->orWhere('detail1', 'like', "%$search%")
-                            ->orWhere('detail2', 'like', "%$search%");
+                            ->orWhere('detail1', 'like', "%$search%");
                     });
                 }
 
@@ -108,7 +106,7 @@ class HardwareItemController extends Controller
                     $val->item,
                     $val->hardwareItemGroup->code.' - '.$val->hardwareItemGroup->name,
                     $val->detail1,
-                    $val->detail2,
+                  
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue lighten-3 white-text btn-small" data-popup="tooltip" title="Barcode" onclick="printBarcode(' . $val->id . ')"><i class="material-icons dp48">reorder
@@ -135,6 +133,12 @@ class HardwareItemController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function getCode(Request $request){
+        $code = HardwareItem::generateCode();
+        				
+		return response()->json($code);
     }
 
     public function Edit(Request $request){
@@ -164,7 +168,7 @@ class HardwareItemController extends Controller
                     $query->item	        = $request->item;
                     $query->hardware_item_group_id	        = $request->item_group_id_edit;
                     $query->detail1	        = $request->detail1_edit;
-                    $query->detail2	        = $request->detail2_edit;
+                 
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -180,7 +184,6 @@ class HardwareItemController extends Controller
                     'user_id'			        => session('bo_id'),
                     'hardware_item_group_id'    => $request->item_group_id_edit,
                     'detail1'			        => $request->detail1_edit,
-                    'detail2'			        => $request->detail2_edit,
                     'status'                    => $request->status ? $request->status : '2',
                 ]);
                 
@@ -246,7 +249,7 @@ class HardwareItemController extends Controller
                     $query->item_id	        = $request->item_id;
                     $query->hardware_item_group_id	        = $request->item_group_id;
                     $query->detail1	        = $request->detail1;
-                    $query->detail2	        = $request->detail2;
+
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -262,7 +265,7 @@ class HardwareItemController extends Controller
                         'user_id'			        => session('bo_id'),
                         'hardware_item_group_id'    => $request->item_group_id,
                         'detail1'			        => $request->arr_detail1[$key],
-                        'detail2'			        => $request->arr_detail2[$key],
+
                         'status'                    => $request->status ? $request->status : '2'
                     ]);
                 }

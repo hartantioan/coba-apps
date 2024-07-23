@@ -1862,17 +1862,15 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $data = HardwareItem::where(function($query) use($search){
-                    $query->orWhere('code','like',"%$search%");
-                })
-                ->whereHas('item', function ($query) use ($search) {
-                    $query->where('name','like',"%$search%");
+                    $query->orWhere('code','like',"%$search%")
+                    ->whereDoesntHave('asset');
                 })
                 ->where('status','1')->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.'-'.$d->item->name,
+                'text' 			=> $d->code.'-'.$d->item,
             ];
         }
         return response()->json(['items' => $response]);

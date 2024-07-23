@@ -109,6 +109,7 @@
                                                         <th>{{ __('translations.remaining_depreciation') }}</th>
                                                         <th>{{ __('translations.method') }}</th>
                                                         <th>{{ __('translations.note') }}</th>
+                                                        <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -157,6 +158,8 @@
                         <div class="input-field col m4 s12">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col m12 s12">
                         </div>
                         <div class="input-field col m4 s12">
                             <select class="select2 browser-default" id="asset_group_id" name="asset_group_id">
@@ -207,9 +210,12 @@
                             </select>
                             <label class="" for="method">{{ __('translations.counting_method') }}</label>
                         </div>
+                       
                         <div class="input-field col m4 s12">
                             <input id="date" name="date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kapitalisasi" readonly>
                             <label class="active" for="date">{{ __('translations.capitalization_date') }} ({{ __('translations.from_form_capitalization') }})</label>
+                        </div>
+                        <div class="input-field col m12 s12">
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal Kapitalisasi" value="0" onkeyup="formatRupiah(this)" readonly>
@@ -218,6 +224,10 @@
                         <div class="input-field col m4 s12">
                             <textarea id="note" name="note" placeholder="Catatan / Keterangan" rows="1" class="materialize-textarea"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
+                        </div>
+                        <div class="input-field col m4 s12">
+                            <select class="browser-default" id="item_id" name="item_id">&nbsp;</select>
+                            <label class="active" for="item_id">Pilih Item dari inventory</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <div class="switch mb-1">
@@ -423,6 +433,8 @@
             });
 
         });
+
+        select2ServerSide('#item_id', '{{ url("admin/select2/hardware_item") }}');
         
         $('#modal1').modal({
             dismissible: false,
@@ -438,6 +450,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#item_id').empty();
                 $('#asset_group_id').val($('#asset_group_id option:eq(0)').val()).trigger('change');
                 M.updateTextFields();
             }
@@ -510,6 +523,7 @@
                 { name: 'count_balance', className: 'center-align' },
                 { name: 'method', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
+                { name: 'item', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'place', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -654,7 +668,12 @@
                 $('#nominal').val(response.nominal);
                 $('#method').val(response.method).formSelect();
                 $('#note').val(response.note);
-
+                if(response.hardware_item_id){
+                    $('#item_id').append(`
+                        <option value="` + response.hardware_item_id + `">` + response.item.code+`-`+response.item.item+`</option>
+                    `);
+                }
+                
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

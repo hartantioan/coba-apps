@@ -60,8 +60,8 @@
                 <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ $rowdetail->item->is_hide_supplier ? '-' : $row->account->name }}</td>
-                <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
-                <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
+                <td>{{ $row->post_date }}</td>
+                <td>{{ $row->document_date }}</td>
                 <td>{{ $row->delivery_no }}</td>
                 <td>{{ $row->receiver_name }}</td>
                 <td>{{ $row->note }}</td>

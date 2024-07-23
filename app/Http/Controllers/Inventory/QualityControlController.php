@@ -366,41 +366,8 @@ class QualityControlController extends Controller
            $x .= '<span style="color: blue;">|| Tanggal Done: ' . $data->done_date .  ' || Done User: ' . $doneUser.'</span>';
         }
         $string = '<div class="row pt-1 pb-1 lighten-4">
-                        <div class="col s12">'.$data->code.$x.'</div>
-                        <div class="col s12">
-                            <table class="bordered" style="min-width:100%;max-width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th class="center-align" colspan="13">Daftar Hasil Pemeriksaan</th>
-                                    </tr>
-                                    <tr>
-                                        <th class="center-align">No.</th>
-                                        <th class="center-align">Nama</th>
-                                        <th class="center-align">Nominal</th>
-                                        <th class="center-align">Satuan</th>
-                                        <th class="center-align">Mempengaruhi Qty</th>
-                                        <th class="center-align">Keterangan</th>
-                                    </tr>
-                                </thead>
-                                <tbody>';
-        $totalqty=0;
-        foreach($data->qualityControl as $key => $rowdetail){
-            $string .= '<tr>
-                <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$rowdetail->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->nominal).'</td>
-                <td class="center-align">'.$rowdetail->unit.'</td>
-                <td class="center-align">'.($rowdetail->is_affect_qty ? 'Ya' : 'Tidak').'</td>
-                <td class="">'.$rowdetail->note.'</td>
-            </tr>';
-        }
-        
-        $string .= '</tbody></table>';
-
-        $string .= '</td></tr>';
-
-        $string .= '</tbody></table></div>
-            ';
+                        <div class="col s12">'.$data->code.$x.'</div>';
+                        
         $string.= '<div class="col s12 mt-2" style="font-weight:bold;">List Pengguna Dokumen :</div><ol class="col s12">';
         if($data->used()->exists()){
             $string.= '<li>'.$data->used->lookable->user->name.' - Tanggal Dipakai: '.$data->used->lookable->post_date.' Keterangan:'.$data->used->lookable->note.'</li>';

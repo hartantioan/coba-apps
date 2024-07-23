@@ -116,7 +116,7 @@ class TaxSeries extends Model
         }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan.'
+                'message' => 'Data Nomor Seri Pajak untuk perusahaan dan tanggal tidak ditemukan. Silahkan atur di Master Data - Akunting - Seri Pajak.'
             ];
         }
 

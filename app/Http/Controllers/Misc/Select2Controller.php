@@ -852,7 +852,7 @@ class Select2Controller extends Controller {
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
                 'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
-                'stock_com'         => '0,000',
+                'stock_com'         => CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)),
             ];
         }
 
@@ -2815,7 +2815,12 @@ class Select2Controller extends Controller {
                 'post_date'     => date('d/m/Y',strtotime($d->post_date)),
                 'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),
                 'code'          => $d->code,
-                'grandtotal'    => number_format($d->grandtotal,2,',','.'),
+                'total'         => CustomHelper::formatConditionalQty($d->total),
+                'tax'           => CustomHelper::formatConditionalQty($d->tax),
+                'grandtotal'    => CustomHelper::formatConditionalQty($d->grandtotal),
+                'percent_dp'    => CustomHelper::formatConditionalQty($d->percent_dp),
+                'total_dp'      => CustomHelper::formatConditionalQty(round(($d->percent_dp / 100) * $d->grandtotal,2)),
+                'payment_type'  => $d->payment_type,
             ];
         }
 

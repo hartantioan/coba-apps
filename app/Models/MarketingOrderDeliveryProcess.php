@@ -192,6 +192,18 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
     }
 
+    public function getSendStatusTracking(){
+        $status = false;
+
+        $data = $this->marketingOrderDeliveryProcessTrack()->whereIn('status',['2','3','4','5'])->count();
+
+        if($data > 0){
+            $status = true;
+        }
+
+        return $status;
+    }
+
     public function purchaseOrderDetail()
     {
         return $this->hasMany('App\Models\PurchaseOrderDetail');

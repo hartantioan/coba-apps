@@ -795,6 +795,40 @@ class Item extends Model
         return $total;
     }
 
+    public function getQtySalesNotSent($places){
+        $totalQty = $this->getStockArrayPlace($places);
+        foreach($this->marketingOrderDeliveryDetail()->whereIn('place_id',$places)->get() as $row){
+            if($row->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
+                if(!$row->marketingOrderDelivery->marketingOrderDeliveryProcess->getSendStatusTracking()){
+                    $totalQty -= $row->qty * $row->marketingOrderDetail->qty_conversion;
+                }
+            }else{
+                $totalQty -= $row->qty * $row->marketingOrderDetail->qty_conversion;
+            }
+        }
+        return $totalQty;
+    }
+
+    public function getQtySalesNotSentByPlace($place_id){
+        $totalQty = $this->getStockPlace($place_id);
+        foreach($this->marketingOrderDeliveryDetail()->where('place_id',$place_id)->get() as $row){
+            if($row->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
+                if(!$row->marketingOrderDelivery->marketingOrderDeliveryProcess->getSendStatusTracking()){
+                    $totalQty -= $row->qty * $row->marketingOrderDetail->qty_conversion;
+                }
+            }else{
+                $totalQty -= $row->qty * $row->marketingOrderDetail->qty_conversion;
+            }
+        }
+        return $totalQty;
+    }
+
+    public function marketingOrderDeliveryDetail(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetail','item_id','id')->whereHas('marketingOrderDelivery',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function getStockWarehouse($warehouse_id){
         $total = $this->itemStock()->where('warehouse_id',$warehouse_id)->sum('qty');
 

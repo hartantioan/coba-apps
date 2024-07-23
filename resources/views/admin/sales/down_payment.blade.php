@@ -187,6 +187,7 @@
                                                         <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
+                                                        <th rowspan="2">{{ __('translations.rounding') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
@@ -249,9 +250,8 @@
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="type" name="type">
-                                            <option value="1">Cash</option>
-                                            <option value="2">Transfer</option>
-                                            <option value="3">Giro/Check</option>
+                                            <option value="1">Cash Before Delivery</option>
+                                            <option value="2">Credit</option>
                                         </select>
                                         <label class="" for="type">{{ __('translations.type') }}</label>
                                     </div>
@@ -358,13 +358,17 @@
                                                         <th class="center">No. Sales Order</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
+                                                        <th class="center">{{ __('translations.total') }}</th>
+                                                        <th class="center">{{ __('translations.tax') }}</th>
                                                         <th class="center">{{ __('translations.grandtotal') }}</th>
+                                                        <th class="center">Prosentase DP</th>
+                                                        <th class="center">Total Down Payment</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="5">
+                                                        <td colspan="9">
                                                             Silahkan pilih Sales Order...
                                                         </td>
                                                     </tr>
@@ -389,31 +393,37 @@
                                         <tr>
                                             <td width="50%">Subtotal (Isi disini)</td>
                                             <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Discount (Isi disini)</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>Total</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                                <input id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>PPN</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                                <input id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Pembulatan</td>
+                                            <td class="right-align">
+                                                <input id="rounding" name="rounding" type="text" value="0,00" style="text-align:right;width:100%;" onkeyup="countAll();">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td><h6>Grandtotal</h6></td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size:20px;" readonly>
+                                                <input id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size:20px;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -846,7 +856,7 @@
                 }
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="5">
+                        <td colspan="9">
                             Silahkan pilih Sales Order...
                         </td>
                     </tr>
@@ -933,7 +943,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="5">
+                        <td colspan="9">
                             Silahkan pilih Sales Order...
                         </td>
                     </tr>
@@ -1022,8 +1032,20 @@
                                 <td>
                                     ` + datakuy.note + `
                                 </td>
-                                <td class="right-align">
+                                <td class="right-align row-total">
+                                    ` + datakuy.total + `
+                                </td>
+                                <td class="right-align row-tax">
+                                    ` + datakuy.tax + `
+                                </td>
+                                <td class="right-align row-grandtotal">
                                     ` + datakuy.grandtotal + `
+                                </td>
+                                <td class="right-align row-percent">
+                                    ` + datakuy.percent_dp + `
+                                </td>
+                                <td class="right-align row-downpayment">
+                                    ` + datakuy.total_dp + `
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1034,6 +1056,9 @@
                         `);
 
                         $('#marketing_order_id').empty();
+
+                        $('#type').val(datakuy.payment_type).formSelect();
+                        countRow();
                     }
                 },
                 error: function() {
@@ -1071,7 +1096,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="5">
+                            <td colspan="9">
                                 Silahkan pilih Sales Order...
                             </td>
                         </tr>
@@ -1394,11 +1419,27 @@
         });
     }
 
+    function countRow(){
+        let total = 0;
+
+        $('.row-downpayment').each(function(){
+            total += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
+        });
+
+        $('#subtotal').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
+
+        countAll();
+    }
+
     function countAll(){
 
-        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();    
+        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
+
+        rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
 
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
@@ -1407,7 +1448,7 @@
             tax = Math.floor(total * (percent_tax / 100));
         }
 
-        grandtotal = total + tax;
+        grandtotal = total + tax + rounding;
 
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
@@ -1421,7 +1462,7 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
 
-        /* if(tax > 0){
+        if(tax > 0){
             $('#textTax').show();
             if(!$('#tax_no').val()){
                 getTaxSeries();
@@ -1429,7 +1470,7 @@
         }else{
             $('#textTax').hide();
             $('#tax_no').val('');
-        } */
+        }
     }
 
     function getTaxSeries(){
@@ -1456,6 +1497,7 @@
                         M.toast({
                             html: response.message
                         });
+                        $('#tax_id').val('0').trigger('change');
                     }
                 },
                 error: function() {
@@ -1579,6 +1621,7 @@
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
@@ -1817,7 +1860,13 @@
                                 <td>
                                     ` + val.note + `
                                 </td>
-                                <td class="right-align">
+                                <td class="right-align row-total">
+                                    ` + val.total + `
+                                </td>
+                                <td class="right-align row-tax">
+                                    ` + val.tax + `
+                                </td
+                                <td class="right-align row-grandtotal">
                                     ` + val.grandtotal + `
                                 </td>
                                 <td class="center">

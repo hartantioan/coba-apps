@@ -4039,6 +4039,7 @@ class CustomHelper {
 				'account_id'	=> $coapiutang->bp_journal ? $account_id : NULL,
 				'type'			=> '1',
 				'nominal'		=> $modp->grandtotal * $data->currency_rate,
+				'nominal_fc'	=> $modp->grandtotal,
 			]);
 
 			JournalDetail::create([
@@ -4047,6 +4048,7 @@ class CustomHelper {
 				'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
 				'type'			=> '2',
 				'nominal'		=> $modp->total * $data->currency_rate,
+				'nominal_fc'	=> $modp->total
 			]);
 
 			if($modp->tax > 0){
@@ -4056,6 +4058,7 @@ class CustomHelper {
 					'account_id'	=> $modp->taxId->coaSale->bp_journal ? $account_id : NULL,
 					'type'			=> '2',
 					'nominal'		=> $modp->tax * $data->currency_rate,
+					'nominal_fc'	=> $modp->tax,
 				]);
 			}
 

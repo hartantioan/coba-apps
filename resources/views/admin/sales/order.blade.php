@@ -387,7 +387,7 @@
                                     <div class="input-field col m3 s12 step21">
                                         <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
                                             <option value="2">Credit</option>
-                                            <option value="1">Cash</option>
+                                            <option value="1">Cash Before Delivery</option>
                                         </select>
                                         <label class="" for="payment_type">Tipe Pembayaran</label>
                                     </div>                   

@@ -34,6 +34,7 @@ class MarketingOrderDownPayment extends Model
         'discount',
         'total',
         'tax',
+        'rounding',
         'grandtotal',
         'document',
         'tax_no',
@@ -109,9 +110,8 @@ class MarketingOrderDownPayment extends Model
 
     public function type(){
         $type = match ($this->type) {
-          '1' => 'Cash',
-          '2' => 'Transfer',
-          '3' => 'Giro/Check',
+          '1' => 'Cash Before Delivery',
+          '2' => 'Credit',
           default => 'Invalid',
         };
 
@@ -138,7 +138,6 @@ class MarketingOrderDownPayment extends Model
     {
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
-
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',

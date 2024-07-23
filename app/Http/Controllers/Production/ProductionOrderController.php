@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use App\Models\Menu;
+use App\Models\MenuUser;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\ProductionSchedule;
@@ -863,7 +864,7 @@ class ProductionOrderController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($query->code),           
             ];
 
             $data_go_chart[]= $data_marketing_order;

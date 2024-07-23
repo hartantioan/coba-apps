@@ -1181,11 +1181,11 @@ class ProductionReceiveController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/production/production_receive?code=".CustomHelper::encrypt($query->code),           
             ];
 
             $data_go_chart[]= $data_core;
-            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_production_issue_receive',$query->id);
+            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_production_receive',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

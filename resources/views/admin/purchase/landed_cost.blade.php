@@ -1970,9 +1970,9 @@
             }
             rowtax = Math.floor(rowtotal * (rowpercenttax / 100));
         }else{
-            $('#arr_fee_nominal' + val).val(
+            /* $('#arr_fee_nominal' + val).val(
                 (rowtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',','))
-            );
+            ); */
         }
 
         if(rowpercentwtax !== 0){

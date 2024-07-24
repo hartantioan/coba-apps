@@ -4161,7 +4161,7 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $totalrow,
 						'nominal_fc'	=> $totalrow,
-						'note'			=> $pir->code,
+						'note'			=> $pir->productionOrderDetail->productionOrder->code,
 					]);
 					
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->orderBy('id')->get() as $row){
@@ -4179,7 +4179,7 @@ class CustomHelper {
 									'type'			=> '2',
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->code,
+									'note'			=> $pir->productionOrderDetail->productionOrder->code,
 								]);
 				
 								self::sendCogs($table_name,
@@ -4231,7 +4231,7 @@ class CustomHelper {
 											'type'                          => '2',
 											'nominal'						=> $nominal,
 											'nominal_fc'					=> $nominal,
-											'note'							=> $pir->code,
+											'note'							=> $pir->productionOrderDetail->productionOrder->code,
 										]);
 									}
 								}else{
@@ -4243,7 +4243,7 @@ class CustomHelper {
 										'type'			=> '2',
 										'nominal'		=> $row->total,
 										'nominal_fc'	=> $row->total,
-										'note'			=> $pir->code,
+										'note'			=> $pir->productionOrderDetail->productionOrder->code,
 									]);
 								}
 							}else{
@@ -4255,7 +4255,7 @@ class CustomHelper {
 									'type'			=> '2',
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->code,
+									'note'			=> $pir->productionOrderDetail->productionOrder->code,
 								]);
 							}
 						}
@@ -4282,7 +4282,7 @@ class CustomHelper {
 										'type'			=> '2',
 										'nominal'		=> $rowtotal,
 										'nominal_fc'	=> $rowtotal,
-										'note'			=> $pir->code.' - '.$rowbatchusage->productionBatch->code,
+										'note'			=> $pir->productionOrderDetail->productionOrder->code,
 									]);
 					
 									self::sendCogs($table_name,
@@ -4329,7 +4329,7 @@ class CustomHelper {
 											'type'			=> '2',
 											'nominal'		=> $totalCost,
 											'nominal_fc'	=> $totalCost,
-											'note'			=> $pir->code.' - '.$rowbatchusage->productionBatch->code,
+											'note'			=> $pir->productionOrderDetail->productionOrder->code,
 										]);
 						
 										self::sendCogs($table_name,
@@ -4370,7 +4370,7 @@ class CustomHelper {
 										'type'			=> '2',
 										'nominal'		=> $row->total,
 										'nominal_fc'	=> $row->total,
-										'note'			=> $pir->code,
+										'note'			=> $pir->productionOrderDetail->productionOrder->code,
 									]);
 					
 									self::sendCogs($table_name,
@@ -4424,7 +4424,7 @@ class CustomHelper {
 										'type'                          => '2',
 										'nominal'						=> $nominal,
 										'nominal_fc'					=> $nominal,
-										'note'							=> $pir->code,
+										'note'							=> $pir->productionOrderDetail->productionOrder->code,
 									]);
 								}
 							}else{
@@ -4436,7 +4436,7 @@ class CustomHelper {
 									'type'			=> '2',
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->code,
+									'note'			=> $pir->productionOrderDetail->productionOrder->code,
 								]);
 							}
 						}else{
@@ -4448,7 +4448,7 @@ class CustomHelper {
 								'type'			=> '2',
 								'nominal'		=> $row->total,
 								'nominal_fc'	=> $row->total,
-								'note'			=> $pir->code,
+								'note'			=> $pir->productionOrderDetail->productionOrder->code,
 							]);
 						}
 					}
@@ -4468,7 +4468,7 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $total,
 					'nominal_fc'	=> $total,
-					'note'			=> $pir->code,
+					'note'			=> $pir->productionOrderDetail->productionOrder->code,
 				]);
 			}
 

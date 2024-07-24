@@ -35,7 +35,6 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
         'Gudang',
         'Area',
         'Shading',
-        'Tangki',
         'Qty Awal',
         'Qty Terpakai',
         'Qty Sisa',
@@ -53,10 +52,6 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
                 $query->where(function($query){
                     $query->where('code', 'like', "%$this->search%")
                         ->orWhereHas('item',function($query){
-                            $query->where('name','like',"%$this->search%")
-                                ->orWhere('code','like',"%$this->search%");
-                        })
-                        ->orWhereHas('tank',function($query){
                             $query->where('name','like',"%$this->search%")
                                 ->orWhere('code','like',"%$this->search%");
                         });
@@ -96,7 +91,6 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
                 'warehouse'     => $row->warehouse()->exists() ? $row->warehouse->name : '-',
                 'area'          => $row->area()->exists() ? $row->area->code : '-',
                 'shading'       => $row->itemShading()->exists() ? $row->itemShading->code : '-',
-                'tank'          => $row->tank()->exists() ? $row->tank->code.' - '.$row->tank->name : '-',
                 'qty_real'      => $row->qty_real,
                 'qty_used'      => $row->qtyUsed(),
                 'qty_balance'   => $row->qtyBalance(),

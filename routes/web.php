@@ -198,7 +198,7 @@ use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\BomStandardController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
-use App\Http\Controllers\MasterData\SalaryComponentController
+use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionHandoverController;

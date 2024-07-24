@@ -180,7 +180,7 @@
                                 {{ __('translations.bussiness_partner') }}
                             </td>
                             <td width="60%">
-                                {{ $data->account->name.' - '.$data->account->phone }}
+                                {{ $data->account()->exists() ? $data->account->name.' - '.$data->account->phone : '-' }}
                             </td>
                         </tr>
                         <tr>

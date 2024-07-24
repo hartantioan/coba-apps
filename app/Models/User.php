@@ -426,9 +426,11 @@ class User extends Authenticatable
     public function grandtotalUninvoiceDo(){
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
-                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
-                    $totalDo += $rowmodd->getGrandtotal();
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcess');
+                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $totalDo += $rowmod->getGrandtotal();
                 }
             }
         }
@@ -439,9 +441,11 @@ class User extends Authenticatable
     public function grandtotalUninvoiceDoCredit(){
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
-                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
-                    $totalDo += ($rowmodd->getGrandtotal() * ((100 - $row->percent_dp)/100));
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcess');
+                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $totalDo += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
                 }
             }
         }
@@ -452,9 +456,11 @@ class User extends Authenticatable
     public function grandtotalUninvoiceDoDp(){
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereHas('marketingOrderDeliveryProcess')->get() as $rowmod){
-                foreach($rowmod->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmodd){
-                    $totalDo += ($rowmodd->getGrandtotal() * ($row->percent_dp/100));
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcess');
+                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $totalDo += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
                 }
             }
         }

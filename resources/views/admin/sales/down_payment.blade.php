@@ -428,9 +428,6 @@
                                     </thead>
                                 </table>
                             </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step20" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                            </div>
                         </div>
                     </div>
                 </form>
@@ -439,6 +436,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light right submit step20" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>

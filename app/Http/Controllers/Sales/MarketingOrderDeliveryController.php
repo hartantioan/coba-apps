@@ -83,10 +83,9 @@ class MarketingOrderDeliveryController extends Controller
             'send_status',
             'code',
             'user_id',
-            'customer_id',
             'company_id',
             'account_id',
-            'marketing_order_no',
+            'customer_id',
             'post_date',
             'delivery_date',
             'note_internal',
@@ -140,10 +139,6 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
-
-                if($request->marketing_order_id){
-                    $query->whereIn('marketing_order_id',$request->marketing_order_id);
-                }
                 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
@@ -195,10 +190,6 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
-
-                if($request->marketing_order_id){
-                    $query->whereIn('marketing_order_id',$request->marketing_order_id);
-                }
                 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
@@ -231,10 +222,9 @@ class MarketingOrderDeliveryController extends Controller
                     ',
                     $val->code,
                     $val->user->name,
-                    $val->marketingOrder->account->name,
                     $val->company->name,
                     $val->account->name,
-                    $val->marketingOrder->code,
+                    $val->customer->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->note_internal,
@@ -461,11 +451,11 @@ class MarketingOrderDeliveryController extends Controller
                 }
 
                 if(!$passedQty){
-                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kurang dari stok saat ini.';
+                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kurang dari stok saat ini';
                 }
 
                 if(!$passedSentMore){
-                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kirim lebih besar dari pesanan.';
+                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kirim lebih besar dari pesanan';
                 }
             }
 
@@ -486,17 +476,26 @@ class MarketingOrderDeliveryController extends Controller
                         $arrStock[] = [
                             'item_stock_id' => $row,
                             'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key])),
+                            'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_stock_conversion[$key])),
                         ];
                     }
                 }
             }
 
-            info($arrStock);
+            foreach($arrStock as $rowstock){
+                $itemstock = ItemStock::find($rowstock['item_stock_id']);
+                if($itemstock){
+                    $qtyconversion = $rowstock['qty'] * $rowstock['conversion'];
+                    if($itemstock->qty < $qtyconversion){
+                        $errorMessage[] = 'Item '.$itemstock->item->code.' - '.$itemstock->item->name.' kurang dari stok. Kebutuhan '.CustomHelper::formatConditionalQty($qtyconversion).' sedangkan stok '.CustomHelper::formatConditionalQty($itemstock->qty);
+                    }
+                }
+            }
 
             if(count($errorMessage) > 0){
                 return response()->json([
                     'status'  => 500,
-                    'message' => implode(', ',$errorMessage)
+                    'message' => implode('. ',$errorMessage)
                 ]);
             }
 
@@ -507,7 +506,7 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
             
-			/* if($request->temp){
+			if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -547,7 +546,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->code = $request->code;
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
-                        $query->marketing_order_id = $request->marketing_order_id;
+                        $query->customer_id = $request->customer_id;
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
                         $query->note_internal = $request->note_internal;
@@ -584,7 +583,7 @@ class MarketingOrderDeliveryController extends Controller
                         'user_id'		            => session('bo_id'),
                         'account_id'                => $request->account_id,
                         'company_id'                => $request->company_id,
-                        'marketing_order_id'	    => $request->marketing_order_id,
+                        'customer_id'	            => $request->customer_id,
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
                         'note_internal'             => $request->note_internal,
@@ -649,7 +648,7 @@ class MarketingOrderDeliveryController extends Controller
 					'status'  => 500,
 					'message' => 'Data failed to save.'
 				];
-			} */
+			}
 		}
 
 		return response()->json($response);
@@ -658,14 +657,8 @@ class MarketingOrderDeliveryController extends Controller
     public function show(Request $request){
         $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['account_name'] = $po->account->name;
-        $po['marketing_order_code'] = $po->marketingOrder->code;
-        $po['outlet'] = $po->marketingOrder->outlet->name;
-        $po['address'] = $po->marketingOrder->destination_address;
-        $po['province'] = $po->marketingOrder->province->name;
-        $po['city'] = $po->marketingOrder->city->name;
-        $po['district'] = $po->marketingOrder->district->name;
-        $po['subdistrict'] = $po->marketingOrder->subdistrict->name;
+        $po['account_name'] = $po->account->employee_no.' - '.$po->account->name;
+        $po['customer_name'] = $po->customer->employee_no.' - '.$po->customer->name;
 
         $arr = [];
         
@@ -682,6 +675,7 @@ class MarketingOrderDeliveryController extends Controller
             }
 
             $arr[] = [
+                'so_no'                 => $row->marketingOrderDetail->marketingOrder->code,
                 'mo'                    => $row->marketingOrderDetail->marketing_order_id,
                 'id'                    => $row->marketing_order_detail_id,
                 'item_id'               => $row->item_id,
@@ -736,7 +730,7 @@ class MarketingOrderDeliveryController extends Controller
                 <td class="center-align" rowspan="2">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
@@ -773,6 +767,7 @@ class MarketingOrderDeliveryController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
+                <td colspan="2"></td>
             </tr>  
         ';
         

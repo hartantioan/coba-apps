@@ -20,6 +20,14 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+
+    table.bordered th {
+        border:1px solid black !important;
+    }
+
+    table.bordered td {
+        border:1px solid black !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -141,10 +149,9 @@
                                                         <th>Status Kirim</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Petugas</th>
-                                                        <th>{{ __('translations.customer') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Ekspedisi</th>
-                                                        <th>No. SO</th>
+                                                        <th>Customer</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Kirim</th>
                                                         <th>Catatan Internal</th>
@@ -279,15 +286,6 @@
                                 <textarea class="materialize-textarea" id="note_external" name="note_external" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
                                 <label class="active" for="note_external">Keterangan Eksternal</label>
                             </div>
-                            <div class="input-field col m4 s12">
-
-                            </div>
-                            <div class="input-field col m4 s12">
-                                
-                            </div>
-                            <div class="col s12 mt-3">
-                                <button class="btn waves-effect waves-light right submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                            </div>
                         </div>
                     </div>
                 </form>
@@ -296,6 +294,7 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
+        <button class="btn waves-effect waves-light right submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -582,6 +581,7 @@ document.addEventListener('focusin', function (event) {
         });
         
         $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').next().remove();
             $(this).closest('tr').remove();
             if($('.row_item').length == 0){
                 $('#body-item').append(`
@@ -1335,10 +1335,9 @@ document.addEventListener('focusin', function (event) {
                 { name: 'send_status', className: '' },
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
-                { name: 'customer_id', searchable: false, orderable: false, className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'account_id', className: '' },
-                { name: 'marketing_order_no', searchable: false, orderable: false, className: '' },
+                { name: 'customer_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },
@@ -1580,9 +1579,9 @@ document.addEventListener('focusin', function (event) {
                 $('#account_id').append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
-                $('#marketing_order_id').empty();
-                $('#marketing_order_id').append(`
-                    <option value="` + response.marketing_order_id + `">` + response.marketing_order_code + `</option>
+                $('#customer_id').empty();
+                $('#customer_id').append(`
+                    <option value="` + response.customer_id + `">` + response.customer_name + `</option>
                 `);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
@@ -1606,6 +1605,9 @@ document.addEventListener('focusin', function (event) {
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                 <td rowspan="2" id="row-main` + count + `">
                                     ` + no + `
+                                </td>
+                                <td>
+                                    ` + val.so_no + `
                                 </td>
                                 <td>
                                     ` + val.item_name + `
@@ -1634,7 +1636,7 @@ document.addEventListener('focusin', function (event) {
                                         <i class="material-icons left">add</i> Tambah Asal Item
                                     </a>
                                 </td>
-                                <td colspan="5">
+                                <td colspan="6">
                                     <table class="bordered" id="table-detail-source` + count + `">
                                         <thead>
                                             <tr>

@@ -156,19 +156,19 @@
                     {{ __('translations.name') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->name }}
+                    {{ $data->customer->name }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.address') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->address }}
+                    {{ $data->customer->address }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.phone_number') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->marketingOrder->account->phone.' / '.$data->marketingOrder->account->office_no }}
+                    {{ $data->customer->phone.' / '.$data->customer->office_no }}
                 </div>
                 <div class="col s12 center-align mt-3">
                     {{ __('translations.expedition') }}
@@ -197,22 +197,10 @@
                     {{ __('translations.delivery') }}
                 </div>
                 <div class="col s4">
-                    {{ __('translations.type') }}
-                </div>
-                <div class="col s8">
-                    {{ $data->marketingOrder->deliveryType() }}
-                </div>
-                <div class="col s4">
                     {{ __('translations.sent_date') }}
                 </div>
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->delivery_date)) }}
-                </div>
-                <div class="col s4">
-                    {{ __('translations.destination_address') }}
-                </div>
-                <div class="col s8">
-                    {{ $data->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrder->subdistrict->name.' - '.$data->marketingOrder->city->name.' - '.$data->marketingOrder->province->name)) }}
                 </div>
             </div>
         </div>
@@ -222,6 +210,7 @@
                 <thead>
                     <tr>
                         <th class="center-align">{{ __('translations.no') }}.</th>
+                        <th class="center-align">No. Sales Order</th>
                         <th class="center-align">{{ __('translations.item') }}</th>
                         <th class="center-align">{{ __('translations.qty') }}</th>
                         <th class="center-align">{{ __('translations.unit') }}</th>
@@ -231,15 +220,16 @@
                     @foreach($data->marketingOrderDeliveryDetail as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
+                        <td class="center-align">{{ $row->marketingOrderDetail->marketingOrder->code }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                     </tr>
                     <tr>
-                        <td colspan="4">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="5">{{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="3">
+                        <td colspan="4">
                             <table class="striped">
                                 <thead>
                                     <tr>
@@ -260,7 +250,7 @@
                     </tr>
                     @endforeach
                     <tr>
-                        <td colspan="5">
+                        <td colspan="6">
                             <div class="mt-3">
                                 {{ __('translations.note_internal') }} : {{ $data->note_internal }}
                             </div>

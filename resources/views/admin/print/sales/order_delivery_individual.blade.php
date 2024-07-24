@@ -197,7 +197,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->marketingOrder->account->name }}
+                                            {{ $data->customer->name }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -206,7 +206,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->marketingOrder->account->address }}
+                                            {{ $data->customer->address }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -215,9 +215,22 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->marketingOrder->account->phone.' / '.$data->marketingOrder->account->office_no }}
+                                            {{ $data->customer->phone.' / '.$data->customer->office_no }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Tgl.Kirim
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ date('d/m/Y',strtotime($data->delivery_date)) }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="50%" class="left-align">
+                                <table border="0" width="100%">
                                     <tr>
                                         <td width="40%">
                                             Ekspedisi
@@ -234,37 +247,6 @@
                                         <td width="1%">:</td>
                                         <td>
                                             {{ $data->account->address }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="50%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="50%">
-                                            Tipe Pengiriman
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="50%">
-                                            {{ $data->marketingOrder->deliveryType() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Tgl.Kirim
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ date('d/m/Y',strtotime($data->delivery_date)) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Almt Tujuan
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrder->subdistrict->name.' - '.$data->marketingOrder->city->name.' - '.$data->marketingOrder->province->name)) }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -286,6 +268,7 @@
                             <thead>
                                 <tr>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
+                                    <th>No. Sales Order</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
@@ -295,15 +278,16 @@
                                 @foreach($data->marketingOrderDeliveryDetail as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
+                                    <td>{{ $row->marketingOrderDetail->marketingOrder->code }}</td>
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="5">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4">
+                                    <td colspan="5">
                                         <table border="1" style="border-collapse:collapse">
                                             <thead>
                                                 <tr>

@@ -179,10 +179,7 @@ class MarketingOrderDelivery extends Model
     public function getTotal(){
         $total = 0;
         foreach($this->marketingOrderDeliveryDetail as $row){
-            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
-            $totalRow = $priceRow * $row->qty;
-            $totalRow = $this->marketingOrder->total * ($totalRow / $this->marketingOrder->subtotal);
-            $total += $totalRow;
+            $total += $row->getTotal();
         }
         return $total;
     }
@@ -190,10 +187,7 @@ class MarketingOrderDelivery extends Model
     public function getTax(){
         $tax = 0;
         foreach($this->marketingOrderDeliveryDetail as $row){
-            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
-            $totalRow = $priceRow * $row->qty;
-            $taxRow = $this->marketingOrder->tax * ($totalRow / $this->marketingOrder->subtotal);
-            $tax += $taxRow;
+            $tax += $row->getTax();
         }
         /* return floor($tax); */
         return $tax;
@@ -202,9 +196,8 @@ class MarketingOrderDelivery extends Model
     public function getRounding(){
         $round = 0;
         foreach($this->marketingOrderDeliveryDetail as $row){
-            $priceRow = $row->marketingOrderDetail->total / $row->marketingOrderDetail->qty;
-            $totalRow = $priceRow * $row->qty;
-            $roundRow = $this->marketingOrder->rounding * ($totalRow / $this->marketingOrder->subtotal);
+            $totalRow = $row->getTotal();
+            $roundRow = $row->marketingOrderDetail->marketingOrder->rounding * ($totalRow / $row->marketingOrderDetail->marketingOrder->total);
             $round += $roundRow;
         }
         return $round;

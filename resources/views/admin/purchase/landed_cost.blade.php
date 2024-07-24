@@ -50,10 +50,6 @@
     .select-wrapper, .select2-container {
         height:3.7rem !important;
     }
-
-    .dataTables_scrollHeadInner, .dataTable {
-        width: 100% !important; 
-    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -2132,7 +2128,7 @@
                 { name: 'tax', className: 'right-align' },
                 { name: 'wtax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

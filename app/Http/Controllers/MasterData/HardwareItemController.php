@@ -146,10 +146,10 @@ class HardwareItemController extends Controller
             'item'                       => 'required',
             'item_group_id_edit'         => 'required',
             'detail1_edit'               => 'required',
-            'code'                       =>  $request->temp ? ['required', Rule::unique('hardware_items', 'code')->ignore($request->temp)] : 'required|unique:hardware_items,code',
+           
         ], [
-            'code.required' 	    => 'Kode tidak boleh kosong.',
-            'code.unique'           => 'Kode telah terpakai.',
+            
+           
             'item.required'          => 'Harap Isi Item.',
             'detail1_edit.required'      => 'Harap isi detail item',
             'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
@@ -161,15 +161,22 @@ class HardwareItemController extends Controller
             ];
         } else {
 			if($request->temp){
+                
                 DB::beginTransaction();
                 try {
                     $query = HardwareItem::find($request->temp);
-                    $query->code            = $request->code;
+                    if($query->receptionHardwareItemsUsageALL()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Inventaris telah di serah terima dan tidak boleh dilakukan pembaruan/edit',
+                        ]);
+                    }
                     $query->item	        = $request->item;
                     $query->hardware_item_group_id	        = $request->item_group_id_edit;
                     $query->detail1	        = $request->detail1_edit;
                  
                     $query->status          = $request->status ? $request->status : '2';
+                
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -179,7 +186,7 @@ class HardwareItemController extends Controller
                 DB::beginTransaction();
                 
                 $query = HardwareItem::create([
-                    'code'                      => $request->code,
+                    'code'                      => HardwareItem::generateCode(),
                     'item'			            => $request->item,
                     'user_id'			        => session('bo_id'),
                     'hardware_item_group_id'    => $request->item_group_id_edit,

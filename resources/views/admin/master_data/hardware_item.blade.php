@@ -221,7 +221,7 @@
                         </div> --}}
                         <div class="input-field col s12 m6">
                           
-                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <input id="code" name="code" type="text" placeholder="Kode" disabled>
                             <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
                         <div class="input-field col s12 m6">

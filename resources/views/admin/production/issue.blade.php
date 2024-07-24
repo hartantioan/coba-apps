@@ -1108,7 +1108,8 @@
                                 </a>
                             </td>
                         </tr>
-                        <tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
+                    ` +
+                        (val.has_batch ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
                             <td colspan="2" class="right-align">
                                 Ambil dari Batch : 
                             </td>
@@ -1136,7 +1137,7 @@
                                     </div>
                                 </div>
                             </td>
-                        </tr>`
+                        </tr>` : ``)
                     );
                     $('#rowQty' + count).trigger('keyup');
                     if(val.has_batch){

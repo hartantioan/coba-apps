@@ -17,7 +17,6 @@ class ProductionBatch extends Model
     protected $fillable = [
         'code',
         'item_id',
-        'tank_id',
         'place_id',
         'warehouse_id',
         'area_id',
@@ -71,10 +70,6 @@ class ProductionBatch extends Model
 
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id');
-    }
-
-    public function tank(){
-        return $this->belongsTo('App\Models\Tank','tank_id','id');
     }
 
     public static function generateCode($type,$line,$group){

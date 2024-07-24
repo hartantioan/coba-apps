@@ -250,7 +250,7 @@
                             $batch = '<ol>';
 
                             foreach($row->productionBatch as $rowbatch){
-                                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty_real).'</li>';
+                                $batch .= '<li>No. '.$rowbatch->code.' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty_real).'</li>';
                             }
 
                             $batch .= '</ol>';

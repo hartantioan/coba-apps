@@ -24,7 +24,6 @@ use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\ProductionReceiveIssue;
 use App\Models\Shift;
-use App\Models\Tank;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Validator;
@@ -58,7 +57,6 @@ class ProductionReceiveController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
-            'tank'          => Tank::where('status','1')->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),
             'maxDate'       => $request->get('maxDate'),
@@ -519,7 +517,6 @@ class ProductionReceiveController extends Controller
                                     ProductionBatch::create([
                                         'code'          => $code_batch,
                                         'item_id'       => $querydetail->item_id,
-                                        'tank_id'       => $request->arr_tank[$keydetail],
                                         'place_id'      => $request->arr_place[$key],
                                         'warehouse_id'  => $request->arr_warehouse[$key],
                                         'lookable_type' => $querydetail->getTable(),
@@ -604,7 +601,6 @@ class ProductionReceiveController extends Controller
             foreach($row->productionBatch as $rowbatch){
                 $batch[] = [
                     'batch_no'  => $rowbatch->code,
-                    'tank_id'   => $rowbatch->tank_id ?? '',
                     'qty'       => CustomHelper::formatConditionalQty($rowbatch->qty_real),
                 ];
             }
@@ -687,7 +683,7 @@ class ProductionReceiveController extends Controller
             $batch = '<ol>';
 
             foreach($row->productionBatch as $rowbatch){
-                $batch .= '<li>No. '.$rowbatch->code.' Tangki : '.($rowbatch->tank()->exists() ? $rowbatch->tank->code : '-').' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty_real).'</li>';
+                $batch .= '<li>No. '.$rowbatch->code.' Qty : '.CustomHelper::formatConditionalQty($rowbatch->qty_real).'</li>';
             }
 
             $batch .= '</ol>';

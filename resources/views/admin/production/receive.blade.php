@@ -844,14 +844,6 @@
                         </select>
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_tank` + count + `" name="arr_tank[]">
-                            <option value="">--{{ __('translations.empty') }}--</option>
-                            @foreach ($tank as $rowtank)
-                                <option value="{{ $rowtank->id }}">{{ $rowtank->code }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
                         <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="" readonly>
                     </td>
                     <td class="center">
@@ -1066,33 +1058,6 @@
 
                 let no = $('.row_item').length + 1;
 
-                let batchhtml = `-`;
-
-                if(datakuy.group_bom == '3'){
-                    batchhtml = `<div class="row">
-                        <div class="col m12 s12">
-                            <table class="bordered" style="width:500px !important;">
-                                <thead>
-                                    <tr>
-                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki (Jika ada)</th>
-                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
-                                        <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="table-batch` + count + `"></tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="4" class="center-align">
-                                            <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
-                                        </td>    
-                                    </tr>    
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>`;
-                }
-
                 $('#body-item').append(`
                     <tr class="row_item" data-id="` + $('#production_order_detail_id').val() + `">
                         <input type="hidden" name="arr_production_order_detail_id[]" value="` + datakuy.id + `">
@@ -1131,7 +1096,27 @@
                             </select>
                         </td>
                         <td class="center-align">
-                            ` + batchhtml + `
+                            <div class="row">
+                                <div class="col m12 s12">
+                                    <table class="bordered" style="width:500px !important;">
+                                        <thead>
+                                            <tr>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
+                                                <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="table-batch` + count + `"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3" class="center-align">
+                                                    <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
+                                                </td>    
+                                            </tr>    
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
                         </td>
                         <td class="center">
                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
@@ -1261,14 +1246,6 @@
                         <tr>
                             <td>
                                 <input name="arr_batch_no[]" id="arr_batch_no` + count + `" type="text" placeholder="Generate otomatis..." value="` + response + `" readonly class="no-batch-` + code + `">
-                            </td>
-                            <td>
-                                <select class="browser-default tank-batch-` + code + `" id="arr_tank` + count + `" name="arr_tank[]">
-                                    <option value="">--Kosong--</option>
-                                    @foreach ($tank as $rowtank)
-                                        <option value="{{ $rowtank->id }}">{{ $rowtank->code.' - LINE '.$rowtank->line->code }}</option>
-                                    @endforeach
-                                </select>
                             </td>
                             <td>
                                 <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + code + `','` + count + `')" style="text-align:right;">    
@@ -1593,7 +1570,6 @@
             if (willDelete) {
                 
                 var formData = new FormData($('#form_data')[0]);
-                formData.delete("arr_tank[]");
                 formData.delete("arr_batch_no[]");
                 formData.delete("arr_qty_batch[]");
                 formData.delete("arr_production_issue_id[]");
@@ -1609,9 +1585,6 @@
                     $('.no-batch-' + $(element).data('id')).each(function(d){
                         formData.append('arr_count_detail[]',count);
                         formData.append('arr_batch_no[]',$(this).val());
-                    });
-                    $('.tank-batch-' + $(element).data('id')).each(function(d){
-                        formData.append('arr_tank[]',$(this).val());
                     });
                     if($('.qty-batch-' + $(element).data('id')).length > 0){
                         $('.qty-batch-' + $(element).data('id')).each(function(d){
@@ -1794,7 +1767,6 @@
                                     <thead>
                                         <tr>
                                             <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki (Jika ada)</th>
                                             <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
                                             <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
                                         </tr>
@@ -1802,7 +1774,7 @@
                                     <tbody id="table-batch` + count + `"></tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="4" class="center-align">
+                                            <td colspan="3" class="center-align">
                                                 <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
                                             </td>    
                                         </tr>    
@@ -1868,14 +1840,6 @@
                                     <input name="arr_batch_no[]" id="arr_batch_no` + detailcode + `" type="text" placeholder="Generate otomatis..." value="` + detail.batch_no + `" readonly class="no-batch-` + count + `">
                                 </td>
                                 <td>
-                                    <select class="browser-default tank-batch-` + count + `" id="arr_tank` + detailcode + `" name="arr_tank[]">
-                                        <option value="">--Kosong--</option>
-                                        @foreach ($tank as $rowtank)
-                                            <option value="{{ $rowtank->id }}">{{ $rowtank->code.' - LINE '.$rowtank->line->code }}</option>
-                                        @endforeach
-                                    </select>
-                                </td>
-                                <td>
                                     <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + detail.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `','` + detailcode + `')" style="text-align:right;">    
                                 </td>
                                 <td>
@@ -1884,7 +1848,6 @@
                                     </a> 
                                 </td>
                             </tr>`);
-                            $('#arr_tank' + detailcode).val(detail.tank_id);
                         });
                     }
 
@@ -1899,7 +1862,6 @@
 
                     $('#arr_warehouse' + count).val(val.warehouse_id);
                     $('#arr_place' + count).val(val.place_id);
-                    $('#arr_tank' + count).val(val.tank_id);
                     no++;
                 });
 

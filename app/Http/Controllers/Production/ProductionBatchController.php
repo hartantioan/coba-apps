@@ -46,7 +46,6 @@ class ProductionBatchController extends Controller
             'warehouse_id',
             'area_id',
             'item_shading_id',
-            'tank_id',
         ];
 
         $start  = $request->start;
@@ -62,10 +61,6 @@ class ProductionBatchController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhereHas('item',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('code','like',"%$search%");
-                            })
-                            ->orWhereHas('tank',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('code','like',"%$search%");
                             });
@@ -102,10 +97,6 @@ class ProductionBatchController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhereHas('item',function($query) use ($search, $request){
-                                $query->where('name','like',"%$search%")
-                                    ->orWhere('code','like',"%$search%");
-                            })
-                            ->orWhereHas('tank',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('code','like',"%$search%");
                             });
@@ -146,7 +137,6 @@ class ProductionBatchController extends Controller
                     $val->warehouse()->exists() ? $val->warehouse->name : '-',
                     $val->area()->exists() ? $val->area->code : '-',
                     $val->itemShading()->exists() ? $val->itemShading->code : '-',
-                    $val->tank()->exists() ? $val->tank->code.' - '.$val->tank->name : '-',
                     CustomHelper::formatConditionalQty($val->qty_real),
                     CustomHelper::formatConditionalQty($val->qtyUsed()),
                     CustomHelper::formatConditionalQty($val->qtyBalance()),

@@ -4602,10 +4602,9 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' Tangki No. '.($d->tank()->exists() ? $d->tank->code : '-'),
+                'text' 			=> $d->code.' Qty '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code,
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
-                'tank_code'     => $d->tank()->exists() ? $d->tank->code : '-',
             ];
         }
 
@@ -4642,7 +4641,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - Qty : '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' - Tangki : '.($d->tank()->exists() ? $d->tank->code : '-').' - Item : '.$d->lookable->item->code.' - '.$d->lookable->item->name,
+                'text' 			=> $d->code.' - Qty : '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' - Item : '.$d->lookable->item->code.' - '.$d->lookable->item->name,
                 'code'          => $d->code,
                 'qty'           => CustomHelper::formatConditionalQty($d->qty),
                 'table'         => $d->getTable(),

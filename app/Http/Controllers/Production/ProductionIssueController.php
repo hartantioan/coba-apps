@@ -521,7 +521,6 @@ class ProductionIssueController extends Controller
                         'production_batch_code' => $rowbatch->productionBatch->code,
                         'qty'                   => CustomHelper::formatConditionalQty($rowbatch->qty),
                         'max_qty'               => CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty + $rowbatch->qty),
-                        'tank_code'             => $rowbatch->productionBatch->tank()->exists() ? $rowbatch->productionBatch->tank->code : '-',
                     ];
                 }
             }

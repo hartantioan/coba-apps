@@ -381,8 +381,12 @@ class User extends Authenticatable
     public function grandtotalUnsentMod(){
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
-                $totalMod += $rowmod->getGrandtotal();
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereDoesntHave('marketingOrderDeliveryProcess');
+                })->get() as $rowmod){
+                    $totalMod += $rowmod->getGrandtotal();
+                }
             }
         }
 
@@ -392,8 +396,12 @@ class User extends Authenticatable
     public function grandtotalUnsentModCredit(){
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
-                $totalMod += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereDoesntHave('marketingOrderDeliveryProcess');
+                })->get() as $rowmod){
+                    $totalMod += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
+                }
             }
         }
 
@@ -403,8 +411,12 @@ class User extends Authenticatable
     public function grandtotalUnsentModDp(){
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
-            foreach($row->marketingOrderDelivery()->whereDoesntHave('marketingOrderDeliveryProcess')->get() as $rowmod){
-                $totalMod += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
+            foreach($row->marketingOrderDetail as $rowdetail){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
+                    $query->whereDoesntHave('marketingOrderDeliveryProcess');
+                })->get() as $rowmod){
+                    $totalMod += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
+                }
             }
         }
 

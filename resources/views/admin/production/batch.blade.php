@@ -100,7 +100,6 @@
                                                         <th>Gudang</th>
                                                         <th>Area</th>
                                                         <th>Shading</th>
-                                                        <th>Tangki</th>
                                                         <th>Qty Awal</th>
                                                         <th>Qty Terpakai</th>
                                                         <th>Qty Sisa</th>
@@ -226,7 +225,7 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[1, 'asc']],
+            "order": [[0, 'desc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
@@ -280,7 +279,6 @@
                 { name: 'warehouse_id', className: 'center-align' },
                 { name: 'area_id', className: 'center-align' },
                 { name: 'item_shading_id', className: 'center-align' },
-                { name: 'tank_id', className: '' },
                 { name: 'qty_start', searchable: false, orderable: false, className: '' },
                 { name: 'qty_used', searchable: false, orderable: false, className: '' },
                 { name: 'qty_balance', searchable: false, orderable: false, className: '' },

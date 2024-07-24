@@ -146,7 +146,14 @@ class CustomHelper {
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null){
-		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->orderByDesc('date')->orderByDesc('id')->first();
+		$item = Item::find($item_id);
+		$bomPowder = $item->bomPlace($place_id)->exists() ? $item->bomPlace($place_id)->first() : NULL;
+		if($bomPowder && $bomPowder->group == '1'){
+			$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
+		}else{
+			$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->orderByDesc('date')->orderByDesc('id')->first();
+		}
+		
 		if($type == 'IN'){
 			ItemCogs::create([
 				'lookable_type'		=> $lookable_type,
@@ -4263,7 +4270,7 @@ class CustomHelper {
 						}else{
 							if($row->productionBatchUsage()->exists()){
 								foreach($row->productionBatchUsage as $rowbatchusage){
-									$price = $rowbatchusage->productionBatch->price();
+									$price = $rowbatchusage->productionBatch->item->priceNowProduction($rowbatchusage->productionBatch->place_id,$data->post_date);
 									$rowtotal = round($rowbatchusage->qty * $price,2);
 									JournalDetail::create([
 										'journal_id'	=> $query->id,

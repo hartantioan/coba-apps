@@ -1108,8 +1108,7 @@
                                 </a>
                             </td>
                         </tr>
-                    ` +
-                        (val.has_batch == '3' ? `<tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
+                        <tr class="row_item_batch gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id').val() + `" data-code="` + count + `">
                             <td colspan="2" class="right-align">
                                 Ambil dari Batch : 
                             </td>
@@ -1137,7 +1136,7 @@
                                     </div>
                                 </div>
                             </td>
-                        </tr>` : ``)
+                        </tr>`
                     );
                     $('#rowQty' + count).trigger('keyup');
                     if(val.has_batch){
@@ -1228,7 +1227,6 @@
                 <tr>
                     <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + count + `" value="` + data.id + `">
                     <td>` + data.code + `</td>
-                    <td>` + data.tank_code + `</td>
                     <td>
                         <input name="arr_qty_batch[]" class="qty-batch-` + code + `" type="text" value="` + data.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + count + `')" data-qty="` + data.qty + `" data-id="` + count + `" class="" id="rowBatch`+ count +`" style="text-align:right;">    
                     </td>
@@ -1920,7 +1918,6 @@
                             <tr>
                                 <input type="hidden" name="arr_batch_id[]" id="arr_batch_id` + countdetail + `" value="` + value.production_batch_id + `">
                                 <td>` + value.production_batch_code + `</td>
-                                <td>` + value.tank_code + `</td>
                                 <td>
                                     <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + countdetail + `')" data-qty="` + value.max_qty + `" data-id="` + countdetail + `" class="" id="rowBatch`+ countdetail +`" style="text-align:right;">    
                                 </td>

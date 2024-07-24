@@ -11,6 +11,7 @@ use App\Models\GoodReturnIssue;
 use App\Models\GoodReturnPO;
 use App\Models\InventoryTransferIn;
 use App\Models\InventoryTransferOut;
+use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\Journal;
 use App\Models\LandedCost;
@@ -51,8 +52,16 @@ class ResetCogs implements ShouldQueue
      */
     public function handle()
     {
-		$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderBy('date')->orderBy('id')->get();
-		$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderByDesc('date')->orderByDesc('id')->first();
+		$item = Item::find($this->item_id);
+		$bomPowder = $item->bomPlace($this->place_id)->exists() ? $item->bomPlace($this->place_id)->first() : NULL;
+		if($bomPowder && $bomPowder->group == '1'){
+			$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderBy('date')->orderBy('id')->get();
+			$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('date')->orderByDesc('id')->first();
+		}else{
+			$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderBy('date')->orderBy('id')->get();
+			$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->orderByDesc('date')->orderByDesc('id')->first();
+		}
+		
 		$total_final = 0;
 		$qty_final = 0;
 		$price_final = 0;

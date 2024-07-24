@@ -1781,6 +1781,10 @@
                     <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
                 `);
 
+                $('#output-line').empty().text(response.line);
+                $('#output-fg').empty().text(response.target_item);
+                $('#output-qty').empty().text(response.target_qty);
+
                 $('#title-modal').text(response.bom_group);
 
                 $('.row_item_issue').remove();

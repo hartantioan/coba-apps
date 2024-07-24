@@ -562,6 +562,9 @@ class ProductionIssueController extends Controller
         $po['detail_issue']                     = $detail_issue;
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         $po['bom_group']                        = strtoupper($po->productionOrderDetail->productionScheduleDetail->bom->group());
+        $po['line']                             = $po->line->code;
+        $po['target_item']                      = $po->productionOrderDetail->productionScheduleDetail->item->code.' - '.$po->productionOrderDetail->productionScheduleDetail->item->name;
+        $po['target_qty']                       = $po->productionOrderDetail->productionScheduleDetail->qty.' - '.$po->productionOrderDetail->productionScheduleDetail->item->uomUnit->code;
         
 		return response()->json($po);
     }

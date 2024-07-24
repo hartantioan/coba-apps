@@ -1781,7 +1781,7 @@
                     <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
                 `);
 
-                $('#output-line').empty().text(response.line);
+                $('#output-line').empty().text(response.line_code);
                 $('#output-fg').empty().text(response.target_item);
                 $('#output-qty').empty().text(response.target_qty);
 

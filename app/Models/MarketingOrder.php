@@ -197,10 +197,6 @@ class MarketingOrder extends Model
         });
     }
 
-    public function marketingOrderDelivery(){
-        return $this->hasMany('App\Models\MarketingOrderDelivery','marketing_order_id','id')->whereIn('status',['2','3']);
-    }
-
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }

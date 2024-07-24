@@ -308,6 +308,7 @@ class MarketingOrderDeliveryController extends Controller
                         'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
                         'qty_conversion'=> CustomHelper::formatConditionalQty($row->qty_conversion),
+                        'code'          => $data->code,
                     ];
                 }
 
@@ -333,11 +334,11 @@ class MarketingOrderDeliveryController extends Controller
         
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
-            /* 'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_deliveries', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_deliveries,code',
-             */'code_place_id'             => 'required',
+            /* 'code'			        => $request->temp ? ['required', Rule::unique('marketing_order_deliveries', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_deliveries,code',
+             */'code_place_id'          => 'required',
             'account_id' 				=> 'required',
             'company_id'			    => 'required',
-            'marketing_order_id'		=> 'required',
+            'customer_id'		        => 'required',
             'post_date'		            => 'required',
             'delivery_date'		        => 'required',
             'arr_modi'                  => 'required|array',
@@ -353,7 +354,7 @@ class MarketingOrderDeliveryController extends Controller
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'account_id.required' 				=> 'Vendor/Ekspedisi/Broker tidak boleh kosong.',
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'marketing_order_id.required' 	    => 'Sales Order tidak boleh kosong.',
+            'customer_id.required' 	            => 'Customer tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'delivery_date.required' 			=> 'Tanggal kirim tidak boleh kosong.',
             'arr_modi.required'                 => 'Data detail sales order tidak boleh kosong.',
@@ -382,16 +383,63 @@ class MarketingOrderDeliveryController extends Controller
             $totalLimitCredit = 0;
             $totalSent = 0;
 
-            $cekmo = MarketingOrder::find($request->marketing_order_id);
+            $user = User::find($request->customer_id);
 
-            $grandtotalUnsentModCredit = $cekmo->account->grandtotalUnsentModCredit();
-            $grandtotalUnsentModDp = $cekmo->account->grandtotalUnsentModDp();
-            $grandtotalUnsentDoCredit = $cekmo->account->grandtotalUninvoiceDoCredit();
-            $grandtotalUnsentDoDp = $cekmo->account->grandtotalUninvoiceDoDp();
+            $grandtotalUnsentModCredit = $user->grandtotalUnsentModCredit();
+            $grandtotalUnsentModDp = $user->grandtotalUnsentModDp();
+            $grandtotalUnsentDoCredit = $user->grandtotalUninvoiceDoCredit();
+            $grandtotalUnsentDoDp = $user->grandtotalUninvoiceDoDp();
+
+            $arrmo = array_unique($request->arr_mo);
 
             $total = 0;
             $tax = 0;
             $grandtotal = 0;
+            $totalCredit = 0;
+            $totalDp = 0;
+            
+            foreach($arrmo as $rowmo){
+                $cekmo = MarketingOrder::find($rowmo);
+
+                if($request->arr_qty){
+                    foreach($request->arr_qty as $key => $row){
+                        $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
+                        if($datamodi->marketing_order_id == $cekmo->id){
+                            $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
+                            $rowtax = 0;
+                            if($datamodi->tax_id > 0){
+                                if($datamodi->is_include_tax == '1'){
+                                    $rowtotal = $rowtotal * (1 + ($datamodi->percent_tax / 100));
+                                }
+                                $rowtax += $rowtotal * ($datamodi->percent_tax / 100);
+                            }
+    
+                            $total += $rowtotal;
+                            $tax += $rowtax;   
+                        }      
+                    }
+
+                    $grandtotal = $total + $tax;
+
+                    $percent_credit = 100 - $cekmo->percent_dp;
+
+                    $totalCredit += ($percent_credit / 100) * $grandtotal;
+                    $totalDp += ($cekmo->percent_dp / 100) * $grandtotal;
+                }
+            }
+
+            $balanceLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit;
+            $balanceLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp;
+            $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
+            $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
+            
+            if($balanceLimitCredit < 0){
+                $passedCreditLimit = false;
+            }
+
+            if($balanceLimitDp < 0){
+                $passedCreditLimit = false;
+            }
 
             $errorMessage = [];
 
@@ -421,42 +469,29 @@ class MarketingOrderDeliveryController extends Controller
                 }
             }
 
-            if($request->arr_qty){
-                foreach($request->arr_qty as $key => $row){
-                    $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);                    
-                    $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
-                    $rowtax = 0;
-                    if($datamodi->tax_id > 0){
-                        if($datamodi->is_include_tax == '1'){
-                            $rowtotal = $rowtotal * (1 + ($datamodi->percent_tax / 100));
+            $passedStock = true;
+            $arrStock = [];
+
+            if($request->arr_item_stock){
+                foreach($request->arr_item_stock as $key => $row){
+                    $index = -1;
+                    foreach($arrStock as $key2 => $rowstock){
+                        if($rowstock['item_stock_id'] == $row){
+                            $index = $key2;
                         }
-                        $rowtax += $rowtotal * ($datamodi->percent_tax / 100);
                     }
-
-                    $total += $rowtotal;
-                    $tax += $rowtax;                    
-                }
-
-                $grandtotal = $total + $tax;
-
-                $percent_credit = 100 - $cekmo->percent_dp;
-
-                $totalCredit = ($percent_credit / 100) * $grandtotal;
-                $totalDp = ($cekmo->percent_dp / 100) * $grandtotal;
-
-                $balanceLimitCredit = $cekmo->account->limit_credit - $cekmo->account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit;
-                $balanceLimitDp = $cekmo->account->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp;
-                $totalLimitCredit = $cekmo->account->limit_credit - $cekmo->account->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
-                $totalLimitDp = $cekmo->account->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
-                
-                if($balanceLimitCredit < 0){
-                    $passedCreditLimit = false;
-                }
-
-                if($balanceLimitDp < 0){
-                    $passedCreditLimit = false;
+                    if($index >= 0){
+                        $arrStock[$index]['qty'] += str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key]));
+                    }else{
+                        $arrStock[] = [
+                            'item_stock_id' => $row,
+                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key])),
+                        ];
+                    }
                 }
             }
+
+            info($arrStock);
 
             if(count($errorMessage) > 0){
                 return response()->json([
@@ -472,7 +507,7 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
             
-			if($request->temp){
+			/* if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -614,7 +649,7 @@ class MarketingOrderDeliveryController extends Controller
 					'status'  => 500,
 					'message' => 'Data failed to save.'
 				];
-			}
+			} */
 		}
 
 		return response()->json($response);

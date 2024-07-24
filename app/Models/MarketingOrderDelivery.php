@@ -20,7 +20,7 @@ class MarketingOrderDelivery extends Model
         'user_id',
         'company_id',
         'account_id',
-        'marketing_order_id',
+        'customer_id',
         'post_date',
         'delivery_date',
         'note_internal',
@@ -48,9 +48,9 @@ class MarketingOrderDelivery extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
-    public function marketingOrder()
+    public function customer()
     {
-        return $this->belongsTo('App\Models\MarketingOrder', 'marketing_order_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\User', 'customer_id', 'id')->withTrashed();
     }
 
     public function voidUser()

@@ -18,7 +18,7 @@
     }
 
     .select-wrapper, .select2-container {
-        height:3.9rem !important;
+        height:3.6rem !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -195,10 +195,9 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="input-field col m3 s12 step3">
-                                        <input type="hidden" id="temp" name="temp">
-                                        <select class="browser-default" id="marketing_order_id" name="marketing_order_id" onchange="getMarketingOrder()"></select>
-                                        <label class="active" for="marketing_order_id">Sales Order</label>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="customer_id" name="customer_id"></select>
+                                        <label class="active" for="customer_id">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="browser-default" id="account_id" name="account_id"></select>
@@ -220,32 +219,17 @@
                                         <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Pengiriman">
                                         <label class="active" for="delivery_date">Tgl. Kirim</label>
                                     </div>
-                                    <div class="input-field col m12 s12 row">
-                                        <h6><b>Info Pengiriman Sales Order</b></h6>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-outlet">-</span>
-                                            <label class="active" for="">{{ __('translations.outlet') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-address">-</span>
-                                            <label class="active" for="">{{ __('translations.address') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-province">-</span>
-                                            <label class="active" for="">{{ __('translations.province') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-city">-</span>
-                                            <label class="active" for="">Kota/Kabupaten</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-district">-</span>
-                                            <label class="active" for="">{{ __('translations.subdistrict') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-subdistrict">-</span>
-                                            <label class="active" for="">{{ __('translations.urban_village') }}</label>
-                                        </div>
+                                    <div class="col m12 s12">
+                                        <hr>
+                                        <h6>Tambah SO (Bisa lebih dari 1 SO)</h6>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input type="hidden" id="temp" name="temp">
+                                        <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
+                                        <label class="active" for="marketing_order_id">Sales Order</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <a class="waves-effect waves-light cyan btn-small mt-3 mr-1" onclick="getMarketingOrder();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambahkan MO</a>
                                     </div>
                                 </fieldset>
                             </div>
@@ -266,6 +250,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th class="center">{{ __('translations.no') }}.</th>
+                                                        <th class="center">No.SO</th>
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">{{ __('translations.stock') }}</th>
                                                         <th class="center">Qty Pesanan</th>
@@ -276,7 +261,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="7">
+                                                        <td colspan="8">
                                                             Silahkan pilih Sales Order...
                                                         </td>
                                                     </tr>
@@ -540,7 +525,7 @@ document.addEventListener('focusin', function (event) {
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#account_id,#marketing_order_id').empty();
+                $('#account_id,#customer_id,#marketing_order_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
@@ -548,12 +533,6 @@ document.addEventListener('focusin', function (event) {
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#info-outlet').text('-');
-                $('#info-address').text('-');
-                $('#info-province').text('-');
-                $('#info-city').text('-');
-                $('#info-district').text('-');
-                $('#info-subdistrict').text('-');
                 tempAccount = null;
                 paymentType = null;
             }
@@ -607,7 +586,7 @@ document.addEventListener('focusin', function (event) {
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="7">
+                        <td colspan="8">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -620,7 +599,33 @@ document.addEventListener('focusin', function (event) {
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
-        select2ServerSide('#marketing_order_id,#filter_marketing_order', '{{ url("admin/select2/marketing_order") }}');
+        select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
+        select2ServerSide('#filter_marketing_order', '{{ url("admin/select2/marketing_order") }}');
+
+        $('#marketing_order_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/marketing_order_by_account") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#customer_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     });
 
     function updateSendStatus(code,element){
@@ -698,19 +703,14 @@ document.addEventListener('focusin', function (event) {
                             }
                         }
 
+                        $('#last-row-item').remove();
+
                         if(!passed){
                             if($('.data-used').length > 0){
                                 $('.data-used').trigger('click');
                             }
                             $('#body-item').empty();
                         }
-
-                        $('#info-outlet').text($('#marketing_order_id').select2('data')[0].outlet);
-                        $('#info-address').text($('#marketing_order_id').select2('data')[0].address);
-                        $('#info-province').text($('#marketing_order_id').select2('data')[0].province);
-                        $('#info-city').text($('#marketing_order_id').select2('data')[0].city);
-                        $('#info-district').text($('#marketing_order_id').select2('data')[0].district);
-                        $('#info-subdistrict').text($('#marketing_order_id').select2('data')[0].subdistrict);
                         $('#delivery_date').val(response.delivery_date);
                         $('#account_id').empty().append(`
                             <option value="` + response.sender_id + `">` + response.sender_name + `</option>
@@ -726,18 +726,22 @@ document.addEventListener('focusin', function (event) {
                                 </div>
                             `);
 
-                            let no = 1;
+                            let no = $('.row_item').length + 1;
 
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 
                                 $('#body-item').append(`
                                     <tr class="row_item" data-id="` + response.id + `">
+                                        <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + $('#marketing_order_id').val() + `">
                                         <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
                                         <td rowspan="2" id="row-main` + count + `">
                                             ` + no + `
+                                        </td>
+                                        <td>
+                                            ` + val.code + `
                                         </td>
                                         <td>
                                             ` + val.item_name + `
@@ -766,7 +770,7 @@ document.addEventListener('focusin', function (event) {
                                                 <i class="material-icons left">add</i> Tambah Asal Item
                                             </a>
                                         </td>
-                                        <td colspan="5">
+                                        <td colspan="6">
                                             <table class="bordered" id="table-detail-source` + count + `">
                                                 <thead>
                                                     <tr>
@@ -784,8 +788,10 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                     </tr>
                                 `);
+                                no++;
                             });
                         }
+                        $('#marketing_order_id').empty();
                     }
                     M.updateTextFields();
                 },
@@ -800,17 +806,11 @@ document.addEventListener('focusin', function (event) {
                 }
             });
         }else{
-            if($('.data-used').length > 0){
-                $('.data-used').trigger('click');
-            }
-            $('#delivery_date').val('{{ date("Y-m-d") }}');
-
-            $('#info-outlet').text('-');
-            $('#info-address').text('-');
-            $('#info-province').text('-');
-            $('#info-city').text('-');
-            $('#info-district').text('-');
-            $('#info-subdistrict').text('-');
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih SO.',
+                icon: 'warning'
+            });
         }
     }
 
@@ -1239,7 +1239,7 @@ document.addEventListener('focusin', function (event) {
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="7">
+                            <td colspan="8">
                                 Silahkan pilih Sales Order...
                             </td>
                         </tr>
@@ -1589,12 +1589,6 @@ document.addEventListener('focusin', function (event) {
                 $('#delivery_date').val(response.delivery_date);
                 $('#note_internal').val(response.note_internal);
                 $('#note_external').val(response.note_external);
-                $('#info-outlet').text(response.outlet);
-                $('#info-address').text(response.address);
-                $('#info-province').text(response.province);
-                $('#info-city').text(response.city);
-                $('#info-district').text(response.district);
-                $('#info-subdistrict').text(response.subdistrict);
                 
                 if(response.details.length > 0){
                     $('#last-row-item').remove();

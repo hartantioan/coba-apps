@@ -534,6 +534,7 @@ class Item extends Model
                 'unit'          => $firstBom->item->uomUnit->code,
                 'type'          => $firstBom->is_powder ?? '',
                 'list_warehouse'=> $firstBom->item->warehouseList(),
+                'materials'     => $firstBom->getMaterialData(),
                 'details'       => [],
             ];
             if(!$firstBom->bomParentMap()->exists()){
@@ -562,6 +563,7 @@ class Item extends Model
                         'unit'          => $secondBom->child->item->uomUnit->code,
                         'type'          => $secondBom->child->is_powder ?? '',
                         'list_warehouse'=> $secondBom->child->item->warehouseList(),
+                        'materials'     => $secondBom->child->getMaterialData(),
                         'details'       => [],
                     ];
                     if(!$secondBom->child->bomParentMap()->exists()){
@@ -590,6 +592,7 @@ class Item extends Model
                                 'unit'          => $thirdBom->child->item->uomUnit->code,
                                 'type'          => $thirdBom->child->is_powder ?? '',
                                 'list_warehouse'=> $thirdBom->child->item->warehouseList(),
+                                'materials'     => $thirdBom->child->getMaterialData(),
                                 'details'       => [],
                             ];
                             if(!$thirdBom->child->bomParentMap()->exists()){
@@ -618,6 +621,7 @@ class Item extends Model
                                         'unit'          => $fourthBom->child->item->uomUnit->code,
                                         'type'          => $fourthBom->child->is_powder ?? '',
                                         'list_warehouse'=> $fourthBom->child->item->warehouseList(),
+                                        'materials'     => $fourthBom->child->getMaterialData(),
                                         'details'       => [],
                                     ];
                                     if(!$fourthBom->child->bomParentMap()->exists()){
@@ -645,6 +649,7 @@ class Item extends Model
                                                 'qty_needed'    => $fifthBom->child->getQtyContent($fifthBom->parent),
                                                 'unit'          => $fifthBom->child->item->uomUnit->code,
                                                 'list_warehouse'=> $fifthBom->child->item->warehouseList(),
+                                                'materials'     => $fifthBom->child->getMaterialData(),
                                                 'type'          => $fifthBom->child->is_powder ?? '',
                                                 'details'       => [],
                                             ];
@@ -674,6 +679,7 @@ class Item extends Model
                                                         'unit'          => $sixthBom->child->item->uomUnit->code,
                                                         'type'          => $sixthBom->child->is_powder ?? '',
                                                         'list_warehouse'=> $sixthBom->child->item->warehouseList(),
+                                                        'materials'     => $sixthBom->child->getMaterialData(),
                                                         'details'       => [],
                                                     ];
                                                 }

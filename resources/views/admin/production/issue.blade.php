@@ -758,7 +758,7 @@
                         <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent`+ count +`" readonly>
                     </td>
                     <td class="center">
-                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent();" style="text-align:right;width:100%;" id="rowQty`+ count +`" required data-id="` + count + `">
                     </td>
                     <td class="center" id="arr_unit` + count + `">
                         -
@@ -1286,9 +1286,9 @@
         });
         $('input[name="arr_qty[]"]').each(function(index){
             let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let percent = (val / total) * 100;
+            let percent = Math.round((((val / total) * 100) + Number.EPSILON) * 100) / 100;
             $('input[name="arr_percentage[]"]').eq(index).val(
-                (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toFixed(2).toString().replace('.',','))
+                (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toString().replace('.',','))
             );
         });
     }

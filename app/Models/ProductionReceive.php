@@ -264,7 +264,7 @@ class ProductionReceive extends Model
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
                 'post_date'                 => date('Y-m-d'),
-                'note'                      => 'DIBUAT OTOMATIS DARI PRODUCTION RECEIVE NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->code.' )',
+                'note'                      => 'PRODUCTION RECEIVE NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
                 'status'                    => '1',
             ]);
 

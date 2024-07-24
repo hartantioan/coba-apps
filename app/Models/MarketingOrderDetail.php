@@ -54,7 +54,7 @@ class MarketingOrderDetail extends Model
 
     public function marketingOrderDeliveryDetail(){
         return $this->hasMany('App\Models\MarketingOrderDeliveryDetail','marketing_order_detail_id','id')->whereHas('marketingOrderDelivery',function($query){
-            $query->whereIn('status',['2','3']);
+            $query->whereIn('status',['1','2','3']);
         });
     }
 

@@ -366,6 +366,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('place', [Select2Controller::class, 'place']);
                 Route::get('period', [Select2Controller::class, 'period']);
                 Route::get('marketing_order', [Select2Controller::class, 'marketingOrder']);
+                Route::get('marketing_order_by_account', [Select2Controller::class, 'marketingOrderByAccount']);
                 Route::get('marketing_order_form_dp', [Select2Controller::class, 'marketingOrderFormDP']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);

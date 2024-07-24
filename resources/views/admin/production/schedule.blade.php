@@ -558,7 +558,7 @@
 <!-- END: Page Main-->
 <script>
 
-    var arrGreenTile = [], arrPowder = [];
+    var arrGreenTile = [], arrPowder = [], arrFg = [];
 
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
@@ -751,6 +751,7 @@
                 `);
                 arrGreenTile = [];
                 arrPowder = [];
+                arrFg = [];
             }
         });
 
@@ -767,6 +768,17 @@
         $('.body-item-detail-normal').on('click', '.delete-data-item-detail-normal', function() {
             $('#list-bom-' + $(this).data('id')).remove();
             $(this).closest('tr').remove();
+            let id = $(this).data('id');
+            let index = -1;
+            $.each(arrFg, function(i, val) {
+                if(val.code == id){
+                    index = i;
+                }
+            });
+            if(index >= 0){
+                arrFg.splice(index,1);
+            }
+            generateSummaryRawmat();
         });
 
         $('.body-item-detail-green').on('click', '.delete-data-item-detail-green', function() {
@@ -988,10 +1000,10 @@
                     },
                     cache: false,
                     beforeSend: function() {
-                        loadingOpen('#datatable_serverside');
+                        loadingOpen('#modal4');
                     },
                     success: function(data){
-                        loadingClose('#datatable_serverside');
+                        loadingClose('#modal4');
                         if(data.status == '200'){
                             M.toast({
                                 html: data.message
@@ -1242,16 +1254,16 @@
                             $('.last-row-item-detail').remove();
                         }
 
+                        if($('.last-row-item-detail-normal').length > 0){
+                            $('.last-row-item-detail-normal').remove();
+                        }
+
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + mop.code + `
                                 <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() + `')">close</i>
                             </div>
                         `);
-                        
-                        /* if(mop.details.length > 0){
-                            $('#body-item-detail-normal').empty();
-                        } */
                         
                         $.each(mop.details, function(i, val) {
                             var count = makeid(10);
@@ -1348,6 +1360,17 @@
                                             <input name="arr_note[]" type="text" required>
                                         </td>
                                     </tr>`;
+                                    if(!$('#temp').val()){
+                                        if(detail.materials.length > 0){
+                                            let arr = [];
+                                            arr['code'] = count;
+                                            arr['item_output'] = detail.item_name;
+                                            arr['qty'] = qtyRow.toFixed(3);
+                                            arr['datas'] = detail.materials;
+                                            arrFg.push(arr);
+                                        }
+                                        generateSummaryRawmat();
+                                    }
                                 }
                             });
 
@@ -1471,6 +1494,16 @@
 
     function generateSummaryRawmat(){
         $('#list-bom-relation').empty();
+        $.each(arrFg, function(i, val) {
+            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+            
+            for(let j = 0;j<val.datas.length;j++){
+                row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`
+            }
+
+            row += `</ul></li>`;
+            $('#list-bom-relation').append(row);
+        });
         $.each(arrPowder, function(i, val) {
             let row = `<li>` + val.item_output + ` butuh : <ul>`;
             

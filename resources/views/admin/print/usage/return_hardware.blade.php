@@ -282,7 +282,7 @@
                     </table>
                     <br>
                     Mengembalikan inventaris :<br>
-                    <table border="0" width="51%" style="font-size:1.2rem;margin-left:4rem">
+                    <table border="0" width="81%" style="font-size:1.2rem;margin-left:4rem">
                         <tr>
                             <td>
                                 No Inventaris

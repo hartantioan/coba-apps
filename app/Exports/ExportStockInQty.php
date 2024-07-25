@@ -45,9 +45,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
         ->orderBy('items.code')->get();
 
         if ($query_data->isEmpty()) {
-            $query_data = ItemStock::where(function($query){
-                // Your additional conditions for the second query, if needed
-            })->get();
+            $query_data = [];
         }
         
         $array_filter = [];

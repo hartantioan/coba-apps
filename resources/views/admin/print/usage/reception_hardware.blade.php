@@ -280,7 +280,7 @@
                     </table>
                     <br>
                     Menerima inventaris dari pihak PT.SUPERIOR PORCELAIN SUKSES :<br>
-                    <table border="0" width="51%" style="font-size:1.2rem;margin-left:4rem">
+                    <table border="0" width="81%" style="font-size:1.2rem;margin-left:4rem">
                         <tr>
                             <td>
                                 No Inventaris
@@ -328,7 +328,7 @@
                                 :
                             </td>
                             <td style="font-weight: bold">
-                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
+                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}}
                             </td>
                         </tr>
                     </table>

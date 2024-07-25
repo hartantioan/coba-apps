@@ -88,9 +88,7 @@ class StockInQtyController extends Controller
         ->get();
 
         if ($query_data->isEmpty()) {
-            $query_data = ItemStock::where(function($query) use ($request) {
-                // Your additional conditions for the second query, if needed
-            })->get();
+            $query_data = [];
         }
         
         foreach($query_data as $row){

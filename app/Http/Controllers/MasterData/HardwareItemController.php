@@ -164,6 +164,19 @@ class HardwareItemController extends Controller
                     
                 
                 ]);
+            }else{
+                $validation = Validator::make($request->all(), [
+                    'item'                       => 'required',
+                    'item_group_id_edit'         => 'required',
+                    'detail1_edit'               => 'required',
+                   
+                ], [
+                    
+                   
+                    'item.required'          => 'Harap Isi Item.',
+                    'detail1_edit.required'      => 'Harap isi detail item',
+                    'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
+                ]);
             }
         }else{
             $validation = Validator::make($request->all(), [

@@ -335,7 +335,7 @@
                     <div style="text-align: justify">
                         <br>        
                         Dan dengan surat pernyataan ini pula, 
-                        menyatakan bertanggung jawab atas inventaris yang telah diserah terimakan kepada Saya, dan mempergunakannya hanya untuk mendukung tugas dan kewajiban Saya sebagai seorang staff PT. SUPERIOR PORCELAIN SUKSES.
+                        menyatakan bertanggung jawab atas inventaris yang telah diserah terimakan kepada Saya, dan mempergunakannya hanya untuk mendukung tugas dan kewajiban selama bekerja di PT. SUPERIOR PORCELAIN SUKSES.
                         <br>
                         <br>
                         Demikian surat pernyataan ini dibuat dan ditanda tangani dengan penuh tanggung jawab dan kesadaran Saya.

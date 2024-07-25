@@ -149,12 +149,16 @@ class TreeHelper {
                     $finished_data_id_gr[]= $gr_id; 
                     $query_gr = GoodReceipt::where('id',$gr_id)->first();
                     foreach($query_gr->goodReceiptDetail as $good_receipt_detail){
-                        $name = $good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name ?? null;
                         
+                        if($good_receipt_detail->purchaseOrderDetail->purchaseOrder->isSecretPo()){
+                            $name = null;
+                        }else{
+                            $name = $good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name ?? null;
+                        }
                         $po = [
                             'properties'=> [
                                 ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : "/* . ($name !== null ? $name : ' ') */],
+                                ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
                                 ['name'=> "Nominal : 0"]
                                 /* ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')] */
                             ],
@@ -554,14 +558,21 @@ class TreeHelper {
                     $query_invoice = PurchaseInvoice::where('id',$invoice_id)->first();
                     foreach($query_invoice->purchaseInvoiceDetail as $row){
                         if($row->purchaseOrderDetail()){
-                            $name = $row_po->supplier->name ?? null;
+                            
                             $row_po=$row->lookable->purchaseOrder;
+                            if($row_po->isSecretPo()){
+                                $name = null;
+                            }else{
+                                $name = $row_po->supplier->name ?? null;
+                               
+                            }
+                           
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
                                     'properties'=> [
                                         ['name'=> "Tanggal :".$row_po->post_date],
-                                        ['name'=> "Vendor  : "/* .($name !== null ? $name : ' ') */],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
                                         ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
                                     ],
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
@@ -1162,13 +1173,17 @@ class TreeHelper {
                     
                     foreach($query_dp->purchaseDownPaymentDetail as $row){
                         if($row->purchaseOrder()->exists()){
-                            $name = $row->purchaseOrder->supplier->name ?? null;
+                            if($row->purchaseOrder->isSecretPo()){
+                                $name = null;
+                            }else{ 
+                                $name = $row->purchaseOrder->supplier->name ?? null;
+                            }
                             $po=[
                                 "name"=>$row->purchaseOrder->code,
                                 "key" => $row->purchaseOrder->code,
                                 'properties'=> [
                                     ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
-                                    ['name'=> "Vendor  : "/* .($name !== null ? $name : ' ') */],
+                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
                                     ['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')],
                                 ],
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
@@ -1998,11 +2013,17 @@ class TreeHelper {
                         if($purchase_request_detail->purchaseOrderDetail()->exists()){
                         
                             foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
-                                $name = $purchase_order_detail->purchaseOrder->supplier->name ?? null;
+                                if($purchase_order_detail->purchaseOrder->isSecretPo){
+                                    $name = null;
+                                   
+                                }else{
+                                    $name = $purchase_order_detail->purchaseOrder->supplier->name ?? null;
+                                }
+                               
                                 $po_tempura = [
                                     'properties'=> [
                                         ['name'=> "Tanggal : ".$purchase_order_detail->purchaseOrder->post_date],
-                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                                        ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
                                     ],
                                     'key'=>$purchase_order_detail->purchaseOrder->code,
                                     'name'=>$purchase_order_detail->purchaseOrder->code,

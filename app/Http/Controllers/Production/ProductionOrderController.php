@@ -86,6 +86,7 @@ class ProductionOrderController extends Controller
             'company_id',
             'place_id',
             'post_date',
+            'item_id',
             'start_date',
             'end_date',
             'type',
@@ -195,6 +196,7 @@ class ProductionOrderController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->listItemTarget(),
                     $val->note,
                     $val->status(),
                     (

@@ -125,6 +125,7 @@
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Tgl.Post</th>
+                                                        <th>Target Item</th>
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -890,6 +891,7 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'item_id', searchable: false, orderable: false, className: '' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

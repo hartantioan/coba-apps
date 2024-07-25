@@ -61,6 +61,14 @@ class ProductionOrder extends Model
         return $this->hasMany('App\Models\ProductionOrderDetail');
     }
 
+    public function listItemTarget(){
+        $arr = [];
+        foreach($this->productionOrderDetail as $row){
+            $arr[] = $row->productionScheduleDetail->item->code.' - '.$row->productionScheduleDetail->item->name;
+        }
+        return implode(', ',$arr);
+    }
+
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();

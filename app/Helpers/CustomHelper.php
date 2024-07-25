@@ -4515,7 +4515,7 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $rowbatch->total,
 							'nominal_fc'	=> $rowbatch->total,
-							'note'			=> $pir->note.' - '.$rowbatch->code,
+							'note'			=> $pir->code,
 						]);
 		
 						self::sendCogs($table_name,
@@ -4557,7 +4557,7 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $row->total,
 						'nominal_fc'	=> $row->total,
-						'note'			=> $pir->note,
+						'note'			=> $pir->code,
 					]);
 	
 					self::sendCogs($table_name,

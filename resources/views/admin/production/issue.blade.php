@@ -1283,9 +1283,16 @@
         $('input[name="arr_qty[]"]').each(function(index){
             total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
+        let totalpercent = 100;
         $('input[name="arr_qty[]"]').each(function(index){
             let val = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let percent = Math.round((((val / total) * 100) + Number.EPSILON) * 1000) / 1000;
+            let percent = Math.round((((val / total) * 100) + Number.EPSILON) * 100) / 100;
+            if(totalpercent > percent){
+                percent = percent;
+                totalpercent -= percent;
+            }else{
+                percent = Math.round((totalpercent + Number.EPSILON) * 100) / 100;
+            }
             $('input[name="arr_percentage[]"]').eq(index).val(
                 (percent >= 0 ? '' : '-') + formatRupiahIni(percent.toString().replace('.',','))
             );

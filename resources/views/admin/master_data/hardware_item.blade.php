@@ -236,7 +236,7 @@
                         
                         <div class="input-field col s12 m6">
                             <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan">
-                            <label class="active" for="detail1_edit">Detail 1</label>
+                            <label class="active" for="detail1_edit">Detail </label>
                         </div>
 
                         <div class="input-field col s12 m6">
@@ -1011,6 +1011,52 @@
                 window.open(data, '_blank');
             }
         });
+    }
+    function getReception(id){
+        $.ajax({
+            url: '{{ Request::url() }}/get_reception',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if (response.ada) {
+                    disableFields();
+                } else {
+                    enableFields();
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+        
+    }
+
+    function disableFields() {
+        $('#code').prop('disabled', true);
+        $('#item').prop('disabled', true);
+        $('#item_group_id_edit').prop('disabled', true);
+        $('#detail1_edit').prop('disabled', true);
+    }
+
+    function enableFields() {
+        $('#item').prop('disabled', false);
+        $('#item_group_id_edit').prop('disabled', false);
+        $('#detail1_edit').prop('disabled', false);
     }
 
     function getCode(){

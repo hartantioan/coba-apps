@@ -113,7 +113,7 @@ class HardwareItemController extends Controller
                         </i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="History" onclick="historyUsage(' . $val->id . ')"><i class="material-icons dp48">change_history
                         </i></button>
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ');getReception('.$val->id.')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -135,6 +135,16 @@ class HardwareItemController extends Controller
         return response()->json($response);
     }
 
+    public function getReception(Request $request){
+        $query = HardwareItem::find($request->id);
+        $ada=false;
+        if($query->receptionHardwareItemsUsageALL()->exists()){
+            $ada = true;
+        }
+        $response['ada']=$ada;
+        return response()->json($response);
+    }
+
     public function getCode(Request $request){
         $code = HardwareItem::generateCode();
         				
@@ -142,18 +152,34 @@ class HardwareItemController extends Controller
     }
 
     public function Edit(Request $request){
-        $validation = Validator::make($request->all(), [
-            'item'                       => 'required',
-            'item_group_id_edit'         => 'required',
-            'detail1_edit'               => 'required',
-           
-        ], [
-            
-           
-            'item.required'          => 'Harap Isi Item.',
-            'detail1_edit.required'      => 'Harap isi detail item',
-            'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
-        ]);
+        $query=null;
+        if($request->temp){
+            $query = HardwareItem::find($request->temp);
+        }
+        if($query){
+            if($query->receptionHardwareItemsUsageALL()->exists()){
+                $validation = Validator::make($request->all(), [
+                
+                ], [
+                    
+                
+                ]);
+            }
+        }else{
+            $validation = Validator::make($request->all(), [
+                'item'                       => 'required',
+                'item_group_id_edit'         => 'required',
+                'detail1_edit'               => 'required',
+               
+            ], [
+                
+               
+                'item.required'          => 'Harap Isi Item.',
+                'detail1_edit.required'      => 'Harap isi detail item',
+                'item_group_id_edit.required'    => 'Harap pilih Group item Asset.',
+            ]);
+        }
+        
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -166,19 +192,21 @@ class HardwareItemController extends Controller
                 try {
                     $query = HardwareItem::find($request->temp);
                     if($query->receptionHardwareItemsUsageALL()->exists()){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Inventaris telah di serah terima dan tidak boleh dilakukan pembaruan/edit',
-                        ]);
+                        $query->status          = $request->status ? $request->status : '2';
+                    
+                        $query->save();
+                        DB::commit();
+                    }else{
+                        $query->item	        = $request->item;
+                        $query->hardware_item_group_id	        = $request->item_group_id_edit;
+                        $query->detail1	        = $request->detail1_edit;
+                    
+                        $query->status          = $request->status ? $request->status : '2';
+                    
+                        $query->save();
+                        DB::commit();
                     }
-                    $query->item	        = $request->item;
-                    $query->hardware_item_group_id	        = $request->item_group_id_edit;
-                    $query->detail1	        = $request->detail1_edit;
-                 
-                    $query->status          = $request->status ? $request->status : '2';
-                
-                    $query->save();
-                    DB::commit();
+                    
                 }catch(\Exception $e){
                     DB::rollback();
                 }
@@ -524,7 +552,7 @@ class HardwareItemController extends Controller
             $data = [
                 'data' => $RH,
             ];
-            $img_path = 'website/logo_web_fix.png';
+            $img_path = 'website/logo_web_small.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
             $img_base_64 = base64_encode($image_temp);

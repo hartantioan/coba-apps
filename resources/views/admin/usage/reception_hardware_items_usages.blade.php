@@ -94,10 +94,9 @@
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.item') }}</th>
                                                         <th>{{ __('translations.location') }}</th>
-                                                        <th>{{ __('translations.date') }}</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>
-                                                        <th>User(Bersangkutan)</th>
+                                                        <th>Penerima</th>
                                                         <th>Tanggal Pengembalian</th>
                                                         <th>Keterangan Pengembalian</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -196,7 +195,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>Pengembalian {{ $title }} <span id="code_recept_id"><span></h4>
+                <h4>Pengembalian <span id="code_recept_id"><span></h4>
                 <form class="row" id="form_data1" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert1" style="display:none;"></div>
@@ -204,11 +203,11 @@
                     <div class="col s12">
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp"> 
-                            <input type="date" id="date" name="date"  onchange="loadDataTable()">
+                            <input type="date" id="date_kembali" name="date"  onchange="loadDataTable()">
                             <label class="active" for="date">Date(tanggal)</label>
                         </div>
                         <div class="input-field col s12">
-                            <input id="info" name="info" type="text" placeholder="Info">
+                            <input id="info_kembali" name="info" type="text" placeholder="Info">
                             <label class="active" for="info">{{ __('translations.note') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
@@ -410,7 +409,7 @@
         $('#modal2').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+  
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#name').focus();
@@ -419,7 +418,9 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
+                $('#form_data1')[0].reset();
+                $('#info_kembali').empty();
+                $('#date_kembali').empty();
                 $('#temp').val('');
                 M.updateTextFields();
             }
@@ -439,6 +440,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data2')[0].reset();
                 $('#user_id1').empty();
+                $('#date1').empty();
+                $('#info1').empty();
                 $('#tempes').val('');
                 M.updateTextFields();
             }
@@ -447,25 +450,24 @@
     });
 
     function getDetail(){
-    
+        
         if($('#hardware_item_id').val()){
             let params = $('#hardware_item_id').select2('data')[0].detail1;
             $('#detail1').val(params);
         }else{
             $('#detail1').val('');
         }
-        if($('#tempes').val() != '' || $('#temp').val() != '' ){
-            if($('#user_id').val()){
-                let paramsdivisi = $('#user_id').select2('data')[0].division;
-                $('#division').val(paramsdivisi);
-           
-            }
-            if($('#user_id1').val()){
-                let paramsdivisi = $('#user_id1').select2('data')[0].division;
-                $('#division1').val(paramsdivisi);
-            
-            }
+        if($('#user_id').val()){
+            let paramsdivisi = $('#user_id').select2('data')[0].division;
+            $('#division').val(paramsdivisi);
+        
         }
+        if($('#user_id1').val()){
+            let paramsdivisi = $('#user_id1').select2('data')[0].division;
+            $('#division1').val(paramsdivisi);
+        
+        }
+        
         
     }
 
@@ -510,7 +512,7 @@
     }
     function openmodal(id){
         var itemId = $(this).data('item-id');
-        console.log(id);
+        
         $.ajax({
             url: '{{ Request::url() }}/modal_print',
             type: 'POST',
@@ -573,7 +575,6 @@
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },
-                { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
                 { name: 'date', className: 'center-align' },
@@ -800,13 +801,13 @@
                 $('#date').val(response.date);
                 $('#location').val(response.location);
                 $('#tab_user').hide();
-                $('#division').val(response.division);
+               
                 $('#tab_hardware').hide();
                 $('#tab_user_edit').show();
                 $('#tab_hardware_edit').show();
                 $('#item_edit').val(response.name);
                 $('#user_edit').val(response.user.name);
-             
+                $('#division').val(response.division);
                 
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
@@ -839,6 +840,7 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                $('#code_recept_id').empty();
                 $('#modal2').modal('open');
                 $('#temp').val(id);
                 $('#code_recept_id').append(response.code);
@@ -929,7 +931,7 @@
     }
 
     function printData(id){
-        console.log(id);
+        
          $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print',
@@ -948,7 +950,7 @@
     }
 
     function printDataReturn(id){
-        console.log(id);
+       
          $.ajax({
             type : "POST",
             url  : '{{ Request::url() }}/print_return',

@@ -330,8 +330,7 @@
                     </table>
                     
                     <br>        
-                    Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> dalam hal ini diwakili oleh Departemen EDP/MIS sebagai kontroler inventaris 
-                    perangkat Hardware Komputer.
+                    Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> diwakili oleh departemen yang bersangkutan.
                     <br>
                     <br>
                     Demikian surat pernyataan ini dibuat dan ditandatangani oleh yang mengembalikan dan menerima kembali inventaris tersebut.

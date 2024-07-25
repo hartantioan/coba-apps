@@ -11,18 +11,23 @@
                 font-family: Tahoma, "Trebuchet MS", sans-serif;
             }
             @page { size: 3cm 5cm landscape;
-                    margin-top: 20%; } 
+                    margin-top: 5%; } 
         </style>
     </head>
     <body>
-        <main>
-            <div align="center" style="font-size: 6px">
-                <span>{{ $data->code }}-{{$data->item}}</span>
-                <div>{{ (strlen($data->detail1) > 20) ? substr($data->detail1, 0, 20).'...' : $data->detail1 }}</div>
+        <main style="padding: 0.1cm">
             
-                <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="50%" />
-            
-                <img src="{{ $image }}" style="position: absolute; top:5px; width:100%; margin-top: 45%;" align="right">
+            <div style="font-size: 6px">
+                <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: fixed;bottom:40px;right: -35px;width:4.5cm;height:0.5cm" />
+                <img src="{{ $image }}" style="position: fixed;top:25px;left:-40px; width:50%;">
+                <div style="position: fixed;bottom:14px;left:25px;font-size:10px;width:100%">{{ $data->code }} - {{$data->item}}</div>
+                <div>
+                
+                
+                </div>
+                <div style="position: fixed;bottom:4px;left:25px;font-size:8px;">{{ (strlen($data->detail1) > 20) ? substr($data->detail1, 0, 20).'...' : $data->detail1 }}</div>
+                <div style="position: fixed; top:35px;left:-25px; width:200%; margin-top: 50%;font-size:9px;">PT SUPERIOR PORCELAIN SUKSES</div>
+
             </div>
             
         </main>

@@ -74,7 +74,7 @@ class HardwareItem extends Model
     {
         $year = Carbon::now()->format('y'); // Get the last two digits of the year
         $cek = 'IT' . $year;
-        $query = HardwareItem::selectRaw('RIGHT(code, 5) as code')
+        $query = HardwareItem::selectRaw('RIGHT(code, 4) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
             ->orderByDesc('id')
@@ -87,7 +87,7 @@ class HardwareItem extends Model
             $code = '00001';
         }
 
-        $no = str_pad($code, 5, '0', STR_PAD_LEFT); // Ensure the number is padded to 5 digits
+        $no = str_pad($code, 4, '0', STR_PAD_LEFT); // Ensure the number is padded to 5 digits
 
         return $cek . $no;
     }

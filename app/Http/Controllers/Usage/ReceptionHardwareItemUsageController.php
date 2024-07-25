@@ -250,7 +250,6 @@ class ReceptionHardwareItemUsageController extends Controller
                     $button = '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="returnItem(' . $val->id . ')"><i class="material-icons dp48">call_missed_outgoing</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' .  $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }if($val->status == 2 ){
@@ -266,7 +265,6 @@ class ReceptionHardwareItemUsageController extends Controller
                     $val->hardwareItem->code ?? '',
                     $val->hardwareItem->item ?? '',
                     $val->location,
-                    date('d/m/Y',strtotime($val->date)),
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,
                     $val->account->name ?? '',

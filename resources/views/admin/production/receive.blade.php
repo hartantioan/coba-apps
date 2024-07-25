@@ -1594,6 +1594,8 @@
                         if(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) !== rowtotal){
                             passedQty = false;
                         }
+                    }else{
+                        passedQty = false;
                     }
                     if(!$('select[name^="arr_warehouse[]"]').eq(index).val()){
                         passedInput = false;
@@ -1609,7 +1611,7 @@
                 if(!passedQty){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty diterima dan qty batch tidak sama.',
+                        text: 'Qty diterima dan qty batch tidak sama. Selain itu batch tidak boleh kosong.',
                         icon: 'error'
                     });
 

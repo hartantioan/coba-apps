@@ -4665,7 +4665,7 @@ class Select2Controller extends Controller {
                         $query->where('production_order_detail_id',$request->pod_id);
                     }
                 })
-                ->whereIn('status',['2','3'])
+                ->whereIn('status',['2'])
                 ->orderBy('created_at')
                 ->get();
 

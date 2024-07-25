@@ -233,37 +233,6 @@
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Pengiriman</legend>
-                                    <div class="input-field col m12 s12 row">
-                                        <h6><b>Info Pengiriman MOD</b></h6>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-sender">-</span>
-                                            <label class="active" for="">Broker</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-outlet">-</span>
-                                            <label class="active" for="">{{ __('translations.outlet') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-address">-</span>
-                                            <label class="active" for="">{{ __('translations.address') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-province">-</span>
-                                            <label class="active" for="">{{ __('translations.province') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-city">-</span>
-                                            <label class="active" for="">Kota/Kabupaten</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-district">-</span>
-                                            <label class="active" for="">{{ __('translations.subdistrict') }}</label>
-                                        </div>
-                                        <div class="input-field col m3 s12">
-                                            <span id="info-subdistrict">-</span>
-                                            <label class="active" for="">{{ __('translations.urban_village') }}</label>
-                                        </div>
-                                    </div>
                                     <div class="input-field col m3 s12 step6">
                                         <select class="browser-default select2" id="user_driver_id" name="user_driver_id" onchange="getDriverInformation();">
                                             <option value="">--Silakan pilih MOD--</option>
@@ -871,13 +840,6 @@ document.addEventListener('focusin', function (event) {
                 };
                 $('#user_driver_id').empty().append(`<option value="">--Silakan pilih MOD--</option>`);
                 $('#driver_name,#driver_hp').prop("readonly", false);
-                $('#info-sender').text('-');
-                $('#info-outlet').text('-');
-                $('#info-address').text('-');
-                $('#info-province').text('-');
-                $('#info-city').text('-');
-                $('#info-district').text('-');
-                $('#info-subdistrict').text('-');
             }
         });
 
@@ -987,13 +949,6 @@ document.addEventListener('focusin', function (event) {
                         $('#marketing_order_delivery_id').empty();
                     }else{
                         $('#post_date').val(response.delivery_date);
-                        $('#info-sender').text(response.sender);
-                        $('#info-outlet').text(response.outlet);
-                        $('#info-address').text(response.address);
-                        $('#info-province').text(response.province);
-                        $('#info-city').text(response.city);
-                        $('#info-district').text(response.district);
-                        $('#info-subdistrict').text(response.subdistrict);
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
 
@@ -1074,7 +1029,6 @@ document.addEventListener('focusin', function (event) {
                 <option value="">--Kosong / Tambah baru--</option>
             `);
             $('#post_date').val('{{ date("Y-m-d") }}');
-            $('#info-sender,#info-outlet,#info-address,#info-province,#info-city,#info-district,#info-subdistrict').text('-');
         }
     }
 
@@ -1946,13 +1900,6 @@ document.addEventListener('focusin', function (event) {
                 $('#note_external').val(response.note_external);
                 $('#vehicle_name').val(response.vehicle_name);
                 $('#vehicle_no').val(response.vehicle_no);
-                $('#info-sender').text(response.sender);
-                $('#info-outlet').text(response.outlet);
-                $('#info-address').text(response.address);
-                $('#info-province').text(response.province);
-                $('#info-city').text(response.city);
-                $('#info-district').text(response.district);
-                $('#info-subdistrict').text(response.subdistrict);
 
                 if(response.drivers.length > 0){
                     $('#user_driver_id').empty().append(`
@@ -2322,13 +2269,6 @@ document.addEventListener('focusin', function (event) {
                     $('#note_external').val(response.note_external);
                     $('#vehicle_name').val(response.vehicle_name);
                     $('#vehicle_no').val(response.vehicle_no);
-                    $('#info-sender').text(response.sender);
-                    $('#info-outlet').text(response.outlet);
-                    $('#info-address').text(response.address);
-                    $('#info-province').text(response.province);
-                    $('#info-city').text(response.city);
-                    $('#info-district').text(response.district);
-                    $('#info-subdistrict').text(response.subdistrict);
 
                     if(response.drivers.length > 0){
                         $('#user_driver_id').empty().append(`

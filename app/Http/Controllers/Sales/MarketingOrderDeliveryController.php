@@ -293,7 +293,7 @@ class MarketingOrderDeliveryController extends Controller
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_id'      => $row->place_id,
                         'place_name'    => $row->place->code,
-                        'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlace($row->place_id) / $row->qty_conversion,3)),
+                        'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlaceWithUnsentSales($row->place_id) / $row->qty_conversion,3)),
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
                         'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
@@ -486,8 +486,9 @@ class MarketingOrderDeliveryController extends Controller
                 $itemstock = ItemStock::find($rowstock['item_stock_id']);
                 if($itemstock){
                     $qtyconversion = $rowstock['qty'] * $rowstock['conversion'];
-                    if($itemstock->qty < $qtyconversion){
-                        $errorMessage[] = 'Item '.$itemstock->item->code.' - '.$itemstock->item->name.' kurang dari stok. Kebutuhan '.CustomHelper::formatConditionalQty($qtyconversion).' sedangkan stok '.CustomHelper::formatConditionalQty($itemstock->qty);
+                    $stock = $itemstock->balanceWithUnsent();
+                    if($stock < $qtyconversion){
+                        $errorMessage[] = 'Item '.$itemstock->item->code.' - '.$itemstock->item->name.' kurang dari stok. Kebutuhan '.CustomHelper::formatConditionalQty($qtyconversion).' sedangkan stok '.CustomHelper::formatConditionalQty($stock);
                     }
                 }
             }

@@ -795,6 +795,16 @@ class Item extends Model
         return $total;
     }
 
+    public function getStockPlaceWithUnsentSales($place_id){
+        $total = 0;
+
+        foreach($this->itemStock()->where('place_id',$place_id)->get() as $row){
+            $total += $row->balanceWithUnsent();
+        }
+
+        return $total;
+    }
+
     public function getStockArrayPlace($arr){
         $total = $this->itemStock()->whereIn('place_id',$arr)->sum('qty');
 

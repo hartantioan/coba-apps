@@ -316,13 +316,6 @@ class MarketingOrderDeliveryProcessController extends Controller
             $data['message'] = 'MOD No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
         }else{
             if(!$data->marketingOrderDeliveryProcess()->exists()){
-                $data['outlet'] = $data->marketingOrder->outlet->name;
-                $data['sender'] = $data->account->name;
-                $data['address'] = $data->marketingOrder->destination_address;
-                $data['province'] = $data->marketingOrder->province->name;
-                $data['city'] = $data->marketingOrder->city->name;
-                $data['district'] = $data->marketingOrder->district->name;
-                $data['subdistrict'] = $data->marketingOrder->subdistrict->name;
 
                 CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Surat Jalan');
 

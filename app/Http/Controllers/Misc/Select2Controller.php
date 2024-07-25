@@ -2489,15 +2489,16 @@ class Select2Controller extends Controller {
         $item       = $request->item_id;
         $data = ItemStock::where('item_id',$item)
                     ->where('place_id',$place)
-                    ->where('qty','>',0)
                     ->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'    => $d->id,
-                'text' 	=> $d->place->code.' &#9830; Gudang : '.$d->warehouse->name.' &#9830; Area : '.($d->area()->exists() ? $d->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($d->qty).' '.$d->item->uomUnit->code.' &#9830; Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
-                'qty'   => CustomHelper::formatConditionalQty($d->qty),
-            ];
+            if($d->balanceWithUnsent() > 0){
+                $response[] = [
+                    'id'    => $d->id,
+                    'text' 	=> $d->place->code.' &#9830; Gudang : '.$d->warehouse->name.' &#9830; Area : '.($d->area()->exists() ? $d->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent()).' '.$d->item->uomUnit->code.' &#9830; Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
+                    'qty'   => CustomHelper::formatConditionalQty($d->balanceWithUnsent()),
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);

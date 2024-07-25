@@ -699,6 +699,7 @@
                                             <tr>
                                                 <th class="center-align">Kode Dokumen</th>
                                                 <th class="center-align">Tgl.Post</th>
+                                                <th class="center-align">Tgl.Jatuh Tempo</th>
                                                 <th class="center-align">{{ __('translations.total') }}</th>
                                                 <th class="center-align">{{ __('translations.tax') }}</th>
                                                 <th class="center-align">{{ __('translations.wtax') }}</th>
@@ -1725,6 +1726,9 @@
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.due_date + `
                                     </td>
                                     <td class="right-align">
                                         ` + val.total + `

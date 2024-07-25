@@ -1851,7 +1851,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.'-'.$d->name,
+                'text' 			=> $d->name,
             ];
         }
         return response()->json(['items' => $response]);

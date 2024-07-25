@@ -398,7 +398,7 @@
                                 @foreach($data->paymentRequestCost as $key => $row)
                                 <tr>
                                     <td align="center">{{ ($key + 1) }}</td>
-                                    <td>{{ $row->coa->code.' - '.$row->coa->name }}</td>
+                                    <td>{{ ($row->coa->prefix ? $row->coa->prefix.'-' : '') . $row->coa->code . ' - ' . $row->coa->name }}</td>
                                     <td align="center">{{ ($row->place()->exists() ? $row->place->code : '-') }}</td>
                                     <td align="center">{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                                     <td align="center">{{ ($row->machine()->exists() ? $row->machine->name : '-') }}</td>

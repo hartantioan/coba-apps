@@ -846,7 +846,6 @@
                                             <thead>
                                                 <tr>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                                 </tr>
@@ -1127,7 +1126,6 @@
                                             <thead>
                                                 <tr>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                                 </tr>
@@ -1873,7 +1871,6 @@
                                             <thead>
                                                 <tr>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
-                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tangki</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
                                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
                                                 </tr>

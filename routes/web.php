@@ -1067,6 +1067,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[HardwareItemGroupController::class, 'index']);
                         Route::get('datatable',[HardwareItemGroupController::class, 'datatable']);
                         Route::post('show', [HardwareItemGroupController::class, 'show']);
+                        Route::post('get_reception', [HardwareItemGroupController::class, 'getReception']);
                         Route::post('create',[HardwareItemGroupController::class, 'create'])->middleware('operation.access:hardware_item_group,update');
                         Route::post('destroy', [HardwareItemGroupController::class, 'destroy'])->middleware('operation.access:hardware_item_group,delete');
                     });

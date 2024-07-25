@@ -360,6 +360,51 @@
             }
         });
     }
+    function getReception(id){
+        $.ajax({
+            url: '{{ Request::url() }}/get_reception',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if (response.ada) {
+                    disableFields();
+                } else {
+                    enableFields();
+                }
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+        
+    }
+
+    function disableFields() {
+        $('#code').prop('disabled', true);
+        $('#name').prop('disabled', true);
+    }
+
+    function enableFields() {
+        $('#code').prop('disabled', false);
+        $('#name').prop('disabled', false);
+       
+    }
+
 
     function destroy(id){
         swal({

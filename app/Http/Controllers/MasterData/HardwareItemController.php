@@ -104,7 +104,7 @@ class HardwareItemController extends Controller
                     $nomor,
                     $val->code,
                     $val->item,
-                    $val->hardwareItemGroup->code.' - '.$val->hardwareItemGroup->name,
+                    $val->hardwareItemGroup->name,
                     $val->detail1,
                   
                     $val->status(),

@@ -86,7 +86,7 @@ class HardwareItemGroupController extends Controller
                     $val->name,
                     $val->status(),
                     '
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ');getReception('.$val->id.')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -108,22 +108,71 @@ class HardwareItemGroupController extends Controller
         return response()->json($response);
     }
 
+    public function getReception(Request $request){
+        $query = HardwareItemGroup::find($request->id);
+        $ada=false;
+        if($query->hardwareItem()->exists()){
+            foreach($query->hardwareItem as $row_hwitem){
+                if($row_hwitem->receptionHardwareItemsUsageALL()->exists()){
+                    $ada = true;
+                }
+            }
+        }
+        
+        $response['ada']=$ada;
+        return response()->json($response);
+    }
+
     public function show(Request $request){
         $HardwareItemGroup = HardwareItemGroup::find($request->id);  
 		return response()->json($HardwareItemGroup);
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'code'              => $request->temp ? ['required', Rule::unique('hardware_item_groups', 'code')->ignore($request->temp)] : 'required|unique:hardware_item_groups,code',
-            'name'              => 'required',
-           
-        ], [
-            'code.required' 	        => 'Kode tidak boleh kosong.',
-            'code.unique'               => 'Kode telah terpakai.',
-            'name.required'             => 'Nama tidak boleh kosong.',
-        ]);
-
+        $query=null;
+        if($request->temp){
+            $query = HardwareItemGroup::find($request->temp);
+        }
+        if($query){
+            $ada=false;
+            if($query->hardwareItem()->exists()){
+                foreach($query->hardwareItem as $row_hwitem){
+                    if($row_hwitem->receptionHardwareItemsUsageALL()->exists()){
+                        $ada = true;
+                    }
+                }
+            }
+            if($ada == true){
+                $validation = Validator::make($request->all(), [
+                
+                ], [
+                    
+                
+                ]);
+            }else{
+                $validation = Validator::make($request->all(), [
+                    'code'              => $request->temp ? ['required', Rule::unique('hardware_item_groups', 'code')->ignore($request->temp)] : 'required|unique:hardware_item_groups,code',
+                    'name'              => 'required',
+                   
+                ], [
+                    'code.required' 	        => 'Kode tidak boleh kosong.',
+                    'code.unique'               => 'Kode telah terpakai.',
+                    'name.required'             => 'Nama tidak boleh kosong.',
+                ]);
+            }
+        }else{
+            $validation = Validator::make($request->all(), [
+                'code'              => $request->temp ? ['required', Rule::unique('hardware_item_groups', 'code')->ignore($request->temp)] : 'required|unique:hardware_item_groups,code',
+                'name'              => 'required',
+               
+            ], [
+                'code.required' 	        => 'Kode tidak boleh kosong.',
+                'code.unique'               => 'Kode telah terpakai.',
+                'name.required'             => 'Nama tidak boleh kosong.',
+            ]);
+    
+        }
+        
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -134,12 +183,27 @@ class HardwareItemGroupController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = HardwareItemGroup::find($request->temp);
-                    $query->code            = $request->code;
-                    $query->name	        = $request->name;
-                    $query->department_id	= $request->department_id;
-                    $query->status          = $request->status ? $request->status : '2';
-                    $query->save();
-                    DB::commit();
+                    $ada = false;
+                    if($query->hardwareItem()->exists()){
+                        foreach($query->hardwareItem as $row_hwitem){
+                            if($row_hwitem->receptionHardwareItemsUsageALL()->exists()){
+                                $ada = true;
+                            }
+                        }
+                    }
+
+                    if($ada == true){
+                        $query->status          = $request->status ? $request->status : '2';
+                        $query->save();
+                        DB::commit();
+                    }else{
+                        $query->code            = $request->code;
+                        $query->name	        = $request->name;
+                        $query->status          = $request->status ? $request->status : '2';
+                        $query->save();
+                        DB::commit();
+                    }
+                    
                 }catch(\Exception $e){
                     DB::rollback();
                 }
@@ -149,7 +213,6 @@ class HardwareItemGroupController extends Controller
                     $query = HardwareItemGroup::create([
                         'code'          => $request->code,
                         'name'			=> $request->name,
-                        'department_id'	=> $request->department_id,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

@@ -36,6 +36,11 @@ class HardwareItemGroup extends Model
 
         return $status;
     }
+
+    public function hardwareItem(){
+        return $this->hasMany('App\Models\HardwareItem');
+    }
+
     public function department(){
         return $this->belongsTo('App\Models\Division','department_id','id')->withTrashed();
     }

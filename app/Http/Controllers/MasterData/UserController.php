@@ -38,6 +38,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Imports\ImportUser;
 use App\Models\NonStaffCompany;
+use App\Models\UserDestination;
 
 class UserController extends Controller
 {
@@ -296,6 +297,7 @@ class UserController extends Controller
         $banks = [];
         $infos = [];
         $drivers = [];
+        $destinations = [];
 
         foreach($data->userBank as $row){
             $banks[] = $row->bank.' No. rek '.$row->no.' Cab. '.$row->branch.' '.$row->isDefault();
@@ -306,8 +308,15 @@ class UserController extends Controller
             $province = $row->province()->exists() ? $row->province->name : '';
             $city = $row->city()->exists() ? $row->city->name : '';
             $district = $row->district()->exists() ? $row->district->name : '';
-            $subdistrict = $row->subdistrict()->exists() ? $row->subdistrict->name : '';
-            $infos[] = $row->title.' '.$row->content.' '.$row->npwp.' '.$row->address.' - '.$subdistrict.' - '.$district.' - '.$city.' - '.$province.' - '.$country;
+            $infos[] = $row->title.' '.$row->content.' '.$row->npwp.' '.$row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
+        }
+
+        foreach($data->userDestination as $row){
+            $country = $row->country()->exists() ? $row->country->name : '';
+            $province = $row->province()->exists() ? $row->province->name : '';
+            $city = $row->city()->exists() ? $row->city->name : '';
+            $district = $row->district()->exists() ? $row->district->name : '';
+            $destinations[] = $row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
         }
 
         foreach($data->userDriver as $row){
@@ -327,10 +336,6 @@ class UserController extends Controller
                             <tr>
                                 <th>Alamat</th>
                                 <th>'.$data->address.'</th>
-                            </tr>
-                            <tr>
-                                <th>Kelurahan</th>
-                                <th>'.($data->subdistrict_id ? $data->subdistrict->name : '-').'</th>
                             </tr>
                             <tr>
                                 <th>Kecamatan</th>
@@ -393,6 +398,10 @@ class UserController extends Controller
                                 <th>'.$data->pic.'</th>
                             </tr>
                             <tr>
+                                <th>JABATAN PIC</th>
+                                <th>'.$data->pic_position.'</th>
+                            </tr>
+                            <tr>
                                 <th>Kontak PIC</th>
                                 <th>'.$data->pic_no.'</th>
                             </tr>
@@ -427,6 +436,10 @@ class UserController extends Controller
                             <tr>
                                 <th>Alamat Penagihan</th>
                                 <th>'.implode('<br>',$infos).'</th>
+                            </tr>
+                            <tr>
+                                <th>Alamat Pengiriman</th>
+                                <th>'.implode('<br>',$destinations).'</th>
                             </tr>
                             <tr>
                                 <th>Daftar Supir</th>
@@ -474,7 +487,6 @@ class UserController extends Controller
                 /* 'province_id'       => 'required',
                 'city_id'           => 'required',
                 'district_id'       => 'required',
-                'subdistrict_id'    => 'required', */
                 // 'country_id'        => 'required',
                 // 'limit_credit'      => 'required',
                 // 'employee_type'     => 'required',
@@ -496,8 +508,7 @@ class UserController extends Controller
                 // 'company.required'              => 'Perusahaan tidak boleh kosong.',
                 /* 'province_id.required'          => 'Provinsi tidak boleh kosong.',
                 'city_id.required'              => 'Kota tidak boleh kosong.',
-                'district_id.required'          => 'Kecamatan tidak boleh kosong.',
-                'subdistrict_id.required'       => 'Kelurahan tidak boleh kosong.', */
+                'district_id.required'          => 'Kecamatan tidak boleh kosong.',*/
                 // 'country_id.required'           => 'Negara tidak boleh kosong.',
                 // 'limit_credit.required'         => 'Limit BS Karyawan tidak boleh kosong.',
                 // 'employee_type.required'        => 'Tipe Pegawai tidak boleh kosong.',
@@ -514,7 +525,6 @@ class UserController extends Controller
                 'province_id'       => 'required',
                 'city_id'           => 'required',
                 'district_id'       => 'required',
-                'subdistrict_id'    => 'required',
                 'pic'               => 'required',
                 'pic_no'            => 'required', */
                 'office_no'         => 'required',
@@ -533,8 +543,7 @@ class UserController extends Controller
                 'type.required'	                => 'Tipe pengguna tidak boleh kosong.',
                 /* 'province_id.required'          => 'Provinsi tidak boleh kosong.',
                 'city_id.required'              => 'Kota tidak boleh kosong.',
-                'district_id.required'          => 'Kecamatan tidak boleh kosong.',
-                'subdistrict_id.required'       => 'Kelurahan tidak boleh kosong.', */
+                'district_id.required'          => 'Kecamatan tidak boleh kosong.',*/
                 'pic.required'                  => 'PIC tidak boleh kosong.',
                 'pic_no.required'               => 'Nomor PIC tidak boleh kosong.',
                 'office_no.required'            => 'Nomor Kantor tidak boleh kosong.',
@@ -614,11 +623,11 @@ class UserController extends Controller
                     $query->province_id     = $request->province_id;
                     $query->city_id         = $request->city_id;
                     $query->district_id     = $request->district_id;
-                    $query->subdistrict_id  = $request->subdistrict_id;
                     $query->tax_id          = $request->tax_id;
                     $query->tax_name        = $request->tax_name;
                     $query->tax_address     = $request->tax_address;
                     $query->pic             = $request->pic ? $request->pic : NULL;
+                    $query->pic_position    = $request->pic_position ? $request->pic_position : NULL;
                     $query->pic_no          = $request->pic_no ? $request->pic_no : NULL;
                     $query->office_no       = $request->office_no ? $request->office_no : NULL;
                     $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : ($query->limit_credit > 0 ? $query->limit_credit : 0);
@@ -660,11 +669,11 @@ class UserController extends Controller
                         'province_id'	        => $request->province_id ? $request->province_id : NULL,
                         'city_id'               => $request->city_id ? $request->city_id : NULL,
                         'district_id'           => $request->district_id ? $request->district_id : NULL,
-                        'subdistrict_id'        => $request->subdistrict_id ? $request->subdistrict_id : NULL,
                         'tax_id'                => $request->tax_id ? $request->tax_id : NULL,
                         'tax_name'              => $request->tax_name ? $request->tax_name : NULL,
                         'tax_address'           => $request->tax_address ? $request->tax_address : NULL,
                         'pic'                   => $request->pic ? $request->pic : NULL,
+                        'pic_position'          => $request->pic_position ? $request->pic_position : NULL,
                         'pic_no'                => $request->pic_no ? $request->pic_no : NULL,
                         'office_no'             => $request->office_no ? $request->office_no : NULL,
                         'limit_credit'          => $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : 0,
@@ -730,6 +739,7 @@ class UserController extends Controller
 
                 if($request->arr_title){
                     $query->userData()->whereNotIn('id',$request->arr_id_data)->delete();
+                    $checked = isset($request->check_info) ? intval($request->check_info) : '';
                     foreach($request->arr_title as $key => $row){
                         if($request->arr_id_data[$key]){
                             UserData::find(intval($request->arr_id_data[$key]))->update([
@@ -741,7 +751,7 @@ class UserController extends Controller
                                 'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
                                 'city_id'       => $request->arr_city[$key] ? $request->arr_city[$key] : NULL,
                                 'district_id'   => $request->arr_district[$key] ? $request->arr_district[$key] : NULL,
-                                'subdistrict_id'=> $request->arr_subdistrict[$key] ? $request->arr_subdistrict[$key] : NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
                             ]);
                         }else{
                             UserData::create([
@@ -754,7 +764,34 @@ class UserController extends Controller
                                 'province_id'   => $request->arr_province[$key] ? $request->arr_province[$key] : NULL,
                                 'city_id'       => $request->arr_city[$key] ? $request->arr_city[$key] : NULL,
                                 'district_id'   => $request->arr_district[$key] ? $request->arr_district[$key] : NULL,
-                                'subdistrict_id'=> $request->arr_subdistrict[$key] ? $request->arr_subdistrict[$key] : NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }
+                    }
+                }
+
+                if($request->arr_address_destination){
+                    $query->userDestination()->whereNotIn('id',$request->arr_id_data_destination)->delete();
+                    $checked = isset($request->check_destination) ? intval($request->check_destination) : '';
+                    foreach($request->arr_address_destination as $key => $row){
+                        if($request->arr_id_data_destination[$key]){
+                            UserDestination::find(intval($request->arr_id_data_destination[$key]))->update([
+                                'address'       => $request->arr_address_destination[$key] ?? NULL,
+                                'country_id'    => $request->arr_country_destination[$key] ?? NULL,
+                                'province_id'   => $request->arr_province_destination[$key] ?? NULL,
+                                'city_id'       => $request->arr_city_destination[$key] ?? NULL,
+                                'district_id'   => $request->arr_district_destination[$key] ?? NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }else{
+                            UserDestination::create([
+                                'user_id'	    => $query->id,
+                                'address'       => $request->arr_address_destination[$key] ?? NULL,
+                                'country_id'    => $request->arr_country_destination[$key] ?? NULL,
+                                'province_id'   => $request->arr_province_destination[$key] ?? NULL,
+                                'city_id'       => $request->arr_city_destination[$key] ?? NULL,
+                                'district_id'   => $request->arr_district_destination[$key] ?? NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
                             ]);
                         }
                     }
@@ -1289,6 +1326,7 @@ class UserController extends Controller
 		$user['banks'] = $banks;
 
         $datas = [];
+        $destinations = [];
 
         foreach($user->userData as $row){
 			$datas[] = [
@@ -1304,12 +1342,27 @@ class UserController extends Controller
                 'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
                 'district_id'       => $row->district_id ? $row->district_id : '',
                 'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
-                'subdistrict_id'    => $row->subdistrict_id ? $row->subdistrict_id : '',
-                'subdistrict_name'  => $row->subdistrict()->exists() ? $row->subdistrict->code.' - '.$row->subdistrict->name : '',
+                'is_default'        => $row->is_default
+            ];
+		}
+
+        foreach($user->userDestination as $row){
+			$destinations[] = [
+                'id'                => $row->id,
+                'address'           => $row->address,
+                'country_id'        => $row->country_id ? $row->country_id : '',
+                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                'province_id'       => $row->province_id ? $row->province_id : '',
+                'city_id'           => $row->city_id ? $row->city_id : '',
+                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                'district_id'       => $row->district_id ? $row->district_id : '',
+                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                'is_default'        => $row->is_default
             ];
 		}
 		
 		$user['datas'] = $datas;
+        $user['destinations'] = $destinations;
 
         $drivers = [];
 

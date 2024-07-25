@@ -30,7 +30,6 @@ class User extends Authenticatable
         'province_id',
         'city_id',
         'district_id',
-        'subdistrict_id',
         'id_card',
         'id_card_address',
         'type',
@@ -44,6 +43,7 @@ class User extends Authenticatable
         'tax_name',
         'tax_address',
         'pic',
+        'pic_position',
         'pic_no',
         'office_no',
         'email',
@@ -264,6 +264,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserData');
     }
 
+    public function userDestination(){
+        return $this->hasMany('App\Models\UserDestination');
+    }
+
     public function getBillingAddress(){
         $arr = [];
         foreach($this->userData as $row){
@@ -271,11 +275,10 @@ class User extends Authenticatable
             $province = $row->province()->exists() ? $row->province->name : '';
             $city = $row->city()->exists() ? $row->city->name : '';
             $district = $row->district()->exists() ? $row->district->name : '';
-            $subdistrict = $row->subdistrict()->exists() ? $row->subdistrict->name : '';
             $arr[] = [
                 'id'        => $row->id,
                 'npwp'      => $row->npwp,
-                'address'   => $row->address.' - '.$subdistrict.' - '.$district.' - '.$city.' - '.$province.' - '.$country,
+                'address'   => $row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country,
             ];
         }
         return $arr;
@@ -533,10 +536,6 @@ class User extends Authenticatable
 
     public function district(){
         return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
-    }
-
-    public function subdistrict(){
-        return $this->belongsTo('App\Models\Region','subdistrict_id','id')->withTrashed();
     }
 
     public function country(){

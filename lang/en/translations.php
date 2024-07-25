@@ -338,6 +338,7 @@ return [
     'valid_from'        => 'Valid From',
     'origin'            => 'Origin',
     'subdistrict'       => 'Subdistrict',
+    'district'          => 'District',
     'bp_type'           => 'BP Type',
     'expense'           => 'Expense',
     'reception'         => 'Reception',

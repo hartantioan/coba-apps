@@ -7,18 +7,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
 
-class UserData extends Model
+class UserDestination extends Model
 {
     use HasFactory, SoftDeletes, Notifiable;
 
-    protected $table = 'user_datas';
+    protected $table = 'user_destinations';
     protected $primaryKey = 'id';
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'user_id',
-        'title',
-        'content',
-        'npwp',
         'address',
         'country_id',
         'province_id',

@@ -324,13 +324,13 @@
                                 :
                             </td>
                             <td>
-                                {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}} 
+                               <b> {{$data->hardwareItem->detail1}} {{$data->hardwareItem->detail2}}</b> 
                             </td>
                         </tr>
                     </table>
                     
                     <br>        
-                    Dalam kondisi baik kepada managemen <b>PT. SUPERIOR PORCELAIN SUKSES</b> diwakili oleh departemen yang bersangkutan.
+                    Dalam kondisi baik kepada manajemen PT. SUPERIOR PORCELAIN SUKSES.
                     <br>
                     <br>
                     Demikian surat pernyataan ini dibuat dan ditandatangani oleh yang mengembalikan dan menerima kembali inventaris tersebut.

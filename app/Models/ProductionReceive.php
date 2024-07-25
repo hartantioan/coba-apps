@@ -263,7 +263,7 @@ class ProductionReceive extends Model
                 'shift_id'                  => $this->shift_id,
                 'group'                     => $this->group,
                 'line_id'                   => $this->line_id,
-                'post_date'                 => date('Y-m-d'),
+                'post_date'                 => $this->post_date,
                 'note'                      => 'PRODUCTION RECEIVE NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
                 'status'                    => '1',
             ]);
@@ -314,7 +314,12 @@ class ProductionReceive extends Model
                                             break;
                                         }
                                     }
-                                    $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    if($rowbom->bom->group == '1'){
+                                        $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
+                                        $totalbatch = round($row->qty * $price,2);
+                                    }else{
+                                        $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    }
                                     $total = $totalbatch;
                                     $nominal = $price;
                                 }else{
@@ -384,7 +389,12 @@ class ProductionReceive extends Model
                                                 break;
                                             }
                                         }
-                                        $price = $totalbatch / round($rowbom->qty * $row->qty,3);
+                                        if($rowbom->bom->group == '1'){
+                                            $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
+                                            $totalbatch = round($row->qty * $price,2);
+                                        }else{
+                                            $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                        }
                                         $total = $totalbatch;
                                         $nominal = $price;
                                     }else{

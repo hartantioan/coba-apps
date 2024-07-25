@@ -2013,7 +2013,7 @@ class TreeHelper {
                         if($purchase_request_detail->purchaseOrderDetail()->exists()){
                         
                             foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
-                                if($purchase_order_detail->purchaseOrder->isSecretPo){
+                                if($purchase_order_detail->purchaseOrder->isSecretPo()){
                                     $name = null;
                                    
                                 }else{

@@ -29,10 +29,12 @@ class ReceptionHardwareItemUsageController extends Controller
 
     public function fetchStorage(Request $request){
         $InStorage = HardwareItem::where('status', '1')
-                    ->whereHas('receptionHardwareItemsUsage', function ($query) {
-                        $query->where('status', '1');
-                    }, '=', 0)
-                    ->orDoesntHave('receptionHardwareItemsUsage')
+                    ->where(function ($query) {
+                        $query->whereHas('receptionHardwareItemsUsage', function ($subQuery) {
+                                $subQuery->where('status', '1');
+                            }, '=', 0)
+                            ->orDoesntHave('receptionHardwareItemsUsage');
+                    })
                     ->get();
         $item_ready=[];
         foreach ($InStorage as $item) {

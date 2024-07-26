@@ -146,6 +146,12 @@ class ProductionHandoverController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })->orWhereHas('productionFgReceive',function($query)use($search){
+                                $query->whereHas('productionOrderDetail',function($query) use ($search){
+                                    $query->whereHas('productionOrder',function($query) use ($search){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
+                                })->orWhere('code', 'like', "%$search%");
                             });
                     });
                 }
@@ -178,6 +184,12 @@ class ProductionHandoverController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })->orWhereHas('productionFgReceive',function($query)use($search){
+                                $query->whereHas('productionOrderDetail',function($query) use ($search){
+                                    $query->whereHas('productionOrder',function($query) use ($search){
+                                        $query->where('code', 'like', "%$search%");
+                                    });
+                                })->orWhere('code', 'like', "%$search%");;
                             });
                     });
                 }

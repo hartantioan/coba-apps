@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Helpers\CustomHelper;
+use Illuminate\Support\Facades\Date;
+use iio\libmergepdf\Merger;
 use App\Http\Controllers\Controller;
 use App\Models\Department;
 use App\Models\HardwareItem;
@@ -583,6 +586,66 @@ class HardwareItemController extends Controller
 
     }
 
+    public function printMultiA4(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            $pr = HardwareItem::whereIn('code',$request->arr_id)->get();
+               
+                
+            if($pr){
+                $data = [
+                    'title'     => 'Inventaris',
+                    'data'      => $pr
+                ];
+                $opciones_ssl=array(
+                    "ssl"=>array(
+                    "verify_peer"=>false,
+                    "verify_peer_name"=>false,
+                    ),
+                );
+                $img_path = 'website/logo_web_small.png';
+                $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                $image_temp = file_get_contents($img_path, false, stream_context_create($opciones_ssl));
+                $img_base_64 = base64_encode($image_temp);
+                $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                $data["image"]=$path_img;
+                $e_banking = 'website/payment_request_e_banking.jpeg';
+                $extencion_banking = pathinfo($e_banking, PATHINFO_EXTENSION);
+                $image_temp_banking = file_get_contents($e_banking);
+                $img_base_64_banking = base64_encode($image_temp_banking);
+                $path_img_banking = 'data:image/' . $extencion_banking . ';base64,' . $img_base_64_banking;
+                $data["e_banking"]=$path_img_banking;
+                $pdf = Pdf::loadView('admin.print.usage.multiple_a4_hardware_item_barcode', $data)->setPaper('a4', 'portrait');
+
+                $content = $pdf->download()->getOriginalContent();
+                $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
+                
+            }
+    
+
+            $response =[
+                'status'=>200,
+                'message'  =>$document_po
+            ];
+        }
+        
+		
+		return response()->json($response);
+    }
+
     public function import(Request $request)
     {
         try {
@@ -599,5 +662,65 @@ class HardwareItemController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
         }
+    }
+
+    public function printMultiSticker(Request $request){
+        $validation = Validator::make($request->all(), [
+            'arr_id'                => 'required',
+        ], [
+            'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
+        ]);
+        
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+            $var_link=[];
+            $currentDateTime = Date::now();
+            $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
+            foreach($request->arr_id as $key =>$row){
+                $pr = HardwareItem::where('code',$row)->first();
+               
+                
+                if($pr){
+                    $data = [
+                        'title'     => 'Inventaris',
+                        'data'      => $pr
+                    ];
+                    $img_path = 'website/logo_web_small.png';
+                    $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
+                    $image_temp = file_get_contents($img_path);
+                    $img_base_64 = base64_encode($image_temp);
+                    $path_img = 'data:image/' . $extencion . ';base64,' . $img_base_64;
+                    $data["image"]=$path_img;
+        
+                    $pdf = Pdf::loadView('admin.print.usage.hardware_item_barcode', $data);
+                    $content = $pdf->download()->getOriginalContent();
+                    $document_po = PrintHelper::savePrint($content); 
+                    $temp_pdf[]=$content;
+                }
+                    
+            }
+            $merger = new Merger();
+            foreach ($temp_pdf as $pdfContent) {
+                $merger->addRaw($pdfContent);
+            }
+
+
+            $result = $merger->merge();
+
+
+            $document_po = PrintHelper::savePrint($result);
+
+            $response =[
+                'status'=>200,
+                'message'  =>$document_po
+            ];
+        }
+        
+		
+		return response()->json($response);
     }
 }

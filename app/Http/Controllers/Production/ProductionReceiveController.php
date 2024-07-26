@@ -108,6 +108,10 @@ class ProductionReceiveController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionOrder',function($query) use ($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
                             });
                     });
                 }
@@ -140,6 +144,10 @@ class ProductionReceiveController extends Controller
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionOrder',function($query) use ($search){
+                                    $query->where('code', 'like', "%$search%");
+                                });
                             });
                     });
                 }

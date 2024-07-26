@@ -80,6 +80,16 @@
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printDataA4();">
+                                                <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                                                <span class="hide-on-small-onl">{{ __('translations.print') }} A4 Multi</span>
+                                                <i class="material-icons right">local_printshop</i>
+                                            </a>
+                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printDataStickerMulti();">
+                                                <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                                                <span class="hide-on-small-onl">{{ __('translations.print') }} Sticker Multi</span>
+                                                <i class="material-icons right">local_printshop</i>
+                                            </a>
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
@@ -654,10 +664,15 @@
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
+            select: {
+                style: 'multi'
+            },
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
-            ]
+                'columnsToggle',
+                'selectAll',
+                'selectNone',
+            ],
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
 
@@ -746,73 +761,73 @@
     }
     function saveEdit(){
 			
-    var formData = new FormData($('#form_data_edit')[0]);
-    
-    $.ajax({
-        url: '{{ Request::url() }}/edit',
-        type: 'POST',
-        dataType: 'JSON',
-        data: formData,
-        contentType: false,
-        processData: false,
-        cache: true,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        beforeSend: function() {
-            $('#validation_alert_edit').hide();
-            $('#validation_alert_edit').html('');
-            loadingOpen('.modal-content');
-        },
-        success: function(response) {
-            loadingClose('.modal-content');
-            if(response.status == 200) {
-                $('#modalEdit').modal('close');
-                loadDataTable();
-                M.toast({
-                    html: response.message
-                });
-            } else if(response.status == 422) {
-                $('#validation_alert_edit').show();
-                $('.modal-content').scrollTop(0);
-                
-                swal({
-                    title: 'Ups! Validation',
-                    text: 'Check your form.',
-                    icon: 'warning'
-                });
-
-                $.each(response.error, function(i, val) {
-                    $.each(val, function(i, val) {
-                        $('#validation_alert_edit').append(`
-                            <div class="card-alert card red">
-                                <div class="card-content white-text">
-                                    <p>` + val + `</p>
-                                </div>
-                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">×</span>
-                                </button>
-                            </div>
-                        `);
+        var formData = new FormData($('#form_data_edit')[0]);
+        
+        $.ajax({
+            url: '{{ Request::url() }}/edit',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert_edit').hide();
+                $('#validation_alert_edit').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    $('#modalEdit').modal('close');
+                    loadDataTable();
+                    M.toast({
+                        html: response.message
                     });
-                });
-            } else {
-                M.toast({
-                    html: response.message
+                } else if(response.status == 422) {
+                    $('#validation_alert_edit').show();
+                    $('.modal-content').scrollTop(0);
+                    
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert_edit').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
                 });
             }
-        },
-        error: function() {
-            $('.modal-content').scrollTop(0);
-            loadingClose('.modal-content');
-            swal({
-                title: 'Ups!',
-                text: 'Check your internet connection.',
-                icon: 'error'
-            });
-        }
-    });
-}
+        });
+    }
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -909,6 +924,69 @@
         });
     }
 
+    function printDataA4(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+        });
+        $.ajax({
+            url: '{{ Request::url() }}/print_multi_a4',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            },
+            success: function(response) {
+                window.open(response.message, '_blank');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+    }
+
+    function printDataStickerMulti(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+        });
+        $.ajax({
+            url: '{{ Request::url() }}/print_multi_sticker',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+            },
+            success: function(response) {
+                window.open(response.message, '_blank');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+        
+    }
    
 
     function itemChanged(){

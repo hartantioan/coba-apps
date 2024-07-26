@@ -1042,6 +1042,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail',[HardwareItemController::class, 'rowDetail']);
                         Route::post('show', [HardwareItemController::class, 'show']);
                         Route::post('print_barcode',[HardwareItemController::class, 'printBarcode']);
+                        Route::post('print_multi_a4',[HardwareItemController::class, 'printMultiA4']);
+                        Route::post('print_multi_sticker',[HardwareItemController::class, 'printMultiSticker']);
                         Route::post('history_usage',[HardwareItemController::class, 'historyUsage']);
                         Route::get('export',[HardwareItemController::class, 'export']);
                         Route::post('get_code', [HardwareItemController::class, 'getCode']);

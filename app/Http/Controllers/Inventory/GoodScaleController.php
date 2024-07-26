@@ -694,6 +694,15 @@ class GoodScaleController extends Controller
 
         $overtolerance = false;
 
+        $arrweight = explode('.',str_replace(',','.',str_replace('.','',$request->qtyOutUpdate)));
+
+        if(strlen($arrweight[0]) <= 3){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Berat timbang dibawah 1000, silahkan cek berat atau kalibrasi ulang koneksi dengan timbangan.'
+            ]);
+        }
+
         $gs = GoodScale::find($request->tempGoodScale);
 
         if($gs){

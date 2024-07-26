@@ -279,6 +279,11 @@ class ProductionFgReceive extends Model
         return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function totalBatchUsage(){
+        $total = $this->productionBatchUsage()->sum('qty');
+        return $total;
+    }
+
     public function createProductionIssue(){
         $lastSegment = 'production_issue';
         $menu = Menu::where('url', $lastSegment)->first();

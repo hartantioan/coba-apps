@@ -4588,6 +4588,36 @@ class CustomHelper {
 	
 					$total += $row->total;
 				}
+
+				if($row->qty_reject > 0){
+					if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
+						self::sendCogs($table_name,
+							$pir->id,
+							$pir->company_id,
+							$pir->place_id,
+							$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+							$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
+							$row->qty_reject,
+							0,
+							'IN',
+							$pir->post_date,
+							NULL,
+							NULL,
+							NULL,
+						);
+	
+						self::sendStock(
+							$pir->place_id,
+							$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+							$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
+							$row->qty_reject,
+							'IN',
+							NULL,
+							NULL,
+							NULL,
+						);
+					}
+				}
 			}
 
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
@@ -4691,6 +4721,39 @@ class CustomHelper {
 			]);
 
 			$pir->createProductionIssue();
+
+			$qtybatch = $pir->totalBatchUsage();
+			$qtystock = $pir->qty();
+			$balance = $qtybatch - $qtyStock;
+			if($balance > 0){
+				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
+					self::sendCogs($table_name,
+						$pir->id,
+						$pir->company_id,
+						$pir->place_id,
+						$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+						$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
+						$balance,
+						0,
+						'IN',
+						$pir->post_date,
+						NULL,
+						NULL,
+						NULL,
+					);
+
+					self::sendStock(
+						$pir->place_id,
+						$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+						$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
+						$balance,
+						'IN',
+						NULL,
+						NULL,
+						NULL,
+					);
+				}
+			}
 
 		}elseif($table_name == 'production_handovers'){
 
@@ -4797,6 +4860,10 @@ class CustomHelper {
 					'status'	=> '3'
 				]);
 			}
+
+			$pir->update([
+				'status'	=> '3'
+			]);
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 

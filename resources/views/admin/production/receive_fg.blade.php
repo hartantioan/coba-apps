@@ -371,6 +371,19 @@
                                                             </td>
                                                         </tr>
                                                     </tbody>
+                                                    <tfoot>
+                                                        <tr>
+                                                            <td class="right-align" colspan="8">
+                                                                
+                                                            </td>
+                                                            <td class="right-align" id="total-received" style="font-weight:700;">
+                                                                0,000
+                                                            </td>
+                                                            <td colspan="5">
+                                                                
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
                                                 </table>
                                             </p>
                                         </div>
@@ -762,6 +775,7 @@
                     $('.data-used').trigger('click');
                 }
                 $('#qty-unit,#sell-unit').text('-');
+                $('#total-received').text('0,000');
             }
         });
         
@@ -809,6 +823,7 @@
                     </tr>
                 `);
             }
+            countAll();
         });
 
         $('#body-batch').on('click', '.delete-data-batch', function() {
@@ -1209,6 +1224,14 @@
         }
     }
 
+    function countAll(){
+        let total = 0;
+        $('input[name^="arr_qty_uom[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-received').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
+    }
+
     function generateBarcode(){
         if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#shading').val() && $('#post_date').val()){
             let arrNo = [];
@@ -1317,6 +1340,7 @@
                                 `);
                             });
                             $('.modal-content').scrollTop($("#body-item").offset().top);
+                            countAll();
                         }
 
                         $('#pallet_id').empty(); 

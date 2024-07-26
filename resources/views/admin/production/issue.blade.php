@@ -220,6 +220,10 @@
                                         <label class="" for="line_id">{{ __('translations.line') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getProductionOrder();"></select>
+                                        <label class="active" for="production_order_detail_id">Daftar Order Produksi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
                                         <select class="browser-default" id="shift_id" name="shift_id"></select>
                                         <label class="active" for="shift_id">Shift</label>
                                     </div>
@@ -258,11 +262,7 @@
                         <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Order Produksi</legend>
-                                    <div class="input-field col m4 s12 step6">
-                                        <select class="browser-default" id="production_order_detail_id" name="production_order_detail_id" onchange="getProductionOrder();"></select>
-                                        <label class="active" for="production_order_detail_id">Daftar Order Produksi</label>
-                                    </div>
+                                    <legend>2. Target Produksi</legend>
                                     <div class="col m12">
                                         <div class="row">
                                             <div class="col m4 s12">

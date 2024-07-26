@@ -227,7 +227,7 @@
                                         <label class="active" for="group">Grup</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
-                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();">
                                         <label class="active" for="post_date">Tgl. Post</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
@@ -716,6 +716,7 @@
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
+                applyStartEndDate();
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
@@ -796,6 +797,11 @@
             $(this).closest('tr').remove();
         });
     });
+
+    function applyStartEndDate(){
+        let date = $('#post_date').val();
+        $('#start_process_time,#end_process_time').val(date + 'T00:00');
+    }
 
     function unlockProductionOrder(){
         if($('#shift_id').val() && $('#group').val()){

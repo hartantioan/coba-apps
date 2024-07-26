@@ -1013,6 +1013,7 @@
         });
     }
     function getReception(id){
+        
         $.ajax({
             url: '{{ Request::url() }}/get_reception',
             type: 'POST',
@@ -1049,18 +1050,25 @@
     function disableFields() {
         $('#code').prop('disabled', true);
         $('#item').prop('disabled', true);
-        $('#item_group_id_edit').prop('disabled', true);
+        $('#item_group_id_edit').parent().css({
+            'pointer-events': 'none',
+            'opacity': '0.5'
+        });
         $('#detail1_edit').prop('disabled', true);
     }
 
     function enableFields() {
         $('#item').prop('disabled', false);
-        $('#item_group_id_edit').prop('disabled', false);
         $('#detail1_edit').prop('disabled', false);
+        
+        $('#item_group_id_edit').parent().css({
+            'pointer-events': '',
+            'opacity': ''
+        });
     }
 
     function getCode(){
-      
+        enableFields();
         if($('#temp').val()){
             
         }else{

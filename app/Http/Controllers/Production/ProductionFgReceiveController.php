@@ -27,7 +27,6 @@ use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use App\Models\Shift;
-use App\Models\Tank;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -719,7 +718,7 @@ class ProductionFgReceiveController extends Controller
         foreach($po->productionBatchUsage as $row){
             $detail_batch[] = [
                 'production_batch_id'   => $row->production_batch_id,
-                'production_batch_info' => $row->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($row->productionBatch->qty_real).' '.$row->productionBatch->item->uomUnit->code.' - Tangki : '.($row->productionBatch->tank()->exists() ? $row->productionBatch->tank->code : '-').' - Item : '.$row->productionBatch->lookable->item->code.' - '.$row->productionBatch->lookable->item->name,
+                'production_batch_info' => $row->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($row->productionBatch->qty_real).' '.$row->productionBatch->item->uomUnit->code.' - Item : '.$row->productionBatch->lookable->item->code.' - '.$row->productionBatch->lookable->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'qty_max'               => CustomHelper::formatConditionalQty($row->productionBatch->qty + $row->qty),
                 'unit'                  => $row->productionBatch->item->uomUnit->code,

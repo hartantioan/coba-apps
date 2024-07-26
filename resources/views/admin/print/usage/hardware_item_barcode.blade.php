@@ -29,9 +29,9 @@
                         </td>
                         <td width="70%" style="vertical-align: middle;padding-top:4px;">
                             <div style="font-weight:700;font-size:8px;">
-                                {{ (strlen($data->code.' - '.$data->item) > 25) ? substr($data->code.' - '.$data->item, 0, 18).'...' : $data->code.' - '.$data->item}}</div>
+                                {{ (strlen($data->code.' - '.$data->item) > 28) ? substr($data->code.' - '.$data->item, 0, 28).'...' : $data->code.' - '.$data->item}}</div>
                             <div style="font-size:7px;">
-                                {{ (strlen($data->detail1) > 50) ? substr($data->detail1, 0, 50).'...' : $data->detail1 }}
+                                {{ (strlen($data->detail1) > 73) ? substr($data->detail1, 0, 73).'...' : $data->detail1 }}
                             </div>
                         </td>
                     </tr>

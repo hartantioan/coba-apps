@@ -3564,363 +3564,372 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                if(response.document){
-                    const baseUrl = 'http://127.0.0.1:8000/storage/';
-                    const filePath = response.document.replace('public/', '');
-                    const fileUrl = baseUrl + filePath;
-                    displayFile(fileUrl);
-                }
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#account_id').empty();
-                $('#account_id').append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
-                $('#type').val(response.type).formSelect();
-                $('#company_id').val(response.company_id).formSelect();
-                $('#post_date').val(response.post_date);
-                $('#received_date').val(response.received_date);
-                $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);                
-                $('#note').val(response.note);
-                $('#tax_no').val(response.tax_no);
-                $('#tax_cut_no').val(response.tax_cut_no);
-                $('#cut_date').val(response.cut_date);
-                $('#spk_no').val(response.spk_no);
-                $('#invoice_no').val(response.invoice_no);
-                $('#document_no').val(response.document_no);
-                $('#downpayment').val(response.downpayment);
-                $('#rounding').val(response.rounding);
-                $('#currency_rate').val(response.currency_rate);
-                $('#currency_id').val(response.currency_id).formSelect();
+                if(response.status == '500'){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
                 
-                if(response.details.length > 0){
-                    $('.row_detail').remove();
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        if(val.type == 'coas'){
-                            $('#last-row-detail').before(`
-                                <tr class="row_detail">
-                                    <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
-                                    <input type="hidden" name="arr_frd_id[]" value="` + val.frd_id + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
-                                    <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
-                                    </td>
-                                    <td class="center" id="qty_stock` + count + `">
-                                        ` + val.qty_stock + `
-                                    </td>
-                                    <td class="center" id="unit_stock` + count + `">
-                                        ` + val.unit_stock + `
-                                    </td>
-                                    <td class="center">
-                                        <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="center">
-                                        -
-                                    </td>
-                                    <td class="right-align row_total" id="row_total` + count + `">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000" data-id="">-- Non-PPN --</option>
-                                            @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0">Tidak</option>
-                                            <option value="1">Ya</option>
-                                        </select>
-                                    </td>
-                                    <td class="right-align" id="row_tax` + count + `">
-                                        <input class="browser-default" type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000" data-id="">-- Non-PPh --</option>
-                                            @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="right-align" id="row_wtax` + count + `">
-                                        <input class="browser-default" type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
-                                    </td>
-                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
-                                        ` + val.grandtotal + `
-                                    </td>
-                                    
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                            @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
-                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                            @foreach ($line as $rowline)
-                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
-                                            @endforeach
-                                        </select>    
-                                    </td>
-                                    <td>
-                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
-                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                            @foreach ($machine as $rowmachine)
-                                                <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
-                                            @endforeach
-                                        </select>    
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
-                                            @foreach ($department as $rowdept)
-                                                <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                            <option value="">--{{ __('translations.empty') }}--</option>
-                                            @foreach ($warehouse as $row)
-                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
-                                    </td>
-                                </tr>
-                            `);
-                            $('#arr_percent_wtax' + count).val(val.percent_wtax);
-                            $('#arr_percent_tax' + count).val(val.percent_tax);
-                            $('#arr_include_tax' + count).val(val.include_tax);
-                            $('#arr_place' + count).val(val.place_id);
-                            $('#arr_line' + count).val(val.line_id);
-                            $('#arr_machine' + count).val(val.machine_id);
-                            $('#arr_department' + count).val(val.department_id);
-                            $('#arr_warehouse' + count).val(val.warehouse_id);
-                            $('#arr_coa' + count).append(`
-                                <option value="` + val.id + `">` + val.name + `</option>
-                            `);
-                            select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
-                            if(val.project_id){
-                                $('#arr_project' + count).append(`
-                                    <option value="` + val.project_id + `">` + val.project_name + `</option>
+                    if(response.document){
+                        const baseUrl = 'http://127.0.0.1:8000/storage/';
+                        const filePath = response.document.replace('public/', '');
+                        const fileUrl = baseUrl + filePath;
+                        displayFile(fileUrl);
+                    }
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#code_place_id').val(response.code_place_id).formSelect();
+                    $('#code').val(response.code);
+                    $('#account_id').empty();
+                    $('#account_id').append(`
+                        <option value="` + response.account_id + `">` + response.account_name + `</option>
+                    `);
+                    $('#type').val(response.type).formSelect();
+                    $('#company_id').val(response.company_id).formSelect();
+                    $('#post_date').val(response.post_date);
+                    $('#received_date').val(response.received_date);
+                    $('#due_date').val(response.due_date);
+                    $('#document_date').val(response.document_date);                
+                    $('#note').val(response.note);
+                    $('#tax_no').val(response.tax_no);
+                    $('#tax_cut_no').val(response.tax_cut_no);
+                    $('#cut_date').val(response.cut_date);
+                    $('#spk_no').val(response.spk_no);
+                    $('#invoice_no').val(response.invoice_no);
+                    $('#document_no').val(response.document_no);
+                    $('#downpayment').val(response.downpayment);
+                    $('#rounding').val(response.rounding);
+                    $('#currency_rate').val(response.currency_rate);
+                    $('#currency_id').val(response.currency_id).formSelect();
+                    
+                    if(response.details.length > 0){
+                        $('.row_detail').remove();
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            if(val.type == 'coas'){
+                                $('#last-row-detail').before(`
+                                    <tr class="row_detail">
+                                        <input type="hidden" name="arr_code[]" value="" data-id="` + count + `">
+                                        <input type="hidden" name="arr_frd_id[]" value="` + val.frd_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]"></select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note[]" value="` + val.info + `" data-id="` + count + `">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();" style="width:75px !important;">
+                                        </td>
+                                        <td class="center" id="qty_stock` + count + `">
+                                            ` + val.qty_stock + `
+                                        </td>
+                                        <td class="center" id="unit_stock` + count + `">
+                                            ` + val.unit_stock + `
+                                        </td>
+                                        <td class="center">
+                                            <input class="browser-default" type="text" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();">
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="center">
+                                            -
+                                        </td>
+                                        <td class="right-align row_total" id="row_total` + count + `">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000" data-id="">-- Non-PPN --</option>
+                                                @foreach ($tax as $row1)
+                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0">Tidak</option>
+                                                <option value="1">Ya</option>
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_tax` + count + `">
+                                            <input class="browser-default" type="text" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000" data-id="">-- Non-PPh --</option>
+                                                @foreach ($wtax as $row2)
+                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_wtax` + count + `">
+                                            <input class="browser-default" type="text" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `" onkeyup="formatRupiah(this);" readonly>
+                                        </td>
+                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                @foreach ($place as $rowplace)
+                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" onchange="changePlace(this);">
+                                                <option value="">--{{ __('translations.empty') }}--</option>
+                                                @foreach ($line as $rowline)
+                                                    <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td>
+                                            <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
+                                                <option value="">--{{ __('translations.empty') }}--</option>
+                                                @foreach ($machine as $rowmachine)
+                                                    <option value="{{ $rowmachine->id }}" data-line="{{ $rowmachine->line_id }}">{{ $rowmachine->name }}</option>
+                                                @endforeach
+                                            </select>    
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_department` + count + `" name="arr_department[]">
+                                                @foreach ($department as $rowdept)
+                                                    <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                <option value="">--{{ __('translations.empty') }}--</option>
+                                                @foreach ($warehouse as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                        </td>
+                                    </tr>
                                 `);
+                                $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                                $('#arr_percent_tax' + count).val(val.percent_tax);
+                                $('#arr_include_tax' + count).val(val.include_tax);
+                                $('#arr_place' + count).val(val.place_id);
+                                $('#arr_line' + count).val(val.line_id);
+                                $('#arr_machine' + count).val(val.machine_id);
+                                $('#arr_department' + count).val(val.department_id);
+                                $('#arr_warehouse' + count).val(val.warehouse_id);
+                                $('#arr_coa' + count).append(`
+                                    <option value="` + val.id + `">` + val.name + `</option>
+                                `);
+                                select2ServerSide('#arr_coa' + count, '{{ url("admin/select2/coa_no_cash") }}');
+                                if(val.project_id){
+                                    $('#arr_project' + count).append(`
+                                        <option value="` + val.project_id + `">` + val.project_name + `</option>
+                                    `);
+                                }
+                                select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+                            }else{
+                                $('#last-row-detail').before(`
+                                    <tr class="row_detail">
+                                        <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
+                                        <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
+                                        <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                                        <td class="center">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td class="center">
+                                            ` + val.rawcode + `
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
+                                        </td>
+                                        <td class="center">
+                                            ` + val.purchase_no + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.delivery_no + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.buy_unit + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.qty_received + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.qty_returned + `
+                                        </td>
+                                        <td class="center">
+                                            <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
+                                        </td>
+                                        <td class="center" id="qty_stock` + count + `">
+                                            ` + val.qty_stock + `
+                                        </td>
+                                        <td class="center" id="unit_stock` + count + `">
+                                            ` + val.unit_stock + `
+                                        </td>
+                                        <td class="right-align">
+                                            ` + val.price + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.post_date + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.due_date + `
+                                        </td>
+                                        <td class="right-align row_total" id="row_total` + count + `">
+                                            ` + val.total + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000">-- Non-PPN --</option>
+                                                @foreach ($tax as $row1)
+                                                    <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0">Tidak</option>
+                                                <option value="1">Ya</option>
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_tax` + count + `">
+                                            ` + val.tax + `
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
+                                                <option value="0.00000">-- Non-PPh --</option>
+                                                @foreach ($wtax as $row2)
+                                                    <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                        </td>
+                                        <td class="right-align" id="row_wtax` + count + `">
+                                            ` + val.wtax + `    
+                                        </td>
+                                        <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
+                                            ` + val.grandtotal + `
+                                        </td>
+                                        
+                                        <td class="center">
+                                            ` + val.place_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.line_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.machine_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.department_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.warehouse_name + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.project_name + `
+                                        </td>
+                                    </tr>
+                                `);
+
+                                $('#arr_percent_wtax' + count).val(val.percent_wtax);
+                                $('#arr_percent_tax' + count).val(val.percent_tax);
+                                $('#arr_include_tax' + count).val(val.include_tax);
                             }
-                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
-                        }else{
-                            $('#last-row-detail').before(`
-                                <tr class="row_detail">
-                                    <input type="hidden" name="arr_type[]" value="` + val.type + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_price[]" value="` + val.price_raw + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_total[]" value="` + val.total + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_grandtotal[]" value="` + val.grandtotal + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_tax[]" value="` + val.tax + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_wtax[]" value="` + val.wtax + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_place` + count + `" name="arr_place[]" value="` + val.place_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_line` + count + `" name="arr_line[]" value="` + val.line_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_machine` + count + `" name="arr_machine[]" value="` + val.machine_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_department` + count + `" name="arr_department[]" value="` + val.department_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_warehouse` + count + `" name="arr_warehouse[]" value="` + val.warehouse_id + `" data-id="` + count + `">
-                                    <input type="hidden" id="arr_project` + count + `" name="arr_project[]" value="` + val.project_id + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_code[]" value="` + val.id + `" data-id="` + count + `">
-                                    <input type="hidden" name="arr_temp_qty[]" value="` + val.qty_balance + `" data-id="` + count + `">
+                        });
+                    }
+
+                    if(response.downpayments.length > 0){
+                        $('#body-detail-dp').empty();
+                        $.each(response.downpayments, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-detail-dp').append(`
+                                <tr class="row_detail_dp">
+                                    <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
                                     <td class="center">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail-dp" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
                                         </a>
                                     </td>
                                     <td class="center">
                                         ` + val.rawcode + `
                                     </td>
-                                    <td>
-                                        <input type="text" name="arr_note[]" value="` + val.note + `" data-id="` + count + `">
-                                    </td>
-                                    <td>
-                                        <input type="text" name="arr_note2[]" value="` + val.note2 + `" data-id="` + count + `">
-                                    </td>
                                     <td class="center">
-                                        ` + val.purchase_no + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.delivery_no + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.buy_unit + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.qty_received + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.qty_returned + `
-                                    </td>
-                                    <td class="center">
-                                        <input class="browser-default" type="text" name="arr_qty[]" onfocus="emptyThis(this);" value="` + val.qty_balance + `" data-id="` + count + `" onkeyup="formatRupiah(this);countAll();countStock(this);" data-conversion="` + val.qty_conversion + `">
-                                    </td>
-                                    <td class="center" id="qty_stock` + count + `">
-                                        ` + val.qty_stock + `
-                                    </td>
-                                    <td class="center" id="unit_stock` + count + `">
-                                        ` + val.unit_stock + `
-                                    </td>
-                                    <td class="right-align">
-                                        ` + val.price + `
+                                        ` + val.pyr_code + `
                                     </td>
                                     <td class="center">
                                         ` + val.post_date + `
                                     </td>
                                     <td class="center">
-                                        ` + val.due_date + `
-                                    </td>
-                                    <td class="right-align row_total" id="row_total` + count + `">
-                                        ` + val.total + `
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_tax` + count + `" name="arr_percent_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000">-- Non-PPN --</option>
-                                            @foreach ($tax as $row1)
-                                                <option value="{{ $row1->percentage }}" data-id="{{ $row1->id }}">{{ $row1->name.' - '.number_format($row1->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_include_tax` + count + `" name="arr_include_tax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0">Tidak</option>
-                                            <option value="1">Ya</option>
-                                        </select>
-                                    </td>
-                                    <td class="right-align" id="row_tax` + count + `">
-                                        ` + val.tax + `
-                                    </td>
-                                    <td class="center">
-                                        <select class="browser-default" id="arr_percent_wtax` + count + `" name="arr_percent_wtax[]" data-id="` + count + `" onchange="countAll();">
-                                            <option value="0.00000">-- Non-PPh --</option>
-                                            @foreach ($wtax as $row2)
-                                                <option value="{{ $row2->percentage }}" data-id="{{ $row2->id }}">{{ $row2->name.' - '.number_format($row2->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="right-align" id="row_wtax` + count + `">
-                                        ` + val.wtax + `    
-                                    </td>
-                                    <td class="right-align row_grandtotal" id="row_grandtotal` + count + `">
                                         ` + val.grandtotal + `
                                     </td>
-                                    
                                     <td class="center">
-                                        ` + val.place_name + `
+                                        ` + val.nominal + `
                                     </td>
                                     <td class="center">
-                                        ` + val.line_name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.machine_name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.department_name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.warehouse_name + `
-                                    </td>
-                                    <td class="center">
-                                        ` + val.project_name + `
+                                        <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
                                     </td>
                                 </tr>
                             `);
-
-                            $('#arr_percent_wtax' + count).val(val.percent_wtax);
-                            $('#arr_percent_tax' + count).val(val.percent_tax);
-                            $('#arr_include_tax' + count).val(val.include_tax);
-                        }
-                    });
+                        });                        
+                    }
                 }
-
-                if(response.downpayments.length > 0){
-                    $('#body-detail-dp').empty();
-                    $.each(response.downpayments, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-detail-dp').append(`
-                            <tr class="row_detail_dp">
-                                <input type="hidden" name="arr_dp_code[]" value="` + val.code + `" data-id="` + count + `">
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail-dp" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                                <td class="center">
-                                    ` + val.rawcode + `
-                                </td>
-                                <td class="center">
-                                    ` + val.pyr_code + `
-                                </td>
-                                <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td class="center">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td class="center">
-                                    ` + val.nominal + `
-                                </td>
-                                <td class="center">
-                                    <input name="arr_nominal[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="rowNominal`+ count +`">
-                                </td>
-                            </tr>
-                        `);
-                    });                        
-                }
+                
+                
 
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();

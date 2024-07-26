@@ -108,13 +108,14 @@ class ProductionOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('productionSchedule',function($query) use ($search, $request){
-                                $query->where('code','like',"%$search%");
-                            })
-                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
-                                $query->whereHas('item',function($query) use ($search, $request){
-                                    $query->where('code','like',"%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                            ->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionScheduleDetail',function($query) use ($search, $request){
+                                    $query->whereHas('item',function($query) use ($search, $request){
+                                        $query->where('code','like',"%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    })->orWhereHas('productionSchedule',function($query) use ($search){
+                                        $query->where('code','like',"%$search%");
+                                    });
                                 });
                             });
                     });
@@ -148,13 +149,14 @@ class ProductionOrderController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
-                            ->orWhereHas('productionSchedule',function($query) use ($search, $request){
-                                $query->where('code','like',"%$search%");
-                            })
-                            ->orWhereHas('productionScheduleDetail',function($query) use ($search, $request){
-                                $query->whereHas('item',function($query) use ($search, $request){
-                                    $query->where('code','like',"%$search%")
-                                        ->orWhere('name','like',"%$search%");
+                            ->orWhereHas('productionOrderDetail',function($query) use ($search, $request){
+                                $query->whereHas('productionScheduleDetail',function($query) use ($search, $request){
+                                    $query->whereHas('item',function($query) use ($search, $request){
+                                        $query->where('code','like',"%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    })->orWhereHas('productionSchedule',function($query) use ($search){
+                                        $query->where('code','like',"%$search%");
+                                    });
                                 });
                             });
                     });

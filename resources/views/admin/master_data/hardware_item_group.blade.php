@@ -337,9 +337,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#department_id').append(`
-                    <option value="` + response.department.id + `">` + response.department.code+`-`+response.department.name+`</option>
-                `);
+                console.log(response);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

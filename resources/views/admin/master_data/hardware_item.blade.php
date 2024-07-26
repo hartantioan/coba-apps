@@ -149,10 +149,10 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
-                                <label for="order">{{ __('translations.status') }}</label>
+                                <label for="status">{{ __('translations.status') }}</label>
                                 <label>
                                     {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <input checked type="checkbox" id="status" name="status">
                                     <span class="lever"></span>
                                    {{ __('translations.active') }}
                                 </label>
@@ -244,7 +244,7 @@
                                 <label for="order">{{ __('translations.status') }}</label>
                                 <label>
                                     {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <input checked type="checkbox" id="status_edit" name="status" value="1">
                                     <span class="lever"></span>
                                    {{ __('translations.active') }}
                                 </label>
@@ -843,12 +843,13 @@
                     <option value="` + response.group_item.id + `">` + response.group_item.code+`-`+response.group_item.name+`</option>
                 `);
                 $('#detail1_edit').val(response.detail1);
-                
+        
                 if(response.status == '1'){
-                    $('#status').prop( "checked", true);
+                    $('#status_edit').prop( "checked", true);
                 }else{
-                    $('#status').prop( "checked", false);
+                    $('#status_edit').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();

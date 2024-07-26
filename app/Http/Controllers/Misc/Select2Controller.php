@@ -4673,6 +4673,7 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group,
+                'note'          => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' )',
             ];
         }
 

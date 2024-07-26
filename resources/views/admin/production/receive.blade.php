@@ -1185,7 +1185,7 @@
                         ` + no + `
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]"></select>
+                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="getNoteFromIssue('` + count + `')"></select>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -1224,6 +1224,13 @@
                 text: 'Silahkan pilih Production Order terlebih dahulu.',
                 icon: 'warning'
             });
+        }
+    }
+
+    function getNoteFromIssue(code){
+        $('#note').val('');
+        if($('#arr_production_issue_id' + code).val()){
+            $('#note').val($('#arr_production_issue_id' + code).select2('data')[0].note);
         }
     }
 

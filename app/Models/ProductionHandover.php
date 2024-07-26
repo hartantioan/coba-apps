@@ -222,4 +222,8 @@ class ProductionHandover extends Model
             return false;
         }
     }
+
+    public function getRequesterByItem($item_id){
+        return $this->user->name;
+    }
 }

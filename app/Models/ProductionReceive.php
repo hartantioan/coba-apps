@@ -478,4 +478,8 @@ class ProductionReceive extends Model
             }
         }
     }
+
+    public function getRequesterByItem($item_id){
+        return $this->user->name;
+    }
 }

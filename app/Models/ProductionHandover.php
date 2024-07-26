@@ -208,4 +208,18 @@ class ProductionHandover extends Model
             return false;
         }
     }
+
+    public function qty(){
+        $qty = $this->productionHandoverDetail()->sum('qty');
+        return $qty;
+    }
+
+    public function hasBalanceReceiveFg(){
+        $qty = $this->productionFgReceive->qtySell() - $this->qty();
+        if($qty > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }

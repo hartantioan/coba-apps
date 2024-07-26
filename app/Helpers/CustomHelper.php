@@ -4792,10 +4792,11 @@ class CustomHelper {
 				);
 			}
 
-			$pir->productionFgReceive->update([
-				'status'	=> '3'
-			]);
-
+			if(!$pir->hasBalanceReceiveFg()){
+				$pir->productionFgReceive->update([
+					'status'	=> '3'
+				]);
+			}
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 

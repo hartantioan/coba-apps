@@ -120,6 +120,11 @@ class ProductionFgReceive extends Model
         return $qty;
     }
 
+    public function qtySell(){
+        $qty = $this->productionFgReceiveDetail()->sum('qty_sell');
+        return $qty;
+    }
+
     public function productionHandover()
     {
         return $this->hasMany('App\Models\ProductionHandover')->whereIn('status',['1','2','3']);

@@ -5109,9 +5109,15 @@ class CustomHelper {
 			$je = Journal::find($table_id)->update(['status' => '3']);
 		}elseif($table_name == 'production_schedules'){
 			$ps = ProductionSchedule::find($table_id);
-			/* if($ps){
-				$ps->createProductionOrder();
-			} */
+			if($ps){
+				if($ps->productionScheduleTarget()->exists()){
+					foreach($ps->productionScheduleTarget as $row){
+						$row->marketingOrderPlanDetail->marketingOrderPlan->update([
+							'status'	=> '3'
+						]);
+					}
+				}
+			}
 		}
 		/* else{
 

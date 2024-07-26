@@ -840,7 +840,7 @@
                 $('#item').val(response.item);
                 
                 $('#item_group_id_edit').append(`
-                    <option value="` + response.group_item.id + `">` + response.group_item.code+`-`+response.group_item.name+`</option>
+                    <option value="` + response.group_item.id + `">` +response.group_item.name+`</option>
                 `);
                 $('#detail1_edit').val(response.detail1);
         

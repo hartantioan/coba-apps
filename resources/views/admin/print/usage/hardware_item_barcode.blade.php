@@ -24,19 +24,19 @@
                         </td>
                     </tr>
                     <tr>
-                        <td width="30%" style="vertical-align:top;padding-left:-12px;" align="left">
+                        <td width="20%" style="vertical-align:top;padding-left:-12px;" align="left">
                             <img src="{{ $image }}" style="width:100%;height:auto;">
                         </td>
-                        <td width="70%" style="vertical-align: middle;padding-top:2px;">
-                            <div style="font-weight:700;font-size:10px;">
-                                {{ (strlen($data->code.' - '.$data->item) > 18) ? substr($data->code.' - '.$data->item, 0, 18).'...' : $data->code.' - '.$data->item}}</div>
+                        <td width="70%" style="vertical-align: middle;padding-top:4px;">
+                            <div style="font-weight:700;font-size:8px;">
+                                {{ (strlen($data->code.' - '.$data->item) > 25) ? substr($data->code.' - '.$data->item, 0, 18).'...' : $data->code.' - '.$data->item}}</div>
                             <div style="font-size:7px;">
                                 {{ (strlen($data->detail1) > 50) ? substr($data->detail1, 0, 50).'...' : $data->detail1 }}
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="2" align="center" style="vertical-align:middle !important;">
+                        <td colspan="2" align="center" style="vertical-align:middle !important;padding-top:5px">
                             <div style="font-weight:700;font-size:8px;">PT SUPERIOR PORCELAIN SUKSES</div>
                         </td>
                     </tr>  

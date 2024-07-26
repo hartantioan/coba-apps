@@ -12,7 +12,7 @@ use App\Models\GoodReturnPO;
 use App\Models\GoodScale;
 use App\Models\GoodIssueRequest;
 use App\Models\InventoryTransferOut;
-use App\Models\PurchaseRequest;
+use App\Models\CancelDocument;
 use App\Models\CloseBill;
 use App\Models\FundRequest;
 use App\Models\Item;
@@ -517,14 +517,19 @@ class LandedCostController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
+                $nodis = '';
                 if($val->isOpenPeriod()){
-
                     $dis = 'style="cursor: default;
                     pointer-events: none;
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+                }else{
+                    $nodis = 'style="cursor: default;
+                    pointer-events: none;
+                    color: #9f9f9f !important;
+                    background-color: #dfdfdf !important;
+                    box-shadow: none;"';
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
@@ -569,7 +574,7 @@ class LandedCostController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+                        <button type="button" class="btn-floating mb-1  btn-small btn-flat waves-effect waves-light purple darken-2 white-text" data-popup="tooltip" title="Cancel" onclick="cancelStatus(`' . CustomHelper::encrypt($val->code) . '`)" '.$nodis.'><i class="material-icons dp48">cancel</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -1630,5 +1635,67 @@ class LandedCostController extends Controller
 
             return response()->json($response);
         }
+    }
+    public function cancelStatus(Request $request){
+        $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+
+            if(!CustomHelper::checkLockAcc($request->cancel_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada tanggal cancel void telah ditutup oleh Akunting.'
+                ]);
+            }
+
+            if(in_array($query->status,['4','5','8'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada A/P Invoice.'
+                ];
+            }else{
+                
+                CustomHelper::removeApproval($query->getTable(),$query->id);
+
+                $query->update([
+                    'status'    => '8',
+                ]);
+
+                $cd = CancelDocument::create([
+                    'code'          => CancelDocument::generateCode('CAPN',substr($query->code,7,2),$request->cancel_date),
+                    'user_id'       => session('bo_id'),
+                    'post_date'     => $request->cancel_date,
+                    'lookable_type' => $query->getTable(),
+                    'lookable_id'   => $query->id,
+                ]);
+
+                CustomHelper::cancelJournal($cd,$request->cancel_date);
+    
+                activity()
+                    ->performedOn(new LandedCost())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void cancel the Landed cost data');
+    
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Landed Cost No. '.$query->code.' telah ditutup dengan tombol cancel void.','Landed Cost No. '.$query->code.' telah ditutup dengan tombol cancel void.',$query->user_id);
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 }

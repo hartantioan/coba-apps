@@ -1613,6 +1613,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('destroy', [LandedCostController::class, 'destroy'])->middleware('operation.access:landed_cost,delete');
                     Route::get('test',[LandedCostController::class, 'test'])->withoutMiddleware('direct.access');
                     Route::get('export_from_page',[LandedCostController::class, 'exportFromTransactionPage']);
+                    Route::post('cancel_status', [LandedCostController::class, 'cancelStatus'])->middleware('operation.access:landed_cost,void');
                 });
 
             });

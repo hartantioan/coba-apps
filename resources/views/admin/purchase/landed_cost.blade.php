@@ -1,3 +1,4 @@
+<script src="{{ url('app-assets/js/sweetalert2.js') }}"></script>
 <style>
     .modal {
         top:0px !important;
@@ -2962,5 +2963,47 @@
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
       
+    }
+
+    function cancelStatus(id){
+        Swal.fire({
+            title: "Pilih tanggal tutup!",
+            input: "date",
+            showCancelButton: true,
+            confirmButtonText: "Lanjut",
+            cancelButtonText: "Batal",
+            cancelButtonColor: "#d33",
+            confirmButtonColor: "#3085d6",
+        }).then((result) => {
+            if (result.value) {
+                $.ajax({
+                    url: '{{ Request::url() }}/cancel_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, cancel_date : result.value },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
     }
 </script>

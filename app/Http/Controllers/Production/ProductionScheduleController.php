@@ -789,6 +789,14 @@ class ProductionScheduleController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if($query->productionScheduleTarget()->exists()){
+					foreach($query->productionScheduleTarget as $row){
+						$row->marketingOrderPlanDetail->marketingOrderPlan->update([
+							'status'	=> '2'
+						]);
+					}
+				}
     
                 activity()
                     ->performedOn(new ProductionSchedule())
@@ -854,6 +862,14 @@ class ProductionScheduleController extends Controller
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
+
+            if($query->productionScheduleTarget()->exists()){
+                foreach($query->productionScheduleTarget as $row){
+                    $row->marketingOrderPlanDetail->marketingOrderPlan->update([
+                        'status'	=> '2'
+                    ]);
+                }
+            }
 
             $query->productionScheduleDetail()->delete();
             $query->productionScheduleTarget()->delete();

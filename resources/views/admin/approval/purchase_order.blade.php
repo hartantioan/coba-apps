@@ -255,7 +255,7 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">  {{ __('translations.No') }}.</th>
+                        <th class="center-align">  {{ __('translations.no') }}.</th>
                         <th class="center-align">  {{ __('translations.item/service') }}</th>
                         <th class="center-align">  {{ __('translations.item_group') }}</th>
                         <th class="center-align">  {{ __('translations.stock_in_hand') }}</th>

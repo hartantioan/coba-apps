@@ -23,7 +23,7 @@
                 <th>{{ __('translations.total') }}</th>
                 <th>Dist.Biaya</th>
             </tr>
-            @foreach ($row->bomDetail as $key => $m)
+            @foreach ($row->bomStandardDetail as $key => $m)
                 <tr>
                     <td>{{ $m->lookable->code.' - '.$m->lookable->name }}</td>
                     <td>{{ $m->description }}</td>

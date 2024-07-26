@@ -9,7 +9,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rule;
-use App\Exports\ExportTemplateMasterBom;
+use App\Exports\ExportBomStandardMasterPage;
 use Illuminate\Support\Facades\Validator;
 use App\Models\BomStandard;
 use App\Models\Place;
@@ -398,7 +398,13 @@ class BomStandardController extends Controller
     public function export(Request $request){
         $search = $request->search ? $request->search : '';
         $status = $request->status ? $request->status : '';
-		
 		return Excel::download(new ExportBomStandard($search,$status), 'bom_standard_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+		
+		return Excel::download(new ExportBomStandardMasterPage($search,$status), 'bom_standard'.uniqid().'.xlsx');
     }
 }

@@ -6,8 +6,9 @@ use App\Models\Bom;
 use App\Models\BomStandard;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class ExportBomStandard implements FromView
+class ExportBomStandard implements FromView,ShouldAutoSize
 {
     /**
     * @return \Illuminate\Support\Collection

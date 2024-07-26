@@ -283,8 +283,8 @@
                                         <td class="center-align"></td>
                                         <td class="center-align"></td>
                                         <td class="">` + val.kode + `</td>
-                                        <td class="">` + val.kode + `</td>
                                         <td class="">` + val.item + `</td>
+                                        <td class="">` + val.satuan + `</td>
                                         <td >`+val.requester+`</td>
                                         <td >`+val.area+`</td>
                                         <td >`+val.shading+`</td>

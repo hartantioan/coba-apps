@@ -137,7 +137,7 @@ class LandedCostController extends Controller
             $datalc = LandedCost::where('supplier_id',$request->id)->whereIn('status',['2','3'])->get();
 
             foreach($datalc as $row){
-                if(!$row->used()->exists()){
+                if(!$row->used()->exists() && !$row->hasChildDocument()){
                     $landed_cost[] = [
                         'id'            => $row->id,
                         'code'          => $row->code,

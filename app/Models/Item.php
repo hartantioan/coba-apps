@@ -991,7 +991,7 @@ class Item extends Model
         $arr = [];
         foreach($this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($po_id){
             $query->where('id','<>',$po_id)->orderByDesc('post_date');
-        })->where('place_id',$place_id)->limit(10)->get() as $row){
+        })->where('place_id',$place_id)->get() as $row){
             $arr[] = [
                 'qty'           => CustomHelper::formatConditionalQty($row->qty),
                 'unit'          => $row->itemUnit->unit->code,

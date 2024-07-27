@@ -997,10 +997,10 @@ class Item extends Model
                 $arr[] = [
                     'qty'           => CustomHelper::formatConditionalQty($row->qty),
                     'unit'          => $row->itemUnit->unit->code,
-                    'supplier'      => $row->purchaseOrder->account->name,
-                    'post_date'     => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
+                    'supplier'      => $rowpo->account->name,
+                    'post_date'     => date('d/m/Y',strtotime($rowpo->post_date)),
                     'price'         => CustomHelper::formatConditionalQty($row->price),
-                    'purchase_no'   => $row->purchaseOrder->code,
+                    'purchase_no'   => $rowpo->code,
                 ];
             }
         }

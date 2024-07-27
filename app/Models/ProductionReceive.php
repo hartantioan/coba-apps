@@ -269,7 +269,6 @@ class ProductionReceive extends Model
             ]);
 
             foreach($this->productionReceiveDetail as $key => $row){
-                
                 $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
                     $query->where('item_id',$row->item_id)->orderByDesc('created_at');
                 })->whereNotNull('is_default')->first();
@@ -287,6 +286,9 @@ class ProductionReceive extends Model
                         $nominal = 0;
                         $total = 0;
                         $itemstock = NULL;
+                        $qty_planned = round($rowbom->qty * ($row->qty_planned / $rowbom->bom->qty_output),3);
+                        $nominal_planned = 0;
+                        $total_planned = 0;
                         if($rowbom->lookable_type == 'items'){
                             $item = Item::find($rowbom->lookable_id);
                             if($item){
@@ -328,21 +330,24 @@ class ProductionReceive extends Model
                                     $nominal = $price;
                                     $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                 }
+                                $nominal_planned = $nominal;
                             }
                         }elseif($rowbom->lookable_type == 'resources'){
                             $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
                             $nominal = $rowbom->nominal;
+                            $nominal_planned = $rowbom->nominal;
                         }
+                        $total_planned = round($nominal_planned * $qty_planned,2);
                         $querydetail->update([
                             'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
-                            'qty_bom'                       => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                            'qty_bom'                       => round($rowbom->qty * ($row->qty_planned / $rowbom->bom->qty_output),3),
                             'nominal_bom'                   => $rowbom->nominal,
                             'total_bom'                     => $total,
-                            'qty_planned'                   => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
-                            'nominal_planned'               => $rowbom->nominal,
-                            'total_planned'                 => $total,
+                            'qty_planned'                   => $qty_planned,
+                            'nominal_planned'               => $nominal_planned,
+                            'total_planned'                 => $total_planned,
                             'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                             'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
                             'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
@@ -362,6 +367,9 @@ class ProductionReceive extends Model
                             $nominal = 0;
                             $total = 0;
                             $itemstock = NULL;
+                            $qty_planned = round($rowbom->qty * ($row->qty_planned / $rowbom->bom->qty_output),3);
+                            $nominal_planned = 0;
+                            $total_planned = 0;
                             if($rowbom->lookable_type == 'items'){
                                 $item = Item::find($rowbom->lookable_id);
                                 if($item){
@@ -403,11 +411,14 @@ class ProductionReceive extends Model
                                         $nominal = $price;
                                         $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                     }
+                                    $nominal_planned = $nominal;
                                 }
                             }elseif($rowbom->lookable_type == 'resources'){
                                 $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
                                 $nominal = $rowbom->nominal;
+                                $nominal_planned = $rowbom->nominal;
                             }
+                            $total_planned = round($nominal_planned * $qty_planned,2);
                             $querydetail->update([
                                 'qty'                           => round($rowbom->qty * $row->qty,3),
                                 'nominal'                       => $nominal,
@@ -415,9 +426,9 @@ class ProductionReceive extends Model
                                 'qty_bom'                       => round($rowbom->qty * $row->qty,3),
                                 'nominal_bom'                   => $rowbom->nominal,
                                 'total_bom'                     => $total,
-                                'qty_planned'                   => round($rowbom->qty * $row->qty,3),
-                                'nominal_planned'               => $rowbom->nominal,
-                                'total_planned'                 => $total,
+                                'qty_planned'                   => $qty_planned,
+                                'nominal_planned'               => $nominal_planned,
+                                'total_planned'                 => $total_planned,
                                 'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                                 'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
                                 'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,

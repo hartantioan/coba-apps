@@ -987,11 +987,10 @@ class Item extends Model
         return $hasRelation;
     }
 
-    public function historyPurchaseOrderByPlace($place_id){
-        $arr = [];
-        foreach($this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query){
-            $query->orderByDesc('post_date');
-        })->where('place_id',$place_id)->limit(10)->get() as $row){
+    public function historyPurchaseOrderByPlace($place_id,$except_po){
+        return $this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($except_po){
+            $query->where('id','<>',$except_po)->orderByDesc('post_date');
+        })->where('place_id',$place_id)->limit(10);/* 
             $arr[] = [
                 'qty'       => CustomHelper::formatConditionalQty($row->qty),
                 'unit'      => $row->itemUnit->unit->code,
@@ -1000,6 +999,6 @@ class Item extends Model
                 'price'     => CustomHelper::formatConditionalQty($row->price), 
             ];
         }
-        return $arr;
+        return $arr; */
     }
 }

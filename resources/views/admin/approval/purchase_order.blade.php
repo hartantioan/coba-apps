@@ -271,7 +271,7 @@
                 <tbody>
                     @foreach($data->purchaseOrderDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="4">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="5">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->itemGroup->name : '-' }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qtyStock()) }}</td>
@@ -284,13 +284,27 @@
                         <td class="right-align">{{ number_format($row->subtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="11">  {{ __('translations.note') }} 1: {{ $row->note }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 1: {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="11">  {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 2: {{ $row->note2 }}</td>
                     </tr>
                     <tr>
-                        <td colspan="11">  {{ __('translations.note') }} 3: {{ $row->note3 }}</td>
+                        <td colspan="10">  {{ __('translations.note') }} 3: {{ $row->note3 }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="10">
+                            Histori Pembelian : 
+                            @if($row->item()->exists())
+                                @if($row->item->historyPurchaseOrderByPlace($row->place_id)->exists())
+                                    <ol>
+                                    @foreach ($row->item->historyPurchaseOrderByPlace($row->place_id,$data->id) as $rowitem)
+                                        <li>Supplier : {{ $rowitem->purchaseOrder->account->name }} Tgl. {{ date('d/m/Y',strtotime($rowitem->purchaseOrder->post_date)) }} Harga @ : {{ CustomHelper::formatConditionQty($rowitem->price) }}</li>
+                                    @endforeach
+                                    </ol>
+                                @endif
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <td colspan="11">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>

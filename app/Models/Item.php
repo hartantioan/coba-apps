@@ -993,7 +993,7 @@ class Item extends Model
             $query->where('item_id',$this->id)->where('place_id',$place_id);
         })->where('id','<>',$po_id)->orderByDesc('post_date')->take(5)->get();
         foreach($data as $rowpo){
-            foreach($rowpo->purchaseOrderDetail as $row){
+            foreach($rowpo->purchaseOrderDetail()->where('item_id',$this->id)->get() as $row){
                 $arr[] = [
                     'qty'           => CustomHelper::formatConditionalQty($row->qty),
                     'unit'          => $row->itemUnit->unit->code,

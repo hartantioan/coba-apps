@@ -990,7 +990,7 @@ class Item extends Model
     public function historyPurchaseOrderByPlace($place_id,$except_po){
         return $this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($except_po){
             $query->where('id','<>',$except_po)->orderByDesc('post_date');
-        })->where('place_id',$place_id)->limit(10);/* 
+        })->where('place_id',$place_id);/* 
             $arr[] = [
                 'qty'       => CustomHelper::formatConditionalQty($row->qty),
                 'unit'      => $row->itemUnit->unit->code,

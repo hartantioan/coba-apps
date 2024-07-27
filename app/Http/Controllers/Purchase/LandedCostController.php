@@ -676,6 +676,12 @@ class LandedCostController extends Controller
                 try {
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
 
+                    if($query->hasChildDocument()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi telah dipakai di dokumen lainnya.'
+                        ]);
+                    }
                     if(!CustomHelper::checkLockAcc($request->post_date)){
                         return response()->json([
                             'status'  => 500,

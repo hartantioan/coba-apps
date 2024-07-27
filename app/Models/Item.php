@@ -986,10 +986,4 @@ class Item extends Model
 
         return $hasRelation;
     }
-
-    public function historyPurchaseOrderByPlace(){
-        return $this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query){
-            $query->orderByDesc('post_date');
-        });
-    }
 }

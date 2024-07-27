@@ -296,9 +296,11 @@
                         <td colspan="10">
                             Histori Pembelian : 
                             @if($row->item()->exists())
-                                @if($row->item->historyPurchaseOrderByPlace()->exists())
+                                @if($row->item->activePurchaseOrderDetail()->exists())
                                     <ol>
-                                    @foreach($row->item->historyPurchaseOrderByPlace as $rowitem)
+                                    @foreach($row->item->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query){
+                                        $query->orderByDesc('post_date');
+                                    })->get() as $rowitem)
                                         <li>Supplier : {{ $rowitem->purchaseOrder->account->name }} Tgl. {{ date('d/m/Y',strtotime($rowitem->purchaseOrder->post_date)) }} Harga @ : {{ CustomHelper::formatConditionalQty($rowitem->price) }}</li>
                                     @endforeach
                                     </ol>

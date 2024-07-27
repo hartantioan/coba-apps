@@ -339,7 +339,7 @@
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">  {{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
+                        <th colspan="11">  {{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

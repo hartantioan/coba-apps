@@ -352,22 +352,6 @@ class LandedCost extends Model
         return implode(', ',$result);
     }
 
-    public function getDetailFromInformation(){
-        $from_address = '';
-        $subdistrict_id = 0;
-        foreach($this->landedCostDetail as $row){
-            $subdistrict_id = $row->lookable->inventoryTransferOut->placeFrom->subdistrict_id;
-            $from_address = $row->lookable->inventoryTransferOut->placeFrom->city->name.' - '.$row->lookable->inventoryTransferOut->placeFrom->subdistrict->name;
-        }
-
-        $arr = [
-            'from_address'      => $from_address,
-            'subdistrict_id'    => $subdistrict_id,
-        ];
-
-        return $arr;
-    }
-
     public function getLocalImportCost(){
         $arr = [];
 
@@ -429,5 +413,15 @@ class LandedCost extends Model
             }
         }
         return implode(', ',$arr);
+    }
+
+    public function hasLandedCost(){
+        $status = false;
+        foreach($this->landedCostDetail as $row){
+            if($row->landedCostDetailSelf()->exists()){
+                $status = true;
+            }
+        }
+        return $status;
     }
 }

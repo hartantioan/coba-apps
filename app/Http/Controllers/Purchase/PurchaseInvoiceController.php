@@ -391,7 +391,7 @@ class PurchaseInvoiceController extends Controller
 
         foreach($datalc as $row){
             $invoice = $row->totalInvoice();
-            if(($row->grandtotal - $invoice) > 0){
+            if(($row->grandtotal - $invoice) > 0 && !$row->hasLandedCost()){
                 $details[] = [
                     'type'          => 'landed_costs',
                     'id'            => $row->id,

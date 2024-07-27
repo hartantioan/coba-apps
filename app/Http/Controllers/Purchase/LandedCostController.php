@@ -236,6 +236,7 @@ class LandedCostController extends Controller
                     }
         
                     $data['details'] = $details;
+                    $data['fees'] = [];
                 }
 
                 $arr_main[] = $data;
@@ -247,7 +248,7 @@ class LandedCostController extends Controller
                 $data = LandedCost::find(intval($row));
                 $data['lookable_type'] = $data->getTable();
                 $data['account_name'] = $data->vendor->name;
-                $data['from_address'] = ($data->supplier->city()->exists() ? $data->supplier->city->name : '').' - '.($data->supplier->subdistrict()->exists() ? $data->supplier->subdistrict->name : '');
+                $data['from_address'] = ($data->supplier->city()->exists() ? $data->supplier->city->name : '');
                 $data['subdistrict_from_id'] = $data->supplier->subdistrict_id;
             
                 if($data->used()->exists()){
@@ -257,6 +258,20 @@ class LandedCostController extends Controller
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
         
                     $details = [];
+                    $fees = [];
+
+                    foreach($data->landedCostFeeDetail as $row){
+                        $fees[] = [
+                            'id'                => $row->landed_cost_fee_id,
+                            'total'             => number_format($row->total,2,',','.'),
+                            'is_include_tax'    => $row->is_include_tax,
+                            'percent_tax'       => $row->percent_tax,
+                            'percent_wtax'      => $row->percent_wtax,
+                            'tax'               => number_format($row->tax,2,',','.'),
+                            'wtax'              => number_format($row->wtax,2,',','.'),
+                            'grandtotal'        => number_format($row->grandtotal,2,',','.'),
+                        ];
+                    }
                     
                     foreach($data->landedCostDetail as $row){
                         $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
@@ -291,6 +306,7 @@ class LandedCostController extends Controller
                     }
         
                     $data['details'] = $details;
+                    $data['fees'] = $fees;
                 }
 
                 $arr_main[] = $data;
@@ -345,6 +361,7 @@ class LandedCostController extends Controller
                     }
         
                     $data['details'] = $details;
+                    $data['fees'] = [];
                 }
 
                 $arr_main[] = $data;
@@ -1007,6 +1024,12 @@ class LandedCostController extends Controller
 
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
+        if(!CustomHelper::checkLockAcc($lc->post_date)){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+            ]);
+        }
         $lc['code_place_id'] = substr($lc->code,7,2);
         $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
         $lc['account_name'] = $lc->vendor()->exists() ? $lc->vendor->name : '';
@@ -1572,7 +1595,15 @@ class LandedCostController extends Controller
             })
             ->orderBy('type');
         })->get() as $key => $row){
-                $string .= '<tr>
+            if($row->type == '1'){
+                $total_debit_asli += $row->nominal_fc;
+                $total_debit_konversi += $row->nominal;
+            }
+            if($row->type == '2'){
+                $total_kredit_asli += $row->nominal_fc;
+                $total_kredit_konversi += $row->nominal;
+            }
+            $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
@@ -1590,6 +1621,13 @@ class LandedCostController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
             }
+            $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
             $response["tbody"] = $string; 
         }else{
             $response = [

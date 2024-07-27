@@ -94,6 +94,7 @@ class User extends Authenticatable
           '2' => 'Customer',
           '3' => 'Supplier',
           '4' => 'Expedisi',
+          '5' => 'Broker',
           default => '',
         };
 

@@ -1014,8 +1014,6 @@
                 window.onbeforeunload = function() {
                     return null;
                 };
-                $('#to_address,#from_address').text('-');
-                $('#temp_from_address,#temp_to_address').val('');
             }
         });
 
@@ -1260,8 +1258,6 @@
                 data: function(params) {
                     return {
                         search: params.term,
-                        /* subdistrict_from : $('#temp_from_address').val(),
-                        subdistrict_to : $('#temp_to_address').val(), */
                     };
                 },
                 processResults: function(data) {
@@ -1663,11 +1659,6 @@
                                             </div>
                                         `);
 
-                                        $('#from_address').text(val.from_address);
-                                        $('#to_address').text(val.to_address);
-                                        $('#temp_from_address').val(val.subdistrict_from_id);
-                                        $('#temp_to_address').val(val.subdistrict_to_id);
-
                                         $.each(val.details, function(i, valdetail) {
                                             var count = makeid(10), rowproporsional = (valdetail.totalrow / totalall) * 100;
                                             totalproporsional += rowproporsional;
@@ -1738,6 +1729,23 @@
                                                     <option value="" class="center-align">-- Stok tersedia --</option>
                                                 `).select();
                                             }
+                                        });
+                                    }
+
+                                    if(val.fees.length > 0){
+                                        $.each(val.fees, function(i, val) {
+                                            $('#arr_fee_nominal' + val.id).val(val.total);
+                                            $('#arr_temp_nominal' + val.id).val(val.total);
+                                            if(val.is_include_tax == '1'){
+                                                $('#arr_fee_include_tax' + val.id).prop('checked',true);
+                                            }else{
+                                                $('#arr_fee_include_tax' + val.id).prop('checked',false);
+                                            }
+                                            $('#arr_fee_tax' + val.id).val(val.percent_tax);
+                                            $('#arr_fee_tax_rp' + val.id).val(val.tax);
+                                            $('#arr_fee_wtax' + val.id).val(val.percent_wtax);
+                                            $('#arr_fee_wtax_rp' + val.id).val(val.wtax);
+                                            $('#arr_fee_grandtotal' + val.id).val(val.grandtotal);
                                         });
                                     }
 
@@ -2697,8 +2705,6 @@
                     $(this).remove();
                 });
                 if($('#last-row-item').length == 0){
-                    $('#from_address,#to_address').text('-');
-                    $('#temp_from_address,#temp_to_address').val('');
                     $('#body-item').append(`
                         <tr id="last-row-item">
                             <td colspan="14" class="center">

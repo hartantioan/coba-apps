@@ -2353,6 +2353,8 @@ class CustomHelper {
 			if($lc){
 				$arrNote = [];
 
+				$otherLc = NULL;
+
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
 					'company_id'	=> $lc->company_id,
@@ -2370,7 +2372,15 @@ class CustomHelper {
 				$totalcost = 0;
 
 				foreach($lc->landedCostDetail as $rowdetail){
-					$totalitem += round($rowdetail->nominal * $lc->currency_rate,2);
+					$rowfc = $rowdetail->nominal;
+					if($rowdetail->lookable_type == 'landed_cost_details'){
+						$otherLc = $rowdetail->lookable->landedCost;
+						$rowfc = round($rowdetail->nominal - $rowdetail->lookable->nominal,2);
+						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2) - round($rowdetail->lookable->nominal * $rowdetail->lookable->landedCost->currency_rate,2);
+					}else{
+						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
+					}
+					$totalitem += $rowtotal;
 
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
@@ -2382,7 +2392,7 @@ class CustomHelper {
 								$rowdetail->warehouse_id,
 								$rowdetail->item_id,
 								0,
-								round($rowdetail->nominal * $lc->currency_rate,2),
+								$rowtotal,
 								'IN',
 								$lc->post_date,
 								NULL,
@@ -2400,8 +2410,8 @@ class CustomHelper {
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
-								'nominal'		=> round($rowdetail->nominal * $lc->currency_rate,2),
-								'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->nominal * $lc->currency_rate : $rowdetail->nominal,
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
 							]);
 						}else{
 							JournalDetail::create([
@@ -2415,24 +2425,44 @@ class CustomHelper {
 								'warehouse_id'	=> $rowdetail->warehouse_id,
 								'item_id'		=> $rowdetail->item_id,
 								'type'			=> '1',
-								'nominal'		=> round($rowdetail->nominal * $lc->currency_rate,2),
-								'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->nominal * $lc->currency_rate : $rowdetail->nominal,
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
 							]);
 						}
 					}
 				}
 
-				foreach($lc->landedCostFeeDetail as $rowdetail){
-					$totalcost += round($rowdetail->total * $lc->currency_rate,2);
-					JournalDetail::create([
-						'journal_id'	=> $query->id,
-						'coa_id'		=> $rowdetail->landedCostFee->coa_id,
-						'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
-						'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
-						'note'			=> $rowdetail->landedCostFee->name,
-					]);
+				if($otherLc){
+					foreach($otherLc->landedCostFeeDetail as $rowfee){
+						$dataother = $lc->landedCostFeeDetail()->where('landed_cost_fee_id',$rowfee->landed_cost_fee_id)->first();
+						if($dataother){
+							$rowfc = round($dataother->total - $rowfee->total,2);
+							$rowtotal = round($dataother->total * $lc->currency_rate,2) - round($rowfee->total * $rowfee->landedCost->currency_rate,2);
+							$totalcost += $rowtotal;
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $dataother->landedCostFee->coa_id,
+								'account_id'	=> $dataother->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $rowtotal,
+								'nominal_fc'	=> $rowfc,
+								'note'			=> $dataother->landedCostFee->name,
+							]);
+						}
+					}
+				}else{
+					foreach($lc->landedCostFeeDetail as $rowdetail){
+						$totalcost += round($rowdetail->total * $lc->currency_rate,2);
+						JournalDetail::create([
+							'journal_id'	=> $query->id,
+							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
+							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
+							'type'			=> '2',
+							'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
+							'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
+							'note'			=> $rowdetail->landedCostFee->name,
+						]);
+					}
 				}
 
 				$balance = $totalitem - $totalcost;

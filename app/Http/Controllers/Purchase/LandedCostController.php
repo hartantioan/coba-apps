@@ -705,7 +705,7 @@ class LandedCostController extends Controller
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
 
                         if($request->has('document')) {
                             if($query->document){
@@ -716,6 +716,11 @@ class LandedCostController extends Controller
                             $document = $request->file('document')->store('public/landed_costs');
                         } else {
                             $document = $query->document;
+                        }
+
+                        if($query->status == '2'){
+                            CustomHelper::removeJournal($query->getTable(),$query->id);
+                            CustomHelper::removeCogs($query->getTable(),$query->id);
                         }
 
                         $query->code = $request->code;
@@ -740,6 +745,8 @@ class LandedCostController extends Controller
                         $query->landedCostDetail()->delete();
 
                         $query->landedCostFeeDetail()->delete();
+
+                        CustomHelper::removeApproval($query->getTable(),$query->id);
 
                         DB::commit();
                     }else{

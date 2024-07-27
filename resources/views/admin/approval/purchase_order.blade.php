@@ -296,9 +296,9 @@
                         <td colspan="10">
                             Histori Pembelian : 
                             @if($row->item()->exists())
-                                @if($row->item->historyPurchaseOrderByPlace($row->place_id,$data->id)->exists())
+                                @if($row->item->historyPurchaseOrderByPlace()->exists())
                                     <ol>
-                                    @foreach($row->item->historyPurchaseOrderByPlace($row->place_id,$data->id) as $rowitem)
+                                    @foreach($row->item->historyPurchaseOrderByPlace as $rowitem)
                                         <li>Supplier : {{ $rowitem->purchaseOrder->account->name }} Tgl. {{ date('d/m/Y',strtotime($rowitem->purchaseOrder->post_date)) }} Harga @ : {{ CustomHelper::formatConditionQty($rowitem->price) }}</li>
                                     @endforeach
                                     </ol>

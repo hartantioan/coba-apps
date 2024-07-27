@@ -676,29 +676,6 @@ class LandedCostController extends Controller
                 try {
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
-                    $revised = false;
-
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
-
-                                if($row->revised){
-                                    $revised = true;
-                                }
-                            }
-                        }
-                    }
-
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Landed Cost telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
                     if(!CustomHelper::checkLockAcc($request->post_date)){
                         return response()->json([
                             'status'  => 500,

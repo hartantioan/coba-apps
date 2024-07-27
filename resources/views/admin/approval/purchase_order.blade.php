@@ -302,7 +302,7 @@
                                 @if(count($datahistori) > 0)
                                     <ol>
                                     @foreach($datahistori as $rowitem)
-                                        <li>Supplier : {{ $rowitem['supplier'] }} Tgl. {{ date('d/m/Y',strtotime($rowitem['post_date'])) }} Harga @ : {{ $rowitem['price'] }} PO NO. {{ $rowitem['purchase_no'] }}</li>
+                                        <li>Supplier : {{ $rowitem['supplier'] }} Tgl. {{ $rowitem['post_date'] }} Harga @ : {{ $rowitem['price'] }} PO NO. {{ $rowitem['purchase_no'] }}</li>
                                     @endforeach
                                     </ol>
                                 @endif

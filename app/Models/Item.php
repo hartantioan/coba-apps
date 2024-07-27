@@ -986,4 +986,20 @@ class Item extends Model
 
         return $hasRelation;
     }
+
+    public function historyPurchaseOrderByPlace($place_id,$po_id){
+        $arr = [];
+        foreach($this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($po_id){
+            $query->where('id','<>',$po_id);
+        })->where('place_id',$place_id)->limit(10)->get() as $row){
+            $arr[] = [
+                'qty'       => CustomHelper::formatConditionalQty($row->qty),
+                'unit'      => $row->itemUnit->unit->code,
+                'supplier'  => $row->purchaseOrder->account->name,
+                'post_date' => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
+                'price'     => CustomHelper::formatConditionalQty($row->price), 
+            ];
+        }
+        return $arr;
+    }
 }

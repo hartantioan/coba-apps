@@ -989,17 +989,20 @@ class Item extends Model
 
     public function historyPurchaseOrderByPlace($place_id,$po_id){
         $arr = [];
-        foreach($this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($po_id){
-            $query->where('id','<>',$po_id)->orderByDesc('post_date');
-        })->where('place_id',$place_id)->get() as $row){
-            $arr[] = [
-                'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                'unit'          => $row->itemUnit->unit->code,
-                'supplier'      => $row->purchaseOrder->account->name,
-                'post_date'     => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
-                'price'         => CustomHelper::formatConditionalQty($row->price),
-                'purchase_no'   => $row->purchaseOrder->code,
-            ];
+        $data = PurchaseOrder::whereIn('status',['1','2','3'])->whereHas('purchaseOrderDetail',function($query)use($place_id){
+            $query->where('item_id',$this->id)->where('place_id',$place_id);
+        })->where('id','<>',$po_id)->orderByDesc('post_date')->take(5)->get();
+        foreach($data as $rowpo){
+            foreach($rowpo->purchaseOrderDetail as $row){
+                $arr[] = [
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty),
+                    'unit'          => $row->itemUnit->unit->code,
+                    'supplier'      => $row->purchaseOrder->account->name,
+                    'post_date'     => date('d/m/Y',strtotime($row->purchaseOrder->post_date)),
+                    'price'         => CustomHelper::formatConditionalQty($row->price),
+                    'purchase_no'   => $row->purchaseOrder->code,
+                ];
+            }
         }
         return $arr;
     }

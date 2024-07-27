@@ -990,7 +990,7 @@ class Item extends Model
     public function historyPurchaseOrderByPlace($place_id,$po_id){
         $arr = [];
         foreach($this->activePurchaseOrderDetail()->whereHas('purchaseOrder',function($query)use($po_id){
-            $query->where('id','<>',$po_id);
+            $query->where('id','<>',$po_id)->orderByDesc('post_date');
         })->where('place_id',$place_id)->limit(10)->get() as $row){
             $arr[] = [
                 'qty'           => CustomHelper::formatConditionalQty($row->qty),

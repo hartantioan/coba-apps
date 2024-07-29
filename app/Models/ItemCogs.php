@@ -16,6 +16,8 @@ class ItemCogs extends Model
     protected $fillable = [
         'lookable_type',
         'lookable_id',
+        'detailable_type',
+        'detailable_id',
         'company_id',
         'place_id',
         'warehouse_id',
@@ -37,6 +39,10 @@ class ItemCogs extends Model
     ];
 
     public function lookable(){
+        return $this->morphTo();
+    }
+
+    public function detailable(){
         return $this->morphTo();
     }
 

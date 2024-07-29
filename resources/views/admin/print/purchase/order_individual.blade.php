@@ -431,7 +431,7 @@ use App\Helpers\PrintHelper;
                                 Dibuat oleh, {{ $data->user->name }}
                             </td>
                             <td style="vertical-align:top;" width="25%">
-                                Tgl : {{ date('d/m/Y') }}
+                                Tgl : {{ date('d/m/Y',strtotime($data->updated_at)) }}
                             </td>
                             <td style="vertical-align:top;" width="25%">
                                 TTD : 

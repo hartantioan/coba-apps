@@ -4752,10 +4752,7 @@ class CustomHelper {
 
 			$pir->createProductionIssue();
 
-			$qtybatch = $pir->totalBatchUsage();
-			$qtystock = $pir->qty();
-			$balance = $qtybatch - $qtyStock;
-			if($balance > 0){
+			if($pir->qty_reject > 0){
 				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
 					self::sendCogs($table_name,
 						$pir->id,
@@ -4763,7 +4760,7 @@ class CustomHelper {
 						$pir->place_id,
 						$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
 						$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
-						$balance,
+						$pir->qty_reject,
 						0,
 						'IN',
 						$pir->post_date,
@@ -4776,7 +4773,7 @@ class CustomHelper {
 						$pir->place_id,
 						$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
 						$pir->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
-						$balance,
+						$pir->qty_reject,
 						'IN',
 						NULL,
 						NULL,

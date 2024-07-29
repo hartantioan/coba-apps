@@ -361,6 +361,7 @@ class ProductionReceive extends Model
                                 'production_order_detail_id'    => $this->production_order_detail_id,
                                 'lookable_type'                 => $rowbom->lookable_type,
                                 'lookable_id'                   => $rowbom->lookable_id,
+                                'bom_id'                        => $bomAlternative->bom_id,
                             ]);
                             $nominal = 0;
                             $total = 0;

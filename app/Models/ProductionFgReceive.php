@@ -453,6 +453,7 @@ class ProductionFgReceive extends Model
                             'production_order_detail_id'    => $this->production_order_detail_id,
                             'lookable_type'                 => $rowbom->lookable_type,
                             'lookable_id'                   => $rowbom->lookable_id,
+                            'bom_id'                        => $bomAlternative->bom_id,
                             'qty'                           => round($rowbom->qty * $row->qty,3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,

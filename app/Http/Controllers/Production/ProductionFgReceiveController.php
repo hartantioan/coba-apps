@@ -472,10 +472,10 @@ class ProductionFgReceiveController extends Controller
                                 foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
                                     if(!in_array($rowbom->lookable_id,$arrItem)){
                                         $arrItem[] = $rowbom->lookable_id;
-                                        $arrQty[] = round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
+                                        $arrQty[] = round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
                                     }else{
                                         $index = array_search($rowbom->lookable_id,$arrItem);
-                                        $arrQty[$index] += round($rowbom->qty * (str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])) / $rowbom->bom->qty_output),3);
+                                        $arrQty[$index] += round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);
                                     }
                                 }
                             }

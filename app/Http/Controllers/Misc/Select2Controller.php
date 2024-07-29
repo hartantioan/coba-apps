@@ -3611,7 +3611,7 @@ class Select2Controller extends Controller {
             if($d->balanceHandover() > 0){
                 $response[] = [
                     'id'   			=> $d->id,
-                    'text' 			=> 'Item : '.$d->item->code.' - '.$d->item->name.' Palet : '.$d->pallet_no.' Shading : '.$d->shading.' Qty : '.CustomHelper::formatConditionalQty($d->qty_sell).' '.$d->itemUnit->unit->code,
+                    'text' 			=> 'Item : '.$d->item->code.' - '.$d->item->name.' Palet : '.$d->pallet_no.' Shading : '.$d->shading.' Qty : '.CustomHelper::formatConditionalQty($d->balanceHandover()).' '.$d->itemUnit->unit->code,
                     'pallet_no'     => $d->pallet_no,
                     'item_id'       => $d->item_id,
                     'item_code'     => $d->item->code,

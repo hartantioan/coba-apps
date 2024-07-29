@@ -243,6 +243,11 @@ class ProductionReceive extends Model
         return $qty;
     }
 
+    public function qtyReject(){
+        $qty = $this->productionReceiveDetail()->sum('qty_reject');
+        return $qty;
+    }
+
     public function createProductionIssue(){
         $countbackflush = $this->productionOrderDetail->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
             $query->whereNotNull('is_default');

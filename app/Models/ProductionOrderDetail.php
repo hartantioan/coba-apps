@@ -79,6 +79,18 @@ class ProductionOrderDetail extends Model
         return $qty;
     }
 
+    public function qtyReject(){
+        $qty = 0;
+        
+        if($this->productionReceive()->exists()){
+            foreach($this->productionReceive as $rowreceive){
+                $qty += $rowreceive->qtyReject();
+            }
+        }
+        
+        return $qty;
+    }
+
     public function hasHandover(){
         $has = false;
 

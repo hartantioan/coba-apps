@@ -34,7 +34,9 @@ class ProductionIssueDetail extends Model
         'from_item_stock_id',
         'place_id',
         'warehouse_id',
+        'production_recalculate_detail_id',
         'is_wip',
+        'cost_distribution_id',
     ];
 
     public function productionBatchUsage(){
@@ -46,9 +48,19 @@ class ProductionIssueDetail extends Model
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
 
+    public function costDistribution()
+    {
+        return $this->belongsTo('App\Models\CostDistribution', 'cost_distribution_id', 'id')->withTrashed();
+    }
+
     public function parent()
     {
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
+    }
+
+    public function productionRecalculateDetail()
+    {
+        return $this->belongsTo('App\Models\ProductionRecalculateDetail', 'production_recalculate_detail_id', 'id')->withTrashed();
     }
 
     public function place()

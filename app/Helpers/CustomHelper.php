@@ -4277,16 +4277,42 @@ class CustomHelper {
 									]);
 								}
 							}else{
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $row->lookable->coa_id,
-									'line_id'		=> $pir->line_id,
-									'place_id'		=> $pir->place_id,
-									'type'			=> '2',
-									'nominal'		=> $row->total,
-									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->productionOrderDetail->productionOrder->code,
-								]);
+								if($row->cost_distribution_id){
+									$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+									$accumulation = 0;
+									foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+										if($key == $lastIndex){
+											$nominal = $row->total - $accumulation;
+										}else{
+											$nominal = round(($rowcost->percentage / 100) * $row->total);
+											$accumulation += $nominal;
+										}
+										JournalDetail::create([
+											'journal_id'                    => $query->id,
+											'cost_distribution_detail_id'   => $rowcost->id,
+											'coa_id'						=> $row->lookable->coa_id,
+											'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
+											'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
+											'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+											'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+											'type'                          => '2',
+											'nominal'						=> $nominal,
+											'nominal_fc'					=> $nominal,
+											'note'							=> $pir->productionOrderDetail->productionOrder->code,
+										]);
+									}
+								}else{
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'coa_id'		=> $row->lookable->coa_id,
+										'line_id'		=> $pir->line_id,
+										'place_id'		=> $pir->place_id,
+										'type'			=> '2',
+										'nominal'		=> $row->total,
+										'nominal_fc'	=> $row->total,
+										'note'			=> $pir->productionOrderDetail->productionOrder->code,
+									]);
+								}
 							}
 						}
 					}
@@ -4470,16 +4496,42 @@ class CustomHelper {
 								]);
 							}
 						}else{
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $row->lookable->coa_id,
-								'line_id'		=> $pir->line_id,
-								'place_id'		=> $pir->place_id,
-								'type'			=> '2',
-								'nominal'		=> $row->total,
-								'nominal_fc'	=> $row->total,
-								'note'			=> $pir->productionOrderDetail->productionOrder->code,
-							]);
+							if($row->cost_distribution_id){
+								$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+								$accumulation = 0;
+								foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+									if($key == $lastIndex){
+										$nominal = $row->total - $accumulation;
+									}else{
+										$nominal = round(($rowcost->percentage / 100) * $row->total);
+										$accumulation += $nominal;
+									}
+									JournalDetail::create([
+										'journal_id'                    => $query->id,
+										'cost_distribution_detail_id'   => $rowcost->id,
+										'coa_id'						=> $row->lookable->coa_id,
+										'place_id'                      => $rowcost->place_id ?? ($pir->place_id ?? NULL),
+										'line_id'                       => $rowcost->line_id ?? ($pir->line_id ?? NULL),
+										'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+										'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+										'type'                          => '2',
+										'nominal'						=> $nominal,
+										'nominal_fc'					=> $nominal,
+										'note'							=> $pir->productionOrderDetail->productionOrder->code,
+									]);
+								}
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->coa_id,
+									'line_id'		=> $pir->line_id,
+									'place_id'		=> $pir->place_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->productionOrderDetail->productionOrder->code,
+								]);
+							}
 						}
 					}
 	
@@ -5145,6 +5197,8 @@ class CustomHelper {
 					}
 				}
 			}
+		}elseif($table_name == 'production_recalculates'){
+
 		}
 		/* else{
 

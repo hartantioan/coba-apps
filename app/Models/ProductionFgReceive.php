@@ -453,8 +453,6 @@ class ProductionFgReceive extends Model
                             'production_order_detail_id'    => $this->production_order_detail_id,
                             'lookable_type'                 => $rowbom->lookable_type,
                             'lookable_id'                   => $rowbom->lookable_id,
-                            'bom_id'                        => $rowbom->bom_id,
-                            'bom_detail_id'                 => $rowbom->id,
                             'qty'                           => round($rowbom->qty * $row->qty,3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
@@ -464,9 +462,10 @@ class ProductionFgReceive extends Model
                             'qty_planned'                   => round($rowbom->qty * $row->qty,3),
                             'nominal_planned'               => $rowbom->nominal,
                             'total_planned'                 => $total,
-                            'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
-                            'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
-                            'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
+                            'from_item_stock_id'            => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->id : NULL) : NULL,
+                            'place_id'                      => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->place_id : NULL) : $this->place_id,
+                            'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : NULL) : NULL,
+                            'cost_distribution_id'          => $rowbom->cost_distribution_id ?? NULL,
                         ]);
                     }
                 }

@@ -342,9 +342,9 @@ class ProductionReceive extends Model
                             'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
-                            'qty_bom'                       => round($rowbom->qty * ($row->qty_planned / $rowbom->bom->qty_output),3),
+                            'qty_bom'                       => $rowbom->qty,
                             'nominal_bom'                   => $rowbom->nominal,
-                            'total_bom'                     => $total,
+                            'total_bom'                     => $rowbom->total,
                             'qty_planned'                   => $qty_planned,
                             'nominal_planned'               => $nominal_planned,
                             'total_planned'                 => $total_planned,
@@ -361,8 +361,6 @@ class ProductionReceive extends Model
                                 'production_order_detail_id'    => $this->production_order_detail_id,
                                 'lookable_type'                 => $rowbom->lookable_type,
                                 'lookable_id'                   => $rowbom->lookable_id,
-                                'bom_id'                        => $rowbom->bom_id,
-                                'bom_detail_id'                 => $rowbom->id,
                             ]);
                             $nominal = 0;
                             $total = 0;
@@ -423,15 +421,16 @@ class ProductionReceive extends Model
                                 'qty'                           => round($rowbom->qty * $row->qty,3),
                                 'nominal'                       => $nominal,
                                 'total'                         => $total,
-                                'qty_bom'                       => round($rowbom->qty * $row->qty,3),
+                                'qty_bom'                       => $rowbom->qty,
                                 'nominal_bom'                   => $rowbom->nominal,
-                                'total_bom'                     => $total,
+                                'total_bom'                     => $rowbom->total,
                                 'qty_planned'                   => $qty_planned,
                                 'nominal_planned'               => $nominal_planned,
                                 'total_planned'                 => $total_planned,
                                 'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
                                 'place_id'                      => $itemstock ? $itemstock->place_id : $this->place_id,
                                 'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
+                                'cost_distribution_id'          => $rowbom->cost_distribution_id ?? NULL,
                             ]);
                         }
                     }

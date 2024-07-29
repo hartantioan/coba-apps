@@ -34,24 +34,22 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
     {
         DB::beginTransaction();
         try {
-            if (isset($row['code']) && $row['code']) {
-                $check = HardwareItem::where('code', $row['code'])->first();
+            if (isset($row['group']) && $row['group']) {
                 $group = explode('#', $row['group'])[0];
                 $group_id = HardwareItemGroup::where('code', $group)->first();
                 if(!$group && $this->error ==null){
                     $this->error = "Group Hardware";
                 }
 
-                if (!$check) {
+                if ($group_id) {
                     
 
                     $query = HardwareItem::create([
-                        'code' => $row['code'],
+                        'code' => HardwareItem::generateCode(),
                         'item' => $row['barang'],
                         'user_id' => session('bo_id'),
                         'hardware_item_group_id' => $group_id->id,
                         'detail1' => $row['detail_1'],
-                        'detail2' => $row['detail_2'],
                         'status' => '1',
                     ]);
 

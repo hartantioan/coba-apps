@@ -31,9 +31,6 @@ class ExportMaterialRequestTransactionPage implements FromView,ShouldAutoSize
                         $query->where(function($query) {
                             $query->where('code', 'like', "%$this->search%")
                                 ->orWhere('post_date', 'like', "%$this->search%")
-                                ->orWhere('delivery_no', 'like', "%$this->search%")
-                                ->orWhere('vehicle_no', 'like', "%$this->search%")
-                                ->orWhere('driver', 'like', "%$this->search%")
                                 ->orWhere('note', 'like', "%$this->search%")
                                 ->orWhereHas('user',function($query){
                                     $query->where('name','like',"%$this->search%")

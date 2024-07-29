@@ -49,7 +49,7 @@
                                     <div class="collapsible-body">
                                         <div class="card-alert card gradient-45deg-yellow-green">
                                             <div class="card-content">
-                                                <p>Info : Untuk mencari batch WP / WIP 5, silahkan filter dari item parent yang disediakan.</p>
+                                                <p>Info : Untuk mencari batch WP / WIP 4, silahkan filter dari item parent yang disediakan.</p>
                                             </div>
                                         </div>
                                         <div class="row">

@@ -109,6 +109,8 @@ class AppServiceProvider extends ServiceProvider
             'production_handover_details'           => 'App\Models\ProductionHandoverDetail',
             'bom_standards'                         => 'App\Models\BomStandard',
             'bom_standard_details'                  => 'App\Models\BomStandardDetail',
+            'production_recalculates'               => 'App\Models\ProductionRecalculate',
+            'production_recalculate_details'        => 'App\Models\ProductionRecalculateDetail',
         ]);
     }
 }

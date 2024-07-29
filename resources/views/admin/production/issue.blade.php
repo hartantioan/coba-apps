@@ -1044,7 +1044,9 @@
                 </td>
             </tr>
         `);
+        $('#note').val('');
         if($('#production_order_detail_id').val()){
+            $('#note').val($('#production_order_detail_id').select2('data')[0].note);
             let datakuy = $('#production_order_detail_id').select2('data')[0];
 
             $('#title-modal').text(datakuy.bom_group);

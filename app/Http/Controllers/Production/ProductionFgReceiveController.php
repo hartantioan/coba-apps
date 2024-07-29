@@ -662,10 +662,10 @@ class ProductionFgReceiveController extends Controller
                                         $item = Item::find($rowbom->lookable_id);
                                         if($item){
                                             $price = $item->priceNowProduction($request->place_id,$request->post_date);
-                                            $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $price,2);
+                                            $rowtotalmaterial += round(round($rowbom->qty * str_replace(',','.',str_replace('.','',$row)),3) * $price,2);
                                         }
                                     }elseif($rowbom->lookable_type == 'resources'){
-                                        $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                                        $rowtotalmaterial += round(round($rowbom->qty * str_replace(',','.',str_replace('.','',$row)),3) * $rowbom->nominal,2);
                                     }
                                 }
                             }

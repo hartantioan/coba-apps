@@ -3813,20 +3813,20 @@ class CustomHelper {
 
 				}elseif($row->lookable_type == 'landed_cost_fee_details'){
 					$type = $pi->currency->type;
+					$currency_rate = $row->lookable->landedCost->currency_rate;
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $row->lookable->landedCostFee->coa_id,
 						'account_id'	=> $row->lookable->landedCostFee->coa->bp_journal ? $row->lookable->landedCost->account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->lookable->total * $pi->currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $pi->currency_rate : $row->lookable->total,
+						'nominal'		=> $row->lookable->total * $currency_rate,
+						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
 						'note'			=> $row->lookable->landedCostFee->name,
 					]);
 
-					$grandtotal += $row->grandtotal * $pi->currency_rate;
-					$tax += $row->tax * $pi->currency_rate;
-					$wtax += $row->wtax * $pi->currency_rate;
-					$currency_rate = $pi->currency_rate;
+					$grandtotal += $row->grandtotal * $currency_rate;
+					$tax += $row->tax * $currency_rate;
+					$wtax += $row->wtax * $currency_rate;
 
 					if($row->tax_id){
 						JournalDetail::create([
@@ -3834,8 +3834,8 @@ class CustomHelper {
 							'coa_id'		=> $row->taxMaster->coa_purchase_id,
 							'account_id'	=> $row->taxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> $row->tax * $pi->currency_rate,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $pi->currency_rate : $row->tax,
+							'nominal'		=> $row->tax * $currency_rate,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
 							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
@@ -3847,8 +3847,8 @@ class CustomHelper {
 							'coa_id'		=> $row->wTaxMaster->coa_purchase_id,
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> $row->wtax * $pi->currency_rate,
-							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $pi->currency_rate : $row->wtax,
+							'nominal'		=> $row->wtax * $currency_rate,
+							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
 							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
 						]);
@@ -3860,7 +3860,7 @@ class CustomHelper {
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
 						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
-						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
+						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
 					]);

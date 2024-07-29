@@ -3608,19 +3608,21 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> 'Item : '.$d->item->code.' - '.$d->item->name.' Palet : '.$d->pallet_no.' Shading : '.$d->shading.' Qty : '.CustomHelper::formatConditionalQty($d->qty_sell).' '.$d->itemUnit->unit->code,
-                'pallet_no'     => $d->pallet_no,
-                'item_id'       => $d->item_id,
-                'item_code'     => $d->item->code,
-                'item_name'     => $d->item->name,
-                'shading'       => $d->shading,
-                'qty'           => CustomHelper::formatConditionalQty($d->qty_sell),
-                'unit'          => $d->itemUnit->unit->code,
-                'list_warehouse'=> $d->item->warehouseList(),
-                'place_id'      => $d->productionFgReceive->place_id,
-            ];
+            if($d->balanceHandover() > 0){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> 'Item : '.$d->item->code.' - '.$d->item->name.' Palet : '.$d->pallet_no.' Shading : '.$d->shading.' Qty : '.CustomHelper::formatConditionalQty($d->qty_sell).' '.$d->itemUnit->unit->code,
+                    'pallet_no'     => $d->pallet_no,
+                    'item_id'       => $d->item_id,
+                    'item_code'     => $d->item->code,
+                    'item_name'     => $d->item->name,
+                    'shading'       => $d->shading,
+                    'qty'           => CustomHelper::formatConditionalQty($d->balanceHandover()),
+                    'unit'          => $d->itemUnit->unit->code,
+                    'list_warehouse'=> $d->item->warehouseList(),
+                    'place_id'      => $d->productionFgReceive->place_id,
+                ];
+            }
         }
 
         return response()->json(['items' => $response]);
@@ -4309,6 +4311,7 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
                 'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
+                'note'                          => 'PRODUCTION ORDER NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
 

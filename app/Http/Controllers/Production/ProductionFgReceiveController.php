@@ -656,6 +656,19 @@ class ProductionFgReceiveController extends Controller
                                 }
                             }
                             $bom_id = $bomAlternative->bom_id;
+                            if($bomAlternative->bom->bomStandard()->exists()){
+                                foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                                    if($rowbom->lookable_type == 'items'){
+                                        $item = Item::find($rowbom->lookable_id);
+                                        if($item){
+                                            $price = $item->priceNowProduction($request->place_id,$request->post_date);
+                                            $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $price,2);
+                                        }
+                                    }elseif($rowbom->lookable_type == 'resources'){
+                                        $rowtotalmaterial += round(round($rowbom->qty * (str_replace(',','.',str_replace('.','',$row)) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                                    }
+                                }
+                            }
                         }
 
                         $rowtotal = $rowtotalbatch + $rowtotalmaterial;

@@ -45,7 +45,7 @@ class ProductionFgReceiveDetail extends Model
     public function balanceHandover(){
         $total = $this->qty_sell;
         foreach($this->productionHandoverDetail as $row){
-            $total -= $row->qty_received;
+            $total -= $row->qty;
         }
         return $total;
     }

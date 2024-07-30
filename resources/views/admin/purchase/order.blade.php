@@ -3087,10 +3087,23 @@
 			subtotal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
 		});
 
+        $('#subtotal').text(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
+        );
+
+        let percent = 1;
+
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowbobot = Math.round(((rownominal / subtotal) + Number.EPSILON) * 10000) / 10000;
-            rowdiscount = discount * rowbobot;
+            rowbobot = Math.round((rownominal / subtotal) * 100) / 100;
+
+            if(percent > rowbobot){
+                percent -= rowbobot;
+            }else{
+                rowbobot = percent;
+            }
+            
+            rowdiscount = Math.round((discount * rowbobot) * 100) / 100;
             rownominal -= rowdiscount;
 
             if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
@@ -3145,9 +3158,6 @@
         grandtotalconvert = grandtotal * currency_rate;
         roundingconvert = rounding * currency_rate;
 
-        $('#subtotal').text(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
-        );
         $('#savesubtotal').val(
             (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );

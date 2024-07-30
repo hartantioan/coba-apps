@@ -307,7 +307,7 @@ class ProductionReceive extends Model
                             if($item){
                                 if($item->productionBatchMoreThanZero()->exists()){
                                     $totalbatch = 0;
-                                    $totalneeded = round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    $totalneeded = round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3);
                                     foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
                                         $qtyused = 0;
                                         if($totalneeded > $rowbatch->qty){
@@ -331,22 +331,22 @@ class ProductionReceive extends Model
                                     }
                                     if($rowbom->bom->group == '1'){
                                         $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
-                                        $totalbatch = round($row->qty * $price,2);
+                                        $totalbatch = round(($row->qty + $row->qty_reject) * $price,2);
                                     }else{
-                                        $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                        $price = $totalbatch / round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3);
                                     }
                                     $total = $totalbatch;
                                     $nominal = $price;
                                 }else{
                                     $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                                    $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
+                                    $total = round(round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3) * $price,2);
                                     $nominal = $price;
                                     $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                 }
                                 $nominal_planned = $nominal;
                             }
                         }elseif($rowbom->lookable_type == 'resources'){
-                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                            $total = round(round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
                             $nominal = $rowbom->nominal;
                             $nominal_planned = $rowbom->nominal;
                         }
@@ -387,7 +387,7 @@ class ProductionReceive extends Model
                                 if($item){
                                     if($item->productionBatchMoreThanZero()->exists()){
                                         $totalbatch = 0;
-                                        $totalneeded = round($rowbom->qty * $row->qty,3);
+                                        $totalneeded = round($rowbom->qty * ($row->qty + $row->qty_reject),3);
                                         foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
                                             $qtyused = 0;
                                             if($totalneeded > $rowbatch->qty){
@@ -411,28 +411,28 @@ class ProductionReceive extends Model
                                         }
                                         if($rowbom->bom->group == '1'){
                                             $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
-                                            $totalbatch = round($row->qty * $price,2);
+                                            $totalbatch = round(($row->qty + $row->qty_reject) * $price,2);
                                         }else{
-                                            $price = $totalbatch / round($rowbom->qty * $row->qty,3);
+                                            $price = $totalbatch / round($rowbom->qty * ($row->qty + $row->qty_reject),3);
                                         }
                                         $total = $totalbatch;
                                         $nominal = $price;
                                     }else{
                                         $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                                        $total = round(round($rowbom->qty * $row->qty,3) * $price,2);
+                                        $total = round(round($rowbom->qty * ($row->qty + $row->qty_reject),3) * $price,2);
                                         $nominal = $price;
                                         $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                     }
                                     $nominal_planned = $nominal;
                                 }
                             }elseif($rowbom->lookable_type == 'resources'){
-                                $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
+                                $total = round(round($rowbom->qty * ($row->qty + $row->qty_reject),3) * $rowbom->nominal,2);
                                 $nominal = $rowbom->nominal;
                                 $nominal_planned = $rowbom->nominal;
                             }
                             $total_planned = round($nominal_planned * $qty_planned,2);
                             $querydetail->update([
-                                'qty'                           => round($rowbom->qty * $row->qty,3),
+                                'qty'                           => round($rowbom->qty * ($row->qty + $row->qty_reject),3),
                                 'nominal'                       => $nominal,
                                 'total'                         => $total,
                                 'qty_bom'                       => $rowbom->qty,

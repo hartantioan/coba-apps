@@ -4,42 +4,16 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\GoodIssueRequest;
-use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
-use App\Models\GoodReturnPO;
-use App\Models\GoodScale;
-use App\Models\InventoryTransferOut;
-use App\Models\Item;
-use App\Models\Line;
-use App\Models\CloseBill;
-use App\Models\FundRequest;
 use App\Exports\ExportOutstandingGRPO;
 use App\Exports\ExportGoodReceiptTransactionPage;
-use App\Models\LandedCost;
-use App\Models\Machine;
-use App\Models\MaterialRequest;
-use App\Models\PaymentRequest;
-use App\Models\PersonalCloseBill;
-use App\Models\PaymentRequestCross;
-use App\Models\PurchaseDownPayment;
-use App\Models\PurchaseInvoice;
-use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrderDetail;
 
 use App\Models\PurchaseOrder;
-use App\Models\ApprovalMatrix;
-use App\Models\ApprovalSource;
-
-use App\Models\PurchaseRequest;
-use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -47,7 +21,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\User;
 use App\Helpers\TreeHelper;
 use App\Models\Place;
-use App\Models\Department;
 use App\Models\GoodReceiptDetail;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
@@ -596,13 +569,13 @@ class GoodReceiptPOController extends Controller
 
                     $rowprice = 0;
 
-                    $bobot = round($pod->subtotal / $subtotal,4);
-                    $rowprice = round($pod->subtotal / $pod->qty,2);
+                    $bobot = $pod->subtotal / $subtotal;
+                    $rowprice = $pod->price;
 
                     $total = round(($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount),2);
 
                     if($pod->is_tax == '1' && $pod->is_include_tax == '1'){
-                        $total = round($total / (1 + ($pod->percent_tax / 100)),2);
+                        $total = $total / (1 + ($pod->percent_tax / 100));
                     }
 
                     if($pod->is_tax == '1'){

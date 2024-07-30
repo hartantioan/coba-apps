@@ -352,7 +352,7 @@ class ProductionReceive extends Model
                         }
                         $total_planned = round($nominal_planned * $qty_planned,2);
                         $querydetail->update([
-                            'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                            'qty'                           => round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
                             'qty_bom'                       => $rowbom->qty,

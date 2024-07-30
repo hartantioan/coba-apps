@@ -4367,7 +4367,7 @@ class CustomHelper {
 									}else{
 										$rowbobot = $percent;
 									}
-									if($row->bom->group == '2'){
+									if($row->bom->group == '1'){
 										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{

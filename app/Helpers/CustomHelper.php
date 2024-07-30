@@ -145,7 +145,7 @@ class CustomHelper {
 		}
 	}
 
-	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null){
+	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		$item = Item::find($item_id);
 		$bomPowder = $item->bomPlace($place_id)->exists() ? $item->bomPlace($place_id)->first() : NULL;
 		if($bomPowder && $bomPowder->group == '1'){
@@ -158,6 +158,8 @@ class CustomHelper {
 			ItemCogs::create([
 				'lookable_type'		=> $lookable_type,
 				'lookable_id'		=> $lookable_id,
+				'detailable_type'	=> $detail_type ?? NULL,
+				'detailable_id'		=> $detail_id ?? NULL,
 				'company_id'		=> $company_id,
 				'place_id'			=> $place_id,
 				'warehouse_id'		=> $warehouse_id,
@@ -184,6 +186,8 @@ class CustomHelper {
 					ItemCogs::create([
 						'lookable_type'		=> $lookable_type,
 						'lookable_id'		=> $lookable_id,
+						'detailable_type'	=> $detail_type ?? NULL,
+						'detailable_id'		=> $detail_id ?? NULL,
 						'company_id'		=> $company_id,
 						'place_id'			=> $place_id,
 						'warehouse_id'		=> $warehouse_id,
@@ -208,6 +212,8 @@ class CustomHelper {
 					ItemCogs::create([
 						'lookable_type'		=> $lookable_type,
 						'lookable_id'		=> $lookable_id,
+						'detailable_type'	=> $detail_type ?? NULL,
+						'detailable_id'		=> $detail_id ?? NULL,
 						'company_id'		=> $company_id,
 						'place_id'			=> $place_id,
 						'warehouse_id'		=> $warehouse_id,
@@ -232,6 +238,8 @@ class CustomHelper {
 					ItemCogs::create([
 						'lookable_type'		=> $lookable_type,
 						'lookable_id'		=> $lookable_id,
+						'detailable_type'	=> $detail_type ?? NULL,
+						'detailable_id'		=> $detail_id ?? NULL,
 						'company_id'		=> $company_id,
 						'place_id'			=> $place_id,
 						'warehouse_id'		=> $warehouse_id,
@@ -256,6 +264,8 @@ class CustomHelper {
 					ItemCogs::create([
 						'lookable_type'		=> $lookable_type,
 						'lookable_id'		=> $lookable_id,
+						'detailable_type'	=> $detail_type ?? NULL,
+						'detailable_id'		=> $detail_id ?? NULL,
 						'company_id'		=> $company_id,
 						'place_id'			=> $place_id,
 						'warehouse_id'		=> $warehouse_id,
@@ -1094,6 +1104,8 @@ class CustomHelper {
 					NULL,
 					NULL,
 					NULL,
+					$rowdetail->getTable(),
+					$rowdetail->id,
 				);
 
 				self::sendStock(
@@ -1942,6 +1954,8 @@ class CustomHelper {
 					$row->area_id,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
 					NULL,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -2014,6 +2028,8 @@ class CustomHelper {
 					NULL,
 					NULL,
 					NULL,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -2102,6 +2118,8 @@ class CustomHelper {
 					NULL,
 					NULL,
 					NULL,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -2218,6 +2236,8 @@ class CustomHelper {
 					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 					$row->itemStock->production_batch_id ? $row->itemStock->production_batch_id : NULL,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -2329,6 +2349,8 @@ class CustomHelper {
 					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
 					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
 					$row->goodIssueDetail->itemStock->production_batch_id ? $row->goodIssueDetail->itemStock->production_batch_id : NULL,
+					$row->getTable(),
+					$row->id
 				);
 
 				self::sendStock(
@@ -2398,6 +2420,8 @@ class CustomHelper {
 								NULL,
 								NULL,
 								NULL,
+								$rowdetail->getTable(),
+								$rowdetail->id,
 							);
 
 							JournalDetail::create([
@@ -2508,6 +2532,8 @@ class CustomHelper {
 						$rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area_id : NULL,
 						$rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->item_shading_id : NULL,
 						$rowdetail->itemStock->productionBatch()->exists() ? $rowdetail->itemStock->production_batch_id : NULL,
+						$rowdetail->getTable(),
+						$rowdetail->id,
 					);
 					
 					if($rowdetail->nominal < 0){
@@ -2750,6 +2776,8 @@ class CustomHelper {
 					$rowdetail->itemStock->area_id,
 					$rowdetail->itemStock->item_shading_id,
 					$rowdetail->itemStock->production_batch_id,
+					$rowdetail->getTable(),
+					$rowdetail->id,
 				);
 
 				self::sendStock(
@@ -2824,6 +2852,8 @@ class CustomHelper {
 					$rowdetail->area_id,
 					$rowdetail->itemStock->item_shading_id,
 					$rowdetail->itemStock->production_batch_id,
+					$rowdetail->getTable(),
+					$rowdetail->id,
 				);
 
 				self::sendStock(
@@ -3046,6 +3076,8 @@ class CustomHelper {
 								NULL,
 								NULL,
 								NULL,
+								$row->getTable(),
+								$row->id,
 							);
 
 							self::sendStock(
@@ -4179,8 +4211,8 @@ class CustomHelper {
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
-				foreach($arrBom as $row){
-					$totalrow = $pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->sum('total');
+				foreach($arrBom as $rowbom){
+					$totalrow = $pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->sum('total');
 
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -4194,7 +4226,7 @@ class CustomHelper {
 						'note'			=> $pir->productionOrderDetail->productionOrder->code,
 					]);
 					
-					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$row)->orderBy('id')->get() as $row){
+					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
 							if($row->is_wip){
 								//do nothing
@@ -4225,6 +4257,8 @@ class CustomHelper {
 									NULL,
 									NULL,
 									NULL,
+									$row->getTable(),
+									$row->id,
 								);
 				
 								self::sendStock(
@@ -4354,6 +4388,8 @@ class CustomHelper {
 										NULL,
 										NULL,
 										$rowbatchusage->production_batch_id,
+										$rowbatchusage->getTable(),
+										$rowbatchusage->id,
 									);
 					
 									self::sendStock(
@@ -4401,6 +4437,8 @@ class CustomHelper {
 											NULL,
 											NULL,
 											$rowbatchusage->productionBatch->id,
+											$rowbatchusage->getTable(),
+											$rowbatchusage->id,
 										);
 						
 										self::sendStock(
@@ -4442,6 +4480,8 @@ class CustomHelper {
 										NULL,
 										NULL,
 										NULL,
+										$row->getTable(),
+										$row->id,
 									);
 					
 									self::sendStock(
@@ -4613,6 +4653,8 @@ class CustomHelper {
 							NULL,
 							NULL,
 							$rowbatch->id,
+							$rowbatch->getTable(),
+							$rowbatch->id,
 						);
 		
 						self::sendStock(
@@ -4655,6 +4697,8 @@ class CustomHelper {
 						NULL,
 						NULL,
 						NULL,
+						$row->getTable(),
+						$row->id,
 					);
 	
 					self::sendStock(
@@ -4686,6 +4730,8 @@ class CustomHelper {
 							NULL,
 							NULL,
 							NULL,
+							$row->getTable(),
+							$row->id,
 						);
 	
 						self::sendStock(
@@ -4777,6 +4823,8 @@ class CustomHelper {
 				NULL,
 				NULL,
 				NULL,
+				$pir->getTable(),
+				$pir->id
 			);
 
 			self::sendStock(
@@ -4880,6 +4928,8 @@ class CustomHelper {
 					$row->area_id,
 					$row->item_shading_id,
 					$row->productionBatch->id,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -4920,6 +4970,8 @@ class CustomHelper {
 					NULL,
 					NULL,
 					NULL,
+					$row->getTable(),
+					$row->id,
 				);
 
 				self::sendStock(
@@ -5198,7 +5250,7 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'production_recalculates'){
-
+			
 		}
 		/* else{
 

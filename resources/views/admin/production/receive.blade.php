@@ -1048,7 +1048,7 @@
         $('#note').val('');
         if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
-                $('#note').val($('#production_order_detail_id').select2('data')[0].note);
+                $('#note').val('PRODUCTION RECEIVE ' + $('#production_order_detail_id').select2('data')[0].note);
                 $('#alert-method').html('-');
                 let datakuy = $('#production_order_detail_id').select2('data')[0];
 

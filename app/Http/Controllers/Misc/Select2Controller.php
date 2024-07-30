@@ -4311,7 +4311,7 @@ class Select2Controller extends Controller {
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'bom_detail'                    => $bomdetail,
                 'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
-                'note'                          => 'PRODUCTION ORDER NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                'note'                          => 'NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
 
@@ -4441,7 +4441,7 @@ class Select2Controller extends Controller {
                 'group_bom'                     => $d->productionScheduleDetail->bom->group,
                 'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
                 'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
-                'note'                          => 'PRODUCTION ORDER NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                'note'                          => 'NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
 

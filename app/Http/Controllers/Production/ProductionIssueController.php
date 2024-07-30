@@ -20,6 +20,7 @@ use App\Models\ProductionIssueDetail;
 use App\Models\ProductionOrder;
 use App\Models\User;
 use App\Models\MenuUser;
+use App\Exports\ExportProductionIssue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -1226,5 +1227,12 @@ class ProductionIssueController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
       
 		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportProductionIssue($post_date,$end_date,$mode), 'production_issue'.uniqid().'.xlsx');
     }
 }

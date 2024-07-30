@@ -40,6 +40,11 @@ class ProductionReceiveDetail extends Model
         return $this->hasMany('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
     }
 
+    public function getProductionBatchCodesAttribute()
+    {
+        return $this->productionBatch->pluck('code')->implode(', ');
+    }
+
     public function productionReceive()
     {
         return $this->belongsTo('App\Models\ProductionReceive', 'production_receive_id', 'id')->withTrashed();

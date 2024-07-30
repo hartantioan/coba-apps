@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UsedData;
 use App\Models\MenuUser;
+use App\Exports\ExportProductionReceive;
 class ProductionReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -1359,5 +1360,12 @@ class ProductionReceiveController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
       
 		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportProductionReceive($post_date,$end_date,$mode), 'production_receive'.uniqid().'.xlsx');
     }
 }

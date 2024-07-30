@@ -39,6 +39,8 @@ use Illuminate\Support\Facades\Storage;
 use iio\libmergepdf\Merger;
 use Illuminate\Support\Facades\Date;
 use Maatwebsite\Excel\Facades\Excel;
+
+use App\Exports\ExportProductionHandover;
 class ProductionHandoverController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -1221,5 +1223,12 @@ class ProductionHandoverController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
       
 		return Excel::download(new ExportProductionIssueReceiveTransactionPage($search,$status,$end_date,$start_date), 'production_schedule'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportProductionHandover($post_date,$end_date,$mode), 'production_handover'.uniqid().'.xlsx');
     }
 }

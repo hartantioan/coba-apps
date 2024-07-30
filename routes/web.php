@@ -205,6 +205,7 @@ use App\Http\Controllers\Production\ProductionHandoverController;
 use App\Http\Controllers\Production\ProductionIssueController;
 use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
+use App\Http\Controllers\Production\ProductionRecapitulationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -2273,6 +2274,13 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable',[ProductionBatchController::class, 'datatable']);
                         Route::get('row_detail',[ProductionBatchController::class, 'rowDetail']);
                         Route::get('export', [ProductionBatchController::class, 'export']);
+                    });
+
+                    Route::prefix('production_recap')->middleware('operation.access:production_recap,view')->group(function () {
+                        Route::get('/',[ProductionRecapitulationController::class, 'index']);
+                        Route::get('datatable',[ProductionRecapitulationController::class, 'datatable']);
+                        Route::get('row_detail',[ProductionRecapitulationController::class, 'rowDetail']);
+                        Route::get('export', [ProductionRecapitulationController::class, 'export']);
                     });
                 });
             });

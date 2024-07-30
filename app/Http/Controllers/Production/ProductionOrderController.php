@@ -12,7 +12,6 @@ use App\Models\IncomingPayment;
 use App\Models\Item;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
-use App\Models\MarketingOrderDownPayment;
 use App\Models\MarketingOrderInvoice;
 use App\Models\User;
 use Illuminate\Support\Facades\Validator;
@@ -28,6 +27,7 @@ use App\Models\ProductionOrderDetail;
 use App\Models\ProductionSchedule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportProductionOrderTransactionPage;
+use App\Exports\ExportProductionOrder;
 use App\Models\ProductionScheduleDetail;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Date;
@@ -950,6 +950,13 @@ class ProductionOrderController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportProductionOrder($post_date,$end_date,$mode), 'production_order'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){

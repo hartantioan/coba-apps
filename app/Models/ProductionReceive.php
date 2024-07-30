@@ -329,7 +329,7 @@ class ProductionReceive extends Model
                                             break;
                                         }
                                     }
-                                    if($rowbom->bom->group == '1'){
+                                    if($bomAlternative->bom->group == '1'){
                                         $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
                                         $totalbatch = round(($row->qty + $row->qty_reject) * $price,2);
                                     }else{

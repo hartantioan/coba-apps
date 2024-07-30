@@ -325,8 +325,6 @@ class ProductionReceive extends Model
                                                 'qty'                   => $qtyused,
                                             ]);
                                             CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
-                                        }else{
-                                            break;
                                         }
                                     }
                                     if($bomAlternative->bom->group == '1'){
@@ -457,14 +455,14 @@ class ProductionReceive extends Model
                     'production_issue_id'   => $query->id,
                 ]);
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                /* CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive No. '.$this->code,session('bo_id'));
 
                 activity()
                     ->performedOn(new ProductionIssue())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit issue production.');
+                    ->log('Add / edit issue production.'); */
             }
         }
     }

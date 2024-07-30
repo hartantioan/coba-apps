@@ -4371,6 +4371,7 @@ class CustomHelper {
 										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{
+										info('kambing');
 										$rowtotal = round($rowbobot * $row->total,2);
 									}
 									JournalDetail::create([

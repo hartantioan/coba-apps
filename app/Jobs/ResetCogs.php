@@ -54,7 +54,11 @@ class ResetCogs implements ShouldQueue
     {
 		$item = Item::find($this->item_id);
 		$bomPowder = $item->bomPlace($this->place_id)->exists() ? $item->bomPlace($this->place_id)->first() : NULL;
-		if($bomPowder && $bomPowder->group == '1'){
+		$bomGroup = '';
+		if($bomPowder){
+			$bomGroup = $bomPowder->group; 
+		}
+		if($bomPowder && $bomGroup == '1'){
 			$itemcogs = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderBy('date')->orderBy('id')->get();
 			$old_data = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 		}else{
@@ -107,6 +111,59 @@ class ResetCogs implements ShouldQueue
 					'qty_final'		=> $qty_final,
 					'total_final'	=> $total_final,
 				]);
+			}
+		}
+
+		if($bomGroup == '2' || $bomGroup == '3'){
+			$itemcogs2 = ItemCogs::where('date','>=',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderBy('date')->orderBy('id')->get();
+			$old_data2 = ItemCogs::where('date','<',$this->date)->where('company_id',$this->company_id)->where('place_id',$this->place_id)->where('item_id',$this->item_id)->orderByDesc('date')->orderByDesc('id')->first();
+
+			$total_final = 0;
+			$qty_final = 0;
+			$price_final = 0;
+			foreach($itemcogs2 as $key => $row){
+				if($key == 0){
+					if($old_data2){
+						if($row->type == 'IN'){
+							$total_final = $old_data->total_final + $row->total_in;
+							$qty_final = $old_data->qty_final + $row->qty_in;
+						}elseif($row->type == 'OUT'){
+							$total_final = $old_data->total_final - $row->total_out;
+							$qty_final = $old_data->qty_final - $row->qty_out;
+						}
+
+						$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+					}else{
+						if($row->type == 'IN'){
+							$total_final = $row->total_in;
+							$qty_final = $row->qty_in;
+						}elseif($row->type == 'OUT'){
+							$total_final = 0 - $row->total_out;
+							$qty_final = 0 - $row->qty_out;
+						}
+
+						$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+					}
+					$row->update([
+						'price_final'	=> $price_final,
+						'qty_final'		=> $qty_final,
+						'total_final'	=> $total_final,
+					]);
+				}else{
+					if($row->type == 'IN'){
+						$total_final += $row->total_in;
+						$qty_final += $row->qty_in;
+					}elseif($row->type == 'OUT'){
+						$total_final -= $row->total_out;
+						$qty_final -= $row->qty_out;
+					}
+					$price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+					$row->update([
+						'price_final'	=> $price_final,
+						'qty_final'		=> $qty_final,
+						'total_final'	=> $total_final,
+					]);
+				}
 			}
 		}
     }

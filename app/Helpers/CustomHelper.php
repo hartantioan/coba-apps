@@ -4367,7 +4367,12 @@ class CustomHelper {
 									}else{
 										$rowbobot = $percent;
 									}
-									$rowtotal = round($rowbobot * $row->total,2);
+									if($row->bom->group == '2'){
+										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
+										$rowtotal = round($price * $rowbatchusage->qty,2);
+									}else{
+										$rowtotal = round($rowbobot * $row->total,2);
+									}
 									JournalDetail::create([
 										'journal_id'	=> $query->id,
 										'coa_id'		=> $rowbatchusage->productionBatch->item->itemGroup->coa_id,

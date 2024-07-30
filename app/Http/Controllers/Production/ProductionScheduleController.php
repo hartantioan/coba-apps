@@ -30,6 +30,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use iio\libmergepdf\Merger;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportProductionScheduleTransactionPage;
+use App\Exports\ExportProductionSchedule;
 use App\Models\ProductionOrder;
 use App\Models\ProductionOrderDetail;
 use Illuminate\Support\Facades\Date;
@@ -1189,6 +1190,12 @@ class ProductionScheduleController extends Controller
         }
     }
 
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportProductionSchedule($post_date,$end_date,$mode), 'production_schedule'.uniqid().'.xlsx');
+    }
     
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';

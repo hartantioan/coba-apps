@@ -17,6 +17,7 @@ use App\Models\MarketingOrderInvoice;
 use App\Models\User;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportMarketingOrderPlanTransactionPage;
+use App\Exports\ExportMarketingOrderPlan;
 use App\Helpers\TreeHelper;
 use App\Models\Line;
 use Illuminate\Support\Facades\Validator;
@@ -1004,6 +1005,13 @@ class MarketingOrderPlanController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function export(Request $request){
+        $post_date = $request->start_date? $request->start_date : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $mode = $request->mode ? $request->mode : '';
+		return Excel::download(new ExportMarketingOrderPlan($post_date,$end_date,$mode), 'marketing_order_plan'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPage(Request $request){

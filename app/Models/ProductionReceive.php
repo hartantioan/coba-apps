@@ -324,7 +324,6 @@ class ProductionReceive extends Model
                                                 'lookable_id'           => $querydetail->id,
                                                 'qty'                   => $qtyused,
                                             ]);
-                                            info('kambing');
                                             CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
                                         }else{
                                             break;

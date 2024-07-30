@@ -4359,9 +4359,15 @@ class CustomHelper {
 							//do nothing
 						}else{
 							if($row->productionBatchUsage()->exists()){
+								$percent = 1;
 								foreach($row->productionBatchUsage as $rowbatchusage){
-									$price = $rowbatchusage->productionBatch->item->priceNowProduction($rowbatchusage->productionBatch->place_id,$data->post_date);
-									$rowtotal = round($rowbatchusage->qty * $price,2);
+									$rowbobot = round($rowbatchusage->qty / $row->qty,2);
+									if($percent > $rowbobot){
+										$percent -= $rowbobot;
+									}else{
+										$rowbobot = $percent;
+									}
+									$rowtotal = round($rowbobot * $row->total,2);
 									JournalDetail::create([
 										'journal_id'	=> $query->id,
 										'coa_id'		=> $rowbatchusage->productionBatch->item->itemGroup->coa_id,

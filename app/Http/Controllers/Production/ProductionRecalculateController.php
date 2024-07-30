@@ -18,7 +18,10 @@ use App\Models\ProductionHandoverDetail;
 use App\Models\ProductionReceive;
 use App\Models\User;
 use App\Models\MenuUser;
+use App\Models\ProductionIssue;
+use App\Models\ProductionIssueDetail;
 use App\Models\ProductionRecalculate;
+use App\Models\ProductionRecalculateDetail;
 use App\Models\ProductionReceiveDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -92,14 +95,16 @@ class ProductionRecalculateController extends Controller
                         }
                     })->get() as $rowcost){
                         $arr[] = [
+                            'production_issue_id'   => $rowissue->id,
                             'production_batch_id'   => $row->id,
                             'production_batch_code' => $row->code,
                             'item_code'             => $row->item->code,
                             'item_name'             => $row->item->name,
                             'qty'                   => CustomHelper::formatConditionalQty($row->qty_real),
                             'unit'                  => $row->item->uomUnit->code,
-                            'lookable_id'           => $rowcost->lookable_id,
-                            'lookable_type'         => $rowcost->lookable_type,
+                            'lookable_id'           => $rowcost->id,
+                            'lookable_type'         => $rowcost->getTable(),
+                            'resource_id'           => $rowcost->lookable_id,
                             'data_name'             => $rowcost->lookable->code.' - '.$rowcost->lookable->name,
                             'total'                 => CustomHelper::formatConditionalQty(round($rowcost->total * $bobotReceive,2)),
                         ];
@@ -268,15 +273,15 @@ class ProductionRecalculateController extends Controller
                 'code_place_id'             => 'required',
                 'company_id'			    => 'required',
                 'post_date'		            => 'required',
-                'start_date'		        => 'required',
-                'end_date'		            => 'required',
+                'start_date_period'		    => 'required',
+                'end_date_period'		    => 'required',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-                'start_date.required' 			    => 'Tanggal mulai periode tidak boleh kosong.',
-                'end_date.required' 			    => 'Tanggal akhir periode tidak boleh kosong.',
+                'start_date_period.required' 	    => 'Tanggal mulai periode tidak boleh kosong.',
+                'end_date_period.required' 			=> 'Tanggal akhir periode tidak boleh kosong.',
             ]);
 
             if($validation->fails()) {
@@ -287,7 +292,7 @@ class ProductionRecalculateController extends Controller
             } else {
 
                 if($request->temp){
-                    $query = ProductionHandover::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = ProductionRecalculate::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -309,18 +314,18 @@ class ProductionRecalculateController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Serah Terima Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Rekalkulasi Produksi telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
-                    if(in_array($query->status,['1','2','5','6'])){
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/production_handovers');
+                            $document = $request->file('file')->store('public/production_recalculates');
                         } else {
                             $document = $query->document;
                         }
@@ -328,107 +333,89 @@ class ProductionRecalculateController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->production_fg_receive_id = $request->production_fg_receive_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
+                        $query->start_date = $request->start_date_period;
+                        $query->end_date = $request->end_date_period;
                         $query->status = '1';
 
                         $query->save();
                         
-                        foreach($query->productionHandoverDetail as $row){
-                            if($row->productionBatchUsage()->exists()){
-                                CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
-                            }
-                            $row->productionBatchUsage()->delete();
-                            $row->productionBatch()->delete();
+                        foreach($query->productionRecalculateDetai as $row){
+                            $row->productionIssueDetail()->delete();
                             $row->delete();
                         }
                     }else{
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Status Serah Terima Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status Rekalkulasi Produksi sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionHandover::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode=ProductionRecalculate::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
-                    $query = ProductionHandover::create([
+                    $query = ProductionRecalculate::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'production_fg_receive_id'  => $request->production_fg_receive_id,
                         'post_date'                 => $request->post_date,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_handovers') : NULL,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_recalculates') : NULL,
                         'note'                      => $request->note,
+                        'start_date'                => $request->start_date_period,
+                        'end_date'                  => $request->end_date_period,
                         'status'                    => '1',
                     ]);
                 }
                 
                 if($query) {
                     
-                    foreach($request->arr_qty as $key => $row){
-                        $prfgd = ProductionFgReceiveDetail::find($request->arr_prfd_id[$key]);
-                        if($prfgd){
-                            $qtyuom = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $prfgd->conversion;
-                            $rowcost = round($prfgd->productionBatch->price() * $qtyuom,2);
-                            $itemShading = ItemShading::where('item_id',$request->arr_item_id[$key])->where('code',$prfgd->shading)->first();
-
-                            if(!$itemShading){
-                                $itemShading = ItemShading::create([
-                                    'item_id'   => $request->arr_item_id[$key],
-                                    'code'      => $prfgd->shading,
+                    foreach($request->arr_production_issue_id as $key => $row){
+                        $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
+                        if($nominal < 0 || $nominal > 0){
+                            $querydetail = ProductionRecalculateDetail::create([
+                                'production_recalculate_id'     => $query->id,
+                                'lookable_type'                 => $request->arr_lookable_type[$key],
+                                'lookable_id'                   => $request->arr_lookable_id[$key],
+                                'production_issue_id'           => $row,
+                                'production_batch_id'           => $request->arr_production_batch_id[$key],
+                                'resource_id'                   => $request->arr_resource_id[$key],
+                                'total'                         => $nominal,
+                            ]);
+                            $updateProductionIssue = ProductionIssue::find($row);
+                            if($updateProductionIssue){
+                                ProductionIssueDetail::create([
+                                    'production_issue_id'               => $updateProductionIssue->id,
+                                    'production_order_detail_id'        => $updateProductionIssue->production_order_detail_id,
+                                    'lookable_type'                     => 'resources',
+                                    'lookable_id'                       => $request->arr_resource_id[$key],
+                                    'qty'                               => 1,
+                                    'nominal'                           => $nominal,
+                                    'total'                             => $nominal,
+                                    'qty_bom'                           => 0,
+                                    'nominal_bom'                       => 0,
+                                    'total_bom'                         => 0,
+                                    'qty_planned'                       => 0,
+                                    'nominal_planned'                   => 0,
+                                    'total_planned'                     => 0,
+                                    'place_id'                          => $updateProductionIssue->place_id,
+                                    'production_recalculate_detail_id'  => $querydetail->id,
                                 ]);
+                                $updateProductionIssue->reJournalAndRecalculateReceive();
                             }
-
-                            $querydetail = ProductionHandoverDetail::create([
-                                'production_handover_id'            => $query->id,
-                                'production_fg_receive_detail_id'   => $prfgd->id,
-                                'item_id'                           => $request->arr_item_id[$key],
-                                'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                'shading'                           => $prfgd->shading,
-                                'place_id'                          => $request->arr_place[$key],
-                                'warehouse_id'                      => $request->arr_warehouse[$key],
-                                'area_id'                           => $request->arr_area_id[$key],
-                                'total'                             => $rowcost,
-                                'item_shading_id'                   => $itemShading->id,
-                            ]);
-                            
-                            ProductionBatchUsage::create([
-                                'production_batch_id'   => $prfgd->productionBatch->id,
-                                'lookable_type'         => $querydetail->getTable(),
-                                'lookable_id'           => $querydetail->id,
-                                'qty'                   => $qtyuom,
-                            ]);
-
-                            CustomHelper::updateProductionBatch($prfgd->productionBatch->id,$qtyuom,'OUT');
-
-                            ProductionBatch::create([
-                                'code'          => $querydetail->productionFgReceiveDetail->pallet_no,
-                                'item_id'       => $querydetail->item_id,
-                                'place_id'      => $request->arr_place[$key],
-                                'warehouse_id'  => $request->arr_warehouse[$key],
-                                'area_id'       => $request->arr_area_id[$key],
-                                'item_shading_id'=> $itemShading->id,
-                                'lookable_type' => $querydetail->getTable(),
-                                'lookable_id'   => $querydetail->id,
-                                'qty'           => $qtyuom,
-                                'qty_real'      => $qtyuom,
-                                'total'         => $rowcost,
-                            ]);
                         }
                     }
                     
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Serah Terima Produksi No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
+                    CustomHelper::sendApproval($query->getTable(),$query->id,'Rekalkulasi Produksi No. '.$query->code);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Rekalkulasi Produksi No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
                     activity()
-                        ->performedOn(new ProductionHandover())
+                        ->performedOn(new ProductionRecalculate())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit handover fg.');
+                        ->log('Add / edit recalculate cost.');
 
                     $response = [
                         'status'    => 200,
@@ -488,7 +475,7 @@ class ProductionRecalculateController extends Controller
                 
         if($pr){
             $data = [
-                'title'     => 'Serah Terima Produksi',
+                'title'     => 'Rekalkulasi Produksi',
                 'data'      => $pr
             ];
 
@@ -628,7 +615,7 @@ class ProductionRecalculateController extends Controller
         $pr = ProductionHandover::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Serah Terima Produksi','a4','portrait','admin.print.production.handover_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'Rekalkulasi Produksi','a4','portrait','admin.print.production.handover_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
@@ -692,9 +679,9 @@ class ProductionRecalculateController extends Controller
                     ->performedOn(new ProductionHandover())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the Serah Terima Produksi data');
+                    ->log('Void the Rekalkulasi Produksi data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Serah Terima Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Rekalkulasi Produksi No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -768,7 +755,7 @@ class ProductionRecalculateController extends Controller
                 ->performedOn(new ProductionHandover())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the Serah Terima Produksi data');
+                ->log('Delete the Rekalkulasi Produksi data');
 
             $response = [
                 'status'  => 200,
@@ -1023,7 +1010,7 @@ class ProductionRecalculateController extends Controller
         $mop = ProductionBatch::find($request->id);
        
         if(!$mop->used()->exists()){
-            CustomHelper::sendUsedData($request->type,$request->id,'Form Serah Terima Produksi');
+            CustomHelper::sendUsedData($request->type,$request->id,'Form Rekalkulasi Produksi');
             return response()->json([
                 'status'    => 200,
             ]);

@@ -253,6 +253,11 @@
                                                 <p>Info : Biaya resource yang muncul adalah nilai kalkulasi dari tiap batch pada periode terpilih. Jika ada lebih dari 1 batch pada saat barang diterima (Production Receive), maka biaya yang muncul adalah nilai proporsional masing-masing batch.</p>
                                             </div>
                                         </div>
+                                        <div class="card-alert card gradient-45deg-indigo-light-blue">
+                                            <div class="card-content white-text">
+                                                <p>Info : Data yang disimpan adalah > 0 atau < 0.</p>
+                                            </div>
+                                        </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
                                                 <table class="bordered" style="border: 1px solid;min-width:1500px;" id="table-detail-item">
@@ -698,121 +703,6 @@
                 `);
             }
         });
-
-        $("#text-barcode").on( "keypress", function(e) {
-            var key = e.which;
-            if(key == 13){
-                if($(this).val()){
-                    let code = $(this).val();
-                    $.ajax({
-                        url: '{{ Request::url() }}/get_scan_barcode',
-                        type: 'POST',
-                        dataType: 'JSON',
-                        data: {
-                            code: code,
-                            fgr_id: $('#production_fg_receive_id').val(),
-                        },
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        beforeSend: function() {
-                            loadingOpen('#modal1');
-                        },
-                        success: function(response) {
-                            loadingClose('#modal1');
-                            if(response.status == 200){
-                                if($('#last-row-item').length > 0){
-                                    $('#last-row-item').remove();
-                                }
-                                let no = $('.row_item').length + 1;
-                                let count = makeid(10);
-                                $('#body-item').append(`
-                                    <tr class="row_item">
-                                        <input type="hidden" name="arr_prfd_id[]" value="` + response.data.id + `">
-                                        <input type="hidden" name="arr_item_id[]" value="` + response.data.item_id + `">
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                        <td class="center-align">
-                                            ` + no + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.pallet_no + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.item_code + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.item_name + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.shading + `
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_qty[]" type="text" value="` + response.data.qty + `" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);">
-                                        </td>
-                                        <td class="center-align">
-                                            ` + response.data.unit + `
-                                        </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                                @foreach ($place as $rowplace)
-                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                <option value="">--Silahkan pilih item--</option>
-                                            </select>
-                                        </td>
-                                        <td class="center-align">
-                                            <select class="browser-default" id="arr_area_id` + count + `" name="arr_area_id[]"></select>
-                                        </td>
-                                    </tr>
-                                `);
-
-                                if(response.data.list_warehouse.length > 0){
-                                    $('#arr_warehouse' + count).empty();
-                                    $.each(response.data.list_warehouse, function(i, val) {
-                                        $('#arr_warehouse' + count).append(`
-                                            <option value="` + val.id + `">` + val.name + `</option>
-                                        `);
-                                    });
-                                }
-
-                                select2ServerSide('#arr_area_id' + count, '{{ url("admin/select2/area") }}');
-
-                                $('#arr_qty_reject' + count).trigger('keyup');
-
-                                $('.modal-content').scrollTop(400);
-                                M.updateTextFields();
-
-                            }else{
-                                swal({
-                                    title: 'Ups!',
-                                    text: response.message,
-                                    icon: 'error'
-                                });
-                            }
-                        },
-                        error: function() {
-                            $('.modal-content').scrollTop(0);
-                            loadingClose('#modal1');
-                            swal({
-                                title: 'Ups!',
-                                text: 'Check your internet connection.',
-                                icon: 'error'
-                            });
-                        }
-                    });
-                }
-                e.preventDefault();
-            }
-            $('#text-barcode').val('');
-        });
     });
 
     function makeTreeOrg(data,link){
@@ -973,7 +863,10 @@
 
                         $('#body-item').append(`
                             <tr class="row_item">
+                                <input type="hidden" name="arr_production_issue_id[]" value="` + val.production_issue_id + `">
                                 <input type="hidden" name="arr_production_batch_id[]" value="` + val.production_batch_id + `">
+                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                 <input type="hidden" name="arr_resource_id[]" value="` + val.resource_id + `">
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">

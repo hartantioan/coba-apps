@@ -19,6 +19,7 @@ class ProductionRecalculateDetail extends Model
         'production_recalculate_id',
         'lookable_type',
         'lookable_id',
+        'production_issue_id',
         'production_batch_id',
         'resource_id',
         'total',
@@ -30,6 +31,15 @@ class ProductionRecalculateDetail extends Model
 
     public function productionBatch(){
         return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id')->withTrashed();
+    }
+
+    public function productionIssue(){
+        return $this->belongsTo('App\Models\ProductionIssue','production_issue_id','id')->withTrashed();
+    }
+
+    public function productionIssueDetail()
+    {
+        return $this->hasOne('App\Models\ProductionIssueDetail','production_recalculate_detail_id','id');
     }
 
     public function resource()

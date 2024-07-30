@@ -57,6 +57,33 @@ class MenuController extends Controller
             ]);
         } */
 
+        /* $itemcogs = ItemCogs::where('lookable_type','good_issues')->get();
+
+        $temp = 0;
+        $temp2 = 0;
+        $index = 0;
+        foreach($itemcogs as $row){
+            $data = NULL;
+            $data = GoodIssueDetail::where('good_issue_id',$row->lookable_id)->whereHas('itemStock',function($query)use($row){
+                $query->where('item_id',$row->item_id);
+            })->get();
+            if($temp == $row->item_id && $temp2 == $row->lookable_id){
+                $index++;
+                $row->update([
+                    'detailable_type'   => $data[$index]->getTable(),
+                    'detailable_id'     => $data[$index]->id,
+                ]);
+            }else{
+                $index = 0;
+                $row->update([
+                    'detailable_type'   => $data[$index]->getTable(),
+                    'detailable_id'     => $data[$index]->id,
+                ]);
+            }
+            $temp2 = $row->lookable_id;
+            $temp = $row->item_id;
+        } */
+
         $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),

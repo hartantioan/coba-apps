@@ -30,6 +30,11 @@ class ProductionReceiveDetail extends Model
         'total',
     ];
 
+    public function totalBatch(){
+        $total = $this->productionBatch()->sum('total');
+        return $total;
+    }
+
     public function productionBatch()
     {
         return $this->hasMany('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);

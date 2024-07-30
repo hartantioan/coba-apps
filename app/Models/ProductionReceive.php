@@ -233,6 +233,14 @@ class ProductionReceive extends Model
         }
     }
 
+    public function totalIssueExcept($id){
+        $total = 0;
+        foreach($this->productionReceiveIssue()->where('production_issue_id','<>',$id)->get() as $row){
+            $total += $row->productionIssue->total();
+        }
+        return $total;
+    }
+
     public function total(){
         $total = $this->productionReceiveDetail()->sum('total');
         return $total;
@@ -371,7 +379,7 @@ class ProductionReceive extends Model
                             $nominal = 0;
                             $total = 0;
                             $itemstock = NULL;
-                            $qty_planned = round($rowbom->qty * ($row->qty_planned / $rowbom->bom->qty_output),3);
+                            $qty_planned = round($rowbom->qty * $row->qty_planned,3);
                             $nominal_planned = 0;
                             $total_planned = 0;
                             if($rowbom->lookable_type == 'items'){
@@ -405,7 +413,7 @@ class ProductionReceive extends Model
                                             $price = $rowbom->lookable->priceNowProduction($this->place_id,$this->post_date);
                                             $totalbatch = round($row->qty * $price,2);
                                         }else{
-                                            $price = $totalbatch / round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                            $price = $totalbatch / round($rowbom->qty * $row->qty,3);
                                         }
                                         $total = $totalbatch;
                                         $nominal = $price;

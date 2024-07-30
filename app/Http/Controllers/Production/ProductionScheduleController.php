@@ -253,7 +253,7 @@ class ProductionScheduleController extends Controller
             'place_id'		            => 'required',
             'post_date'		            => 'required',
             /* 'arr_id'                    => 'required|array', */
-            'arr_qty'                   => 'required|array',
+            /* 'arr_qty'                   => 'required|array', */
             'arr_detail_qty'            => 'required|array',
             'arr_item_detail_id'        => 'required|array',
             'arr_bom'                   => 'required|array',
@@ -266,8 +266,8 @@ class ProductionScheduleController extends Controller
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             /* 'arr_id.required'                   => 'Marketing Order Plan item target tidak boleh kosong.',
             'arr_id.array'                      => 'Marketing Order Plan item target harus array.', */
-            'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty target harus array.',
+            /* 'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
+            'arr_qty.array'                     => 'Qty target harus array.', */
             'arr_detail_qty.required'           => 'Qty detail tidak boleh kosong.',
             'arr_detail_qty.array'              => 'Qty detail harus array.',
             'arr_bom.required'                  => 'Bom tidak boleh kosong.',
@@ -388,12 +388,14 @@ class ProductionScheduleController extends Controller
                 DB::beginTransaction();
                 try {
                     
-                    foreach($request->arr_id as $key => $row){
-                        ProductionScheduleTarget::create([
-                            'production_schedule_id'            => $query->id,
-                            'marketing_order_plan_detail_id'    => $row,
-                            'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        ]);
+                    if($request->arr_id){
+                        foreach($request->arr_id as $key => $row){
+                            ProductionScheduleTarget::create([
+                                'production_schedule_id'            => $query->id,
+                                'marketing_order_plan_detail_id'    => $row,
+                                'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            ]);
+                        }
                     }
 
                     foreach($request->arr_detail_id as $key => $row){

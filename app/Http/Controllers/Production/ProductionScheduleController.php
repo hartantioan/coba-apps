@@ -656,7 +656,7 @@ class ProductionScheduleController extends Controller
                 <td style="min-width:150px !important;">'.$row->item->code.'</td>
                 <td style="min-width:150px !important;">'.$row->item->name.'</td>
                 <td style="min-width:150px !important;">'.$row->bom->code.' - '.$row->bom->name.'</td>
-                <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($rowdetail->production_date)).'</td>
+                <td style="min-width:150px !important;">'.date('d/m/Y',strtotime($row->production_date)).'</td>
                 <td style="min-width:150px !important;" class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td style="min-width:150px !important;" class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td style="min-width:150px !important;">'.$row->getMaterialHtml().'</td>

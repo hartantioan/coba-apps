@@ -1495,7 +1495,7 @@
     function generateSummaryRawmat(){
         $('#list-bom-relation').empty();
         $.each(arrFg, function(i, val) {
-            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+            let row = `<li><b>` + val.item_output + `</b> butuh : <ul>`;
             
             for(let j = 0;j<val.datas.length;j++){
                 row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`
@@ -1505,7 +1505,7 @@
             $('#list-bom-relation').append(row);
         });
         $.each(arrPowder, function(i, val) {
-            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+            let row = `<li><b>` + val.item_output + `</b> butuh : <ul>`;
             
             for(let j = 0;j<val.datas.length;j++){
                 row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`
@@ -1516,7 +1516,7 @@
         });
         $.each(arrGreenTile, function(i, val) {
             
-            let row = `<li>` + val.item_output + ` butuh : <ul>`;
+            let row = `<li><b>` + val.item_output + `</b> butuh : <ul>`;
 
             for(let j = 0;j<val.datas.length;j++){
                 row += `<li>` + val.datas[j]['item_code'] + ` - ` + val.datas[j]['item_name'] + ` : ` + formatRupiahIni((val.qty * val.datas[j]['qty']).toFixed(3).toString().replace('.',',')) + ` ` + val.datas[j]['unit'] + ` </li>`

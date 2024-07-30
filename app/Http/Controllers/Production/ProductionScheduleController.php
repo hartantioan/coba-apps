@@ -252,7 +252,7 @@ class ProductionScheduleController extends Controller
             'company_id'			    => 'required',
             'place_id'		            => 'required',
             'post_date'		            => 'required',
-            'arr_id'                    => 'required|array',
+            /* 'arr_id'                    => 'required|array', */
             'arr_qty'                   => 'required|array',
             'arr_detail_qty'            => 'required|array',
             'arr_item_detail_id'        => 'required|array',
@@ -264,8 +264,8 @@ class ProductionScheduleController extends Controller
             'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
             'place_id.required' 			    => 'Plant tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'arr_id.required'                   => 'Marketing Order Plan item target tidak boleh kosong.',
-            'arr_id.array'                      => 'Marketing Order Plan item target harus array.',
+            /* 'arr_id.required'                   => 'Marketing Order Plan item target tidak boleh kosong.',
+            'arr_id.array'                      => 'Marketing Order Plan item target harus array.', */
             'arr_qty.required'                  => 'Qty target tidak boleh kosong.',
             'arr_qty.array'                     => 'Qty target harus array.',
             'arr_detail_qty.required'           => 'Qty detail tidak boleh kosong.',

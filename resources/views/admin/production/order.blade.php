@@ -528,7 +528,7 @@
                                 </td>
                             </tr>
                             <tr class="row_close">
-                                <td colspan="6">` + val.detail_issue + val.detail_receive + `</td>
+                                <td colspan="7">` + val.detail_issue + val.detail_receive + `</td>
                             </tr>
                         `);
                     });

@@ -443,7 +443,7 @@ class ProductionHandoverController extends Controller
                         $prfgd = ProductionFgReceiveDetail::find($request->arr_prfd_id[$key]);
                         if($prfgd){
                             $qtyuom = str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) * $prfgd->conversion;
-                            $prodbatch = $prfgd->productionBatch->id;
+                            $prodbatch = ProductionBatch::find($prfgd->productionBatch->id);
                             $rowcost = round($prodbatch->priceByBalance() * $qtyuom,2);
                             $itemShading = ItemShading::where('item_id',$request->arr_item_id[$key])->where('code',$prfgd->shading)->first();
 

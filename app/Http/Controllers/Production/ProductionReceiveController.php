@@ -640,6 +640,7 @@ class ProductionReceiveController extends Controller
         $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
         $po['issues']                           = $issue;
         $po['bom_group']                        = strtoupper($po->productionOrderDetail->productionScheduleDetail->bom->group());
+        $po['group_bom']                        = $po->productionOrderDetail->productionScheduleDetail->bom->group;
         
 		return response()->json($po);
     }

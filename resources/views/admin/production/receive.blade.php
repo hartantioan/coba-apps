@@ -183,6 +183,7 @@
                                     <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="tempGroup" name="tempGroup">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
@@ -729,7 +730,7 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+                $('#temp,#tempGroup').val('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
@@ -1048,6 +1049,7 @@
         $('#note').val('');
         if($('#production_order_detail_id').val()){
             if($('#shift_id').val() && $('#group').val()){
+                $('#tempGroup').val($('#production_order_detail_id').select2('data')[0].group_bom);
                 $('#note').val('PRODUCTION RECEIVE ' + $('#production_order_detail_id').select2('data')[0].note);
                 $('#alert-method').html('-');
                 let datakuy = $('#production_order_detail_id').select2('data')[0];
@@ -1582,7 +1584,29 @@
                 formData.delete("arr_qty_batch[]");
                 formData.delete("arr_production_issue_id[]");
 
-                let passedInput = true, passedQty = true;
+                let passedInput = true, passedQty = true, passedProductionIssue = true;
+
+                if($('#tempGroup').val() == '1' || $('#tempGroup').val() == '3'){
+                    if($('select[name^="arr_production_issue_id[]"]').length == 0){
+                        passedProductionIssue = false;
+                    }else{
+                        $('select[name^="arr_production_issue_id[]"]').each(function(index){
+                            if(!$(this).val()){
+                                passedProductionIssue = false;
+                            }
+                        });
+                    }
+                }
+
+                if(!passedProductionIssue){
+                    swal({
+                        title: 'Ups! Maaf.',
+                        text: 'Untuk Tipe Bom Powder dan FG, silahkan pilih Production Issue (Batch).',
+                        icon: 'error'
+                    });
+
+                    return false;
+                }
 
                 $('input[name^="arr_qty[]"]').each(function(index){
                     let count = makeid(10), rowtotal = 0, element = this;
@@ -1739,6 +1763,7 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
+                $('#tempGroup').val(response.group_bom);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#post_date').val(response.post_date);

@@ -297,7 +297,7 @@
                                         <label class="active" for="item_name">Item FG (Parent)</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="pallet_id" name="pallet_id"></select>
+                                        <select class="browser-default" id="pallet_id" name="pallet_id" onchange="getChildFg();"></select>
                                         <label class="active" for="pallet_id">Palet</label>
                                     </div>
                                     <div class="input-field col m3 s12">

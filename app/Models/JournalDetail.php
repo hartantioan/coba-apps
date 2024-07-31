@@ -31,7 +31,19 @@ class JournalDetail extends Model
         'nominal_fc',
         'note',
         'note2',
+        'lookable_type',
+        'lookable_id',
+        'detailable_type',
+        'detailable_id',
     ];
+
+    public function lookable(){
+        return $this->morphTo();
+    }
+
+    public function detailable(){
+        return $this->morphTo();
+    }
 
     public function journal(){
         return $this->belongsTo('App\Models\Journal', 'journal_id', 'id')->withTrashed();

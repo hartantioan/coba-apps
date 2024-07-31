@@ -194,13 +194,14 @@
                                                     <th class="center-align">Nama Item</th>
                                                     <th class="center-align">Kode BOM</th>
                                                     <th class="center-align">Qty Planned</th>
-                                                    <th class="center-align">Qty Real</th>
+                                                    <th class="center-align">Qty Receive</th>
+                                                    <th class="center-align">Qty Reject</th>
                                                     <th class="center-align">Satuan</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-close">
                                                 <tr>
-                                                    <td class="center-align" colspan="7">Data tidak ditemukan</td>
+                                                    <td class="center-align" colspan="8">Data tidak ditemukan</td>
                                                 </t>
                                             </tbody>
                                         </table>
@@ -518,6 +519,9 @@
                                 </td>
                                 <td class="right-align">
                                     ` + val.qty_received + `
+                                </td>
+                                <td class="right-align">
+                                    ` + val.qty_reject + `
                                 </td>
                                 <td class="center-align">
                                     ` + val.unit + `

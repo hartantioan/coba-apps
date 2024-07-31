@@ -259,6 +259,7 @@ class ProductionOrderController extends Controller
                     'bom_code'              => $row->productionScheduleDetail->bom->code,
                     'qty_planned'           => CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty),
                     'qty_received'          => CustomHelper::formatConditionalQty($row->qtyReceive()),
+                    'qty_reject'            => CustomHelper::formatConditionalQty($row->qtyReject()),
                     'unit'                  => $row->productionScheduleDetail->item->uomUnit->code,
                     'detail_issue'          => $detailIssue,
                     'detail_receive'        => $detailReceive,

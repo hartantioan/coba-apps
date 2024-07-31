@@ -1845,7 +1845,7 @@
                                     ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` : `-`) + `
                                 </td>
                                 <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan ..." value="` + val.note + `">
+                                    <input name="` + (val.type == 'coas' ? `arr_note_item[]` : `arr_note[]` + `" class="materialize-textarea" type="text" placeholder="Keterangan ..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">

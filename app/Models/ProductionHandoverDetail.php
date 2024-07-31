@@ -31,26 +31,26 @@ class ProductionHandoverDetail extends Model
     ];
 
     public function productionBatchUsage(){
-        return $this->hasOne('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasOne('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table)->withTrashed();
     }
 
     public function productionBatch(){
-        return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table);
+        return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table)->withTrashed();
     }
 
     public function productionHandover()
     {
-        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id');
+        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id')->withTrashed();
     }
 
     public function parent()
     {
-        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id');
+        return $this->belongsTo('App\Models\ProductionHandover','production_handover_id','id')->withTrashed();
     }
 
     public function productionFgReceiveDetail()
     {
-        return $this->belongsTo('App\Models\ProductionFgReceiveDetail','production_fg_receive_detail_id','id');
+        return $this->belongsTo('App\Models\ProductionFgReceiveDetail','production_fg_receive_detail_id','id')->withTrashed();
     }
 
     public function place()

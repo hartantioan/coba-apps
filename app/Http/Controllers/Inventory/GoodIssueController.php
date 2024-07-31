@@ -535,7 +535,6 @@ class GoodIssueController extends Controller
                         'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arrItemNotPassed).', stok tidak tersedia atau melebihi stok yang tersedia.',
                     ]);
                 }
-
                 if($request->temp){
                     $query = GoodIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -616,7 +615,7 @@ class GoodIssueController extends Controller
                         'user_id'		        => session('bo_id'),
                         'company_id'		    => $request->company_id,
                         'post_date'             => $request->post_date,
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_issues') : NULL,
+                        'document'              => $request->file('file') ? $request->file('file')->store('public/good_issues') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
                         'grandtotal'            => round($grandtotal,2)

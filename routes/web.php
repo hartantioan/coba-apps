@@ -2162,6 +2162,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionIssueController::class, 'rowDetail']);
                     Route::post('show', [ProductionIssueController::class, 'show']);
                     Route::post('get_code', [ProductionIssueController::class, 'getCode']);
+                    Route::post('get_account_data', [ProductionIssueController::class, 'getAccountData']);
                     Route::post('print',[ProductionIssueController::class, 'print']);
                     Route::post('done',[ProductionIssueController::class, 'done'])->middleware('operation.access:production_issue,update');
                     Route::post('print_by_range',[ProductionIssueController::class, 'printByRange']);
@@ -2183,6 +2184,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ProductionReceiveController::class, 'show']);
                     Route::post('get_code', [ProductionReceiveController::class, 'getCode']);
                     Route::post('get_batch_code', [ProductionReceiveController::class, 'getBatchCode']);
+                    Route::post('get_account_data', [ProductionReceiveController::class, 'getAccountData']);
                     Route::post('print',[ProductionReceiveController::class, 'print']);
                     Route::post('done',[ProductionReceiveController::class, 'done'])->middleware('operation.access:production_receive,update');
                     Route::post('print_by_range',[ProductionReceiveController::class, 'printByRange']);

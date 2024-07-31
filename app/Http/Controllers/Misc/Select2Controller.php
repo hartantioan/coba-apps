@@ -4219,6 +4219,8 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $initialId = $request->id;
+       
         $data = ProductionOrderDetail::where(function($query)use($search){  
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
@@ -4257,6 +4259,14 @@ class Select2Controller extends Controller {
         })
         ->get();
 
+        if($initialId){
+            $data_tamba =ProductionOrderDetail::where('id',$initialId)
+            ->get();
+            if($data_tamba){
+                $data = $data_tamba;
+            }
+            
+        }
         foreach($data as $d) {
             $bomdetail = [];
             $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
@@ -4380,6 +4390,7 @@ class Select2Controller extends Controller {
         $response = [];
         $shift = Shift::find($request->shift_id);
         $search   = $request->search;
+        $initialId = $request->id;
         $data = ProductionOrderDetail::where(function($query)use($search){  
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
@@ -4410,7 +4421,14 @@ class Select2Controller extends Controller {
             });
         })
         ->get();
-
+        if($initialId){
+            $data_tamba =ProductionOrderDetail::where('id',$initialId)
+            ->get();
+            if($data_tamba){
+                $data = $data_tamba;
+            }
+            
+        }
         foreach($data as $d) {
             $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
                 $query->whereNotNull('is_default');

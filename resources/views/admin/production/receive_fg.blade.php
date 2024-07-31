@@ -1719,6 +1719,12 @@
                     passedQty = false;
                 } */
 
+                $('input[name^="arr_qty_uom[]"]').each(function(index){
+                    if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) <= 0 || !$(this).val()){
+                        passedInput = false;
+                    }
+                });
+
                 if($('.row_item').length == 0){
                     passedInput = false;
                 }
@@ -1735,7 +1741,7 @@
                 if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Batch dan qty tidak boleh kosong. Baris item fg tidak boleh kosong.',
+                        text: 'Batch dan qty tidak boleh kosong. Baris item fg tidak boleh kosong. Jumlah qty diterima tidak boleh 0.',
                         icon: 'error'
                     });
                 }else{

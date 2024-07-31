@@ -1072,6 +1072,10 @@ class CustomHelper {
 					'nominal'		=> floatval($rowtotal),
 					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? floatval($rowtotal) : floatval($rowdetail->getRowTotal()),
 					'note'			=> $gr->delivery_no,
+					'lookable_type'	=> $gr->getTable(),
+					'lookable_id'	=> $gr->id,
+					'detailable_type'=> $rowdetail->getTable(),
+					'detailable_id'	=> $rowdetail->id,
 				]);
 
 				if($coa_credit){
@@ -1088,6 +1092,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> floatval($rowtotal),
 						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? floatval($rowtotal) : floatval($rowdetail->getRowTotal()),
+						'lookable_type'	=> $gr->getTable(),
+						'lookable_id'	=> $gr->id,
+						'detailable_type'=> $rowdetail->getTable(),
+						'detailable_id'	=> $rowdetail->id,
 					]);
 				}
 
@@ -4861,8 +4869,6 @@ class CustomHelper {
 				'note'			=> $pir->code,
 			]);
 
-			$pir->createProductionIssue();
-
 			if($pir->qty_reject > 0){
 				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){
 					self::sendCogs($table_name,
@@ -4878,6 +4884,8 @@ class CustomHelper {
 						NULL,
 						NULL,
 						NULL,
+						$pir->getTable(),
+						$pir->id
 					);
 
 					self::sendStock(
@@ -4892,6 +4900,8 @@ class CustomHelper {
 					);
 				}
 			}
+
+			$pir->createProductionIssue();
 
 		}elseif($table_name == 'production_handovers'){
 

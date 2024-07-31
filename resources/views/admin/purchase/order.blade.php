@@ -3384,7 +3384,7 @@
         }) */.start();
     }
 
-    function done(id){
+    /* function done(id){
         $.ajax({
             url: '{{ Request::url() }}/get_items',
             type: 'POST',
@@ -3538,7 +3538,7 @@
                 });
             }
         });
-    }
+    } */
 
     function whatPrinting(code) {
         $.ajax({

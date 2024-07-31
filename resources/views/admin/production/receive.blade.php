@@ -286,7 +286,7 @@
                                     <div class="col m12 s12">
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:500px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">{{ __('translations.no') }}.</th>

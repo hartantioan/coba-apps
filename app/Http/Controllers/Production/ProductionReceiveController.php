@@ -77,24 +77,55 @@ class ProductionReceiveController extends Controller
 
     public function getAccountData(Request $request){
         $response = [];
-        $data = ProductionOrder::whereHas('productionOrderDetail',function($query)use($request){
-            $query->whereHas('productionScheduleDetail',function($query)use($request){
-                $query->where('line_id',$request->line_id)
-                    ->whereHas('productionSchedule',function($query)use($request){
-                        $query->where('place_id',$request->place_id);
+        $search   = $request->search;
+        $initialId = $request->id;
+        $data = ProductionOrderDetail::where(function($query)use($search){  
+            $query->whereHas('productionOrder',function($query) use($search){
+                $query->where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhereHas('user',function($query) use ($search){
+                        $query->where('name','like',"%$search%")
+                            ->orWhere('employee_no','like',"%$search%");
                     });
+                });
+            })->orWhereHas('productionScheduleDetail',function($query) use($search){
+                $query->whereHas('item',function($query) use($search){
+                    $query->where('code','like',"%$search%")
+                        ->orWhere('name','like',"%$search%");
+                })
+                ->orWhereHas('productionSchedule',function($query) use($search){
+                    $query->where('code','like',"%$search%");
+                });
             });
-        })    
-        ->whereDoesntHave('used')
-        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['2'])
+        })
+        ->whereHas('productionOrder',function($query){
+            $query->whereDoesntHave('used')
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2']);
+        })
+        ->whereHas('productionScheduleDetail',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereNull('is_sales_item');
+            });
+        })
         ->get();
-
+        if($initialId){
+            $data_tamba =ProductionOrderDetail::where('id',$initialId)
+            ->get();
+            if($data_tamba){
+                $data = $data_tamba;
+            }
+            
+        }
         foreach($data as $d) {
+            $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
+                $query->whereNotNull('is_default');
+            })->where('issue_method','2')->count();
+            $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
-                'code'                          => $d->code,
+                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                'code'                          => $d->productionOrder->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
@@ -113,6 +144,10 @@ class ProductionReceiveController extends Controller
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
+                'group_bom'                     => $d->productionScheduleDetail->bom->group,
+                'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
+                'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
+                'note'                          => 'NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
 

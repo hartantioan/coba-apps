@@ -978,9 +978,9 @@
                 if(kind == '1'){
                     $('#modal_pdo').modal('open');
                 
-                    if(response.length > 0){
+                    if(response.details.length > 0){
                        
-                        $.each(response, function(i, val) {
+                        $.each(response.details, function(i, val) {
 
                             $('#body-detail-pdo').append(`
                                 <tr data-id="` + val.id + `">

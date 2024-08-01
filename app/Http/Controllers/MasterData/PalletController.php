@@ -111,12 +111,12 @@ class PalletController extends Controller
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('pallets', 'code')->ignore($request->temp)] : 'required|unique:pallets,code',
             'name'              => 'required',
-            'prefix_code'       => 'required',
+            /* 'prefix_code'       => 'required', */
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
             'name.required'         => 'Nama tidak boleh kosong.',
-            'prefix_code.required'  => 'Kode prefix palet / curah tidak boleh kosong.',
+            /* 'prefix_code.required'  => 'Kode prefix palet / curah tidak boleh kosong.', */
         ]);
 
         if($validation->fails()) {

@@ -77,14 +77,14 @@ class ProductionReceiveController extends Controller
 
     public function getAccountData(Request $request){
         $response = [];
-        $data = ProductionOrder::where(function($query)use($request){
+        $data = ProductionOrder::whereHas('productionOrderDetail',function($query)use($request){
             $query->whereHas('productionScheduleDetail',function($query)use($request){
                 $query->where('line_id',$request->line_id)
                     ->whereHas('productionSchedule',function($query)use($request){
                         $query->where('place_id',$request->place_id);
                     });
             });
-        })
+        })    
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])

@@ -25,7 +25,6 @@
             <th>{{ __('translations.qty') }}</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Tgl. Request</th>
-            <th>{{ __('translations.line') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -59,8 +58,7 @@
                     <td>{{ $row_detail->note2 }}</td>
                     <td>{{ $row_detail->qty }}</td>
                     <td>{{ $row_detail->item->uomUnit->code }}</td>
-                    <td>{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
-                    <td>{{ ($row_detail->line()->exists() ? $row_detail->line->code : '-') }}</td>
+                    <td>{{ date('d/m/Y',strtotime($row_detail->request_date)) }}</td>
                 </tr>
                 @php
                     $no++;

@@ -130,7 +130,7 @@ class PalletController extends Controller
                 try {
                     $query = Pallet::find($request->temp);
                     $query->code            = $request->code;
-                    $query->prefix_code     = $request->prefix_code;
+                    $query->prefix_code     = $request->prefix_code ?? NULL;
                     $query->name	        = $request->name;
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status          = $request->status ? $request->status : '2';
@@ -144,7 +144,7 @@ class PalletController extends Controller
                 try {
                     $query = Pallet::create([
                         'code'          => $request->code,
-                        'prefix_code'   => $request->prefix_code,
+                        'prefix_code'   => $request->prefix_code ?? NULL,
                         'name'			=> $request->name,
                         'nominal'       => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'        => $request->status ? $request->status : '2'

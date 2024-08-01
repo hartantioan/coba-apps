@@ -17,11 +17,11 @@
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
             <th>Kode Item</th>
-            <th>{{ __('translations.item') }}</th>
-            <th>Qty Real</th>
+            <th>Nama Item</th>
             <th>Qty Planned</th>
+            <th>Qty Real</th>
             <th>Qty Reject</th>
-            <th>{{ __('translations.unit') }}</th>
+            <th>Satuan Produksi</th>
             <th>No Batch</th>
             <th>Line</th>
             <th>Gudang</th>
@@ -52,8 +52,8 @@
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                     <td>{{ $row_detail->item->code }}</td>
                     <td>{{ $row_detail->item->name }}</td>
-                    <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->qty_planned}}</td>
+                    <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->qty_reject}}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->getProductionBatchCodesAttribute()}}</td>

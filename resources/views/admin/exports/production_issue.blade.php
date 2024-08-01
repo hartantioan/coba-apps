@@ -16,8 +16,8 @@
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
-            <th>Kode Item</th>
-            <th>{{ __('translations.item') }}</th>
+            <th>Kode Item / Resource</th>
+            <th>Nama Item / Resource</th>
             <th>Qty Planned</th>
             <th>Qty Real</th>
             <th>{{ __('translations.unit') }}</th>

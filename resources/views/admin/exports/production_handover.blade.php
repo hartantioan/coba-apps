@@ -17,7 +17,7 @@
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
             <th>Kode Item</th>
-            <th>{{ __('translations.item') }}</th>
+            <th>Nama Item</th>
             <th>No Batch Palet/Curah</th>
             <th>Shading</th>
             <th>Qty Diterima</th>

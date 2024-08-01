@@ -1219,6 +1219,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> floatval($totalDepre * $ret->currency_rate),
 						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($totalDepre * $ret->currency_rate) : floatval($totalDepre),
+						'lookable_type'	=> $ret->getTable(),
+						'lookable_id'	=> $ret->id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -1230,6 +1234,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> floatval($row->asset->book_balance * $ret->currency_rate),
 						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->asset->book_balance * $ret->currency_rate) : floatval($row->asset->book_balance),
+						'lookable_type'	=> $ret->getTable(),
+						'lookable_id'	=> $ret->id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -1241,6 +1249,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> floatval($row->retirement_nominal * $ret->currency_rate),
 						'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->retirement_nominal * $ret->currency_rate) : floatval($row->retirement_nominal),
+						'lookable_type'	=> $ret->getTable(),
+						'lookable_id'	=> $ret->id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$balanceProfitLoss = ($totalDepre + $row->retirement_nominal) - $row->asset->nominal;
@@ -1253,6 +1265,10 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> floatval($balanceProfitLoss * $ret->currency_rate),
 							'nominal_fc'	=> $ret->currency->type == '1' ? floatval($balanceProfitLoss * $ret->currency_rate) : floatval($balanceProfitLoss),
+							'lookable_type'	=> $ret->getTable(),
+							'lookable_id'	=> $ret->id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 
@@ -1264,6 +1280,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> floatval(abs($balanceProfitLoss) * $ret->currency_rate),
 							'nominal_fc'	=> $ret->currency->type == '1' ? floatval(abs($balanceProfitLoss) * $ret->currency_rate) : floatval(abs($balanceProfitLoss)),
+							'lookable_type'	=> $ret->getTable(),
+							'lookable_id'	=> $ret->id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -1275,6 +1295,8 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> floatval($row->asset->nominal * $ret->currency_rate),
 					'nominal_fc'	=> $ret->currency->type == '1' ? floatval($row->asset->nominal * $ret->currency_rate) : floatval($row->asset->nominal),
+					'lookable_type'	=> $ret->getTable(),
+					'lookable_id'	=> $ret->id,
 				]);
 
 				self::updateBalanceAsset($row->asset_id,floatval($row->asset->book_balance),'OUT',$table_name);
@@ -1308,6 +1330,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> floatval($ip->wtax * $ip->currency_rate),
 						'nominal_fc'	=> $ip->currency->type == '1' ? $ip->wtax * $ip->currency_rate : $ip->wtax,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 
@@ -1318,6 +1342,8 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> floatval($ip->grandtotal * $ip->currency_rate),
 					'nominal_fc'	=> $ip->currency->type == '1' ? floatval($ip->grandtotal * $ip->currency_rate) : floatval($ip->grandtotal),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first();
@@ -1351,6 +1377,10 @@ class CustomHelper {
 									'nominal'                       => floatval($nominal * $ip->currency_rate),
 									'nominal_fc'					=> $ip->currency->type == '1' ? floatval($nominal * $ip->currency_rate) : floatval($nominal),
 									'note'							=> $row->note,
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $row->getTable(),
+									'detailable_id'					=> $row->id,
 								]);
 							}
 						}else{
@@ -1362,6 +1392,10 @@ class CustomHelper {
 								'nominal'		=> floatval($row->total * $ip->currency_rate),
 								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 								'note'			=> $row->note,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 						}
 						
@@ -1374,6 +1408,10 @@ class CustomHelper {
 							'nominal'		=> floatval($row->total * $ip->currency_rate),
 							'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 							'note'			=> $row->note,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
@@ -1389,6 +1427,10 @@ class CustomHelper {
 								'nominal'		=> floatval(abs($row->total * $ip->currency_rate)),
 								'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($row->total * $ip->currency_rate)) : floatval(abs($row->total)),
 								'note'			=> $row->note,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 						}else{
 							JournalDetail::create([
@@ -1399,6 +1441,10 @@ class CustomHelper {
 								'nominal'		=> floatval($row->total * $ip->currency_rate),
 								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
 								'note'			=> $row->note,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 							if($row->lookable_type == 'marketing_order_down_payments'){
 								self::addDeposit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
@@ -1420,6 +1466,8 @@ class CustomHelper {
 							'type'			=> $row->rounding > 0 ? '2' : '1',
 							'nominal'		=> floatval(abs($row->rounding * $ip->currency_rate)),
 							'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($row->rounding * $ip->currency_rate)) : floatval(abs($row->rounding)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
 						]);
 					}
 				}
@@ -1473,6 +1521,10 @@ class CustomHelper {
 								'type'                          => '1',
 								'nominal'                       => floatval($nominal * $pr->currency_rate),
 								'nominal_fc'					=> $pr->currency->type == '1' ? floatval($nominal * $pr->currency_rate) : floatval($nominal),
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}else{
@@ -1489,6 +1541,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> floatval($row->nominal * $pr->currency_rate),
 							'nominal_fc'	=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -1504,6 +1560,8 @@ class CustomHelper {
 							'type'			=> $pr->rounding > 0 ? '1' : '2',
 							'nominal'		=> floatval(abs($pr->rounding * $pr->currency_rate)),
 							'nominal_fc'	=> $pr->currency->type == '1' ? floatval(abs($pr->rounding * $pr->currency_rate)) : floatval(abs($pr->rounding)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
 						]);
 					}
 				}
@@ -1518,6 +1576,10 @@ class CustomHelper {
 						'type'                          => '2',
 						'nominal'                       => floatval($row->nominal * $pr->currency_rate),
 						'nominal_fc'					=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
+						'lookable_type'					=> $table_name,
+						'lookable_id'					=> $table_id,
+						'detailable_type'				=> $row->getTable(),
+						'detailable_id'					=> $row->id,
 					]);
 				}
 
@@ -1639,6 +1701,10 @@ class CustomHelper {
 								'type'                          => '1',
 								'nominal'                       => floatval($nominal * $op->currency_rate),
 								'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}else{
@@ -1654,6 +1720,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> floatval($balanceReal),
 							'nominal_fc'	=> $op->currency->type == '1' ? floatval(round($mustpay * $op->currency_rate,2)) : floatval(round($mustpay,2)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						if($row->lookable_type == 'marketing_order_memos'){
 							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);
@@ -1710,6 +1780,10 @@ class CustomHelper {
 								'nominal_fc'					=> floatval($nominal),
 								'note'							=> $row->note,
 								'note2'							=> $row->note2,
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}else{
@@ -1727,6 +1801,10 @@ class CustomHelper {
 							'nominal_fc'	=> floatval($row->nominal_debit_fc),
 							'note'			=> $row->note,
 							'note2'			=> $row->note2,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -1758,6 +1836,10 @@ class CustomHelper {
 								'nominal_fc'					=> floatval($nominal),
 								'note'							=> $row->note,
 								'note2'							=> $row->note2,
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}else{
@@ -1775,6 +1857,10 @@ class CustomHelper {
 							'nominal_fc'	=> floatval($row->nominal_credit_fc),
 							'note'			=> $row->note,
 							'note2'			=> $row->note2,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -1791,6 +1877,8 @@ class CustomHelper {
 						'type'			=> $op->rounding > 0 ? '1' : '2',
 						'nominal'		=> floatval(abs($op->rounding * $op->currency_rate)),
 						'nominal_fc'	=> $op->currency->type == '1' ? floatval(abs($op->rounding * $op->currency_rate)) : floatval(abs($op->rounding)),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 			}
@@ -1807,6 +1895,8 @@ class CustomHelper {
 						'type'			=> $balanceKurs < 0  ? '1' : '2',
 						'nominal'		=> floatval(abs($balanceKurs)),
 						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 			}
@@ -1837,6 +1927,8 @@ class CustomHelper {
 							'type'                          => '1',
 							'nominal'                       => floatval($nominal * $op->currency_rate),
 							'nominal_fc'					=> $op->currency->type == '1' ? floatval($nominal * $op->currency_rate) : floatval($nominal),
+							'lookable_type'					=> $table_name,
+							'lookable_id'					=> $table_id,
 						]);
 					}
 				}else{
@@ -1847,6 +1939,8 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> floatval($row->nominal * $op->currency_rate),
 						'nominal_fc'	=> $op->currency->type == '1' ? floatval($row->nominal * $op->currency_rate) : floatval($row->nominal),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 			}
@@ -1860,6 +1954,10 @@ class CustomHelper {
 					'type'                          => '2',
 					'nominal'                       => floatval($row->nominal * $op->currency_rate),
 					'nominal_fc'					=> $op->currency->type == '1' ? floatval($row->nominal * $op->currency_rate) : floatval($row->nominal),
+					'lookable_type'					=> $table_name,
+					'lookable_id'					=> $table_id,
+					'detailable_type'				=> $row->getTable(),
+					'detailable_id'					=> $row->id,
 				]);
 			}
 
@@ -1870,6 +1968,8 @@ class CustomHelper {
 				'type'			=> '2',
 				'nominal'		=> floatval($totalPay),
 				'nominal_fc'	=> $op->currency->type == '1' ? floatval($totalPay) : floatval($totalPay / $op->currency_rate),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			$op->paymentRequest->update([
@@ -1907,6 +2007,10 @@ class CustomHelper {
 					'nominal'		=> $row->total * $gr->currency_rate,
 					'nominal_fc'	=> $gr->currency->type == '1' ? $row->total * $gr->currency_rate : $row->total,
 					'item_id'		=> $row->item_id,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				if($row->cost_distribution_id){
@@ -1932,6 +2036,10 @@ class CustomHelper {
 							'type'                          => '2',
 							'nominal'						=> $nominal,
 							'nominal_fc'					=> $nominal,
+							'lookable_type'					=> $table_name,
+							'lookable_id'					=> $table_id,
+							'detailable_type'				=> $row->getTable(),
+							'detailable_id'					=> $row->id,
 						]);
 					}
 				}else{
@@ -1946,6 +2054,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->total * $gr->currency_rate,
 						'nominal_fc'	=> $gr->currency->type == '1' ? $row->total * $gr->currency_rate : $row->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -2095,6 +2207,10 @@ class CustomHelper {
 						'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -2111,6 +2227,10 @@ class CustomHelper {
 					'nominal_fc'	=> $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $row->getRowTotal(),
 					'note'			=> $row->note,
 					'note2'			=> $row->note2,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				self::sendCogs('good_returns',
@@ -2200,6 +2320,10 @@ class CustomHelper {
 							'type'                          => '1',
 							'nominal'						=> $nominal,
 							'nominal_fc'					=> $nominal,
+							'lookable_type'					=> $table_name,
+							'lookable_id'					=> $table_id,
+							'detailable_type'				=> $row->getTable(),
+							'detailable_id'					=> $row->id,
 						]);
 					}
 				}else{
@@ -2214,6 +2338,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $total,
 						'nominal_fc'	=> $total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -2229,6 +2357,10 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> $total,
 					'nominal_fc'	=> $total,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				self::sendCogs('good_issues',
@@ -2301,6 +2433,10 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $row->total,
 					'nominal_fc'	=> $row->total,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				if($row->goodIssueDetail->cost_distribution_id){
@@ -2326,6 +2462,10 @@ class CustomHelper {
 							'type'                          => '2',
 							'nominal'						=> $nominal,
 							'nominal_fc'					=> $nominal,
+							'lookable_type'					=> $table_name,
+							'lookable_id'					=> $table_id,
+							'detailable_type'				=> $row->getTable(),
+							'detailable_id'					=> $row->id,
 						]);
 					}
 				}else{
@@ -2341,6 +2481,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->total,
 						'nominal_fc'	=> $row->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -2384,6 +2528,8 @@ class CustomHelper {
 				$arrNote = [];
 
 				$otherLc = NULL;
+
+				$coaselisihhargabahan = Coa::where('code','500.02.01.13.01')->where('company_id',$lc->company_id)->where('status','1')->first();
 
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -2444,11 +2590,15 @@ class CustomHelper {
 								'type'			=> '1',
 								'nominal'		=> $rowtotal,
 								'nominal_fc'	=> $rowfc,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
 							]);
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
-								'coa_id'		=> $rowdetail->coa_id,
+								'coa_id'		=> $coaselisihhargabahan,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
@@ -2459,6 +2609,10 @@ class CustomHelper {
 								'type'			=> '1',
 								'nominal'		=> $rowtotal,
 								'nominal_fc'	=> $rowfc,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowdetail->getTable(),
+								'detailable_id'	=> $rowdetail->id,
 							]);
 						}
 					}
@@ -2479,6 +2633,10 @@ class CustomHelper {
 								'nominal'		=> $rowtotal,
 								'nominal_fc'	=> $rowfc,
 								'note'			=> $dataother->landedCostFee->name,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $rowfee->getTable(),
+								'detailable_id'	=> $rowfee->id,
 							]);
 						}
 					}
@@ -2493,6 +2651,10 @@ class CustomHelper {
 							'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
 							'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
 							'note'			=> $rowdetail->landedCostFee->name,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
 						]);
 					}
 				}
@@ -2507,6 +2669,8 @@ class CustomHelper {
 						'type'			=> $balance < 0 ? '1' : '2',
 						'nominal'		=> abs($balance),
 						'nominal_fc'	=> abs($balance),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 			}
@@ -2558,6 +2722,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> -1 * $rowdetail->nominal,
 							'nominal_fc'	=> -1 * $rowdetail->nominal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
 						]);
 
 						JournalDetail::create([
@@ -2572,7 +2740,11 @@ class CustomHelper {
 							'project_id'	=> $rowdetail->project_id,
 							'type'			=> '2',
 							'nominal'		=> -1 * $rowdetail->nominal,
-							'nominal_fc'	=> -1 * $rowdetail->nominal
+							'nominal_fc'	=> -1 * $rowdetail->nominal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
 						]);
 					}else{
 						JournalDetail::create([
@@ -2588,6 +2760,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $rowdetail->nominal,
 							'nominal_fc'	=> $rowdetail->nominal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -2602,6 +2778,10 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $rowdetail->nominal,
 							'nominal_fc'	=> $rowdetail->nominal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $rowdetail->getTable(),
+							'detailable_id'	=> $rowdetail->id,
 						]);
 					}
 				}
@@ -2649,6 +2829,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $row->total * $cp->currency_rate,
 						'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$coaAyatSilangPembelianAset = Coa::where('code','100.01.01.99.04')->where('company_id',$row->asset->place->company_id)->first();
@@ -2676,6 +2860,10 @@ class CustomHelper {
 								'type'                          => '1',
 								'nominal'                       => $nominal * $cp->currency_rate,
 								'nominal_fc'					=> $cp->currency->type == '1' ? $nominal * $cp->currency_rate : $nominal,
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}else{
@@ -2690,6 +2878,10 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->total * $cp->currency_rate,
 							'nominal_fc'	=> $cp->currency->type == '1' ? $row->total * $cp->currency_rate : $row->total,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 
@@ -2747,6 +2939,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $nominal,
 						'nominal_fc'	=> $nominal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $rowdetail->getTable(),
+						'detailable_id'	=> $rowdetail->id,
 					]);
 	
 					JournalDetail::create([
@@ -2758,6 +2954,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $nominal,
 						'nominal_fc'	=> $nominal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $rowdetail->getTable(),
+						'detailable_id'	=> $rowdetail->id,
 					]);
 				}
 			/* } */
@@ -2831,6 +3031,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $rowdetail->total,
 						'nominal_fc'	=> $rowdetail->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $rowdetail->getTable(),
+						'detailable_id'	=> $rowdetail->id,
 					]);
 	
 					JournalDetail::create([
@@ -2842,6 +3046,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $rowdetail->total,
 						'nominal_fc'	=> $rowdetail->total,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $rowdetail->getTable(),
+						'detailable_id'	=> $rowdetail->id,
 					]);
 				}
 			/* } */
@@ -2902,6 +3110,10 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $row->nominal,
 					'nominal_fc'	=> $row->nominal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				JournalDetail::create([
@@ -2911,6 +3123,10 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> $row->nominal,
 					'nominal_fc'	=> $row->nominal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 				
 				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT',$table_name);
@@ -2979,7 +3195,11 @@ class CustomHelper {
 							'nominal'		=> $wtax,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $wtax : $row->wtax,
 							'note'			=> $pm->return_tax_no,
-							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
+							'note2'			=> date('d/m/Y',strtotime($pm->return_date)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 					
@@ -3023,6 +3243,10 @@ class CustomHelper {
 							'project_id'	=> $project_id,
 							'nominal'		=> $grandtotal,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $grandtotal : $row->grandtotal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 					
@@ -3047,6 +3271,10 @@ class CustomHelper {
 								'type'			=> '2',
 								'nominal'		=> $total,
 								'nominal_fc'	=> $type == '1' || $type == '' ? $total : $row->total,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 						}elseif($row->lookable->lookable_type == 'landed_cost_fee_details'){
 							$total = $row->total * $row->lookable->lookable->landedCost->currency_rate;
@@ -3069,6 +3297,10 @@ class CustomHelper {
 								'type'			=> '2',
 								'nominal'		=> $total,
 								'nominal_fc'	=> $type == '1' || $type == '' ? $total : $row->total,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 
 							self::sendCogs('purchase_memos',
@@ -3126,7 +3358,11 @@ class CustomHelper {
 							'nominal'		=> $tax,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $tax : $row->tax,
 							'note'			=> $pm->return_tax_no,
-							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
+							'note2'			=> date('d/m/Y',strtotime($pm->return_date)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -3146,7 +3382,11 @@ class CustomHelper {
 							'nominal'		=> $row->wtax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->wtax * $row->lookable->currency_rate : $row->wtax,
 							'note'			=> $pm->return_tax_no,
-							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
+							'note2'			=> date('d/m/Y',strtotime($pm->return_date)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 					
@@ -3158,6 +3398,10 @@ class CustomHelper {
 							'type'			=> '1',
 							'nominal'		=> $row->grandtotal * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->grandtotal * $row->lookable->currency_rate : $row->grandtotal,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 
@@ -3169,6 +3413,10 @@ class CustomHelper {
 							'type'			=> '2',
 							'nominal'		=> $row->total * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->total * $row->lookable->currency_rate : $row->total,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 
@@ -3181,7 +3429,11 @@ class CustomHelper {
 							'nominal'		=> $row->tax * $row->lookable->currency_rate,
 							'nominal_fc'	=> $row->lookable->currency->type == '1' ? $row->tax * $row->lookable->currency_rate : $row->tax,
 							'note'			=> $pm->return_tax_no,
-							'note2'			=> date('d/m/Y',strtotime($pm->return_date))
+							'note2'			=> date('d/m/Y',strtotime($pm->return_date)),
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -3195,6 +3447,8 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $pm->rounding > 0 ? $pm->rounding * $currency_rate : $pm->rounding * $currency_rate,
 					'nominal_fc'	=> $type == '1' || $type == '' ? ($pm->rounding > 0 ? $pm->rounding * $currency_rate : $pm->rounding * $currency_rate) : $pm->rounding,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 
 				JournalDetail::create([
@@ -3204,6 +3458,8 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> $pm->rounding > 0 ? $pm->rounding : $pm->rounding,
 					'nominal_fc'	=> $type == '1' || $type == '' ? ($pm->rounding > 0 ? $pm->rounding : $pm->rounding) : $pm->rounding,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -3236,6 +3492,10 @@ class CustomHelper {
 					'nominal'		=> $row->nominal * $cb->currency_rate,
 					'nominal_fc'	=> $cb->currency->type == '1' || $cb->currency->type == '' ? $row->nominal * $cb->currency_rate : $row->nominal,
 					'note'			=> $row->note,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 				
 				if($row->outgoingPayment()->exists()){
@@ -3288,6 +3548,10 @@ class CustomHelper {
 								'nominal_fc'					=> $cb->currency->type == '1' || $cb->currency->type == '' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
 								'note'							=> $row->note,
 								'note2'							=> $row->note2,
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}
@@ -3316,6 +3580,10 @@ class CustomHelper {
 								'nominal_fc'					=> $cb->currency->type == '1' || $cb->currency->type == '' ? floatval($nominal * $cb->currency_rate) : floatval($nominal),
 								'note'							=> $row->note,
 								'note2'							=> $row->note2,
+								'lookable_type'					=> $table_name,
+								'lookable_id'					=> $table_id,
+								'detailable_type'				=> $row->getTable(),
+								'detailable_id'					=> $row->id,
 							]);
 						}
 					}
@@ -3334,6 +3602,10 @@ class CustomHelper {
 							'nominal_fc'	=> $row->nominal_debit_fc,
 							'note'			=> $row->note,
 							'note2'			=> $row->note2,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
@@ -3350,6 +3622,10 @@ class CustomHelper {
 							'nominal_fc'	=> $row->nominal_credit_fc,
 							'note'			=> $row->note,
 							'note2'			=> $row->note2,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 				}
@@ -3409,6 +3685,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $rowtotal,
 						'nominal_fc'	=> $rowtotal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -3424,6 +3704,10 @@ class CustomHelper {
 						'type'			=> $rowrounding > 0 ? '2' : '1',
 						'nominal'		=> $rowrounding,
 						'nominal_fc'	=> $rowrounding,
+						'lookable_type' => $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -3455,6 +3739,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $rowtotal,
 						'nominal_fc'	=> $rowtotal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 
@@ -3477,6 +3765,8 @@ class CustomHelper {
 					'type'			=> '1',
 					'nominal'		=> $balance,
 					'nominal_fc'	=> $balance,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -3489,6 +3779,8 @@ class CustomHelper {
 					'nominal'		=> $tax,
 					'nominal_fc'	=> $tax,
 					'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -3715,6 +4007,10 @@ class CustomHelper {
 						'nominal_fc'	=> $row->total,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$grandtotal += $row->grandtotal;
@@ -3735,7 +4031,11 @@ class CustomHelper {
 							'nominal'		=> $row->tax * $pi->currency_rate,
 							'nominal_fc'	=> $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3753,7 +4053,11 @@ class CustomHelper {
 							'nominal'		=> $row->wtax * $pi->currency_rate,
 							'nominal_fc'	=> $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3771,6 +4075,10 @@ class CustomHelper {
 						'nominal_fc'	=> $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 				}elseif($row->lookable_type == 'purchase_order_details'){
@@ -3792,6 +4100,10 @@ class CustomHelper {
 						'nominal_fc'	=> $type == '1' || $type == '' ? $pod->getArrayTotal()['total'] * $pi->currency_rate : $pod->getArrayTotal()['total'],
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$grandtotal += $row->grandtotal * $pi->currency_rate;
@@ -3813,7 +4125,11 @@ class CustomHelper {
 							'nominal'		=> $row->tax * $pi->currency_rate,
 							'nominal_fc'	=> $pi->currency->type == '1' ? $row->tax * $pi->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3831,7 +4147,11 @@ class CustomHelper {
 							'nominal'		=> $row->wtax * $pi->currency_rate,
 							'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->wtax * $pi->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3849,6 +4169,10 @@ class CustomHelper {
 						'nominal_fc'	=> $pi->currency->type == '1' || $pi->currency->type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 				}elseif($row->lookable_type == 'landed_cost_fee_details'){
@@ -3862,6 +4186,10 @@ class CustomHelper {
 						'nominal'		=> $row->lookable->total * $currency_rate,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
 						'note'			=> $row->lookable->landedCostFee->name,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$grandtotal += $row->grandtotal * $currency_rate;
@@ -3877,7 +4205,11 @@ class CustomHelper {
 							'nominal'		=> $row->tax * $currency_rate,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3891,6 +4223,10 @@ class CustomHelper {
 							'nominal_fc'	=> $type == '1' || $type == '' ? $row->wtax * $currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
 							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3903,6 +4239,10 @@ class CustomHelper {
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}else{
 					$type = $pi->currency->type;
@@ -3921,6 +4261,10 @@ class CustomHelper {
 							'type'			=> $balancegrpo > 0  ? '2' : '1',
 							'nominal'		=> floatval(abs($balancegrpo)),
 							'nominal_fc'	=> 0,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 
@@ -3938,6 +4282,10 @@ class CustomHelper {
 						'nominal_fc'	=> $type == '1' || $type == '' ? $totalgrpo : $row->total,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 
 					$grandtotal += $row->grandtotal * $pi->currency_rate;
@@ -3959,7 +4307,11 @@ class CustomHelper {
 							'nominal'		=> $row->tax * $pi->currency_rate,
 							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $pi->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3977,7 +4329,11 @@ class CustomHelper {
 							'nominal'		=> $row->wtax * $pi->currency_rate,
 							'nominal_fc'	=> $type == '1' || $type == '2' ? $row->wtax * $pi->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
-							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
+							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 					}
 	
@@ -3995,6 +4351,10 @@ class CustomHelper {
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 			}
@@ -4008,6 +4368,8 @@ class CustomHelper {
 					'type'			=> $pi->rounding > 0 ? '1' : '2',
 					'nominal'		=> abs($pi->rounding * $currency_rate),
 					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 
 				JournalDetail::create([
@@ -4017,6 +4379,8 @@ class CustomHelper {
 					'type'			=> $pi->rounding > 0 ? '2' : '1',
 					'nominal'		=> abs($pi->rounding * $currency_rate),
 					'nominal_fc'	=> $type == '1' || $type == '' ? abs($pi->rounding * $currency_rate) : abs($pi->rounding),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -4034,6 +4398,10 @@ class CustomHelper {
 						'type'			=> '1',
 						'nominal'		=> $row->nominal * $currencydp,
 						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $currencydp : $row->nominal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 	
 					JournalDetail::create([
@@ -4043,6 +4411,10 @@ class CustomHelper {
 						'type'			=> '2',
 						'nominal'		=> $row->nominal * $currencydp,
 						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $currencydp : $row->nominal,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 					$realDownPayment += $row->nominal * $currencydp;
 					$realInvoice += $row->nominal * $pi->currency_rate;
@@ -4068,6 +4440,8 @@ class CustomHelper {
 						'type'			=> $balanceKurs > 0  ? '1' : '2',
 						'nominal'		=> floatval(abs($balanceKurs)),
 						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -4076,6 +4450,8 @@ class CustomHelper {
 						'type'			=> $balanceKurs > 0  ? '2' : '1',
 						'nominal'		=> floatval(abs($balanceKurs)),
 						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
 					]);
 				}
 			}
@@ -4117,6 +4493,8 @@ class CustomHelper {
 				'type'			=> '1',
 				'nominal'		=> $modp->grandtotal * $data->currency_rate,
 				'nominal_fc'	=> $modp->grandtotal,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			JournalDetail::create([
@@ -4125,7 +4503,9 @@ class CustomHelper {
 				'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
 				'type'			=> '2',
 				'nominal'		=> $modp->total * $data->currency_rate,
-				'nominal_fc'	=> $modp->total
+				'nominal_fc'	=> $modp->total,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			if($modp->tax > 0){
@@ -4136,6 +4516,8 @@ class CustomHelper {
 					'type'			=> '2',
 					'nominal'		=> $modp->tax * $data->currency_rate,
 					'nominal_fc'	=> $modp->tax,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -4167,6 +4549,8 @@ class CustomHelper {
 				'type'			=> '1',
 				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
 				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			JournalDetail::create([
@@ -4176,6 +4560,8 @@ class CustomHelper {
 				'type'			=> '2',
 				'nominal'		=> $pdp->grandtotal * $pdp->currency_rate,
 				'nominal_fc'	=> $pdp->currency->type == '1' ? $pdp->grandtotal * $pdp->currency_rate : $pdp->grandtotal,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			CustomHelper::addDeposit($account_id,$pdp->grandtotal * $pdp->currency_rate);
@@ -4232,6 +4618,10 @@ class CustomHelper {
 						'nominal'		=> $totalrow,
 						'nominal_fc'	=> $totalrow,
 						'note'			=> $pir->productionOrderDetail->productionOrder->code,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 					
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
@@ -4250,6 +4640,10 @@ class CustomHelper {
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
 									'note'			=> $pir->productionOrderDetail->productionOrder->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 				
 								self::sendCogs($table_name,
@@ -4304,6 +4698,10 @@ class CustomHelper {
 											'nominal'						=> $nominal,
 											'nominal_fc'					=> $nominal,
 											'note'							=> $pir->productionOrderDetail->productionOrder->code,
+											'lookable_type'					=> $table_name,
+											'lookable_id'					=> $table_id,
+											'detailable_type'				=> $row->getTable(),
+											'detailable_id'					=> $row->id,
 										]);
 									}
 								}else{
@@ -4316,6 +4714,10 @@ class CustomHelper {
 										'nominal'		=> $row->total,
 										'nominal_fc'	=> $row->total,
 										'note'			=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'	=> $table_name,
+										'lookable_id'	=> $table_id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
 									]);
 								}
 							}else{
@@ -4341,6 +4743,10 @@ class CustomHelper {
 											'nominal'						=> $nominal,
 											'nominal_fc'					=> $nominal,
 											'note'							=> $pir->productionOrderDetail->productionOrder->code,
+											'lookable_type'					=> $table_name,
+											'lookable_id'					=> $table_id,
+											'detailable_type'				=> $row->getTable(),
+											'detailable_id'					=> $row->id,
 										]);
 									}
 								}else{
@@ -4353,6 +4759,10 @@ class CustomHelper {
 										'nominal'		=> $row->total,
 										'nominal_fc'	=> $row->total,
 										'note'			=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'	=> $table_name,
+										'lookable_id'	=> $table_id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
 									]);
 								}
 							}
@@ -4392,6 +4802,10 @@ class CustomHelper {
 										'nominal'		=> $rowtotal,
 										'nominal_fc'	=> $rowtotal,
 										'note'			=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'	=> $table_name,
+										'lookable_id'	=> $table_id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
 									]);
 					
 									self::sendCogs($table_name,
@@ -4441,6 +4855,10 @@ class CustomHelper {
 											'nominal'		=> $totalCost,
 											'nominal_fc'	=> $totalCost,
 											'note'			=> $pir->productionOrderDetail->productionOrder->code,
+											'lookable_type'	=> $table_name,
+											'lookable_id'	=> $table_id,
+											'detailable_type'=> $row->getTable(),
+											'detailable_id'	=> $row->id,
 										]);
 						
 										self::sendCogs($table_name,
@@ -4484,6 +4902,10 @@ class CustomHelper {
 										'nominal'		=> $row->total,
 										'nominal_fc'	=> $row->total,
 										'note'			=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'	=> $table_name,
+										'lookable_id'	=> $table_id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
 									]);
 					
 									self::sendCogs($table_name,
@@ -4540,6 +4962,10 @@ class CustomHelper {
 										'nominal'						=> $nominal,
 										'nominal_fc'					=> $nominal,
 										'note'							=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'					=> $table_name,
+										'lookable_id'					=> $table_id,
+										'detailable_type'				=> $row->getTable(),
+										'detailable_id'					=> $row->id,
 									]);
 								}
 							}else{
@@ -4552,6 +4978,10 @@ class CustomHelper {
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
 									'note'			=> $pir->productionOrderDetail->productionOrder->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 							}
 						}else{
@@ -4577,6 +5007,10 @@ class CustomHelper {
 										'nominal'						=> $nominal,
 										'nominal_fc'					=> $nominal,
 										'note'							=> $pir->productionOrderDetail->productionOrder->code,
+										'lookable_type'					=> $table_name,
+										'lookable_id'					=> $table_id,
+										'detailable_type'				=> $row->getTable(),
+										'detailable_id'					=> $row->id,
 									]);
 								}
 							}else{
@@ -4589,6 +5023,10 @@ class CustomHelper {
 									'nominal'		=> $row->total,
 									'nominal_fc'	=> $row->total,
 									'note'			=> $pir->productionOrderDetail->productionOrder->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 							}
 						}
@@ -4610,6 +5048,8 @@ class CustomHelper {
 					'nominal'		=> $total,
 					'nominal_fc'	=> $total,
 					'note'			=> $pir->productionOrderDetail->productionOrder->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
 				]);
 			}
 
@@ -4657,6 +5097,10 @@ class CustomHelper {
 							'nominal'		=> $rowbatch->total,
 							'nominal_fc'	=> $rowbatch->total,
 							'note'			=> $pir->code,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 		
 						self::sendCogs($table_name,
@@ -4701,6 +5145,10 @@ class CustomHelper {
 						'nominal'		=> $row->total,
 						'nominal_fc'	=> $row->total,
 						'note'			=> $pir->code,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 	
 					self::sendCogs($table_name,
@@ -4778,6 +5226,8 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			$pir->update([
@@ -4827,6 +5277,8 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			self::sendCogs($table_name,
@@ -4867,6 +5319,8 @@ class CustomHelper {
 				'nominal'		=> $total,
 				'nominal_fc'	=> $total,
 				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
 			]);
 
 			if($pir->qty_reject > 0){
@@ -4934,6 +5388,10 @@ class CustomHelper {
 					'nominal'		=> $row->total,
 					'nominal_fc'	=> $row->total,
 					'note'			=> $pir->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 				self::sendCogs($table_name,
@@ -4975,6 +5433,10 @@ class CustomHelper {
 					'nominal'		=> $row->total,
 					'nominal_fc'	=> $row->total,
 					'note'			=> $pir->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
 				]);
 
 
@@ -5046,6 +5508,10 @@ class CustomHelper {
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 							'note'			=> $row->lookable->code,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -5054,6 +5520,10 @@ class CustomHelper {
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 							'note'			=> $row->lookable->code,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						if($row->lookable_type == 'purchase_down_payments'){
 							if($row->lookable->balanceInvoice() <= 0){
@@ -5078,6 +5548,10 @@ class CustomHelper {
 									'nominal'		=> $nominal,
 									'nominal_fc'	=> 0,
 									'note'			=> 'REVERSE*'.$row->lookable->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 								JournalDetail::create([
 									'journal_id'	=> $queryreverse->id,
@@ -5086,6 +5560,10 @@ class CustomHelper {
 									'nominal'		=> $nominal,
 									'nominal_fc'	=> 0,
 									'note'			=> $row->lookable->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 							}
 						}
@@ -5099,6 +5577,10 @@ class CustomHelper {
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 							'note'			=> $row->lookable->code,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -5107,6 +5589,10 @@ class CustomHelper {
 							'nominal'		=> $nominal,
 							'nominal_fc'	=> 0,
 							'note'			=> $row->lookable->code,
+							'lookable_type'	=> $table_name,
+							'lookable_id'	=> $table_id,
+							'detailable_type'=> $row->getTable(),
+							'detailable_id'	=> $row->id,
 						]);
 						if($row->lookable_type == 'purchase_down_payments'){
 							if($row->lookable->balancePayment() <= 0){
@@ -5131,6 +5617,10 @@ class CustomHelper {
 									'nominal'		=> $nominal,
 									'nominal_fc'	=> 0,
 									'note'			=> 'REVERSE*'.$row->lookable->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 								JournalDetail::create([
 									'journal_id'	=> $queryreverse->id,
@@ -5139,6 +5629,10 @@ class CustomHelper {
 									'nominal'		=> $nominal,
 									'nominal_fc'	=> 0,
 									'note'			=> $row->lookable->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
 								]);
 							}
 						}
@@ -5172,6 +5666,10 @@ class CustomHelper {
 						'type'			=> $row->type,
 						'nominal'		=> abs($row->nominal),
 						'nominal_fc'	=> abs($row->nominal_fc),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
 					]);
 				}
 

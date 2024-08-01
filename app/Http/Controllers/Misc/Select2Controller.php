@@ -4508,6 +4508,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $initialId = $request->id;
         $data = ProductionOrderDetail::where(function($query)use($search){  
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
@@ -4538,7 +4539,14 @@ class Select2Controller extends Controller {
             });
         })
         ->get();
-
+        if($initialId){
+            $data_tamba =ProductionOrderDetail::where('id',$initialId)
+            ->get();
+            if($data_tamba){
+                $data = $data_tamba;
+            }
+            
+        }
         foreach($data as $d) {
             $response[] = [
                 'id'        => $d->id,

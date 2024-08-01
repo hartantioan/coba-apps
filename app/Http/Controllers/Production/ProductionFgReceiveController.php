@@ -811,6 +811,48 @@ class ProductionFgReceiveController extends Controller
         }
     }
 
+    public function getAccountData(Request $request){
+        $account = User::find($request->id);
+        $response = [];
+        $data = ProductionOrderDetail::where(function($query){  
+            
+        })
+        ->whereHas('productionOrder',function($query){
+            $query->whereDoesntHave('used')
+                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2']);
+        })
+        ->whereHas('productionScheduleDetail',function($query){
+            $query->whereHas('item',function($query){
+                $query->whereNotNull('is_sales_item');
+            });
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'        => $d->id,
+                'code'      => $d->productionOrder->code,
+                'user'      => $d->productionOrder->user->name,
+                'post_date' => $d->productionOrder->post_date,
+                'item_receive_name'=> $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
+                'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
+                'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
+                'note1'      => $d->productionOrder->note,
+                'status'    => $d->productionOrder->statusRaw(),
+                'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
+            ];
+        }
+       
+
+        $account['details'] = $response;
+
+        return response()->json($account);
+    }
+
 
     public function rowDetail(Request $request)
     {

@@ -2213,6 +2213,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_barcode/{id}',[ProductionFgReceiveController::class, 'printBarcode']);
                     Route::get('viewstructuretree',[ProductionFgReceiveController::class, 'viewStructureTree']);
                     Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData']);
+                    Route::post('get_account_data', [ProductionFgReceiveController::class, 'getAccountData']);
                     Route::post('remove_used_data', [ProductionFgReceiveController::class, 'removeUsedData']);
                     Route::post('create',[ProductionFgReceiveController::class, 'create'])->middleware('operation.access:production_fg_receive,update');
                     Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData'])->middleware('operation.access:production_fg_receive,update');

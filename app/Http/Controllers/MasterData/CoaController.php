@@ -225,6 +225,7 @@ class CoaController extends Controller
                     $query->parent_id = $request->parent_id ? $request->parent_id : NULL;
                     $query->currency_id = $request->currency_id ?? NULL;
                     $query->level = $request->level;
+                    $query->prefix = $request->prefix;
                     $query->status = $request->status ? $request->status : '2';
                     $query->is_cash_account = $request->is_cash_account ? $request->is_cash_account : NULL;
                     $query->is_hidden = $request->is_hidden ? $request->is_hidden : NULL;
@@ -246,6 +247,7 @@ class CoaController extends Controller
                         'parent_id'	            => $request->parent_id ? $request->parent_id : NULL,
                         'currency_id'           => $request->currency_id ?? NULL,
                         'level'                 => $request->level,
+                        'prefix'                => $request->prefix,
                         'is_cash_account'       => $request->is_cash_account ? $request->is_cash_account : NULL,
                         'is_hidden'             => $request->is_hidden ? $request->is_hidden : NULL,
                         'show_journal'          => $request->show_journal ? $request->show_journal : NULL,

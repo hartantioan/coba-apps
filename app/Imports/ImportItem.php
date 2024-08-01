@@ -121,7 +121,9 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         $check->is_sales_item=$row['is_sales_item'];
                         $check->is_purchase_item=$row['is_purchase'];
                         $check->is_service=$row['is_service'];
-                        $check->is_hide_supplier = $row['is_production'];
+                        $check->is_production = $row['is_production'];
+                        $check->is_quality_check = $row['is_quality_check'];
+                        $check->is_hide_supplier = $row['is_top_secret'];
                         $check->type_id= $type ? $type->id : NULL;
                         $check->size_id = $size ? $size->id : NULL;
                         $check->variety_id = $variety ? $variety->id : NULL;

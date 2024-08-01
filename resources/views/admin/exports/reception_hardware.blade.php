@@ -6,6 +6,7 @@
             <th>User</th>
             <th>Kode Inventaris</th>
             <th>{{ __('translations.item') }}</th>
+            <th>Keterangan </th>
             <th>{{ __('translations.location') }}</th>
             <th>{{ __('translations.date') }}</th>
             <th>Tanggal Penyerahan</th>
@@ -27,6 +28,7 @@
                 <td>{{ $row->user->name ?? '-' }}</td>
                 <td>{{ $row->hardwareItem->code ?? '' }}</td>
                 <td>{{ $row->hardwareItem->item ?? '' }}</td>
+                <td>{{ $row->hardwareItem->detail1 ?? '' }}</td>
                 <td>{{ $row->location }}</td>
                 <td>{{ $row->date }}</td>
                 <td>{{ $row->reception_date }}</td>

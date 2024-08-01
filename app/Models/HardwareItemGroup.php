@@ -36,7 +36,6 @@ class HardwareItemGroup extends Model
 
         return $status;
     }
-
     public function hardwareItem(){
         return $this->hasMany('App\Models\HardwareItem');
     }

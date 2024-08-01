@@ -210,9 +210,16 @@ class ReceptionHardwareItemUsageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
-                            ->orWhere('location', 'like', "%$search%")
-                            ->where('status_item', '1');
+                              ->orWhere('location', 'like', "%$search%");
+                    })
+                    ->orWhereHas('hardwareItem', function($query) use ($search) {
+                        $query->where('item', 'like', "%$search%")
+                              ->orWhere('detail1', 'like', "%$search%")
+                              ->orWhereHas('hardwareItemGroup', function($query) use ($search) {
+                                  $query->where('name', 'like', "%$search%");
+                              });
                     });
+                    
                 }
 
                 if($request->status){
@@ -231,9 +238,16 @@ class ReceptionHardwareItemUsageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
-                            ->orWhere('location', 'like', "%$search%")
-                            ->where('status_item', '1');
+                              ->orWhere('location', 'like', "%$search%");
+                    })
+                    ->orWhereHas('hardwareItem', function($query) use ($search) {
+                        $query->where('item', 'like', "%$search%")
+                              ->orWhere('detail1', 'like', "%$search%")
+                              ->orWhereHas('hardwareItemGroup', function($query) use ($search) {
+                                  $query->where('name', 'like', "%$search%");
+                              });
                     });
+                    
                 }
 
                 if($request->status){
@@ -266,6 +280,7 @@ class ReceptionHardwareItemUsageController extends Controller
                     $val->user->name ?? '-',
                     $val->hardwareItem->code ?? '',
                     $val->hardwareItem->item ?? '',
+                    $val->hardwareItem->detail1 ?? '',
                     $val->location,
                     date('d/m/Y',strtotime($val->reception_date)),
                     $val->info,

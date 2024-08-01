@@ -23,10 +23,16 @@ class ExportReceptionHardwareUsage implements FromView,ShouldAutoSize
             'data' => ReceptionHardwareItemsUsage::where(function($query) {
                
                 if($this->search) {
-                    $query->where(function($query) {
+                    $query->where(function($query)  {
                         $query->orWhere('code', 'like', "%$this->search%")
-                            ->orWhere('location', 'like', "%$this->search%")
-                            ->where('status_item', '1');
+                              ->orWhere('location', 'like', "%$this->search%");
+                    })
+                    ->orWhereHas('hardwareItem', function($query)  {
+                        $query->where('item', 'like', "%$this->search%")
+                              ->orWhere('detail1', 'like', "%$this->search%")
+                              ->orWhereHas('hardwareItemGroup', function($query)  {
+                                  $query->where('name', 'like', "%$this->search%");
+                              });
                     });
                 }
             })

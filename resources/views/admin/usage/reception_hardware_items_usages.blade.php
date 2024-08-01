@@ -93,6 +93,7 @@
                                                         <th>User</th>
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.item') }}</th>
+                                                        <th>Keterangan</th>
                                                         <th>{{ __('translations.location') }}</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>
@@ -572,6 +573,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'hardware_item_code', className: 'center-align' },
+                { name: 'info', className: 'center-align' },
                 { name: 'hardware_item_id', className: 'center-align' },
                 { name: 'lokasi', className: 'center-align' },
                 { name: 'info', className: 'center-align' },

@@ -125,6 +125,12 @@ class ProductionReceiveController extends Controller
             $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
+                'item_receive_id'               => $d->productionScheduleDetail->item_id,
+                'item_receive_code'             => $d->productionScheduleDetail->item->code,
+                'item_receive_name'             => $d->productionScheduleDetail->item->name,
+                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
+                'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
+                'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
                 'user'                          => $d->productionOrder->user->name,
                 'post_date'                     => date('d/m/Y',strtotime($d->productionOrder->post_date)),
                 'note1'                         => $d->productionOrder->note,

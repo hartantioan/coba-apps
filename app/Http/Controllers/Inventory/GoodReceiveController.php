@@ -498,7 +498,7 @@ class GoodReceiveController extends Controller
                         'post_date'             => $request->post_date,
                         'currency_id'           => $request->currency_id,
                         'currency_rate'         => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'document'              => $request->file('document') ? $request->file('document')->store('public/good_receives') : NULL,
+                        'document'              => $request->file('file') ? $request->file('file')->store('public/good_receives') : NULL,
                         'note'                  => $request->note,
                         'status'                => '1',
                         'grandtotal'            => $grandtotal

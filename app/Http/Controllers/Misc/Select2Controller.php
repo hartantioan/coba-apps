@@ -445,6 +445,10 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
+                })->whereHas('itemGroup',function($query) {
+                    $query->whereHas('itemGroupWarehouse',function($query){
+                        $query->whereIn('warehouse_id', $this->datawarehouses);
+                    });
                 })->where('status','1')->get();
 
         foreach($data as $d) {
@@ -498,6 +502,10 @@ class Select2Controller extends Controller {
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
+                })->whereHas('itemGroup',function($query) {
+                    $query->whereHas('itemGroupWarehouse',function($query){
+                        $query->whereIn('warehouse_id', $this->datawarehouses);
+                    });
                 })->where('status','1')->get();
 
         foreach($data as $d) {
@@ -773,6 +781,11 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%")
                         ->orWhere('other_name', 'like', "%$search%");
+                })
+                ->whereHas('itemGroup',function($query) {
+                    $query->whereHas('itemGroupWarehouse',function($query){
+                        $query->whereIn('warehouse_id', $this->datawarehouses);
+                    });
                 })
                 ->where('status','1')
                 ->where(function($query) use($search){

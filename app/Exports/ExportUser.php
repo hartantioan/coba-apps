@@ -104,7 +104,7 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'pic_position'      => $row->pic_position ?? '-',
                 'pic_no'            => $row->pic_no  ?? '-',
                 'office_no'         => $row->office_no  ?? '-',
-                'limit_credit'      => $row->limit_credit  ?? '-',
+                'limit_credit'      => number_format($row->limit_credit,2,',','.') ?? '-',
                 'email'             => $row->email  ?? '-',
                 'gender'            => $row->gender(),
                 'employee_status'   => $row->employeeType(),

@@ -77,24 +77,12 @@ class ProductionReceiveController extends Controller
 
     public function getAccountData(Request $request){
         $response = [];
-        $shift = Shift::find($request->shift_id);
-        $search   = $request->search;
-        $data = ProductionOrder::where(function($query) use($search){
-            $query->where('code', 'like', "%$search%")
-                ->orWhereHas('user',function($query) use ($search){
-                    $query->where('name','like',"%$search%")
-                        ->orWhere('employee_no','like',"%$search%");
-                });
-        })
-        ->where(function($query)use($request){
+        $data = ProductionOrder::where(function($query)use($request){
             $query->whereHas('productionScheduleDetail',function($query)use($request){
                 $query->where('line_id',$request->line_id)
                     ->whereHas('productionSchedule',function($query)use($request){
                         $query->where('place_id',$request->place_id);
-                    })/* 
-                    ->whereHas('item',function($query){
-                        $query->whereNull('is_sales_item');
-                    }) */;
+                    });
             });
         })
         ->whereDoesntHave('used')

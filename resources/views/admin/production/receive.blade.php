@@ -340,7 +340,7 @@
                                                             <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">{{ __('translations.item') }}</th>
                                                             <th class="center" width="150px">Qty Planned</th>
-                                                            <th class="center" width="150px">Qty Receive</th>
+                                                            <th class="center" width="150px">Qty Receive (OK)</th>
                                                             <th class="center" width="150px">Qty Reject (Jika ada)</th>
                                                             <th class="center" width="300px">Satuan Produksi</th>
                                                             <th class="center">Plant</th>

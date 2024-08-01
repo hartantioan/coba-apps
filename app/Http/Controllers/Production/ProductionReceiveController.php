@@ -76,45 +76,37 @@ class ProductionReceiveController extends Controller
     }
 
     public function getAccountData(Request $request){
-        $account = User::find($request->id);
-
         $response = [];
-        $data = ProductionOrderDetail::where(function($query){  
-            
-        })
-        ->whereHas('productionOrder',function($query){
-            $query->whereDoesntHave('used')
-                ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-                ->whereIn('status',['2']);
-        })
-        ->whereHas('productionScheduleDetail',function($query){
-            $query->whereHas('item',function($query){
-                $query->whereNull('is_sales_item');
-            })->whereHas('bom',function($query){
-                $query->whereHas('bomDetail',function($query){
-                    $query->whereHas('bomAlternative',function($query){
-                        $query->whereNotNull('is_default');
-                    })
-                    ->where('issue_method','1');
+        $shift = Shift::find($request->shift_id);
+        $search   = $request->search;
+        $data = ProductionOrder::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
                 });
+        })
+        ->where(function($query)use($request){
+            $query->whereHas('productionScheduleDetail',function($query)use($request){
+                $query->where('line_id',$request->line_id)
+                    ->whereHas('productionSchedule',function($query)use($request){
+                        $query->where('place_id',$request->place_id);
+                    })/* 
+                    ->whereHas('item',function($query){
+                        $query->whereNull('is_sales_item');
+                    }) */;
             });
         })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2'])
         ->get();
 
-        
         foreach($data as $d) {
-            $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
-                $query->whereNotNull('is_default');
-            })->where('issue_method','2')->count();
-            $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
-                'user'                          => $d->productionOrder->user->name,
-                'post_date'                     => date('d/m/Y',strtotime($d->productionOrder->post_date)),
-                'note1'                         => $d->productionOrder->note,
-                'status'                        => $d->productionOrder->statusRaw(),
-                'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
-                'code'                          => $d->productionOrder->code,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                'code'                          => $d->code,
                 'item_receive_id'               => $d->productionScheduleDetail->item_id,
                 'item_receive_code'             => $d->productionScheduleDetail->item->code,
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
@@ -133,17 +125,10 @@ class ProductionReceiveController extends Controller
                 'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
                 'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
                 'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
-                'group_bom'                     => $d->productionScheduleDetail->bom->group,
-                'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
-                'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
-                'note'                          => 'NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
             ];
         }
-       
 
-        $account['details'] = $response;
-
-        return response()->json($account);
+        return response()->json($response);
     }
 
     public function getBatchCode(Request $request){

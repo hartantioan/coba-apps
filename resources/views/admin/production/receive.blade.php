@@ -961,7 +961,10 @@
             type: 'POST',
             dataType: 'JSON',
             data: {
-                id: $('#account_id').val()
+                id: $('#account_id').val(),
+                shift_id: $('#shift_id').val(),
+                place_id: $('#place_id').val(),
+                line_id: $('#line_id').val(),
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -975,9 +978,9 @@
                 if(kind == '1'){
                     $('#modal_pdo').modal('open');
                 
-                    if(response.details.length > 0){
+                    if(response.length > 0){
                        
-                        $.each(response.details, function(i, val) {
+                        $.each(response, function(i, val) {
 
                             $('#body-detail-pdo').append(`
                                 <tr data-id="` + val.id + `">

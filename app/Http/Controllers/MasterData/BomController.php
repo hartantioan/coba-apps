@@ -368,7 +368,7 @@ class BomController extends Controller
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
-                                        <th colspan="10" class="center">MATERIAL</th>
+                                        <th colspan="9" class="center">MATERIAL</th>
                                     </tr>
                                     <tr>
                                         <th class="center">No</th>

@@ -79,6 +79,7 @@ class ProductionReceiveController extends Controller
         $response = [];
         $search   = $request->search;
         $initialId = $request->id;
+        $account = User::find($request->id);
         $data = ProductionOrderDetail::where(function($query)use($search){  
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
@@ -124,26 +125,12 @@ class ProductionReceiveController extends Controller
             $hasStandard = $d->productionScheduleDetail->bom->bomStandard()->exists() ? true : false;
             $response[] = [
                 'id'   			                => $d->id,
+                'user'                          => $d->productionOrder->user->name,
+                'post_date'                     => date('d/m/Y',strtotime($d->productionOrder->post_date)),
+                'note1'                         => $d->productionOrder->note,
+                'status'                        => $d->productionOrder->statusRaw(),
                 'text' 			                => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'code'                          => $d->productionOrder->code,
-                'item_receive_id'               => $d->productionScheduleDetail->item_id,
-                'item_receive_code'             => $d->productionScheduleDetail->item->code,
-                'item_receive_name'             => $d->productionScheduleDetail->item->name,
-                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
-                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
-                'line'                          => $d->productionScheduleDetail->line->code,
-                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
-                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
-                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
-                'line_id'                       => $d->productionScheduleDetail->line_id,
-                'line_code'                     => $d->productionScheduleDetail->line->code,
-                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
-                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
-                'bom_id'                        => $d->productionScheduleDetail->bom_id,
-                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
-                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
-                'list_warehouse'                => $d->productionScheduleDetail->item->warehouseList(),
-                'is_powder'                     => $d->productionScheduleDetail->bom->is_powder ?? '0',
                 'group_bom'                     => $d->productionScheduleDetail->bom->group,
                 'has_backflush'                 => $countbackflush > 0 || $hasStandard == true ? '1' : '',
                 'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
@@ -151,7 +138,9 @@ class ProductionReceiveController extends Controller
             ];
         }
 
-        return response()->json($response);
+        $account['details'] = $response;
+
+        return response()->json($account);
     }
 
     public function getBatchCode(Request $request){

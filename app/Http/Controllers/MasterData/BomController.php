@@ -368,7 +368,7 @@ class BomController extends Controller
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>
-                                        <th colspan="9" class="center">MATERIAL</th>
+                                        <th colspan="7" class="center">MATERIAL</th>
                                     </tr>
                                     <tr>
                                         <th class="center">No</th>
@@ -377,8 +377,6 @@ class BomController extends Controller
                                         <th class="center">Deskripsi</th>
                                         <th class="center">Qty</th>
                                         <th class="center">Satuan</th>
-                                        <th class="center">Nominal</th>
-                                        <th class="center">Total</th>
                                         <th class="center">Dist.Biaya</th>
                                     </tr>
                                 </thead>
@@ -392,8 +390,6 @@ class BomController extends Controller
                     <td>'.$m->description.'</td>
                     <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
                     <td class="center-align">'.$m->lookable->uomUnit->code.'</td>
-                    <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
-                    <td class="right-align">'.number_format($m->total,2,',','.').'</td>
                     <td>'.($m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '').'</td>
                 </tr>';
             }

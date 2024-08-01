@@ -6,7 +6,6 @@
             <th>NAMA</th>
             <th>ITEM</th>
             <th>PLANT</th>
-            <th>GUDANG</th>
             <th>QTY OUTPUT</th>
             <th>STATUS</th>
         </tr>
@@ -19,7 +18,6 @@
                 <td style="background-color:#adaaaa;">{{ $row->name }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->item->code.' - '.$row->item->name }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->place->code }}</td>
-                <td style="background-color:#adaaaa;">{{ $row->warehouse->name }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->qty_output }}</td>
                 <th style="background-color:#adaaaa;">{!! $row->status() !!}</th>
             </tr>

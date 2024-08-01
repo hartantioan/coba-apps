@@ -8,6 +8,7 @@
             <th>PLANT</th>
             <th>QTY OUTPUT</th>
             <th>STATUS</th>
+            <th>BOM STANDARD</th>
         </tr>
     </thead>
     <tbody>
@@ -20,6 +21,7 @@
                 <td style="background-color:#adaaaa;">{{ $row->place->code }}</td>
                 <td style="background-color:#adaaaa;">{{ $row->qty_output }}</td>
                 <th style="background-color:#adaaaa;">{!! $row->status() !!}</th>
+                <th style="background-color:#adaaaa;">{!! $row->bomStandard()->exists() ? $row->bomStandard->code : '-' !!}</th>
             </tr>
             @foreach($row->bomAlternative as $rowalt)
                 <tr align="center">

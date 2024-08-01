@@ -118,7 +118,7 @@ class ProductionFgReceiveController extends Controller
                         $sellConvert = $itemChild->sellConversion();
 
                         $result = [];
-                        $prefix = $pallet->prefix_code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
+                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
                         $latestCode = ProductionBatch::getLatestCodeFg($prefix);
                         $oldprefix = 0;
                         if($request->listno){

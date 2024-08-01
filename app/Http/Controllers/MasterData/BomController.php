@@ -364,7 +364,7 @@ class BomController extends Controller
             $string .= '<div class="row pt-1 pb-1 lighten-4">';
             
             $string .= '<div class="col s12">
-                            <h5>Bom Standard : '.$data->bomStandard->code.'</h5>
+                            <h5>Bom Standard : '.$data->bomStandard->code.' ( '.$data->bomStandard->name.' )</h5>
                             <table class="bordered" style="min-width:100%;max-width:100%;">
                                 <thead>
                                     <tr>

@@ -254,7 +254,7 @@
                 <div class="invoice-product-details mt-2" style="font-size:0.8rem;">
                     Dengan hormat,<br>
                     Saya yang bertanda tangan di bawah ini :<br>
-                    <table border="0" width="40%" style="font-size:1.2rem;margin-left:4rem">
+                    <table border="0" width="80%" style="font-size:1.2rem;margin-left:4rem">
                         <tr>
                             <td>
                                 Nama Lengkap

@@ -776,13 +776,16 @@ class LandedCostController extends Controller
 			if($query) {
                 
                 if($request->arr_item){
-                    DB::beginTransaction();
-                    try {
+                    /* DB::beginTransaction();
+                    try { */
                         foreach($request->arr_item as $key => $row){
+                            $item = Item::find(intval($row));
+                            $stock = $item->getStockPlace($request->arr_place[$key]);
+                            $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$query->company_id)->where('status','1')->first();
                             LandedCostDetail::create([
                                 'landed_cost_id'        => $query->id,
                                 'item_id'               => $row,
-                                'coa_id'                => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
+                                'coa_id'                => $stock > 0 ? $item->itemGroup->coa_id : $coa->id,
                                 'qty'                   => floatval($request->arr_qty[$key]),
                                 'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
                                 'place_id'              => $request->arr_place[$key],
@@ -811,10 +814,10 @@ class LandedCostController extends Controller
                                 ]);
                             }
                         }
-                        DB::commit();
+                        /* DB::commit();
                     }catch(\Exception $e){
                         DB::rollback();
-                    }
+                    } */
                 }
 
                 CustomHelper::sendApproval('landed_costs',$query->id,$query->note);

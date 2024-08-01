@@ -360,6 +360,47 @@ class BomController extends Controller
         
         $string .= '</div>';
 
+        if($data->bomStandard()->exists()){
+            $string .= '<div class="row pt-1 pb-1 lighten-4">';
+            
+            $string .= '<div class="col s12">
+                            <h5>Bom Standard : '.$data->code.'</h5>
+                            <table class="bordered" style="min-width:100%;max-width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th colspan="10" class="center">MATERIAL</th>
+                                    </tr>
+                                    <tr>
+                                        <th class="center">No</th>
+                                        <th class="center">Tipe</th>
+                                        <th class="center">Item/Resource</th>
+                                        <th class="center">Deskripsi</th>
+                                        <th class="center">Qty</th>
+                                        <th class="center">Satuan</th>
+                                        <th class="center">Nominal</th>
+                                        <th class="center">Total</th>
+                                        <th class="center">Dist.Biaya</th>
+                                    </tr>
+                                </thead>
+                                <tbody>';
+
+            foreach($data->bomStandard->bomStandardDetail as $key => $m){
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$m->type().'</td>
+                    <td>'.$m->lookable->code.' - '.$m->lookable->name.'</td>
+                    <td>'.$m->description.'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($m->qty).'</td>
+                    <td class="center-align">'.$m->lookable->uomUnit->code.'</td>
+                    <td class="right-align">'.number_format($m->nominal,2,',','.').'</td>
+                    <td class="right-align">'.number_format($m->total,2,',','.').'</td>
+                    <td>'.($m->costDistribution()->exists() ? $m->costDistribution->code.' - '.$m->costDistribution->name : '').'</td>
+                </tr>';
+            }
+            
+            $string .= '</tbody></table></div></div>';
+        }
+
         return response()->json($string);
     }
 

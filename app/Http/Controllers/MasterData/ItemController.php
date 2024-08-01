@@ -80,7 +80,7 @@ class ItemController extends Controller
         $data = [
             'title'     => 'Item',
             'content'   => 'admin.master_data.item',
-            'group'     =>  $itemGroup,
+            'group'     => $itemGroup,
             'unit'      => Unit::where('status','1')->get(),
             'place'     => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'warehouse' => Warehouse::where('status','1')->whereIn('id',$this->datawarehouses)->get(),

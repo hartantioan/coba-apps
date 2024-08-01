@@ -56,6 +56,8 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                     $this->error = "reject.";
                 }elseif(!$place && $this->error ==null){
                     $this->error = "plant.";
+                }elseif(!$bomStandard && $this->error ==null){
+                    $this->error = "bom standard.";
                 }
 
                 if (!$check) {
@@ -100,7 +102,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
             DB::commit();
         }catch (\Exception $e) {
             DB::rollback();
-            $sheet='BOM';
+            $sheet='Header';
             throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
     }

@@ -1720,17 +1720,7 @@
         });
     }
 
-   /*  function exportExcel(){
-        var search = table.search();
-        var status = $('#filter_status').val();
-        var start_date = $('#start_date').val();
-        var end_date = $('#finish_date').val();
-        var type = $('#filter_type').val();
-        var modedata = '{{ $modedata }}';
-
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type=" + type + "&end_date=" + end_date + "&start_date=" + start_date ;
-       
-    } */
+   
 
     function done(id){
         var msg = '';

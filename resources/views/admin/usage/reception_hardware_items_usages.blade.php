@@ -544,6 +544,10 @@
             "serverSide": true,
             "deferRender": true,
             "destroy": true,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
             "iDisplayInLength": 10,
             "order": [[0, 'desc']],
             ajax: {

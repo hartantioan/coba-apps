@@ -561,6 +561,37 @@ class HardwareItemController extends Controller
         
     }
 
+    public function destroy(Request $request){
+        $query = HardwareItem::find($request->id);
+        if($query->receptionHardwareItemsUsageALL()->exists()){
+            $response = [
+                'status'  => 500,
+                'message' => 'Data sudah dibuat serah terima.'
+            ];
+            return response()->json($response);
+        }
+        
+        if($query->delete()) {
+            activity()
+                ->performedOn(new HardwareItem())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the Inventaris Hardware data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
     public function printBarcode( Request $request){
 
         $RH = HardwareItem::find($request->id);

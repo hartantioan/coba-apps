@@ -2561,7 +2561,7 @@ class CustomHelper {
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
 					}
 					$totalitem += $rowtotal;
-
+					$itemdata = NULL;
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
 						if($itemdata->qty_final > 0){

@@ -147,7 +147,10 @@ class CustomHelper {
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		$item = Item::find($item_id);
-		$bomPowder = $item->bomPlace($place_id)->exists() ? $item->bomPlace($place_id)->first() : NULL;
+		$bomPowder = NULL;
+		if($item->bomPlace($place_id)->exists()){
+			$bomPowder = $item->bomPlace($place_id)->first();
+		}
 		if($bomPowder && $bomPowder->group == '1'){
 			$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
 		}else{

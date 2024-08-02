@@ -115,11 +115,7 @@
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
-                                                <i class="material-icons hide-on-med-and-up">view_headline</i>
-                                                <span class="hide-on-small-onl">Export</span>
-                                                <i class="material-icons right">view_headline</i>
-                                            </a>
+                                           
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
@@ -1723,6 +1719,18 @@
             }
         });
     }
+
+   /*  function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+        var type = $('#filter_type').val();
+        var modedata = '{{ $modedata }}';
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type=" + type + "&end_date=" + end_date + "&start_date=" + start_date ;
+       
+    } */
 
     function done(id){
         var msg = '';

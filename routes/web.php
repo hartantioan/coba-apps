@@ -2106,6 +2106,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('remove_used_data', [MarketingOrderPlanController::class, 'removeUsedData']);
                     Route::post('print_by_range',[MarketingOrderPlanController::class, 'printByRange']);
                     Route::get('export',[MarketingOrderPlanController::class, 'export']);
+                    Route::get('export_from_page',[MarketingOrderPlanController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[MarketingOrderPlanController::class, 'viewStructureTree']);
                     Route::post('create',[MarketingOrderPlanController::class, 'create'])->middleware('operation.access:marketing_order_production,update');
                     Route::get('approval/{id}',[MarketingOrderPlanController::class, 'approval'])->withoutMiddleware('direct.access');
@@ -2124,6 +2125,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionScheduleController::class, 'done'])->middleware('operation.access:production_schedule,update');
                     Route::post('print_by_range',[ProductionScheduleController::class, 'printByRange']);
                     Route::get('export',[ProductionScheduleController::class, 'export']);
+                    Route::get('export_from_page',[ProductionScheduleController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionScheduleController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [ProductionScheduleController::class, 'removeUsedData']);
                     Route::post('create',[ProductionScheduleController::class, 'create'])->middleware('operation.access:production_schedule,update');
@@ -2145,6 +2147,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionOrderController::class, 'done'])->middleware('operation.access:production_order,update');
                     Route::post('print_by_range',[ProductionOrderController::class, 'printByRange']);
                     Route::get('export',[ProductionOrderController::class, 'export']);
+                    Route::get('export_from_page',[ProductionOrderController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionOrderController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [ProductionOrderController::class, 'removeUsedData']);
                     Route::post('create',[ProductionOrderController::class, 'create'])->middleware('operation.access:production_order,update');
@@ -2167,6 +2170,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionIssueController::class, 'done'])->middleware('operation.access:production_issue,update');
                     Route::post('print_by_range',[ProductionIssueController::class, 'printByRange']);
                     Route::get('export',[ProductionIssueController::class, 'export']);
+                    Route::get('export_from_page',[ProductionIssueController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionIssueController::class, 'viewStructureTree']);
                     Route::post('create',[ProductionIssueController::class, 'create'])->middleware('operation.access:production_issue,update');
                     Route::post('send_used_data',[ProductionIssueController::class, 'sendUsedData'])->middleware('operation.access:production_issue,update');
@@ -2189,6 +2193,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionReceiveController::class, 'done'])->middleware('operation.access:production_receive,update');
                     Route::post('print_by_range',[ProductionReceiveController::class, 'printByRange']);
                     Route::get('export',[ProductionReceiveController::class, 'export']);
+                    Route::get('export_from_page',[ProductionReceiveController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionReceiveController::class, 'viewStructureTree']);
                     Route::post('create',[ProductionReceiveController::class, 'create'])->middleware('operation.access:production_receive,update');
                     Route::get('view_journal/{id}',[ProductionReceiveController::class, 'viewJournal'])->middleware('operation.access:production_receive,journal');
@@ -2210,6 +2215,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionFgReceiveController::class, 'done'])->middleware('operation.access:production_fg_receive,update');
                     Route::post('print_by_range',[ProductionFgReceiveController::class, 'printByRange']);
                     Route::get('export',[ProductionFgReceiveController::class, 'export']);
+                    Route::get('export_from_page',[ProductionFgReceiveController::class, 'exportFromTransactionPage']);
                     Route::get('print_barcode/{id}',[ProductionFgReceiveController::class, 'printBarcode']);
                     Route::get('viewstructuretree',[ProductionFgReceiveController::class, 'viewStructureTree']);
                     Route::post('send_used_data',[ProductionFgReceiveController::class, 'sendUsedData']);
@@ -2236,6 +2242,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[ProductionHandoverController::class, 'done'])->middleware('operation.access:production_handover,update');
                     Route::post('print_by_range',[ProductionHandoverController::class, 'printByRange']);
                     Route::get('export',[ProductionHandoverController::class, 'export']);
+                    Route::get('export_from_page',[ProductionHandoverController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionHandoverController::class, 'viewStructureTree']);
                     Route::post('send_used_data',[ProductionHandoverController::class, 'sendUsedData']);
                     Route::post('remove_used_data', [ProductionHandoverController::class, 'removeUsedData']);

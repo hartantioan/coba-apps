@@ -257,7 +257,9 @@
                             <tr>
                                 <th align="center">{{ __('translations.no') }}.</th>
                                 <th align="center">{{ __('translations.item') }}</th>
-                                <th align="center">{{ __('translations.qty') }}</th>
+                                <th align="center">Qty Planned</th>
+                                <th align="center">Qty Real</th>
+                                <th align="center">Qty Reject</th>
                                 <th align="center">{{ __('translations.unit') }}</th>
                                 <th align="center">{{ __('translations.line') }}</th>
                                 <th align="center">{{ __('translations.warehouse') }}</th>
@@ -269,6 +271,8 @@
                                 <td align="center" rowspan="2">{{ ($key + 1) }}</td>
                                 <td align="center">{{ $row->productionScheduleDetail->item->code.' - '.$row->productionScheduleDetail->item->name }}</td>
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->productionScheduleDetail->qty) }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qtyReceive()) }}</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($row->qtyReject()) }}</td>
                                 <td align="center">{{ $row->productionScheduleDetail->item->uomUnit->code }}</td>
                                 <td align="center">{{ $row->productionScheduleDetail->line->code }}</td>
                                 <td align="center">{{ $row->productionScheduleDetail->warehouse->name }}</td>

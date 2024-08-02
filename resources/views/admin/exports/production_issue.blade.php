@@ -57,10 +57,10 @@
                     <td>{{ $row_detail->qty_planned}}</td>
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->uomUnit->code }}</td>
-                    <td>{{ $row_detail->nominal_planned}}</td>
-                    <td>{{ $row_detail->nominal }}</td>
-                    <td>{{ $row_detail->total_planned}}</td>
-                    <td>{{ $row_detail->total }}</td>
+                    <td>{{ number_format($row_detail->nominal_planned ,3,',','.') }}</td>
+                    <td>{{ number_format($row_detail->nominal ,3,',','.') }}</td>
+                    <td>{{ number_format($row_detail->total_planned ,3,',','.') }}</td>
+                    <td>{{ number_format($row_detail->total ,3,',','.') }}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ ($row_detail->warehouse()->exists() ? $row_detail->warehouse->code : '-') }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>

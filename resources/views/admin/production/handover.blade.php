@@ -125,10 +125,7 @@
                                                 <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
                                                 <i class="material-icons right">refresh</i>
                                             </a>
-                                            <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" href="javascript:void(0);" onclick="exportExcel();">
-                                                <span class="hide-on-small-onl">Export</span>
-                                                <i class="material-icons right">view_headline</i>
-                                            </a>
+                                           
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>

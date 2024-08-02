@@ -210,7 +210,11 @@ class ReceptionHardwareItemUsageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
-                              ->orWhere('location', 'like', "%$search%");
+                              ->orWhere('location', 'like', "%$search%")
+                              ->orWhereHas('account', function($query) use ($search) {
+                                $query->where('name', 'like', "%$search%");
+                                    
+                            });
                     })
                     ->orWhereHas('hardwareItem', function($query) use ($search) {
                         $query->where('item', 'like', "%$search%")
@@ -238,7 +242,11 @@ class ReceptionHardwareItemUsageController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('code', 'like', "%$search%")
-                              ->orWhere('location', 'like', "%$search%");
+                              ->orWhere('location', 'like', "%$search%")
+                              ->orWhereHas('account', function($query) use ($search) {
+                                $query->where('name', 'like', "%$search%");
+                                    
+                            });
                     })
                     ->orWhereHas('hardwareItem', function($query) use ($search) {
                         $query->where('item', 'like', "%$search%")

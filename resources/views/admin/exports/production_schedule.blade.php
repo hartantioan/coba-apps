@@ -26,6 +26,7 @@
             <th>Tgl. Produksi</th>
             <th>Gudang</th>
             <th>{{ __('translations.line') }}</th>
+            <th>Based On</th>
         </tr>
     </thead>
     <tbody>
@@ -61,6 +62,7 @@
                     <td>{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
                     <td>{{ $row_detail->warehouse->code }}</td>
                     <td>{{ ($row_detail->line()->exists() ? $row_detail->line->code : '-') }}</td>
+                    <td>{{ ($row_detail->marketingOrderPlanDetail()->exists() ? $row_detail->marketingOrderPlanDetail->marketingOrderPlan->code : '-') }}</td>
                 </tr>
                 @php
                     $no++;

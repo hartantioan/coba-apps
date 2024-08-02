@@ -26,6 +26,7 @@
             <th>Line</th>
             <th>Gudang</th>
             <th>Based On</th>
+            <th>Based On Issue No.</th>
         </tr>
     </thead>
     <tbody>
@@ -60,6 +61,7 @@
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ $row_detail->warehouse->code}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>
+                    <td>{{ $row_detail->productionOrderDetail->productionIssue->code }}</td>
                 </tr>
                 @php
                     $no++;

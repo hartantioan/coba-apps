@@ -227,7 +227,7 @@
                                             :
                                         </td>
                                         <td>
-                                            {{ $data->productionIssue()->exists() ? $data->productionIssue->code : '-' }}
+                                            {{ $data->productionIssue()->exists() ? $data->productionIssueList() : '-' }}
                                         </td>
                                     </tr>
                                     <tr>

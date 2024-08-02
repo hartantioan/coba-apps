@@ -25,6 +25,7 @@
             <th>{{ __('translations.line') }}</th>
             <th>Gudang</th>
             <th>Tipe</th>
+            <th>Based On</th>
         </tr>
     </thead>
     <tbody>
@@ -58,6 +59,7 @@
                     <td>{{ ($row_detail->productionScheduleDetail->line()->exists() ? $row_detail->productionScheduleDetail->line->code : '-') }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->warehouse->code }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->type() }}</td>
+                    <td>{{ $row_detail->productionScheduleDetail->productionSchedule->code }}</td>
                 </tr>
                 @php
                     $no++;

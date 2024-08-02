@@ -293,7 +293,7 @@ i@php
                             <tr>
                                 <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                 <td>{{ $row->marketingOrderDetail()->exists() ? $row->marketingOrderDetail->marketingOrder->code : '-' }}</td>
-                                <td align="center">{{ $row->qty }}</td>
+                                <td align="center">{{ number_format($row->qty ,3,',','.') }}</td>
                                 <td align="center">{{ $row->item->uomUnit->code }}</td>
                                 <td align="center">{{ date('d/m/Y',strtotime($row->request_date)) }}</td>
                             </tr>

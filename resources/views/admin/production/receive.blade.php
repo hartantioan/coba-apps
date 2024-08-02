@@ -1254,6 +1254,7 @@
         }
         $('#note').val('');
         if($('#production_order_detail_id').val()){
+            $('#body-item').empty()
             if($('#shift_id').val() && $('#group').val()){
                 
                 

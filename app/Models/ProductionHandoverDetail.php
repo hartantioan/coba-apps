@@ -20,8 +20,6 @@ class ProductionHandoverDetail extends Model
         'production_fg_receive_detail_id',
         'item_id',
         'qty',
-        'qty_reject',
-        'qty_received',
         'shading',
         'place_id',
         'warehouse_id',

@@ -192,6 +192,16 @@ class ProductionOrderDetail extends Model
         return $total;
     }
 
+    public function listIssue(){
+        $arr = [];
+        if($this->productionIssue()->exists()){
+            foreach($this->productionIssue as $row){
+                $arr[] = $row->code;
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function totalIssueItem(){
         $total = 0;
         

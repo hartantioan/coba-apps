@@ -54,7 +54,8 @@
                     <td>{{ $row_detail->item->name }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->pallet_no}}</td>
                     <td>{{ $row_detail->shading}}</td> 
-                    <td>{{ $row_detail->qty_received}}</td>                <td>{{ $row_detail->item->uomUnit->code}}</td>
+                    <td>{{ $row_detail->qty}}</td>                
+                    <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
                     <td>{{ $row_detail->warehouse->code}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->code : '-') }}</td>

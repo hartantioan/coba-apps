@@ -537,8 +537,6 @@ class ProductionHandoverController extends Controller
                 'pallet_no'             => $row->productionFgReceiveDetail->pallet_no,
                 'shading'               => $row->shading,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'qty_reject'            => CustomHelper::formatConditionalQty($row->qty_reject),
-                'qty_received'          => CustomHelper::formatConditionalQty($row->qty_received),
                 'place_id'              => $row->place_id,
                 'warehouse_id'          => $row->warehouse_id,
                 'list_warehouse'        => $row->item->warehouseList(),

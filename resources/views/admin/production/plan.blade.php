@@ -1720,8 +1720,6 @@
         });
     }
 
-   
-
     function done(id){
         var msg = '';
         swal({

@@ -252,7 +252,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="6" class="center-align">Daftar Target Produksi</th>
+                                <th colspan="8" class="center-align">Daftar Target Produksi</th>
                             </tr>
                             <tr>
                                 <th align="center">{{ __('translations.no') }}.</th>
@@ -278,7 +278,7 @@
                                 <td align="center">{{ $row->productionScheduleDetail->warehouse->name }}</td>
                             </tr>
                             <tr>
-                                <td colspan="6">Keterangan : {{ $row->productionScheduleDetail->note }}</td>
+                                <td colspan="8">Keterangan : {{ $row->productionScheduleDetail->note }}</td>
                             </tr>
                             @endforeach
                         </tbody>

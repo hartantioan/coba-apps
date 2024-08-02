@@ -61,7 +61,7 @@
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ $row_detail->warehouse->code}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>
-                    <td>{{ $row_detail->productionOrderDetail->productionIssue->code }}</td>
+                    <td>{{ $row_detail->productionOrderDetail->productionIssue()->exists() ? $row_detail->productionOrderDetail->listIssue() : '-' }}</td>
                 </tr>
                 @php
                     $no++;

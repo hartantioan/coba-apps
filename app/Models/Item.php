@@ -488,7 +488,12 @@ class Item extends Model
 
     public function bomPlace($place_id)
     {
-        return $this->hasMany('App\Models\Bom','item_id','id')->where('place_id',intval($place_id))->where('status','1')->orderByDesc('id');
+        $data = $this->bom()->where('place_id',intval($place_id))->where('status','1')->orderByDesc('id')->get();
+        if($data){
+            return $data;
+        }else{
+            return '';
+        }
     }
 
     public function bom()

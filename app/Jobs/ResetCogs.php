@@ -53,7 +53,7 @@ class ResetCogs implements ShouldQueue
     public function handle()
     {
 		$item = Item::find($this->item_id);
-		$bomPowder = $item->bomPlace($this->place_id)->exists() ? $item->bomPlace($this->place_id)->first() : NULL;
+		$bomPowder = $item->bomPlace($this->place_id) ? $item->bomPlace($this->place_id)->first() : NULL;
 		$bomGroup = '';
 		if($bomPowder){
 			$bomGroup = $bomPowder->group; 

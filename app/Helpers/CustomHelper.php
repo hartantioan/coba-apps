@@ -2601,7 +2601,7 @@ class CustomHelper {
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
-								'coa_id'		=> $coaselisihhargabahan,
+								'coa_id'		=> $coaselisihhargabahan->id,
 								'place_id'		=> $rowdetail->place_id,
 								'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
 								'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,

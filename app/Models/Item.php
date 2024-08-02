@@ -488,7 +488,7 @@ class Item extends Model
 
     public function bomPlace($place_id)
     {
-        $data = $this->bom()->where('place_id',intval($place_id))->where('status','1')->orderByDesc('id')->get();
+        $data = $this->bom()->where('place_id',intval($place_id))->orderByDesc('id')->get();
         if($data){
             return $data;
         }else{

@@ -148,6 +148,7 @@ class CustomHelper {
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		$item = Item::find($item_id);
 		$bomPowder = NULL;
+		info($item);
 		if($item->bomPlace($place_id)){
 			$bomPowder = $item->bomPlace($place_id)->first();
 		}

@@ -715,7 +715,7 @@ class LandedCostController extends Controller
                         $query->reference = $request->reference;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->note = $request->note;
+                        $query->note = $request->note ?? 'LANDED COST - '.$request->code;
                         $query->document = $document;
                         $query->total = round($total,3);
                         $query->tax = round($tax,3);
@@ -758,7 +758,7 @@ class LandedCostController extends Controller
                         'reference'                 => $request->reference,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'note'                      => $request->note,
+                        'note'                      => $request->note ?? 'LANDED COST - '.$newCode,
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),

@@ -246,7 +246,7 @@ class OutStandingAPController extends Controller
                             AND ard.lookable_id = pi.id
                             AND (
                                 CASE 
-                                    
+                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
                                     WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                                 END
                             )

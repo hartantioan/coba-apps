@@ -152,7 +152,7 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date = :date7
+                        pi.post_date <= :date7
                         AND pi.balance > 0
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
@@ -305,7 +305,7 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date = :date8
+                        pi.post_date <= :date8
                         AND pi.grandtotal > 0
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL

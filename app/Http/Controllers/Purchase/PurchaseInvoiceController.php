@@ -1091,10 +1091,6 @@ class PurchaseInvoiceController extends Controller
                 try { */
                     $query = PurchaseInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    if($query->journal()->exists()){
-                        CustomHelper::removeJournal($query->getTable(),$query->id);
-                    }
-
                     $approved = false;
                     $revised = false;
 
@@ -1176,6 +1172,9 @@ class PurchaseInvoiceController extends Controller
                         }
 
                         CustomHelper::removeApproval($query->getTable(),$query->id);
+                        if($query->journal()->exists()){
+                            CustomHelper::removeJournal($query->getTable(),$query->id);
+                        }
 
                         /* DB::commit(); */
                     }else{

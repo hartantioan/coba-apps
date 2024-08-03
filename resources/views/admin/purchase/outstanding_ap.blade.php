@@ -167,7 +167,7 @@
                                     <td class="center-align">`+val.top+`</td>
                                     <td class="center-align">`+val.due_date+`</td>
                                     <td class="right-align">`+val.grandtotal+`</td>
-                                    <td class="right-align">`+val.journal+`</td>
+                                    <td class="right-align">`+val.payed+`</td>
                                     <td class="right-align">`+val.sisa+`</td>
                                 </tr>
                             `);

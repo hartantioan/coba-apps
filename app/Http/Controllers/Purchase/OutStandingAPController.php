@@ -55,8 +55,7 @@ class OutStandingAPController extends Controller
                 rs.total_memo,
                 rs.total_reconcile,
                 rs.total_journal,
-                rs.status_cancel,
-                rs.total_journal_check
+                rs.status_cancel
             FROM
                 (SELECT 
                     IFNULL((SELECT 
@@ -138,20 +137,6 @@ class OutStandingAPController extends Controller
                             AND cd.lookable_id = pi.id
                             AND cd.deleted_at IS NULL
                     ),0) AS status_cancel,
-                    IFNULL((
-                        SELECT
-                            SUM(jd.nominal)
-                            FROM journal_details jd
-                            JOIN journals j
-                                ON j.id = jd.journal_id
-                            WHERE jd.coa_id = 122
-                            AND j.lookable_type = 'purchase_invoices'
-                            AND j.lookable_id = pi.id
-                            AND j.status IN ('2','3')
-                            AND jd.deleted_at IS NULL
-                            AND j.deleted_at IS NULL
-                            AND jd.type = '2'
-                    ),0) AS total_journal_check,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     pi.code,
@@ -208,8 +193,7 @@ class OutStandingAPController extends Controller
                 rs.total_reconcile,
                 rs.status_cancel,
                 rs.total_journal_debit,
-                rs.total_journal_credit,
-                rs.total_journal_check
+                rs.total_journal_credit
             FROM
                 (SELECT
                     pi.top AS topdp,
@@ -306,20 +290,6 @@ class OutStandingAPController extends Controller
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'
                     ),0) AS total_journal_credit,
-                    IFNULL((
-                        SELECT
-                            SUM(jd.nominal)
-                            FROM journal_details jd
-                            JOIN journals j
-                                ON j.id = jd.journal_id
-                            WHERE jd.coa_id = 122
-                            AND j.lookable_type = 'purchase_down_payments'
-                            AND j.lookable_id = pi.id
-                            AND j.status IN ('2','3')
-                            AND jd.deleted_at IS NULL
-                            AND j.deleted_at IS NULL
-                            AND jd.type = '2'
-                    ),0) AS total_journal_check,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     pi.code,
@@ -370,7 +340,6 @@ class OutStandingAPController extends Controller
                     'top'       => '-',
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                     'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
-                    'journal'   => number_format($row->total_journal_check,2,',','.'),
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),
                 ];
                 $totalAll += $balance_after_adjust;
@@ -390,7 +359,6 @@ class OutStandingAPController extends Controller
                     'top'       => '-',
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                     'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
-                    'journal'   => number_format($row->total_journal_check,2,',','.'),
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),
                 ];
                 

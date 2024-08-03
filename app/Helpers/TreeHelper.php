@@ -54,7 +54,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 class TreeHelper {
-    public static function treeLoop1($data_go_chart = [] , $data_link = [], $data_id = '', $id = null){
+    public static function treeLoop1($data_go_chart = [] , $data_link = [], $data_id = '', $id = null ,$hide_nominal = null){
         function formatNominal($model) {
             if ($model->currency) {
                 return $model->currency->symbol;
@@ -155,13 +155,16 @@ class TreeHelper {
                         }else{
                             $name = $good_receipt_detail->purchaseOrderDetail->purchaseOrder->supplier->name ?? null;
                         }
+                        $properties = [
+                            ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
+                            ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] = ['name'=> "Nominal : 0"];
+                        }
                         $po = [
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".$good_receipt_detail->purchaseOrderDetail->purchaseOrder->post_date],
-                                ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
-                                ['name'=> "Nominal : 0"]
-                                /* ['name'=> "Nominal :".formatNominal($good_receipt_detail->purchaseOrderDetail->purchaseOrder).number_format($good_receipt_detail->purchaseOrderDetail->purchaseOrder->grandtotal,2,',','.')] */
-                            ],
+                            'properties'=>$properties,
                             'key'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                             'name'=>$good_receipt_detail->purchaseOrderDetail->purchaseOrder->code,
                             'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($good_receipt_detail->purchaseOrderDetail->purchaseOrder->code),
@@ -210,14 +213,18 @@ class TreeHelper {
                         //landed cost searching
                         if($good_receipt_detail->landedCostDetail()->exists()){
                             foreach($good_receipt_detail->landedCostDetail as $landed_cost_detail){
+                                $properties = [
+                                    ['name'=> "Tanggal : ".$landed_cost_detail->landedCost->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($landed_cost_detail->landedCost).number_format($landed_cost_detail->landedCost->grandtotal,2,',','.')];
+                                }
                                 $data_lc=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal : ".$landed_cost_detail->landedCost->post_date],
-                                        ['name'=> "Nominal :".formatNominal($landed_cost_detail->landedCost).number_format($landed_cost_detail->landedCost->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'key'=>$landed_cost_detail->landedCost->code,
                                     'name'=>$landed_cost_detail->landedCost->code,
-                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost_detail->landedCost->code),    
+                                    'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($landed_cost_detail->landedCost->code),    
                                 ];
 
                                 $data_go_chart[]=$data_lc;
@@ -240,12 +247,15 @@ class TreeHelper {
                         //invoice searching
                         if($good_receipt_detail->purchaseInvoiceDetail()->exists()){
                             foreach($good_receipt_detail->purchaseInvoiceDetail as $invoice_detail){
+                                $properties = [
+                                    ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($invoice_detail->purchaseInvoice).number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')];
+                                }
                                 $invoice_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal : ".$invoice_detail->purchaseInvoice->post_date],
-                                        ['name'=> "Nominal :".formatNominal($invoice_detail->purchaseInvoice).number_format($invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                                        
-                                    ],
+                                    'properties'=> $properties,
                                     'key'=>$invoice_detail->purchaseInvoice->code,
                                     'name'=>$invoice_detail->purchaseInvoice->code,
                                     'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($invoice_detail->purchaseInvoice->code)
@@ -268,12 +278,16 @@ class TreeHelper {
 
                         if($good_receipt_detail->goodScale()->exists()){
                             $name = $good_receipt_detail->goodScale->supplier->name ?? null;
+                            $properties = [
+                                ['name'=> "Tanggal: ".$good_receipt_detail->goodScale->post_date],
+                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScale).number_format($good_receipt_detail->goodScale->grandtotal,2,',','.')];
+                            }
                             $data_gscale = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal: ".$good_receipt_detail->goodScale->post_date],
-                                        ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
-                                        ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodScale).number_format($good_receipt_detail->goodScale->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'key'=>$good_receipt_detail->goodScale->code,
                                     'name'=>$good_receipt_detail->goodScale->code,
                                     'url'=>request()->root()."/admin/inventory/good_scale?code=".CustomHelper::encrypt($good_receipt_detail->goodScale->code),
@@ -299,11 +313,16 @@ class TreeHelper {
                     $query = OutgoingPayment::where('id',$op_id)->first();
                     if($query->paymentRequest()->exists()){
                         foreach($query->paymentRequest->paymentRequestDetail as $row_pyr_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =  ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 "key" => $row_pyr_detail->paymentRequest->code,
                                 "name" => $row_pyr_detail->paymentRequest->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -319,12 +338,17 @@ class TreeHelper {
                                 
                             
                             if($row_pyr_detail->fundRequest()){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                        
+                                    ];
                                 
+                                if (!$hide_nominal) {
+                                    $properties[] =  ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_fund_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
@@ -343,12 +367,17 @@ class TreeHelper {
                             }
                             foreach($row_pyr_detail->paymentRequest->paymentRequestDetail as $row_pyrd){
                                 if($row_pyrd->purchaseDownPayment()){
-                                
+                                    $properties = [
+                                        ['name'=> "Tanggal :".$row_pyrd->lookable->post_date],
+                                         
+                                        ];
+                                    
+                                    if (!$hide_nominal) {
+                                        $properties[] =    ['name'=> "Nominal :".formatNominal($row_pyrd->lookable).number_format($row_pyrd->lookable->grandtotal,2,',','.')]
+                                        ;
+                                    }
                                     $data_downp_tempura = [
-                                        'properties'=> [
-                                            ['name'=> "Tanggal :".$row_pyrd->lookable->post_date],
-                                            ['name'=> "Nominal :".formatNominal($row_pyrd->lookable).number_format($row_pyrd->lookable->grandtotal,2,',','.')]
-                                        ],
+                                        'properties'=> $properties,
                                         "key" => $row_pyrd->lookable->code,
                                         "name" => $row_pyrd->lookable->code,
                                         'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyrd->lookable->code),  
@@ -369,12 +398,16 @@ class TreeHelper {
                     if($query->paymentRequestCross()){
                        
                         foreach($query->paymentRequestCross as $row_pyr_cross){
-                           
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pyrc_tempura = [
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 "key" => $row_pyr_cross->lookable->code,
                                 "name" => $row_pyr_cross->lookable->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
@@ -566,15 +599,19 @@ class TreeHelper {
                                 $name = $row_po->supplier->name ?? null;
                                
                             }
-                           
+                                $properties = [
+                                    ['name'=> "Tanggal :".$row_po->post_date],
+                                    ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
+                                   ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =  ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $po =[
                                     "name"=>$row_po->code,
                                     "key" => $row_po->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_po->post_date],
-                                        ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
-                                        ['name'=> "Nominal :".formatNominal($row_po).number_format($row_po->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po->code),           
                                 ];
 
@@ -589,11 +626,16 @@ class TreeHelper {
                                 foreach($row_po->purchaseOrderDetail as $po_detail){
                                     if($po_detail->goodReceiptDetail()->exists()){
                                         foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
+                                            $properties = [
+                                                ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
+                                            ];
+                                            
+                                            if (!$hide_nominal) {
+                                                $properties[] =  ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
+                                                ;
+                                            }
                                             $data_good_receipt=[
-                                                'properties'=> [
-                                                    ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                                    ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
-                                                ],
+                                                'properties'=> $properties,
                                                 "key" => $good_receipt_detail->goodReceipt->code,
                                                 "name" => $good_receipt_detail->goodReceipt->code,
                                                 'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),
@@ -638,11 +680,16 @@ class TreeHelper {
                         }
                         /* melihat apakah ada hubungan lc */
                         if($row->landedCostFeeDetail()){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =   ['name'=> "Nominal :".formatNominal($row->lookable->landedCost).number_format($row->lookable->landedCost->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_lc=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->landedCost->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row->lookable->landedCost).number_format($row->lookable->landedCost->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties ,
                                 "key" => $row->lookable->landedCost->code,
                                 "name" => $row->lookable->landedCost->code,
                                 'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
@@ -660,13 +707,18 @@ class TreeHelper {
 
                         if($row->purchaseMemoDetail()->exists()){
                             foreach($row->purchaseMemoDetail as $purchase_memodetail){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                                    ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_memo = [
                                     "name"=>$purchase_memodetail->purchaseMemo->code,
                                     "key" => $purchase_memodetail->purchaseMemo->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
-                                        ['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                                 ];
                                 $data_link[]=[
@@ -681,14 +733,19 @@ class TreeHelper {
 
                         if($row->fundRequestDetail()->exists()){
                             $name = $row->fundRequestDetail->fundRequest->account->name ?? null;
+                            $properties = [
+                                ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
+                                ['name'=> "User :".$name],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $fr=[
                                 "name"=>$row->fundRequestDetail->fundRequest->code,
                                 "key" => $row->fundRequestDetail->fundRequest->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
-                                    ['name'=> "User :".$name],
-                                    ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                             ];
                         
@@ -707,11 +764,16 @@ class TreeHelper {
                     }
                     if($query_invoice->purchaseInvoiceDp()->exists()){
                         foreach($query_invoice->purchaseInvoiceDp as $row_pi){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_pi->purchaseDownPayment->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_pi->purchaseDownPayment).number_format($row_pi->purchaseDownPayment->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_down_payment=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pi->purchaseDownPayment->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pi->purchaseDownPayment).number_format($row_pi->purchaseDownPayment->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 "key" => $row_pi->purchaseDownPayment->code,
                                 "name" => $row_pi->purchaseDownPayment->code,
                                 'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pi->purchaseDownPayment->code),
@@ -725,11 +787,16 @@ class TreeHelper {
             
                             if($row_pi->purchaseDownPayment->hasPaymentRequestDetail()->exists()){
                                 foreach($row_pi->purchaseDownPayment->hasPaymentRequestDetail as $row_pyr_detail){
+                                    $properties =[
+                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                                    ];
+                                    
+                                    if (!$hide_nominal) {
+                                        $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                        ;
+                                    }
                                     $data_pyr_tempura=[
-                                        'properties'=> [
-                                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                            ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                        ],
+                                        'properties'=> $properties,
                                         "key" => $row_pyr_detail->paymentRequest->code,
                                         "name" => $row_pyr_detail->paymentRequest->code,
                                         'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -745,12 +812,17 @@ class TreeHelper {
 
 
                                     if($row_pyr_detail->fundRequest()){
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                            ['name'=> "User :".$row_pyr_detail->lookable->account->name],
+                                            ];
+                                        
+                                        if (!$hide_nominal) {
+                                            $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ;
+                                        }
                                         $data_fund_tempura=[
-                                            'properties'=> [
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                                ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                            ],
+                                            'properties'=>$properties, 
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
@@ -771,11 +843,16 @@ class TreeHelper {
                                         
                                     }
                                     if($row_pyr_detail->purchaseDownPayment()){
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                        ];
+                                        
+                                        if (!$hide_nominal) {
+                                            $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ;
+                                        }
                                         $data_downp_tempura = [
-                                            'properties'=> [
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                            ],
+                                            'properties'=> $properties,
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -792,11 +869,16 @@ class TreeHelper {
                                         
                                     }
                                     if($row_pyr_detail->purchaseInvoice()){
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                        ];
+                                        
+                                        if (!$hide_nominal) {
+                                            $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                            ;
+                                        }
                                         $data_invoices_tempura = [
-                                            'properties'=> [
-                                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                            ],
+                                            'properties'=> $properties,
                                             "key" => $row_pyr_detail->lookable->code,
                                             "name" => $row_pyr_detail->lookable->code,
                                             'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -823,11 +905,16 @@ class TreeHelper {
                     if($query_invoice->realPaymentRequestDetail()->exists()){
                       
                         foreach($query_invoice->realPaymentRequestDetail as $row_pyr_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pyr_detail->paymentRequest->code,
                                 "name" => $row_pyr_detail->paymentRequest->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -847,12 +934,17 @@ class TreeHelper {
                             }    
                             
                             if($row_pyr_detail->fundRequest()){
+                                $properties =  [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                    ['name'=> "User :".$row_pyr_detail->lookable->account->name],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_fund_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                        ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
@@ -872,11 +964,16 @@ class TreeHelper {
                                 
                             }
                             if($row_pyr_detail->purchaseDownPayment()){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_downp_tempura = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -893,11 +990,16 @@ class TreeHelper {
                                 
                             }
                             if($row_pyr_detail->purchaseInvoice()){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                                    ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_invoices_tempura = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -927,11 +1029,16 @@ class TreeHelper {
                     $query_pyr = PaymentRequest::find($payment_request_id);
                     
                     if($query_pyr->outgoingPayment()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal :".$query_pyr->outgoingPayment->pay_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] = ['name'=> "Nominal :".formatNominal($query_pyr->outgoingPayment).number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
+                            ;
+                        }
                         $outgoing_payment = [
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$query_pyr->outgoingPayment->pay_date],
-                                ['name'=> "Nominal :".formatNominal($query_pyr->outgoingPayment).number_format($query_pyr->outgoingPayment->grandtotal,2,',','.')]
-                            ],
+                            'properties'=>$properties,
                             "key" => $query_pyr->outgoingPayment->code,
                             "name" => $query_pyr->outgoingPayment->code,
                             'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyr->outgoingPayment->code),  
@@ -951,12 +1058,16 @@ class TreeHelper {
                     }
                     
                     foreach($query_pyr->paymentRequestDetail as $row_pyr_detail){
+                        $properties = [
+                            ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                        ];
                         
+                        if (!$hide_nominal) {
+                            $properties[] =  ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                            ;
+                        }
                         $data_pyr_tempura=[
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                            ],
+                            'properties'=> $properties,
                             "key" => $row_pyr_detail->paymentRequest->code,
                             "name" => $row_pyr_detail->paymentRequest->code,
                             'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -972,12 +1083,17 @@ class TreeHelper {
                                     $color = ['color' => 'lightblue'];
                                 }
                             }
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
+                                ['name'=> "User :".$row_pyr_detail->lookable->account->name],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =   ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_fund_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                    ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pyr_detail->lookable->code.$x,
                                 "name" => $row_pyr_detail->lookable->code . $x,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
@@ -998,11 +1114,16 @@ class TreeHelper {
                             
                         }
                         if($row_pyr_detail->purchaseDownPayment()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_downp_tempura = [
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
                                 'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -1022,11 +1143,16 @@ class TreeHelper {
                             }
                         }
                         if($row_pyr_detail->purchaseInvoice()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_invoices_tempura = [
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->lookable->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pyr_detail->lookable->code,
                                 "name" => $row_pyr_detail->lookable->code,
                                 'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code),  
@@ -1050,12 +1176,16 @@ class TreeHelper {
                         
                         
                             foreach($row_pyr_detail->paymentRequest->paymentRequestCross as $row_pyr_cross){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
+                                ];
                                 
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_pyrc_tempura = [
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_cross->lookable->post_date],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_cross->lookable).number_format($row_pyr_cross->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     "key" => $row_pyr_cross->lookable->code,
                                     "name" => $row_pyr_cross->lookable->code,
                                     'url'=>request()->root()."/admin/finance/payment_requests?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
@@ -1086,13 +1216,18 @@ class TreeHelper {
                     $finished_data_id_pyrcs[]=$payment_request_cross_id;
                     $query_pyrc = PaymentRequestCross::find($payment_request_cross_id);
                     if($query_pyrc->paymentRequest()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->pay_date))],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal :".formatNominal($query_pyrc->paymentRequest).number_format($query_pyrc->paymentRequest->grandtotal,2,',','.')]
+                            ;
+                        }
                         $data_pyr_tempura = [
                             'key'   => $query_pyrc->paymentRequest->code,
                             "name"  => $query_pyrc->paymentRequest->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->pay_date))],
-                                ['name'=> "Nominal :".formatNominal($query_pyrc->paymentRequest).number_format($query_pyrc->paymentRequest->grandtotal,2,',','.')]
-                            ],
+                            'properties'=>$properties,
                             'url'   =>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($query_pyrc->paymentRequest->code),
                             "title" =>$query_pyrc->paymentRequest->code,
                         ];
@@ -1109,13 +1244,16 @@ class TreeHelper {
                         }
                         foreach($query_pyrc->paymentRequest->paymentRequestDetail as $row_pyr_detail){
                             if($row_pyr_detail->fundRequest()){
-                            
+                                $properties = [
+                                    ['name'=> "Tanggal: ".date('d/m/Y',strtotime($query_pyrc->paymentRequest->pay_date))],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominal($query_pyrc->paymentRequest).number_format($query_pyrc->paymentRequest->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_fund_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->lookable->code],
-                                        ['name'=> "User :".$row_pyr_detail->lookable->account->name],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->lookable).number_format($row_pyr_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     "key" => $row_pyr_detail->lookable->code,
                                     "name" => $row_pyr_detail->lookable->code,
                                     'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pyr_detail->lookable->code), 
@@ -1139,12 +1277,16 @@ class TreeHelper {
                         
                     }
                     if($query_pyrc->outgoingPayment()){
-                       
+                        $properties =[
+                            ['name'=> "Tanggal :".$query_pyrc->lookable->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal :".formatNominal($query_pyrc->lookable).number_format($query_pyrc->lookable->grandtotal,2,',','.')]
+                            ;
+                        }
                         $outgoing_tempura = [
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$query_pyrc->lookable->post_date],
-                                ['name'=> "Nominal :".formatNominal($query_pyrc->lookable).number_format($query_pyrc->lookable->grandtotal,2,',','.')]
-                            ],
+                            'properties'=> $properties,
                             "key" => $query_pyrc->lookable->code,
                             "name" => $query_pyrc->lookable->code,
                             'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($query_pyrc->lookable->code),  
@@ -1178,14 +1320,19 @@ class TreeHelper {
                             }else{ 
                                 $name = $row->purchaseOrder->supplier->name ?? null;
                             }
+                            $properties = [
+                                ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
+                                ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')]
+                                ;
+                            }
                             $po=[
                                 "name"=>$row->purchaseOrder->code,
                                 "key" => $row->purchaseOrder->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->purchaseOrder->post_date],
-                                    ['name'=> "Vendor  : ".($name !== null ? $name : ' ')],
-                                    ['name'=> "Nominal :".formatNominal($row->purchaseOrder).number_format($row->purchaseOrder->grandtotal,2,',','.')],
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($row->purchaseOrder->code),
                             ];
                         
@@ -1225,12 +1372,16 @@ class TreeHelper {
                                 /* mendapatkan gr po */
                                 if($po_detail->goodReceiptDetail()->exists()){
                                     foreach($po_detail->goodReceiptDetail as $good_receipt_detail){
-                            
+                                        $properties =[
+                                            ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
+                                            ];
+                                        
+                                        if (!$hide_nominal) {
+                                            $properties[] =['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')]
+                                            ;
+                                        }
                                         $data_good_receipt = [
-                                            'properties'=> [
-                                                ['name'=> "Tanggal :".$good_receipt_detail->goodReceipt->post_date],
-                                                ['name'=> "Nominal :".formatNominal($good_receipt_detail->goodReceipt).number_format($good_receipt_detail->goodReceipt->grandtotal,2,',','.')],
-                                            ],
+                                            'properties'=> $properties,
                                             "key" => $good_receipt_detail->goodReceipt->code,
                                             "name" => $good_receipt_detail->goodReceipt->code,
                                             'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($good_receipt_detail->goodReceipt->code),  
@@ -1258,14 +1409,19 @@ class TreeHelper {
                         
                         if($row->fundRequestDetail()->exists()){
                             $name = $row->fundRequestDetail->fundRequest->account->name ?? null;
+                            $properties = [
+                                ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
+                                ['name'=> "User :".($name !== null ? $name : ' ')],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $fr=[
                                 "name"=>$row->fundRequestDetail->fundRequest->code,
                                 "key" => $row->fundRequestDetail->fundRequest->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->fundRequestDetail->fundRequest->post_date],
-                                    ['name'=> "User :".($name !== null ? $name : ' ')],
-                                    ['name'=> "Nominal :".formatNominal($row->fundRequestDetail->fundRequest).number_format($row->fundRequestDetail->fundRequest->grandtotal,2,',','.')],
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row->fundRequestDetail->fundRequest->code),
                             ];
                         
@@ -1283,14 +1439,18 @@ class TreeHelper {
                     }
 
                     foreach($query_dp->purchaseInvoiceDp as $purchase_invoicedp){
+                        $properties =  [
+                            ['name'=> "Tanggal :".$purchase_invoicedp->purchaseInvoice->post_date],
+                        ];
                         
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal :".formatNominal($purchase_invoicedp->purchaseInvoice).number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')]
+                            ;
+                        }
                         $invoice_tempura = [
                             "name"=>$purchase_invoicedp->purchaseInvoice->code,
                             "key" => $purchase_invoicedp->purchaseInvoice->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$purchase_invoicedp->purchaseInvoice->post_date],
-                                ['name'=> "Nominal :".formatNominal($purchase_invoicedp->purchaseInvoice).number_format($purchase_invoicedp->purchaseInvoice->grandtotal,2,',','.')],
-                                ],
+                            'properties'=> $properties,
                             'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($purchase_invoicedp->purchaseInvoice->code),           
                         ];
                         
@@ -1310,13 +1470,18 @@ class TreeHelper {
                     }
 
                     foreach($query_dp->purchaseMemoDetail as $purchase_memodetail){
+                        $properties =[
+                            ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')]
+                            ;
+                        }
                         $data_memo=[
                             "name"=>$purchase_memodetail->purchaseMemo->code,
                             "key" => $purchase_memodetail->purchaseMemo->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$purchase_memodetail->purchaseMemo->post_date],
-                                ['name'=> "Nominal :".formatNominal($purchase_memodetail->purchaseMemo).number_format($purchase_memodetail->purchaseMemo->grandtotal,2,',','.')],
-                                ],
+                            'properties'=> $properties,
                             'url'=>request()->root()."/admin/finance/purchase_memo?code=".CustomHelper::encrypt($purchase_memodetail->purchaseMemo->code),           
                         ];
                         $data_go_chart[]=$data_memo;
@@ -1332,13 +1497,18 @@ class TreeHelper {
                     if($query_dp->hasPaymentRequestDetail()->exists()){
                         
                         foreach($query_dp->hasPaymentRequestDetail as $row_pyr_detail){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pyr_tempura=[
                                 "name"=>$row_pyr_detail->paymentRequest->code,
                                 "key" => $row_pyr_detail->paymentRequest->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')],
-                                    ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),           
                             ];
                             $data_go_chart[]=$data_pyr_tempura;
@@ -1364,11 +1534,16 @@ class TreeHelper {
                     $query = PurchaseMemo::find($memo_id);
                     foreach($query->purchaseMemoDetail as $row){
                         if($row->lookable_type == 'purchase_invoice_details'){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row->lookable->purchaseInvoice->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row->lookable->purchaseInvoice).number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_invoices_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->purchaseInvoice->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row->lookable->purchaseInvoice).number_format($row->lookable->purchaseInvoice->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 "key" => $row->lookable->purchaseInvoice->code,
                                 "name" => $row->lookable->purchaseInvoice->code,
                                 'url'=>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row->lookable->purchaseInvoice->code),
@@ -1385,11 +1560,16 @@ class TreeHelper {
                                 $added=true;
                             }
                         }elseif($row->lookable_type == 'purchase_down_payments'){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row->lookable->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row->lookable).number_format($row->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_downp_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row->lookable->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row->lookable).number_format($row->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row->lookable->code,
                                 "name" => $row->lookable->code,
                                 'url'=>request()->root()."/admin/finance/purchase_down_payment?code=".CustomHelper::encrypt($row->lookable->code),
@@ -1417,13 +1597,18 @@ class TreeHelper {
                     $query_good_issue = GoodIssue::find($good_issue_id);
                     foreach($query_good_issue->goodIssueDetail as $data_detail_good_issue){
                         if($data_detail_good_issue->materialRequestDetail()){
+                            $properties =[
+                                ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->materialRequest).number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $material_request_tempura = [
                                 "key" => $data_detail_good_issue->lookable->materialRequest->code,
                                 "name" => $data_detail_good_issue->lookable->materialRequest->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$data_detail_good_issue->lookable->materialRequest->post_date],
-                                    ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->materialRequest).number_format($data_detail_good_issue->lookable->materialRequest->grandtotal,2,',','.')],
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/purchase/material_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->materialRequest->code),
                             ];
 
@@ -1438,13 +1623,18 @@ class TreeHelper {
 
                         if($data_detail_good_issue->purchaseOrderDetail()->exists()){
                             foreach($data_detail_good_issue->purchaseOrderDetail as $data_purchase_order_detail){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$data_purchase_order_detail->purchaseOrder->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal :".formatNominal($data_purchase_order_detail->purchaseOrder).number_format($data_purchase_order_detail->purchaseOrder->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $po_tempura = [
                                     "key" => $data_purchase_order_detail->purchaseOrder->code,
                                     "name" => $data_purchase_order_detail->purchaseOrder->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$data_purchase_order_detail->purchaseOrder->post_date],
-                                        ['name'=> "Nominal :".formatNominal($data_purchase_order_detail->purchaseOrder).number_format($data_purchase_order_detail->purchaseOrder->grandtotal,2,',','.')],
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($data_purchase_order_detail->purchaseOrder->code),
                                 ];
     
@@ -1459,13 +1649,18 @@ class TreeHelper {
                         }
                         
                         if($data_detail_good_issue->goodIssueRequestDetail()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$data_detail_good_issue->lookable->goodIssueRequest->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->goodIssueRequest).number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $good_issue_request_tempura = [
                                 "key" => $data_detail_good_issue->lookable->goodIssueRequest->code,
                                 "name" => $data_detail_good_issue->lookable->goodIssueRequest->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$data_detail_good_issue->lookable->goodIssueRequest->post_date],
-                                    ['name'=> "Nominal :".formatNominal($data_detail_good_issue->lookable->goodIssueRequest).number_format($data_detail_good_issue->lookable->goodIssueRequest->grandtotal,2,',','.')],
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/inventory/good_issue_request?code=".CustomHelper::encrypt($data_detail_good_issue->lookable->goodIssueRequest->code),
                             ];
 
@@ -1512,14 +1707,19 @@ class TreeHelper {
 
                         }
                         if($lc_detail->landedCostDetail()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($lc_detail->lookable->landedCost).number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')]
+                                ;
+                            }
                             $lc_other = [
                                 "key" => $lc_detail->lookable->landedCost->code,
                                 "name" => $lc_detail->lookable->landedCost->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$lc_detail->lookable->landedCost->post_date],
-                                    ['name'=> "Nominal :".formatNominal($lc_detail->lookable->landedCost).number_format($lc_detail->lookable->landedCost->grandtotal,2,',','.')],
-                                ],
-                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
+                                'properties'=>$properties,
+                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
                             ];
 
                             $data_go_chart[]=$lc_other;
@@ -1536,13 +1736,17 @@ class TreeHelper {
                                             
                         }//??
                         if($lc_detail->inventoryTransferOutDetail()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$lc_detail->lookable->inventoryTransferOut->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($lc_detail->lookable->inventoryTransferOut).number_format($lc_detail->lookable->inventoryTransferOut->grandtotal,2,',','.')];
+                            }
                             $inventory_transfer_out = [
                                 "key" => $lc_detail->lookable->inventoryTransferOut->code,
                                 "name" => $lc_detail->lookable->inventoryTransferOut->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$lc_detail->lookable->inventoryTransferOut->post_date],
-                                    ['name'=> "Nominal :".formatNominal($lc_detail->lookable->inventoryTransferOut).number_format($lc_detail->lookable->inventoryTransferOut->grandtotal,2,',','.')],
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($lc_detail->lookable->inventoryTransferOut->code),
                             ];
 
@@ -1559,14 +1763,18 @@ class TreeHelper {
                     if($query->landedCostFeeDetail()->exists()){
                         foreach($query->landedCostFeeDetail as $row_landedfee_detail){
                             foreach($row_landedfee_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                                $properties =  [
+                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')];
+                                }
                                 $data_invoices_tempura = [
                                     'key'   => $row_invoice_detail->purchaseInvoice->code,
                                     "name"  => $row_invoice_detail->purchaseInvoice->code,
                                 
-                                    'properties'=> [
-                                        ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                        ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                 ];
                                 $data_go_chart[]=$data_invoices_tempura;
@@ -1592,13 +1800,17 @@ class TreeHelper {
                     $query_inventory_transfer_out = InventoryTransferOut::find($id_transfer_out);
                     foreach($query_inventory_transfer_out->inventoryTransferOutDetail as $row_transfer_out_detail){
                         if($row_transfer_out_detail->landedCostDetail->exists()){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_transfer_out_detail->landedCostDetail->landedCost->post_date],
+                               ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_transfer_out_detail->landedCostDetail).number_format($row_transfer_out_detail->landedCostDetail->landedCost->grandtotal,2,',','.')];
+                            }
                             $lc_tempura = [
                                 "key" => $row_transfer_out_detail->landedCostDetail->landedCost->code,
                                 "name" => $row_transfer_out_detail->landedCostDetail->landedCost->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_transfer_out_detail->landedCostDetail->landedCost->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_transfer_out_detail->landedCostDetail).number_format($row_transfer_out_detail->landedCostDetail->landedCost->grandtotal,2,',','.')],
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/inventory/inventory_transfer_out?code=".CustomHelper::encrypt($row_transfer_out_detail->landedCostDetail->landedCost->code),
                             ];
 
@@ -1626,12 +1838,16 @@ class TreeHelper {
 
                     foreach($query_pcb->personalCloseBillDetail as $row_pcbd){
                         if($row_pcbd->fundRequest()->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pcbd->fundRequest->code],
+                                ['name'=> "User :".$row_pcbd->fundRequest->account->name],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row_pcbd->fundRequest).number_format($row_pcbd->fundRequest->grandtotal,2,',','.')];
+                            }
                             $data_fund_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pcbd->fundRequest->code],
-                                    ['name'=> "User :".$row_pcbd->fundRequest->account->name],
-                                    ['name'=> "Nominal :".formatNominal($row_pcbd->fundRequest).number_format($row_pcbd->fundRequest->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pcbd->fundRequest->code,
                                 "name" => $row_pcbd->fundRequest->code,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_pcbd->fundRequest->code), 
@@ -1653,11 +1869,16 @@ class TreeHelper {
 
                     if($query_pcb->closebillDetail()->exists()){
                         foreach($query_pcb->closebillDetail as $row_cbd){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_cbd->closeBill->code],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal :".formatNominal($row_cbd->closeBill).number_format($row_cbd->closeBill->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_cb_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_cbd->closeBill->code],
-                                    ['name'=> "Nominal :".formatNominal($row_cbd->closeBill).number_format($row_cbd->closeBill->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_cbd->closeBill->code,
                                 "name" => $row_cbd->closeBill->code,
                                 'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_cbd->closeBill->code), 
@@ -1691,11 +1912,16 @@ class TreeHelper {
                                 if($row_pyr_detail->paymentRequest->code == $row_pyr_detail->paymentRequest->code){
                                     $x = ' (PYR)';
                                 }
+                                $properties =  [
+                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_pyr_tempura=[
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                        ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     "key" => $row_pyr_detail->paymentRequest->code . $x,
                                     "name" => $row_pyr_detail->paymentRequest->code . $x,
                                     'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -1716,14 +1942,19 @@ class TreeHelper {
                         
                         if($row_fr_detail->purchaseInvoiceDetail()->exists()){
                             foreach($row_fr_detail->purchaseInvoiceDetail as $row_invoice_detail){
+                                $properties =  [
+                                    ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_invoices_tempura = [
                                     'key'   => $row_invoice_detail->purchaseInvoice->code,
                                     "name"  => $row_invoice_detail->purchaseInvoice->code,
                                 
-                                    'properties'=> [
-                                        ['name'=> "Tanggal: ".$row_invoice_detail->purchaseInvoice->post_date],
-                                        ['name'=> "Nominal :".formatNominal($row_invoice_detail->purchaseInvoice).number_format($row_invoice_detail->purchaseInvoice->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'   =>request()->root()."/admin/finance/purchase_invoice?code=".CustomHelper::encrypt($row_invoice_detail->purchaseInvoice->code),
                                 ];
                                 $data_go_chart[]=$data_invoices_tempura;
@@ -1766,11 +1997,16 @@ class TreeHelper {
                     }
                     if($query_fr->hasPaymentRequestDetail()->exists()){
                         foreach($query_fr->hasPaymentRequestDetail as $row_pyr_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pyr_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pyr_detail->paymentRequest->pay_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pyr_detail->paymentRequest).number_format($row_pyr_detail->paymentRequest->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pyr_detail->paymentRequest->code,
                                 "name" => $row_pyr_detail->paymentRequest->code,
                                 'url'=>request()->root()."/admin/finance/payment_request?code=".CustomHelper::encrypt($row_pyr_detail->paymentRequest->code),
@@ -1791,11 +2027,16 @@ class TreeHelper {
                     if($query_fr->personalCloseBillDetail()->exists()){
 
                         foreach($query_fr->personalCloseBillDetail as $row_pcbd){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_pcbd->personalCloseBill->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal :".formatNominal($row_pcbd->personalCloseBill).number_format($row_pcbd->personalCloseBill->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_pcb_tempura=[
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_pcbd->personalCloseBill->post_date],
-                                    ['name'=> "Nominal :".formatNominal($row_pcbd->personalCloseBill).number_format($row_pcbd->personalCloseBill->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 "key" => $row_pcbd->personalCloseBill->code,
                                 "name" => $row_pcbd->personalCloseBill->code,
                                 'url'=>request()->root()."/admin/finance/close_bill_personal?code=".CustomHelper::encrypt($row_pcbd->personalCloseBill->code),
@@ -2174,13 +2415,18 @@ class TreeHelper {
                     $query_ip = IncomingPayment::find($row_id_ip);
                     foreach($query_ip->incomingPaymentDetail as $row_ip_detail){
                         if($row_ip_detail->marketingOrderDownPayment()->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_ip_detail->marketingOrderDownPayment->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_downpayment=[
                                 "name"=>$row_ip_detail->marketingOrderDownPayment->code,
                                 "key" => $row_ip_detail->marketingOrderDownPayment->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_ip_detail->marketingOrderDownPayment->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderDownPayment->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/finance/incoming_payment?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderDownPayment->code),
                             ];
                             $data_go_chart[]=$mo_downpayment;
@@ -2193,13 +2439,18 @@ class TreeHelper {
                             
                         }
                         if($row_ip_detail->marketingOrderInvoice()->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_ip_detail->marketingOrderInvoice->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderInvoice->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_invoice=[
                                 "name"=>$row_ip_detail->marketingOrderInvoice->code,
                                 "key" => $row_ip_detail->marketingOrderInvoice->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_ip_detail->marketingOrderInvoice->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->marketingOrderInvoice->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_ip_detail->marketingOrderInvoice->code),
                             ];
                             $data_go_chart[]=$mo_invoice;
@@ -2222,13 +2473,18 @@ class TreeHelper {
                     
                     if($query_dp->incomingPaymentDetail()->exists()){
                         foreach($query_dp->incomingPaymentDetail as $row_incoming_payment){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_incoming_payment->incomingPayment->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_incoming_payment->incomingPayment->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_incoming_payment=[
                                 "name"=>$row_incoming_payment->incomingPayment->code,
                                 "key" => $row_incoming_payment->incomingPayment->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_incoming_payment->incomingPayment->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_incoming_payment->incomingPayment->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_incoming_payment->incomingPayment->code),
                             ];
                             $data_go_chart[]=$mo_incoming_payment;
@@ -2255,14 +2511,19 @@ class TreeHelper {
                             
                             $newArray = array_unique($arr);
                             $string = implode(', ', $newArray);
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                ['name'=> "No Surat Jalan  :".$string.""]
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_invoice = [
                                 "name"=>$row_invoice_detail->marketingOrderInvoice->code,
                                 "key" => $row_invoice_detail->marketingOrderInvoice->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')],
-                                    ['name'=> "No Surat Jalan  :".$string.""]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
                             ];
                             
@@ -2291,13 +2552,18 @@ class TreeHelper {
 
                     if($query_mo_receipt->marketingOrderHandoverReceiptDetail->exists()){
                         foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mohr=[
                                 "name"=>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
                                 "key" =>$row_mo_h_rd->marketingOrderHandoverReceipt->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_h_rd->marketingOrderHandoverReceipt->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_rd->marketingOrderHandoverReceipt->code),
                             ];
                             $data_go_chart[]=$mohr;
@@ -2316,13 +2582,18 @@ class TreeHelper {
                     
                     foreach($query_mo_receipt->marketingOrderReceiptDetail as $row_mo_receipt_detail){
                         if($row_mo_receipt_detail->marketingOrderInvoice()){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_mo_receipt_detail->lookable->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_receipt_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_invoice_tempura = [
                                 "name"=>$row_mo_receipt_detail->lookable->code,
                                 "key" => $row_mo_receipt_detail->lookable->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_receipt_detail->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_receipt_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_receipt_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
@@ -2348,13 +2619,18 @@ class TreeHelper {
 
                     if($query_mo_delivery_process->purchaseOrderDetail()->exists()){
                         foreach($query_mo_delivery_process->purchaseOrderDetail as $row_po_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_po_detail->purchaseOrder->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_po_detail->purchaseOrder->grandtotal,2,',','.')]
+                                ;
+                            }
                             $po_tempura=[
                                 "name"=>$row_po_detail->purchaseOrder->code,
                                 "key" =>$row_po_detail->purchaseOrder->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_po_detail->purchaseOrder->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_po_detail->purchaseOrder->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."admin/purchase/purchase_order?code=".CustomHelper::encrypt($row_po_detail->purchaseOrder->code),
                             ];
                             $data_go_chart[]=$po_tempura;
@@ -2381,13 +2657,18 @@ class TreeHelper {
                     $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
                     foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
                         if($row_mo_h_receipt_detail->marketingOrderInvoice()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_invoice_tempura=[
                                 "name"=>$row_mo_h_receipt_detail->lookable->code,
                                 "key" => $row_mo_h_receipt_detail->lookable->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
@@ -2411,13 +2692,18 @@ class TreeHelper {
                     $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
                     foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
                         if($row_mo_h_invoice_detail->marketingOrderInvoice->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_invoice_tempura=[
                                 "name"=>$row_mo_h_receipt_detail->lookable->code,
                                 "key" => $row_mo_h_receipt_detail->lookable->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
@@ -2442,13 +2728,18 @@ class TreeHelper {
                     $query_invoice = MarketingOrderInvoice::find($row_id_invoice);
                     if($query_invoice->incomingPaymentDetail()->exists()){
                         foreach($query_invoice->incomingPaymentDetail as $row_ip_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_ip_detail->incomingPayment->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_ip_detail->incomingPayment->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_incoming_payment=[
                                 "name"=>$row_ip_detail->incomingPayment->code,
                                 "key" => $row_ip_detail->incomingPayment->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_ip_detail->incomingPayment->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_ip_detail->incomingPayment->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_ip_detail->incomingPayment->code),
                             ];
                             $data_go_chart[]=$mo_incoming_payment;
@@ -2465,15 +2756,19 @@ class TreeHelper {
                     }
                     if($query_invoice->marketingOrderInvoiceDeliveryProcess()->exists()){
                         foreach($query_invoice->marketingOrderInvoiceDeliveryProcess as $row_delivery_detail){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_delivery_detail->lookable->marketingOrderDelivery->post_date],
+                               
+                            ];
                             
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_delivery_detail->lookable->marketingOrderDelivery->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_delivery=[
                                 "name"=> $row_delivery_detail->lookable->marketingOrderDelivery->code,
                                 "key" => $row_delivery_detail->lookable->marketingOrderDelivery->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_delivery_detail->lookable->marketingOrderDelivery->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_delivery_detail->lookable->marketingOrderDelivery->grandtotal,2,',','.')],
-                                    
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_delivery_detail->lookable->marketingOrderDelivery->code),
                             ];
                             $data_go_chart[]=$mo_delivery;
@@ -2488,13 +2783,18 @@ class TreeHelper {
                     }
                     if($query_invoice->marketingOrderInvoiceDownPayment()->exists()){
                         foreach($query_invoice->marketingOrderInvoiceDownPayment as $row_dp){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_dp->lookable->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_dp->lookable->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_downpayment=[
                                 "name"=>$row_dp->lookable->code,
                                 "key" =>$row_dp->lookable->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_dp->lookable->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_dp->lookable->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_dp->lookable->code),
                             ];
                             $data_go_chart[]=$mo_downpayment;
@@ -2513,13 +2813,18 @@ class TreeHelper {
                     }
                     if($query_invoice->marketingOrderHandoverInvoiceDetail()->exists()){
                         foreach($query_invoice->marketingOrderHandoverInvoiceDetail as $row_handover_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =  ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_handover_tempura=[
                                 "name"=>$row_handover_detail->marketingOrderHandoverInvoice->code,
                                 "key" =>$row_handover_detail->marketingOrderHandoverInvoice->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_handover_detail->marketingOrderHandoverInvoice->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_handover_detail->marketingOrderHandoverInvoice->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_handover_invoice?code=".CustomHelper::encrypt($row_handover_detail->marketingOrderHandoverInvoice->code),
                             ];
                             $data_go_chart[]=$mo_handover_tempura;
@@ -2537,13 +2842,18 @@ class TreeHelper {
                     }
                     if($query_invoice->marketingOrderReceiptDetail()->exists()){
                         foreach($query_invoice->marketingOrderReceiptDetail as $row_mo_receipt_detail){
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_mo_receipt_detail->marketingOrderReceipt->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_receipt_tempura=[
                                 "name"=>$row_mo_receipt_detail->marketingOrderReceipt->code,
                                 "key" =>$row_mo_receipt_detail->marketingOrderReceipt->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_receipt_detail->marketingOrderReceipt->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
-                                ],
+                                'properties'=> $properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_receipt_detail->marketingOrderReceipt->code),
                             ];
                             $data_go_chart[]=$mo_receipt_tempura;
@@ -2562,13 +2872,18 @@ class TreeHelper {
                     foreach($query_invoice->marketingOrderInvoiceDetail as $row_invoice_detail){
                         if($row_invoice_detail->marketingOrderMemoDetail()->exists()){
                             foreach($row_invoice_detail->marketingOrderMemoDetail as $row_memo){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_memo->marketingOrderMemo->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_memo->marketingOrderMemo->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $mo_memo=[
                                     "name"=>$row_memo->marketingOrderMemo->code,
                                     "key" => $row_memo->marketingOrderMemo->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_memo->marketingOrderMemo->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_memo->marketingOrderMemo->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'url'=>request()->root()."/admin/sales/marketing_order_memo?code=".CustomHelper::encrypt($row_memo->marketingOrderMemo->code),
                                 ];
                                 $data_go_chart[]=$mo_memo;
@@ -2596,13 +2911,18 @@ class TreeHelper {
                     $query_mo_memo = MarketingOrderMemo::find($row_id_memo);
                     if($query_mo_memo->incomingPaymentDetail()->exists()){
                         foreach($query_mo_memo->incomingPaymentDetail as $ip_detail){
+                            $properties = [
+                                ['name'=> "Tanggal :".$ip_detail->incomingPayment->post_date],
+                                ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($ip_detail->incomingPayment->grandtotal,2,',','.')]
+                                ;
+                            }
                             $ip_tempura = [
                                 "name"=>$ip_detail->incomingPayment->code,
                                 "key" => $ip_detail->incomingPayment->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$ip_detail->incomingPayment->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($ip_detail->incomingPayment->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/delivery_order/?code=".CustomHelper::encrypt($ip_detail->incomingPayment->code),
                             ];
                             
@@ -2620,13 +2940,18 @@ class TreeHelper {
                     }
                     foreach($query_mo_memo->marketingOrderMemoDetail as $row_mo_memo_detail){
                             if($row_mo_memo_detail->marketingOrderDownPayment()){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$row_mo_memo_detail->lookable->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_memo_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $mo_downpayment=[
                                     "name"=>$row_mo_memo_detail->lookable->code,
                                     "key" => $row_mo_memo_detail->lookable->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_mo_memo_detail->lookable->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_mo_memo_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."admin/sales/sales_down_payment/?code=".CustomHelper::encrypt($row_mo_memo_detail->lookable->code),
                                 ];
                                 $data_go_chart[]=$mo_downpayment;
@@ -2640,13 +2965,18 @@ class TreeHelper {
                                 
                             }
                             if($row_mo_memo_detail->marketingOrderInvoiceDetail()){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_mo_memo_detail->lookable->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_memo_detail->lookable->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $mo_invoice_tempura=[
                                     "name"=>$row_mo_memo_detail->lookable->code,
                                     "key" => $row_mo_memo_detail->lookable->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_mo_memo_detail->lookable->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_mo_memo_detail->lookable->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'url'=>request()->root()."admin/sales/sales_down_payment/?code=".CustomHelper::encrypt($row_mo_memo_detail->lookable->code),
                                 ];
                                 $data_go_chart[]=$mo_invoice_tempura;
@@ -2669,13 +2999,18 @@ class TreeHelper {
                     $query_mo_return = MarketingOrderReturn::find($row_id_mo_return);
                     foreach($query_mo_return->marketingOrderReturnDetail as $row_mo_return_detail){
                         if($row_id_mo_return->marketingOrderDeliveryDetail()->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->grandtotal,2,',','.')]
+                                ;
+                            }
                             $data_mo_delivery_tempura = [
                                 "name"=>$row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
                                 "key" => $row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_delivery/?code=".CustomHelper::encrypt($row_mo_return_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code),
                             ];
                             $data_go_chart[]=$data_mo_delivery_tempura;
@@ -2701,13 +3036,18 @@ class TreeHelper {
                     $finished_data_id_mo_delivery[]=$row_id_mo_delivery;
                     $query_mo_delivery = MarketingOrderDelivery::find($row_id_mo_delivery);
                     if($query_mo_delivery->marketingOrderDeliveryProcess()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal :".$query_mo_delivery->marketingOrderDeliveryProcess->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                            ;
+                        }
                         $data_mo_delivery_process = [
                             "name"=>$query_mo_delivery->marketingOrderDeliveryProcess->code,
                             "key" => $query_mo_delivery->marketingOrderDeliveryProcess->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$query_mo_delivery->marketingOrderDeliveryProcess->post_date],
-                                ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
-                            ],
+                            'properties'=>$properties,
                             'url'=>request()->root()."/admin/sales/delivery_order/?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrderDeliveryProcess->code),
                         ];
                         
@@ -2736,15 +3076,19 @@ class TreeHelper {
                                 
                                 $newArray = array_unique($arr);
                                 $string = implode(', ', $newArray);
+                                $properties =  [
+                                    ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
+                                    ['name'=> "No Surat Jalan  :".$string.""]
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_invoice = [
                                     "name"=>$row_invoice_detail->marketingOrderInvoice->code,
                                     "key" => $row_invoice_detail->marketingOrderInvoice->code,
-                                
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_invoice_detail->marketingOrderInvoice->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->marketingOrderInvoice->grandtotal,2,',','.')],
-                                        ['name'=> "No Surat Jalan  :".$string.""]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_invoice_detail->marketingOrderInvoice->code),
                                 ];
                                 
@@ -2764,14 +3108,19 @@ class TreeHelper {
 
                         if($row_delivery_detail->marketingOrderReturnDetail()->exists()){
                             foreach($row_delivery_detail->marketingOrderReturnDetail as $row_return_detail){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_return_detail->marketingOrderReturn->post_date],
+                                    ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_return_detail->marketingOrderReturn->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $data_return = [
                                     "name"=>$row_return_detail->marketingOrderReturn->code,
                                     "key" => $row_return_detail->marketingOrderReturn->code,
                                     
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_return_detail->marketingOrderReturn->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_return_detail->marketingOrderReturn->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=> $properties,
                                     'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_return_detail->marketingOrderReturn->code),
                                 ];
                                 
@@ -2787,13 +3136,18 @@ class TreeHelper {
                         }//mencari marketing order return
                     }
                     if($query_mo_delivery->marketingOrder()->exists()){
+                        $properties =[
+                            ['name'=> "Tanggal :".$query_mo_delivery->marketingOrder->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrder->grandtotal,2,',','.')]
+                            ;
+                        }
                         $data_marketing_order = [
                             "name"=> $query_mo_delivery->marketingOrder->code,
                             "key" => $query_mo_delivery->marketingOrder->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$query_mo_delivery->marketingOrder->post_date],
-                                ['name'=> "Nominal : Rp.:".number_format($query_mo_delivery->marketingOrder->grandtotal,2,',','.')]
-                            ],
+                            'properties'=> $properties,
                             'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($query_mo_delivery->marketingOrder->code),           
                         ];
             
@@ -3182,13 +3536,18 @@ class TreeHelper {
                     foreach($query_prs->productionScheduleDetail as $row_production_schedule_detail){
                        
                         if($row_production_schedule_detail->productionOrderDetail()->exists()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_production_schedule_detail->productionOrderDetail->productionOrder->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_production_schedule_detail->productionOrderDetail->productionOrder->grandtotal,2,',','.')]
+                                ;
+                            }
                             $production_order_tempura = [
                                 "name"=>$row_production_schedule_detail->productionOrderDetail->productionOrder->code,
                                 "key" => $row_production_schedule_detail->productionOrderDetail->productionOrder->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_production_schedule_detail->productionOrderDetail->productionOrder->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_production_schedule_detail->productionOrderDetail->productionOrder->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/production/production_order?code=".CustomHelper::encrypt($row_production_schedule_detail->productionOrderDetail->productionOrder->code),  
                             ];
                             $data_go_chart[]=$production_order_tempura;
@@ -3208,13 +3567,18 @@ class TreeHelper {
                     foreach($query_prs->productionScheduleTarget as $row_production_target){
                         if($row_production_target->marketingOrderPlanDetail()->exists()){
                             $row_mop_detail=$row_production_target->marketingOrderPlanDetail;
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_mop_detail->marketingOrderPlan->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mop_detail->marketingOrderPlan->grandtotal,2,',','.')]
+                                ;
+                            }
                             $mo_plan_tempura = [
                                 "name"=>$row_mop_detail->marketingOrderPlan->code,
                                 "key" => $row_mop_detail->marketingOrderPlan->code,
-                                'properties'=> [
-                                    ['name'=> "Tanggal :".$row_mop_detail->marketingOrderPlan->post_date],
-                                    ['name'=> "Nominal : Rp.:".number_format($row_mop_detail->marketingOrderPlan->grandtotal,2,',','.')]
-                                ],
+                                'properties'=>$properties,
                                 'url'=>request()->root()."/admin/sales/marketing_order_plan?code=".CustomHelper::encrypt($row_mop_detail->marketingOrderPlan->code),  
                             ];
                             $data_go_chart[]=$mo_plan_tempura;
@@ -3268,13 +3632,18 @@ class TreeHelper {
                         }
                     }
                     if($query_mop->marketingOrder()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal :".$query_mop->marketingOrder->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mop->marketingOrder->grandtotal,2,',','.')]
+                            ;
+                        }
                         $marketing_order_tempura = [
                             "name"=>$query_mop->marketingOrder->code,
                             "key" => $query_mop->marketingOrder->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$query_mop->marketingOrder->post_date],
-                                ['name'=> "Nominal : Rp.:".number_format($query_mop->marketingOrder->grandtotal,2,',','.')]
-                            ],
+                            'properties'=> $properties,
                             'url'=>request()->root()."/admin/sales/marketing_order?code=".CustomHelper::encrypt($query_mop->marketingOrder->code),  
                         ];
                         $data_go_chart[]=$marketing_order_tempura;
@@ -3324,13 +3693,18 @@ class TreeHelper {
                     $query_mo= MarketingOrder::find($row_id_mo);
 
                     foreach($query_mo->marketingOrderDelivery as $row_mod_del){
+                        $properties = [
+                            ['name'=> "Tanggal :".$row_mod_del->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mod_del->grandtotal,2,',','.')]
+                            ;
+                        }
                         $modelvery=[
                             "name"=>$row_mod_del->code,
                             "key" => $row_mod_del->code,
-                            'properties'=> [
-                                ['name'=> "Tanggal :".$row_mod_del->post_date],
-                                ['name'=> "Nominal : Rp.:".number_format($row_mod_del->grandtotal,2,',','.')]
-                            ],
+                            'properties'=>$properties,
                             'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mod_del->code),  
                         ];
     
@@ -3349,13 +3723,18 @@ class TreeHelper {
                     foreach($query_mo->marketingOrderDetail as $row_marketing_order_detail){
                         if($row_marketing_order_detail->marketingOrderPlanDetail()->exists()){
                             foreach($row_marketing_order_detail->marketingOrderPlanDetail as $row_mop_detail){
+                                $properties =[
+                                    ['name'=> "Tanggal :".$row_mop_detail->marketingOrderPlan->post_date],
+                                ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_mop_detail->marketingOrderPlan->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $mo_plan_tempura = [
                                     "name"=>$row_mop_detail->marketingOrderPlan->code,
                                     "key" => $row_mop_detail->marketingOrderPlan->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_mop_detail->marketingOrderPlan->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_mop_detail->marketingOrderPlan->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."/admin/sales/marketing_order_plan?code=".CustomHelper::encrypt($row_mop_detail->marketingOrderPlan->code),  
                                 ];
                                 $data_go_chart[]=$mo_plan_tempura;
@@ -3373,13 +3752,18 @@ class TreeHelper {
                         }
                         if($row_marketing_order_detail->marketingOrderDeliveryDetail()->exists()){
                             foreach($row_marketing_order_detail->marketingOrderDeliveryDetail as $row_mo_delivery_detail){
+                                $properties = [
+                                    ['name'=> "Tanggal :".$row_mo_delivery_detail->marketingorderdelivery->post_date],
+                                    ];
+                                
+                                if (!$hide_nominal) {
+                                    $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_delivery_detail->marketingorderdelivery->grandtotal,2,',','.')]
+                                    ;
+                                }
                                 $modelvery=[
                                     "name"=>$row_mo_delivery_detail->marketingorderdelivery->code,
                                     "key" => $row_mo_delivery_detail->marketingorderdelivery->code,
-                                    'properties'=> [
-                                        ['name'=> "Tanggal :".$row_mo_delivery_detail->marketingorderdelivery->post_date],
-                                        ['name'=> "Nominal : Rp.:".number_format($row_mo_delivery_detail->marketingorderdelivery->grandtotal,2,',','.')]
-                                    ],
+                                    'properties'=>$properties,
                                     'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mo_delivery_detail->marketingorderdelivery->code),  
                                 ];
             

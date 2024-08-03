@@ -55,7 +55,8 @@ class OutStandingAPController extends Controller
                 rs.total_memo,
                 rs.total_reconcile,
                 rs.total_journal,
-                rs.status_cancel
+                rs.status_cancel,
+                rs.total_journal_check
             FROM
                 (SELECT 
                     IFNULL((SELECT 
@@ -149,6 +150,7 @@ class OutStandingAPController extends Controller
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND j.deleted_at IS NULL
+                            AND jd.type = '2'
                     ),0) AS total_journal_check,
                     u.name AS account_name,
                     u.employee_no AS account_code,
@@ -206,7 +208,8 @@ class OutStandingAPController extends Controller
                 rs.total_reconcile,
                 rs.status_cancel,
                 rs.total_journal_debit,
-                rs.total_journal_credit
+                rs.total_journal_credit,
+                rs.total_journal_check
             FROM
                 (SELECT
                     pi.top AS topdp,
@@ -315,6 +318,7 @@ class OutStandingAPController extends Controller
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND j.deleted_at IS NULL
+                            AND jd.type = '2'
                     ),0) AS total_journal_check,
                     u.name AS account_name,
                     u.employee_no AS account_code,

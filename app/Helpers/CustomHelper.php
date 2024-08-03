@@ -3989,6 +3989,7 @@ class CustomHelper {
 			$currency_rate = 1;
 			$realInvoice = 0;
 			$realDownPayment = 0;
+			$adjustLandedCost = 0;
 
 			$type = '';
 
@@ -4238,7 +4239,7 @@ class CustomHelper {
 						'coa_id'		=> $coahutangusaha->id,
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
+						'nominal'		=> $row->grandtotal * $currency_rate,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
@@ -4247,6 +4248,8 @@ class CustomHelper {
 						'detailable_type'=> $row->getTable(),
 						'detailable_id'	=> $row->id,
 					]);
+
+					$adjustLandedCost += (($row->grandtotal * $currency_rate) - ($row->grandtotal * $pi->currency_rate));
 				}else{
 					$type = $pi->currency->type;
 
@@ -4433,7 +4436,7 @@ class CustomHelper {
 					}
 				}
 
-				$balanceKurs = $realDownPayment - $realInvoice;
+				$balanceKurs = $realDownPayment - $realInvoice - $adjustLandedCost;
 
 				if($balanceKurs > 0 || $balanceKurs < 0){
 					JournalDetail::create([
@@ -6180,7 +6183,7 @@ class CustomHelper {
 						'coa_id'		=> $coahutangusaha->id,
 						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
 						'type'			=> '1',
-						'nominal'		=> $row->grandtotal * $row->lookable->landedCost->currency_rate,
+						'nominal'		=> $row->grandtotal * $currency_rate_invoice,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $currency_rate_invoice : $row->grandtotal,
 						'note'			=> 'VOID CANCEL '.$row->note,
 						'note2'			=> 'VOID CANCEL '.$row->note2,

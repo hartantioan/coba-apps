@@ -157,8 +157,8 @@ class OutStandingAPController extends Controller
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
                 ) AS rs
-            WHERE (rs.balance - rs.total_payment - rs.total_memo - rs.total_reconcile - rs.total_journal) > 0
-            AND rs.status_cancel = '0'
+            WHERE /* (rs.balance - rs.total_payment - rs.total_memo - rs.total_reconcile - rs.total_journal) > 0
+            AND */ rs.status_cancel = '0'
             ORDER BY rs.post_date ASC
         ", array(
             'date1' => $date,
@@ -310,8 +310,8 @@ class OutStandingAPController extends Controller
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
                 ) AS rs
-                WHERE (rs.grandtotal - rs.total_payment - rs.total_memo - rs.total_reconcile) > 0
-                AND rs.status_cancel = '0'
+                WHERE /* (rs.grandtotal - rs.total_payment - rs.total_memo - rs.total_reconcile) > 0
+                AND */ rs.status_cancel = '0'
                 ORDER BY rs.post_date ASC
         ", array(
             'date1' => $date,

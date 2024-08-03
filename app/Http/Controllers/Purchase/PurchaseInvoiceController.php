@@ -2443,11 +2443,11 @@ class PurchaseInvoiceController extends Controller
         })->get() as $key => $row){
                 if($row->type == '1'){
                     $total_debit_asli += $row->nominal_fc;
-                    $total_debit_konversi += $row->nominal;
+                    $total_debit_konversi += round($row->nominal,2);
                 }
                 if($row->type == '2'){
                     $total_kredit_asli += $row->nominal_fc;
-                    $total_kredit_konversi += $row->nominal;
+                    $total_kredit_konversi += round($row->nominal,2);
                 }
                 
                 $string .= '<tr>

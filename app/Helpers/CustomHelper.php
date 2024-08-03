@@ -3990,6 +3990,7 @@ class CustomHelper {
 			$realInvoice = 0;
 			$realDownPayment = 0;
 			$adjustLandedCost = 0;
+			$adjustGrpo = 0;
 
 			$type = '';
 
@@ -4255,8 +4256,8 @@ class CustomHelper {
 
 					$currency_rate = $row->lookable->goodReceipt->latestCurrencyRateByDate($pi->post_date);
 
-					$totalgrpo = $row->total * $currency_rate;
-					$totalinvoice = $row->total * $pi->currency_rate;
+					$totalgrpo = round($row->total * $currency_rate,2);
+					$totalinvoice = round($row->total * $pi->currency_rate,2);
 					$balancegrpo = $totalgrpo - $totalinvoice;
 
 					if($balancegrpo > 0 || $balancegrpo < 0){
@@ -4310,7 +4311,7 @@ class CustomHelper {
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 							'type'			=> '1',
-							'nominal'		=> $row->tax * $pi->currency_rate,
+							'nominal'		=> round($row->tax * $pi->currency_rate,2),
 							'nominal_fc'	=> $type == '1' || $type == '' ? $row->tax * $pi->currency_rate : $row->tax,
 							'note'			=> $row->purchaseInvoice->tax_no ? $row->purchaseInvoice->tax_no : '',
 							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
@@ -4332,7 +4333,7 @@ class CustomHelper {
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> $row->wtax * $pi->currency_rate,
+							'nominal'		=> round($row->wtax * $pi->currency_rate,2),
 							'nominal_fc'	=> $type == '1' || $type == '2' ? $row->wtax * $pi->currency_rate : $row->wtax,
 							'note'			=> $row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',
 							'note2'			=> $row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
@@ -4353,7 +4354,7 @@ class CustomHelper {
 						'department_id'	=> $row->department_id ? $row->department_id : NULL,
 						'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
 						'type'			=> '2',
-						'nominal'		=> $row->grandtotal * $pi->currency_rate,
+						'nominal'		=> round($row->grandtotal * $pi->currency_rate,2),
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->grandtotal * $pi->currency_rate : $row->grandtotal,
 						'note'			=> $row->note,
 						'note2'			=> $row->note2,
@@ -4361,6 +4362,37 @@ class CustomHelper {
 						'lookable_id'	=> $table_id,
 						'detailable_type'=> $row->getTable(),
 						'detailable_id'	=> $row->id,
+					]);
+
+					$adjustGrpo += round($row->grandtotal * $pi->currency_rate,2);
+				}
+			}
+
+			if($adjustGrpo > 0){
+				$balanceselisih = $adjustGrpo - round($pi->grandtotal * $pi->currency_rate,2);
+				if($balanceselisih < 0 || $balanceselisih > 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding->id,
+						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+						'type'			=> $balanceselisih > 0 ? '1' : '2',
+						'nominal'		=> abs($balanceselisih),
+						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'note'			=> 'AUTO ADJUST SELISIH RUPIAH GRPO & APIN KURS ASING'
+					]);
+	
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coahutangusaha->id,
+						'account_id'	=> $coahutangusaha->bp_journal ? $account_id : NULL,
+						'type'			=> $balanceselisih > 0 ? '2' : '1',
+						'nominal'		=> abs($balanceselisih),
+						'nominal_fc'	=> 0,
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'note'			=> 'AUTO ADJUST SELISIH RUPIAH GRPO & APIN KURS ASING'
 					]);
 				}
 			}

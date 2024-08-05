@@ -496,32 +496,60 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <div class="row">
-                    <div class="col s12 mt-2">
-                        <div id="datatable_buttons_purchase_order"></div>
-                        <i class="right">Pilih salah satu data dari tabel dibawah untuk bisa diproses di form sebelumnya.</i>
-                        <table id="table_purchase_order" class="display" width="100%">
-                            <thead>
-                                <tr>
-                                    <th class="center-align">No. PO</th>
-                                    <th class="center-align">Tgl.Post</th>
-                                    <th class="center-align">Nama Penerima</th>
-                                    <th class="center-align">Alamat Penerima</th>
-                                    <th class="center-align">Kontak Penerima</th>
-                                    <th class="center-align">% Sisa (GRPO)</th>
-                                    <th class="center-align">Detail Barang</th>
-                                </tr>
-                            </thead>
-                            <tbody id="body-detail-purchase-order"></tbody>
-                        </table>
+                <h4>{{ $title }} Update Informasi</h4>
+                <form class="row" id="form_data_last" onsubmit="return false;">
+                    <div class="col s12">
+                        <div class="row">
+                            <input type="hidden" id="tempGoodScaleLast" name="tempGoodScaleLast">
+                            <div class="input-field col m3 s12">
+                                <div id="codeUpdateLast" class="mt-2">
+
+                                </div>
+                                <label class="active" for="codeUpdateLast">{{ __('translations.code') }}</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="plantUpdateLast" class="mt-2">
+
+                                </div>
+                                <label class="active" for="plantUpdateLast">{{ __('translations.plant') }}</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="warehouseUpdateLast" class="mt-2">
+
+                                </div>
+                                <label class="active" for="warehouseUpdateLast">{{ __('translations.warehouse') }}</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <div id="purchaseOrderUpdateLast" class="mt-2">
+
+                                </div>
+                                <label class="active" for="purchaseOrderUpdateLast">Purchase Order</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="deliveryNoLast" name="deliveryNoLast" type="text" placeholder="No. Pengiriman">
+                                <label class="active" for="deliveryNoLast">Nomor Pengiriman / SJ</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="vehicleNoLast" name="vehicleNoLast" type="text" placeholder="No. Kendaraan">
+                                <label class="active" for="vehicleNoLast">Nomor Kendaraan</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <input id="driverLast" name="driverLast" type="text" placeholder="Nama Supir">
+                                <label class="active" for="driverLast">Nama Supir</label>
+                            </div>
+                            <div class="input-field col m3 s12">
+                                <textarea class="materialize-textarea" id="noteUpdateLast" name="noteUpdateLast" placeholder="Catatan / Keterangan" rows="1"></textarea>
+                                <label class="active" for="noteUpdateLast">{{ __('translations.note') }}</label>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
-        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
+        <button class="btn waves-effect waves-light purple right submit" onclick="saveUpdateLast();">Update <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -938,48 +966,12 @@
                 
             },
             onOpenEnd: function(modal, trigger) {
-                table_purchase_order = $('#table_purchase_order').DataTable({
-                    "responsive": true,
-                    scrollY: '50vh',
-                    scrollCollapse: true,
-                    "iDisplayInLength": 10,
-                    "ordering": false,
-                    dom: 'Blfrtip',
-                    buttons: [
-                        'selectAll',
-                        'selectNone'
-                    ],
-                    select: {
-                        style: 'multi'
-                    },
-                    "language": {
-                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
-                        "zeroRecords": "Data tidak ditemukan / kosong",
-                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
-                        "infoEmpty": "Data tidak ditemukan / kosong",
-                        "infoFiltered": "(disaring dari _MAX_ total data)",
-                        "search": "Cari",
-                        "paginate": {
-                            first:      "<<",
-                            previous:   "<",
-                            next:       ">",
-                            last:       ">>"
-                        },
-                        "buttons": {
-                            selectAll: "Pilih semua",
-                            selectNone: "Hapus pilihan"
-                        },
-                        "select": {
-                            rows: "%d baris terpilih"
-                        }
-                    }
-                });
-                $('#table_purchase_order_wrapper > .dt-buttons').appendTo('#datatable_buttons_purchase_order');
-                $('select[name="table_purchase_order_length"]').addClass('browser-default');
+                
             },
             onCloseEnd: function(modal, trigger){
-                $('#body-detail-purchase-order').empty();
-                $('#table_purchase_order').DataTable().clear().destroy();
+                $('#codeUpdateLast,#plantUpdateLast,#warehouseUpdateLast,#purchaseOrderUpdateLast').text('');
+                $('#tempGoodScaleLast').val('');
+                $('#form_data_last')[0].reset();
             },
             dismissible:false,
         });
@@ -1269,78 +1261,6 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
-
-    function getPurchaseOrderAi(){
-        if($('#account_id').val() && $('#place_id').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/get_purchase_order_ai',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    account_id:  $('#account_id').val(),
-                    place_id: $('#place_id').val(),
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-                    $('#modal2').modal('open');
-
-                    if(response.length > 0){
-                        $.each(response, function(i, val) {
-                            $('#body-detail-purchase-order').append(`
-                                <tr data-id="` + val.id + `">
-                                    <td class="center">
-                                        ` + val.code + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.post_date + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.receiver_name + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.receiver_address + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.receiver_phone + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.percent_balance + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.description + `
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                    }
-                    
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih supplier dan plant terlebih dahulu.',
-                icon: 'warning'
-            });
-        }
-    }
 
     function getPurchaseOrderQty(){
         if($('#purchase_order_detail_id').val()){
@@ -1915,6 +1835,62 @@
         });
     }
 
+    function saveUpdateLast(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_data_last')[0]);
+
+                $.ajax({
+                    url: '{{ Request::url() }}/save_update_information',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: false,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#modal2');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal2');
+                        if(response.status == 200) {
+                            successUpdateLast();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#modal2');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function update(id){
         $.ajax({
             url: '{{ Request::url() }}/update',
@@ -1965,6 +1941,55 @@
         });
     }
 
+    function updateInformation(id){
+        $.ajax({
+            url: '{{ Request::url() }}/update_information',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 200){
+                    $('#modal2').modal('open');
+                    $('#tempGoodScaleLast').val(response.data.id);
+                    $('#codeUpdateLast').text(response.data.code);
+                    $('#plantUpdateLast').text(response.data.place_code);
+                    $('#warehouseUpdateLast').text(response.data.warehouse_name);
+                    $('#purchaseOrderUpdateLast').text(response.data.purchase_code);
+                    $('#deliveryNoLast').val(response.data.delivery_no);
+                    $('#vehicleNoLast').val(response.data.vehicle_no);
+                    $('#driverLast').val(response.data.driver);
+                    $('#noteUpdateLast').val(response.data.note);
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                }else{
+                    M.toast({
+                        html: response.message
+                    });
+                }
+                
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
@@ -1973,6 +1998,11 @@
     function successUpdate(){
         loadDataTable();
         $('#modal6').modal('close');
+    }
+
+    function successUpdateLast(){
+        loadDataTable();
+        $('#modal2').modal('close');
     }
 
     function rowDetail(data) {

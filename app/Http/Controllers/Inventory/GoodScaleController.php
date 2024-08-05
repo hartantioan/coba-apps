@@ -239,8 +239,8 @@ class GoodScaleController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                         '.$updateBtn.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light indigo accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					',
                 ];
@@ -690,6 +690,27 @@ class GoodScaleController extends Controller
         return response()->json($data);
     }
 
+    public function updateInformation(Request $request){
+        $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
+        if($data->goodReceiptDetail()->exists()){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Data Timbangan telah ditarik menjadi GRPO, anda tidak bisa merubah data.'
+            ]);
+        }else{
+            $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+            $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code;
+            $data['place_code'] = $data->place->code;
+            $data['warehouse_name'] = $data->warehouse->name;
+            $response = [
+                'status'    => 200,  
+                'data'      => $data
+            ];
+        }
+
+        return response()->json($response);
+    }
+
     public function saveUpdate(Request $request){
 
         $overtolerance = false;
@@ -756,6 +777,33 @@ class GoodScaleController extends Controller
                     GoodScale::find($idgs)->createGoodReceipt();
                 }
             } */
+    
+            $response = [
+                'status'    => 200,
+                'message'   => 'Data successfully updated.',
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function createUpdateInformation(Request $request){
+
+        $gs = GoodScale::find($request->tempGoodScaleLast);
+
+        if($gs){
+            if($gs->goodReceiptDetail()->exists()){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Data Timbangan telah ditarik menjadi GRPO, anda tidak bisa merubah data.'
+                ]);
+            }
+
+            $gs->delivery_no = $request->deliveryNoLast;
+            $gs->vehicle_no = $request->vehicleNoLast;
+            $gs->driver = $request->driverLast;
+            $gs->note = $request->noteUpdateLast;
+            $gs->save();
     
             $response = [
                 'status'    => 200,

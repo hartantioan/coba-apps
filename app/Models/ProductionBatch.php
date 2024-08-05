@@ -49,10 +49,17 @@ class ProductionBatch extends Model
         return $price;
     }
 
-    public function priceByBalance(){
+    public function priceByQty($qtyuom){
         $total = $this->total;
-        $totalout = $this->qtyUsed() * $this->price();
-        $price = ($total - $totalout) / $this->qtyBalance();
+        $price = 0;
+        $qty = $this->qtyBalance() - $qtyuom;
+        if($qty <= 0){
+            $total = $total - round($this->qtyUsed() * $this->price(),2);
+            $price = $total / $qtyuom;
+        }else{
+            $price = $this->price();
+        }
+        
         return $price;
     }
 

@@ -43,6 +43,13 @@ class LandedCostFeeDetail extends Model
         });
     }
 
+    public function purchaseInvoiceRealDetail()
+    {
+        return $this->hasMany('App\Models\PurchaseInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('purchaseInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function isIncludeTax(){
         $type = match ($this->is_include_tax) {
           '0' => 'Tidak',
@@ -56,7 +63,7 @@ class LandedCostFeeDetail extends Model
     public function balanceInvoice(){
         $total = round($this->grandtotal,2);
 
-        foreach($this->purchaseInvoiceDetail as $rowinvoice){
+        foreach($this->purchaseInvoiceRealDetail as $rowinvoice){
             $total -= round($rowinvoice->grandtotal,2);
         }
 

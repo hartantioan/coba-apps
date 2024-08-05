@@ -9,9 +9,21 @@
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">{{ __('translations.note') }}</th>
             <th class="center-align">{{ __('translations.status') }}</th>
+            <th class="center-align">Voider</th>
+            <th class="center-align">Tgl. Void</th>
+            <th class="center-align">Ket. Void</th>
+            <th class="center-align">Deleter</th>
+            <th class="center-align">Tgl. Delete</th>
+            <th class="center-align">Ket. Delete</th>
+            <th class="center-align">NIK</th>
+            <th class="center-align">User</th>
             <th class="center-align">Due Date</th>
             <th class="center-align">Kode BP</th>
             <th class="center-align">Nama BP</th>
+            <th class="center-align">Kode Biaya</th>
+            <th class="center-align">Nama Biaya</th>
+            <th class="center-align">Kode Coa</th>
+            <th class="center-align">Nama Coa</th>
             <th class="center-align">Total Tagihan</th>
             <th class="center-align">Total Dibayar</th>
             <th class="center-align">Sisa Tunggakan</th>
@@ -26,9 +38,21 @@
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
                 <td>{{ $row['status'] }}</td>
+                <td>{{ $row['void_user'] }}</td>
+                <td>{{ $row['void_date'] }}</td>
+                <td>{{ $row['void_note'] }}</td>
+                <td>{{ $row['delete_user'] }}</td>
+                <td>{{ $row['delete_date'] }}</td>
+                <td>{{ $row['delete_note'] }}</td>
+                <td>{{ $row['user_code'] }}</td>
+                <td>{{ $row['user_name'] }}</td>
                 <td>{{ $row['due_date'] }}</td>
                 <td>{{ $row['kode_bp'] }}</td>
                 <td>{{ $row['nama_bp'] }}</td>
+                <td>{{ $row['kode_biaya'] }}</td>
+                <td>{{ $row['nama_biaya'] }}</td>
+                <td>{{ $row['kode_coa'] }}</td>
+                <td>{{ $row['nama_coa'] }}</td>
                 <td>{{ $row['tagihan'] }}</td>
                 <td>{{ $row['dibayar'] }}</td>
                 <td>{{ $row['sisa'] }}</td>

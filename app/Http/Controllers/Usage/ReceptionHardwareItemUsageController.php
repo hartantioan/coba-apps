@@ -120,7 +120,7 @@ class ReceptionHardwareItemUsageController extends Controller
     }
 
     public function saveTargeted(Request $request){
-        info($request);
+      
         $validation = Validator::make($request->all(), [
             'user_id1'                       => 'required',
             'date1'                          => 'required',

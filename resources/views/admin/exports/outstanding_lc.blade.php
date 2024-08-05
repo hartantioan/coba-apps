@@ -25,6 +25,7 @@
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['note'] }}</td>
+                <td>{{ $row['status'] }}</td>
                 <td>{{ $row['due_date'] }}</td>
                 <td>{{ $row['kode_bp'] }}</td>
                 <td>{{ $row['nama_bp'] }}</td>

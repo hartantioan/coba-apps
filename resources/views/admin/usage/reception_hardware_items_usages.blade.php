@@ -93,7 +93,7 @@
                                                         <th>User</th>
                                                         <th>Kode Inventaris</th>
                                                         <th>{{ __('translations.item') }}</th>
-                                                        <th>Keterangan</th>
+                                                        <th>Detail</th>
                                                         <th>{{ __('translations.location') }}</th>
                                                         <th>Tanggal Penyerahan</th>
                                                         <th>Keterangan Penyerahan</th>

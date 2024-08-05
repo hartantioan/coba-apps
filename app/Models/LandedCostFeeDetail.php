@@ -61,10 +61,10 @@ class LandedCostFeeDetail extends Model
     }
 
     public function balanceInvoice(){
-        $total = round($this->grandtotal,2);
+        $total = round($this->total,2);
 
         foreach($this->purchaseInvoiceRealDetail as $rowinvoice){
-            $total -= round($rowinvoice->grandtotal,2);
+            $total -= round($rowinvoice->total,2);
         }
 
         return $total;

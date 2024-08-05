@@ -803,6 +803,12 @@ class GoodScaleController extends Controller
             $gs->driver = $request->driverLast;
             $gs->note = $request->noteUpdateLast;
             $gs->save();
+
+            activity()
+                    ->performedOn(new GoodScale())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($gs)
+                    ->log('Change information good scale data');
     
             $response = [
                 'status'    => 200,

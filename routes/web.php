@@ -1786,9 +1786,9 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[GoodScaleController::class, 'rowDetail']);
                     Route::post('show', [GoodScaleController::class, 'show']);
                     Route::post('get_code', [GoodScaleController::class, 'getCode']);
-                    Route::post('update', [GoodScaleController::class, 'update']);
-                    Route::post('update_information', [GoodScaleController::class, 'updateInformation']);
-                    Route::post('save_update_information', [GoodScaleController::class, 'createUpdateInformation']);
+                    Route::post('update', [GoodScaleController::class, 'update'])->middleware('operation.access:good_scale,update');
+                    Route::post('update_information', [GoodScaleController::class, 'updateInformation'])->middleware('operation.access:good_scale,update');
+                    Route::post('save_update_information', [GoodScaleController::class, 'createUpdateInformation'])->middleware('operation.access:good_scale,update');
                     Route::post('print',[GoodScaleController::class, 'print']);
                     Route::post('print_by_range',[GoodScaleController::class, 'printByRange']);
                     Route::get('print_individual/{id}',[GoodScaleController::class, 'printIndividual'])->withoutMiddleware('direct.access');

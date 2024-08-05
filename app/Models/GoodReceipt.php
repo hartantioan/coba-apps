@@ -298,7 +298,7 @@ class GoodReceipt extends Model
     }
 
     public function balanceTotal(){
-        $total = $this->total;
+        $total = $this->goodReceiptDetail()->sum('total');
 
         foreach($this->goodReceiptDetail()->whereHas('purchaseInvoiceDetail')->get() as $row){
             foreach($row->purchaseInvoiceDetail as $rowinvoice){

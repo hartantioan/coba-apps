@@ -52,4 +52,14 @@ class LandedCostFeeDetail extends Model
 
         return $type;
     }
+
+    public function balanceInvoice(){
+        $total = round($this->grandtotal,2);
+
+        foreach($this->purchaseInvoiceDetail as $rowinvoice){
+            $total -= round($rowinvoice->grandtotal,2);
+        }
+
+        return $total;
+    }
 }

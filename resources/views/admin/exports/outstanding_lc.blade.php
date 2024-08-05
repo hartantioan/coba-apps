@@ -20,6 +20,10 @@
             <th class="center-align">Due Date</th>
             <th class="center-align">Kode BP</th>
             <th class="center-align">Nama BP</th>
+            <th class="center-align">Kode Vendor</th>
+            <th class="center-align">Nama Vendor</th>
+            <th class="center-align">Grand Total Rupiah</th>
+            <th class="center-align">Kurs</th>
             <th class="center-align">Kode Biaya</th>
             <th class="center-align">Nama Biaya</th>
             <th class="center-align">Kode Coa</th>
@@ -49,6 +53,10 @@
                 <td>{{ $row['due_date'] }}</td>
                 <td>{{ $row['kode_bp'] }}</td>
                 <td>{{ $row['nama_bp'] }}</td>
+                <td>{{ $row['kode_vendor'] }}</td>
+                <td>{{ $row['nama_vendor'] }}</td>
+                <td>{{ $row['total_rupiah'] }}</td>
+                <td>{{ $row['currency'] }}</td>
                 <td>{{ $row['kode_biaya'] }}</td>
                 <td>{{ $row['nama_biaya'] }}</td>
                 <td>{{ $row['kode_coa'] }}</td>

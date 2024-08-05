@@ -141,7 +141,7 @@ class HardwareItemController extends Controller
     public function getReception(Request $request){
         $query = HardwareItem::find($request->id);
         $ada=false;
-        if($query->receptionHardwareItemsUsageALL()->exists()){
+        if($query->receptionHardwareItemsUsageALL()->exists()  || $query->asset()->exists()){
             $ada = true;
         }
         $response['ada']=$ada;
@@ -160,7 +160,7 @@ class HardwareItemController extends Controller
             $query = HardwareItem::find($request->temp);
         }
         if($query){
-            if($query->receptionHardwareItemsUsageALL()->exists()){
+            if($query->receptionHardwareItemsUsageALL()->exists()  || $query->asset()->exists()){
                 $validation = Validator::make($request->all(), [
                 
                 ], [
@@ -207,7 +207,7 @@ class HardwareItemController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = HardwareItem::find($request->temp);
-                    if($query->receptionHardwareItemsUsageALL()->exists()){
+                    if($query->receptionHardwareItemsUsageALL()->exists() || $query->asset()->exists()){
                         $query->status          = $request->status ? $request->status : '2';
                     
                         $query->save();
@@ -563,7 +563,7 @@ class HardwareItemController extends Controller
 
     public function destroy(Request $request){
         $query = HardwareItem::find($request->id);
-        if($query->receptionHardwareItemsUsageALL()->exists()){
+        if($query->receptionHardwareItemsUsageALL()->exists()  || $query->asset()->exists()){
             $response = [
                 'status'  => 500,
                 'message' => 'Data sudah dibuat serah terima.'

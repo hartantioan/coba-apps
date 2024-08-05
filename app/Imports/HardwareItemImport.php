@@ -43,15 +43,30 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
 
                 if ($group_id) {
                     
-
-                    $query = HardwareItem::create([
-                        'code' => HardwareItem::generateCode(),
-                        'item' => $row['barang'],
-                        'user_id' => session('bo_id'),
-                        'hardware_item_group_id' => $group_id->id,
-                        'detail1' => $row['detail_1'],
-                        'status' => '1',
-                    ]);
+                    if (isset($row['detail_1']) && $row['detail_1']) {
+                       
+                        if (isset($row['barang']) && $row['barang']) {
+                          
+                            $query = HardwareItem::create([
+                                'code' => HardwareItem::generateCode(),
+                                'item' => $row['barang'],
+                                'user_id' => session('bo_id'),
+                                'hardware_item_group_id' => $group_id->id,
+                                'detail1' => $row['detail_1'],
+                                'status' => '1',
+                            ]);
+                        }else{
+                            DB::rollback();
+                            $this->error = 'barang';
+                            $sheet='BOM';
+                            throw new RowImportException('Ada yang tidak Lengkap', $row->getIndex(),$this->error,$sheet);
+                        }
+                    }else{
+                        DB::rollback();
+                        $this->error = 'detail';
+                        $sheet='BOM';
+                        throw new RowImportException('Ada yang tidak Lengkap', $row->getIndex(),$this->error,$sheet);
+                    }
 
                     activity()
                         ->performedOn(new HardwareItem())

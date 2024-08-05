@@ -156,7 +156,7 @@ class DeliveryCostController extends Controller
                     $nomor,
                     $val->code,
                     $val->name,
-                    $val->account->name,
+                    $val->account->name ?? '',
                     date('d/m/Y',strtotime($val->valid_from)),
                     date('d/m/Y',strtotime($val->valid_to)),
                     $val->fromCity->name,

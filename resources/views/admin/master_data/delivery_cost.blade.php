@@ -164,7 +164,7 @@
                                 <select class="select2 browser-default" id="from_subdistrict_id" name="from_subdistrict_id">
                                     <option value="">--{{ __('translations.select') }}--</option>
                                 </select>
-                                <label class="active" for="from_subdistrict_id">{{ __('translations.subdistrict') }}</label>
+                                <label class="active" for="from_subdistrict_id">{{ __('translations.district') }}</label>
                             </div>
                         </div>
                         <div class="col s12">
@@ -177,7 +177,7 @@
                                 <select class="select2 browser-default" id="to_subdistrict_id" name="to_subdistrict_id">
                                     <option value="">--{{ __('translations.select') }}--</option>
                                 </select>
-                                <label class="active" for="to_subdistrict_id">{{ __('translations.subdistrict') }}</label>
+                                <label class="active" for="to_subdistrict_id">{{ __('translations.district') }}</label>
                             </div>
                         </div>
                         <div class="input-field col m6 s12">

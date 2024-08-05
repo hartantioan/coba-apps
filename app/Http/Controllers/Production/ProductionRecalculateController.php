@@ -403,7 +403,7 @@ class ProductionRecalculateController extends Controller
                                     'place_id'                          => $updateProductionIssue->place_id,
                                     'production_recalculate_detail_id'  => $querydetail->id,
                                 ]);
-                                $updateProductionIssue->reJournalAndRecalculateReceive();
+                                /* $updateProductionIssue->reJournalAndRecalculateReceive(); */
                             }
                         }
                     }

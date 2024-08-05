@@ -92,6 +92,23 @@ class Region extends Model
         return $text;
     }
 
+    public function getProvince(){
+        $arr = explode('.', $this->code);
+
+        $data = Region::where('code', $arr[0])->first();
+        $x=$data->name;
+        return $x;
+    }
+
+    public function city(){
+        $arr = explode('.', $this->code);
+
+        $data = Region::where('code', $arr[0].'.'. $arr[1])->first();
+        $x=$data->name;
+        return $x;
+    }
+    
+
     public function country()
     {
         return $this->belongsTo('App\Models\Country', 'country_id', 'id')->withTrashed();

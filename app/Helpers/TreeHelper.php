@@ -1188,7 +1188,7 @@ class TreeHelper {
                                     'properties'=> $properties,
                                     "key" => $row_pyr_cross->lookable->code,
                                     "name" => $row_pyr_cross->lookable->code,
-                                    'url'=>request()->root()."/admin/finance/payment_requests?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
+                                    'url'=>request()->root()."/admin/finance/outgoing_payment?code=".CustomHelper::encrypt($row_pyr_cross->lookable->code),  
                                 ];
                     
                                 $data_go_chart[]=$data_pyrc_tempura;

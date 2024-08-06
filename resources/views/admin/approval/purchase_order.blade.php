@@ -310,7 +310,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="11">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code : '-' }}</td>
+                        <td colspan="11">  {{ __('translations.reference') }}: {{ $row->purchaseRequestDetail()->exists() ? $row->purchaseRequestDetail->purchaseRequest->code.' - '.date('d/m/Y',strtotime($row->purchaseRequestDetail->purchaseRequest->post_date)) : '-' }}</td>
                     </tr>
                     @endforeach
                     <tr>

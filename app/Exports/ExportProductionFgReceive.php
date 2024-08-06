@@ -20,20 +20,32 @@ class ExportProductionFgReceive implements  FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data =  ProductionFgReceive::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<='   , $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionFgReceive())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production fg receive.');
             return view('admin.exports.production_fg_receive', [
-                'data' => ProductionFgReceive::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<='   , $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = ProductionFgReceive::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionFgReceive())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production fg receive.');
             return view('admin.exports.production_fg_receive', [
-                'data' => ProductionFgReceive::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

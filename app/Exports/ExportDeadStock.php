@@ -70,6 +70,12 @@ class ExportDeadStock implements FromView,ShouldAutoSize
                 
                       
         }
+
+        activity()
+            ->performedOn(new ItemCogs())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query_data)
+            ->log('Export Dead stock.');
       
         return view('admin.exports.dead_stock', [
             'data' => $array_filter,

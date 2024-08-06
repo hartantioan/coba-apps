@@ -8,6 +8,8 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\MaterialRequest;
+
 class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
 {
 
@@ -61,7 +63,11 @@ class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
             
             
         }
-        
+        activity()
+            ->performedOn(new MaterialRequestDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding material request.');
         
         return view('admin.exports.outstanding_material_request', [
             'data' => $array,

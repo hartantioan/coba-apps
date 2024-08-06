@@ -20,20 +20,32 @@ class ExportProductionOrder implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = ProductionOrder::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionOrder())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production order.');
             return view('admin.exports.production_order', [
-                'data' => ProductionOrder::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = ProductionOrder::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionOrder())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production order.');
             return view('admin.exports.production_order', [
-                'data' => ProductionOrder::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

@@ -76,6 +76,12 @@ class ExportFundRequest implements FromCollection, WithTitle, WithHeadings, With
 
         $arr = [];
 
+        activity()
+            ->performedOn(new FundRequest())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Fund Request data.');
+
         foreach($data as $key => $row){
             foreach($row->fundRequestDetail as $rowDetail){
                 $arr[] = [

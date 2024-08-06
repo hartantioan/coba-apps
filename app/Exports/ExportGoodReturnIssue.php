@@ -25,20 +25,32 @@ class ExportGoodReturnIssue implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = GoodReturnIssue::where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReturnIssue())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good return issue  data.');
             return view('admin.exports.good_return_issue', [
-                'data' => GoodReturnIssue::where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data =GoodReturnIssue::withTrashed()->where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReturnIssue())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good return issue  data.');
             return view('admin.exports.good_return_issue', [
-                'data' => GoodReturnIssue::withTrashed()->where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

@@ -11,9 +11,9 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class ExportMarketingRecapitulation implements FromView , WithEvents
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    
+    protected $start_date,$end_date;
+
     public function __construct(string $start_date, string $end_date)
     {
         $this->start_date = $start_date ? $start_date : '';
@@ -54,6 +54,12 @@ class ExportMarketingRecapitulation implements FromView , WithEvents
                 'balance'           => round($balance,2),
             ];            
         }
+
+        activity()
+                ->performedOn(new MarketingOrder())
+                ->causedBy(session('bo_id'))
+                ->withProperties($mo)
+                ->log('Export market recapitulation marketing data.');
 
         return view('admin.exports.sales_recapitulation', [
             'data'      => $array_filter,

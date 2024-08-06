@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportProject implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$status;
 
     public function __construct(string $search, string $status)
     {
@@ -29,7 +27,7 @@ class ExportProject implements FromCollection, WithTitle, WithHeadings, WithCust
 
     public function collection()
     {
-        return Project::where(function($query) {
+        $data = Project::where(function($query) {
             if($this->search) {
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
@@ -43,6 +41,13 @@ class ExportProject implements FromCollection, WithTitle, WithHeadings, WithCust
                 $query->where('status', $this->status);
             }
         })->get(['id','code','name','note']);
+        
+        activity()
+            ->performedOn(new Project())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export project.');
+        return $data;
     }
 
     public function title(): string

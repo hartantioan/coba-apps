@@ -29,7 +29,11 @@ class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
                 $array[] = $entry;
             }
         }
-        
+        activity()
+                ->performedOn(new FundRequest())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export outstanding fund request.');
         
         return view('admin.exports.outstanding_fr', [
             'data' => $array,

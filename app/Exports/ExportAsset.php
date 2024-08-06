@@ -80,6 +80,11 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'status'        => $row->statusRaw(),
             ];
         }
+        activity()
+            ->performedOn(new Asset())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Asset data.');
 
         return collect($arr);
     }

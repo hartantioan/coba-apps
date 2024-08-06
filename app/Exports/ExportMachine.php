@@ -11,9 +11,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportMachine implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$status;
 
     public function __construct(string $search, string $status)
     {
@@ -66,7 +64,11 @@ class ExportMachine implements FromCollection, WithTitle, WithHeadings, WithCust
                 'status'        => $row->statusRaw(),
             ];
         }
-
+        activity()
+            ->performedOn(new Machine())
+            ->causedBy(session('bo_id'))
+            ->withProperties($lines)
+            ->log('Export machine data.');
         return collect($arr);
     }
 

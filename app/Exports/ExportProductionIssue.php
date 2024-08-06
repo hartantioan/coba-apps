@@ -20,20 +20,32 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = ProductionIssue::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<='   , $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionIssue())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production issue.');
             return view('admin.exports.production_issue', [
-                'data' => ProductionIssue::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<='   , $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = ProductionIssue::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionIssue())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production issue.');
             return view('admin.exports.production_issue', [
-                'data' => ProductionIssue::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

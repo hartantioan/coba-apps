@@ -86,7 +86,11 @@ class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
 
         $sheets[] = new DocumentTaxSheet($taxes);
 
-       
+        activity()
+        ->performedOn(new DocumentTax())
+        ->causedBy(session('bo_id'))
+        ->withProperties($taxes)
+        ->log('Export tax data.');
         
 
        

@@ -55,6 +55,11 @@ class ExportItemGroup implements FromCollection, WithTitle, WithHeadings, WithCu
                 'coa'       => $row->coa->code.' - '.$row->coa->name,
             ];
         }
+        activity()
+            ->performedOn(new ItemGroup())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export grup item data.');
 
         return collect($arr);
     }

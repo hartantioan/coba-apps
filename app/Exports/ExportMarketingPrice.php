@@ -9,9 +9,9 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportMarketingPrice implements FromView
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    
+    protected $search,$item;
+
     public function __construct(string $search, string $item)
     {
         $this->search = $search ? $search : '';
@@ -59,6 +59,13 @@ class ExportMarketingPrice implements FromView
             ];
             
         }
+
+        activity()
+                ->performedOn(new MarketingOrderDetail())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query_data)
+                ->log('Export marketing order price data.');
+
       
         return view('admin.exports.sales_price', [
             'data' => $array_filter,

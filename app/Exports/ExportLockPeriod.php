@@ -25,20 +25,32 @@ class ExportLockPeriod implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = LockPeriod::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new LockPeriod())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export lock period data.');
             return view('admin.exports.lock_period', [
-                'data' => LockPeriod::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = LockPeriod::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new LockPeriod())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export lock period data.');
             return view('admin.exports.lock_period', [
-                'data' => LockPeriod::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

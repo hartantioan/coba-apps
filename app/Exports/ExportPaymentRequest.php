@@ -118,6 +118,12 @@ class ExportPaymentRequest implements FromCollection, WithTitle, WithHeadings, S
             
         }
 
+        activity()
+            ->performedOn(new PaymentRequest())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding payment request.');
+
         return collect($arr);
     }
 

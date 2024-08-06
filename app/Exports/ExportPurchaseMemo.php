@@ -108,6 +108,12 @@ class ExportPurchaseMemo implements FromCollection, WithTitle, WithHeadings, Sho
             ];
         }
 
+        activity()
+            ->performedOn(new PurchaseMemo())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export purchase memo .');
+
         return collect($arr);
     }
 

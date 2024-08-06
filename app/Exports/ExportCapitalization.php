@@ -24,20 +24,33 @@ class ExportCapitalization implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = Capitalization::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new Capitalization())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export capitalization data.');
+            
             return view('admin.exports.capitalization', [
-                'data' => Capitalization::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data= Capitalization::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+             activity()
+                ->performedOn(new Capitalization())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export capitalization data.');
             return view('admin.exports.capitalization', [
-                'data' => Capitalization::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

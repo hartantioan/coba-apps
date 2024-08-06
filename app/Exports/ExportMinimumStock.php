@@ -76,6 +76,12 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
                 $array_filter[]=$data_tempura;
             }
         }
+
+        activity()
+                ->performedOn(new ItemStock())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query_data)
+                ->log('Export minimum stock data.');
       
         return view('admin.exports.minimum_stock', [
             'data' => $array_filter,

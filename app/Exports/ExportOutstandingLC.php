@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\LandedCost;
+use App\Models\LandedCostFee;
 use App\Models\LandedCostFeeDetail;
 use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\View\View;
@@ -57,7 +58,11 @@ class ExportOutstandingLC implements FromView,ShouldAutoSize
             
             
         }
-        
+        activity()
+            ->performedOn(new LandedCostFeeDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding Lc.');
         
         return view('admin.exports.outstanding_lc', [
             'data' => $array,

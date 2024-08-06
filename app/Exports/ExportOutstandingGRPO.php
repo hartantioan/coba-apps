@@ -8,6 +8,8 @@ use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\GoodReceipt;
+
 class ExportOutstandingGRPO implements FromView,ShouldAutoSize
 {
     /**
@@ -45,7 +47,11 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
             
             
         }
-        
+        activity()
+            ->performedOn(new GoodReceiptDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding grpo.');
         
         return view('admin.exports.outstanding_po', [
             'data' => $array,

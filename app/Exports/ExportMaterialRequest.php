@@ -28,39 +28,52 @@ class ExportMaterialRequest implements FromView
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = MaterialRequestDetail::whereHas('materialRequest',function($query){
+                $query->where(function ($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+                });
+                if(!$this->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
+            })
+            ->whereIn('warehouse_id',$this->warehouses)
+            ->get();
+            activity()
+                ->performedOn(new MaterialRequestDetail())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export material Request data.');
+
             return view('admin.exports.material_request', [
-                'data' => MaterialRequestDetail::whereHas('materialRequest',function($query){
-                    $query->where(function ($query) {
-                        $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                    });
-                    if(!$this->modedata){
-                        $query->where('user_id',session('bo_id'));
-                    }
-                })
-                ->whereIn('warehouse_id',$this->warehouses)
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = MaterialRequestDetail::withTrashed()->whereHas('materialRequest',function($query){
+                $query->where(function ($query) {
+                    $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+                });
+                if(!$this->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
+            })
+            ->where(function ($query) {
+                
+                $query->whereNull('deleted_at')
+                      ->orWhereHas('materialRequest', function ($query) {
+                          $query->withTrashed()->whereNotNull('deleted_at');
+                      });
+            })
+            ->whereIn('warehouse_id',$this->warehouses)
+            ->get();
+            activity()
+                ->performedOn(new MaterialRequestDetail())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export material Request data.');
             return view('admin.exports.material_request', [
-                'data' => MaterialRequestDetail::withTrashed()->whereHas('materialRequest',function($query){
-                    $query->where(function ($query) {
-                        $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                    });
-                    if(!$this->modedata){
-                        $query->where('user_id',session('bo_id'));
-                    }
-                })
-                ->where(function ($query) {
-                    
-                    $query->whereNull('deleted_at')
-                          ->orWhereHas('materialRequest', function ($query) {
-                              $query->withTrashed()->whereNotNull('deleted_at');
-                          });
-                })
-                ->whereIn('warehouse_id',$this->warehouses)
-                ->get()
+                'data' => $data
             ]);
         }
     }

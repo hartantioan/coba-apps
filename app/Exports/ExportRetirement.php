@@ -25,20 +25,32 @@ class ExportRetirement implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = Retirement::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new Retirement())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export retirement data  .');
             return view('admin.exports.retirement', [
-                'data' => Retirement::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = Retirement::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new Retirement())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export retirement data  .');
             return view('admin.exports.retirement', [
-                'data' => Retirement::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

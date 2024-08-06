@@ -111,7 +111,11 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'status'            => $row->statusRaw(),
             ];
         }
-
+        activity()
+            ->performedOn(new User())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export user data  .');
         return collect($arr);
     }
 

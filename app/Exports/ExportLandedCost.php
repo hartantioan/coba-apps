@@ -101,6 +101,12 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
             ];
         }
 
+         activity()
+            ->performedOn(new LandedCost())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Landed Cost data.');
+
         return collect($arr);
     }
 

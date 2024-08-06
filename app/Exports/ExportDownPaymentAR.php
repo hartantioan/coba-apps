@@ -12,9 +12,8 @@ use Maatwebsite\Excel\Events\AfterSheet;
 
 class ExportDownPaymentAR implements FromView , WithEvents
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $date;
+
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
@@ -85,7 +84,13 @@ class ExportDownPaymentAR implements FromView , WithEvents
                     $totalbalance += $balance;
                 }
             }  
-        return view('admin.exports.down_payment_ar', [
+            activity()
+                ->performedOn(new MarketingOrderDownPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query_data)
+                ->log('Export Downpayment AR data.');
+        
+            return view('admin.exports.down_payment_ar', [
             'data'      => $array_filter,
             'totalall'  => round($totalbalance,2)
         ]);

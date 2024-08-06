@@ -149,6 +149,11 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
             ];
             
         }
+        activity()
+        ->performedOn(new PurchaseInvoiceDetail())
+        ->causedBy(session('bo_id'))
+        ->withProperties($data)
+        ->log('Export purchase Invoice .');
 
         return collect($arr);
     }

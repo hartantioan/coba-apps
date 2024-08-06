@@ -10,9 +10,6 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportGoodReceive implements FromView,ShouldAutoSize
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
 
     protected $start_date, $end_date, $mode;
 
@@ -26,20 +23,32 @@ class ExportGoodReceive implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = GoodReceive::where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+                activity()
+                ->performedOn(new GoodReceive())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good receive  data.');
             return view('admin.exports.good_receive', [
-                'data' => GoodReceive::where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data =GoodReceive::withTrashed()->where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReceive())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good receive  data.');
             return view('admin.exports.good_receive', [
-                'data' => GoodReceive::withTrashed()->where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

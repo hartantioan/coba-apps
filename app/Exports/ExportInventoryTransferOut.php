@@ -26,20 +26,32 @@ class ExportInventoryTransferOut implements FromView , ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = InventoryTransferOut::where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new InventoryTransferOut())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export inventory transfer out data.');
             return view('admin.exports.inventory_transfer_out', [
-                'data' => InventoryTransferOut::where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = InventoryTransferOut::withTrashed()->where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new InventoryTransferOut())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export inventory transfer out data.');
             return view('admin.exports.inventory_transfer_out', [
-                'data' => InventoryTransferOut::withTrashed()->where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

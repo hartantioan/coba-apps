@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$status;
 
     public function __construct(string $search, string $status)
     {
@@ -73,6 +71,12 @@ class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'capacity' => $row->capacity
             ];
         }
+
+        activity()
+            ->performedOn(new Place())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export place data.');
 
         return collect($arr);
     }

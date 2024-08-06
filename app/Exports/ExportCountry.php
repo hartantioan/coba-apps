@@ -10,9 +10,8 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportCountry implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+   
+    protected $search;
 
     public function __construct(string $search)
     {
@@ -27,14 +26,22 @@ class ExportCountry implements FromCollection, WithTitle, WithHeadings, WithCust
     ];
 
     public function collection()
-    {
-        return Country::where(function ($query) {
+    {   
+        $data =  Country::where(function ($query) {
             if ($this->search) {
                 $query->where('code', 'like', "%$this->search%")
                     ->orWhere('name', 'like', "%$this->search%")
                     ->orWhere('phone_code', 'like', "%$this->search%");
             }
         })->get(['id','code','name','phone_code']);
+
+        activity()
+                ->performedOn(new Country())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Country data.');
+                
+        return $data;
     }
 
     public function title(): string

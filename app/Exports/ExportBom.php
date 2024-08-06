@@ -22,24 +22,30 @@ class ExportBom implements FromView
 
     public function view(): View
     {
+        $data = Bom::where(function ($query) {
+            if($this->search) {
+                $query->where(function ($query) {
+                    $query->where('code', 'like', "%$this->search%")
+                        ->orWhere('name', 'like', "%$this->search%")
+                        ->orWhereHas('place',function($query){
+                            $query->where('name','like',"%$this->search%");
+                        })->orWhereHas('item',function($query){
+                            $query->where('name','like',"%$this->search%");
+                        });
+                });
+            }
+
+            if($this->status){
+                $query->where('status', $this->status);
+            }
+        })->get();
+        activity()
+            ->performedOn(new Bom())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Bom data.');
         return view('admin.exports.bom', [
-            'data' => Bom::where(function ($query) {
-                if($this->search) {
-                    $query->where(function ($query) {
-                        $query->where('code', 'like', "%$this->search%")
-                            ->orWhere('name', 'like', "%$this->search%")
-                            ->orWhereHas('place',function($query){
-                                $query->where('name','like',"%$this->search%");
-                            })->orWhereHas('item',function($query){
-                                $query->where('name','like',"%$this->search%");
-                            });
-                    });
-                }
-    
-                if($this->status){
-                    $query->where('status', $this->status);
-                }
-            })->get()
+            'data' => $data
         ]);
     }
 }

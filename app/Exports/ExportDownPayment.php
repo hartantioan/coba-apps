@@ -151,8 +151,15 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     ];
                     $totalbalance += round($balance_rp,2);
                 }
-            }  
-        return view('admin.exports.down_payment', [
+            } 
+            
+            activity()
+                ->performedOn(new PurchaseDownPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query_data)
+                ->log('Export puchase downpayment data.');
+        
+            return view('admin.exports.down_payment', [
             'data'      => $array_filter,
             'totalall'  => round($totalbalance,2)
         ]);

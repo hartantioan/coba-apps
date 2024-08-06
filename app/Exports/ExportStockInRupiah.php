@@ -338,6 +338,13 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         if($this->type == 'final'){
             $combinedArray=$array_filter;
         }
+
+        activity()
+            ->performedOn(new ItemCogs())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query_data)
+            ->log('Export stock in rupiah data  .');
+
         return view('admin.exports.stock_in_rupiah', [
             'data'          => $combinedArray,
             'latest'        => $array_last_item,

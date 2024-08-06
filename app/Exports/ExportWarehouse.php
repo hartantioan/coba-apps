@@ -14,6 +14,8 @@ class ExportWarehouse implements FromCollection, WithTitle, WithHeadings, WithCu
     * @return \Illuminate\Support\Collection
     */
 
+    protected $search,$status;
+
     public function __construct(string $search, string $status)
     {
         $this->search = $search ? $search : '';
@@ -52,6 +54,11 @@ class ExportWarehouse implements FromCollection, WithTitle, WithHeadings, WithCu
                 'note'      => $row->note,
             ];
         }
+        activity()
+            ->performedOn(new Warehouse())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export warehouse data .');
 
         return collect($arr);
     }

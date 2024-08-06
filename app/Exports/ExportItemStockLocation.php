@@ -47,6 +47,11 @@ class ExportItemStockLocation implements FromView,ShouldAutoSize
             ];
             $array_filter[]=$data_tempura;
         }
+        activity()
+            ->performedOn(new ItemStock())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export lokasi item stock data.');
       
         return view('admin.exports.item_stock_location', [
             'data' => $array_filter,

@@ -19,20 +19,32 @@ class ExportProductionHandover implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = ProductionHandover::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<='   , $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionHandover())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production handover.');
             return view('admin.exports.production_handover', [
-                'data' => ProductionHandover::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<='   , $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = ProductionHandover::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new ProductionHandover())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export production handover.');
             return view('admin.exports.production_handover', [
-                'data' => ProductionHandover::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

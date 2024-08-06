@@ -104,6 +104,12 @@ class ExportOutstandingAR implements FromView , WithEvents
             }
         }
 
+        activity()
+                ->performedOn(new MarketingOrderInvoice())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query_data)
+                ->log('Export marketing order invoice.');
+
         return view('admin.exports.outstanding_ar', [
             'data'          => $array_filter,
             'grandtotal'    => number_format($grandtotalAll,2,',','.'),

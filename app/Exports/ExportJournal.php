@@ -24,22 +24,39 @@ class ExportJournal implements FromView, ShouldAutoSize
 
     public function view(): View
     {
+        
         if($this->mode == '1'){
-            return view('admin.exports.journal', [
-                'data' => Journal::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
+            $data = Journal::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
 
-                })
-                ->get()
+            })
+            ->get();
+
+            activity()
+            ->performedOn(new Journal())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Journal data.');
+
+            return view('admin.exports.journal', [
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = Journal::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get(); 
+
+            activity()
+            ->performedOn(new Journal())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Journal data.');
+
             return view('admin.exports.journal', [
-                'data' => Journal::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' =>$data
             ]);
         }
     }

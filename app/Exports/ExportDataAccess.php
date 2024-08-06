@@ -125,6 +125,11 @@ class ExportDataAccess implements FromView,ShouldAutoSize
             $new_array = array_values($new_array);
             return $new_array;
         }
+        activity()
+            ->performedOn(new User())
+            ->causedBy(session('bo_id'))
+            ->withProperties($user)
+            ->log('Export Data Access data.');
         $data_array = unique_key($menuArray,'name');
         return view('admin.exports.data_access', [
             'user'      => $user,

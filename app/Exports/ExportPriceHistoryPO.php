@@ -9,9 +9,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 
 class ExportPriceHistoryPO implements FromView
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$item,$inventory_type;
     public function __construct(string $search, string $item,string $inventory_type)
     {
         $this->search = $search ? $search : '';
@@ -63,6 +61,12 @@ class ExportPriceHistoryPO implements FromView
             ];
             
         }
+
+        activity()
+            ->performedOn(new PurchaseOrderDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query_data)
+            ->log('Export price history po.');
       
         return view('admin.exports.price_history_po', [
             'data' => $array_filter,

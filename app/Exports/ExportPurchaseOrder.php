@@ -231,6 +231,12 @@ class ExportPurchaseOrder implements FromCollection, WithTitle, WithHeadings, Sh
             
         }
 
+        activity()
+            ->performedOn(new PurchaseOrder())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export purchase Order .');
+
         return collect($arr);
     }
 

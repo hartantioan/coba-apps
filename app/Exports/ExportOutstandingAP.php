@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\OutstandingAP;
+use App\Models\PaymentRequestDetail;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use Illuminate\View\View;
@@ -324,6 +325,12 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
                 $array_filter[] = $data_tempura;
             }
         }
+
+        activity()
+                ->performedOn(new PaymentRequestDetail())
+                ->causedBy(session('bo_id'))
+                ->withProperties($results)
+                ->log('Export outstanding ap.');
 
         return view('admin.exports.outstanding_ap', [
             'data' => $array_filter,

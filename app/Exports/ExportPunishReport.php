@@ -10,6 +10,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class ExportPunishReport implements FromView,ShouldAutoSize,WithTitle
 {
+    protected $period_id;
     public function __construct(string $period_id)
     {
         $this->period_id = $period_id ? $period_id : '';

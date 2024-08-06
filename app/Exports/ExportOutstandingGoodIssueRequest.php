@@ -52,7 +52,11 @@ class ExportOutstandingGoodIssueRequest implements FromView,ShouldAutoSize
                 $array[] = $entry;
             }
         }
-        
+        activity()
+            ->performedOn(new GoodIssueRequestDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding good issue request.');
         
         return view('admin.exports.outstanding_good_issue_request', [
             'data' => $array,

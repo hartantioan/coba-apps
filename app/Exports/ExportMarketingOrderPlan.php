@@ -23,20 +23,32 @@ class ExportMarketingOrderPlan implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
-            return view('admin.exports.marketing_order_plan', [
-                'data' => MarketingOrderPlan::where(function($query){
+            $data = MarketingOrderPlan::where(function($query){
                     $query->where('post_date', '>=',$this->start_date)
                         ->where('post_date', '<=', $this->end_date);
                 })
-                ->get()
+                ->get();
+            activity()
+                ->performedOn(new MarketingOrderPlan())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export marketing order plan data.');
+            return view('admin.exports.marketing_order_plan', [
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = MarketingOrderPlan::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new MarketingOrderPlan())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export marketing order plan data.');
             return view('admin.exports.marketing_order_plan', [
-                'data' => MarketingOrderPlan::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

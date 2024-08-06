@@ -25,20 +25,38 @@ class ExportClosingJournal implements FromView, ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+
+            $data =  ClosingJournal::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+
+            activity()
+                ->performedOn(new ClosingJournal())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Close Bill data.');
+
             return view('admin.exports.closing_journal', [
-                'data' => ClosingJournal::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+
+            $data = ClosingJournal::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+
+            activity()
+                ->performedOn(new ClosingJournal())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Closing Journal data.');
+
             return view('admin.exports.closing_journal', [
-                'data' => ClosingJournal::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

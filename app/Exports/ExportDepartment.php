@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportDepartment implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search, $status;
 
     public function __construct(string $search, string $status)
     {
@@ -28,7 +26,7 @@ class ExportDepartment implements FromCollection, WithTitle, WithHeadings, WithC
 
     public function collection()
     {
-        return Department::where(function($query) {
+        $data = Department::where(function($query) {
             if($this->search) {
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
@@ -40,6 +38,14 @@ class ExportDepartment implements FromCollection, WithTitle, WithHeadings, WithC
                 $query->where('status', $this->status);
             }
         })->get(['id','code','name']);
+
+        activity()
+            ->performedOn(new Department())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export department data.');
+
+        return $data;
     }
 
     public function title(): string

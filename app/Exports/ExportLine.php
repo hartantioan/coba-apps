@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportLine implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$status;
 
     public function __construct(string $search, string $status)
     {
@@ -61,6 +59,12 @@ class ExportLine implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'status'        => $row->statusRaw(),
             ];
         }
+
+        activity()
+            ->performedOn(new Line())
+            ->causedBy(session('bo_id'))
+            ->withProperties($lines)
+            ->log('Export Line data.');
 
         return collect($arr);
     }

@@ -92,6 +92,12 @@ class ExportOutgoingPayment implements FromCollection, WithTitle, WithHeadings, 
             
         }
 
+        activity()
+                ->performedOn(new OutgoingPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export outgoing payment data.');
+
         return collect($arr);
     }
 

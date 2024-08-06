@@ -51,7 +51,11 @@ class ExportOutstandingPurchaseRequest implements FromView,ShouldAutoSize
             
             
         }
-        
+        activity()
+            ->performedOn(new PurchaseRequestDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding Purchase request.');
         
         return view('admin.exports.outstanding_pr', [
             'data' => $array,

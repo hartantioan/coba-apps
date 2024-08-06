@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportCompany implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search, $status;
 
     public function __construct(string $search, string $status)
     {
@@ -65,6 +63,12 @@ class ExportCompany implements FromCollection, WithTitle, WithHeadings, WithCust
                 'city' => $row->city->name
             ];
         }
+
+        activity()
+                ->performedOn(new Company())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export company data.');
 
         return collect($arr);
     }

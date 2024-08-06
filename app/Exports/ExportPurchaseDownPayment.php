@@ -99,6 +99,12 @@ class ExportPurchaseDownPayment implements FromCollection, WithTitle, WithHeadin
             ];
         }
 
+        activity()
+            ->performedOn(new PurchaseDownPayment())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export purchase downpayment .');
+
         return collect($arr);
     }
 

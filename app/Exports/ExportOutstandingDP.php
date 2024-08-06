@@ -32,7 +32,11 @@ class ExportOutstandingDP implements FromView,ShouldAutoSize
                 $array[] = $entry;
             }
         }
-        
+        activity()
+                ->performedOn(new PurchaseDownPayment())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export outstanding dp.');
         return view('admin.exports.outstanding_down_payment', [
             'data' => $array,
             

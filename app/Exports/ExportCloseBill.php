@@ -24,32 +24,47 @@ class ExportCloseBill implements FromView
     public function view(): View
     {
         if($this->mode == '1'){
+            $data =  CloseBill::where(function($query) {
+                if($this->start_date && $this->end_date) {
+                    $query->whereDate('post_date', '>=', $this->start_date)
+                        ->whereDate('post_date', '<=', $this->end_date);
+                } else if($this->start_date) {
+                    $query->whereDate('post_date','>=', $this->start_date);
+                } else if($this->end_date) {
+                    $query->whereDate('post_date','<=', $this->end_date);
+                }
+            })
+            ->get();
+
+             activity()
+                ->performedOn(new CloseBill())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Close Bill data.');
             return view('admin.exports.close_bill', [
-                'data' => CloseBill::where(function($query) {
-                    if($this->start_date && $this->end_date) {
-                        $query->whereDate('post_date', '>=', $this->start_date)
-                            ->whereDate('post_date', '<=', $this->end_date);
-                    } else if($this->start_date) {
-                        $query->whereDate('post_date','>=', $this->start_date);
-                    } else if($this->end_date) {
-                        $query->whereDate('post_date','<=', $this->end_date);
-                    }
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = CloseBill::withTrashed()->where(function($query) {
+                if($this->start_date && $this->end_date) {
+                    $query->whereDate('post_date', '>=', $this->start_date)
+                        ->whereDate('post_date', '<=', $this->end_date);
+                } else if($this->start_date) {
+                    $query->whereDate('post_date','>=', $this->start_date);
+                } else if($this->end_date) {
+                    $query->whereDate('post_date','<=', $this->end_date);
+                }
+            })
+            ->get();
+
+            activity()
+                ->performedOn(new CloseBill())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Close Bill data.');
+
             return view('admin.exports.close_bill', [
-                'data' => CloseBill::withTrashed()->where(function($query) {
-                    if($this->start_date && $this->end_date) {
-                        $query->whereDate('post_date', '>=', $this->start_date)
-                            ->whereDate('post_date', '<=', $this->end_date);
-                    } else if($this->start_date) {
-                        $query->whereDate('post_date','>=', $this->start_date);
-                    } else if($this->end_date) {
-                        $query->whereDate('post_date','<=', $this->end_date);
-                    }
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

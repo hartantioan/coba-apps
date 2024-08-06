@@ -26,20 +26,32 @@ class ExportGoodReturnPO implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = GoodReturnPO::where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReturnPO())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good return PO  data.');
             return view('admin.exports.good_return_po', [
-                'data' => GoodReturnPO::where(function ($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
+            $data = GoodReturnPO::withTrashed()->where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReturnPO())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good return PO  data.');
             return view('admin.exports.good_return_po', [
-                'data' => GoodReturnPO::withTrashed()->where(function ($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

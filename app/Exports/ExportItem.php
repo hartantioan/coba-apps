@@ -114,6 +114,11 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
                 'shading'           => $row->listShading(),
             ];
         }
+        activity()
+            ->performedOn(new Item())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export item data.');
 
         return collect($arr);
     }

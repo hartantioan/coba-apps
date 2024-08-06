@@ -24,23 +24,40 @@ class ExportDepreciation implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
-            return view('admin.exports.depreciation', [
-                'data' => Depreciation::where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
+            $data = Depreciation::where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
 
-                })
-                ->get()
+            })
+            ->get();
+
+            activity()
+                ->performedOn(new Depreciation())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export depreciation data.');
+
+            return view('admin.exports.depreciation', [
+                'data' => $data
             ]);
         }elseif($this->mode == '2'){
-            return view('admin.exports.depreciation', [
-                'data' => Depreciation::withTrashed()->where(function($query){
-                    $query->where('post_date', '>=',$this->start_date)
-                        ->where('post_date', '<=', $this->end_date);
+            $data = Depreciation::withTrashed()->where(function($query){
+                $query->where('post_date', '>=',$this->start_date)
+                    ->where('post_date', '<=', $this->end_date);
 
-                })
-                ->get()
+            })
+            ->get();
+
+            activity()
+                ->performedOn(new Depreciation())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export depreciation datas.');
+
+            return view('admin.exports.depreciation', [
+                'data' => $data
             ]);
         }
+        
     }
 }

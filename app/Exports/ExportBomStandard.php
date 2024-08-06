@@ -24,19 +24,27 @@ class ExportBomStandard implements FromView,ShouldAutoSize
 
     public function view(): View
     {
+        $data = BomStandard::where(function ($query) {
+            if($this->search) {
+                $query->where(function ($query) {
+                    $query->where('code', 'like', "%$this->search%")
+                        ->orWhere('name', 'like', "%$this->search%");
+                });
+            }
+
+            if($this->status){
+                $query->where('status', $this->status);
+            }
+        })->get();
+        
+        activity()
+            ->performedOn(new BomStandard())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export Bom Standar data.');
+
         return view('admin.exports.bom_standard', [
-            'data' => BomStandard::where(function ($query) {
-                if($this->search) {
-                    $query->where(function ($query) {
-                        $query->where('code', 'like', "%$this->search%")
-                            ->orWhere('name', 'like', "%$this->search%");
-                    });
-                }
-    
-                if($this->status){
-                    $query->where('status', $this->status);
-                }
-            })->get()
+            'data' => $data
         ]);
     }
 }

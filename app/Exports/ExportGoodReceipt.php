@@ -28,34 +28,46 @@ class ExportGoodReceipt implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = GoodReceipt::where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date)
+                ->whereHas('goodReceiptDetail',function($query){
+                    $query->whereIn('warehouse_id',$this->warehouses);
+                });
+                if(!$this->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReceipt())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good Receipt  data.');
             return view('admin.exports.good_receipt', [
-                'data' => GoodReceipt::where(function ($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date)
-                    ->whereHas('goodReceiptDetail',function($query){
-                        $query->whereIn('warehouse_id',$this->warehouses);
-                    });
-                    if(!$this->modedata){
-                        $query->where('user_id',session('bo_id'));
-                    }
-                })
-                ->get(),
+                'data' => $data,
                 'modedata'  => $this->modedata,
                 'nominal'   => $this->nominal,
             ]);
         }elseif($this->mode == '2'){
+            $data = GoodReceipt::withTrashed()->where(function ($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date)
+                ->whereHas('goodReceiptDetail',function($query){
+                    $query->whereIn('warehouse_id',$this->warehouses);
+                });
+                if(!$this->modedata){
+                    $query->where('user_id',session('bo_id'));
+                }
+            })
+            ->get();
+            activity()
+                ->performedOn(new GoodReceipt())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Good Issue  data.');
             return view('admin.exports.good_receipt', [
-                'data' => GoodReceipt::withTrashed()->where(function ($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date)
-                    ->whereHas('goodReceiptDetail',function($query){
-                        $query->whereIn('warehouse_id',$this->warehouses);
-                    });
-                    if(!$this->modedata){
-                        $query->where('user_id',session('bo_id'));
-                    }
-                })
-                ->get(),
+                'data' => $data,
                 'modedata'  => $this->modedata,
                 'nominal'   => $this->nominal,
             ]);

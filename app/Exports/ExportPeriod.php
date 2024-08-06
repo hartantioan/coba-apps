@@ -19,6 +19,7 @@ class ExportPeriod implements WithMultipleSheets
     * @return \Illuminate\Support\Collection
     */
     use Exportable;
+    protected $period_id;
     public function __construct(string $period_id)
     {
         $this->period_id = $period_id ? $period_id : '';

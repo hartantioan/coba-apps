@@ -11,9 +11,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportResidence implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $search,$status;
 
     public function __construct(string $search,string $status)
     {
@@ -57,6 +55,12 @@ class ExportResidence implements FromCollection, WithTitle, WithHeadings, WithCu
                 'region_name'   => $row->region->name,
             ];
         }
+
+        activity()
+                ->performedOn(new ResidenceDetail())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export Residence data  .');
 
         return collect($arr);
     }

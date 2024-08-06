@@ -97,6 +97,12 @@ class ExportPersonalCloseBill implements FromCollection, WithTitle, WithHeadings
             
         }
 
+        activity()
+            ->performedOn(new PersonalCloseBill())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding close bill.');
+
         return collect($arr);
     }
 

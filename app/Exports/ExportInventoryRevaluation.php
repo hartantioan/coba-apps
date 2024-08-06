@@ -25,20 +25,32 @@ class ExportInventoryRevaluation implements FromView,ShouldAutoSize
     public function view(): View
     {
         if($this->mode == '1'){
+            $data = InventoryRevaluation::where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new InventoryRevaluation())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export inventory revaluation data.');
             return view('admin.exports.inventory_revaluation', [
-                'data' => InventoryRevaluation::where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data, 
             ]);
         }elseif($this->mode == '2'){
+            $data =  InventoryRevaluation::withTrashed()->where(function($query) {
+                $query->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+            })
+            ->get();
+            activity()
+                ->performedOn(new InventoryRevaluation())
+                ->causedBy(session('bo_id'))
+                ->withProperties($data)
+                ->log('Export inventory revaluation data.');
             return view('admin.exports.inventory_revaluation', [
-                'data' => InventoryRevaluation::withTrashed()->where(function($query) {
-                    $query->where('post_date', '>=',$this->start_date)
-                    ->where('post_date', '<=', $this->end_date);
-                })
-                ->get()
+                'data' => $data
             ]);
         }
     }

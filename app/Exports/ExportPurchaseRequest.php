@@ -136,6 +136,12 @@ class ExportPurchaseRequest implements FromCollection, WithTitle, WithHeadings, 
             ];
         }
 
+        activity()
+            ->performedOn(new PurchaseRequestDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export purchase request .');
+
         return collect($arr);
     }
 

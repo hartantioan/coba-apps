@@ -274,6 +274,11 @@ class ExportPaymentProgressReport implements  FromView,ShouldAutoSize,WithTitle
            
         }
       
+        activity()
+            ->performedOn(new PurchaseOrder())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding progress Report.');
         return view('admin.exports.payment_progress_report', [
             'data' => $array_detail,
             'type' => $this->type,

@@ -8,6 +8,8 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Models\PurchaseOrderDetail;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\PurchaseOrder;
+
 class ExportOutstandingPOHide implements FromView,ShouldAutoSize
 {
     protected $start_date,$end_date,$mode;
@@ -63,6 +65,11 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
             
         }
         
+        activity()
+            ->performedOn(new PurchaseOrderDetail())
+            ->causedBy(session('bo_id'))
+            ->withProperties($data)
+            ->log('Export outstanding PO Hide.');
         
         return view('admin.exports.outstanding_po', [
             'data' => $array,

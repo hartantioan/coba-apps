@@ -3052,13 +3052,15 @@
                 disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
                 disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",",".")),
                 conversion = $('#arr_item' + id).val() ? parseFloat($('#arr_unit' + id).find(':selected').data('conversion')) : 1;
-
-            if(qtylimit > 0){
-                if(qty > qtylimit){
-                    qty = qtylimit;
-                    $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+            if($('#inventory_type').val() === '1'){
+                if(qtylimit > 0){
+                    if(qty > qtylimit){
+                        qty = qtylimit;
+                        $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+                    }
                 }
             }
+            
 
             let qtyConversion = qty * conversion;
 

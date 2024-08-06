@@ -75,7 +75,9 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
                         ->log('Add / edit from excel HardwareItem data.');
                 }
             }else{
-                return null;
+                DB::rollback();
+                $sheet='BOM';
+                throw new RowImportException('Group belum di isi', $row->getIndex(),'Group',$sheet);
             } 
             DB::commit();
         }catch (\Exception $e) {

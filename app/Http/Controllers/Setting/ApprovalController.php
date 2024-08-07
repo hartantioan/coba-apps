@@ -378,7 +378,7 @@ class ApprovalController extends Controller
             $message = '';
             if($query){
                 
-                if(!in_array($query->lookable_type,['purchase_requests','material_requests','purchase_orders','good_issue_requests','close_bill_personals','document_taxes','document_tax_handovers','work_orders','request_spareparts','registrations','marketing_orders','fund_requests','payment_requests','hardware_item_handover'])){
+                if(!in_array($query->approvalSource->lookable_type,['purchase_requests','material_requests','purchase_orders','good_issue_requests','close_bill_personals','document_taxes','document_tax_handovers','work_orders','request_spareparts','registrations','marketing_orders','fund_requests','payment_requests','hardware_item_handover'])){
                     if(!CustomHelper::checkLockAcc($query->approvalSource->lookable->post_date)){
                         return response()->json([
                             'status'  => 500,

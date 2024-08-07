@@ -3151,6 +3151,15 @@
         tax = Math.floor(tax);
         wtax = Math.floor(wtax);
 
+        let balancetemp = total - subtotal;
+
+        if(balancetemp > 0){
+            $('.arr_subtotal').eq($('.arr_subtotal').length - 1).text(
+                formatRupiahIni((parseFloat($('.arr_subtotal').eq($('.arr_subtotal').length - 1).text().replaceAll(".", "").replaceAll(",",".")) - balancetemp).toFixed(2).toString().replace('.',','))
+            );
+            total = total - balancetemp;
+        }
+
         grandtotal = total + tax - wtax + rounding;
 
         subtotalconvert = subtotal * currency_rate;

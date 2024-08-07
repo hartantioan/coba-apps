@@ -2256,6 +2256,25 @@ class PaymentRequestController extends Controller
                     
                     $cek = PaymentRequest::where('code',CustomHelper::decrypt($request->tempPay))->first();
 
+                    $passedDate = true;
+                    $arrErrorDate = [];
+
+                    foreach($cek->paymentRequestDetail as $row){
+                        if($row->purchaseInvoice() || $row->purchaseDownPayment()){
+                            if($request->pay_date_pay < $row->lookable->post_date){
+                                $passedDate = false;
+                                $arrErrorDate[] = $row->lookable->code.' '.date('d/m/Y',strtotime($row->lookable->post_date));
+                            }
+                        }
+                    }
+
+                    if(!$passedDate){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Tanggal Dokumen Bayar '.implode(', ',$arrErrorDate).' tidak boleh kurang dari Tanggal Bayar '.date('d/m/Y',strtotime($request->pay_date_pay)).'. Silahkan rubah tanggal pada dokumen sesuai tanggal bayar.'
+                        ]);
+                    }
+
                     $lastSegment = 'outgoing_payment';
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode = OutgoingPayment::generateCode($menu->document_code.date('y').substr($cek->code,7,2));

@@ -36,8 +36,8 @@
                         <td align="center">{{$row['area']}}</td>
                         <td align="center">{{$row['shading']}}</td>
                         <td align="center">{{$row['production_batch']}}</td>
-                        <td align="center">Saldo Awal</td>
                         <td align="center"></td>
+                        <td align="center">Saldo Awal</td>
                         <td align="right">{{ $row['last_qty'] }}</td>
                     </tr>
                     @php

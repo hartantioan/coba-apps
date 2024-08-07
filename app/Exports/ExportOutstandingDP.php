@@ -35,7 +35,7 @@ class ExportOutstandingDP implements FromView,ShouldAutoSize
         activity()
                 ->performedOn(new PurchaseDownPayment())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export outstanding dp.');
         return view('admin.exports.outstanding_down_payment', [
             'data' => $array,

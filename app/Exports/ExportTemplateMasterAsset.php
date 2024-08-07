@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\AssetGroup;
+use App\Models\HardwareItem;
 use App\Models\Place;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -19,9 +20,10 @@ class ExportTemplateMasterAsset implements WithEvents
         $event->writer->getSheetByIndex(0); #main
         $event->writer->getSheetByIndex(1); #place
         $event->writer->getSheetByIndex(2); #asset group
-    
+        $event->writer->getSheetByIndex(4);
         $asset_group = AssetGroup::where('status','1')->orderBy('code')->get();
         $place = Place::where('status','1')->get();
+        $inventaris = HardwareItem::where('status','1')->get();
         
         $startRow = 2;
         foreach($place as $row){
@@ -33,6 +35,13 @@ class ExportTemplateMasterAsset implements WithEvents
         foreach($asset_group as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($inventaris as $row){
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->item);
             $startRow++;
         }
 

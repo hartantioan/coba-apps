@@ -87,7 +87,7 @@ class ExportDownPaymentAR implements FromView , WithEvents
             activity()
                 ->performedOn(new MarketingOrderDownPayment())
                 ->causedBy(session('bo_id'))
-                ->withProperties($query_data)
+                ->withProperties(null)
                 ->log('Export Downpayment AR data.');
         
             return view('admin.exports.down_payment_ar', [

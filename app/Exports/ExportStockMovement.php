@@ -336,7 +336,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new ItemCogs())
             ->causedBy(session('bo_id'))
-            ->withProperties($query_data)
+            ->withProperties(null)
             ->log('Export stock movement data  .');
         return view('admin.exports.stock_movement', [
             'data' => $combinedArray,

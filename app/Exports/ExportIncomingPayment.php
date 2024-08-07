@@ -35,7 +35,7 @@ class ExportIncomingPayment implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new IncomingPayment())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Incoming payment data.');
             return view('admin.exports.incoming_payment', [
                 'data' => $data
@@ -49,7 +49,7 @@ class ExportIncomingPayment implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new IncomingPayment())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Incoming payment data.');
             return view('admin.exports.incoming_payment', [
                 'data' => $data

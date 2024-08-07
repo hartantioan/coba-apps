@@ -34,7 +34,7 @@ class ExportDepreciation implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new Depreciation())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export depreciation data.');
 
             return view('admin.exports.depreciation', [
@@ -51,7 +51,7 @@ class ExportDepreciation implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new Depreciation())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export depreciation datas.');
 
             return view('admin.exports.depreciation', [

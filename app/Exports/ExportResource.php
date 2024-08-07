@@ -72,7 +72,7 @@ class ExportResource implements FromCollection, WithTitle, WithHeadings, WithCus
         activity()
                 ->performedOn(new Resource())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Resource  .');
 
         return collect($arr);

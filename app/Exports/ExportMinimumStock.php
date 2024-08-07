@@ -80,7 +80,7 @@ class ExportMinimumStock implements FromView,ShouldAutoSize
         activity()
                 ->performedOn(new ItemStock())
                 ->causedBy(session('bo_id'))
-                ->withProperties($query_data)
+                ->withProperties(null)
                 ->log('Export minimum stock data.');
       
         return view('admin.exports.minimum_stock', [

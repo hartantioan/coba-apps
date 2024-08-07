@@ -40,7 +40,7 @@ class ExportBomStandard implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new BomStandard())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Bom Standar data.');
 
         return view('admin.exports.bom_standard', [

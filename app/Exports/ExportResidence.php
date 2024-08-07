@@ -59,7 +59,7 @@ class ExportResidence implements FromCollection, WithTitle, WithHeadings, WithCu
         activity()
                 ->performedOn(new ResidenceDetail())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Residence data  .');
 
         return collect($arr);

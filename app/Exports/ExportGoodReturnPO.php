@@ -34,7 +34,7 @@ class ExportGoodReturnPO implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReturnPO())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good return PO  data.');
             return view('admin.exports.good_return_po', [
                 'data' => $data
@@ -48,7 +48,7 @@ class ExportGoodReturnPO implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReturnPO())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good return PO  data.');
             return view('admin.exports.good_return_po', [
                 'data' => $data

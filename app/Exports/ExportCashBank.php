@@ -102,7 +102,7 @@ class ExportCashBank implements FromCollection, WithTitle, WithHeadings, ShouldA
         activity()
         ->performedOn(new Coa())
         ->causedBy(session('bo_id'))
-        ->withProperties($query_data)
+        ->withProperties(null)
         ->log('Export Kas Bank data.');
 
         return collect($arr);

@@ -45,7 +45,7 @@ class ExportProject implements FromCollection, WithTitle, WithHeadings, WithCust
         activity()
             ->performedOn(new Project())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export project.');
         return $data;
     }

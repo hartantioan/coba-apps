@@ -58,7 +58,7 @@ class ExportAssetGroup implements FromCollection, WithTitle, WithHeadings, WithC
         activity()
             ->performedOn(new AssetGroup())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Group Asset data.');
 
         return collect($arr);

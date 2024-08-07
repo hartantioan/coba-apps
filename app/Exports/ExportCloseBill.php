@@ -39,7 +39,7 @@ class ExportCloseBill implements FromView
              activity()
                 ->performedOn(new CloseBill())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Close Bill data.');
             return view('admin.exports.close_bill', [
                 'data' => $data
@@ -60,7 +60,7 @@ class ExportCloseBill implements FromView
             activity()
                 ->performedOn(new CloseBill())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Close Bill data.');
 
             return view('admin.exports.close_bill', [

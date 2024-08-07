@@ -156,7 +156,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new PurchaseDownPayment())
                 ->causedBy(session('bo_id'))
-                ->withProperties($query_data)
+                ->withProperties(null)
                 ->log('Export puchase downpayment data.');
         
             return view('admin.exports.down_payment', [

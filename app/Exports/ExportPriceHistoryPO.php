@@ -65,7 +65,7 @@ class ExportPriceHistoryPO implements FromView
         activity()
             ->performedOn(new PurchaseOrderDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($query_data)
+            ->withProperties(null)
             ->log('Export price history po.');
       
         return view('admin.exports.price_history_po', [

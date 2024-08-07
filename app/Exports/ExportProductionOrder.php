@@ -28,7 +28,7 @@ class ExportProductionOrder implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionOrder())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production order.');
             return view('admin.exports.production_order', [
                 'data' => $data
@@ -42,7 +42,7 @@ class ExportProductionOrder implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionOrder())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production order.');
             return view('admin.exports.production_order', [
                 'data' => $data

@@ -30,7 +30,7 @@ class ExportQualityControl implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodScale())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Quality Control .');
             return view('admin.exports.good_scale', [
                 'data' => $data
@@ -44,7 +44,7 @@ class ExportQualityControl implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodScale())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Quality Control .');
             return view('admin.exports.good_scale', [
                 'data' => $data

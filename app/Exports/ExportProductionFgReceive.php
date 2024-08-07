@@ -28,7 +28,7 @@ class ExportProductionFgReceive implements  FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionFgReceive())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production fg receive.');
             return view('admin.exports.production_fg_receive', [
                 'data' => $data
@@ -42,7 +42,7 @@ class ExportProductionFgReceive implements  FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionFgReceive())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production fg receive.');
             return view('admin.exports.production_fg_receive', [
                 'data' => $data

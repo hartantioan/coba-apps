@@ -95,7 +95,7 @@ class ExportCoa implements FromCollection, WithTitle, WithHeadings, WithCustomSt
         activity()
                 ->performedOn(new Coa())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Coa data.');
 
         return collect($arr);

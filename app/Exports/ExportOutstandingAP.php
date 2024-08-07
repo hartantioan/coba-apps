@@ -329,7 +329,7 @@ class ExportOutstandingAP implements FromView ,ShouldAutoSize
         activity()
                 ->performedOn(new PaymentRequestDetail())
                 ->causedBy(session('bo_id'))
-                ->withProperties($results)
+                ->withProperties(null)
                 ->log('Export outstanding ap.');
 
         return view('admin.exports.outstanding_ap', [

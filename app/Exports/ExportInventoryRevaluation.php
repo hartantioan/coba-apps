@@ -33,7 +33,7 @@ class ExportInventoryRevaluation implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new InventoryRevaluation())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export inventory revaluation data.');
             return view('admin.exports.inventory_revaluation', [
                 'data' => $data, 
@@ -47,7 +47,7 @@ class ExportInventoryRevaluation implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new InventoryRevaluation())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export inventory revaluation data.');
             return view('admin.exports.inventory_revaluation', [
                 'data' => $data

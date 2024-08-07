@@ -114,7 +114,7 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
         activity()
             ->performedOn(new User())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export user data  .');
         return collect($arr);
     }

@@ -32,7 +32,7 @@ class ExportOutstandingFundRequest implements FromView,ShouldAutoSize
         activity()
                 ->performedOn(new FundRequest())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export outstanding fund request.');
         
         return view('admin.exports.outstanding_fr', [

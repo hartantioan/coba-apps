@@ -125,7 +125,7 @@ class ExportMarketingOrderProductionTransactionPage implements FromCollection, W
         activity()
                 ->performedOn(new ProductionOrder())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export marketing order production data.');
 
         return collect($arr);

@@ -67,7 +67,7 @@ class ExportMachine implements FromCollection, WithTitle, WithHeadings, WithCust
         activity()
             ->performedOn(new Machine())
             ->causedBy(session('bo_id'))
-            ->withProperties($lines)
+            ->withProperties(null)
             ->log('Export machine data.');
         return collect($arr);
     }

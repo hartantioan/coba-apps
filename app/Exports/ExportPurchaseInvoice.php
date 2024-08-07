@@ -152,7 +152,7 @@ class ExportPurchaseInvoice implements FromCollection, WithTitle, WithHeadings, 
         activity()
         ->performedOn(new PurchaseInvoiceDetail())
         ->causedBy(session('bo_id'))
-        ->withProperties($data)
+        ->withProperties(null)
         ->log('Export purchase Invoice .');
 
         return collect($arr);

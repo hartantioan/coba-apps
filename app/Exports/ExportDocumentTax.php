@@ -33,7 +33,7 @@ class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
                 'Digunakan' => '2',
                 'Ditolak' => '3',
                 'Disetujui' => '4',
-                default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
+                default => null,
               };
             
             $taxbos = DocumentTax::where(function($query) use($result,$status) {
@@ -55,7 +55,7 @@ class ExportDocumentTax implements WithMultipleSheets,ShouldAutoSize
         activity()
             ->performedOn(new DocumentTax())
             ->causedBy(session('bo_id'))
-            ->withProperties($taxes)
+            ->withProperties(null)
             ->log('Export tax data.');
         
 

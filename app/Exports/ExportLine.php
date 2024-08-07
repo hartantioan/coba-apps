@@ -63,7 +63,7 @@ class ExportLine implements FromCollection, WithTitle, WithHeadings, WithCustomS
         activity()
             ->performedOn(new Line())
             ->causedBy(session('bo_id'))
-            ->withProperties($lines)
+            ->withProperties(null)
             ->log('Export Line data.');
 
         return collect($arr);

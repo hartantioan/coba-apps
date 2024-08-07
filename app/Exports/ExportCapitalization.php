@@ -32,7 +32,7 @@ class ExportCapitalization implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new Capitalization())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export capitalization data.');
             
             return view('admin.exports.capitalization', [
@@ -47,7 +47,7 @@ class ExportCapitalization implements FromView,ShouldAutoSize
              activity()
                 ->performedOn(new Capitalization())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export capitalization data.');
             return view('admin.exports.capitalization', [
                 'data' => $data

@@ -36,7 +36,7 @@ class ExportJournal implements FromView, ShouldAutoSize
             activity()
             ->performedOn(new Journal())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Journal data.');
 
             return view('admin.exports.journal', [
@@ -52,7 +52,7 @@ class ExportJournal implements FromView, ShouldAutoSize
             activity()
             ->performedOn(new Journal())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Journal data.');
 
             return view('admin.exports.journal', [

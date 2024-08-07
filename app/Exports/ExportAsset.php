@@ -83,7 +83,7 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
         activity()
             ->performedOn(new Asset())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Asset data.');
 
         return collect($arr);

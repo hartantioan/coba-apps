@@ -27,7 +27,7 @@ class ExportProductionSchedule implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionSchedule())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production schedule.');
             return view('admin.exports.production_schedule', [
                 'data' => $data
@@ -41,7 +41,7 @@ class ExportProductionSchedule implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionSchedule())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production schedule.');
             return view('admin.exports.production_schedule', [
                 'data' => $data

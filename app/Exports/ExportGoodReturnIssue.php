@@ -33,7 +33,7 @@ class ExportGoodReturnIssue implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReturnIssue())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good return issue  data.');
             return view('admin.exports.good_return_issue', [
                 'data' => $data
@@ -47,7 +47,7 @@ class ExportGoodReturnIssue implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReturnIssue())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good return issue  data.');
             return view('admin.exports.good_return_issue', [
                 'data' => $data

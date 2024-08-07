@@ -138,7 +138,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
         activity()
             ->performedOn(new Coa())
             ->causedBy(session('bo_id'))
-            ->withProperties($query_data)
+            ->withProperties(null)
             ->log('Export Ledger data.');
 
         return collect($arr);

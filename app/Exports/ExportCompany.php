@@ -67,7 +67,7 @@ class ExportCompany implements FromCollection, WithTitle, WithHeadings, WithCust
         activity()
                 ->performedOn(new Company())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export company data.');
 
         return collect($arr);

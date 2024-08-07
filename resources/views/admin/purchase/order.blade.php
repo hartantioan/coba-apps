@@ -3154,8 +3154,6 @@
         let totaltemp = subtotal - discount;
         let balancetemp = total - totaltemp;
 
-        console.log(balancetemp);
-
         if(balancetemp > 0){
             total = total - balancetemp;
         }

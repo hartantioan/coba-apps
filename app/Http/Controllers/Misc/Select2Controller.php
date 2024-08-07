@@ -3335,33 +3335,39 @@ class Select2Controller extends Controller {
 
         foreach($data as $d) {
             $details = [];
-
+            $hasBom = true;
             foreach($d->marketingOrderPlanDetail as $row){
                 $cekBom = $row->item->bomPlace($request->place_id);
-                $details[] = [
-                    'mopd_id'           => $row->id,
-                    'item_id'           => $row->item_id,
-                    'item_code'         => $row->item->code,
-                    'item_name'         => $row->item->name,
-                    'qty'               => CustomHelper::formatConditionalQty($row->qty),
-                    'uom'               => $row->item->uomUnit->code,
-                    'request_date'      => date('d/m/Y',strtotime($row->request_date)),
-                    'note'              => $row->note ?? '',
-                    'note2'             => $row->note2 ?? '',
-                    'priority'          => $row->priority,
-                    'has_bom'           => $cekBom->exists() ? '1' : '',
-                    'place_id'          => $request->place_id,
-                    'list_warehouse'    => $row->item->warehouseList(),
-                    'list_bom'          => $row->item->listBom(),
+                if(!$cekBom){
+                    $hasBom = false;
+                }else{
+                    $details[] = [
+                        'mopd_id'           => $row->id,
+                        'item_id'           => $row->item_id,
+                        'item_code'         => $row->item->code,
+                        'item_name'         => $row->item->name,
+                        'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                        'uom'               => $row->item->uomUnit->code,
+                        'request_date'      => date('d/m/Y',strtotime($row->request_date)),
+                        'note'              => $row->note ?? '',
+                        'note2'             => $row->note2 ?? '',
+                        'priority'          => $row->priority,
+                        'has_bom'           => $cekBom->exists() ? '1' : '',
+                        'place_id'          => $request->place_id,
+                        'list_warehouse'    => $row->item->warehouseList(),
+                        'list_bom'          => $row->item->listBom(),
+                    ];
+                }
+            }
+            if($hasBom){
+                $response[] = [
+                    'id'   			=> $d->id,
+                    'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)),
+                    'table'         => $d->getTable(),
+                    'details'       => $details,
+                    'code'          => $d->code,
                 ];
             }
-            $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)),
-                'table'         => $d->getTable(),
-                'details'       => $details,
-                'code'          => $d->code,
-            ];
         }
 
         return response()->json(['items' => $response]);

@@ -3352,7 +3352,7 @@ class Select2Controller extends Controller {
                         'note'              => $row->note ?? '',
                         'note2'             => $row->note2 ?? '',
                         'priority'          => $row->priority,
-                        'has_bom'           => $cekBom->exists() ? '1' : '',
+                        'has_bom'           => $cekBom ? '1' : '',
                         'place_id'          => $request->place_id,
                         'list_warehouse'    => $row->item->warehouseList(),
                         'list_bom'          => $row->item->listBom(),

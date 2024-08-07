@@ -4464,6 +4464,9 @@ class CustomHelper {
 									'balance_status'	=> '1'
 								]);
 							}
+							$row->purchaseDownPayment->update([
+								'balance_status'	=> '1',
+							]);
 						}
 					}
 				}

@@ -223,7 +223,7 @@ class AssetGroupController extends Controller
 
     public function show(Request $request){
         $itemgroup = AssetGroup::find($request->id);
-        $itemgroup['cost_coa_name'] = $itemgroup->costCoa->name;
+        $itemgroup['cost_coa_name'] = $itemgroup->costCoa->code.' - '.$itemgroup->costCoa->name;
         				
 		return response()->json($itemgroup);
     }

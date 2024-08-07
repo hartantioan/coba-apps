@@ -3151,8 +3151,10 @@
         tax = Math.floor(tax);
         wtax = Math.floor(wtax);
 
-        let totaltemp = total - discount;
-        let balancetemp = totaltemp - subtotal;
+        let totaltemp = subtotal - discount;
+        let balancetemp = total - totaltemp;
+
+        console.log(balancetemp);
 
         if(balancetemp > 0){
             $('.arr_subtotal').eq($('.arr_subtotal').length - 1).text(

@@ -588,6 +588,7 @@
 
         $('#body-asset').on('click', '.delete-data-asset', function() {
             $(this).closest('tr').remove();
+            reInitializedAsset();
         });
     });
 

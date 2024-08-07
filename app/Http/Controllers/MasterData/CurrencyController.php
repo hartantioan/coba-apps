@@ -35,6 +35,7 @@ class CurrencyController extends Controller
             'document_text',
             'symbol',
             'type',
+            'max_decimal'
         ];
 
         $start  = $request->start;
@@ -88,6 +89,7 @@ class CurrencyController extends Controller
                     $val->document_text,
                     $val->symbol,
                     $val->type(),
+                    $val->max_decimal,
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown accent-2 white-text btn-small" data-popup="tooltip" title="History" onclick="history(' . $val->id . ')"><i class="material-icons dp48">format_list_numbered</i></button>
@@ -140,6 +142,7 @@ class CurrencyController extends Controller
                     $query->document_text   = $request->document_text;
                     $query->symbol          = $request->symbol;
                     $query->type            = $request->type;
+                    $query->max_decimal     = $request->max_dec;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -155,6 +158,7 @@ class CurrencyController extends Controller
                         'document_text' => $request->document_text,
                         'symbol'        => $request->symbol,
                         'type'          => $request->type,
+                        'max_decimal'   => $request->max_dec,
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

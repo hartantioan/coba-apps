@@ -74,7 +74,8 @@
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.text_document') }}</th>
                                                         <th>{{ __('translations.symbol') }}</th>
-                                                        <th>{{ __('translations.currency_type') }}/th>
+                                                        <th>{{ __('translations.currency_type') }}</th>
+                                                        <th>Max Decimal</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -122,11 +123,15 @@
                             <label class="active" for="symbol">{{ __('translations.symbol') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
+                            <input id="max_dec" name="max_dec" type="number" placeholder="Maks desimal">
+                            <label class="active" for="max_dec">Max Decimal</label>
+                        </div>
+                        <div class="input-field col s12 m6">
                             <select id="type" name="type" class="browser-default">
                                 <option value="1">{{ __('translations.local') }}</option>
                                 <option value="2">{{ __('translations.foreign') }}</option>
                             </select>
-                            <label for="type" class="active">{{ __('translations.currency_type') }}/label>
+                            <label for="type" class="active">{{ __('translations.currency_type') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <div class="switch mb-1">
@@ -275,6 +280,7 @@
                 { name: 'document_text', className: 'center-align' },
                 { name: 'symbol', className: 'center-align' },
                 { name: 'type', className: 'center-align' },
+                { name: 'max_decimal', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

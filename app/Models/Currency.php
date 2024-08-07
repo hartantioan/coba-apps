@@ -20,7 +20,8 @@ class Currency extends Model
         'document_text',
         'symbol',
         'type',
-        'status'
+        'status',
+        'max_decimal'
     ];
 
     public function type(){

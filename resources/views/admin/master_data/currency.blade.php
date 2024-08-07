@@ -414,6 +414,7 @@
                 $('#code').val(response.code);
                 $('#name').val(response.name);
                 $('#document_text').val(response.document_text);
+                $('#max_dec').val(response.max_decimal);
                 $('#symbol').val(response.symbol);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

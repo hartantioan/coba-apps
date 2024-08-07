@@ -949,6 +949,11 @@ class Select2Controller extends Controller {
                 })
                 ->where('status','1')
                 ->whereNull('date')
+                ->where(function($query)use($request){
+                    if($request->arr_id){
+                        $query->whereNotIn('id',$request->arr_id);
+                    }
+                })
                 ->get();
 
         foreach($data as $d) {

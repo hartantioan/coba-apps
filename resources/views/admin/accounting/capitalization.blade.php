@@ -753,7 +753,41 @@
             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
             select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
             $('#asset_id').empty();
+            reInitializedAsset();
         }
+    }
+
+    function reInitializedAsset(){
+        let arr = [];
+
+        $('input[name^="arr_asset_id[]"]').each(function(index){
+            arr.push($(this).val());
+        });
+
+        $('#asset_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/asset_capitalization") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        arr_id: arr,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function rowDetail(data) {

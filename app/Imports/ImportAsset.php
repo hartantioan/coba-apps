@@ -40,7 +40,7 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
             'asset_group_id' =>$asset_group->id,
             'method' => $method,
             'note' => $row['note'],
-            'hardware_item_id' => $inventaris->id,
+            'hardware_item_id' => $inventaris->id ?? null ,
             'status' => '1',
         ]);
         activity()

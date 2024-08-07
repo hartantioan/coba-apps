@@ -38,7 +38,7 @@ class ExportGoodReceiptFinance implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReceipt())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good Issue  data.');
             return view('admin.exports.good_receipt_finance', [
                 'data' => $data,
@@ -60,7 +60,7 @@ class ExportGoodReceiptFinance implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReceipt())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good Issue  data.');
             return view('admin.exports.good_receipt_finance', [
                 'data' => $data,

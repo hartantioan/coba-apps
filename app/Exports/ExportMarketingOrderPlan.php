@@ -31,7 +31,7 @@ class ExportMarketingOrderPlan implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new MarketingOrderPlan())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export marketing order plan data.');
             return view('admin.exports.marketing_order_plan', [
                 'data' => $data
@@ -45,7 +45,7 @@ class ExportMarketingOrderPlan implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new MarketingOrderPlan())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export marketing order plan data.');
             return view('admin.exports.marketing_order_plan', [
                 'data' => $data

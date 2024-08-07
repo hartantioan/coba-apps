@@ -117,7 +117,7 @@ class ExportItem implements FromCollection, WithTitle, WithHeadings, WithCustomS
         activity()
             ->performedOn(new Item())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export item data.');
 
         return collect($arr);

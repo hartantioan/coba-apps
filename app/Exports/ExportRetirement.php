@@ -33,7 +33,7 @@ class ExportRetirement implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new Retirement())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export retirement data  .');
             return view('admin.exports.retirement', [
                 'data' => $data
@@ -47,7 +47,7 @@ class ExportRetirement implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new Retirement())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export retirement data  .');
             return view('admin.exports.retirement', [
                 'data' => $data

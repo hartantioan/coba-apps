@@ -89,7 +89,7 @@ class ExportDocumentTaxTable implements WithMultipleSheets,ShouldAutoSize
         activity()
         ->performedOn(new DocumentTax())
         ->causedBy(session('bo_id'))
-        ->withProperties($taxes)
+        ->withProperties(null)
         ->log('Export tax data.');
         
 

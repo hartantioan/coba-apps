@@ -34,7 +34,7 @@ class ExportInventoryTransferOut implements FromView , ShouldAutoSize
             activity()
                 ->performedOn(new InventoryTransferOut())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export inventory transfer out data.');
             return view('admin.exports.inventory_transfer_out', [
                 'data' => $data
@@ -48,7 +48,7 @@ class ExportInventoryTransferOut implements FromView , ShouldAutoSize
             activity()
                 ->performedOn(new InventoryTransferOut())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export inventory transfer out data.');
             return view('admin.exports.inventory_transfer_out', [
                 'data' => $data

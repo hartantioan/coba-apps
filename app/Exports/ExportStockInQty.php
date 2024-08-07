@@ -72,7 +72,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new ItemStock())
             ->causedBy(session('bo_id'))
-            ->withProperties($query_data)
+            ->withProperties(null)
             ->log('Export stock in qty data  .');
         return view('admin.exports.stock_in_qty', [
             'data' => $array_filter,

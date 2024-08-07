@@ -105,7 +105,7 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
         activity()
             ->performedOn(new ProductionBatch())
             ->causedBy(session('bo_id'))
-            ->withProperties($query_data)
+            ->withProperties(null)
             ->log('Export production batch.');
 
         return collect($arr);

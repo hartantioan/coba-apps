@@ -57,7 +57,7 @@ class ExportWarehouse implements FromCollection, WithTitle, WithHeadings, WithCu
         activity()
             ->performedOn(new Warehouse())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export warehouse data .');
 
         return collect($arr);

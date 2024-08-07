@@ -42,7 +42,7 @@ class ExportDepartment implements FromCollection, WithTitle, WithHeadings, WithC
         activity()
             ->performedOn(new Department())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export department data.');
 
         return $data;

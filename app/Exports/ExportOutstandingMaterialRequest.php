@@ -66,7 +66,7 @@ class ExportOutstandingMaterialRequest implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new MaterialRequestDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding material request.');
         
         return view('admin.exports.outstanding_material_request', [

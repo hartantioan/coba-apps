@@ -64,7 +64,7 @@ class ExportRegion extends DefaultValueBinder implements WithCustomValueBinder, 
         activity()
             ->performedOn(new Region())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export region data.');
             
         return collect($array);

@@ -42,7 +42,7 @@ class ExportBom implements FromView
         activity()
             ->performedOn(new Bom())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export Bom data.');
         return view('admin.exports.bom', [
             'data' => $data

@@ -50,7 +50,7 @@ class ExportItemStockLocation implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new ItemStock())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export lokasi item stock data.');
       
         return view('admin.exports.item_stock_location', [

@@ -68,7 +68,7 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new PurchaseOrderDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding PO Hide.');
         
         return view('admin.exports.outstanding_po', [

@@ -474,8 +474,16 @@
             var status= $(item).find('td:nth-child(5)').text().trim();
             arr_status.push(status);
         });
-
-        window.location = "{{ Request::url() }}/export?no_faktur=" + arr_id_temp+"&arr_status=" + arr_status; 
+        if (arr_id_temp.length > 0) {
+            window.location = "{{ Request::url() }}/export?no_faktur=" + arr_id_temp + "&arr_status=" + arr_status;
+        } else {
+            swal({
+                title: 'No Data Selected!',
+                text: 'Please select at least one row.',
+                icon: 'warning'
+            });
+        }
+        
     }
 
     function excelFilterTable(){

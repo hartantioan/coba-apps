@@ -75,7 +75,7 @@ class ExportPlace implements FromCollection, WithTitle, WithHeadings, WithCustom
         activity()
             ->performedOn(new Place())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export place data.');
 
         return collect($arr);

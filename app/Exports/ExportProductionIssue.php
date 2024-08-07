@@ -28,7 +28,7 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionIssue())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production issue.');
             return view('admin.exports.production_issue', [
                 'data' => $data
@@ -42,7 +42,7 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionIssue())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production issue.');
             return view('admin.exports.production_issue', [
                 'data' => $data

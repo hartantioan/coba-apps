@@ -58,7 +58,7 @@ class ExportItemGroup implements FromCollection, WithTitle, WithHeadings, WithCu
         activity()
             ->performedOn(new ItemGroup())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export grup item data.');
 
         return collect($arr);

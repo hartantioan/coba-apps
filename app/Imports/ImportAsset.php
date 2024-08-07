@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Asset;
 use App\Models\AssetGroup;
+use App\Models\HardwareItem;
 use App\Models\Place;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -28,6 +29,8 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
         $asset_group_code=explode('#',$row['asset_group_id'])[0];
         $asset_group = AssetGroup::where('code',$asset_group_code)->first();
         $method =explode('#',$row['method'])[0];
+        $inventaris_code =explode('#',$row['inventaris'])[0];
+        $inventaris = HardwareItem::where('code',$inventaris_code)->first();
         $row = $row->toArray();
         $query = Asset::create([
             'code' => $row['code'],
@@ -37,6 +40,7 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
             'asset_group_id' =>$asset_group->id,
             'method' => $method,
             'note' => $row['note'],
+            'hardware_item_id' => $inventaris->id,
             'status' => '1',
         ]);
         activity()

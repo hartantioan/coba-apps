@@ -60,7 +60,7 @@ class ExportPosition implements FromCollection, WithTitle, WithHeadings, WithCus
         activity()
             ->performedOn(new Position())
             ->causedBy(session('bo_id'))
-            ->withProperties($position)
+            ->withProperties(null)
             ->log('Export position data.');
 
         return collect($arr);

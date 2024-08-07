@@ -42,7 +42,7 @@ class ExportMaterialRequest implements FromView
             activity()
                 ->performedOn(new MaterialRequestDetail())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export material Request data.');
 
             return view('admin.exports.material_request', [
@@ -70,7 +70,7 @@ class ExportMaterialRequest implements FromView
             activity()
                 ->performedOn(new MaterialRequestDetail())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export material Request data.');
             return view('admin.exports.material_request', [
                 'data' => $data

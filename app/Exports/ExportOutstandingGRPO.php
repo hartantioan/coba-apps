@@ -50,7 +50,7 @@ class ExportOutstandingGRPO implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new GoodReceiptDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding grpo.');
         
         return view('admin.exports.outstanding_po', [

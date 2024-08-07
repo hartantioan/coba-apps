@@ -33,7 +33,7 @@ class ExportLockPeriod implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new LockPeriod())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export lock period data.');
             return view('admin.exports.lock_period', [
                 'data' => $data
@@ -47,7 +47,7 @@ class ExportLockPeriod implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new LockPeriod())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export lock period data.');
             return view('admin.exports.lock_period', [
                 'data' => $data

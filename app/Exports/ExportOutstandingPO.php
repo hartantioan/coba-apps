@@ -57,7 +57,7 @@ class ExportOutstandingPO implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new PurchaseOrderDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding purchase order.');
         
         return view('admin.exports.outstanding_po', [

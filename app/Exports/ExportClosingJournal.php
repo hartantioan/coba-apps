@@ -35,7 +35,7 @@ class ExportClosingJournal implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ClosingJournal())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Close Bill data.');
 
             return view('admin.exports.closing_journal', [
@@ -52,7 +52,7 @@ class ExportClosingJournal implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ClosingJournal())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Closing Journal data.');
 
             return view('admin.exports.closing_journal', [

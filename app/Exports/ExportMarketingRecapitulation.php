@@ -58,7 +58,7 @@ class ExportMarketingRecapitulation implements FromView , WithEvents
         activity()
                 ->performedOn(new MarketingOrder())
                 ->causedBy(session('bo_id'))
-                ->withProperties($mo)
+                ->withProperties(null)
                 ->log('Export market recapitulation marketing data.');
 
         return view('admin.exports.sales_recapitulation', [

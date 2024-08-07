@@ -57,7 +57,7 @@ class ExportDocumentTaxHandoverTable implements ShouldAutoSize,FromView
         activity()
             ->performedOn(new DocumentTaxHandover())
             ->causedBy(session('bo_id'))
-            ->withProperties($documentTaxHandover)
+            ->withProperties(null)
             ->log('Export tax handover data.');
         return view('admin.exports.document_tax_detail_handover', [
             'data' => $handover_detail,

@@ -27,7 +27,7 @@ class ExportProductionHandover implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionHandover())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production handover.');
             return view('admin.exports.production_handover', [
                 'data' => $data
@@ -41,7 +41,7 @@ class ExportProductionHandover implements FromView, ShouldAutoSize
             activity()
                 ->performedOn(new ProductionHandover())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export production handover.');
             return view('admin.exports.production_handover', [
                 'data' => $data

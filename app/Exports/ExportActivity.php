@@ -10,9 +10,7 @@ use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class ExportActivity implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
+    protected $status,$search;
 
     public function __construct(string $search, string $status)
     {

@@ -61,7 +61,7 @@ class ExportOutstandingLC implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new LandedCostFeeDetail())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding Lc.');
         
         return view('admin.exports.outstanding_lc', [

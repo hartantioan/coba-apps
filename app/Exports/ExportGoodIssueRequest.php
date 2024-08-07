@@ -33,7 +33,7 @@ class ExportGoodIssueRequest implements FromView
             activity()
                 ->performedOn(new GoodIssueRequest())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good Issue  data.');
             return view('admin.exports.good_issue_request', [
                 'data' => $data
@@ -47,7 +47,7 @@ class ExportGoodIssueRequest implements FromView
             activity()
                 ->performedOn(new GoodIssueRequest())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good Issue  data.');
             return view('admin.exports.good_issue_request', [
                 'data' => $data

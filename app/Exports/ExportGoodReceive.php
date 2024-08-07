@@ -31,7 +31,7 @@ class ExportGoodReceive implements FromView,ShouldAutoSize
                 activity()
                 ->performedOn(new GoodReceive())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good receive  data.');
             return view('admin.exports.good_receive', [
                 'data' => $data
@@ -45,7 +45,7 @@ class ExportGoodReceive implements FromView,ShouldAutoSize
             activity()
                 ->performedOn(new GoodReceive())
                 ->causedBy(session('bo_id'))
-                ->withProperties($data)
+                ->withProperties(null)
                 ->log('Export Good receive  data.');
             return view('admin.exports.good_receive', [
                 'data' => $data

@@ -40,7 +40,7 @@ class ExportOutstandingInvoice implements FromView,ShouldAutoSize
         activity()
             ->performedOn(new PurchaseInvoice())
             ->causedBy(session('bo_id'))
-            ->withProperties($data)
+            ->withProperties(null)
             ->log('Export outstanding invoice.');
         
         return view('admin.exports.outstanding_invoice', [

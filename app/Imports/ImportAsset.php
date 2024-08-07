@@ -30,7 +30,7 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
         $asset_group = AssetGroup::where('code',$asset_group_code)->first();
         $method =explode('#',$row['method'])[0];
         $inventaris_code =explode('#',$row['inventaris'])[0];
-        $inventaris = HardwareItem::where('code',$inventaris_code)->first();
+        $inventaris = HardwareItem::where('code',$inventaris_code)->first() ?? null;
         $row = $row->toArray();
         $query = Asset::create([
             'code' => $row['code'],

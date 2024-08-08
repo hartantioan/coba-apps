@@ -3153,7 +3153,7 @@
         let balancetemp = Math.round((total - totaltemp) * 100) /100;
 
       
-        if(balancetemp != 0){
+        if(balancetemp != 0 && id_biggest_total){
             total = totaltemp;
             var biggestTotalValue = parseFloat($('#arr_nominal_total' + id_biggest_total).val().replaceAll(".", "").replaceAll(",","."));
       

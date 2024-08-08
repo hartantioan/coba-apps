@@ -14,6 +14,7 @@ use App\Models\ReceptionHardwareItemsUsage;
 use App\Models\RequestRepairHardwareItemsUsage;
 use App\Models\ReturnHardwareItemsUsage;
 use App\Models\User;
+use App\Models\HardwareItemGroup;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use App\Helpers\PrintHelper;
+use App\Exports\ExportHardwareItem;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\ExportTemplateMasterHardwareItem;
 use App\Imports\HardwareItemImport;
@@ -41,6 +43,7 @@ class HardwareItemController extends Controller
             'title' => 'Item Hardware',
             'content' => 'admin.master_data.hardware_item',
             'department'    => Department::where('status','1')->get(),
+            'group'         => HardwareItemGroup::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             
         ];
@@ -71,10 +74,13 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('item', 'like', "%$search%")
+                            ->orWhere('code', 'like', "%$search%")
                             ->orWhere('detail1', 'like', "%$search%");
                     });
                 }
-
+                if($request->group){
+                    $query->where('hardware_item_group_id',$request->group);
+                }
                 if($request->status){
                     $query->where('status', $request->status);
                 }
@@ -88,10 +94,13 @@ class HardwareItemController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->orWhere('item', 'like', "%$search%")
+                            ->orWhere('code', 'like', "%$search%")
                             ->orWhere('detail1', 'like', "%$search%");
                     });
                 }
-
+                if($request->group){
+                    $query->where('hardware_item_group_id',$request->group);
+                }
                 if($request->status){
                     $query->where('status', $request->status);
                 }
@@ -269,6 +278,14 @@ class HardwareItemController extends Controller
 
     public function getImportExcel(){
         return Excel::download(new ExportTemplateMasterHardwareItem(), 'format_master_hardware_item'.uniqid().'.xlsx');
+    }
+
+    public function export(Request $request){
+        $search = $request->search ? $request->search : '';
+        $status = $request->status ? $request->status : '';
+        $group = $request->group ? $request->group : '';
+		
+		return Excel::download(new ExportHardwareItem($search,$status,$group), 'inventaris_'.uniqid().'.xlsx');
     }
 
 

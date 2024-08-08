@@ -25,6 +25,16 @@ class HardwareItem extends Model
         'status',
     ];
 
+    public function statusRaw(){
+        $status = match ($this->status) {
+            '1' => 'Aktif',
+            '2' => 'Tidak Aktif',
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
+    
     public function status(){
         switch($this->status) {
             case '1':

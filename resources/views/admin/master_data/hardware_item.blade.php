@@ -57,7 +57,7 @@
                         <div class="col s12">
                             <div class="card-panel">
                                 <div class="row">
-                                    <div class="col s12 ">
+                                    <div class="col m4 s12 ">
                                         <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
@@ -66,6 +66,24 @@
                                                 <option value="2">{{ __('translations.non_active') }}</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    <div class="col m4 s12 ">
+                                        <label for="filter_group" style="font-size:1.2rem;">Filter Group :</label>
+                                        <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
+                                            <select class="form-control" id="filter_group" name="filter_group" onchange="loadDataTable()">
+                                                <option value="">Semua</option>
+                                                @foreach($group as $row)
+                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col m4 s12">
+                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                            <span class="hide-on-small-onl">Excel</span>
+                                            <i class="material-icons right">view_list</i>
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -90,6 +108,7 @@
                                                 <span class="hide-on-small-onl">{{ __('translations.print') }} Sticker Multi</span>
                                                 <i class="material-icons right">local_printshop</i>
                                             </a>
+                                            
                                             <table id="datatable_serverside" >
                                                 <thead>
                                                     <tr>
@@ -1179,5 +1198,12 @@
             });
         }
         
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        var group = $('#filter_group').val();
+        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&group=" + group;
     }
 </script>

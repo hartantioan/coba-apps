@@ -274,7 +274,7 @@
                         <td class="center-align" rowspan="5">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->code.' - '.$row->item->name : $row->coa->code.' - '.$row->coa->name }}</td>
                         <td class="center-align">{{ $row->item_id ? $row->item->itemGroup->name : '-' }}</td>
-                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qtyStock()) }}</td>
+                        <td class="center-align">{{ $row->item_id ? CustomHelper::formatConditionalQty($row->qtyStock()) : 0 }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ ($row->itemUnit()->exists() ? $row->itemUnit->unit->code : ($row->coaUnit()->exists() ? $row->coaUnit->code : '-')) }}</td>
                         <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>

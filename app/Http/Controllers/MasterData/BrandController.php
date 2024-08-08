@@ -101,7 +101,7 @@ class BrandController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('grades', 'code')->ignore($request->temp)] : 'required|unique:grades,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('brands', 'code')->ignore($request->temp)] : 'required|unique:brands,code',
             'name'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',

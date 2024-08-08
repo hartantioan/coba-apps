@@ -471,6 +471,14 @@
                                         <td class="right-align" style="border:0.6px solid black;font-family: Arial, Helvetica, sans-serif">{{ $data->currency->code.'.'.number_format($data->balance,2,',','.') }}</td>
                                     </tr class="break-row">                              
                                 </table>
+                                @if($data->paymentRequestCross()->exists())
+                                    Data BS Terpakai :
+                                    <ol>
+                                        @foreach ($data->paymentRequestCross as $row)
+                                            <li>{{ $row->lookable->code.' - '.$row->lookable->paymentRequest->code.' - '.$row->lookable->account->name.' - '.CustomHelper::formatConditionalQty($row->nominal) }}</li>
+                                        @endforeach
+                                    </ol>
+                                @endif
                             </div>
                         </div>
                         <table class="table-bot1" width="100%" border="0">

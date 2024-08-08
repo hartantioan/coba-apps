@@ -357,7 +357,7 @@ class OutStandingAPController extends Controller
                     'post_date' => date('d/m/Y',strtotime($row->post_date)),
                     'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
-                    'top'       => CustomHelper::countDays($row->post_date,$row->due_date),
+                    'top'       => 0,
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                     'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),

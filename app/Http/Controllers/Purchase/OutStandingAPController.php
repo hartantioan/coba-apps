@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Purchase;
 
 use App\Exports\ExportOutstandingAP;
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use App\Models\OutstandingAP;
 use App\Models\PurchaseDownPayment;
@@ -337,7 +338,7 @@ class OutStandingAPController extends Controller
                     'post_date' => date('d/m/Y',strtotime($row->post_date)),
                     'rec_date'  => date('d/m/Y',strtotime($row->received_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
-                    'top'       => '-',
+                    'top'       => CustomHelper::countDays($row->received_date,$row->due_date),
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                     'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),
@@ -356,7 +357,7 @@ class OutStandingAPController extends Controller
                     'post_date' => date('d/m/Y',strtotime($row->post_date)),
                     'rec_date'  => date('d/m/Y',strtotime($row->document_date)),
                     'due_date'  => date('d/m/Y',strtotime($row->due_date)),
-                    'top'       => '-',
+                    'top'       => CustomHelper::countDays($row->post_date,$row->due_date),
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),
                     'payed'     => number_format($total_invoice_after_adjust,2,',','.'),
                     'sisa'      => number_format($balance_after_adjust,2,',','.'),

@@ -1119,6 +1119,7 @@ class PurchaseDownPaymentController extends Controller
 
                 $query->update([
                     'status'    => '8',
+                    'done_id'   => session('bo_id'),
                 ]);
 
                 $cd = CancelDocument::create([

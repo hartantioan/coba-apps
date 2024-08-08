@@ -654,7 +654,7 @@ class PurchaseInvoice extends Model
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', ['3'])
+                        ->whereIn('status_closing', ['2','3'])
                         ->get();
        
         if(count($see)>0){

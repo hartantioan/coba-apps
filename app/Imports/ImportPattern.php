@@ -26,6 +26,8 @@ class ImportPattern implements OnEachRow, WithHeadingRow, WithValidation, WithBa
         $brand_code= explode('#',$row['brand_id'])[0];
         $brand = Brand::where('code',$brand_code)->first();
         $nameNoSpace = str_replace(' ','',$row['name']);
+        $cek = NULL;
+        $cekCode = NULL;
         $cek = Pattern::whereRaw("REPLACE(name,' ','') = '$nameNoSpace'")->where('status','1')->first();
         $cekCode = Pattern::where('code',$row['code'])->where('status','1')->first();
 
@@ -37,10 +39,10 @@ class ImportPattern implements OnEachRow, WithHeadingRow, WithValidation, WithBa
                 'status'    => '1',
             ]);
             activity()
-                ->performedOn(new Brand())
+                ->performedOn(new Pattern())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('From excel brand to database.');
+                ->log('From excel pattern to database.');
         }
     }
 

@@ -572,7 +572,11 @@ class GoodReceiptPOController extends Controller
                     $bobot = $pod->subtotal / $subtotal;
                     $rowprice = $pod->price;
 
-                    $total = round(($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount),2);
+                    if($pod->total){
+                        $total = $pod->total;
+                    }else{
+                        $total = round(($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))) - ($bobot * $discount),2);
+                    }
 
                     if($pod->is_tax == '1' && $pod->is_include_tax == '1'){
                         $total = $total / (1 + ($pod->percent_tax / 100));

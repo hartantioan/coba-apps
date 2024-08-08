@@ -1686,6 +1686,7 @@ class PurchaseInvoiceController extends Controller
         $pi['downpayment'] = number_format($pi->downpayment,2,',','.');
         $pi['rounding'] = number_format($pi->rounding,2,',','.');
         $pi['currency_rate'] = number_format($pi->currency_rate,2,',','.');
+        $pi['top'] = $pi->top();
         if(!CustomHelper::checkLockAcc($pi->post_date)){
             return response()->json([
                 'status'  => 500,

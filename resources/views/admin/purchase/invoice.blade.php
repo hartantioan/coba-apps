@@ -3601,6 +3601,7 @@
                     $('#rounding').val(response.rounding);
                     $('#currency_rate').val(response.currency_rate);
                     $('#currency_id').val(response.currency_id).formSelect();
+                    $('#top').val(response.top);
                     
                     if(response.details.length > 0){
                         $('.row_detail').remove();

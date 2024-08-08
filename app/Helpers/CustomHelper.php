@@ -1708,6 +1708,8 @@ class CustomHelper {
 								'lookable_id'					=> $table_id,
 								'detailable_type'				=> $row->getTable(),
 								'detailable_id'					=> $row->id,
+								'note'							=> $op->paymentRequest->code,
+								'note2'							=> $row->lookable_type == 'fund_requests' ? $row->lookable->code : '',
 							]);
 						}
 					}else{
@@ -1727,6 +1729,8 @@ class CustomHelper {
 							'lookable_id'	=> $table_id,
 							'detailable_type'=> $row->getTable(),
 							'detailable_id'	=> $row->id,
+							'note'			=> $op->paymentRequest->code,
+							'note2'			=> $row->lookable_type == 'fund_requests' ? $row->lookable->code : '',
 						]);
 						if($row->lookable_type == 'marketing_order_memos'){
 							CustomHelper::addCountLimitCredit($op->account_id,$balanceReal);

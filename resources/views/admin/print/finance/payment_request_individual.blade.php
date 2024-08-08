@@ -472,7 +472,7 @@
                                     </tr class="break-row">                              
                                 </table>
                                 @if($data->paymentRequestCross()->exists())
-                                    <div style="left:0px;width:300px;">
+                                    <div style="left:0px;width:250px;">
                                         Data BS Terpakai :
                                         <ol>
                                             @foreach ($data->paymentRequestCross as $row)

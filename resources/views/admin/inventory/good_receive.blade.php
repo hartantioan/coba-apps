@@ -206,7 +206,7 @@
                             </div>
                             <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12 step6">
-                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiahNominal(this)">
                                 <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                             </div>
                             <div class="col m4 s12 step7">
@@ -1003,7 +1003,7 @@
                     </select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiahQty(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                 </td>
                 <td class="center">
                     <span id="arr_unit` + count + `">-</span>
@@ -1015,7 +1015,7 @@
                     <span id="arr_price` + count + `">0,00</span>
                 </td>
                 <td class="right-align">
-                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
+                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
                 </td>
                 <td>
                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ...">
@@ -1323,7 +1323,7 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahQty(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="rowQty`+ count +`">
                                 </td>
                                 <td class="center">
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
@@ -1335,7 +1335,7 @@
                                     <span id="arr_price` + count + `">` + val.price + `</span>
                                 </td>
                                 <td class="right-align">
-                                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
+                                    <input onfocus="emptyThis(this);" name="arr_total[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiahNominal(this);countRow('` + count + `')" style="text-align:right;width:100%;" id="arr_total`+ count +`">
                                 </td>
                                 <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang ..." value="` + val.note + `">
@@ -1946,5 +1946,61 @@
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
        
+    }
+
+    function formatRupiahNominal(angka){
+        let decimal = 2;
+        let val = angka.value ? angka.value : '';
+        var number_string = val.replace(/[^,\d]/g, '').toString(),
+        sign = val.charAt(0),
+        split   		= number_string.toString().split(','),
+        sisa     		= parseFloat(split[0]).toString().length % 3,
+        rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+        ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
+    
+        if(ribuan){
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        if(split[1] != undefined){
+            if(split[1].length > decimal){
+                rupiah = rupiah + ',' + split[1].slice(0,decimal);
+            }else{
+                rupiah = rupiah + ',' + split[1];
+            }
+        }else{
+            rupiah = rupiah;
+        }
+    
+        angka.value = sign == '-' ? sign + rupiah : rupiah;
+    }
+
+    function formatRupiahQty(angka){
+        let decimal = 3;
+        let val = angka.value ? angka.value : '';
+        var number_string = val.replace(/[^,\d]/g, '').toString(),
+        sign = val.charAt(0),
+        split   		= number_string.toString().split(','),
+        sisa     		= parseFloat(split[0]).toString().length % 3,
+        rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
+        ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
+    
+        if(ribuan){
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        if(split[1] != undefined){
+            if(split[1].length > decimal){
+                rupiah = rupiah + ',' + split[1].slice(0,decimal);
+            }else{
+                rupiah = rupiah + ',' + split[1];
+            }
+        }else{
+            rupiah = rupiah;
+        }
+    
+        angka.value = sign == '-' ? sign + rupiah : rupiah;
     }
 </script>

@@ -82,6 +82,12 @@ class ProductionBatch extends Model
         return $this->hasMany('App\Models\ProductionBatchUsage');
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id');
     }
@@ -132,9 +138,9 @@ class ProductionBatch extends Model
         return $newcode.$no.'.'.strtoupper($line).strtoupper($group);
     }
 
-    public static function getLatestCodeFg($prefix){
+    public static function getLatestCodeFg($yearmonth){
         $query = ProductionBatch::selectRaw('RIGHT(code, 5) as code')
-            ->whereRaw("code LIKE '$prefix%'")
+            ->whereRaw("RIGHT(code, 9) LIKE '$yearmonth%'")
             ->withTrashed()
             ->orderByDesc('id')
             ->limit(1)
@@ -148,7 +154,7 @@ class ProductionBatch extends Model
 
         $no = str_pad($code, 5, 0, STR_PAD_LEFT);
 
-        return $prefix.$no;
+        return $yearmonth.$no;
     }
 
     public function used(){

@@ -134,7 +134,7 @@ class Item extends Model
         /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
         $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
 
-        $unit = '-';
+        $unit = '';
         if($itemUnit){
             $unit = $itemUnit->unit->code;
         }

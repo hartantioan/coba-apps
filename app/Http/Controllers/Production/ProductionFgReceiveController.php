@@ -118,12 +118,13 @@ class ProductionFgReceiveController extends Controller
                         $sellConvert = $itemChild->sellConversion();
 
                         $result = [];
-                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->code.$group.'/'.date('ym',strtotime($date));
-                        $latestCode = ProductionBatch::getLatestCodeFg($prefix);
+                        $yearmonth = date('ym',strtotime($date));
+                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->code.$group.'/'.$yearmonth;
+                        $latestCode = ProductionBatch::getLatestCodeFg($yearmonth);
                         $oldprefix = 0;
                         if($request->listno){
                             foreach($request->listno as $row){
-                                if(substr($row,0,17) == $prefix){
+                                if(substr($row,(strlen($row)-9),4) == $yearmonth){
                                     $oldprefix = intval(substr($row,(strlen($row)-5),5));
                                 }
                             }

@@ -579,7 +579,7 @@ class GoodReceiptPOController extends Controller
                     }
 
                     if($pod->is_tax == '1' && $pod->is_include_tax == '1'){
-                        $total = $total / (1 + ($pod->percent_tax / 100));
+                        $total = round($total / (1 + ($pod->percent_tax / 100)),2);
                     }
 
                     if($pod->is_tax == '1'){

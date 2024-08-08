@@ -356,7 +356,8 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
+            /* $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day')); */
+            $due_date = $date;
             $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;
@@ -786,7 +787,8 @@ class AgingAPController extends Controller
         }
 
         foreach($results2 as $row){
-            $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day'));
+            /* $due_date = $row->due_date ? $row->due_date : date('Y-m-d', strtotime($row->post_date. ' + '.$row->topdp.' day')); */
+            $due_date = $date;
             $totalPayed = round($row->total_payment + $row->total_memo + $row->total_reconcile,2);
             $balance = $row->grandtotal - $totalPayed;
             $currency_rate = $row->currency_rate;

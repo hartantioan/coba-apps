@@ -361,7 +361,8 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0 && $row->status_cancel == '0'){
                     $totalAll += $balance_after_adjust;
-                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    /* $daysDiff = $this->dateDiffInDays($row->due_date,$this->date); */
+                    $daysDiff = $this->dateDiffInDays($this->date,$this->date);
                     $index = $this->findDuplicate($row->account_code,$newData);
                     if($index >= 0){
                         foreach($newData[$index]['data'] as $key => $rowdata){
@@ -458,7 +459,8 @@ class ExportAgingAP implements FromView, ShouldAutoSize
                 $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $currency_rate,2) + $row->total_journal_debit + $row->total_journal_credit;
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 if($balance > 0 && $row->status_cancel == '0'){
-                    $daysDiff = $this->dateDiffInDays($row->due_date,$this->date);
+                    /* $daysDiff = $this->dateDiffInDays($row->due_date,$this->date); */
+                    $daysDiff = $this->dateDiffInDays($this->date,$this->date);
                     $arrDetail = [];
                     $totalAll += $balance_after_adjust;
                     foreach($arrColumn as $key => $rowcolumn){

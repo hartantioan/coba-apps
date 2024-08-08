@@ -3094,18 +3094,12 @@
         );
 
         let percent = 1;
-
+        var max_nominal = 0;
+        var id_biggest_total = '';
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowbobot = Math.round((rownominal / subtotal) * 100000) / 100000;
-
-            if(percent > rowbobot){
-                percent -= rowbobot;
-            }else{
-                rowbobot = percent;
-            }
+            rowdiscount = Math.round(( parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")) /subtotal* discount) * 100) / 100;
             
-            rowdiscount = discount * rowbobot;
             rownominal -= rowdiscount;
 
             if($('select[name^="arr_tax"]').eq(index).val() !== '0'){
@@ -3118,7 +3112,11 @@
             }
 
             rownominal = Math.round(rownominal * 100) / 100;
-
+            if(max_nominal < rownominal){
+                max_nominal = rownominal;
+                let extractedPart = $(this).attr('id').replace('arr_subtotal', '');;
+                id_biggest_total = extractedPart;
+            }
             if($('select[name^="arr_wtax"]').eq(index).val() !== '0'){
                 let percent_wtax = parseFloat($('select[name^="arr_wtax"]').eq(index).val());
                 rowwtax = Math.floor(rownominal * (percent_wtax / 100));
@@ -3152,10 +3150,23 @@
         wtax = Math.floor(wtax);
 
         let totaltemp = subtotal - discount;
-        let balancetemp = total - totaltemp;
+        let balancetemp = Math.round((total - totaltemp) * 100) /100;
 
-        if(balancetemp > 0){
-            total = total - balancetemp;
+      
+        if(balancetemp != 0){
+            total = totaltemp;
+            var biggestTotalValue = parseFloat($('#arr_nominal_total' + id_biggest_total).val().replaceAll(".", "").replaceAll(",","."));
+      
+            if(balancetemp > 0){
+
+                var newBiggestTotal = biggestTotalValue - balancetemp;
+            }else{
+                
+                var newBiggestTotal = biggestTotalValue + balancetemp;
+            }
+            $('#arr_nominal_total' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ','));
+            $('#arr_nominal_grandtotal' + id_biggest_total).val(newBiggestTotal.toFixed(2).replace('.', ','));
+          
         }
 
         grandtotal = total + tax - wtax + rounding;
@@ -3216,6 +3227,7 @@
             (grandtotalconvert >= 0 ? '' : '-') + formatRupiahIni(grandtotalconvert.toFixed(2).toString().replace('.',','))
         );
     }
+    
 
     function countGrandtotal(val){
         let total = parseFloat($('#savetotal').val().replaceAll(".", "").replaceAll(",",".")), tax = parseFloat($('#savetax').val().replaceAll(".", "").replaceAll(",",".")), wtax = parseFloat(val.replaceAll(".", "").replaceAll(",","."));

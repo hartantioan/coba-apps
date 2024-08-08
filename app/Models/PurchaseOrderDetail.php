@@ -30,6 +30,7 @@ class PurchaseOrderDetail extends Model
         'percent_discount_2',
         'discount_3',
         'subtotal',
+        'total',
         'tax',
         'wtax',
         'grandtotal',

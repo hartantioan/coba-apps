@@ -472,12 +472,14 @@
                                     </tr class="break-row">                              
                                 </table>
                                 @if($data->paymentRequestCross()->exists())
-                                    Data BS Terpakai :
-                                    <ol>
-                                        @foreach ($data->paymentRequestCross as $row)
-                                            <li>{{ $row->lookable->code.' - '.$row->lookable->paymentRequest->code.' - '.$row->lookable->account->name.' - '.CustomHelper::formatConditionalQty($row->nominal) }}</li>
-                                        @endforeach
-                                    </ol>
+                                    <div style="left:0px;">
+                                        Data BS Terpakai :
+                                        <ol>
+                                            @foreach ($data->paymentRequestCross as $row)
+                                                <li>{{ $row->lookable->code.' - '.$row->lookable->paymentRequest->code.' - '.$row->lookable->account->name.' - '.CustomHelper::formatConditionalQty($row->nominal) }}</li>
+                                            @endforeach
+                                        </ol>
+                                    </div>
                                 @endif
                             </div>
                         </div>

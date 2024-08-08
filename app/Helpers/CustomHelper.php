@@ -4464,6 +4464,9 @@ class CustomHelper {
 									'balance_status'	=> '1'
 								]);
 							}
+							$row->purchaseDownPayment->update([
+								'balance_status'	=> '1',
+							]);
 						}
 					}
 				}
@@ -5137,8 +5140,8 @@ class CustomHelper {
 							'note'			=> $pir->code,
 							'lookable_type'	=> $table_name,
 							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
+							'detailable_type'=> $rowbatch->getTable(),
+							'detailable_id'	=> $rowbatch->id,
 						]);
 		
 						self::sendCogs($table_name,

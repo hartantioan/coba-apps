@@ -133,6 +133,7 @@
                                                         <th>Periode</th>
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>By</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -782,6 +783,7 @@
                 { name: 'period', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

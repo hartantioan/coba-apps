@@ -149,6 +149,7 @@
                                                         <th>Tgl.Kapitalisasi</th>
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
+                                                        <th>By</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -588,6 +589,7 @@
 
         $('#body-asset').on('click', '.delete-data-asset', function() {
             $(this).closest('tr').remove();
+            reInitializedAsset();
         });
     });
 
@@ -753,7 +755,41 @@
             select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
             select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
             $('#asset_id').empty();
+            reInitializedAsset();
         }
+    }
+
+    function reInitializedAsset(){
+        let arr = [];
+
+        $('input[name^="arr_asset_id[]"]').each(function(index){
+            arr.push($(this).val());
+        });
+
+        $('#asset_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/asset_capitalization") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        arr_id: arr,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
     }
 
     function rowDetail(data) {
@@ -831,6 +867,7 @@
                 { name: 'date', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',

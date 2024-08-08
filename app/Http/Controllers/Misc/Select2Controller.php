@@ -4572,7 +4572,7 @@ class Select2Controller extends Controller {
             
         }
         foreach($data as $d) {
-            if($d->productionScheduleDetail->item->sellUnit()){
+            /* if($d->productionScheduleDetail->item->sellUnit()){ */
                 $response[] = [
                     'id'        => $d->id,
                     'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
@@ -4582,7 +4582,7 @@ class Select2Controller extends Controller {
                     'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
                     'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
                 ];
-            }
+            /* } */
         }
 
         return response()->json(['items' => $response]);

@@ -590,224 +590,224 @@ class PurchaseOrderController extends Controller
     }
 
     public function create(Request $request){
-        if($request->inventory_type == '1'){
-            $validation = Validator::make($request->all(), [
-                'code'                      => 'required',
-                'code_place_id'             => 'required',
-                'supplier_id' 				=> 'required',
-                'inventory_type'			=> 'required',
-                'shipping_type'		        => 'required',
-                'payment_type'		        => 'required',
-                'payment_term'		        => 'required',
-                'currency_id'               => 'required',
-                'currency_rate'             => 'required',
-                'post_date'                 => 'required',
-                'delivery_date'             => 'required',
-                'arr_item'                  => 'required|array',
-                'arr_qty'                   => 'required|array',
-                'arr_price'                 => 'required|array',
-                'arr_disc1'                 => 'required|array',
-                'arr_disc2'                 => 'required|array',
-                'arr_disc3'                 => 'required|array',
-                'arr_place'                 => 'required|array',
-                'arr_warehouse'             => 'required|array',
-                'discount'                  => 'required',
-                'rounding'                  => 'required',
-            ], [
-                'code.required' 	                => 'Kode tidak boleh kosong.',
-                'code_place_id.required'            => 'Plant Tidak boleh kosong',
-                'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
-                'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
-                'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
-                'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
-                'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
-                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-                'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-                'post_date.required'                => 'Tanggal post tidak boleh kosong.',
-                'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
-                'arr_item.required'                 => 'Item tidak boleh kosong.',
-                'arr_item.array'                    => 'Item harus array.',
-                'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-                'arr_qty.array'                     => 'Qty harus array.',
-                'arr_price.required'                => 'Harga tidak boleh kosong.',
-                'arr_price.array'                   => 'Harga harus array.',
-                'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
-                'arr_disc1.array'                   => 'Diskon 1 harus array.',
-                'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
-                'arr_disc2.array'                   => 'Diskon 2 harus array.',
-                'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
-                'arr_disc3.array'                   => 'Diskon 3 harus array.',
-                'arr_place.required'                => 'Plant tidak boleh kosong.',
-                'arr_place.array'                   => 'Plant harus array.',
-                'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
-                'arr_warehouse.array'               => 'Gudang harus array.',
-                'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
-                'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
-            ]);
-        }elseif($request->inventory_type == '2'){
-            $validation = Validator::make($request->all(), [
-                'code'			            => 'required',
-                'code_place_id'             => 'required',
-                'supplier_id' 				=> 'required',
-                'inventory_type'			=> 'required',
-                'shipping_type'		        => 'required',
-                'payment_type'		        => 'required',
-                'payment_term'		        => 'required',
-                'currency_id'               => 'required',
-                'currency_rate'             => 'required',
-                'post_date'                 => 'required',
-                'delivery_date'             => 'required',
-                'arr_coa'                   => 'required|array',
-                'arr_qty'                   => 'required|array',
-                'arr_price'                 => 'required|array',
-                'arr_disc1'                 => 'required|array',
-                'arr_disc2'                 => 'required|array',
-                'arr_disc3'                 => 'required|array',
-                'discount'                  => 'required',
-                'rounding'                  => 'required',
-            ], [
-                'code.required' 	                => 'Kode tidak boleh kosong.',
-                'code_place_id.required'            => 'Plant Tidak boleh kosong',
-                'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
-                'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
-                'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
-                'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
-                'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
-                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-                'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-                'post_date.required'                => 'Tanggal post tidak boleh kosong.',
-                'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
-                'arr_coa.required'                  => 'Coa tidak boleh kosong.',
-                'arr_coa.array'                     => 'Coa harus array.',
-                'arr_qty.required'                  => 'Qty tidak boleh kosong.',
-                'arr_qty.array'                     => 'Qty harus array.',
-                'arr_price.required'                => 'Harga tidak boleh kosong.',
-                'arr_price.array'                   => 'Harga harus array.',
-                'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
-                'arr_disc1.array'                   => 'Diskon 1 harus array.',
-                'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
-                'arr_disc2.array'                   => 'Diskon 2 harus array.',
-                'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
-                'arr_disc3.array'                   => 'Diskon 3 harus array.',
-                'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
-                'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
-            ]);
-        }
-
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
-
-            $passedZero = true;
-            $passedMustPr = true;
-            $passedSecretItem = true;
-            if($request->arr_price){
-                $total = 0;
-                foreach($request->arr_price as $row){
-                    $total += floatval(str_replace(',','.',str_replace('.','',$row)));
-                }
-                if($total == 0){
-                    $passedZero = false;
-                }
-
-                if(!$passedZero){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Harga total tidak boleh 0.'
-                    ]);
-                }
+        DB::beginTransaction();
+        try {
+            if($request->inventory_type == '1'){
+                $validation = Validator::make($request->all(), [
+                    'code'                      => 'required',
+                    'code_place_id'             => 'required',
+                    'supplier_id' 				=> 'required',
+                    'inventory_type'			=> 'required',
+                    'shipping_type'		        => 'required',
+                    'payment_type'		        => 'required',
+                    'payment_term'		        => 'required',
+                    'currency_id'               => 'required',
+                    'currency_rate'             => 'required',
+                    'post_date'                 => 'required',
+                    'delivery_date'             => 'required',
+                    'arr_item'                  => 'required|array',
+                    'arr_qty'                   => 'required|array',
+                    'arr_price'                 => 'required|array',
+                    'arr_disc1'                 => 'required|array',
+                    'arr_disc2'                 => 'required|array',
+                    'arr_disc3'                 => 'required|array',
+                    'arr_place'                 => 'required|array',
+                    'arr_warehouse'             => 'required|array',
+                    'discount'                  => 'required',
+                    'rounding'                  => 'required',
+                ], [
+                    'code.required' 	                => 'Kode tidak boleh kosong.',
+                    'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                    'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
+                    'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
+                    'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
+                    'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
+                    'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
+                    'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                    'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+                    'post_date.required'                => 'Tanggal post tidak boleh kosong.',
+                    'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
+                    'arr_item.required'                 => 'Item tidak boleh kosong.',
+                    'arr_item.array'                    => 'Item harus array.',
+                    'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+                    'arr_qty.array'                     => 'Qty harus array.',
+                    'arr_price.required'                => 'Harga tidak boleh kosong.',
+                    'arr_price.array'                   => 'Harga harus array.',
+                    'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
+                    'arr_disc1.array'                   => 'Diskon 1 harus array.',
+                    'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
+                    'arr_disc2.array'                   => 'Diskon 2 harus array.',
+                    'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
+                    'arr_disc3.array'                   => 'Diskon 3 harus array.',
+                    'arr_place.required'                => 'Plant tidak boleh kosong.',
+                    'arr_place.array'                   => 'Plant harus array.',
+                    'arr_warehouse.required'            => 'Gudang tidak boleh kosong.',
+                    'arr_warehouse.array'               => 'Gudang harus array.',
+                    'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
+                    'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
+                ]);
+            }elseif($request->inventory_type == '2'){
+                $validation = Validator::make($request->all(), [
+                    'code'			            => 'required',
+                    'code_place_id'             => 'required',
+                    'supplier_id' 				=> 'required',
+                    'inventory_type'			=> 'required',
+                    'shipping_type'		        => 'required',
+                    'payment_type'		        => 'required',
+                    'payment_term'		        => 'required',
+                    'currency_id'               => 'required',
+                    'currency_rate'             => 'required',
+                    'post_date'                 => 'required',
+                    'delivery_date'             => 'required',
+                    'arr_coa'                   => 'required|array',
+                    'arr_qty'                   => 'required|array',
+                    'arr_price'                 => 'required|array',
+                    'arr_disc1'                 => 'required|array',
+                    'arr_disc2'                 => 'required|array',
+                    'arr_disc3'                 => 'required|array',
+                    'discount'                  => 'required',
+                    'rounding'                  => 'required',
+                ], [
+                    'code.required' 	                => 'Kode tidak boleh kosong.',
+                    'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                    'supplier_id.required' 				=> 'Supplier tidak boleh kosong.',
+                    'inventory_type.required' 			=> 'Tipe persediaan/jasa tidak boleh kosong.',
+                    'shipping_type.required' 			=> 'Tipe pengiriman tidak boleh kosong.',
+                    'payment_type.required' 			=> 'Tipe pembayaran tidak boleh kosong.',
+                    'payment_term.required'				=> 'Termin pembayaran tidak boleh kosong.',
+                    'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                    'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+                    'post_date.required'                => 'Tanggal post tidak boleh kosong.',
+                    'delivery_date.required'            => 'Tanggal kirim tidak boleh kosong.',
+                    'arr_coa.required'                  => 'Coa tidak boleh kosong.',
+                    'arr_coa.array'                     => 'Coa harus array.',
+                    'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+                    'arr_qty.array'                     => 'Qty harus array.',
+                    'arr_price.required'                => 'Harga tidak boleh kosong.',
+                    'arr_price.array'                   => 'Harga harus array.',
+                    'arr_disc1.required'                => 'Diskon 1 tidak boleh kosong.',
+                    'arr_disc1.array'                   => 'Diskon 1 harus array.',
+                    'arr_disc2.required'                => 'Diskon 2 tidak boleh kosong.',
+                    'arr_disc2.array'                   => 'Diskon 2 harus array.',
+                    'arr_disc3.required'                => 'Diskon 3 tidak boleh kosong.',
+                    'arr_disc3.array'                   => 'Diskon 3 harus array.',
+                    'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
+                    'rounding.required'                 => 'Pembulatan tidak boleh kosong.'
+                ]);
             }
 
-            if($request->inventory_type == '1'){
-                $arrGroupItem = [];
-                $hasSecret = false;
-                $hasNonSecret = false;
-                foreach($request->arr_item as $key => $row){
-                    $item = Item::find(intval($row));
-                    $topGroupId = $item->itemGroup->getTopParent($item->itemGroup);
-                    $topGroupName = $item->itemGroup->getTopParentName($item->itemGroup);
-                    $index = -1;
-                    foreach($arrGroupItem as $keyitem => $row){
-                        if($topGroupId == $row['group_id']){
-                            $index = $keyitem;
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+
+                $passedZero = true;
+                $passedMustPr = true;
+                $passedSecretItem = true;
+                if($request->arr_price){
+                    $total = 0;
+                    foreach($request->arr_price as $row){
+                        $total += floatval(str_replace(',','.',str_replace('.','',$row)));
+                    }
+                    if($total == 0){
+                        $passedZero = false;
+                    }
+
+                    if(!$passedZero){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Harga total tidak boleh 0.'
+                        ]);
+                    }
+                }
+
+                if($request->inventory_type == '1'){
+                    $arrGroupItem = [];
+                    $hasSecret = false;
+                    $hasNonSecret = false;
+                    foreach($request->arr_item as $key => $row){
+                        $item = Item::find(intval($row));
+                        $topGroupId = $item->itemGroup->getTopParent($item->itemGroup);
+                        $topGroupName = $item->itemGroup->getTopParentName($item->itemGroup);
+                        $index = -1;
+                        foreach($arrGroupItem as $keyitem => $row){
+                            if($topGroupId == $row['group_id']){
+                                $index = $keyitem;
+                            }
+                        }
+                        if($index >= 0){
+
+                        }else{
+                            $arrGroupItem[] = [
+                                'item_name'     => $item->code.' - '.$item->name,
+                                'group_name'    => $topGroupName,
+                                'group_id'      => $topGroupId,
+                            ];
+                        }
+                        if($item->is_hide_supplier){
+                            $hasSecret = true;
+                        }else{
+                            $hasNonSecret = true;
                         }
                     }
-                    if($index >= 0){
-
-                    }else{
-                        $arrGroupItem[] = [
-                            'item_name'     => $item->code.' - '.$item->name,
-                            'group_name'    => $topGroupName,
-                            'group_id'      => $topGroupId,
-                        ];
+                    if(count($arrGroupItem) > 1){
+                        $arrError = [];
+                        foreach($arrGroupItem as $row){
+                            $arrError[] = $row['item_name'].' Grup : '.$row['group_name'];
+                        }
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf PO tidak bisa memiliki lebih dari 1 macam group item. Daftarnya : '.implode(', ',$arrError),
+                        ]);
                     }
-                    if($item->is_hide_supplier){
-                        $hasSecret = true;
-                    }else{
-                        $hasNonSecret = true;
+                    foreach($request->arr_type as $key => $row){
+                        if(!$row){
+                            $passedMustPr = false;
+                        }
+                    }
+
+                    if($hasSecret && $hasNonSecret){
+                        $passedSecretItem = false;
                     }
                 }
-                if(count($arrGroupItem) > 1){
-                    $arrError = [];
-                    foreach($arrGroupItem as $row){
-                        $arrError[] = $row['item_name'].' Grup : '.$row['group_name'];
-                    }
+
+                if(!$passedSecretItem){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Mohon maaf PO tidak bisa memiliki lebih dari 1 macam group item. Daftarnya : '.implode(', ',$arrError),
+                        'message' => 'Mohon maaf PO tipe Persediaan terdapat item rahasia tercampur dengan item biasa. 1 PO tidak bisa dicampur antara item rahasia dan item umum.',
                     ]);
                 }
-                foreach($request->arr_type as $key => $row){
-                    if(!$row){
-                        $passedMustPr = false;
-                    }
+
+                if(!$passedMustPr){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf PO tipe Persediaan harus menarik data Purchase Request.',
+                    ]);
                 }
 
-                if($hasSecret && $hasNonSecret){
-                    $passedSecretItem = false;
-                }
-            }
-
-            if(!$passedSecretItem){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf PO tipe Persediaan terdapat item rahasia tercampur dengan item biasa. 1 PO tidak bisa dicampur antara item rahasia dan item umum.',
-                ]);
-            }
-
-            if(!$passedMustPr){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf PO tipe Persediaan harus menarik data Purchase Request.',
-                ]);
-            }
-
-            if($request->inventory_type == '2'){
-                $passedProfitLoss = true;
-                if($request->arr_coa){
-                    foreach($request->arr_coa as $key => $row){
-                        $coa = Coa::find(intval($row));
-                        if(in_array(substr($coa->code,0,1),['4','5','6','7','8'])){
-                            if(!isset($request->arr_department[$key])){
-                                $passedProfitLoss = false;
+                if($request->inventory_type == '2'){
+                    $passedProfitLoss = true;
+                    if($request->arr_coa){
+                        foreach($request->arr_coa as $key => $row){
+                            $coa = Coa::find(intval($row));
+                            if(in_array(substr($coa->code,0,1),['4','5','6','7','8'])){
+                                if(!isset($request->arr_department[$key])){
+                                    $passedProfitLoss = false;
+                                }
                             }
                         }
                     }
+                    if(!$passedProfitLoss){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Untuk Coa terpilih harus memiliki Divisi. Silahkan pilih divisi.'
+                        ]);
+                    }
                 }
-                if(!$passedProfitLoss){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Untuk Coa terpilih harus memiliki Divisi. Silahkan pilih divisi.'
-                    ]);
-                }
-            }
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                
+                if($request->temp){
                     $query = PurchaseOrder::where('code',CustomHelper::decrypt($request->temp))->first();
             
                     if($query->hasChildDocument()){
@@ -894,20 +894,13 @@ class PurchaseOrderController extends Controller
                         }
 
                         CustomHelper::removeApproval($query->getTable(),$query->id);
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status purchase order sudah SELESAI, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status purchase order sudah SELESAI, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $fileUpload = '';
 
                     if($request->file('file')){
@@ -960,17 +953,9 @@ class PurchaseOrderController extends Controller
                         'receiver_address'          => $request->receiver_address,
                         'receiver_phone'            => $request->receiver_phone
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-
-                DB::beginTransaction();
-                try {
+                
+                if($query) {
 
                     if($request->inventory_type == '1'){
                         foreach($request->arr_item as $key => $row){
@@ -1091,33 +1076,32 @@ class PurchaseOrderController extends Controller
                         }
                     }
 
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new PurchaseOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit purchase order.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Order No. '.$query->code,$query->note,session('bo_id'));
-
-                activity()
-                    ->performedOn(new PurchaseOrder())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit purchase order.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
-
-		return response()->json($response);
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
+        return response()->json($response);
     }
 
     public function rowDetail(Request $request)

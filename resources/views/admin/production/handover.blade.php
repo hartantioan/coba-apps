@@ -835,8 +835,8 @@
         if($("#production_fg_receive_detail_id").val()){
             $("#qty-unit").text($("#production_fg_receive_detail_id").select2('data')[0].unit);
             let originalTotal = parseFloat($("#production_fg_receive_detail_id").select2('data')[0].qty.toString().replaceAll(".", "").replaceAll(",","."));
-            let item_id = $("#production_fg_receive_detail_id").select2('data')[0].item_id;
-            $('input[name^="arr_qty[]"][data-item="' + item_id + '"]').each(function(index){
+            let pallet_no = $("#production_fg_receive_detail_id").select2('data')[0].pallet_no;
+            $('input[name^="arr_qty[]"][data-item="' + pallet_no + '"]').each(function(index){
                 originalTotal -= parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
             });
             if(originalTotal > 0){

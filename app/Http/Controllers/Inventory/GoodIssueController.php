@@ -867,7 +867,7 @@ class GoodIssueController extends Controller
                 'department_id'             => $row->department_id,
                 'project_id'                => $row->project()->exists() ? $row->project->id : '',
                 'project_name'              => $row->project()->exists() ? $row->project->name : '',
-                'requester'                 => $row->requester,
+                'requester'                 => $row->requester ?? '',
                 'qty_return'                => CustomHelper::formatConditionalQty($row->qty_return),
                 'is_activa'                 => $row->itemStock->item->itemGroup->is_activa ? $row->itemStock->item->itemGroup->is_activa : '',
                 'list_serial'               => $row->arrSerial(),

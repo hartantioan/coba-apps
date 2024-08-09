@@ -690,13 +690,13 @@ class LandedCostController extends Controller
                     }
                     if(in_array($query->status,['1','6'])){
 
-                        if($request->has('document')) {
+                        if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('document')->store('public/landed_costs');
+                            $document = $request->file('file')->store('public/landed_costs');
                         } else {
                             $document = $query->document;
                         }
@@ -759,7 +759,7 @@ class LandedCostController extends Controller
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'note'                      => $request->note ?? 'LANDED COST - '.$newCode,
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/landed_costs') : NULL,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/landed_costs') : NULL,
                         'total'                     => round($total,3),
                         'tax'                       => round($tax,3),
                         'wtax'                      => round($wtax,3),

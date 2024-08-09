@@ -1612,7 +1612,7 @@
                                 ` + val.shading + `
                             </td>
                             <td class="center">
-                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + val.item_id + `">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + val.pallet_no + `">
                             </td>
                             <td class="center-align">
                                 ` + val.unit + `

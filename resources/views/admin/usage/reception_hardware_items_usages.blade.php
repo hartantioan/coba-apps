@@ -364,6 +364,7 @@
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
+                $('#date').prop('disabled', false);
                 $('#form_data')[0].reset();
                 $('#hardware_item_id').empty();
                 $('#user_id').empty();
@@ -807,7 +808,7 @@
                 $('#date').val(response.date);
                 $('#location').val(response.location);
                 $('#tab_user').hide();
-               
+                $('#date').prop('disabled', true);
                 $('#tab_hardware').hide();
                 $('#tab_user_edit').show();
                 $('#tab_hardware_edit').show();

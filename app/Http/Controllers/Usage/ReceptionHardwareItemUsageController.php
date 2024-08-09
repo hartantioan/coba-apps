@@ -274,12 +274,14 @@ class ReceptionHardwareItemUsageController extends Controller
                     $button = '-';
                 }if($val->status == 1 ){
                     $button = '
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Return" onclick="returnItem(' . $val->id . ')"><i class="material-icons dp48">call_missed_outgoing</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
                 }if($val->status == 2 ){
                     $button = '
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light brown darken-2 white-text btn-small" data-popup="tooltip" title="Print" data-item-id="'. $val->id .'" onclick="openmodal('. $val->id .')"><i class="material-icons dp48">filter_frames</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					';
@@ -407,12 +409,11 @@ class ReceptionHardwareItemUsageController extends Controller
         if($request->tempe){
             $validation = Validator::make($request->all(), [
                 
-                'date'                          => 'required',
+                
                 'info'                          => 'required',
                 'location'                      => 'required',
             ], [
-                
-                'date.required'                         => 'Tanggal tidak boleh kosong.',
+
                 'info.required'                         => 'Keterangan tidak boleh kosong.',
                 'location.required'                     => 'Lokasi tidak boleh kosong.',
             ]);

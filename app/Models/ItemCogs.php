@@ -73,4 +73,12 @@ class ItemCogs extends Model
     public function area(){
         return $this->belongsTo('App\Models\Area', 'area_id', 'id')->withTrashed();
     }
+
+    public function getRequester(){
+        $requester = '-';
+        if($this->lookable_type == 'good_receipts' || $this->lookable_type == 'good_issues'){
+            $requester = $this->detailable->requester;
+        }
+        return $requester;
+    }
 }

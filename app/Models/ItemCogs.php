@@ -78,10 +78,10 @@ class ItemCogs extends Model
         $requester = '-';
         if($this->lookable_type == 'good_receipts' || $this->lookable_type == 'good_issues'){
             if($this->lookable_type == 'good_issues'){
-                $requester = $this->detailable->requester ?? 'TIDAK DIISI';
+                $requester = $this->detailable->requester ?? '';
             }
             if($this->lookable_type == 'good_receipts'){
-                $requester = $this->detailable->purchaseOrderDetail->requester ?? 'TIDAK DIISI';
+                $requester = $this->detailable->purchaseOrderDetail->requester ?? '';
             }
         }
         return $requester;

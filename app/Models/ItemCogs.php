@@ -77,7 +77,12 @@ class ItemCogs extends Model
     public function getRequester(){
         $requester = '-';
         if($this->lookable_type == 'good_receipts' || $this->lookable_type == 'good_issues'){
-            $requester = $this->detailable->requester ?? 'TIDAK DIISI';
+            if($this->lookable_type == 'good_issues'){
+                $requester = $this->detailable->requester ?? 'TIDAK DIISI';
+            }
+            if($this->lookable_type == 'good_receipts'){
+                $requester = $this->detailable->purchaseOrderDetail->requester ?? 'TIDAK DIISI';
+            }
         }
         return $requester;
     }

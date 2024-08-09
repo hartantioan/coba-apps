@@ -36,6 +36,7 @@
             <th>{{ __('translations.line') }}</th>
             <th>{{ __('translations.engine') }}</th>
             <th>{{ __('translations.division') }}</th>
+            <th>Requester</th>
             <th>{{ __('translations.warehouse') }}</th>
             <th>Based On</th>
         </tr>
@@ -83,6 +84,7 @@
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->machine->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->department->name ?? ''  }}</td>
+                <td align="center">{{ $rowdetail->purchaseOrderDetail->requester ?? '' }}</td>
                 <td align="center">{{ $rowdetail->warehouse->name }}</td>
                 <td align="center">{{ $rowdetail->purchaseOrderDetail->purchaseOrder->code }}</td>
             </tr>

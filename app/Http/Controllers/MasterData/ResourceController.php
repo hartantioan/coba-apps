@@ -179,6 +179,16 @@ class ResourceController extends Controller
                     $query->cost	            = str_replace(',','.',str_replace('.','',$request->cost));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
+
+                    if($query->bomStandardDetail()->exists()){
+                        foreach($query->bomStandardDetail as $row){
+                            $row->update([
+                                'nominal'   => str_replace(',','.',str_replace('.','',$request->cost)),
+                                'total'     => round(str_replace(',','.',str_replace('.','',$request->cost)) * $row->qty,2),
+                            ]);
+                        }
+                    }
+
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();

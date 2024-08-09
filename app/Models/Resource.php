@@ -46,6 +46,10 @@ class Resource extends Model
         return $status;
     }
 
+    public function bomStandardDetail(){
+        return $this->hasMany('App\Models\BomStandardDetail','lookable_id','id')->where('lookable_type',$this->getTable());
+    }
+
     public function place()
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();

@@ -24,6 +24,7 @@
             
             <th>Qty Keluar</th>
             <th>Qty Kembali</th>
+            <th>Qty Sisa</th>
             <th>{{ __('translations.unit') }}</th>
             
           
@@ -59,8 +60,9 @@
                 <td>{{ $rowdetail->item->name }}</td>
                 <td>{{ $rowdetail->goodIssueDetail->itemStock->place->code }}</td>
                 <td>{{ $rowdetail->note }}</td>
-                <td>{{ $rowdetail->goodIssueDetail->qtyBalanceReturn() }}</td>
+                <td>{{ $rowdetail->goodIssueDetail->qty }}</td>
                 <td>{{ $rowdetail->qty }}</td>
+                <td>{{ $rowdetail->goodIssueDetail->qtyBalanceReturn() }}</td>
                 <td>{{ $rowdetail->item->uomUnit->code }}</td>
       
   

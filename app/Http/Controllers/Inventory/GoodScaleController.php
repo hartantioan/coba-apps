@@ -852,12 +852,13 @@ class GoodScaleController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
-            }elseif($query->alreadyChecked()){
+            }elseif($query->status_qc){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah dicek QC dan tidak bisa dirubah.'
                 ];
             }else{
+               
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),

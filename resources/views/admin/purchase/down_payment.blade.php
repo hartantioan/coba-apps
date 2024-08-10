@@ -388,20 +388,21 @@
                             <div class="input-field col m4 s12 step17">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        <tr>
+                                        {{-- <tr>
                                             <td width="50%">Subtotal <b><i>(Masukkan nominal disini jika tanpa PO)</i></b></td>
                                             <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                                <input class="browser-default" id="discount" name="discount" type="hidden" value="0,00">
+                                                
                                             </td>
                                         </tr>
-                                        {{-- <tr>
+                                        <tr>
                                             <td>Discount</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr> --}}
                                         <tr>
+                                            <input class="browser-default" id="subtotal" name="subtotal" type="hidden" value="0,00" onkeyup="formatRupiah(this);">
+                                            <input class="browser-default" id="discount" name="discount" type="hidden" value="0,00">
                                             <td><h6>Grandtotal</h6></td>
                                             <td class="right-align"><h6><span id="grandtotal">0,00</span></h6></td>
                                         </tr>

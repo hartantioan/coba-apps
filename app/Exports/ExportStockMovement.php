@@ -126,7 +126,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
-                'requester'    => $row->getRequester(),
+                'requester'    => $this->type == 'final' ? '-' : $row->getRequester(),
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,

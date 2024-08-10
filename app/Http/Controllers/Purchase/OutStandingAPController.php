@@ -355,7 +355,7 @@ class OutStandingAPController extends Controller
                     'code'      => $row->code,
                     'vendor'    => $row->account_name,
                     'post_date' => date('d/m/Y',strtotime($row->post_date)),
-                    'rec_date'  => $row->received_date ? date('d/m/Y',strtotime($row->document_date)) : '-',
+                    'rec_date'  => $row->document_date ? date('d/m/Y',strtotime($row->document_date)) : '-',
                     'due_date'  => $row->due_date ? date('d/m/Y',strtotime($row->due_date)) : '-',
                     'top'       => 0,
                     'grandtotal'=> number_format($total_received_after_adjust,2,',','.'),

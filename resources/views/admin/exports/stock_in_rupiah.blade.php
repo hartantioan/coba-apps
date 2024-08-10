@@ -58,6 +58,7 @@
                         <td align="center">{{ $row['satuan'] }}</td>
                         <td align="center">{{ $row['area'] }}</td>
                         <td align="center">{{ $row['shading'] }}</td>
+                        <td align="center">{{$row['production_batch']}}</td>
                         <td align="center">{{ $row['document'] }}</td>
                         <td  align="right">{{ $row['qty'] }}</td>
                         <td  align="right">{{ $row['final'] }}</td>

@@ -152,7 +152,7 @@ class StockMovementController extends Controller
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
-                'requester'    => $row->getRequester(),
+                'requester'    => $request->type == 'final' ? '-' : $row->getRequester(),
                 'plant' => $row->place->code,
                 'warehouse' => $row->warehouse->name,
                 'item' => $row->item->name,

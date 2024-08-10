@@ -213,6 +213,11 @@ class QualityControlController extends Controller
                 'status'    => 500,
                 'message'   => 'Ups. Maaf, Data sedang dipakai oleh pengguna lainnya.'
             ]);
+        }elseif($data->status == '5'){
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data telah ditutup.'
+            ]);
         }else{
             CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Quality Control');
 

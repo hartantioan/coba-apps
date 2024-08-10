@@ -855,7 +855,7 @@ class GoodScaleController extends Controller
             }elseif($query->alreadyChecked()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data telah digunakan pada dokumen lain.'
+                    'message' => 'Data telah dicek QC dan tidak bisa dirubah.'
                 ];
             }else{
                 $query->update([

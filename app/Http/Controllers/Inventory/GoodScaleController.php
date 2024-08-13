@@ -76,6 +76,7 @@ class GoodScaleController extends Controller
         $column = [
             'id',
             'code',
+            'ref_po',
             'user_id',
             'company_id',
             'post_date',

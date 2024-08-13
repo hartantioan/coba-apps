@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Purchase;
-
+use App\Exceptions\RowImportException;
+use App\Imports\ImportPurchaseRequest;
 use App\Models\CloseBill;
 use App\Models\FundRequest;
 use App\Exports\ExportOutstandingPurchaseRequest;
+use App\Exports\ExportTemplatePurchaseRequest;
 use App\Exports\ExportPurchaseRequestTransactionPage;
 use App\Exports\ReportPurchaseRequest;
 use App\Models\GoodIssueRequest;
@@ -1209,6 +1211,29 @@ class PurchaseRequestController extends Controller
         }
         return response()->json($response);
     }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplatePurchaseRequest(), 'format_template_pr_'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new ImportPurchaseRequest, $request->file('file'));
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
+    }
+
 
     public function getItems(Request $request){
         $pr = PurchaseRequest::where('code',CustomHelper::decrypt($request->id))->first();

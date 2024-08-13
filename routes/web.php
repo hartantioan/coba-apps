@@ -517,6 +517,7 @@ Route::prefix('admin')->group(function () {
                             Route::post('{id}/create',[UserController::class, 'createCompany'])->middleware('operation.access:user,update');
                             Route::post('{id}/destroy', [UserController::class, 'destroyCompany'])->middleware('operation.access:user,delete');
                         });
+                        Route::get('get_import_excel',[UserController::class, 'getImportExcel']);
                         Route::post('show', [UserController::class, 'show']);
                         Route::post('get_access', [UserController::class, 'getAccess']);
                         Route::post('get_files', [UserController::class, 'getFiles']);
@@ -1490,6 +1491,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[PurchaseRequestController::class, 'datatable']);
                     Route::get('row_detail',[PurchaseRequestController::class, 'rowDetail']);
                     Route::post('show', [PurchaseRequestController::class, 'show']);
+                    Route::post('import',[PurchaseRequestController::class, 'import'])->middleware('operation.access:purchase_request,update');
+                    Route::get('get_import_excel',[PurchaseRequestController::class, 'getImportExcel']);
                     Route::post('get_items', [PurchaseRequestController::class, 'getItems']);
                     Route::post('get_code', [PurchaseRequestController::class, 'getCode']);
                     Route::post('get_items_from_stock', [PurchaseRequestController::class, 'getItemFromStock']);

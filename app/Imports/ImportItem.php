@@ -180,7 +180,7 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                         $checkUnit = ItemUnit::where('item_id',$check->id)->where('unit_id',$unit->id)->first();
                         if($checkUnit){
                             $checkUnit->update([
-                                'conversion'    => $row['konversi'],
+                                'conversion'    => $row['konversi'] ?? 1,
                                 'is_buy_unit'   => $row['beli'],
                                 'is_sell_unit'  => $row['jual'],
                                 'is_default'    => $row['default'],
@@ -189,7 +189,7 @@ class handleConversionSheet implements OnEachRow, WithHeadingRow{
                             ItemUnit::create([
                                 'item_id'       => $check->id,
                                 'unit_id'       => $unit->id,
-                                'conversion'    => $row['konversi'],
+                                'conversion'    => $row['konversi'] ?? 1,
                                 'is_buy_unit'   => $row['beli'],
                                 'is_sell_unit'   => $row['jual'],
                                 'is_default'    => $row['default'],

@@ -4,6 +4,7 @@ namespace App\Helpers;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ResetCogs;
+use App\Jobs\ResetCogsNew;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendMail;
@@ -290,127 +291,12 @@ class CustomHelper {
 		}
 
 		/* ResetCogs::dispatch($date,$place_id,$item_id); */
-		ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
+		/* ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch); */
+		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
 	}
 
-	public static function sendCogs2($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null){
-		$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
-		if($type == 'IN'){
-			ItemCogs::create([
-				'lookable_type'		=> $lookable_type,
-				'lookable_id'		=> $lookable_id,
-				'company_id'		=> $company_id,
-				'place_id'			=> $place_id,
-				'warehouse_id'		=> $warehouse_id,
-				'area_id'			=> $area_id,
-				'item_id'			=> $item_id,
-				'item_shading_id'	=> $shading ? $shading : NULL,
-				'qty_in'			=> $qty,
-				'price_in'			=> $qty > 0 ? round($total / $qty,2) : 0,
-				'total_in'			=> $total,
-				'qty_final'			=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'		=> $old_data ? round((($old_data->total_final + $total) / ($old_data->qty_final + $qty)),2) : ($qty > 0 ? round($total / $qty,2) : 0),
-				'total_final'		=> $old_data ? round(($old_data->total_final + $total),2) : $total,
-				'date'				=> $date,
-				'type'				=> $type
-			]);
-		}elseif($type == 'OUT'){
-			if($old_data){
-				if($lookable_type == 'good_returns'){
-					$priceout = round($total / $qty,3);
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $total;
-					$pricefinal = $qtybalance > 0 ? round($totalfinal / $qtybalance,2) : 0;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> $priceout,
-						'total_out'			=> $total,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> $pricefinal,
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}elseif($lookable_type == 'production_issue_receives'){
-					$priceeach = $old_data->total_final / $old_data->qty_final;
-					$totalout = round($priceeach * $qty,2);
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $totalout;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> round($priceeach,2),
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> round($priceeach,2),
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}elseif($lookable_type == 'purchase_memos'){
-					$priceeach = $total / $qty;
-					$totalout = $total;
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $total;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> round($priceeach,2),
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> round($priceeach,2),
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}else{
-					$priceeach = $old_data->total_final / $old_data->qty_final;
-					$totalout = round($priceeach * $qty,0);
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $totalout;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> $priceeach,
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> $priceeach,
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}
-			}
-		}
+	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
+		
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null, $batch = null){
@@ -825,208 +711,6 @@ class CustomHelper {
 				'note'				=> $note,
 				'status'			=> '1'
 			]);
-		}
-	}
-
-	public static function sendCogsFromReset($table_name = null,$table_id = null){
-		if($table_name == 'good_receipts'){
-
-			$gr = GoodReceipt::find($table_id);
-
-			$gr->journal->journalDetail()->delete();
-
-			$coa_credit = Coa::where('code','200.01.03.01.02')->where('company_id',$gr->company_id)->first();
-
-			foreach($gr->goodReceiptDetail as $rowdetail){
-
-				$rowtotal = $rowdetail->getRowTotal() * $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate;
-				
-				JournalDetail::create([
-					'journal_id'	=> $gr->journal->id,
-					'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
-					'place_id'		=> $rowdetail->place_id,
-					'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-					'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-					'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-					'warehouse_id'	=> $rowdetail->warehouse_id,
-					'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
-					'type'			=> '1',
-					'nominal'		=> $rowtotal,
-					'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
-					'note'			=> $gr->delivery_no,
-				]);
-
-				if($coa_credit){
-					JournalDetail::create([
-						'journal_id'	=> $gr->journal->id,
-						'coa_id'		=> $coa_credit->id,
-						'place_id'		=> $rowdetail->place_id,
-						'line_id'		=> $rowdetail->line_id ? $rowdetail->line_id : NULL,
-						'machine_id'	=> $rowdetail->machine_id ? $rowdetail->machine_id : NULL,
-						'account_id'	=> $coa_credit->bp_journal ? $gr->account_id : NULL,
-						'department_id'	=> $rowdetail->department_id ? $rowdetail->department_id : NULL,
-						'warehouse_id'	=> $rowdetail->warehouse_id,
-						'project_id'	=> $rowdetail->purchaseOrderDetail->project_id ? $rowdetail->purchaseOrderDetail->project_id : NULL,
-						'type'			=> '2',
-						'nominal'		=> $rowtotal,
-						'nominal_fc'	=> $rowdetail->purchaseOrderDetail->purchaseOrder->currency->type == '1' ? $rowtotal : $rowdetail->getRowTotal(),
-					]);
-				}
-				
-				self::sendCogs2('good_receipts',
-					$gr->id,
-					$gr->company_id,
-					$rowdetail->place_id,
-					$rowdetail->warehouse_id,
-					$rowdetail->item_id,
-					$rowdetail->qtyConvert(),
-					$rowtotal,
-					'IN',
-					$gr->post_date,
-					NULL,
-					NULL,
-				);
-			}
-			
-		}elseif($table_name == 'good_receives'){
-
-			$gr = GoodReceive::find($table_id);
-
-			foreach($gr->goodReceiveDetail as $row){
-				self::sendCogs2('good_receives',
-					$gr->id,
-					$row->place->company_id,
-					$row->place_id,
-					$row->warehouse_id,
-					$row->item_id,
-					$row->qty,
-					$row->total * $gr->currency_rate,
-					'IN',
-					$gr->post_date,
-					$row->area_id,
-					$row->item_shading_id ? $row->item_shading_id : NULL,
-				);
-			}
-		}elseif($table_name == 'good_issues'){
-
-			$gr = GoodIssue::find($table_id);
-
-			foreach($gr->goodIssueDetail as $row){
-				$total = round($row->itemStock->priceDate($gr->post_date),2) * $row->qty;
-
-				self::sendCogs2('good_issues',
-					$gr->id,
-					$row->itemStock->place->company_id,
-					$row->itemStock->place_id,
-					$row->itemStock->warehouse_id,
-					$row->itemStock->item_id,
-					$row->qty,
-					$total,
-					'OUT',
-					$gr->post_date,
-					$row->itemStock->area_id ? $row->itemStock->area_id : NULL,
-					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
-				);
-
-				$row->update([
-					'total'	=> $total,
-				]);
-			}
-
-		}elseif($table_name == 'good_returns'){
-
-			$gr = GoodReturnPO::find($table_id);
-
-			foreach($gr->goodReturnPODetail as $row){
-				$rowtotal = $row->getRowTotal() * $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate;
-
-				self::sendCogs2('good_returns',
-					$gr->id,
-					$row->goodReceiptDetail->place->company_id,
-					$row->goodReceiptDetail->place_id,
-					$row->goodReceiptDetail->warehouse_id,
-					$row->item_id,
-					$row->qtyConvert(),
-					$rowtotal,
-					'OUT',
-					$gr->post_date,
-					NULL,
-					NULL,
-				);
-			}
-
-		}elseif($table_name == 'good_return_issues'){
-
-			$gr = GoodReturnIssue::find($table_id);
-
-			foreach($gr->goodReturnIssueDetail as $row){
-				self::sendCogs2($gr->getTable(),
-					$gr->id,
-					$row->goodIssueDetail->itemStock->place->company_id,
-					$row->goodIssueDetail->itemStock->place_id,
-					$row->goodIssueDetail->itemStock->warehouse_id,
-					$row->item_id,
-					$row->qty,
-					$row->total,
-					'IN',
-					$gr->post_date,
-					$row->goodIssueDetail->itemStock->area_id ? $row->goodIssueDetail->itemStock->area_id : NULL,
-					$row->goodIssueDetail->itemStock->item_shading_id ? $row->goodIssueDetail->itemStock->item_shading_id : NULL,
-				);
-			}
-
-		}elseif($table_name == 'marketing_order_returns'){
-
-		}elseif($table_name == 'landed_costs'){
-			
-			$lc = LandedCost::find($table_id);
-
-			foreach($lc->landedCostDetail as $rowdetail){
-				self::sendCogs2('landed_costs',
-					$lc->id,
-					$rowdetail->place->company_id,
-					$rowdetail->place_id,
-					$rowdetail->warehouse_id,
-					$rowdetail->item_id,
-					0,
-					$rowdetail->nominal * $lc->currency_rate,
-					'IN',
-					$lc->post_date,
-					NULL,
-					NULL,
-				);
-			}
-
-		}elseif($table_name == 'inventory_revaluations'){
-
-		}elseif($table_name == 'inventory_transfer_outs'){
-
-		}elseif($table_name == 'inventory_transfer_ins'){
-
-		}elseif($table_name == 'purchase_memos'){
-			$pm = PurchaseMemo::find($table_id);
-
-			foreach($pm->purchaseMemoDetail as $row){
-				if($row->lookable_type == 'purchase_invoice_details'){
-					if($row->lookable->lookable_type == 'good_receipt_details'){
-						$total = $row->total * $row->lookable->lookable->purchaseOrderDetail->purchaseOrder->currency_rate;
-
-						self::sendCogs2('purchase_memos',
-							$pm->id,
-							$pm->company_id,
-							$row->lookable->lookable->place_id,
-							$row->lookable->lookable->warehouse_id,
-							$row->lookable->lookable->item_id,
-							round($row->qty * $row->lookable->lookable->qty_conversion,3),
-							$total,
-							'OUT',
-							$pm->post_date,
-							NULL,
-							NULL,
-						);
-					}
-				}
-			}
 		}
 	}
 
@@ -4849,8 +4533,8 @@ class CustomHelper {
 										'note'			=> $pir->productionOrderDetail->productionOrder->code,
 										'lookable_type'	=> $table_name,
 										'lookable_id'	=> $table_id,
-										'detailable_type'=> $row->getTable(),
-										'detailable_id'	=> $row->id,
+										'detailable_type'=> $rowbatchusage->getTable(),
+										'detailable_id'	=> $rowbatchusage->id,
 									]);
 					
 									self::sendCogs($table_name,
@@ -4902,8 +4586,8 @@ class CustomHelper {
 											'note'			=> $pir->productionOrderDetail->productionOrder->code,
 											'lookable_type'	=> $table_name,
 											'lookable_id'	=> $table_id,
-											'detailable_type'=> $row->getTable(),
-											'detailable_id'	=> $row->id,
+											'detailable_type'=> $rowbatchusage->getTable(),
+											'detailable_id'	=> $rowbatchusage->id,
 										]);
 						
 										self::sendCogs($table_name,
@@ -6456,7 +6140,7 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
-				ResetCogs::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
+				ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
 				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}

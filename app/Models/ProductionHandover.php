@@ -223,6 +223,61 @@ class ProductionHandover extends Model
         }
     }
 
+    public function recalculate(){
+        /* foreach($this->productionHandoverDetail as $key => $row){
+            $prfgd = ProductionFgReceiveDetail::find($row->production_fg_receive_detail_id);
+            if($prfgd){
+                $qtyuom = $row->qty * $prfgd->conversion;
+                $prodbatch = ProductionBatch::find($prfgd->productionBatch->id);
+                $rowcost = round($prodbatch->priceByQty($qtyuom) * $qtyuom,2);
+                $itemShading = ItemShading::where('item_id',$request->arr_item_id[$key])->where('code',$prfgd->shading)->first();
+
+                if(!$itemShading){
+                    $itemShading = ItemShading::create([
+                        'item_id'   => $request->arr_item_id[$key],
+                        'code'      => $prfgd->shading,
+                    ]);
+                }
+
+                $querydetail = ProductionHandoverDetail::create([
+                    'production_handover_id'            => $query->id,
+                    'production_fg_receive_detail_id'   => $prfgd->id,
+                    'item_id'                           => $request->arr_item_id[$key],
+                    'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                    'shading'                           => $prfgd->shading,
+                    'place_id'                          => $request->arr_place[$key],
+                    'warehouse_id'                      => $request->arr_warehouse[$key],
+                    'area_id'                           => $request->arr_area_id[$key],
+                    'total'                             => $rowcost,
+                    'item_shading_id'                   => $itemShading->id,
+                ]);
+                
+                ProductionBatchUsage::create([
+                    'production_batch_id'   => $prfgd->productionBatch->id,
+                    'lookable_type'         => $querydetail->getTable(),
+                    'lookable_id'           => $querydetail->id,
+                    'qty'                   => $qtyuom,
+                ]);
+
+                CustomHelper::updateProductionBatch($prfgd->productionBatch->id,$qtyuom,'OUT');
+
+                ProductionBatch::create([
+                    'code'          => $querydetail->productionFgReceiveDetail->pallet_no,
+                    'item_id'       => $querydetail->item_id,
+                    'place_id'      => $request->arr_place[$key],
+                    'warehouse_id'  => $request->arr_warehouse[$key],
+                    'area_id'       => $request->arr_area_id[$key],
+                    'item_shading_id'=> $itemShading->id,
+                    'lookable_type' => $querydetail->getTable(),
+                    'lookable_id'   => $querydetail->id,
+                    'qty'           => $qtyuom,
+                    'qty_real'      => $qtyuom,
+                    'total'         => $rowcost,
+                ]);
+            }
+        } */
+    }
+
     public function getRequesterByItem($item_id){
         return $this->user->name;
     }

@@ -28,4 +28,10 @@ class ProductionBatchUsage extends Model
     public function productionBatch(){
         return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id')->withTrashed();
     }
+
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
 }

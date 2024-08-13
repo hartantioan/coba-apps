@@ -45,6 +45,12 @@ class ProductionReceiveDetail extends Model
         return $this->productionBatch->pluck('code')->implode(', ');
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function productionReceive()
     {
         return $this->belongsTo('App\Models\ProductionReceive', 'production_receive_id', 'id')->withTrashed();

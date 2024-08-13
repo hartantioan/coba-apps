@@ -43,6 +43,12 @@ class ProductionIssueDetail extends Model
         return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function productionIssue()
     {
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();

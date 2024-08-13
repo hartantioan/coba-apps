@@ -112,6 +112,12 @@ class LandedCostDetail extends Model
         });
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function getTax(){
         $total = $this->landedCost->total;
         $tax = ($this->nominal / $total) * $this->landedCost->tax;

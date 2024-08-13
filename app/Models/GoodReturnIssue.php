@@ -178,4 +178,12 @@ class GoodReturnIssue extends Model
         }
         return implode(', ',$arr);
     }
+
+    public function updateGrandtotal(){
+        $total = $this->goodReturnIssueDetail()->sum('total');
+        
+        GoodReturnIssue::find($this->id)->update([
+            'grandtotal'    => $total,
+        ]);
+    }
 }

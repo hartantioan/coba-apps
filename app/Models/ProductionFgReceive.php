@@ -43,6 +43,12 @@ class ProductionFgReceive extends Model
         'done_note',
     ];
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','lookable_id','id')->where('lookable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
@@ -265,7 +271,7 @@ class ProductionFgReceive extends Model
 
         // Query the LockPeriod model
         $see = LockPeriod::where('month', $monthYear)
-                        ->whereIn('status_closing', ['3'])
+                        ->whereIn('status_closing', ['2','3'])
                         ->get();
        
         if(count($see)>0){
@@ -482,6 +488,77 @@ class ProductionFgReceive extends Model
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
                 ->log('Add / edit issue production.');
+        }
+    }
+    
+    public function recalculate($date){
+        $totalCost = 0;
+        $totalQty = 0;
+        $totalBatch = 0;
+        foreach($this->productionFgReceiveDetail as $key => $row){
+            $totalQty += $row->qty;
+        }
+
+        foreach($this->productionBatchUsage as $key => $row){
+            $totalCost += round($row->productionBatch->price() * $row->qty,2);
+            $totalBatch += $row->qty;
+        }
+
+        $totalCostAll = $totalCost;
+        
+        foreach($this->productionFgReceiveDetail as $key => $row){
+            $rowtotalbatch = round(($row->qty / $totalQty) * $totalCost,2);
+            $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
+            $rowtotalmaterial = 0;
+
+            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row,$key){
+                $query->where('item_id',$row->item_id)->orderByDesc('created_at');
+            })->whereNotNull('is_default')->first();
+
+            if($bomAlternative){
+                foreach($bomAlternative->bomDetail as $rowbom){
+                    if($rowbom->lookable_type == 'items'){
+                        $item = Item::find($rowbom->lookable_id);
+                        if($item){
+                            $price = $item->priceNowProduction($this->place_id,$date);
+                            $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
+                        }
+                    }elseif($rowbom->lookable_type == 'resources'){
+                        $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
+                    }
+                }
+                if($bomAlternative->bom->bomStandard()->exists()){
+                    foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                        if($rowbom->lookable_type == 'items'){
+                            $item = Item::find($rowbom->lookable_id);
+                            if($item){
+                                $price = $item->priceNowProduction($this->place_id,$date);
+                                $rowtotalmaterial += round(round($rowbom->qty * $row->qty,3) * $price,2);
+                            }
+                        }elseif($rowbom->lookable_type == 'resources'){
+                            $rowtotalmaterial += round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
+                        }
+                    }
+                }
+            }
+
+            $rowtotal = $rowtotalbatch + $rowtotalmaterial;
+
+            $row->update([
+                'total_batch'               => $rowtotalbatch,
+                'total_material'            => $rowtotalmaterial,
+                'total'                     => $rowtotal,
+            ]);
+
+            $pfrd = ProductionFgReceiveDetail::find($row->id);
+
+            if($pfrd){
+                if($pfrd->productionBatch()->exists()){
+                    $pfrd->productionBatch->update([
+                        'total' => $pfrd->total,
+                    ]);
+                }
+            }
         }
     }
 

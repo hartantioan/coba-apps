@@ -200,6 +200,12 @@ class GoodIssueDetail extends Model
         });
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function itemSerial(){
         return $this->hasMany('App\Models\ItemSerial','usable_id','id')->where('usable_type',$this->table);
     }

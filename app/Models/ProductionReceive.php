@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Jobs\ResetCogsNew;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -254,6 +255,53 @@ class ProductionReceive extends Model
     public function qtyReject(){
         $qty = $this->productionReceiveDetail()->sum('qty_reject');
         return $qty;
+    }
+
+    public function recalculate(){
+        $totalQty = 0;
+        foreach($this->productionReceiveDetail as $row){
+            $totalQty += $row->qty;
+        }
+        $totalIssue = 0;
+        foreach($this->productionReceiveIssue as $key => $row){
+            $totalIssue += $row->productionIssue->total();
+        }
+        foreach($this->productionReceiveDetail as $row){
+            $rowtotal = round(($row->qty / $totalQty) * $totalIssue,2);
+            foreach($row->productionBatch as $rowbatch){
+                $totalbatch = round(($rowbatch->qty_real / $row->qty) * $rowtotal,2);
+                $rowbatch->update([
+                    'total' => $totalbatch,
+                ]);
+            }
+            $row->update([
+                'total' => $rowtotal,
+            ]);
+        }
+    }
+
+    public function recalculateAndResetCogs(){
+        $totalQty = 0;
+        foreach($this->productionReceiveDetail as $row){
+            $totalQty += $row->qty;
+        }
+        $totalIssue = 0;
+        foreach($this->productionReceiveIssue as $key => $row){
+            $totalIssue += $row->productionIssue->total();
+        }
+        foreach($this->productionReceiveDetail as $row){
+            $rowtotal = round(($row->qty / $totalQty) * $totalIssue,2);
+            foreach($row->productionBatch as $rowbatch){
+                $totalbatch = round(($rowbatch->qty_real / $row->qty) * $rowtotal,2);
+                $rowbatch->update([
+                    'total' => $totalbatch,
+                ]);
+                ResetCogsNew::dispatch($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
+            }
+            $row->update([
+                'total' => $rowtotal,
+            ]);
+        }
     }
 
     public function createProductionIssue(){

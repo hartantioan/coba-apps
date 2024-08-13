@@ -9,7 +9,9 @@ use App\Models\Place;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Jobs\ResetCogsNew;
 use App\Models\ItemShading;
+use App\Models\JournalDetail;
 use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionFgReceiveDetail;
@@ -342,7 +344,8 @@ class ProductionRecalculateController extends Controller
 
                         $query->save();
                         
-                        foreach($query->productionRecalculateDetai as $row){
+                        foreach($query->productionRecalculateDetail as $row){
+                            $row->productionIssueDetail->journalDetail()->delete();
                             $row->productionIssueDetail()->delete();
                             $row->delete();
                         }
@@ -386,7 +389,7 @@ class ProductionRecalculateController extends Controller
                             ]);
                             $updateProductionIssue = ProductionIssue::find($row);
                             if($updateProductionIssue){
-                                ProductionIssueDetail::create([
+                                $pid = ProductionIssueDetail::create([
                                     'production_issue_id'               => $updateProductionIssue->id,
                                     'production_order_detail_id'        => $updateProductionIssue->production_order_detail_id,
                                     'lookable_type'                     => 'resources',
@@ -403,7 +406,33 @@ class ProductionRecalculateController extends Controller
                                     'place_id'                          => $updateProductionIssue->place_id,
                                     'production_recalculate_detail_id'  => $querydetail->id,
                                 ]);
-                                /* $updateProductionIssue->reJournalAndRecalculateReceive(); */
+                                $journal = $updateProductionIssue->journal()->exists() ? $updateProductionIssue->journal : '';
+                                if($journal){
+                                    JournalDetail::create([
+                                        'journal_id'	=> $journal->id,
+										'coa_id'		=> $pid->lookable->coa_id,
+										'line_id'		=> $pid->productionIssue->line_id,
+										'place_id'		=> $pid->productionIssue->place_id,
+										'type'			=> '2',
+										'nominal'		=> $pid->total,
+										'nominal_fc'	=> $pid->total,
+										'note'			=> 'REKALKULASI PRODUKSI NO.'.$query->code,
+										'lookable_type'	=> $updateProductionIssue->getTable(),
+										'lookable_id'	=> $updateProductionIssue->id,
+										'detailable_type'=> $pid->getTable(),
+										'detailable_id'	=> $pid->id,
+                                    ]);
+                                    $journal->journalDetail()->where('type','1')->update([
+                                        'nominal_fc'  => $pid->productionIssue->total(),
+                                        'nominal'     => $pid->productionIssue->total(),
+                                    ]);
+                                }
+                                if($updateProductionIssue->productionReceiveIssue()->exists()){
+                                    $productionReceive = ProductionReceive::find($updateProductionIssue->productionReceiveIssue->production_receive_id);
+                                    if($productionReceive){
+                                        $productionReceive->recalculateAndResetCogs();
+                                    }
+                                }
                             }
                         }
                     }
@@ -630,14 +659,16 @@ class ProductionRecalculateController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionRecalculate::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            if(!CustomHelper::checkLockAcc($query->post_date)){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                ]);
+            foreach($query->productionRecalculateDetail as $row){
+                if(!CustomHelper::checkLockAcc($row->productionIssueDetail->productionIssue->post_date)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi Production Issue No. '.$row->productionIssueDetail->productionIssue->code.' terjadi pada tanggal '.date('d/m/Y',strtotime($row->productionIssueDetail->productionIssue->post_date)).' dan pada periode tersebut telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan pada dokumen.'
+                    ]);
+                }
             }
             if(in_array($query->status,['4','5'])){
                 $response = [
@@ -650,22 +681,27 @@ class ProductionRecalculateController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                if(in_array($query->status,['2','3'])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                    CustomHelper::removeCogs($query->getTable(),$query->id);
-                    if($query->productionFgReceive()->exists()){
-                        $query->productionFgReceive->update([
-                            'status'    => '2'
-                        ]);
-                    }
-                }
 
-                foreach($query->productionHandoverDetail as $row){
-                    if($row->productionBatchUsage()->exists()){
-                        CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
+                foreach($query->productionRecalculateDetail as $row){
+                    $row->productionIssueDetail->journalDetail()->delete();
+                    $pid = $row->production_issue_id;
+                    $row->productionIssueDetail()->delete();
+                    $updateProductionIssue = ProductionIssue::find($pid);
+                    if($updateProductionIssue){
+                        $journal = $updateProductionIssue->journal()->exists() ? $updateProductionIssue->journal : '';
+                        if($journal){
+                            $journal->journalDetail()->where('type','1')->update([
+                                'nominal_fc'  => $updateProductionIssue->total(),
+                                'nominal'     => $updateProductionIssue->total(),
+                            ]);
+                        }
+                        if($updateProductionIssue->productionReceiveIssue()->exists()){
+                            $productionReceive = ProductionReceive::find($updateProductionIssue->productionReceiveIssue->production_receive_id);
+                            if($productionReceive){
+                                $productionReceive->recalculateAndResetCogs();
+                            }
+                        }
                     }
-                    $row->productionBatchUsage()->delete();
-                    $row->productionBatch()->delete();
                 }
 
                 $query->update([
@@ -676,7 +712,7 @@ class ProductionRecalculateController extends Controller
                 ]);
 
                 activity()
-                    ->performedOn(new ProductionHandover())
+                    ->performedOn(new ProductionRecalculate())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the Rekalkulasi Produksi data');

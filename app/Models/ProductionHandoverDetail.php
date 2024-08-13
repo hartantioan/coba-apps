@@ -32,6 +32,12 @@ class ProductionHandoverDetail extends Model
         return $this->hasOne('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table)->withTrashed();
     }
 
+    public function journalDetail(){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function productionBatch(){
         return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table)->withTrashed();
     }

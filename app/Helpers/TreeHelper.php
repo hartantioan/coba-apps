@@ -1689,7 +1689,7 @@ class TreeHelper {
                                     ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
                                     
                                 ],
-                                'url'=>request()->root()."/admin/inventory/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
+                                'url'=>request()->root()."/admin/inventory/good_receipt_po?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
                             ];
                             
                             $data_go_chart[]=$data_good_receipt;

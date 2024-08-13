@@ -9,6 +9,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
 use App\Models\Place;
+use App\Models\Project;
 use App\Models\PurchaseRequest;
 use App\Models\PurchaseRequestDetail;
 use Carbon\Carbon;
@@ -155,8 +156,9 @@ class handlePRdetail implements OnEachRow, WithHeadingRow
                         $divisi_id = Division::where('code',$divisi)->first()->id ?? null;
                      
                         $project =  explode('#', $row['proyek'])[0];
-                        $project_id= Machine::where('code',$project)->first()->id ?? '';
-                 
+                        $project_id= Project::where('code',$project)->first()->id ?? null;
+                        info($project);
+                        info($project_id);
                         $jumlah = $row['jumlah'];$ket1 = $row['ket_1']; $ket2 = $row['ket_2'];
                         $tgl_pakai = $row['tgl_pakai']; $requester= $row['requester'];
 

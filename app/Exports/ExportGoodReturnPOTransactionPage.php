@@ -52,8 +52,9 @@ class ExportGoodReturnPOTransactionPage implements FromView,ShouldAutoSize
                     $query->whereDate('post_date','<=', $this->end_date);
                 }
                 if($this->status){
-                    $query->whereIn('status', $this->status);
-                }
+            $array = explode(',', $this->status);
+            $query->whereIn('status',$array);
+        }
             })
             ->get()
         ]);

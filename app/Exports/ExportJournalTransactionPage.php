@@ -52,8 +52,9 @@ class ExportJournalTransactionPage implements FromView,ShouldAutoSize
                     $query->whereIn('currency_id',$groupIds);
                 }
                 if($this->status){
-                    $query->whereIn('status', $this->status);
-                }
+            $array = explode(',', $this->status);
+            $query->whereIn('status',$array);
+        }
             })
             ->get()
         ]);

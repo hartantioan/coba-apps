@@ -55,8 +55,9 @@ class ExportGoodReceiptTransactionPage implements FromView,ShouldAutoSize
                 }
 
                 if($this->status){
-                    $query->whereIn('status', $this->status);
-                }
+            $array = explode(',', $this->status);
+            $query->whereIn('status',$array);
+        }
 
                 if(!$this->modedata){
                     $query->where('user_id',session('bo_id'));

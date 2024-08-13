@@ -30,12 +30,6 @@ class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
                     ->orWhere('vehicle_no', 'like', "%$this->search%")
                     ->orWhere('driver', 'like', "%$this->search%")
                     ->orWhere('note', 'like', "%$this->search%")
-                    ->orWhereHas('goodScaleDetail',function($query) {
-                        $query->whereHas('item',function($query){
-                            $query->where('code', 'like', "%$this->search%")
-                                ->orWhere('name','like',"%$this->search%");
-                        });
-                    })
                     ->orWhereHas('user',function($query){
                         $query->where('name','like',"%$this->search%")
                             ->orWhere('employee_no','like',"%$this->search%");
@@ -51,7 +45,8 @@ class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
             $query->whereDate('post_date','<=', $this->end_date);
         }
         if($this->status){
-            $query->whereIn('status', $this->status);
+            $array = explode(',', $this->status);
+            $query->whereIn('status',$array);
         }
     })
     ->get();

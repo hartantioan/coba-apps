@@ -1689,7 +1689,7 @@ class TreeHelper {
                                     ['name'=> "Tanggal :".$lc_detail->lookable->goodReceipt->post_date],
                                     
                                 ],
-                                'url'=>request()->root()."/admin/purchase/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
+                                'url'=>request()->root()."/admin/inventory/good_receipt?code=".CustomHelper::encrypt($lc_detail->lookable->goodReceipt->code),
                             ];
                             
                             $data_go_chart[]=$data_good_receipt;
@@ -1719,7 +1719,7 @@ class TreeHelper {
                                 "key" => $lc_detail->lookable->landedCost->code,
                                 "name" => $lc_detail->lookable->landedCost->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
+                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($lc_detail->lookable->landedCost->code),
                             ];
 
                             $data_go_chart[]=$lc_other;

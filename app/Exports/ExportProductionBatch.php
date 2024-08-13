@@ -96,8 +96,8 @@ class ExportProductionBatch implements FromCollection, WithTitle, WithHeadings, 
                 'qty_balance'   => $row->qtyBalance(),
                 'unit'          => $row->item->uomUnit->code,
                 'value_total'   => $row->total,
-                'value_used'    => $row->price() * $row->qtyUsed(),
-                'value_balance' => $row->price() * $row->qtyBalance(),
+                'value_used'    => round($row->price() * $row->qtyUsed(),2),
+                'value_balance' => round($row->price() * $row->qtyBalance(),2),
                 'ref_code'      => $row->lookable->parent->code,
             ];
         }

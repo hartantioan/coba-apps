@@ -142,8 +142,8 @@ class ProductionBatchController extends Controller
                     CustomHelper::formatConditionalQty($val->qtyBalance()),
                     $val->item->uomUnit->code,
                     CustomHelper::formatConditionalQty($val->total),
-                    CustomHelper::formatConditionalQty($val->price() * $val->qtyUsed()),
-                    CustomHelper::formatConditionalQty($val->price() * $val->qtyBalance()),
+                    CustomHelper::formatConditionalQty(round($val->price() * $val->qtyUsed(),2)),
+                    CustomHelper::formatConditionalQty(round($val->price() * $val->qtyBalance(),2)),
                     $val->lookable->parent->code,
                 ];
 

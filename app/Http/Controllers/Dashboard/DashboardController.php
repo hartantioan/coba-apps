@@ -1215,6 +1215,7 @@ class DashboardController extends Controller
     }
 
     public function changePeriod(Request $request){
+        $attendance_per_day = [];
         $attendance_monthly_user = AttendanceMonthlyReport::where('period_id',$request->id)
         ->where('user_id',session('bo_id'))->first();
      

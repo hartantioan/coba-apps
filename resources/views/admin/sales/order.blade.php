@@ -214,7 +214,6 @@
                                                         <th>Tipe Pembayaran</th>
                                                         <th>TOP.Internal</th>
                                                         <th>TOP.Customer</th>
-                                                        <th>Bergaransi</th>
                                                         <th>Alamat Penagihan</th>
                                                         <th>{{ __('translations.outlet') }}</th>
                                                         <th>Alamat Tujuan</th>
@@ -228,7 +227,6 @@
                                                         <th>% DP</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
-                                                        <th>{{ __('translations.subtotal') }}</th>
                                                         <th>Diskon</th>
                                                         <th>{{ __('translations.total') }}</th>
                                                         <th>{{ __('translations.tax') }}</th>
@@ -325,6 +323,15 @@
                                         <input id="document_no" name="document_no" type="text" placeholder="No. Referensi dokumen...">
                                         <label class="active" for="document_no">No. Referensi</label>
                                     </div>
+                                    <div class="input-field col m3 s12 ">
+                                        
+                                    </div>
+                                    <div class="input-field col m3 s12 ">
+                                        
+                                    </div>
+                                    <div class="input-field col m3 s12 right-align ">
+                                        <h6>Deposit : <b><span id="limit">0,00</span></b></h6>
+                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">
@@ -399,13 +406,7 @@
                                         <input id="top_customer" name="top_customer" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_customer">TOP Customer (hari)</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step24">
-                                        <select class="form-control" id="is_guarantee" name="is_guarantee">
-                                            <option value="1">Ya</option>
-                                            <option value="2">Tidak</option>
-                                        </select>
-                                        <label class="" for="is_guarantee">Bergaransi</label>
-                                    </div>
+                                  
                                     <div class="input-field col m3 s12 step25">
                                         <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                             @foreach ($currency as $row)
@@ -457,8 +458,9 @@
                                                         <th class="center">Satuan UoM</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">Satuan Pesanan</th>
+                                                        <th class="center">Qty Konversi</th>
                                                         <th class="center">{{ __('translations.price') }}</th>
-                                                        <th class="center">Margin</th>
+                                                       
                                                         <th class="center">
                                                             PPN
                                                             <label class="pl-2">
@@ -470,7 +472,6 @@
                                                         <th class="center">Disc1(%)</th>
                                                         <th class="center">Disc2(%)</th>
                                                         <th class="center">Disc3(Rp)</th>
-                                                        <th class="center">Biaya Lain</th>
                                                         <th class="center">{{ __('translations.final_price') }}</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
@@ -508,12 +509,7 @@
                             <div class="input-field col m4 s12 step34">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        <tr>
-                                            <td width="50%">Subtotal</td>
-                                            <td width="50%" class="right-align">
-                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
+                                        
                                         {{-- <tr>
                                             <td>Diskon</td>
                                             <td class="right-align"> --}}
@@ -795,8 +791,9 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#limit').text('0,00');
                 $('#account_id,#sender_id,#sales_id,#project_id,#transportation_id,#outlet_id').empty();
-                $('#subtotal,#discount,#total,#tax,#grandtotal,#rounding,#balance').val('0,00');
+                $('#total,#tax,#grandtotal,#rounding,#balance').val('0,00');
                 $('.row_item').each(function(){
                     $(this).remove();
                 });
@@ -965,6 +962,7 @@
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
+            $('#limit').text($('#account_id').select2('data')[0].deposit);
             var result = new Date($('#post_date').val());
             result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
             $('#valid_date').val(result.toISOString().split('T')[0]);
@@ -1382,7 +1380,6 @@
                     $.each($("#arr_item" + nil).select2('data')[0].list_outletprice, function(i, value) {
                         if(value.account_id == $('#account_id').val() && value.outlet_id == $('#outlet_id').val() && enough == false){
                             $("#rowPrice" + nil).val(value.price);
-                            $("#rowMargin" + nil).val(value.margin);
                             $("#rowDisc1" + nil).val(value.percent_discount_1);
                             $("#rowDisc2" + nil).val(value.percent_discount_2);
                             $("#rowDisc3" + nil).val(value.discount_3);
@@ -1403,7 +1400,6 @@
                 <option value="">--Silahkan pilih item--</option>
             `);
             $("#rowPrice" + nil).val('0,00');
-            $("#rowMargin" + nil).val('0,00');
             $("#rowDisc1" + nil).val('0');
             $("#rowDisc2" + nil).val('0');
             $("#rowDisc3" + nil).val('0');
@@ -1412,84 +1408,91 @@
     }
 
     function addItem(){
-        var count = makeid(10);
-        $('#last-row-item').remove();
-        $('#body-item').append(`
-            <tr class="row_item">
-                <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
-                <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
-                <td>
-                    <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                </td>
-                <td class="center-align">
-                    <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                        @foreach ($place as $rowplace)
-                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
-                <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
-                <td class="center-align" id="arr_uom_unit` + count + `">-</td>
-                <td>
-                    <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                </td>
-                <td class="center">
-                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
-                        <option value="">--Silahkan pilih item--</option>
-                    </select>
-                </td>
-                <td class="center">
-                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                    <datalist id="tempPrice` + count + `"></datalist>
-                </td>
-                <td class="center">
-                    <input list="tempMargin` + count + `" name="arr_margin[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowMargin`+ count +`">
-                    <datalist id="tempMargin` + count + `"></datalist>
-                </td>
-                <td>
-                    <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
-                        <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                        @foreach ($tax as $row)
-                            <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                        @endforeach
-                    </select>
-                </td>
-                <td>
-                    <label>
-                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
-                        <span>Ya/Tidak</span>
-                    </label>
-                </td>
-                <td class="center">
-                    <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_other_fee[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="arr_other_fee`+ count +`">
-                </td>
-                <td class="center">
-                    <input name="arr_final_price[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
-                </td>
-                <td class="center">
-                    <input name="arr_total[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
-                </td>
-                <td>
-                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang...">
-                </td>
-                <td class="center">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+        if($('#code_place_id').val()){
+            var selectedValue = $('#code_place_id').val();
+            var selectedText = $('#code_place_id option:selected').text();
+            var count = makeid(10);
+            $('#last-row-item').remove();
+            $('#body-item').append(`
+                <tr class="row_item">
+                    <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
+                    <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
+                    <td>
+                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                    </td>
+                    <td class="center-align">
+                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                            <option value="` + selectedValue + `">` + selectedText + `</option>
+                            
+                        </select>
+                    </td>
+                    <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
+                    <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
+                    <td class="center-align" id="arr_uom_unit` + count + `">-</td>
+                    <td>
+                        <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                    </td>
+                    <td class="center">
+                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
+                            <option value="">--Silahkan pilih item--</option>
+                        </select>
+                    </td>
+                    <td class="center">
+                        <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                        <datalist id="tempPrice` + count + `"></datalist>
+                    </td>
+                   
+                    <td>
+                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
+                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                            @foreach ($tax as $row)
+                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                            <span>Ya/Tidak</span>
+                        </label>
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                    </td>
+                    <td class="center">
+                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                    </td>
+        
+                    <td class="center">
+                        <input name="arr_final_price[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
+                    </td>
+                    <td class="center">
+                        <input name="arr_total[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
+                    </td>
+                    <td>
+                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang...">
+                    </td>
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+        }else{
+            swal({
+                title: '!',
+                text: 'Harap Pilih Plant Terlebih dahulu.',
+                icon: 'error'
+            });
+        } 
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -1675,7 +1678,7 @@
                 { name: 'payment_type', className: '' },
                 { name: 'top_internal', className: '' },
                 { name: 'top_customer', className: '' },
-                { name: 'is_guarantee', className: '' },
+               
                 { name: 'billing_address', className: '' },
                 { name: 'outlet_id', className: '' },
                 { name: 'destination_address', className: '' },
@@ -1689,7 +1692,6 @@
                 { name: 'percent_dp', className: 'center-align' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
-                { name: 'subtotal', className: 'right-align' },
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
@@ -1787,13 +1789,11 @@
                 formData.delete("arr_unit[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_price[]");
-                formData.delete("arr_margin[]");
                 formData.delete("arr_tax[]");
                 formData.delete("arr_is_include_tax[]");
                 formData.delete("arr_disc1[]");
                 formData.delete("arr_disc2[]");
                 formData.delete("arr_disc3[]");
-                formData.delete("arr_other_fee[]");
                 formData.delete("arr_final_price[]");
                 formData.delete("arr_total[]");
                 formData.delete("arr_note[]");
@@ -1807,14 +1807,14 @@
                         formData.append('arr_unit[]',($('select[name^="arr_unit[]"]').eq(index).val() ? $('select[name^="arr_unit[]"]').eq(index).val() : '' ));
                         formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
                         formData.append('arr_price[]',$('input[name^="arr_price"]').eq(index).val());
-                        formData.append('arr_margin[]',$('input[name^="arr_margin"]').eq(index).val());
+                       
                         formData.append('arr_tax[]',$('select[name^="arr_tax"]').eq(index).val());
                         formData.append('arr_tax_id[]',$('option:selected','select[name^="arr_tax"]').eq(index).data('id'));
                         formData.append('arr_is_include_tax[]',($('input[name^="arr_is_include_tax"]').eq(index).is(':checked') ? '1' : '0'));
                         formData.append('arr_disc1[]',$('input[name^="arr_disc1"]').eq(index).val());
                         formData.append('arr_disc2[]',$('input[name^="arr_disc2"]').eq(index).val());
                         formData.append('arr_disc3[]',$('input[name^="arr_disc3"]').eq(index).val());
-                        formData.append('arr_other_fee[]',$('input[name^="arr_other_fee"]').eq(index).val());
+                       
                         formData.append('arr_final_price[]',$('input[name^="arr_final_price"]').eq(index).val());
                         formData.append('arr_total[]',$('input[name^="arr_total"]').eq(index).val());
                         formData.append('arr_note[]',$('input[name^="arr_note[]"]').eq(index).val());
@@ -1951,6 +1951,7 @@
                 $('#account_id').append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
+                $('#limit').text(response.deposit);
                 $('#company_id').val(response.company_id).formSelect();
                 $('#type').val(response.type).formSelect();
                 $('#post_date').val(response.post_date);
@@ -2021,8 +2022,7 @@
                 $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
                 $('#note_internal').val(response.note_internal);
                 $('#note_external').val(response.note_external);
-                $('#subtotal').val(response.subtotal);
-                $('#discount').val(response.discount);
+            
                 $('#total').val(response.total);
                 $('#tax').val(response.tax);
                 $('#total_after_tax').val(response.total_after_tax);
@@ -2061,13 +2061,13 @@
                                     <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
                                 </td>
                                 <td class="center">
+                                    <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
+                                </td>
+                                <td class="center">
                                     <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
-                                <td class="center">
-                                    <input list="tempMargin` + count + `" name="arr_margin[]" class="browser-default" type="text" value="` + val.margin + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowMargin`+ count +`">
-                                    <datalist id="tempMargin` + count + `"></datalist>
-                                </td>
+                                
                                 <td>
                                     <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                         <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
@@ -2091,9 +2091,7 @@
                                 <td class="center">
                                     <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                 </td>
-                                <td class="center">
-                                    <input name="arr_other_fee[]" class="browser-default" type="text" value="` + val.other_fee + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="arr_other_fee`+ count +`">
-                                </td>
+                                
                                 <td class="center">
                                     <input name="arr_final_price[]" class="browser-default" type="text" value="` + val.final_price + `" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
                                 </td>
@@ -2125,6 +2123,7 @@
                             `);
                         });
                         $('#arr_unit' + count).val(val.item_unit_id);
+                        $('#rowQty' + count).trigger('keyup');
                     });
                 }
                 
@@ -2265,21 +2264,21 @@
             conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString()),
             qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
             price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
-            margin = parseFloat($('#rowMargin' + id).val().replaceAll(".", "").replaceAll(",",".")),
             disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
 
         qtylimit = (qtylimit / conversion).toFixed(3);
-
+        var qtykonversi = qty * conversion.toFixed(3);
         if(qtylimit > 0){
             if(qty > qtylimit){
                 qty = qtylimit;
                 $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
             }
         }
-        
-        price = price - margin;
+        console.log(qtykonversi)
+        $('#arr_konversi' + id).text(formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',',')) + ' m2');
+        price = price;
 
         var finalpricedisc1 = price - (price * (disc1 / 100));
         var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
@@ -2314,7 +2313,7 @@
     }
 
     function countAll(){
-        var subtotal = 0, tax = 0, discount = parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",",".")), total = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), total_after_tax = 0;
+        var subtotal = 0, tax = 0, total = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), total_after_tax = 0;
 
         $('input[name^="arr_total"]').each(function(index){
 			subtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
@@ -2322,16 +2321,15 @@
 
         $('input[name^="arr_total"]').each(function(index){
             let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let bobot = rownominal / subtotal;
-            let rowdiscount = discount * bobot;
+
             let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
             if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
-                rownominal = (rownominal - rowdiscount) / (1 + (percent_tax / 100));
+                rownominal = rownominal / (1 + (percent_tax / 100));
             }
-            tax += (rownominal - rowdiscount) * (percent_tax / 100);
+            tax += rownominal * (percent_tax / 100);
         });
 
-        total = subtotal - discount;
+        total = subtotal;
         
         tax = Math.floor(tax);
 
@@ -2339,9 +2337,6 @@
 
         grandtotal = total_after_tax + rounding;
 
-        $('#subtotal').val(
-            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
-        );
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
@@ -2489,11 +2484,6 @@
                     intro : 'Tenggat pembayaran customer dalam satuan hari.'
                 },
                 {
-                    title : 'Garansi',
-                    element : document.querySelector('.step24'),
-                    intro : 'Apakah SO ini bergaransi atau tidak.'
-                },
-                {
                     title : 'Mata Uang',
                     element : document.querySelector('.step25'),
                     intro : 'Mata uang, silahkan pilih mata uang lain, untuk mata uang asing.' 
@@ -2541,7 +2531,7 @@
                 {
                     title : 'Informasi Total',
                     element : document.querySelector('.step34'),
-                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Diskon ini mengurangi subtotal. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
+                    intro : 'Nominal diskon, untuk diskon yang ingin dimunculkan di dalam dokumen ketika dicetak. Sedangkan untuk Rounding akan menambah atau mengurangi nilai grandtotal sesuai inputan pengguna.' 
                 },
                 {
                     title : 'Tombol Simpan',
@@ -2648,8 +2638,7 @@
                         $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
-                        $('#subtotal').val(response.subtotal);
-                        $('#discount').val(response.discount);
+                        
                         $('#total').val(response.total);
                         $('#tax').val(response.tax);
                         $('#total_after_tax').val(response.total_after_tax);
@@ -2684,17 +2673,18 @@
                                         <td>
                                             <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
                                         </td>
+                                        
                                         <td class="center">
                                             <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
+                                        </td>
+                                        <td class="center">
+                                            <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
                                         </td>
                                         <td class="center">
                                             <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                             <datalist id="tempPrice` + count + `"></datalist>
                                         </td>
-                                        <td class="center">
-                                            <input list="tempMargin` + count + `" name="arr_margin[]" class="browser-default" type="text" value="` + val.margin + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowMargin`+ count +`">
-                                            <datalist id="tempMargin` + count + `"></datalist>
-                                        </td>
+                                        
                                         <td>
                                             <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                                 <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
@@ -2718,9 +2708,7 @@
                                         <td class="center">
                                             <input name="arr_disc3[]" class="browser-default" type="text" value="` + val.disc3 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
                                         </td>
-                                        <td class="center">
-                                            <input name="arr_other_fee[]" class="browser-default" type="text" value="` + val.other_fee + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="arr_other_fee`+ count +`">
-                                        </td>
+                                        
                                         <td class="center">
                                             <input name="arr_final_price[]" class="browser-default" type="text" value="` + val.final_price + `" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
                                         </td>

@@ -1062,6 +1062,7 @@ class Select2Controller extends Controller {
                 'text' 			        => $d->employee_no.' - '.$d->name,
                 'top_customer'          => $d->top ?? 0,
                 'top_internal'          => $d->top_internal ?? 0,
+                'deposit'               => $d->deposit ?? 0,
                 'limit_credit'          => number_format($d->limit_credit,2,',','.'),
                 'count_limit_credit'    => number_format($d->count_limit_credit,2,',','.'),
                 'billing_address'       => $d->getBillingAddress()

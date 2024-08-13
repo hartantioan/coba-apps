@@ -107,7 +107,7 @@ class MarketingOrderController extends Controller
             'payment_type',
             'top_internal',
             'top_customer',
-            'is_guarantee',
+           
             'billing_address',
             'outlet_id',
             'destination_address',
@@ -119,7 +119,7 @@ class MarketingOrderController extends Controller
             'currency_rate',
             'note_internal',
             'note_external',
-            'subtotal',
+           
             'discount',
             'total',
             'tax',
@@ -143,7 +143,6 @@ class MarketingOrderController extends Controller
                             ->orWhere('document_no', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
@@ -220,7 +219,6 @@ class MarketingOrderController extends Controller
                             ->orWhere('document_no', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
-                            ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('discount', 'like', "%$search%")
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
@@ -319,7 +317,6 @@ class MarketingOrderController extends Controller
                     $val->paymentType(),
                     $val->top_internal,
                     $val->top_customer,
-                    $val->isGuarantee(),
                     $val->billing_address,
                     $val->outlet->name,
                     $val->destination_address,
@@ -333,7 +330,6 @@ class MarketingOrderController extends Controller
                     $val->percent_dp,
                     $val->note_internal,
                     $val->note_external,
-                    number_format($val->subtotal,2,',','.'),
                     number_format($val->discount,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
@@ -401,7 +397,7 @@ class MarketingOrderController extends Controller
             'sender_id'                 => 'required',
             'delivery_date'             => 'required',
             'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
-            'outlet_id'                 => 'required',
+            
             'billing_address'           => 'required',
             'destination_address'       => 'required',
             'province_id'               => 'required',
@@ -411,7 +407,7 @@ class MarketingOrderController extends Controller
             'payment_type'              => 'required',
             'top_internal'              => 'required',
             'top_customer'              => 'required',
-            'is_guarantee'              => 'required',
+           
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'percent_dp'                => 'required',
@@ -432,7 +428,7 @@ class MarketingOrderController extends Controller
             'arr_other_fee'             => 'required|array',
             'arr_final_price'           => 'required|array',
             'arr_total'                 => 'required|array',
-            'subtotal'                  => 'required',
+           
             'discount'                  => 'required',
             'total'                     => 'required',
             'tax'                       => 'required',
@@ -454,7 +450,7 @@ class MarketingOrderController extends Controller
             'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
             'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
             'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
-            'outlet_id.required'                => 'Outlet tidak boleh kosong.',
+         
             'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
             'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
             'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
@@ -464,7 +460,7 @@ class MarketingOrderController extends Controller
             'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
             'top_internal.required'             => 'TOP internal tidak boleh kosong.',
             'top_customer.required'             => 'TOP customer tidak boleh kosong',
-            'is_guarantee.required'             => 'Garansi atau tidaknya barang tidak boleh kosong.',
+            
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
             'percent_dp.required'               => 'Prosentase DP tidak boleh kosong. Silahkan isi 0 jika memang tidak ada.',
@@ -502,7 +498,7 @@ class MarketingOrderController extends Controller
             'arr_total.required'                => 'Baris total tidak boleh kosong.',
             'arr_total.array'                   => 'Baris total harus array.',
             'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
-            'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
+          
             'total.required'                    => 'Total tidak boleh kosong.',
             'tax.required'                      => 'PPN tidak boleh kosong.',
             'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
@@ -597,7 +593,6 @@ class MarketingOrderController extends Controller
                         $query->payment_type = $request->payment_type;
                         $query->top_internal = $request->top_internal;
                         $query->top_customer = $request->top_customer;
-                        $query->is_guarantee = $request->is_guarantee;
                         $query->transportation_id = $request->transportation_id;
                         $query->outlet_id = $request->outlet_id;
                         $query->user_data_id = $request->billing_address;
@@ -613,7 +608,7 @@ class MarketingOrderController extends Controller
                         $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
-                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
+                       
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
@@ -663,7 +658,6 @@ class MarketingOrderController extends Controller
                         'payment_type'              => $request->payment_type,
                         'top_internal'              => $request->top_internal,
                         'top_customer'              => $request->top_customer,
-                        'is_guarantee'              => $request->is_guarantee,
                         'transportation_id'         => $request->transportation_id,
                         'outlet_id'                 => $request->outlet_id,
                         'user_data_id'              => $request->billing_address,
@@ -679,7 +673,7 @@ class MarketingOrderController extends Controller
                         'percent_dp'                => str_replace(',','.',str_replace('.','',$request->percent_dp)),
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,
-                        'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
+
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
@@ -765,7 +759,6 @@ class MarketingOrderController extends Controller
         $po['sales_name'] = $po->sales->name.' - '.$po->sales->phone.' Pos. '.$po->sales->position->name.' Dep. '.$po->sales->position->division->department->name;
         $po['province_name'] = $po->province->name;
         $po['cities'] = $po->province->getCity();
-        $po['subtotal'] = number_format($po->subtotal,2,',','.');
         $po['discount'] = number_format($po->discount,2,',','.');
         $po['total'] = number_format($po->total,2,',','.');
         $po['tax'] = number_format($po->tax,2,',','.');
@@ -778,7 +771,7 @@ class MarketingOrderController extends Controller
         $po['user_data'] = $po->account->getBillingAddress();
         $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
         $po['outlet_name'] = $po->outlet->code.' - '.$po->outlet->name;
-
+        $po['deposit'] = $po->account->deposit;
         $arr = [];
         
         foreach($po->marketingOrderDetail as $row){
@@ -915,10 +908,7 @@ class MarketingOrderController extends Controller
             </tr>  
         ';
 
-        $string .= '<tr>
-                        <td class="right-align" colspan="13">Subtotal</td>
-                        <td class="right-align">'.number_format($data->subtotal,2,',','.').'</td>
-                    </tr>
+        $string .= '
                     <tr>
                         <td class="right-align" colspan="13">Diskon</td>
                         <td class="right-align">'.number_format($data->discount,2,',','.').'</td>

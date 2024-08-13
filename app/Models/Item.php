@@ -470,6 +470,18 @@ class Item extends Model
         return $arr;
     }
 
+    public function defaultBuyUnit(){
+        $unit = $this->itemUnit()->whereNotNull('is_buy_unit')->whereNotNull('is_default')->first();
+        $data = [];
+        if($unit){
+            $data = [
+                'item_unit_id'  => $unit->id,
+                'conversion'    => $unit->conversion,
+            ];
+        }
+        return $data;
+    }
+
     public function arrSellUnits(){
         $arr = [];
         foreach($this->itemUnit()->whereNotNull('is_sell_unit')->orderByDesc('is_default')->get() as $row){

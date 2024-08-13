@@ -42,6 +42,8 @@ class User extends Authenticatable
         'tax_id',
         'tax_name',
         'tax_address',
+        'nib',
+        'sppkp',
         'pic',
         'pic_position',
         'pic_no',
@@ -70,6 +72,8 @@ class User extends Authenticatable
         'registration_id',
         'reset_code',
         'type_payment',
+        'nib',
+        'spkp',
         'id_program_lama',
         'is_special_lock_user',
     ];

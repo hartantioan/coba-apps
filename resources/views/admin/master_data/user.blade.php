@@ -161,7 +161,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100% !important;">
     <div class="modal-content" style="overflow-x: hidden !important;">
         <div class="row">
             <div class="col s12">
@@ -376,11 +376,11 @@
                                     <table class="bordered">
                                         <thead>
                                             <tr>
+                                                <th width="20%" class="center">Utama</th>
                                                 <th width="30%" class="center">Bank</th>
                                                 <th width="20%" class="center">{{ __('translations.on_behalf_of') }}</th>
                                                 <th width="20%" class="center">{{ __('translations.bank_account') }}</th>
                                                 <th width="20%" class="center">{{ __('translations.branch') }}</th>
-                                                <th width="20%" class="center">Utama</th>
                                                 <th width="10%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
@@ -402,6 +402,7 @@
                                     <table class="bordered" style="min-width:100%;">
                                         <thead>
                                             <tr>
+                                                <th class="center">Default</th>
                                                 <th class="center">Nama (Sesuai NPWP)</th>
                                                 <th class="center">{{ __('translations.note') }}</th>
                                                 <th class="center">NPWP</th>
@@ -410,7 +411,7 @@
                                                 <th class="center">{{ __('translations.province') }}</th>
                                                 <th class="center">{{ __('translations.city') }}</th>
                                                 <th class="center">{{ __('translations.district') }}</th>
-                                                <th class="center">Default</th>
+                                                
                                                 <th width="5%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
@@ -432,12 +433,12 @@
                                     <table class="bordered" style="min-width:100%;">
                                         <thead>
                                             <tr>
+                                                <th class="center">Default</th>
                                                 <th class="center">{{ __('translations.address') }}</th>
                                                 <th class="center">Negara</th>
                                                 <th class="center">{{ __('translations.province') }}</th>
                                                 <th class="center">{{ __('translations.city') }}</th>
                                                 <th class="center">{{ __('translations.district') }}</th>
-                                                <th class="center">Default</th>
                                                 <th width="5%" class="center">{{ __('translations.delete') }}</th>
                                             </tr>
                                         </thead>
@@ -528,11 +529,11 @@
     </div>
 </div>
 
-<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+<div id="modal4" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>import Excel</h4>
+                <h4>{{ __('translations.import') }} Excel</h4>
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
@@ -540,7 +541,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>File</span>
+                            <span>Dokumen Excel</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">
@@ -548,7 +549,7 @@
                         </div>
                     </div>
                     <div class="input-field col m6 s12">
-                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_bp.xlsx')) }}" target="_blank">File</a>
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Apabila ada bagian yang tidak diisi harap isi dengan X pada kolom no header agar tidak terjadi error</h6>
                     </div>
                     <div class="input-field col m12 s12">
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
@@ -1133,6 +1134,99 @@
             }
         });
 
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                       
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        let errorMessage = '';
+                        response.responseJSON.errors.forEach(function(error) {
+                            errorMessage += error.errors.join('\n') + '\n';
+                        });
+
+                        $('#validation_alertImport').html(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>${errorMessage}</p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `).show();
+                    }else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                       
+                        let errorMessage = response.status === 400 ? 
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                            `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
+
+                        $('#validation_alertImport').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    ${errorMessage}
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                }
+            });
+        });
+
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
@@ -1223,7 +1317,6 @@
                         });
                     }
                     loadingClose('.modal-content');
-                    $('#form_dataimport')[0].reset();
                 },
                 error: function(response) {
                     var errors = response.responseJSON.errors;
@@ -1660,6 +1753,12 @@
             <tr class="row_destination">
                 <input type="hidden" name="arr_id_data_destination[]" value="">
                 <td class="center">
+                    <label>
+                        <input class="with-gap" name="check_destination" type="radio" value="` + count + `" `+checked+`>
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center">
                     <input name="arr_address_destination[]" type="text" placeholder="Alamat Kantor">
                 </td>
                 <td class="center">
@@ -1678,12 +1777,6 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_district_destination` + code + `" name="arr_district_destination[]"></select>
-                </td>
-                <td class="center">
-                    <label>
-                        <input class="with-gap" name="check_info" type="radio" value="` + count + `" `+checked+`>
-                        <span>Pilih</span>
-                    </label>
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-destination" href="javascript:void(0);">
@@ -1764,6 +1857,12 @@
         $('#last-row-bank').before(`
             <tr class="row_bank">
                 <input type="hidden" name="arr_id_bank[]" value="">
+                <td class="center">
+                    <label>
+                        <input class="with-gap" name="check" type="radio" value="` + count + `" `+checked+`>
+                        <span>Pilih</span>
+                    </label>
+                </td>
                 <td>
                     <input name="arr_bank[]" type="text" placeholder="Nama Bank">
                 </td>
@@ -1776,12 +1875,7 @@
                 <td>
                     <input name="arr_branch[]" type="text" placeholder="Cabang">
                 </td>
-                <td class="center">
-                    <label>
-                        <input class="with-gap" name="check" type="radio" value="` + count + `" `+checked+`>
-                        <span>Pilih</span>
-                    </label>
-                </td>
+                
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bank" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -1803,6 +1897,12 @@
         $('#last-row-info').before(`
             <tr class="row_info">
                 <input type="hidden" name="arr_id_data[]" value="">
+                <td class="center">
+                    <label>
+                        <input class="with-gap" name="check_info" type="radio" value="` + length + `" `+checked+`>
+                        <span>Pilih</span>
+                    </label>
+                </td>
                 <td>
                     <input name="arr_title[]" type="text" style="width:200px !important;">
                 </td>
@@ -1832,12 +1932,7 @@
                 <td class="center">
                     <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
                 </td>
-                <td class="center">
-                    <label>
-                        <input class="with-gap" name="check_destination" type="radio" value="` + length + `" `+checked+`>
-                        <span>Pilih</span>
-                    </label>
-                </td>
+                
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
@@ -2281,6 +2376,12 @@
                         $('#last-row-bank').before(`
                             <tr class="row_bank">
                                 <input type="hidden" name="arr_id_bank[]" value="` + val.id + `">
+                                <td class="center">
+                                    <label>
+                                        <input class="with-gap" name="check" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
                                 <td>
                                     <input name="arr_bank[]" type="text" placeholder="Atas nama" value="` + val.bank + `">
                                 </td>
@@ -2293,12 +2394,7 @@
                                 <td>
                                     <input name="arr_branch[]" type="text" placeholder="Cabang" value="` + val.branch + `">
                                 </td>
-                                <td class="center">
-                                    <label>
-                                        <input class="with-gap" name="check" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
+                                
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-bank" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -2319,6 +2415,12 @@
                         $('#last-row-info').before(`
                             <tr class="row_info">
                                 <input type="hidden" name="arr_id_data[]" value="` + val.id + `">
+                                <td class="center">
+                                    <label>
+                                        <input class="with-gap" name="check_info" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
                                 <td>
                                     <input name="arr_title[]" type="text" style="width:200px !important;" value="` + val.title + `">
                                 </td>
@@ -2348,12 +2450,7 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_district` + count + `" name="arr_district[]"></select>
                                 </td>
-                                <td class="center">
-                                    <label>
-                                        <input class="with-gap" name="check_info" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
+                               
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-info" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>
@@ -2455,6 +2552,12 @@
                             <tr class="row_destination">
                                 <input type="hidden" name="arr_id_data_destination[]" value="` + val.id + `">
                                 <td class="center">
+                                    <label>
+                                        <input class="with-gap" name="check_destination" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center">
                                     <input name="arr_address_destination[]" type="text" placeholder="Alamat Kantor" value="` + val.address + `">
                                 </td>
                                 <td class="center">
@@ -2474,12 +2577,7 @@
                                 <td class="center">
                                     <select class="browser-default" id="arr_district_destination` + count + `" name="arr_district_destination[]"></select>
                                 </td>
-                                <td class="center">
-                                    <label>
-                                        <input class="with-gap" name="check_destination" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
-                                        <span>Pilih</span>
-                                    </label>
-                                </td>
+                                
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-destination" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>

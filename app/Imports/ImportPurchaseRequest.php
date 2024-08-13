@@ -74,6 +74,7 @@ class handlePR implements OnEachRow, WithHeadingRow
                         'post_date' => $dateFormatted1,
                         'due_date' => $dateFormatted2,
                         'place_id' => $place->id,
+                        'note'     => $row['note'],
                     ]);
                     
       
@@ -185,7 +186,7 @@ class handlePRdetail implements OnEachRow, WithHeadingRow
                                 'place_id'            => $plant_id,
                                 'line_id'             => $line_id,
                                 'machine_id'          => $machine_id,
-                                'jumlah'              => $jumlah,
+                                'qty'              => $jumlah,
                                 'note'                => $ket1,
                                 'note2'               => $ket2,
                                 'required_date'       => $dateFormatted_duedate,

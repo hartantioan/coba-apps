@@ -898,7 +898,7 @@
             }
         });
 
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
         select2ServerSide('#pallet_id', '{{ url("admin/select2/pallet") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');

@@ -48,7 +48,7 @@ class ProductionRecalculateController extends Controller
        
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
-            'title'         => 'Serah Terima',
+            'title'         => 'Rekalkulasi Produksi',
             'content'       => 'admin.production.recalculate',
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),

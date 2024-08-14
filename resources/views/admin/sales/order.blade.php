@@ -1441,7 +1441,7 @@
                         <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
                     </td>
                     <td class="center">
-                        <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                        <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
                         <datalist id="tempPrice` + count + `"></datalist>
                     </td>
                    
@@ -2064,7 +2064,7 @@
                                     <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
                                 </td>
                                 <td class="center">
-                                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
                                 
@@ -2260,7 +2260,8 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
+        if($('#arr_unit' + id).val()){
+            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
             conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString()),
             qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
             price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
@@ -2268,47 +2269,48 @@
             disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
 
-        qtylimit = (qtylimit / conversion).toFixed(3);
-        var qtykonversi = qty * conversion.toFixed(3);
-        if(qtylimit > 0){
-            if(qty > qtylimit){
-                qty = qtylimit;
-                $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
+            qtylimit = (qtylimit / conversion).toFixed(3);
+            var qtykonversi = qty * conversion.toFixed(3);
+            if(qtylimit > 0){
+                if(qty > qtylimit){
+                    qty = qtylimit;
+                    $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
+                }
             }
-        }
-        $('#arr_konversi' + id).text(formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',',')) + ' m2');
-        price = price;
+            $('#arr_konversi' + id).text(formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',',')) + ' m2');
+            price = price;
 
-        var finalpricedisc1 = price - (price * (disc1 / 100));
-        var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
-        var finalpricedisc3 = finalpricedisc2 - disc3;
-        var rowtotal = (finalpricedisc3 * qty).toFixed(2);
-        var rowtax = 0;
+            var finalpricedisc1 = price - (price * (disc1 / 100));
+            var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
+            var finalpricedisc3 = finalpricedisc2 - disc3;
+            var rowtotal = (finalpricedisc3 * qty).toFixed(2);
+            var rowtax = 0;
 
-        if($('#arr_tax' + id).val() !== '0'){
-            let percent_tax = parseFloat($('#arr_tax' + id).val());
-            if($('#arr_is_include_tax' + id).is(':checked')){
-                rowtotal = rowtotal / (1 + (percent_tax / 100));
+            if($('#arr_tax' + id).val() !== '0'){
+                let percent_tax = parseFloat($('#arr_tax' + id).val());
+                if($('#arr_is_include_tax' + id).is(':checked')){
+                    rowtotal = rowtotal / (1 + (percent_tax / 100));
+                }
+                rowtax = rowtotal * (percent_tax / 100);
             }
-            rowtax = rowtotal * (percent_tax / 100);
+
+            $('#arr_tax_nominal' + id).val(rowtax.toFixed(2));
+            $('#arr_grandtotal' + id).val((parseFloat(rowtax) + parseFloat(rowtotal)).toFixed(2));
+
+            if(finalpricedisc3 >= 0){
+                $('#arr_final_price' + id).val(formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
+            }else{
+                $('#arr_final_price' + id).val('-' + formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
+            }
+
+            if(rowtotal >= 0){
+                $('#arr_total' + id).val(formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',',')));
+            }else{
+                $('#arr_total' + id).val('-' + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',',')));
+            }
+
+            countAll();
         }
-
-        $('#arr_tax_nominal' + id).val(rowtax.toFixed(2));
-        $('#arr_grandtotal' + id).val((parseFloat(rowtax) + parseFloat(rowtotal)).toFixed(2));
-
-        if(finalpricedisc3 >= 0){
-            $('#arr_final_price' + id).val(formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
-        }else{
-            $('#arr_final_price' + id).val('-' + formatRupiahIni(finalpricedisc3.toFixed(2).toString().replace('.',',')));
-        }
-
-        if(rowtotal >= 0){
-            $('#arr_total' + id).val(formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',',')));
-        }else{
-            $('#arr_total' + id).val('-' + formatRupiahIni(roundTwoDecimal(rowtotal).toString().replace('.',',')));
-        }
-
-        countAll();
     }
 
     function countAll(){

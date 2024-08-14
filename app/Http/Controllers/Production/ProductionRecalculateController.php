@@ -514,38 +514,30 @@ class ProductionRecalculateController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionRecalculate::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="10" style="font-size:20px !important;">Daftar Item Receive</th>
+                                <th class="center-align" colspan="6" style="font-size:20px !important;">Daftar Rekalkulasi Resource</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>
-                                <th class="center">No.Batch Palet/Curah</th>
-                                <th class="center">Item</th>
-                                <th class="center">'.__('translations.shading').'</th>
-                                <th class="center">Qty Diterima</th>
-                                <th class="center">Satuan</th>
-                                <th class="center">Konversi</th>
-                                <th class="center">'.__('translations.plant').'</th>
-                                <th class="center">'.__('translations.warehouse').'</th>
-                                <th class="center">'.__('translations.area').'</th>
+                                <th class="center">Production Issue</th>
+                                <th class="center">Batch No.</th>
+                                <th class="center">Resource</th>
+                                <th class="center">Total Lama</th>
+                                <th class="center">Nilai rekalkulasi</th>
                             </tr>
                         </thead><tbody>';
-        foreach($data->productionHandoverDetail()->orderBy('id')->get() as $key => $row){
+        foreach($data->productionRecalculateDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'</td>
-                <td>'.$row->productionFgReceiveDetail->pallet_no.'</td>
-                <td>'.$row->item->code.' - '.$row->item->name.'</td>
-                <td>'.$row->shading.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->productionFgReceiveDetail->itemUnit->unit->code.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionFgReceiveDetail->conversion).'</td>
-                <td class="">'.$row->place->code.'</td>
-                <td class="">'.$row->warehouse->name.'</td>
-                <td class="">'.$row->area->code.'</td>
+                <td>'.$row->productionIssue->code.'</td>
+                <td>'.$row->productionBatch->code.'</td>
+                <td>'.$row->resource->code.' - '.$row->resource->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->lookable->total).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->total).'</td>
             </tr>';
         }
 

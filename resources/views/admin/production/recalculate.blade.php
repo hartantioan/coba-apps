@@ -260,12 +260,14 @@
                                         </div>
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;min-width:1500px;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;min-width:1800px;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center" width="25px">{{ __('translations.delete') }}</th>
                                                             <th class="center" width="25px">No.</th>
                                                             <th class="center" width="150px">No.Batch Palet/Curah</th>
+                                                            <th class="center" width="150px">No.Production Order</th>
+                                                            <th class="center" width="150px">Tgl.Post Receive</th>
                                                             <th class="center" width="100px">Kode Item</th>
                                                             <th class="center" width="100px">Nama Item</th>
                                                             <th class="center" width="100px">Qty</th>
@@ -277,7 +279,7 @@
                                                     </thead>
                                                     <tbody id="body-item">
                                                         <tr id="last-row-item">
-                                                            <td class="center-align" colspan="10">
+                                                            <td class="center-align" colspan="12">
                                                                 Silahkan Tarik Data untuk memulai...
                                                             </td>
                                                         </tr>
@@ -879,6 +881,12 @@
                                 <td>
                                     ` + val.production_batch_code + `
                                 </td>
+                                <td>
+                                    ` + val.production_order_code + `
+                                </td>
+                                <td>
+                                    ` + val.post_date + `
+                                </td>v
                                 <td>
                                     ` + val.item_code + `
                                 </td>

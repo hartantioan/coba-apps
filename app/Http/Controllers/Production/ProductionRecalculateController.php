@@ -100,6 +100,8 @@ class ProductionRecalculateController extends Controller
                             'production_issue_id'   => $rowissue->id,
                             'production_batch_id'   => $row->id,
                             'production_batch_code' => $row->code,
+                            'production_order_code' => $rowdata->productionReceive->productionOrderDetail->productionOrder->code,
+                            'post_date'             => date('d/m/Y',strtotime($rowdata->productionReceive->post_date)),
                             'item_code'             => $row->item->code,
                             'item_name'             => $row->item->name,
                             'qty'                   => CustomHelper::formatConditionalQty($row->qty_real),
@@ -525,6 +527,8 @@ class ProductionRecalculateController extends Controller
                                 <th class="center">No.</th>
                                 <th class="center">Production Issue</th>
                                 <th class="center">Batch No.</th>
+                                <th class="center">Production Order</th>
+                                <th class="center">Tgl.Receive</th>
                                 <th class="center">Resource</th>
                                 <th class="center">Total Lama</th>
                                 <th class="center">Nilai rekalkulasi</th>
@@ -535,6 +539,8 @@ class ProductionRecalculateController extends Controller
                 <td class="center-align">'.($key+1).'</td>
                 <td>'.$row->productionIssue->code.'</td>
                 <td>'.$row->productionBatch->code.'</td>
+                <td>'.$row->productionIssue->productionOrderDetail->productionOrder->code.'</td>
+                <td>'.date('d/m/Y',strtotime($row->productionIssue->productionReceiveIssue->productionReceive->post_date)).'</td>
                 <td>'.$row->resource->code.' - '.$row->resource->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->lookable->total).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->total).'</td>

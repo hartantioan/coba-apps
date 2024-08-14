@@ -1905,14 +1905,14 @@ class Select2Controller extends Controller {
                     $query->orWhere('code', 'like', "%$search%")
                     ->orWhere('item', 'like', "%$search%");
                 })
-                ->where('status', '1')
                 ->whereHas('receptionHardwareItemsUsage')
                 ->whereHas('receptionHardwareItemsUsage', function ($query) {
                     $query->where('status', '1');
                 }, '=', 0)
                 ->orDoesntHave('receptionHardwareItemsUsage')
+                ->where('status', '1')
                 ->get();
-
+                
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,

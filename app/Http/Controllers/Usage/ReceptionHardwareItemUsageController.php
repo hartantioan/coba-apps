@@ -140,20 +140,39 @@ class ReceptionHardwareItemUsageController extends Controller
 			
 			
             DB::beginTransaction();
+            $cek = HardwareItem::where('status', '1')
+                    ->where('id',$request->tempes)
+                    ->where(function ($query) {
+                        $query->whereHas('receptionHardwareItemsUsage', function ($subQuery) {
+                                $subQuery->where('status', '1');
+                            }, '=', 0)
+                            ->orDoesntHave('receptionHardwareItemsUsage');
+                    })
+                    ->get();
+            if(count($cek) > 0){
+                
+                $query = ReceptionHardwareItemsUsage::create([
+                    'code'              => ReceptionHardwareItemsUsage::generateCode(),
+                    'user_id'           => session('bo_id'),
+                    'account_id'        => $request->user_id1,
+                    'hardware_item_id'  => $request->tempes,
+                    'info'              => $request->info1,
+                    'date'              => now(),
+                    'division'          => $request->division1,
+                    'reception_date'    => $request->date1,
+                    'status'            => 1,
+                    'status_item'       => 1,
+                    'location'			=> $request->location1,
+                ]);
+            }else{
+                $response = [
+					'status'  => 500,
+					'message' => 'Data failed to save. Already have reception that was active'
+				];
+                return response()->json($response);
+            }
             
-            $query = ReceptionHardwareItemsUsage::create([
-                'code'              => ReceptionHardwareItemsUsage::generateCode(),
-                'user_id'           => session('bo_id'),
-                'account_id'        => $request->user_id1,
-                'hardware_item_id'  => $request->tempes,
-                'info'              => $request->info1,
-                'date'              => now(),
-                'division'          => $request->division1,
-                'reception_date'    => $request->date1,
-                'status'            => 1,
-                'status_item'       => 1,
-                'location'			=> $request->location1,
-            ]);
+
             DB::commit();
             
 			
@@ -457,19 +476,36 @@ class ReceptionHardwareItemUsageController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
-                    $query = ReceptionHardwareItemsUsage::create([
-                        'code'              => ReceptionHardwareItemsUsage::generateCode(),
-                        'user_id'           => session('bo_id'),
-                        'account_id'        => $request->user_id,
-                        'hardware_item_id'  => $request->hardware_item_id,
-                        'info'              => $request->info,
-                        'date'              => now(),
-                        'division'          => $request->division,
-                        'reception_date'    => $request->date,
-                        'status'            => 1,
-                        'status_item'       => 1,
-                        'location'			=> $request->location,
-                    ]);
+                            $cek = HardwareItem::where('status', '1')
+                            ->where('id',$request->hardware_item_id)
+                            ->where(function ($query) {
+                                $query->whereHas('receptionHardwareItemsUsage', function ($subQuery) {
+                                        $subQuery->where('status', '1');
+                                    }, '=', 0)
+                                    ->orDoesntHave('receptionHardwareItemsUsage');
+                            })
+                            ->get();
+                    if(count($cek) > 0){
+                        $query = ReceptionHardwareItemsUsage::create([
+                            'code'              => ReceptionHardwareItemsUsage::generateCode(),
+                            'user_id'           => session('bo_id'),
+                            'account_id'        => $request->user_id,
+                            'hardware_item_id'  => $request->hardware_item_id,
+                            'info'              => $request->info,
+                            'date'              => now(),
+                            'division'          => $request->division,
+                            'reception_date'    => $request->date,
+                            'status'            => 1,
+                            'status_item'       => 1,
+                            'location'			=> $request->location,
+                        ]);
+                    }else{
+                        $response = [
+                            'status'  => 500,
+                            'message' => 'Data failed to save. Already have reception that was active'
+                        ];
+                        return response()->json($response);
+                    }
                     DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();

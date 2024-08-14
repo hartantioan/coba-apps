@@ -348,6 +348,24 @@ class ProductionReceiveController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
+
+                if($request->arr_production_issue_id){
+                    $passedIssue = true;
+                    foreach($request->arr_production_issue_id as $row){
+                        $issue = ProductionIssue::find($row);
+                        if($issue){
+                            if($issue->productionReceiveIssue()->exists()){
+                                $passedIssue = false;
+                            }
+                        }
+                    }
+                    if(!$passedIssue){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Terdapat Production Issue yang telah dipakai pada receive lainnya. Silahkan cek kembali inputan anda.'
+                        ]);
+                    }
+                }
                 
                 $arrItemReject = [];
                 if($request->arr_qty_reject){

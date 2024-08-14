@@ -2157,6 +2157,7 @@
                                 return {
                                     search: params.term,
                                     pod_id: $('#production_order_detail_id').val(),
+                                    arrissue: arrIssue,
                                 };
                             },
                             processResults: function(data) {
@@ -2167,6 +2168,8 @@
                         }
                     });
                 });
+
+                resetIssue();
 
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);

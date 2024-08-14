@@ -181,7 +181,7 @@ class MarketingOrderPlan extends Model
         $hasRelation = false;
 
         foreach($this->marketingOrderPlanDetail as $row){
-            if($row->productionScheduleDetail()->exists()){
+            if($row->productionScheduleTarget()->exists()){
                 $hasRelation = true;
             }
         }

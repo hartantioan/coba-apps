@@ -889,6 +889,7 @@ class InventoryRevaluationController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                $tempStatus = $query->status;
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -896,7 +897,7 @@ class InventoryRevaluationController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($query->status,['2','3','4','5'])){
+                if(in_array($tempStatus,['2','3','4','5'])){
                     CustomHelper::removeJournal('inventory_revaluations',$query->id);
                     CustomHelper::removeCogs('inventory_revaluations',$query->id);
                 }

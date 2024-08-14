@@ -732,7 +732,16 @@ class ProductionHandoverController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                if(in_array($query->status,['2','3'])){
+                $tempStatus = $query->status;
+
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                if(in_array($tempStatus,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                     if($query->productionFgReceive()->exists()){
@@ -749,13 +758,6 @@ class ProductionHandoverController extends Controller
                     $row->productionBatchUsage()->delete();
                     $row->productionBatch()->delete();
                 }
-
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
 
                 activity()
                     ->performedOn(new ProductionHandover())

@@ -198,6 +198,7 @@ use App\Http\Controllers\MasterData\BomMapController;
 use App\Http\Controllers\MasterData\BomStandardController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
+use App\Http\Controllers\MasterData\ItemPricelistController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
@@ -206,6 +207,7 @@ use App\Http\Controllers\Production\ProductionIssueController;
 use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 use App\Http\Controllers\Production\ProductionRecapitulationController;
+use App\Models\ItemPricelist;
 
 /*
 |--------------------------------------------------------------------------
@@ -296,6 +298,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('inventory_item', [Select2Controller::class, 'inventoryItem']);
                 Route::get('sales_item', [Select2Controller::class, 'salesItem']);
                 Route::get('sales_item_parent', [Select2Controller::class, 'salesItemParent']);
+                Route::get('sales_item_child', [Select2Controller::class, 'salesItemChild']);
                 Route::get('coa', [Select2Controller::class, 'coa']);
                 Route::get('coa_no_cash', [Select2Controller::class, 'coaNoCash']);
                 Route::get('inventory_coa_issue', [Select2Controller::class, 'inventoryCoaIssue']);
@@ -1228,6 +1231,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [LandedCostFeeController::class, 'show']);
                         Route::post('create',[LandedCostFeeController::class, 'create'])->middleware('operation.access:landed_cost_fee,update');
                         Route::post('destroy', [LandedCostFeeController::class, 'destroy'])->middleware('operation.access:landed_cost_fee,delete');
+                    });
+
+                    Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {
+                        Route::get('/',[ItemPricelistController::class, 'index']);
+                        Route::get('datatable',[ItemPricelistController::class, 'datatable']);
+                        Route::post('show', [ItemPricelistController::class, 'show']);
+                        Route::post('create',[ItemPricelistController::class, 'create'])->middleware('operation.access:item_pricelist,update');
+                        Route::post('destroy', [ItemPricelistController::class, 'destroy'])->middleware('operation.access:item_pricelist,delete');
                     });
                 });
 

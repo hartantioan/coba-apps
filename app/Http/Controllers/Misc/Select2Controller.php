@@ -881,9 +881,7 @@ class Select2Controller extends Controller {
                         ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')
-                ->where(function($query) use($search){
-                    $query->whereNotNull('is_sales_item');
-                })
+                ->whereNotNull('is_sales_item')
                 ->whereHas('fgGroup')->get();
 
         foreach($data as $d) {
@@ -900,6 +898,28 @@ class Select2Controller extends Controller {
                 'sell_units'        => $d->arrSellUnits(),
                 'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
                 'stock_com'         => '0,000',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function salesItemChild(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->whereNotNull('is_sales_item')
+                ->whereHas('parentFg')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
             ];
         }
 

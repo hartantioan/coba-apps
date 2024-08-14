@@ -313,7 +313,10 @@ class ResetCogsNew implements ShouldQueue
               'company_id'		      => $row->productionHandover->company_id,
               'place_id'			      => $row->place_id,
               'warehouse_id'		    => $row->warehouse_id,
+              'area_id'             => $row->area_id,
               'item_id'			        => $row->item_id,
+              'item_shading_id'	    => $row->item_shading_id,
+						  'production_batch_id' => $row->productionBatchUsage->productionBatch->id,
               'qty_in'			        => $qty,
               'price_in'			      => $total / $qty,
               'total_in'			      => $total,
@@ -321,7 +324,7 @@ class ResetCogsNew implements ShouldQueue
               'price_final'		      => $total_final / $qty_final,
               'total_final'		      => $total_final,
               'date'				        => $dateloop,
-              'type'				        => 'IN'
+              'type'				        => 'IN',
             ]);
             foreach($row->journalDetail as $rowjournal){
               $rowjournal->update([

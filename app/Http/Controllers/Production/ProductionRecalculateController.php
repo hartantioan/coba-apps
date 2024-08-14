@@ -543,33 +543,6 @@ class ProductionRecalculateController extends Controller
 
         $string .= '</tbody></table></div>';
 
-        $string .= '<div class="col m12 s12 mt-1"><table style="min-width:100%;"><thead>
-                    <tr>
-                        <th colspan="5" class="center-align">Daftar Batch Terpakai</th>
-                    </tr>
-                    <tr>
-                        <th class="center">'.__('translations.no').'.</th>
-                        <th class="center">No.Batch</th>
-                        <th class="center">Item Parent</th>
-                        <th class="center">Item Child</th>
-                        <th class="center">Qty</th>
-                        <th class="center">Satuan</th>
-                    </tr>
-                </thead><tbody>';
-
-        foreach($data->productionHandoverDetail as $key => $row){
-            $string .= '<tr>
-                <td class="center-align">'.($key+1).'</td>
-                <td>'.$row->productionBatchUsage->productionBatch->code.'</td>
-                <td>'.$data->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->code.' - '.$data->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->name.'</td>
-                <td>'.$row->productionBatchUsage->productionBatch->item->code.' - '.$row->productionBatchUsage->productionBatch->item->name.'</td>
-                <td class="right-align">'.CustomHelper::formatConditionalQty($row->productionBatchUsage->qty).'</td>
-                <td class="center-align">'.$row->productionBatchUsage->productionBatch->item->uomUnit->code.'</td>
-            </tr>';
-        }
-
-        $string .= '</tbody></table></div>';
-
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
                         <thead>
                             <tr>

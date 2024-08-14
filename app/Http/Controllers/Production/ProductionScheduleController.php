@@ -465,7 +465,7 @@ class ProductionScheduleController extends Controller
                 'request_date'      => date('d/m/Y',strtotime($row->marketingOrderPlanDetail->request_date)),
                 'note'              => $row->marketingOrderPlanDetail->note ?? '',
                 'note2'             => $row->marketingOrderPlanDetail->note2 ?? '',
-                'has_bom'           => $cekBom->exists() ? '1' : '',
+                'has_bom'           => $cekBom ? '1' : '',
                 'place_id'          => $po->place_id,
             ];
         }

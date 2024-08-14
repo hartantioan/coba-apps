@@ -10,6 +10,7 @@ use App\Models\BenchmarkPrice;
 use App\Models\Group;
 use App\Models\ItemPricelist;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
 class ItemPricelistController extends Controller
@@ -137,11 +138,17 @@ class ItemPricelistController extends Controller
         $validation = Validator::make($request->all(), [
             'item_id'               => 'required',
             'place_id'              => 'required',
+            'group_id'              => 'required',
             'price'                 => 'required',
+            'start_date'            => 'required',
+            'end_date'              => 'required',
         ], [
             'item_id.required'      => 'Item tidak boleh kosong.',
             'place_id.required'     => 'Plant tidak boleh kosong.',
+            'group_id.required'     => 'Group tidak boleh kosong.',
             'price.required'        => 'Harga tidak boleh kosong.',
+            'start_date.required'   => 'Tgl.Mulai Aktif tidak boleh kosong.',
+            'end_date.required'     => 'Tgl.Akhir Aktif tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -153,18 +160,25 @@ class ItemPricelistController extends Controller
             DB::beginTransaction();
             try {
                 if($request->temp){
-                    $query = BenchmarkPrice::find($request->temp);
+                    $query = ItemPricelist::find($request->temp);
                     $query->user_id         = session('bo_id');
                     $query->item_id	        = $request->item_id;
+                    $query->group_id        = $request->group_id;
                     $query->place_id        = $request->place_id;
+                    $query->start_date      = $request->start_date;
+                    $query->end_date        = $request->end_date;
                     $query->price           = str_replace(',','.',str_replace('.','',$request->price));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                 }else{
-                    $query = BenchmarkPrice::create([
+                    $query = ItemPricelist::create([
+                        'code'              => strtoupper(Str::random(15)),
                         'user_id'           => session('bo_id'),
                         'item_id'			=> $request->item_id,
+                        'group_id'          => $request->group_id,
                         'place_id'          => $request->place_id,
+                        'start_date'        => $request->start_date,
+                        'end_date'          => $request->end_date,
                         'price'             => str_replace(',','.',str_replace('.','',$request->price)),
                         'status'            => $request->status ? $request->status : '2'
                     ]);

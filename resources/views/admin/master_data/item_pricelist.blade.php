@@ -112,12 +112,12 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="group_id" name="group_id">
-                                <option value="">Silahkan pilih Grup</option>
+                                <option value="">Silahkan pilih Grup Customer</option>
                                 @foreach($group as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label for="group_id" class="">{{ __('translations.plant') }}</label>
+                            <label for="group_id" class="">Group Customer</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="place_id" name="place_id">
@@ -219,7 +219,7 @@
             }
         });
 
-        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/sales_item_child") }}');
     });
 
     function loadDataTable() {

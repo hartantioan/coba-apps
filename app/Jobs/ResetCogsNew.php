@@ -616,7 +616,7 @@ class ResetCogsNew implements ShouldQueue
               foreach($row->productionBatchUsage as $rowbatch){
                 if($bomGroup == '1'){
                   $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
-                  $rowtotal = round($rowbatch->qty * $price,2);
+                  $rowtotal = round($rowbatch->qty * $rowprice,2);
                   $rowqty = $rowbatch->qty;
                   $total_final = $totalBefore - $rowtotal;
                   $qty_final = $qtyBefore - $rowqty;

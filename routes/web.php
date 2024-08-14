@@ -101,6 +101,7 @@ use App\Http\Controllers\MasterData\DeliveryCostController;
 use App\Http\Controllers\MasterData\UserDateController;
 use App\Http\Controllers\MasterData\UserItemController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
+use App\Http\Controllers\MasterData\StandardCustomerPriceController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
 use App\Http\Controllers\MasterData\TransportationController;
@@ -417,6 +418,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('production_batch_fg', [Select2Controller::class, 'productionBatchFg']);
                 Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
                 Route::get('production_issue', [Select2Controller::class, 'productionIssue']);
+                Route::get('group_customer', [Select2Controller::class, 'groupCustomer']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -1231,6 +1233,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [LandedCostFeeController::class, 'show']);
                         Route::post('create',[LandedCostFeeController::class, 'create'])->middleware('operation.access:landed_cost_fee,update');
                         Route::post('destroy', [LandedCostFeeController::class, 'destroy'])->middleware('operation.access:landed_cost_fee,delete');
+                    });
+
+                    Route::prefix('standar_customer_price')->middleware('operation.access:standar_customer_price,view')->group(function () {
+                        Route::get('/',[StandardCustomerPriceController::class, 'index']);
+                        Route::get('datatable',[StandardCustomerPriceController::class, 'datatable']);
+                        Route::get('row_detail',[StandardCustomerPriceController::class, 'rowDetail']);
+                        Route::post('show', [StandardCustomerPriceController::class, 'show']);
+                        Route::post('print',[StandardCustomerPriceController::class, 'print']);
+                        Route::get('export',[StandardCustomerPriceController::class, 'export']);
+                        Route::post('import',[StandardCustomerPriceController::class, 'import'])->middleware('operation.access:standar_customer_price,update');
+                        Route::post('import_master',[StandardCustomerPriceController::class, 'importMaster'])->middleware('operation.access:standar_customer_price,update');
+                        Route::post('create',[StandardCustomerPriceController::class, 'create'])->middleware('operation.access:standar_customer_price,update');
+                        Route::post('destroy', [StandardCustomerPriceController::class, 'destroy'])->middleware('operation.access:standar_customer_price,delete');
                     });
 
                     Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {

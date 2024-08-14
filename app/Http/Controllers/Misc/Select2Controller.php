@@ -87,6 +87,8 @@ use App\Models\Size;
 use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
+
+use App\Models\Group;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -4792,6 +4794,39 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->date.'||'.$d->transaction_code.$d->code,
+                'code'              => $d->code,
+                'date'              => $d->date,
+
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function groupCustomer(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+       
+        $data = Group::where(function($query) use($search,$request){
+            $query->where(function($query) use ($search, $request) {
+                if ($search) {
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%")
+                        ->orWhere('note', 'like', "%$search%");
+                }
+                $query->where('type','2')->where('status','1')->get();
+            });
+            
+            
+        })
+        ->orderBy('code','DESC')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.'||'.$d->name,
                 'code'              => $d->code,
                 'date'              => $d->date,
 

@@ -622,6 +622,7 @@ class ResetCogsNew implements ShouldQueue
                   $qty_final = $qtyBefore - $rowqty;
                   $total += $rowtotal;
                   $totalBefore -= $rowtotal;
+                  $qtyBefore -= $rowqty;
                   ItemCogs::create([
                     'lookable_type'		    => $row->productionIssue->getTable(),
                     'lookable_id'		      => $row->productionIssue->id,

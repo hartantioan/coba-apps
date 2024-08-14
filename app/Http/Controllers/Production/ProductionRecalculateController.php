@@ -521,7 +521,7 @@ class ProductionRecalculateController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="6" style="font-size:20px !important;">Daftar Rekalkulasi Resource</th>
+                                <th class="center-align" colspan="8" style="font-size:20px !important;">Daftar Rekalkulasi Resource</th>
                             </tr>
                             <tr>
                                 <th class="center">No.</th>

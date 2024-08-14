@@ -215,7 +215,8 @@ class ProductionHandover extends Model
     }
 
     public function hasBalanceReceiveFg(){
-        $qty = $this->productionFgReceive->qtySell() - $this->qty();
+        $qtyused = $this->productionFgReceive->qtyUsed();
+        $qty = $this->productionFgReceive->qtySell() - $qtyused;
         if($qty > 0){
             return true;
         }else{

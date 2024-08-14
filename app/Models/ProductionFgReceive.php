@@ -131,6 +131,14 @@ class ProductionFgReceive extends Model
         return $qty;
     }
 
+    public function qtyUsed(){
+        $qty = 0;
+        foreach($this->productionHandover as $row){
+            $qty += $row->qty();
+        }
+        return $qty;
+    }
+
     public function productionHandover()
     {
         return $this->hasMany('App\Models\ProductionHandover')->whereIn('status',['1','2','3']);

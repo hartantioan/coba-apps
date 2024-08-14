@@ -148,74 +148,103 @@ class ResetCogsHelper
 
             $productionreceive = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+            })->where('item_reject_id',$item_id)->get();
+
+            foreach($productionreceive as $row){
+                if($row->qty_reject > 0){
+                    $qty_final = $totalBefore + $row->qty_reject;
+                    $total_final = $totalBefore + 0;
+                    ItemCogs::create([
+                        'lookable_type'		        => $row->productionReceive->getTable(),
+                        'lookable_id'		        => $row->productionReceive->id,
+                        'company_id'		        => $row->productionReceive->company_id,
+                        'place_id'			        => $row->place_id,
+                        'warehouse_id'		        => $row->productionReceive->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+                        'item_id'			        => $row->item_reject_id,
+                        'qty_in'			        => $row->qty_reject,
+                        'price_in'			        => 0,
+                        'total_in'			        => 0,
+                        'qty_final'			        => $qty_final,
+                        'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                        'total_final'		        => $total_final,
+                        'date'				        => $dateloop,
+                        'type'				        => 'IN'
+                    ]);
+                    $qtyBefore = $qty_final;
+                    $totalBefore = $total_final;
+                }
+            }
+
+            $productionreceive = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($dateloop){
+                $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get();
 
             foreach($productionreceive as $row){
                 if($row->productionBatch()->exists()){
-                foreach($row->productionBatch as $rowbatch){
-                    $total = $rowbatch->total;
-                    $qty = $rowbatch->qty_real;
+                    foreach($row->productionBatch as $rowbatch){
+                        $total = $rowbatch->total;
+                        $qty = $rowbatch->qty_real;
+                        $total_final = $totalBefore + $total;
+                        $qty_final = $qtyBefore + $qty;
+                        ItemCogs::create([
+                            'lookable_type'		        => $row->productionReceive->getTable(),
+                            'lookable_id'		        => $row->productionReceive->id,
+                            'detailable_type'	        => $rowbatch->getTable(),
+                            'detailable_id'		        => $rowbatch->id,
+                            'company_id'		        => $row->productionReceive->company_id,
+                            'place_id'			        => $row->place_id,
+                            'warehouse_id'		        => $row->warehouse_id,
+                            'item_id'			        => $row->item_id,
+                            'production_batch_id'       => $rowbatch->id,
+                            'qty_in'			        => $qty,
+                            'price_in'			        => $qty > 0 ? $total / $qty : 0,
+                            'total_in'			        => $total,
+                            'qty_final'			        => $qty_final,
+                            'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                            'total_final'		        => $total_final,
+                            'date'				        => $dateloop,
+                            'type'				        => 'IN'
+                        ]);
+                        foreach($rowbatch->journalDetail as $rowjournal){
+                            $rowjournal->update([
+                                'nominal_fc'  => $total,
+                                'nominal'     => $total,
+                            ]);
+                        }
+                        $qtyBefore = $qty_final;
+                        $totalBefore = $total_final;
+                    }
+                }else{
+                    $total = $row->total;
+                    $qty = $row->qty;
                     $total_final = $totalBefore + $total;
                     $qty_final = $qtyBefore + $qty;
                     ItemCogs::create([
-                    'lookable_type'		    => $row->productionReceive->getTable(),
-                    'lookable_id'		      => $row->productionReceive->id,
-                    'detailable_type'	    => $rowbatch->getTable(),
-                    'detailable_id'		    => $rowbatch->id,
-                    'company_id'		      => $row->productionReceive->company_id,
-                    'place_id'			      => $row->place_id,
-                    'warehouse_id'		    => $row->warehouse_id,
-                    'item_id'			        => $row->item_id,
-                    'production_batch_id' => $rowbatch->id,
-                    'qty_in'			        => $qty,
-                    'price_in'			      => $qty > 0 ? $total / $qty : 0,
-                    'total_in'			      => $total,
-                    'qty_final'			      => $qty_final,
-                    'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
-                    'total_final'		      => $total_final,
-                    'date'				        => $dateloop,
-                    'type'				        => 'IN'
+                        'lookable_type'		    => $row->productionReceive->getTable(),
+                        'lookable_id'		      => $row->productionReceive->id,
+                        'detailable_type'	    => $row->getTable(),
+                        'detailable_id'		    => $row->id,
+                        'company_id'		      => $row->productionReceive->company_id,
+                        'place_id'			      => $row->place_id,
+                        'warehouse_id'		    => $row->warehouse_id,
+                        'item_id'			        => $row->item_id,
+                        'qty_in'			        => $qty,
+                        'price_in'			      => $total / $qty,
+                        'total_in'			      => $total,
+                        'qty_final'			      => $qty_final,
+                        'price_final'		      => $total_final / $qty_final,
+                        'total_final'		      => $total_final,
+                        'date'				        => $dateloop,
+                        'type'				        => 'IN'
                     ]);
-                    foreach($rowbatch->journalDetail as $rowjournal){
-                    $rowjournal->update([
+                    foreach($row->journalDetail as $rowjournal){
+                        $rowjournal->update([
                         'nominal_fc'  => $total,
                         'nominal'     => $total,
-                    ]);
+                        ]);
                     }
                     $qtyBefore = $qty_final;
                     $totalBefore = $total_final;
-                }
-                }else{
-                $total = $row->total;
-                $qty = $row->qty;
-                $total_final = $totalBefore + $total;
-                $qty_final = $qtyBefore + $qty;
-                ItemCogs::create([
-                    'lookable_type'		    => $row->productionReceive->getTable(),
-                    'lookable_id'		      => $row->productionReceive->id,
-                    'detailable_type'	    => $row->getTable(),
-                    'detailable_id'		    => $row->id,
-                    'company_id'		      => $row->productionReceive->company_id,
-                    'place_id'			      => $row->place_id,
-                    'warehouse_id'		    => $row->warehouse_id,
-                    'item_id'			        => $row->item_id,
-                    'qty_in'			        => $qty,
-                    'price_in'			      => $total / $qty,
-                    'total_in'			      => $total,
-                    'qty_final'			      => $qty_final,
-                    'price_final'		      => $total_final / $qty_final,
-                    'total_final'		      => $total_final,
-                    'date'				        => $dateloop,
-                    'type'				        => 'IN'
-                ]);
-                foreach($row->journalDetail as $rowjournal){
-                    $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                    ]);
-                }
-                $qtyBefore = $qty_final;
-                $totalBefore = $total_final;
                 }
                 if($row->productionReceive->journal()->exists()){
                     $row->productionReceive->journal->journalDetail()->where('type','2')->update([

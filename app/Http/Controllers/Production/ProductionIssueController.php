@@ -836,10 +836,7 @@ class ProductionIssueController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                if(in_array($query->status,['2','3'])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                    CustomHelper::removeCogs($query->getTable(),$query->id);
-                }
+                $tempStatus = $query->status;
 
                 $query->update([
                     'status'    => '5',
@@ -847,6 +844,11 @@ class ProductionIssueController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if(in_array($tempStatus,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
 
                 foreach($query->productionIssueDetail as $row){
                     foreach($row->productionBatchUsage as $rowdetail){

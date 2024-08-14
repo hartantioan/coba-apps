@@ -573,10 +573,7 @@ class ProductionFgReceive extends Model
     public function voidProductionIssue(){
         if($this->productionIssue()->exists()){
             foreach($this->productionIssue as $row){
-                if(in_array($row->status,['2','3'])){
-                    CustomHelper::removeJournal($row->getTable(),$row->id);
-                    CustomHelper::removeCogs($row->getTable(),$row->id);
-                }
+                $tempStatus = $row->status;
 
                 $row->update([
                     'status'    => '5',
@@ -584,6 +581,11 @@ class ProductionFgReceive extends Model
                     'void_note' => 'Ditutup otomatis dari Production Receive FG '.$this->code,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if(in_array($tempStatus,['2','3'])){
+                    CustomHelper::removeJournal($row->getTable(),$row->id);
+                    CustomHelper::removeCogs($row->getTable(),$row->id);
+                }
 
                 foreach($row->productionIssueDetail as $rowdetail){
                     foreach($rowdetail->productionBatchUsage as $rowdetailkuy){

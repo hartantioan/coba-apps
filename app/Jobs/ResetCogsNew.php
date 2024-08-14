@@ -316,7 +316,7 @@ class ResetCogsNew implements ShouldQueue
               'area_id'             => $row->area_id,
               'item_id'			        => $row->item_id,
               'item_shading_id'	    => $row->item_shading_id,
-						  'production_batch_id' => $row->productionBatchUsage->productionBatch->id,
+						  'production_batch_id' => $row->productionBatch->id,
               'qty_in'			        => $qty,
               'price_in'			      => $total / $qty,
               'total_in'			      => $total,

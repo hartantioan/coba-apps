@@ -217,10 +217,12 @@ class ResetCogsHelper
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;
                 }
-                $row->productionReceive->journal->journalDetail()->where('type','2')->update([
-                'nominal_fc'  => $row->productionReceive->total(),
-                'nominal'     => $row->productionReceive->total(),
-                ]);
+                if($row->productionReceive->journal()->exists()){
+                    $row->productionReceive->journal->journalDetail()->where('type','2')->update([
+                        'nominal_fc'  => $row->productionReceive->total(),
+                        'nominal'     => $row->productionReceive->total(),
+                    ]);
+                }
             }
 
             $productionfgreceive = ProductionFgReceive::whereHas('productionOrderDetail',function($query)use($item_id){
@@ -257,10 +259,10 @@ class ResetCogsHelper
                 'type'				        => 'IN'
                 ]);
                 foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
                 }
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;
@@ -297,10 +299,10 @@ class ResetCogsHelper
                 'type'				        => 'IN',
                 ]);
                 foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
                 }
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;

@@ -607,7 +607,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                                 <label>
-                                                                    <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $m->id }},'view')" data-id="{{ $m->id }}"/>
+                                                                    <input type="checkbox" class="checkboxView reset-checkbox" onclick="checkAll(this,{{ $m->id }},'view')" data-id="{{ $m->id }}"/>
                                                                     <span>Pilih</span>
                                                                 </label>
                                                             @endif
@@ -615,7 +615,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxUpdate" onclick="checkAll(this,{{ $m->id }},'update')"/>
+                                                                <input type="checkbox" class="checkboxUpdate reset-checkbox" onclick="checkAll(this,{{ $m->id }},'update')"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                             @endif
@@ -623,7 +623,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxDelete" onclick="checkAll(this,{{ $m->id }},'delete')"/>
+                                                                <input type="checkbox" class="checkboxDelete reset-checkbox" onclick="checkAll(this,{{ $m->id }},'delete')"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                             @endif
@@ -631,7 +631,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxVoid" onclick="checkAll(this,{{ $m->id }},'void')"/>
+                                                                <input type="checkbox" class="checkboxVoid reset-checkbox" onclick="checkAll(this,{{ $m->id }},'void')"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                             @endif
@@ -639,7 +639,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'journal')"/>
+                                                                <input type="checkbox" class="checkboxJournal reset-checkbox" onclick="checkAll(this,{{ $m->id }},'journal')"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                             @endif
@@ -647,7 +647,7 @@
                                                         <td>
                                                             @if (!$m->childHasChild())
                                                             <label>
-                                                                <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $m->id }},'report')"/>
+                                                                <input type="checkbox" class="checkboxJournal reset-checkbox" onclick="checkAll(this,{{ $m->id }},'report')"/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                             @endif
@@ -661,37 +661,37 @@
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxView" onclick="checkAll(this,{{ $msub->id }},'view')" data-id="{{ $msub->id }}"/>
+                                                                        <input type="checkbox" class="checkboxView reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'view')" data-id="{{ $msub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxUpdate" onclick="checkAll(this,{{ $msub->id }},'update')"/>
+                                                                        <input type="checkbox" class="checkboxUpdate reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'update')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxDelete" onclick="checkAll(this,{{ $msub->id }},'delete')"/>
+                                                                        <input type="checkbox" class="checkboxDelete reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'delete')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxVoid" onclick="checkAll(this,{{ $msub->id }},'void')"/>
+                                                                        <input type="checkbox" class="checkboxVoid reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'void')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxJournal" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
+                                                                        <input type="checkbox" class="checkboxJournal reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td>
                                                                     <label>
-                                                                        <input type="checkbox" class="checkboxReport" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
+                                                                        <input type="checkbox" class="checkboxReport reset-checkbox" onclick="checkAll(this,{{ $msub->id }},'journal')"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
@@ -706,7 +706,7 @@
                                                                         </td>
                                                                         <td class="center">
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataView(this);"/>
+                                                                                <input type="checkbox" name="checkboxView[]" class="reset-checkbox" id="checkboxView{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataView(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                             @if ($msub2->type == '1')
@@ -722,20 +722,20 @@
                                                                         </td>
                                                                         <td class="center">
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxUpdate[]" id="checkboxUpdate{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <input type="checkbox" name="checkboxUpdate[]" class="reset-checkbox" id="checkboxUpdate{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                         </td>
                                                                         <td class="center">
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxDelete[]" id="checkboxDelete{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <input type="checkbox" name="checkboxDelete[]" class="reset-checkbox" id="checkboxDelete{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                         </td>
                                                                         <td class="center">
                                                                             @if ($msub2->type == '1')
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <input type="checkbox" name="checkboxVoid[]" class="reset-checkbox" id="checkboxVoid{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                             @endif
@@ -743,7 +743,7 @@
                                                                         <td class="center">
                                                                             @if ($msub2->type == '1')
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
+                                                                                <input type="checkbox" name="checkboxJournal[]" class="reset-checkbox" id="checkboxJournal{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                             @endif
@@ -751,7 +751,7 @@
                                                                         <td class="center">
                                                                             @if ($msub2->type == '1')
                                                                             <label>
-                                                                                <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataReport(this);"/>
+                                                                                <input type="checkbox" name="checkboxReport[]" class="reset-checkbox" id="checkboxReport{{ $msub2->id }}" value="{{ $msub2->id }}" data-parent="{{ $msub2->parentsub->id }}" onclick="showDataReport(this);"/>
                                                                                 <span>Pilih</span>
                                                                             </label>
                                                                             <div class="switch">
@@ -782,7 +782,7 @@
                                                                 </td>
                                                                 <td class="center">
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataView(this);"/>
+                                                                        <input type="checkbox" name="checkboxView[]" class="reset-checkbox" id="checkboxView{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataView(this);"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                     @if ($msub->type == '1')
@@ -798,20 +798,20 @@
                                                                 </td>
                                                                 <td class="center">
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxUpdate[]" id="checkboxUpdate{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <input type="checkbox" name="checkboxUpdate[]" class="reset-checkbox" id="checkboxUpdate{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td class="center">
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxDelete[]" id="checkboxDelete{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <input type="checkbox" name="checkboxDelete[]" class="reset-checkbox" id="checkboxDelete{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                 </td>
                                                                 <td class="center">
                                                                     @if ($msub->type == '1')
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <input type="checkbox" name="checkboxVoid[]" class="reset-checkbox" id="checkboxVoid{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                     @endif
@@ -819,7 +819,7 @@
                                                                 <td class="center">
                                                                     @if ($msub->type == '1')
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
+                                                                        <input type="checkbox" name="checkboxJournal[]" class="reset-checkbox" id="checkboxJournal{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                     @endif
@@ -827,7 +827,7 @@
                                                                 <td class="center">
                                                                     @if ($msub->type == '1')
                                                                     <label>
-                                                                        <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataReport(this);"/>
+                                                                        <input type="checkbox" name="checkboxReport[]" class="reset-checkbox" id="checkboxReport{{ $msub->id }}" value="{{ $msub->id }}" data-parent="{{ $msub->parentsub->id }}" onclick="showDataReport(this);"/>
                                                                         <span>Pilih</span>
                                                                     </label>
                                                                     <div class="switch">
@@ -858,37 +858,37 @@
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxView[]" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxView[]" class="reset-checkbox" id="checkboxView{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxUpdate[]" id="checkboxUpdate{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxUpdate[]" class="reset-checkbox" id="checkboxUpdate{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxDelete[]" id="checkboxDelete{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxDelete[]" class="reset-checkbox" id="checkboxDelete{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxVoid[]" id="checkboxVoid{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxVoid[]" class="reset-checkbox" id="checkboxVoid{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxJournal[]" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxJournal[]" class="reset-checkbox" id="checkboxJournal{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>
                                                         <td class="center">
                                                             <label>
-                                                                <input type="checkbox" name="checkboxReport[]" id="checkboxReport{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
+                                                                <input type="checkbox" name="checkboxReport[]" class="reset-checkbox" id="checkboxReport{{ $m->id }}" value="{{ $m->id }}" data-parent=""/>
                                                                 <span>Pilih</span>
                                                             </label>
                                                         </td>

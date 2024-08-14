@@ -80,10 +80,9 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
+                                                        <th>Kode Produksi</th>
                                                         <th>{{ __('translations.plant') }}</th>
-                                                    
                                                         <th>{{ __('translations.name') }}</th>
-                                                       
                                                         <th>Time In</th>
                                                         <th>Time Out</th>
                                                         <th>Toleransi</th>
@@ -120,8 +119,10 @@
                             <input id="name" name="name" type="text" placeholder="Nama Shift">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
-                        
-                        
+                        <div class="input-field col s4">
+                            <input id="production_code" name="production_code" type="text" placeholder="Kode Produksi">
+                            <label class="active" for="production_code">Kode Produksi</label>
+                        </div>
                         <div class="input-field col s4">
                             <input id="time_in" name="time_in" type="text" placeholder="Time in" class="timepicker">
                             <label class="active" for="time_in">Time In</label>
@@ -343,6 +344,7 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
                 { name: 'code', className: 'center-align' },
+                { name: 'production_code', className: 'center-align' },
                 { name: 'place', className: 'center-align' },
                /*  { name: 'department', className: 'center-align' }, */
                 { name: 'name', className: 'center-align' },
@@ -481,6 +483,7 @@
                 
                 $('#temp').val(id);
                 $('#name').val(response.name);
+                $('#production_code').val(response.production_code);
                 $('#place_id').val(response.place_id).formSelect();
                 /* $('#department_id').val(response.department_id).formSelect(); */
                 $('#tolerant').val(response.tolerant);

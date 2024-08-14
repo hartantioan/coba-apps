@@ -2670,7 +2670,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name .'|'. $d->time_in.' - '.$d->time_out,
+                'text' 			=> $d->production_code.' - '.$d->name,
                 'data'          => $d
             ];
         }

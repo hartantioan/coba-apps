@@ -41,6 +41,7 @@ class ShiftController extends Controller
         $column = [
             'id',
             'code',
+            'production_code',
             'place_id',
             // 'department_id',
             'name',
@@ -58,6 +59,7 @@ class ShiftController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('production_code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhereHas('place',function($query) use($search,$request){
                                 $query->where('name','like',"%$search%");
@@ -82,6 +84,7 @@ class ShiftController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
+                            ->orWhere('production_code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
                             ->orWhereHas('place',function($query) use($search,$request){
                                 $query->where('name','like',"%$search%");
@@ -107,6 +110,7 @@ class ShiftController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
+                    $val->production_code,
                     $val->place->code,
                   /*   $val->department->name, */
                     $val->name,
@@ -201,6 +205,7 @@ class ShiftController extends Controller
                 try {
                     $query = Shift::find($request->temp);
                     $query->name                = $request->name;
+                    $query->production_code     = $request->production_code ?? '';
                     $query->edit_id             = session('bo_id');
                     $query->place_id            = $request->place_id;
                   /*   $query->department_id       = $request->department_id; */
@@ -227,6 +232,7 @@ class ShiftController extends Controller
                     $code = $query_place->id.'||'.$time_in . ' - ' . $time_out;
                     $query = Shift::create([
                         'code'              => $code,
+                        'production_code'   => $request->production_code ?? '',
                         'name'			    => $request->name,
                         'user_id'           => session('bo_id'),
                         'place_id'          => $request->place_id,

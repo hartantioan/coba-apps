@@ -16,6 +16,7 @@ class Shift extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
+        'production_code',
         'user_id',
         'edit_id',
         'place_id',

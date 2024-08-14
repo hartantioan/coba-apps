@@ -816,7 +816,7 @@
 
         select2ServerSide('#production_order_detail_id', '{{ url("admin/select2/production_order_detail") }}');
 
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
 
         $('#body-item-issue').on('click', '.delete-data-item-issue', function() {
             let id = $(this).data('id');

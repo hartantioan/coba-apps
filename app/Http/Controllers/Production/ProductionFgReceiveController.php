@@ -119,7 +119,7 @@ class ProductionFgReceiveController extends Controller
 
                         $result = [];
                         $yearmonth = date('ym',strtotime($date));
-                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->code.$group.'/'.$yearmonth;
+                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->production_code.$group.'/'.$yearmonth;
                         $latestCode = ProductionBatch::getLatestCodeFg($yearmonth);
                         $oldprefix = 0;
                         if($request->listno){
@@ -168,7 +168,7 @@ class ProductionFgReceiveController extends Controller
                             'sell_unit'     => $itemChild->sellUnit(),
                             'uom_unit'      => $itemChild->uomUnit->code,
                             'plant'         => $plant->code,
-                            'shift'         => $shift->code,
+                            'shift'         => $shift->production_code,
                             'group'         => $group,
                             'list_materials'=> $listBom
                         ];

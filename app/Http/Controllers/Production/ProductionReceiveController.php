@@ -153,7 +153,7 @@ class ProductionReceiveController extends Controller
         $pod = ProductionOrderDetail::find($request->pod_id);
         $type = $pod->productionScheduleDetail->bom->is_powder ? 'powder' : 'normal';
         $shift = Shift::find($request->shift_id);
-        $code = ProductionBatch::generateCodeWithNumber($type,$shift->code,$request->group,$request->number);
+        $code = ProductionBatch::generateCodeWithNumber($type,$shift->production_code,$request->group,$request->number);
         return response()->json($code);
     }
 

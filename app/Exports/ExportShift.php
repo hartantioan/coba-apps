@@ -22,7 +22,8 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
 
     private $headings = [
         'ID',
-        'KODE', 
+        'KODE',
+        'KODE PRODUKSI',
         'NAMA',
         'SITE',
         'DEPARTEMEN',
@@ -39,6 +40,7 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
             if ($this->search) {
                 $query->where(function($query) {
                     $query->where('code', 'like', "%$this->search%")
+                        ->orWhere('production_code', 'like', "%$this->search%")
                         ->orWhere('name', 'like', "%$this->search%")
                         ->orWhereHas('place',function($query){
                             $query->where('name','like',"%$this->search%");
@@ -58,6 +60,7 @@ class ExportShift implements FromCollection, WithTitle, WithHeadings, WithCustom
             $arr[] = [
                 'id'            => ($key + 1),
                 'code'          => $row->code,
+                'production_code'=> $row->production_code,
                 'name'          => $row->name,
                 'place'         => $row->place->code,
                 'department'    => $row->department->name,

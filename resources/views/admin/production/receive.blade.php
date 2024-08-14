@@ -879,7 +879,7 @@
             }
         });
 
-        select2ServerSide('#shift_id', '{{ url("admin/select2/shift") }}');
+        select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
             let id = $(this).data('id');

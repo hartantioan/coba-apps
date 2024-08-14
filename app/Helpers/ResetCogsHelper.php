@@ -707,16 +707,18 @@ class ResetCogsHelper
                 }
                 }
                 if($row->productionIssue->productionFgReceive()->exists()){
-                $productionFgReceive = ProductionFgReceive::find($row->productionIssue->productionFgReceive->id);
-                if($productionFgReceive){
-                    $productionFgReceive->recalculate($dateloop);
-                    ResetCogsNew::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
+                    $productionFgReceive = ProductionFgReceive::find($row->productionIssue->productionFgReceive->id);
+                    if($productionFgReceive){
+                        $productionFgReceive->recalculate($dateloop);
+                        ResetCogsNew::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
+                    }
                 }
+                if($row->productionIssue->journal()->exists()){
+                    $row->productionIssue->journal->journalDetail()->where('type','1')->update([
+                        'nominal_fc'  => $row->productionIssue->total(),
+                        'nominal'     => $row->productionIssue->total(),
+                    ]);
                 }
-                $row->productionIssue->journal->journalDetail()->where('type','1')->update([
-                'nominal_fc'  => $row->productionIssue->total(),
-                'nominal'     => $row->productionIssue->total(),
-                ]);
             }
 
             $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop,$item_id){

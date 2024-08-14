@@ -4741,6 +4741,9 @@ class Select2Controller extends Controller {
                     if($request->pod_id){
                         $query->where('production_order_detail_id',$request->pod_id);
                     }
+                    if($request->arrissue){
+                        $query->whereNotIn('id',$request->arrissue);
+                    }
                 })
                 ->whereIn('status',['2'])
                 ->orderBy('created_at')

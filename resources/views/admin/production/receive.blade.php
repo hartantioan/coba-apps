@@ -848,6 +848,7 @@
                 `);
                 $('#alert-method').html('-');
                 $('#title-modal').text('-');
+                resetIssue();
             }
         });
         
@@ -889,6 +890,7 @@
 
         $('#body-issue').on('click', '.delete-data-issue', function() {
             $(this).closest('tr').remove();
+            resetIssue();
         });
     });
 
@@ -1383,6 +1385,17 @@
         $(element).parent().parent().remove();
     }
 
+    var arrIssue = [];
+
+    function resetIssue(){
+        arrIssue = [];
+        $('select[name^="arr_production_issue_id[]"]').each(function(index){
+            if($(this).val()){
+                arrIssue.push($(this).val());
+            }
+        });
+    }
+
     function addIssue(){
         if($('#production_order_detail_id').val()){
             if($('#last-row-issue').length > 0){
@@ -1396,7 +1409,7 @@
                         ` + no + `
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]"></select>
+                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();"></select>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -1420,6 +1433,7 @@
                         return {
                             search: params.term,
                             pod_id: $('#production_order_detail_id').val(),
+                            arrissue: arrIssue,
                         };
                     },
                     processResults: function(data) {

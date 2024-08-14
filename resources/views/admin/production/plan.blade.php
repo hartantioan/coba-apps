@@ -242,6 +242,11 @@
                                 <fieldset>
                                     <legend>2. Detail Produk</legend>
                                     <div class="col m12 s12 step8" style="overflow:auto;width:100% !important;">
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>Info : Data item yang muncul adalah item penjualan yang memiliki child FG (diatur pada form relasi item FG).</p>
+                                            </div>
+                                        </div>
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" id="table-detail">
                                                 <thead>

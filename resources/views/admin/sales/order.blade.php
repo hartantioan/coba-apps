@@ -2276,7 +2276,6 @@
                 $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
             }
         }
-        console.log(qtykonversi)
         $('#arr_konversi' + id).text(formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',',')) + ' m2');
         price = price;
 

@@ -292,7 +292,8 @@ class CustomHelper {
 
 		/* ResetCogs::dispatch($date,$place_id,$item_id); */
 		/* ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch); */
-		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
+		/* ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch); */
+		ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){

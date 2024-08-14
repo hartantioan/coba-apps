@@ -44,11 +44,7 @@
                             <span class="hide-on-small-onl">Excel</span>
                             <i class="material-icons right">view_list</i>
                         </a>
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
-                            <i class="material-icons hide-on-med-and-up">file_download</i>
-                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
-                            <i class="material-icons right">file_download</i>
-                        </a>
+                       
                     </div>
                 </div>
             </div>
@@ -850,9 +846,7 @@
     function exportExcel(){
         var search = window.table.search();
         var status = $('#filter_status').val();
-        var company = $('#filter_company').val();
-        var type = $('#filter_type').val();
         
-        window.location = "{{ Request::url() }}/export?search=" + search + "&status=" + status + "&company=" + company + "&type=" + type;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status;
     }
 </script>

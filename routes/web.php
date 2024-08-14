@@ -1242,6 +1242,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [StandardCustomerPriceController::class, 'show']);
                         Route::post('print',[StandardCustomerPriceController::class, 'print']);
                         Route::get('export',[StandardCustomerPriceController::class, 'export']);
+                        Route::get('export_from_page',[StandardCustomerPriceController::class, 'exportFromTransactionPage']);
                         Route::post('import',[StandardCustomerPriceController::class, 'import'])->middleware('operation.access:standar_customer_price,update');
                         Route::post('import_master',[StandardCustomerPriceController::class, 'importMaster'])->middleware('operation.access:standar_customer_price,update');
                         Route::post('create',[StandardCustomerPriceController::class, 'create'])->middleware('operation.access:standar_customer_price,update');

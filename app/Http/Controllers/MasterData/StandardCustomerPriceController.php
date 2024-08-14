@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\MasterData;
 
+use App\Exports\ExportTransactionPageStandarCustomerPrice;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\StandardCustomerPrice;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class StandardCustomerPriceController extends Controller
 {
@@ -45,7 +47,16 @@ class StandardCustomerPriceController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('price', 'like', "%$search%")
+                            ->orWhere('start_date', 'like', "%$search%")
+                            ->orWhere('end_date', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%");
+                            })->orWhereHas('group',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                ->orWhere('code','like',"%$search%");
+                            });
                     });
                 }
 
@@ -62,7 +73,16 @@ class StandardCustomerPriceController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
+                            ->orWhere('name', 'like', "%$search%")
+                            ->orWhere('price', 'like', "%$search%")
+                            ->orWhere('start_date', 'like', "%$search%")
+                            ->orWhere('end_date', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use($search){
+                                $query->where('name','like',"%$search%");
+                            })->orWhereHas('group',function($query) use($search){
+                                $query->where('name','like',"%$search%")
+                                ->orWhere('code','like',"%$search%");
+                            });
                     });
                 }
 
@@ -80,9 +100,9 @@ class StandardCustomerPriceController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->user->name,
                     $val->name,
                     $val->group->code,
+                    $val->user->name,
                     $val->price,
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
@@ -277,5 +297,11 @@ class StandardCustomerPriceController extends Controller
         $type = $request->type ? $request->type : '';
 		
 		// return Excel::download(new ExportCoa($search,$status,$company,$type), 'coa_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $status = $request->status ? $request->status : '';
+		return Excel::download(new ExportTransactionPageStandarCustomerPrice($search,$status), 'standar_harga_pelanggan_'.uniqid().'.xlsx');
     }
 }

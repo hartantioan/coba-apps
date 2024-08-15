@@ -660,8 +660,8 @@ class ResetCogsHelper
                         ]);
                         foreach($rowbatch->journalDetail as $rowjournal){
                             $rowjournal->update([
-                            'nominal_fc'  => $rowtotal,
-                            'nominal'     => $rowtotal,
+                                'nominal_fc'  => $rowtotal,
+                                'nominal'     => $rowtotal,
                             ]);
                         }
                     }else{
@@ -756,7 +756,7 @@ class ResetCogsHelper
                 } */
                 if($row->productionIssue->journal()->exists()){
                     foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
-                        info('kambing');
+                        info($row->productionIssue->total());
                         $rowjournal->update([
                             'nominal_fc'  => $row->productionIssue->total(),
                             'nominal'     => $row->productionIssue->total(),

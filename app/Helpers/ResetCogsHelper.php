@@ -727,11 +727,11 @@ class ResetCogsHelper
                 if($productionReceive){
                     $productionReceive->recalculate();
                     foreach($productionReceive->productionReceiveDetail as $rowreceive){
-                    if($rowreceive->productionBatch()->exists()){
-                        foreach($rowreceive->productionBatch as $rowbatch){
-                            self::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                        if($rowreceive->productionBatch()->exists()){
+                            foreach($rowreceive->productionBatch as $rowbatch){
+                                self::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                            }
                         }
-                    }
                     }
                 }
                 }

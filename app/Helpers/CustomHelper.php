@@ -4362,19 +4362,12 @@ class CustomHelper {
 							//do nothing
 						}else{
 							if($row->productionBatchUsage()->exists()){
-								$percent = 1;
 								foreach($row->productionBatchUsage as $rowbatchusage){
-									$rowbobot = round($rowbatchusage->qty / $row->qty,2);
-									if($percent > $rowbobot){
-										$percent -= $rowbobot;
-									}else{
-										$rowbobot = $percent;
-									}
 									if($row->bom->group == '1'){
 										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{
-										$rowtotal = round($rowbobot * $row->total,2);
+										$rowtotal = $rowbatchusage->productionBatch->totalById($rowbatchusage->id);
 									}
 									JournalDetail::create([
 										'journal_id'	=> $query->id,

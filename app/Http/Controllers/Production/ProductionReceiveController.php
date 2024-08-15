@@ -950,7 +950,7 @@ class ProductionReceiveController extends Controller
                     }
                 }
             }
-            if(!$query->productionReceiveIssue()->exists()){
+            if($query->productionReceiveIssue()->exists()){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf receive telah memiliki issue, silahkan void issue terlebih dahulu.'

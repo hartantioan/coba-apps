@@ -100,7 +100,9 @@ class ProductionReceive extends Model
 
     public function productionReceiveIssue()
     {
-        return $this->hasMany('App\Models\ProductionReceiveIssue');
+        return $this->hasMany('App\Models\ProductionReceiveIssue')->whereHas('productionIssue',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function used(){

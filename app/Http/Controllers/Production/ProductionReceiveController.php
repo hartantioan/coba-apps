@@ -435,7 +435,7 @@ class ProductionReceiveController extends Controller
                                         }
                                     }else{
                                         $itemstock = NULL;
-                                        $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->orderByDesc('date')->orderByDesc('id')->first();
+                                        $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                         if($itemstock){
                                             if($itemstock->qty_final < $qty){
                                                 $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
@@ -464,7 +464,7 @@ class ProductionReceiveController extends Controller
                                             }
                                         }else{
                                             $itemstock = NULL;
-                                            $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->orderByDesc('date')->orderByDesc('id')->first();
+                                            $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                             if($itemstock){
                                                 if($itemstock->qty_final < $qty){
                                                     $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);

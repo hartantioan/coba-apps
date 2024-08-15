@@ -344,8 +344,6 @@ class ProductionRecalculateController extends Controller
                         $query->save();
                         
                         foreach($query->productionRecalculateDetail as $row){
-                            $row->productionIssueDetail->journalDetail()->delete();
-                            $row->productionIssueDetail()->delete();
                             $row->delete();
                         }
                     }else{
@@ -386,53 +384,6 @@ class ProductionRecalculateController extends Controller
                                 'resource_id'                   => $request->arr_resource_id[$key],
                                 'total'                         => $nominal,
                             ]);
-                            $updateProductionIssue = ProductionIssue::find($row);
-                            if($updateProductionIssue){
-                                $pid = ProductionIssueDetail::create([
-                                    'production_issue_id'               => $updateProductionIssue->id,
-                                    'production_order_detail_id'        => $updateProductionIssue->production_order_detail_id,
-                                    'lookable_type'                     => 'resources',
-                                    'lookable_id'                       => $request->arr_resource_id[$key],
-                                    'qty'                               => 1,
-                                    'nominal'                           => $nominal,
-                                    'total'                             => $nominal,
-                                    'qty_bom'                           => 0,
-                                    'nominal_bom'                       => 0,
-                                    'total_bom'                         => 0,
-                                    'qty_planned'                       => 0,
-                                    'nominal_planned'                   => 0,
-                                    'total_planned'                     => 0,
-                                    'place_id'                          => $updateProductionIssue->place_id,
-                                    'production_recalculate_detail_id'  => $querydetail->id,
-                                ]);
-                                $journal = $updateProductionIssue->journal()->exists() ? $updateProductionIssue->journal : '';
-                                if($journal){
-                                    JournalDetail::create([
-                                        'journal_id'	=> $journal->id,
-										'coa_id'		=> $pid->lookable->coa_id,
-										'line_id'		=> $pid->productionIssue->line_id,
-										'place_id'		=> $pid->productionIssue->place_id,
-										'type'			=> '2',
-										'nominal'		=> $pid->total,
-										'nominal_fc'	=> $pid->total,
-										'note'			=> 'REKALKULASI PRODUKSI NO.'.$query->code,
-										'lookable_type'	=> $updateProductionIssue->getTable(),
-										'lookable_id'	=> $updateProductionIssue->id,
-										'detailable_type'=> $pid->getTable(),
-										'detailable_id'	=> $pid->id,
-                                    ]);
-                                    $journal->journalDetail()->where('type','1')->update([
-                                        'nominal_fc'  => $pid->productionIssue->total(),
-                                        'nominal'     => $pid->productionIssue->total(),
-                                    ]);
-                                }
-                                if($updateProductionIssue->productionReceiveIssue()->exists()){
-                                    $productionReceive = ProductionReceive::find($updateProductionIssue->productionReceiveIssue->production_receive_id);
-                                    if($productionReceive){
-                                        $productionReceive->recalculateAndResetCogs();
-                                    }
-                                }
-                            }
                         }
                     }
                     

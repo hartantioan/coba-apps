@@ -723,17 +723,17 @@ class ResetCogsHelper
                     'total'   => $total,
                 ]);
                 if($row->productionIssue->productionReceiveIssue()->exists()){
-                $productionReceive = ProductionReceive::find($row->productionIssue->productionReceiveIssue->production_receive_id);
-                if($productionReceive){
-                    $productionReceive->recalculate();
-                    foreach($productionReceive->productionReceiveDetail as $rowreceive){
-                        if($rowreceive->productionBatch()->exists()){
-                            foreach($rowreceive->productionBatch as $rowbatch){
-                                self::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                    $productionReceive = ProductionReceive::find($row->productionIssue->productionReceiveIssue->production_receive_id);
+                    if($productionReceive){
+                        $productionReceive->recalculate();
+                        foreach($productionReceive->productionReceiveDetail as $rowreceive){
+                            if($rowreceive->productionBatch()->exists()){
+                                foreach($rowreceive->productionBatch as $rowbatch){
+                                    self::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                                }
                             }
                         }
                     }
-                }
                 }
                 if($row->productionIssue->productionFgReceive()->exists()){
                     $productionFgReceive = ProductionFgReceive::find($row->productionIssue->productionFgReceive->id);

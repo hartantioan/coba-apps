@@ -72,10 +72,11 @@ class ProductionBatch extends Model
         if(($qty - ($qtyused + $qtycheck)) <= 0){
             $total = $total - round($qtyused * $this->price(),2);
             $price = $total / $qtycheck;
-            info('kambing');
         }else{
             $price = $this->price();
         }
+
+        info($price);
         
         return $price;
     }

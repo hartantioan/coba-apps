@@ -1251,7 +1251,11 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {
                         Route::get('/',[ItemPricelistController::class, 'index']);
+                        Route::post('import',[ItemPricelistController::class, 'import'])->middleware('operation.access:item_pricelist,update');
+                        Route::get('get_import_excel',[ItemPricelistController::class, 'getImportExcel']);
                         Route::get('datatable',[ItemPricelistController::class, 'datatable']);
+                        Route::get('export',[ItemPricelistController::class, 'export']);
+                        Route::get('export_from_page',[ItemPricelistController::class, 'exportFromTransactionPage']);
                         Route::post('show', [ItemPricelistController::class, 'show']);
                         Route::post('create',[ItemPricelistController::class, 'create'])->middleware('operation.access:item_pricelist,update');
                         Route::post('destroy', [ItemPricelistController::class, 'destroy'])->middleware('operation.access:item_pricelist,delete');

@@ -30,6 +30,16 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-2" href="javascript:void(0);" onclick="exportExcel();">
+                            <i class="material-icons hide-on-med-and-up">view_headline</i>
+                            <span class="hide-on-small-onl">Export</span>
+                            <i class="material-icons right">view_headline</i>
+                        </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal_import">
+                            <i class="material-icons hide-on-med-and-up">file_download</i>
+                            <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
+                            <i class="material-icons right">file_download</i>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -164,6 +174,40 @@
     </div>
 </div>
 
+<div id="modal_import" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.import') }} Excel</h4>
+                <div class="col s12">
+                    <div id="validation_alertImport" style="display:none;"></div>
+                </div>
+                <form class="row" action="{{ Request::url() }}/import" method="POST" enctype="multipart/form-data" id="form_dataimport">
+                    @csrf
+                    <div class="file-field input-field col m6 s12">
+                        <div class="btn">
+                            <span>Dokumen Excel</span>
+                            <input type="file" class="form-control-file" id="fileExcel" name="file">
+                        </div>
+                        <div class="file-path-wrapper">
+                            <input class="file-path validate" type="text">
+                        </div>
+                    </div>
+                    <div class="input-field col m6 s12">
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Untuk Satuan dan Grup Item, silahkan pilih dari dropdown yang tersedia.</h6>
+                    </div>
+                    <div class="input-field col m12 s12">
+                        <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -199,7 +243,108 @@
     });
     $(function() {
         loadDataTable();
-        
+        $('#modal_import').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_dataimport')[0].reset();
+            }
+        });
+
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                       
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        let errorMessage = '';
+                        response.responseJSON.errors.forEach(function(error) {
+                            errorMessage += error.errors.join('\n') + '\n';
+                        });
+
+                        $('#validation_alertImport').html(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>${errorMessage}</p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `).show();
+                    }else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        console.log(response);
+                        let errorMessage = response.status === 400 ? 
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                            `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
+
+                        $('#validation_alertImport').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    ${errorMessage}
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                }
+            });
+        });
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -207,6 +352,7 @@
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#code').focus();
+                
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -214,6 +360,8 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#start_date').val('');
+                $('#end_date').val('');
                 M.updateTextFields();
                 $('#item_id').empty();
             }
@@ -369,9 +517,12 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#item_id').empty().append(`
-                    <option value="` + response.item_id + `">` + response.item_name + `</option>
+                    <option value="` + response.item + `">` + response.item['name'] + `</option>
                 `);
+                $('#start_date').val(response.start_date);
+                $('#end_date').val(response.end_date);
                 $('#place_id').val(response.place_id).formSelect();
+                $('#group_id').val(response.group_id).formSelect();
                 $('#price').val(response.price);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
@@ -434,5 +585,12 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status;
     }
 </script>

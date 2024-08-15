@@ -959,6 +959,7 @@
     }
 
     function getTopCustomer(){
+        
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
@@ -1331,6 +1332,7 @@
     }
     
     function getRowUnit(nil){
+        var price_f_pricelist  = parseFloat($("#arr_item" + nil).select2('data')[0].price);
         $('#tempPrice' + nil).empty();
         $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
@@ -1374,21 +1376,28 @@
                     }
                 });
             }
-            if($("#arr_item" + nil).select2('data')[0].list_outletprice.length > 0){
-                if($('#account_id').val() && $('#outlet_id').val()){
-                    let enough = false;
-                    $.each($("#arr_item" + nil).select2('data')[0].list_outletprice, function(i, value) {
-                        if(value.account_id == $('#account_id').val() && value.outlet_id == $('#outlet_id').val() && enough == false){
-                            $("#rowPrice" + nil).val(value.price);
-                            $("#rowDisc1" + nil).val(value.percent_discount_1);
-                            $("#rowDisc2" + nil).val(value.percent_discount_2);
-                            $("#rowDisc3" + nil).val(value.discount_3);
-                            $("#arr_final_price" + nil).val(value.final_price);
-                            enough = true;
-                        }
-                    });
+            
+            if($("#arr_item" + nil).select2('data')[0].price){
+                if($('#account_id').val() ){
+                    $("#rowPrice" + nil).val(price_f_pricelist);
+                    $("#arr_final_price" + nil).val(price_f_pricelist);
                 }
             }
+            // if($("#arr_item" + nil).select2('data')[0].list_outletprice.length > 0){
+            //     if($('#account_id').val() && $('#outlet_id').val()){
+            //         let enough = false;
+            //         $.each($("#arr_item" + nil).select2('data')[0].list_outletprice, function(i, value) {
+            //             if(value.account_id == $('#account_id').val() && value.outlet_id == $('#outlet_id').val() && enough == false){
+            //                 $("#rowPrice" + nil).val(value.price);
+            //                 $("#rowDisc1" + nil).val(value.percent_discount_1);
+            //                 $("#rowDisc2" + nil).val(value.percent_discount_2);
+            //                 $("#rowDisc3" + nil).val(value.discount_3);
+            //                 $("#arr_final_price" + nil).val(value.final_price);
+            //                 enough = true;
+            //             }
+            //         });
+            //     }
+            // }
         }else{
             $('#arr_uom_unit' + nil).empty().append(`-`);
             $('#arr_qty_now' + nil).empty().append(`-`);
@@ -1408,91 +1417,126 @@
     }
 
     function addItem(){
-        if($('#code_place_id').val()){
-            var selectedValue = $('#code_place_id').val();
-            var selectedText = $('#code_place_id option:selected').text();
-            var count = makeid(10);
-            $('#last-row-item').remove();
-            $('#body-item').append(`
-                <tr class="row_item">
-                    <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
-                    <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
-                    <td>
-                        <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
-                    </td>
-                    <td class="center-align">
-                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                            <option value="` + selectedValue + `">` + selectedText + `</option>
-                            
-                        </select>
-                    </td>
-                    <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
-                    <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
-                    <td class="center-align" id="arr_uom_unit` + count + `">-</td>
-                    <td>
-                        <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                    </td>
-                    <td class="center">
-                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
-                            <option value="">--Silahkan pilih item--</option>
-                        </select>
-                    </td>
-                    <td class="center">
-                        <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
-                    </td>
-                    <td class="center">
-                        <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
-                        <datalist id="tempPrice` + count + `"></datalist>
-                    </td>
-                   
-                    <td>
-                        <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
-                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                            @foreach ($tax as $row)
-                                <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td>
-                        <label>
-                            <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
-                            <span>Ya/Tidak</span>
-                        </label>
-                    </td>
-                    <td class="center">
-                        <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
-                    </td>
-                    <td class="center">
-                        <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
-                    </td>
-                    <td class="center">
-                        <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
-                    </td>
-        
-                    <td class="center">
-                        <input name="arr_final_price[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
-                    </td>
-                    <td class="center">
-                        <input name="arr_total[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
-                    </td>
-                    <td>
-                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang...">
-                    </td>
-                    <td class="center">
-                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                            <i class="material-icons">delete</i>
-                        </a>
-                    </td>
-                </tr>
-            `);
-            select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+        if($('#account_id').val()){
+            if($('#code_place_id').val()){
+                var selectedValue = $('#code_place_id').val();
+                var selectedText = $('#code_place_id option:selected').text();
+                var count = makeid(10);
+                $('#last-row-item').remove();
+                $('#body-item').append(`
+                    <tr class="row_item">
+                        <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
+                        <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
+                        <td>
+                            <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
+                        </td>
+                        <td class="center-align">
+                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                <option value="` + selectedValue + `">` + selectedText + `</option>
+                                
+                            </select>
+                        </td>
+                        <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
+                        <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
+                        <td class="center-align" id="arr_uom_unit` + count + `">-</td>
+                        <td>
+                            <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                        </td>
+                        <td class="center">
+                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
+                                <option value="">--Silahkan pilih item--</option>
+                            </select>
+                        </td>
+                        <td class="center">
+                            <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
+                            <datalist id="tempPrice` + count + `"></datalist>
+                        </td>
+                    
+                        <td>
+                            <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
+                                <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                @foreach ($tax as $row)
+                                    <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                @endforeach
+                            </select>
+                        </td>
+                        <td>
+                            <label>
+                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                                <span>Ya/Tidak</span>
+                            </label>
+                        </td>
+                        <td class="center">
+                            <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input name="arr_disc2[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc2`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input name="arr_disc3[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowDisc3`+ count +`">
+                        </td>
+            
+                        <td class="center">
+                            <input name="arr_final_price[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_final_price`+ count +`" readonly>
+                        </td>
+                        <td class="center">
+                            <input name="arr_total[]" class="browser-default" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
+                        </td>
+                        <td>
+                            <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang...">
+                        </td>
+                        <td class="center">
+                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                <i class="material-icons">delete</i>
+                            </a>
+                        </td>
+                    </tr>
+                `);
+                
+               
+                $('#arr_item' + count).select2({
+                    placeholder: '-- Kosong --',
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    cache: true,
+                    width: 'resolve',
+                    dropdownParent: $('body').parent(),
+                    ajax: {
+                        url: '{{ url("admin/select2/sales_item") }}',
+                        type: 'GET',
+                        dataType: 'JSON',
+                        data: function(params) {
+                            return {
+                                search: params.term,
+                                account_id: $('#account_id').val(),
+                                date: $('#post_date').val(),
+                            };
+                        },
+                        processResults: function(data) {
+                            return {
+                                results: data.items
+                            }
+                        }
+                    }
+                });
+            }else{
+                swal({
+                    title: '!',
+                    text: 'Harap Pilih Plant Terlebih dahulu.',
+                    icon: 'error'
+                });
+            } 
         }else{
             swal({
                 title: '!',
-                text: 'Harap Pilih Plant Terlebih dahulu.',
+                text: 'Harap Pilih Customer Terlebih dahulu.',
                 icon: 'error'
             });
-        } 
+        }
+       
     }
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -2116,7 +2160,33 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                        
+                       
+                        $('#arr_item' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/sales_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        account_id: $('#account_id').val(),
+                                        date: $('#post_date').val(),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                         $.each(val.sell_units, function(i, value) {
                             $('#arr_unit' + count).append(`
                                 <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
@@ -2734,7 +2804,33 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
-                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
+                                
+                               
+                                $('#arr_item' + count).select2({
+                                    placeholder: '-- Kosong --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/sales_item") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                account_id: $('#account_id').val(),
+                                                date: $('#post_date').val(),
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
                                 $.each(val.sell_units, function(i, value) {
                                     $('#arr_unit' + count).append(`
                                         <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>

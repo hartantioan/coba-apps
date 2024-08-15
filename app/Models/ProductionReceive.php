@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\ResetCogsHelper;
 use App\Jobs\ResetCogsNew;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -296,7 +297,7 @@ class ProductionReceive extends Model
                 $rowbatch->update([
                     'total' => $totalbatch,
                 ]);
-                ResetCogsNew::dispatch($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
+                ResetCogsHelper::gas($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
             }
             $row->update([
                 'total' => $rowtotal,

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Exports\ExportInventoryTransferIn;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Helpers\ResetCogsHelper;
 use App\Models\GoodIssue;
 use App\Models\GoodIssueDetail;
 use App\Models\GoodReceipt;
@@ -728,7 +729,7 @@ class ResetCogsNew implements ShouldQueue
                 foreach($productionReceive->productionReceiveDetail as $rowreceive){
                   if($rowreceive->productionBatch()->exists()){
                     foreach($rowreceive->productionBatch as $rowbatch){
-                      ResetCogsNew::dispatch($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                      ResetCogsHelper::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
                     }
                   }
                 }
@@ -738,7 +739,7 @@ class ResetCogsNew implements ShouldQueue
               $productionFgReceive = ProductionFgReceive::find($row->productionIssue->productionFgReceive->id);
               if($productionFgReceive){
                 $productionFgReceive->recalculate($dateloop);
-                ResetCogsNew::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
+                ResetCogsHelper::gas($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
               }
             }
             $row->productionIssue->journal->journalDetail()->where('type','1')->update([

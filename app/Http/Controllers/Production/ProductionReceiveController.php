@@ -35,6 +35,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UsedData;
 use App\Models\MenuUser;
 use App\Exports\ExportProductionReceive;
+use App\Models\ItemCogs;
+
 class ProductionReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -425,7 +427,7 @@ class ProductionReceiveController extends Controller
                                 if($item){
                                     if($item->productionBatchMoreThanZero()->exists()){
                                         $totalstock = 0;
-                                        foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                        foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
                                             $totalstock += $rowbatch->qty;
                                         }
                                         if($qty > $totalstock){
@@ -433,9 +435,9 @@ class ProductionReceiveController extends Controller
                                         }
                                     }else{
                                         $itemstock = NULL;
-                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                        $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->orderByDesc('date')->orderByDesc('id')->first();
                                         if($itemstock){
-                                            if($itemstock->qty < $qty){
+                                            if($itemstock->qty_final < $qty){
                                                 $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
                                             }
                                         }else{
@@ -454,7 +456,7 @@ class ProductionReceiveController extends Controller
                                     if($item){
                                         if($item->productionBatchMoreThanZero()->exists()){
                                             $totalstock = 0;
-                                            foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                            foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
                                                 $totalstock += $rowbatch->qty;
                                             }
                                             if($qty > $totalstock){
@@ -462,9 +464,9 @@ class ProductionReceiveController extends Controller
                                             }
                                         }else{
                                             $itemstock = NULL;
-                                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                            $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->orderByDesc('date')->orderByDesc('id')->first();
                                             if($itemstock){
-                                                if($itemstock->qty < $qty){
+                                                if($itemstock->qty_final < $qty){
                                                     $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
                                                 }
                                             }else{

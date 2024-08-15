@@ -2238,22 +2238,6 @@ class CustomHelper {
 				]);
 
 				foreach($ir->inventoryRevaluationDetail as $rowdetail){
-					self::sendCogs($ir->getTable(),
-						$ir->id,
-						$rowdetail->place->company_id,
-						$rowdetail->place_id,
-						$rowdetail->warehouse_id,
-						$rowdetail->item_id,
-						0,
-						$rowdetail->nominal,
-						'IN',
-						$ir->post_date,
-						$rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area_id : NULL,
-						$rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->item_shading_id : NULL,
-						$rowdetail->itemStock->productionBatch()->exists() ? $rowdetail->itemStock->production_batch_id : NULL,
-						$rowdetail->getTable(),
-						$rowdetail->id,
-					);
 					
 					if($rowdetail->nominal < 0){
 						JournalDetail::create([
@@ -2331,6 +2315,22 @@ class CustomHelper {
 							'detailable_id'	=> $rowdetail->id,
 						]);
 					}
+					self::sendCogs($ir->getTable(),
+						$ir->id,
+						$rowdetail->place->company_id,
+						$rowdetail->place_id,
+						$rowdetail->warehouse_id,
+						$rowdetail->item_id,
+						0,
+						$rowdetail->nominal,
+						'IN',
+						$ir->post_date,
+						$rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area_id : NULL,
+						$rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->item_shading_id : NULL,
+						$rowdetail->itemStock->productionBatch()->exists() ? $rowdetail->itemStock->production_batch_id : NULL,
+						$rowdetail->getTable(),
+						$rowdetail->id,
+					);
 				}
 			}
 		}elseif($table_name == 'fund_requests'){
@@ -4659,6 +4659,31 @@ class CustomHelper {
 
 			$total = 0;
 
+			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
+
+			foreach($pir->productionReceiveDetail as $row){
+				if($row->productionBatch()->exists()){
+					foreach($row->productionBatch as $rowbatch){
+						$total += $rowbatch->total;
+					}
+				}else{
+					$total += $row->total;
+				}
+			}
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'type'			=> '2',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+			]);
+
 			foreach($pir->productionReceiveDetail as $row){
 				if($row->productionBatch()->exists()){
 					foreach($row->productionBatch as $rowbatch){
@@ -4706,8 +4731,6 @@ class CustomHelper {
 							NULL,
 							$rowbatch->id,
 						);
-		
-						$total += $rowbatch->total;
 					}
 				}else{
 					JournalDetail::create([
@@ -4754,8 +4777,6 @@ class CustomHelper {
 						NULL,
 						NULL,
 					);
-	
-					$total += $row->total;
 				}
 
 				if($row->qty_reject > 0){
@@ -4790,21 +4811,6 @@ class CustomHelper {
 					}
 				}
 			}
-
-			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coawip->id,
-				'line_id'		=> $pir->line_id,
-				'place_id'		=> $pir->place_id,
-				'type'			=> '2',
-				'nominal'		=> $total,
-				'nominal_fc'	=> $total,
-				'note'			=> $pir->code,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
 
 			$pir->update([
 				'status'	=> '3'
@@ -4857,6 +4863,20 @@ class CustomHelper {
 				'lookable_id'	=> $table_id,
 			]);
 
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '2',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+			]);
+
 			self::sendCogs($table_name,
 				$pir->id,
 				$pir->company_id,
@@ -4884,20 +4904,6 @@ class CustomHelper {
 				NULL,
 				NULL,
 			);
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coawip->id,
-				'line_id'		=> $pir->line_id,
-				'place_id'		=> $pir->place_id,
-				'machine_id'	=> $pir->machine_id,
-				'type'			=> '2',
-				'nominal'		=> $total,
-				'nominal_fc'	=> $total,
-				'note'			=> $pir->code,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-			]);
 
 			if($pir->qty_reject > 0){
 				if($pir->productionOrderDetail->productionScheduleDetail->bom->itemReject()->exists()){

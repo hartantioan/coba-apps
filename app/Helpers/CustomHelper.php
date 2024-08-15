@@ -2108,23 +2108,6 @@ class CustomHelper {
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
 						if($itemdata->qty_final > 0){
-							self::sendCogs('landed_costs',
-								$lc->id,
-								$rowdetail->place->company_id,
-								$rowdetail->place_id,
-								$rowdetail->warehouse_id,
-								$rowdetail->item_id,
-								0,
-								$rowtotal,
-								'IN',
-								$lc->post_date,
-								NULL,
-								NULL,
-								NULL,
-								$rowdetail->getTable(),
-								$rowdetail->id,
-							);
-
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
 								'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
@@ -2142,6 +2125,23 @@ class CustomHelper {
 								'detailable_type'=> $rowdetail->getTable(),
 								'detailable_id'	=> $rowdetail->id,
 							]);
+
+							self::sendCogs('landed_costs',
+								$lc->id,
+								$rowdetail->place->company_id,
+								$rowdetail->place_id,
+								$rowdetail->warehouse_id,
+								$rowdetail->item_id,
+								0,
+								$rowtotal,
+								'IN',
+								$lc->post_date,
+								NULL,
+								NULL,
+								NULL,
+								$rowdetail->getTable(),
+								$rowdetail->id,
+							);
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,

@@ -74,6 +74,7 @@ use App\Models\ProductionBatch;
 use App\Models\ProductionFgReceive;
 use App\Models\ProductionHandover;
 use App\Models\ProductionIssue;
+use App\Models\ProductionRecalculate;
 use App\Models\ProductionReceive;
 use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
@@ -4370,7 +4371,7 @@ class CustomHelper {
 										$rowbobot = $percent;
 									}
 									if($row->bom->group == '1'){
-										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
+										$price = $rowbatchusage->productionBatch->price();
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{
 										$rowtotal = round($rowbobot * $row->total,2);
@@ -5354,7 +5355,39 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'production_recalculates'){
-			
+			$cj = ProductionRecalculate::find($table_id);
+
+			if($cj){
+
+				$query = Journal::create([
+					'user_id'		=> session('bo_id'),
+					'company_id'	=> $cj->company_id,
+					'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'post_date'		=> $data->post_date,
+					'note'			=> $cj->note,
+					'status'		=> '3'
+				]);
+				
+				foreach($cj->productionRecalculateDatail as $row){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $row->coa_id,
+						'type'			=> $row->type,
+						'nominal'		=> abs($row->nominal),
+						'nominal_fc'	=> abs($row->nominal_fc),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+					]);
+				}
+
+				$cj->update([
+					'status'	=> '3'
+				]);
+			}
 		}
 		/* else{
 

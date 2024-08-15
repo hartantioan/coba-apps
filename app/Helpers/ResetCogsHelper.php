@@ -755,8 +755,8 @@ class ResetCogsHelper
                     }
                 } */
                 if($row->productionIssue->journal()->exists()){
+                    info($row->productionIssue->code);
                     foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
-                        info($row->productionIssue->code);
                         $rowjournal->update([
                             'nominal_fc'  => $row->productionIssue->total(),
                             'nominal'     => $row->productionIssue->total(),

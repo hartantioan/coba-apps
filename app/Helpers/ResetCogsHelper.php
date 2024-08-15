@@ -91,7 +91,7 @@ class ResetCogsHelper
                 'warehouse_id'		    => $row->warehouse_id,
                 'item_id'			        => $row->item_id,
                 'qty_in'			        => $qty,
-                'price_in'			      => $total / $qty,
+                'price_in'			      => round($total / $qty,6),
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
                 'price_final'		      => $total_final / $qty_final,
@@ -128,7 +128,7 @@ class ResetCogsHelper
                 'warehouse_id'		    => $row->warehouse_id,
                 'item_id'			        => $row->item_id,
                 'qty_in'			        => $qty,
-                'price_in'			      => $total / $qty,
+                'price_in'			      => round($total / $qty,6),
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
                 'price_final'		      => $total_final / $qty_final,
@@ -197,7 +197,7 @@ class ResetCogsHelper
                             'item_id'			        => $row->item_id,
                             'production_batch_id'       => $rowbatch->id,
                             'qty_in'			        => $qty,
-                            'price_in'			        => $qty > 0 ? $total / $qty : 0,
+                            'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
                             'total_in'			        => $total,
                             'qty_final'			        => $qty_final,
                             'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
@@ -229,7 +229,7 @@ class ResetCogsHelper
                         'warehouse_id'		    => $row->warehouse_id,
                         'item_id'			        => $row->item_id,
                         'qty_in'			        => $qty,
-                        'price_in'			      => $total / $qty,
+                        'price_in'			      => round($total / $qty,6),
                         'total_in'			      => $total,
                         'qty_final'			      => $qty_final,
                         'price_final'		      => $total_final / $qty_final,
@@ -279,7 +279,7 @@ class ResetCogsHelper
                 'warehouse_id'		    => $row->productionOrderDetail->productionScheduleDetail->item->warehouse(),
                 'item_id'			        => $row->productionOrderDetail->productionScheduleDetail->item_id,
                 'qty_in'			        => $qty,
-                'price_in'			      => $total / $qty,
+                'price_in'			      => round($total / $qty,6),
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
                 'price_final'		      => $total_final / $qty_final,
@@ -319,7 +319,7 @@ class ResetCogsHelper
                 'item_shading_id'	    => $row->item_shading_id,
                             'production_batch_id' => $row->productionBatch->id,
                 'qty_in'			        => $qty,
-                'price_in'			      => $total / $qty,
+                'price_in'			      => round($total / $qty,6),
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
                 'price_final'		      => $total_final / $qty_final,
@@ -428,7 +428,7 @@ class ResetCogsHelper
             })->get();
 
             foreach($goodissue as $row){
-                $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                $price = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
                 $total = round($row->qty * $price,2);
                 $qty = $row->qty;
                 $total_final = $totalBefore - $total;
@@ -465,17 +465,17 @@ class ResetCogsHelper
                 'total' => $total
                 ]);
                 if($row->goodReturnIssueDetail()->exists()){
-                foreach($row->goodReturnIssueDetail as $rowretur){
-                    $rowretur->update([
-                    'total'   => round($price * $rowretur->qty,2),
-                    ]);
-                }
+                    foreach($row->goodReturnIssueDetail as $rowretur){
+                        $rowretur->update([
+                        'total'   => round($price * $rowretur->qty,2),
+                        ]);
+                    }
                 }
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;
                 $gi = GoodIssue::find($row->good_issue_id);
                 if($gi){
-                $gi->updateGrandtotal();
+                    $gi->updateGrandtotal();
                 }
             }
 
@@ -486,7 +486,7 @@ class ResetCogsHelper
             foreach($goodreturnissue as $row){
                 $total = $row->total;
                 $qty = $row->qty;
-                $price = $total / $qty;
+                $price = round($total / $qty,6);
                 $total_final = $totalBefore + $total;
                 $qty_final = $qtyBefore + $qty;
                 ItemCogs::create([
@@ -576,7 +576,7 @@ class ResetCogsHelper
             foreach($goodtransferin as $row){
                 $total = $row->total;
                 $qty = $row->qty;
-                $price = $total / $qty;
+                $price = round($total / $qty,6);
                 $total_final = $totalBefore + $total;
                 $qty_final = $qtyBefore + $qty;
                 ItemCogs::create([
@@ -619,7 +619,7 @@ class ResetCogsHelper
                 if($row->productionBatchUsage()->exists()){
                 foreach($row->productionBatchUsage as $rowbatch){
                     if($bomGroup == '1'){
-                        $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                        $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
                         $rowtotal = round($rowbatch->qty * $rowprice,2);
                         $rowqty = $rowbatch->qty;
                         $total_final = $totalBefore - $rowtotal;
@@ -671,7 +671,7 @@ class ResetCogsHelper
                             'price_out'			      => $rowprice,
                             'total_out'			      => $rowtotal,
                             'qty_final'			      => $qtyBefore,
-                            'price_final'		      => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
+                            'price_final'		      => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0,
                             'total_final'		      => $totalBefore,
                             'date'				        => $dateloop,
                             'type'				        => 'OUT',
@@ -686,7 +686,7 @@ class ResetCogsHelper
                     }
                 }
                 }else{
-                    $rowprice = $totalBefore / $qtyBefore;
+                    $rowprice = round($totalBefore / $qtyBefore,6);
                     $rowtotal = round($rowprice * $row->qty,2);
                     $total += $rowtotal;
                     $totalBefore -= $rowtotal;

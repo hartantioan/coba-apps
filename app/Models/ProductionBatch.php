@@ -67,8 +67,8 @@ class ProductionBatch extends Model
         $total = $this->total;
         $price = 0;
         $qty = $this->qty_real;
-        $qtyused = $qty - $this->productionBatchUsage()->where('id','<=',$id)->sum('qty');
-        $qtycheck = $qty - $this->productionBatchUsage()->where('id','=',$id)->sum('qty');
+        $qtyused = $this->productionBatchUsage()->where('id','<',$id)->sum('qty');
+        $qtycheck = $this->productionBatchUsage()->where('id','=',$id)->sum('qty');
         if(($qty - $qtyused) <= 0){
             $total = $total - round($qtyused * $this->price(),2);
             $price = $total / $qtycheck;

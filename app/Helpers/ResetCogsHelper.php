@@ -734,7 +734,7 @@ class ResetCogsHelper
                     'nominal' => $total / $row->qty,
                     'total'   => $total,
                 ]);
-                if($row->productionIssue->productionReceiveIssue()->exists()){
+                /* if($row->productionIssue->productionReceiveIssue()->exists()){
                     $productionReceive = ProductionReceive::find($row->productionIssue->productionReceiveIssue->production_receive_id);
                     if($productionReceive){
                         $productionReceive->recalculate();
@@ -753,7 +753,7 @@ class ResetCogsHelper
                         $productionFgReceive->recalculate($dateloop);
                         self::gas($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
                     }
-                }
+                } */
                 if($row->productionIssue->journal()->exists()){
                     $row->productionIssue->journal->journalDetail()->where('type','1')->update([
                         'nominal_fc'  => $row->productionIssue->total(),

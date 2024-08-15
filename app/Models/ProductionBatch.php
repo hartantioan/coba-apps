@@ -73,8 +73,6 @@ class ProductionBatch extends Model
         }else{
             $total = round($qtycheck * $this->price(),2);
         }
-
-        info($total);
         
         return $total;
     }

@@ -864,25 +864,25 @@ class ResetCogsHelper
             foreach($itemcogs2 as $key => $row){
             if($key == 0){
                 if($old_data2){
-                if($row->type == 'IN'){
-                    $total_final = $old_data->total_final + $row->total_in;
-                    $qty_final = $old_data->qty_final + $row->qty_in;
-                }elseif($row->type == 'OUT'){
-                    $total_final = $old_data->total_final - $row->total_out;
-                    $qty_final = $old_data->qty_final - $row->qty_out;
-                }
+                    if($row->type == 'IN'){
+                        $total_final = $old_data2->total_final + $row->total_in;
+                        $qty_final = $old_data2->qty_final + $row->qty_in;
+                    }elseif($row->type == 'OUT'){
+                        $total_final = $old_data2->total_final - $row->total_out;
+                        $qty_final = $old_data2->qty_final - $row->qty_out;
+                    }
     
-                $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
                 }else{
-                if($row->type == 'IN'){
-                    $total_final = $row->total_in;
-                    $qty_final = $row->qty_in;
-                }elseif($row->type == 'OUT'){
-                    $total_final = 0 - $row->total_out;
-                    $qty_final = 0 - $row->qty_out;
-                }
-    
-                $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    if($row->type == 'IN'){
+                        $total_final = $row->total_in;
+                        $qty_final = $row->qty_in;
+                    }elseif($row->type == 'OUT'){
+                        $total_final = 0 - $row->total_out;
+                        $qty_final = 0 - $row->qty_out;
+                    }
+        
+                    $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
                 }
                 $row->update([
                 'price_final'	=> $price_final,
@@ -891,17 +891,17 @@ class ResetCogsHelper
                 ]);
             }else{
                 if($row->type == 'IN'){
-                $total_final += $row->total_in;
-                $qty_final += $row->qty_in;
+                    $total_final += $row->total_in;
+                    $qty_final += $row->qty_in;
                 }elseif($row->type == 'OUT'){
-                $total_final -= $row->total_out;
-                $qty_final -= $row->qty_out;
+                    $total_final -= $row->total_out;
+                    $qty_final -= $row->qty_out;
                 }
                 $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
                 $row->update([
-                'price_final'	=> $price_final,
-                'qty_final'		=> $qty_final,
-                'total_final'	=> $total_final,
+                    'price_final'	=> $price_final,
+                    'qty_final'		=> $qty_final,
+                    'total_final'	=> $total_final,
                 ]);
             }
             }

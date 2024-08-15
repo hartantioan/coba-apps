@@ -4188,6 +4188,26 @@ class CustomHelper {
 				}
 			}
 
+			foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
+				if(!$row->is_wip){
+					$total += $row->total;
+				}
+			}
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '1',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->productionOrderDetail->productionOrder->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+			]);
+
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
 				foreach($arrBom as $rowbom){

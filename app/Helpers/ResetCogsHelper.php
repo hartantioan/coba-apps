@@ -755,10 +755,13 @@ class ResetCogsHelper
                     }
                 } */
                 if($row->productionIssue->journal()->exists()){
-                    $row->productionIssue->journal->journalDetail()->where('type','1')->update([
-                        'nominal_fc'  => $row->productionIssue->total(),
-                        'nominal'     => $row->productionIssue->total(),
-                    ]);
+                    foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
+                        info('kambing');
+                        $rowjournal->update([
+                            'nominal_fc'  => $row->productionIssue->total(),
+                            'nominal'     => $row->productionIssue->total(),
+                        ]);
+                    }
                 }
             }
 

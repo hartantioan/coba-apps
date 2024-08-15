@@ -427,8 +427,10 @@ class ProductionReceiveController extends Controller
                                 if($item){
                                     if($item->productionBatchMoreThanZero()->exists()){
                                         $totalstock = 0;
-                                        foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
-                                            $totalstock += $rowbatch->qty;
+                                        foreach($item->productionBatchMoreThanZero()->where('lookable_type','production_receive_details')->get() as $rowbatch){
+                                            if($rowbatch->lookable->productionReceive->post_date <= $request->post_date){
+                                                $totalstock += $rowbatch->qty;
+                                            }
                                         }
                                         if($qty > $totalstock){
                                             $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($totalstock).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
@@ -456,8 +458,10 @@ class ProductionReceiveController extends Controller
                                     if($item){
                                         if($item->productionBatchMoreThanZero()->exists()){
                                             $totalstock = 0;
-                                            foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
-                                                $totalstock += $rowbatch->qty;
+                                            foreach($item->productionBatchMoreThanZero()->where('lookable_type','production_receive_details')->orderBy('created_at')->get() as $rowbatch){
+                                                if($rowbatch->lookable->productionReceive->post_date <= $request->post_date){
+                                                    $totalstock += $rowbatch->qty;
+                                                }
                                             }
                                             if($qty > $totalstock){
                                                 $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($totalstock).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);

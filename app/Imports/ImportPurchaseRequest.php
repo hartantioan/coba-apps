@@ -158,8 +158,7 @@ class handlePRdetail implements OnEachRow, WithHeadingRow
                      
                         $project =  explode('#', $row['proyek'])[0];
                         $project_id= Project::where('code',$project)->first()->id ?? null;
-                        info($project);
-                        info($project_id);
+                    
                         $jumlah = $row['jumlah'];$ket1 = $row['ket_1']; $ket2 = $row['ket_2'];
                         $tgl_pakai = $row['tgl_pakai']; $requester= $row['requester'];
 

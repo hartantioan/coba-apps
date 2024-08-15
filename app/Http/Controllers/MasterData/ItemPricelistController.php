@@ -1,7 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+
+use App\Exceptions\RowImportException;
+use App\Exports\ExportTemplatePriceList;
+use App\Exports\ExportTransactionPageItemPriceList;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportPriceList;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,6 +17,7 @@ use App\Models\ItemPricelist;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ItemPricelistController extends Controller
 {
@@ -192,10 +198,10 @@ class ItemPricelistController extends Controller
 			if($query) {
 
                 activity()
-                    ->performedOn(new BenchmarkPrice())
+                    ->performedOn(new ItemPricelist())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit benchmark price data.');
+                    ->log('Add / edit item price list data.');
 
 				$response = [
 					'status'  => 200,
@@ -213,22 +219,23 @@ class ItemPricelistController extends Controller
     }
 
     public function show(Request $request){
-        $bp = BenchmarkPrice::find($request->id);
+        $bp = ItemPricelist::find($request->id);
         $bp['price'] = number_format($bp->price,2,',','.');
-        $bp['item_name'] = $bp->item->code.' - '.$bp->item->name;
+        $bp['item'] = $bp->item;
+        $bp['group']= $bp->group;
         				
 		return response()->json($bp);
     }
 
     public function destroy(Request $request){
-        $query = BenchmarkPrice::find($request->id);
+        $query = ItemPricelist::find($request->id);
 		
         if($query->delete()) {
             activity()
-                ->performedOn(new BenchmarkPrice())
+                ->performedOn(new ItemPricelist())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the benchmark price data');
+                ->log('Delete the item price list data');
 
             $response = [
                 'status'  => 200,
@@ -242,5 +249,33 @@ class ItemPricelistController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplatePriceList(), 'format_template_price_list'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new ImportPriceList, $request->file('file'));
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search = $request->search? $request->search : '';
+        $status = $request->status ? $request->status : '';
+		return Excel::download(new ExportTransactionPageItemPriceList($search,$status), 'standar_harga_pelanggan_'.uniqid().'.xlsx');
     }
 }

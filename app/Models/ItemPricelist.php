@@ -50,4 +50,17 @@ class ItemPricelist extends Model
 
         return $status;
     }
+
+    public function statusRaw(){
+        
+        $status = match ($this->status) {
+            '1' => 'Aktif',
+            '2' => 'Tidak Aktif',
+
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
+
 }

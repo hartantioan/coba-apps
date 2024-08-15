@@ -4186,9 +4186,6 @@ class CustomHelper {
 						$arrBom[] = $row->bom_id;
 					}
 				}
-			}
-
-			foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
 				if(!$row->is_wip){
 					$total += $row->total;
 				}
@@ -4629,26 +4626,7 @@ class CustomHelper {
 							}
 						}
 					}
-	
-					if(!$row->is_wip){
-						$total += $row->total;
-					}
 				}
-	
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					/* 'coa_id'		=> $parentFg ? $pir->productionOrderDetail->productionScheduleDetail->item->itemGroup->coa_id : $coawip->id, */
-					'coa_id'		=> $coawip->id,
-					'line_id'		=> $pir->line_id,
-					'place_id'		=> $pir->place_id,
-					'machine_id'	=> $pir->machine_id,
-					'type'			=> '1',
-					'nominal'		=> $total,
-					'nominal_fc'	=> $total,
-					'note'			=> $pir->productionOrderDetail->productionOrder->code,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-				]);
 			}
 
 			if($parentFg){

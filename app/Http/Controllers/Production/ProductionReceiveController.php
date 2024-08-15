@@ -35,6 +35,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UsedData;
 use App\Models\MenuUser;
 use App\Exports\ExportProductionReceive;
+use App\Models\ItemCogs;
+
 class ProductionReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -425,7 +427,7 @@ class ProductionReceiveController extends Controller
                                 if($item){
                                     if($item->productionBatchMoreThanZero()->exists()){
                                         $totalstock = 0;
-                                        foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                        foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
                                             $totalstock += $rowbatch->qty;
                                         }
                                         if($qty > $totalstock){
@@ -433,9 +435,9 @@ class ProductionReceiveController extends Controller
                                         }
                                     }else{
                                         $itemstock = NULL;
-                                        $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                        $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                         if($itemstock){
-                                            if($itemstock->qty < $qty){
+                                            if($itemstock->qty_final < $qty){
                                                 $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
                                             }
                                         }else{
@@ -454,7 +456,7 @@ class ProductionReceiveController extends Controller
                                     if($item){
                                         if($item->productionBatchMoreThanZero()->exists()){
                                             $totalstock = 0;
-                                            foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
+                                            foreach($item->productionBatchMoreThanZero()->whereDate('created_at','<=',$request->post_date)->orderBy('created_at')->get() as $rowbatch){
                                                 $totalstock += $rowbatch->qty;
                                             }
                                             if($qty > $totalstock){
@@ -462,9 +464,9 @@ class ProductionReceiveController extends Controller
                                             }
                                         }else{
                                             $itemstock = NULL;
-                                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                            $itemstock = ItemCogs::where('item_id',$rowbom->lookable_id)->where('place_id',$request->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                             if($itemstock){
-                                                if($itemstock->qty < $qty){
+                                                if($itemstock->qty_final < $qty){
                                                     $arrItemError[] = 'Item : '.$item->code.' - '.$item->name.' stok '.CustomHelper::formatConditionalQty($itemstock->qty).' sedangkan kebutuhan '.CustomHelper::formatConditionalQty($qty);
                                                 }
                                             }else{
@@ -950,6 +952,12 @@ class ProductionReceiveController extends Controller
                     }
                 }
             }
+            if($query->productionReceiveIssue()->exists()){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf receive telah memiliki issue, silahkan void issue terlebih dahulu.'
+                ]);
+            }
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -961,7 +969,16 @@ class ProductionReceiveController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                if(in_array($query->status,['2','3'])){
+                $tempStatus = $query->status;
+
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                if(in_array($tempStatus,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                     foreach($query->productionReceiveIssue as $row){
@@ -978,13 +995,6 @@ class ProductionReceiveController extends Controller
                         $row->productionBatch()->delete();
                     }
                 }
-
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
 
                 $query->voidProductionIssue();
 

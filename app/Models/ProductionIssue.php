@@ -104,7 +104,9 @@ class ProductionIssue extends Model
     }
 
     public function productionReceiveIssue(){
-        return $this->hasOne('App\Models\ProductionReceiveIssue','production_issue_id','id');
+        return $this->hasOne('App\Models\ProductionReceiveIssue','production_issue_id','id')->whereHas('productionReceive',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function total(){

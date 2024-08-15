@@ -274,10 +274,10 @@ class ProductionIssueController extends Controller
                         if($request->arr_batch_index && in_array($key,$request->arr_batch_index)){
                             foreach($request->arr_batch_index as $keybatch => $rowbatch){
                                 if($key == $rowbatch){
-                                    $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->where('production_batch_id',$request->arr_batch_id[$keybatch])->first();
+                                    $itemstock = $item->itemCogs()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->where('production_batch_id',$request->arr_batch_id[$keybatch])->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                                     $qty = str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keybatch]));
                                     if($itemstock){
-                                        if(round($qty,3) > $itemstock->qty){
+                                        if(round($qty,3) > $itemstock->qty_final){
                                             $passedQty = false;
                                             $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                         }
@@ -285,10 +285,10 @@ class ProductionIssueController extends Controller
                                 }
                             }
                         }else{
-                            $itemstock = $item->itemStock()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->first();
+                            $itemstock = $item->itemCogs()->where('place_id',$request->arr_place[$key])->where('warehouse_id',$request->arr_warehouse[$key])->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                             $qty = str_replace(',','.',str_replace('.','',$row));
                             if($itemstock){
-                                if(round($qty,3) > $itemstock->qty){
+                                if(round($qty,3) > $itemstock->qty_final){
                                     $passedQty = false;
                                     $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                 }
@@ -836,10 +836,7 @@ class ProductionIssueController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
-                if(in_array($query->status,['2','3'])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                    CustomHelper::removeCogs($query->getTable(),$query->id);
-                }
+                $tempStatus = $query->status;
 
                 $query->update([
                     'status'    => '5',
@@ -847,6 +844,11 @@ class ProductionIssueController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if(in_array($tempStatus,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    CustomHelper::removeCogs($query->getTable(),$query->id);
+                }
 
                 foreach($query->productionIssueDetail as $row){
                     foreach($row->productionBatchUsage as $rowdetail){

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Helpers\CustomHelper;
+use App\Helpers\ResetCogsHelper;
 use App\Jobs\ResetCogsNew;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
@@ -99,7 +100,9 @@ class ProductionReceive extends Model
 
     public function productionReceiveIssue()
     {
-        return $this->hasMany('App\Models\ProductionReceiveIssue');
+        return $this->hasMany('App\Models\ProductionReceiveIssue')->whereHas('productionIssue',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
     }
 
     public function used(){
@@ -296,7 +299,7 @@ class ProductionReceive extends Model
                 $rowbatch->update([
                     'total' => $totalbatch,
                 ]);
-                ResetCogsNew::dispatch($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
+                ResetCogsHelper::gas($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
             }
             $row->update([
                 'total' => $rowtotal,
@@ -522,10 +525,7 @@ class ProductionReceive extends Model
     public function voidProductionIssue(){
         if($this->productionIssue()->exists()){
             foreach($this->productionIssue as $row){
-                if(in_array($row->status,['2','3'])){
-                    CustomHelper::removeJournal($row->getTable(),$row->id);
-                    CustomHelper::removeCogs($row->getTable(),$row->id);
-                }
+                $tempStatus = $row->status;
 
                 $row->update([
                     'status'    => '5',
@@ -533,6 +533,11 @@ class ProductionReceive extends Model
                     'void_note' => 'Ditutup otomatis dari Production Receive '.$this->code,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if(in_array($tempStatus,['2','3'])){
+                    CustomHelper::removeJournal($row->getTable(),$row->id);
+                    CustomHelper::removeCogs($row->getTable(),$row->id);
+                }
 
                 foreach($row->productionIssueDetail as $rowdetail){
                     foreach($rowdetail->productionBatchUsage as $rowdetailkuy){

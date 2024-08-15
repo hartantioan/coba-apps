@@ -147,152 +147,7 @@ class CustomHelper {
 	}
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
-		$item = Item::find($item_id);
-		$bomPowder = NULL;
-		if($item->bomPlace($place_id)){
-			$bomPowder = $item->bomPlace($place_id)->first();
-		}
-		if($bomPowder && $bomPowder->group == '1'){
-			$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
-		}else{
-			$old_data = ItemCogs::where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->whereDate('date','<=',$date)->where('area_id',$area_id)->where('item_shading_id',$shading)->where('production_batch_id',$batch)->orderByDesc('date')->orderByDesc('id')->first();
-		}
-		
-		if($type == 'IN'){
-			ItemCogs::create([
-				'lookable_type'		=> $lookable_type,
-				'lookable_id'		=> $lookable_id,
-				'detailable_type'	=> $detail_type ?? NULL,
-				'detailable_id'		=> $detail_id ?? NULL,
-				'company_id'		=> $company_id,
-				'place_id'			=> $place_id,
-				'warehouse_id'		=> $warehouse_id,
-				'area_id'			=> $area_id,
-				'item_id'			=> $item_id,
-				'item_shading_id'	=> $shading ? $shading : NULL,
-				'production_batch_id'=> $batch ?? NULL,
-				'qty_in'			=> $qty,
-				'price_in'			=> $qty > 0 ? $total / $qty : 0,
-				'total_in'			=> $total,
-				'qty_final'			=> $old_data ? $old_data->qty_final + $qty : $qty,
-				'price_final'		=> $old_data ? (($old_data->total_final + $total) / ($old_data->qty_final + $qty)) : ($qty > 0 ? $total / $qty : 0),
-				'total_final'		=> $old_data ? round(($old_data->total_final + $total),2) : $total,
-				'date'				=> $date,
-				'type'				=> $type
-			]);
-		}elseif($type == 'OUT'){
-			if($old_data){
-				if($lookable_type == 'good_returns'){
-					$priceout = round($total / $qty,3);
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $total;
-					$pricefinal = $qtybalance > 0 ? round($totalfinal / $qtybalance,2) : 0;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'detailable_type'	=> $detail_type ?? NULL,
-						'detailable_id'		=> $detail_id ?? NULL,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'production_batch_id'=> $batch ?? NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> $priceout,
-						'total_out'			=> $total,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> $pricefinal,
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}elseif($lookable_type == 'production_issue_receives'){
-					$priceeach = $old_data->total_final / $old_data->qty_final;
-					$totalout = round($priceeach * $qty,2);
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $totalout;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'detailable_type'	=> $detail_type ?? NULL,
-						'detailable_id'		=> $detail_id ?? NULL,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'production_batch_id'=> $batch ?? NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> round($priceeach,2),
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> round($priceeach,2),
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}elseif($lookable_type == 'purchase_memos'){
-					$priceeach = $total / $qty;
-					$totalout = $total;
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $total;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'detailable_type'	=> $detail_type ?? NULL,
-						'detailable_id'		=> $detail_id ?? NULL,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'production_batch_id'=> $batch ?? NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> round($priceeach,2),
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> round($priceeach,2),
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}else{
-					$priceeach = $total / $qty;
-					$totalout = $total;
-					$qtybalance = $old_data->qty_final - $qty;
-					$totalfinal = $old_data->total_final - $totalout;
-					ItemCogs::create([
-						'lookable_type'		=> $lookable_type,
-						'lookable_id'		=> $lookable_id,
-						'detailable_type'	=> $detail_type ?? NULL,
-						'detailable_id'		=> $detail_id ?? NULL,
-						'company_id'		=> $company_id,
-						'place_id'			=> $place_id,
-						'warehouse_id'		=> $warehouse_id,
-						'area_id'			=> $area_id,
-						'item_id'			=> $item_id,
-						'item_shading_id'	=> $shading ? $shading : NULL,
-						'production_batch_id'=> $batch ?? NULL,
-						'qty_out'			=> $qty,
-						'price_out'			=> $priceeach,
-						'total_out'			=> $totalout,
-						'qty_final'			=> $qtybalance,
-						'price_final'		=> $priceeach,
-						'total_final'		=> $totalfinal,
-						'date'				=> $date,
-						'type'				=> $type
-					]);
-				}
-			}
-		}
-
-		/* ResetCogs::dispatch($date,$place_id,$item_id); */
-		/* ResetCogs::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch); */
-		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
+		ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
@@ -6141,7 +5996,8 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
-				ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
+				/* ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
+				ResetCogsHelper::gas($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
 				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}

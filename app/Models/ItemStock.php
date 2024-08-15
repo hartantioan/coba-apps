@@ -62,7 +62,7 @@ class ItemStock extends Model
         $price = 0;
         $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderByDesc('date')->orderByDesc('id')->first();
         if($cek){
-            $price = $cek->qty_final > 0 || $cek->qty_final < 0 ? $cek->total_final / $cek->qty_final : 0;
+            $price = $cek->qty_final > 0 || $cek->qty_final < 0 ? round($cek->total_final / $cek->qty_final,6) : 0;
         }
 
         return $price;
@@ -72,7 +72,7 @@ class ItemStock extends Model
         $price = 0;
         $cek = ItemCogs::where('place_id',$this->place_id)->where('item_id',$this->item_id)->whereDate('date','<=',$date)->where('area_id',$this->area_id)->where('item_shading_id',$this->item_shading_id)->orderByDesc('date')->orderByDesc('id')->first();
         if($cek){
-            $price = $cek->qty_final > 0 || $cek->qty_final < 0 ? $cek->total_final / $cek->qty_final : 0;
+            $price = $cek->qty_final > 0 || $cek->qty_final < 0 ? round($cek->total_final / $cek->qty_final,6) : 0;
         }
 
         return $price;

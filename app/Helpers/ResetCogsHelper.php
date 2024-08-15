@@ -32,7 +32,6 @@ use App\Models\MarketingOrderReturnDetail;
 use App\Models\ProductionFgReceive;
 use App\Models\ProductionFgReceiveDetail;
 use App\Models\ProductionHandoverDetail;
-use App\Models\ProductionIssue;
 use App\Models\ProductionIssueDetail;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
@@ -756,14 +755,12 @@ class ResetCogsHelper
                     }
                 } */
                 if($row->productionIssue->journal()->exists()){
-                    $pi = ProductionIssueDetail::find($row->id);
-                    if($pi){
-                        foreach($pi->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
-                            $rowjournal->update([
-                                'nominal_fc'  => $pi->productionIssue->total(),
-                                'nominal'     => $pi->productionIssue->total(),
-                            ]);
-                        }
+                    foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
+                        info($row->productionIssue->code);
+                        $rowjournal->update([
+                            'nominal_fc'  => $row->productionIssue->total(),
+                            'nominal'     => $row->productionIssue->total(),
+                        ]);
                     }
                 }
             }

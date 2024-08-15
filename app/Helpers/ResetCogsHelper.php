@@ -691,8 +691,8 @@ class ResetCogsHelper
                         ]);
                         foreach($rowbatch->journalDetail as $rowjournal){
                             $rowjournal->update([
-                            'nominal_fc'  => $rowtotal,
-                            'nominal'     => $rowtotal,
+                                'nominal_fc'  => $rowtotal,
+                                'nominal'     => $rowtotal,
                             ]);
                         }
                     }

@@ -87,7 +87,7 @@ use App\Models\Size;
 use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
-
+use App\Models\ItemPriceList;
 use App\Models\Group;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -845,6 +845,8 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $account_id   = $request->account_id;
+        $date   = $request->date;
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
@@ -853,8 +855,13 @@ class Select2Controller extends Controller {
                 ->where(function($query) use($search){
                     $query->whereNotNull('is_sales_item');
                 })->get();
-
+        $user = User::find($account_id);
         foreach($data as $d) {
+            $cek_price = ItemPriceList::where('group_id',$user->group_id)
+            ->where('item_id',$d->id)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->first() ?? 0;
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
@@ -866,6 +873,7 @@ class Select2Controller extends Controller {
                 'list_outletprice'  => $d->listOutletPrice(),
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
+                'price'             => $cek_price->price ?? 0,
                 'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
                 'stock_com'         => CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)),
             ];
@@ -4211,7 +4219,7 @@ class Select2Controller extends Controller {
                 $query->whereNotNull('is_default');
             })->get() as $row){
                 $qty_planned = $row->qty * $qtyBobotOutput;
-                //info($qty_planned);
+                
                 $bomdetail[] = [
                     'bom_id'            => $row->bom->id,
                     'bom_detail_id'     => $row->id,

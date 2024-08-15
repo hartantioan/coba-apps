@@ -665,8 +665,8 @@ class ResetCogsHelper
                             ]);
                         }
                     }else{
-                        $rowprice = $rowbatch->productionBatch->priceById($rowbatch->id);
-                        $rowtotal = round($rowprice * $rowbatch->qty,2);
+                        $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
+                        $rowprice = $rowtotal / $rowbatch->qty;
                         $total += $rowtotal;
                         $totalBefore -= $rowtotal;
                         $qtyBefore -= $rowbatch->qty;

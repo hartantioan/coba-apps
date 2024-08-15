@@ -4371,7 +4371,7 @@ class CustomHelper {
 										$rowbobot = $percent;
 									}
 									if($row->bom->group == '1'){
-										$price = $rowbatchusage->productionBatch->price();
+										$price = $row->lookable->priceNowProduction($row->place_id,$pir->post_date);
 										$rowtotal = round($price * $rowbatchusage->qty,2);
 									}else{
 										$rowtotal = round($rowbobot * $row->total,2);

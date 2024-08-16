@@ -698,7 +698,7 @@ class ResetCogsHelper
                         }
                     }
                 }else{
-                    $rowprice = round($totalBefore / $qtyBefore,6);
+                    $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
                     $rowtotal = round($rowprice * $row->qty,2);
                     $total += $rowtotal;
                     $totalBefore -= $rowtotal;

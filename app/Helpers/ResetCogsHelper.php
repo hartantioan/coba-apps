@@ -146,11 +146,11 @@ class ResetCogsHelper
                 $totalBefore = $total_final;
             }
 
-            $productionreceive = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($dateloop){
+            $productionreceivereject = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_reject_id',$item_id)->get();
 
-            foreach($productionreceive as $row){
+            foreach($productionreceivereject as $row){
                 if($row->qty_reject > 0){
                     $qty_final = $totalBefore + $row->qty_reject;
                     $total_final = $totalBefore + 0;
@@ -255,6 +255,39 @@ class ResetCogsHelper
                         'nominal_fc'  => $row->productionReceive->total(),
                         'nominal'     => $row->productionReceive->total(),
                     ]);
+                }
+            }
+
+            $productionfgreceivereject = ProductionFgReceive::whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->where('qty_reject','>',0)->whereHas('productionOrderDetail',function($query)use($item_id){
+                $query->whereHas('productionScheduleDetail',function($query)use($item_id){
+                    $query->whereHas('bom',function($query)use($item_id){
+                        $query->where('item_reject_id',$item_id);
+                    });
+                });
+            })->get();
+
+            foreach($productionfgreceivereject as $row){
+                if($row->qty_reject > 0){
+                    $qty_final = $totalBefore + $row->qty_reject;
+                    $total_final = $totalBefore + 0;
+                    ItemCogs::create([
+                        'lookable_type'		        => $row->getTable(),
+                        'lookable_id'		        => $row->id,
+                        'company_id'		        => $row->company_id,
+                        'place_id'			        => $row->place_id,
+                        'warehouse_id'		        => $row->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
+                        'item_id'			        => $row->productionOrderDetail->productionScheduleDetail->bom->item_reject_id,
+                        'qty_in'			        => $row->qty_reject,
+                        'price_in'			        => 0,
+                        'total_in'			        => 0,
+                        'qty_final'			        => $qty_final,
+                        'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                        'total_final'		        => $total_final,
+                        'date'				        => $dateloop,
+                        'type'				        => 'IN'
+                    ]);
+                    $qtyBefore = $qty_final;
+                    $totalBefore = $total_final;
                 }
             }
 

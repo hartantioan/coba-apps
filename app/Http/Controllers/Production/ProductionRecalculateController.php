@@ -581,14 +581,6 @@ class ProductionRecalculateController extends Controller
         $query = ProductionRecalculate::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
-            foreach($query->productionRecalculateDetail as $row){
-                if(!CustomHelper::checkLockAcc($row->productionIssueDetail->productionIssue->post_date)){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Transaksi Production Issue No. '.$row->productionIssueDetail->productionIssue->code.' terjadi pada tanggal '.date('d/m/Y',strtotime($row->productionIssueDetail->productionIssue->post_date)).' dan pada periode tersebut telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan pada dokumen.'
-                    ]);
-                }
-            }
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,
@@ -601,26 +593,8 @@ class ProductionRecalculateController extends Controller
                 ];
             }else{
 
-                foreach($query->productionRecalculateDetail as $row){
-                    $row->productionIssueDetail->journalDetail()->delete();
-                    $pid = $row->production_issue_id;
-                    $row->productionIssueDetail()->delete();
-                    $updateProductionIssue = ProductionIssue::find($pid);
-                    if($updateProductionIssue){
-                        $journal = $updateProductionIssue->journal()->exists() ? $updateProductionIssue->journal : '';
-                        if($journal){
-                            $journal->journalDetail()->where('type','1')->update([
-                                'nominal_fc'  => $updateProductionIssue->total(),
-                                'nominal'     => $updateProductionIssue->total(),
-                            ]);
-                        }
-                        if($updateProductionIssue->productionReceiveIssue()->exists()){
-                            $productionReceive = ProductionReceive::find($updateProductionIssue->productionReceiveIssue->production_receive_id);
-                            if($productionReceive){
-                                $productionReceive->recalculateAndResetCogs();
-                            }
-                        }
-                    }
+                if(in_array($query->status,['2',3])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
                 }
 
                 $query->update([
@@ -990,7 +964,7 @@ class ProductionRecalculateController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionHandover::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionRecalculate::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

@@ -5366,18 +5366,34 @@ class CustomHelper {
 					'note'			=> $cj->note,
 					'status'		=> '3'
 				]);
+
+				$coaayatsilangstock = Coa::where('code','100.01.01.99.03')->where('company_id',$cj->company_id)->first();
 				
-				foreach($cj->productionRecalculateDatail as $row){
+				foreach($cj->productionRecalculateDetail as $row){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
-						'coa_id'		=> $row->coa_id,
-						'type'			=> $row->type,
-						'nominal'		=> abs($row->nominal),
-						'nominal_fc'	=> abs($row->nominal_fc),
+						'coa_id'		=> $row->resource->coa_id,
+						'type'			=> $row->total > 0 ? '1' : '2',
+						'nominal'		=> abs($row->total),
+						'nominal_fc'	=> abs($row->total),
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 						'detailable_type'=> $row->getTable(),
 						'detailable_id'	=> $row->id,
+						'note'			=> 'REKALKULASI PRODUKSI NO. '.$cj->code,
+					]);
+
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coaayatsilangstock->id,
+						'type'			=> $row->total < 0 ? '1' : '2',
+						'nominal'		=> abs($row->total),
+						'nominal_fc'	=> abs($row->total),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+						'detailable_type'=> $row->getTable(),
+						'detailable_id'	=> $row->id,
+						'note'			=> 'REKALKULASI PRODUKSI NO. '.$cj->code,
 					]);
 				}
 

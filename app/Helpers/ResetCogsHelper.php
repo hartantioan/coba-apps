@@ -182,7 +182,7 @@ class ResetCogsHelper
             })->get();
 
             foreach($productionfgreceivereject as $row){
-                $qty_final = $totalBefore + $row->qty_reject;
+                $qty_final = $qtyBefore + $row->qty_reject;
                 $total_final = $totalBefore + 0;
                 ItemCogs::create([
                     'lookable_type'		        => $row->getTable(),

@@ -177,8 +177,10 @@ class ResetCogsHelper
 
             $productionreceive = ProductionReceiveDetail::whereHas('productionReceive',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-            })->whereHas('productionBatch',function($query)use($production_batch_id){
-                $query->where('id',$production_batch_id);
+            })->whereHas('productionBatch',function($query)use($production_batch_id,$bomGroup){
+                if($production_batch_id && $bomGroup !== '1'){
+                    $query->where('id',$production_batch_id);
+                }
             })->where('item_id',$item_id)->get();
 
             foreach($productionreceive as $row){
@@ -617,8 +619,8 @@ class ResetCogsHelper
             })
             ->where('lookable_type','items')->where('lookable_id',$item_id)
             ->whereNull('is_wip')
-            ->where(function($query)use($production_batch_id){
-                if($production_batch_id){
+            ->where(function($query)use($production_batch_id,$bomGroup){
+                if($production_batch_id && $bomGroup !== '1'){
                     $query->whereHas('productionBatchUsage',function($query)use($production_batch_id){
                         $query->where('production_batch_id',$production_batch_id);
                     });

@@ -366,11 +366,10 @@ class ProductionReceive extends Model
                                             $qtyused = 0;
                                             if($rowbatch->qty > $totalneeded){
                                                 $qtyused = $totalneeded;
-                                                $totalneeded -= $rowbatch->qty;
                                             }else{
                                                 $qtyused = $rowbatch->qty;
-                                                $totalneeded -= $rowbatch->qty;
                                             }
+                                            $totalneeded -= $rowbatch->qty;
                                             if($qtyused > 0){
                                                 $totalbatch += round($rowbatch->price() * $qtyused,2);
                                                 ProductionBatchUsage::create([
@@ -449,11 +448,10 @@ class ProductionReceive extends Model
                                                 $qtyused = 0;
                                                 if($rowbatch->qty > $totalneeded){
                                                     $qtyused = $totalneeded;
-                                                    $totalneeded -= $rowbatch->qty;
                                                 }else{
                                                     $qtyused = $rowbatch->qty;
-                                                    $totalneeded -= $rowbatch->qty;
                                                 }
+                                                $totalneeded -= $rowbatch->qty;
                                                 if($qtyused > 0){
                                                     $totalbatch += round($rowbatch->price() * $qtyused,2);
                                                     ProductionBatchUsage::create([

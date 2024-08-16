@@ -285,27 +285,29 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 }
             }
             
-    
-            foreach($query_no as $row_tidak_ada){
+            if(count($query_no) > 0 ){
+                foreach($query_no as $row_tidak_ada){
                 
-                if($row_tidak_ada->qty_final > 0){
-                    $array_first_item[] = [
-                        'perlu'        => 1,
-                        'item_id'      => $row_tidak_ada->item->id,
-                        'id'           => $row_tidak_ada->id, 
-                        'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
-                        'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
-                        'item'         => $row_tidak_ada->item->name,
-                        'area'         => $row_tidak_ada->area->code ?? '-',
-                        'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
-                        'shading'      => $row_tidak_ada->shading->code ?? '-',
-                        'satuan'       => $row_tidak_ada->item->uomUnit->code,
-                        'kode'         => $row_tidak_ada->item->code,
-                        'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
-                    ]; 
+                    if($row_tidak_ada->qty_final > 0){
+                        $array_first_item[] = [
+                            'perlu'        => 1,
+                            'item_id'      => $row_tidak_ada->item->id,
+                            'id'           => $row_tidak_ada->id, 
+                            'date'         => $row_tidak_ada ? date('d/m/Y', strtotime($row_tidak_ada->date)) : null,
+                            'last_nominal' => $row_tidak_ada ? number_format($row_tidak_ada->total_final, 2, ',', '.') : 0,
+                            'item'         => $row_tidak_ada->item->name,
+                            'area'         => $row_tidak_ada->area->code ?? '-',
+                            'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
+                            'shading'      => $row_tidak_ada->shading->code ?? '-',
+                            'satuan'       => $row_tidak_ada->item->uomUnit->code,
+                            'kode'         => $row_tidak_ada->item->code,
+                            'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
+                        ]; 
+                    }
+                    
                 }
-                
             }
+            
         }
         
         $combinedArray = [];

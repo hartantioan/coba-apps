@@ -316,7 +316,7 @@ class ProductionHandoverController extends Controller
                 ];
             } else {
                 
-                $passedQty = true;
+                $passedDate = true;
                 
                 $arrQty = [];
                 foreach($request->arr_qty as $key => $row){
@@ -346,6 +346,9 @@ class ProductionHandoverController extends Controller
                             $balance = CustomHelper::formatConditionalQty($row['qty'] - $max);
                             $arrMessageQty[] = 'Item '.$data->item->code.' - '.$data->item->name.' nomor batch '.$data->pallet_no.' kelebihan penerimaan sebesar '.$balance.' dari sisa penerimaan seharusnya '.CustomHelper::formatConditionalQty($max);
                         }
+                        if($request->post_date < $data->productionFgReceive->post_date){
+                            $passedDate = false;
+                        }
                     }
                 }
 
@@ -353,6 +356,13 @@ class ProductionHandoverController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => implode('. ',$arrMessageQty),
+                    ]);
+                }
+
+                if(!$passedDate){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Tanggal Serah Terima tidak boleh kurang dari tanggal Receive FG',
                     ]);
                 }
 

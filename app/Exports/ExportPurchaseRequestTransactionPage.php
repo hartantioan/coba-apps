@@ -140,7 +140,7 @@ class ExportPurchaseRequestTransactionPage implements FromCollection, WithTitle,
                 'warehouse'         => $row->warehouse()->exists() ? $row->warehouse->name : '',
                 'requester'         => $row->requester,
                 'project'           => $row->project()->exists() ? $row->project->name : '',
-                'reference'         => $row->lookable_id ? $row->lookable->materialRequest->code : '',
+                'reference'         => $row->lookable()->exists() ? $row->lookable->materialRequest->code : '',
             ];
         }
 

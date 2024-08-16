@@ -63,6 +63,18 @@ class ProductionBatch extends Model
         return $price;
     }
 
+    public function getDate(){
+        $date = date('d/m/Y',strtotime($this->created_at));
+        if($this->lookable_type == 'production_receive_details'){
+            $date = date('d/m/Y',strtotime($this->lookable->productionReceive->post_date));
+        }elseif($this->lookable_type == 'production_fg_receive_details'){
+            $date = date('d/m/Y',strtotime($this->lookable->productionFgReceive->post_date));
+        }elseif($this->lookable_type == 'production_handover_details'){
+            $date = date('d/m/Y',strtotime($this->lookable->productionHandover->post_date));
+        }
+        return $date;
+    }
+
     public function totalById($id){
         $total = $this->total;
         $qty = $this->qty_real;

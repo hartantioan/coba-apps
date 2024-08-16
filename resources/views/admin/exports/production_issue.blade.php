@@ -20,6 +20,7 @@
             <th>Nama Item / Resource</th>
             <th>Qty Planned</th>
             <th>Qty Real</th>
+            <th>Group item</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Nominal Planned</th>
             <th>Nominal Real</th>
@@ -56,6 +57,7 @@
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->name }}</td>
                     <td>{{ $row_detail->qty_planned}}</td>
                     <td>{{ $row_detail->qty}}</td>
+                    <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->itemGroup->code }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->uomUnit->code }}</td>
                     <td>{{ number_format($row_detail->nominal_planned ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->nominal ,3,',','.') }}</td>

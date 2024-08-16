@@ -292,6 +292,13 @@ class ProductionRecalculateController extends Controller
                 ];
             } else {
 
+                if(!CustomHelper::checkLockAcc($request->post_date)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+
                 if($request->temp){
                     $query = ProductionRecalculate::where('code',CustomHelper::decrypt($request->temp))->first();
 

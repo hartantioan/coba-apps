@@ -286,6 +286,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             }
             
             if(count($query_no) > 0 ){
+                info($query_no);
                 foreach($query_no as $row_tidak_ada){
                     info($row_tidak_ada);
                     if($row_tidak_ada->qty_final > 0){

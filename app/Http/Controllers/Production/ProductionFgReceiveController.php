@@ -609,6 +609,7 @@ class ProductionFgReceiveController extends Controller
                         'document'                  => $request->file('file') ? $request->file('file')->store('public/production_fg_receives') : NULL,
                         'note'                      => $request->note,
                         'status'                    => '1',
+                        'qty_reject'                => 0,
                     ]);
                 }
                 

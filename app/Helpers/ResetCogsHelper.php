@@ -632,7 +632,7 @@ class ResetCogsHelper
                 $total = 0;
                 if($row->productionBatchUsage()->exists()){
                     foreach($row->productionBatchUsage as $rowbatch){
-                        /* if($bomGroup == '1'){
+                        if($bomGroup == '1'){
                             $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
                             $rowtotal = round($rowbatch->qty * $rowprice,2);
                             $rowqty = $rowbatch->qty;
@@ -666,7 +666,7 @@ class ResetCogsHelper
                                     'nominal'     => $rowtotal,
                                 ]);
                             }
-                        }else{ */
+                        }else{
                             $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
                             $rowprice = $rowtotal / $rowbatch->qty;
                             $total += $rowtotal;
@@ -697,7 +697,7 @@ class ResetCogsHelper
                                     'nominal'     => $rowtotal,
                                 ]);
                             }
-                        /* } */
+                        }
                     }
                 }else{
                     $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;

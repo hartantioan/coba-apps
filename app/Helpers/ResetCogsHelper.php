@@ -847,32 +847,32 @@ class ResetCogsHelper
 
             foreach($productionhandoverout as $row){
                 $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
+                $price = $row->total / $qty;
                 $total_final = $totalBefore - $row->total;
                 $qty_final = $qtyBefore - $qty;
                 ItemCogs::create([
-                'lookable_type'		    => $row->productionHandover->getTable(),
-                'lookable_id'		      => $row->productionHandover->id,
-                'detailable_type'	    => $row->getTable(),
-                'detailable_id'		    => $row->id,
-                'company_id'		      => $row->productionHandover->company_id,
-                'place_id'			      => $row->productionHandover->productionFgReceive->place_id,
-                'warehouse_id'		    => $row->productionHandover->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-                'item_id'			        => $row->productionHandover->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
-                'qty_out'			        => $qty,
-                'price_out'			      => $row->productionFgReceiveDetail->productionBatch->price(),
-                'total_out'			      => $row->total,
-                'qty_final'			      => $qty_final,
-                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
-                'total_final'		      => $total_final,
-                'date'				        => $dateloop,
-                'type'				        => 'OUT',
-                'production_batch_id' => $row->productionFgReceiveDetail->productionBatch->id,
+                    'lookable_type'		    => $row->productionHandover->getTable(),
+                    'lookable_id'		    => $row->productionHandover->id,
+                    'detailable_type'	    => $row->getTable(),
+                    'detailable_id'		    => $row->id,
+                    'company_id'		    => $row->productionHandover->company_id,
+                    'place_id'			    => $row->productionHandover->productionFgReceive->place_id,
+                    'warehouse_id'		    => $row->productionHandover->productionFgReceive->item->warehouse(),
+                    'item_id'			    => $row->productionHandover->productionFgReceive->item_id,
+                    'qty_out'			    => $qty,
+                    'price_out'			    => $price,
+                    'total_out'			    => $row->total,
+                    'qty_final'			    => $qty_final,
+                    'price_final'		    => $qty_final > 0 ? $total_final / $qty_final : 0,
+                    'total_final'		    => $total_final,
+                    'date'				    => $dateloop,
+                    'type'				    => 'OUT',
                 ]);
                 foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
                 }
                 $totalBefore = $total_final;
                 $qtyBefore = $qty_final;

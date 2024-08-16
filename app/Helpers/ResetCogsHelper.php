@@ -69,7 +69,6 @@ class ResetCogsHelper
                 if($old_data){
                     $qtyBefore = $old_data->qty_final;
                     $totalBefore = $old_data->total_final;
-                    info($old_data->item->name.' - '.$old_data->qty_final);
                 }
             }
 

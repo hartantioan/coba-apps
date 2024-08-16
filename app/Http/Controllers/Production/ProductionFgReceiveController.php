@@ -72,7 +72,7 @@ class ProductionFgReceiveController extends Controller
 
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
-        $code = ProductionReceive::generateCode($request->val);
+        $code = ProductionFgReceive::generateCode($request->val);
         				
 		return response()->json($code);
     }

@@ -362,24 +362,27 @@ class ProductionReceive extends Model
                                     $totalbatch = 0;
                                     $totalneeded = round($rowbom->qty * (($row->qty + $row->qty_reject) / $rowbom->bom->qty_output),3);
                                     foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
-                                        $qtyused = 0;
-                                        if($rowbatch->qty > $totalneeded){
-                                            $qtyused = $totalneeded;
-                                            $totalneeded -= $rowbatch->qty;
-                                        }else{
-                                            $qtyused = $rowbatch->qty;
-                                        }
-                                        if($qtyused > 0){
-                                            $totalbatch += round($rowbatch->price() * $qtyused,2);
-                                            ProductionBatchUsage::create([
-                                                'production_batch_id'   => $rowbatch->id,
-                                                'lookable_type'         => $querydetail->getTable(),
-                                                'lookable_id'           => $querydetail->id,
-                                                'qty'                   => $qtyused,
-                                            ]);
-                                            CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
-                                        }else{
-                                            break;
+                                        if($totalneeded > 0){
+                                            $qtyused = 0;
+                                            if($rowbatch->qty > $totalneeded){
+                                                $qtyused = $totalneeded;
+                                                $totalneeded -= $rowbatch->qty;
+                                            }else{
+                                                $qtyused = $rowbatch->qty;
+                                                $totalneeded -= $rowbatch->qty;
+                                            }
+                                            if($qtyused > 0){
+                                                $totalbatch += round($rowbatch->price() * $qtyused,2);
+                                                ProductionBatchUsage::create([
+                                                    'production_batch_id'   => $rowbatch->id,
+                                                    'lookable_type'         => $querydetail->getTable(),
+                                                    'lookable_id'           => $querydetail->id,
+                                                    'qty'                   => $qtyused,
+                                                ]);
+                                                CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
+                                            }else{
+                                                break;
+                                            }
                                         }
                                     }
                                     if($bomAlternative->bom->group == '1'){
@@ -442,24 +445,27 @@ class ProductionReceive extends Model
                                         $totalbatch = 0;
                                         $totalneeded = round($rowbom->qty * ($row->qty + $row->qty_reject),3);
                                         foreach($item->productionBatchMoreThanZero()->orderBy('created_at')->get() as $rowbatch){
-                                            $qtyused = 0;
-                                            if($rowbatch->qty > $totalneeded){
-                                                $qtyused = $totalneeded;
-                                                $totalneeded -= $rowbatch->qty;
-                                            }else{
-                                                $qtyused = $rowbatch->qty;
-                                            }
-                                            if($qtyused > 0){
-                                                $totalbatch += round($rowbatch->price() * $qtyused,2);
-                                                ProductionBatchUsage::create([
-                                                    'production_batch_id'   => $rowbatch->id,
-                                                    'lookable_type'         => $querydetail->getTable(),
-                                                    'lookable_id'           => $querydetail->id,
-                                                    'qty'                   => $qtyused,
-                                                ]);
-                                                CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
-                                            }else{
-                                                break;
+                                            if($totalneeded > 0){
+                                                $qtyused = 0;
+                                                if($rowbatch->qty > $totalneeded){
+                                                    $qtyused = $totalneeded;
+                                                    $totalneeded -= $rowbatch->qty;
+                                                }else{
+                                                    $qtyused = $rowbatch->qty;
+                                                    $totalneeded -= $rowbatch->qty;
+                                                }
+                                                if($qtyused > 0){
+                                                    $totalbatch += round($rowbatch->price() * $qtyused,2);
+                                                    ProductionBatchUsage::create([
+                                                        'production_batch_id'   => $rowbatch->id,
+                                                        'lookable_type'         => $querydetail->getTable(),
+                                                        'lookable_id'           => $querydetail->id,
+                                                        'qty'                   => $qtyused,
+                                                    ]);
+                                                    CustomHelper::updateProductionBatch($rowbatch->id,$qtyused,'OUT');
+                                                }else{
+                                                    break;
+                                                }
                                             }
                                         }
                                         if($bomAlternative->bom->group == '1'){

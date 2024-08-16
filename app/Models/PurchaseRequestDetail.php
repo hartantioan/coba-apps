@@ -36,7 +36,7 @@ class PurchaseRequestDetail extends Model
     ];
 
     public function lookable(){
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 
     public function project()

@@ -279,17 +279,16 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 })
                 ->orderBy('date', 'desc')
                 ->orderBy('id', 'desc')
-                ->get();
-                info($first);
+                ->first();
                 if($first){
                     $query_no[]=$first;
                 }
             }
             
             if(count($query_no) > 0 ){
-                info($query_no);
+                
                 foreach($query_no as $row_tidak_ada){
-                    info($row_tidak_ada);
+                  
                     if($row_tidak_ada->qty_final > 0){
                         $array_first_item[] = [
                             'perlu'        => 1,

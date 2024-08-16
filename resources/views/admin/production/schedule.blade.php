@@ -374,10 +374,10 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>5. Summary Kebutuhan Rawmat</legend>
+                                    <legend>5. Summary Kebutuhan Material</legend>
                                     <div class="card-alert card gradient-45deg-yellow-green">
                                         <div class="card-content">
-                                            <p>Info : Kebutuhan Rawmat dihitung dari qty komponen material saja.</p>
+                                            <p>Info : Kebutuhan Material dihitung dari qty komponen material saja.</p>
                                         </div>
                                     </div>
                                     <div class="col m12 s12">

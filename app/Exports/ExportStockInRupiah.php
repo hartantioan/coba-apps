@@ -178,7 +178,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                     'id'           => $query_first->id ?? null,
                     'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
                     'area'         => $row->area->code ?? '-',
-                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                    'production_batch' => '-',
                     'shading'      => $row->shading->code ?? '-',
                     'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
                     'item'         => $row->item->name,

@@ -231,7 +231,7 @@ class StockInRupiahController extends Controller
                     'item'         => $row->item->name,
                     'satuan'       => $row->item->uomUnit->code,
                     'area' => $row->area->code ?? '-',
-                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                    'production_batch' => '-',
                     'shading' => $row->shading->code ?? '-',
                     'kode'         => $row->item->code,
                     'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,

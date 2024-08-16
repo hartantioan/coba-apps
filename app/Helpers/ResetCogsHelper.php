@@ -633,7 +633,7 @@ class ResetCogsHelper
                 if($row->productionBatchUsage()->exists()){
                     foreach($row->productionBatchUsage as $rowbatch){
                         if($bomGroup == '1'){
-                            $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
+                            $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
                             $rowtotal = round($rowbatch->qty * $rowprice,2);
                             $rowqty = $rowbatch->qty;
                             $total_final = $totalBefore - $rowtotal;

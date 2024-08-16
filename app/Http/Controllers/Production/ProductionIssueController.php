@@ -281,6 +281,9 @@ class ProductionIssueController extends Controller
                                             $passedQty = false;
                                             $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
                                         }
+                                    }else{
+                                        $passedQty = false;
+                                        $arrNotPassedQty[] = $item->code.' - '.$item->name;
                                     }
                                 }
                             }
@@ -291,6 +294,9 @@ class ProductionIssueController extends Controller
                                 if(round($qty,3) > $itemstock->qty_final){
                                     $passedQty = false;
                                     $arrNotPassedQty[] = $itemstock->item->code.' - '.$itemstock->item->name;
+                                }else{
+                                    $passedQty = false;
+                                    $arrNotPassedQty[] = $item->code.' - '.$item->name;
                                 }
                             }
                         }

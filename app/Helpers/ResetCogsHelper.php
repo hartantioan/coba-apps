@@ -872,8 +872,8 @@ class ResetCogsHelper
                 ]);
                 foreach($row->journalDetail as $rowjournal){
                     $rowjournal->update([
-                        'nominal_fc'  => $total,
-                        'nominal'     => $total,
+                        'nominal_fc'  => $row->total,
+                        'nominal'     => $row->total,
                     ]);
                 }
                 $totalBefore = $total_final;

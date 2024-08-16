@@ -839,10 +839,12 @@ class ResetCogsHelper
                 }
             }
 
-            $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop,$item_id){
+            $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->whereHas('productionFgReceiveDetail',function($query)use($item_id){
-                $query->where('item_id',$item_id);
+                $query->whereHas('productionFgReceive',function($query)use($item_id){
+                    $query->where('item_id',$item_id);
+                });
             })->get();
 
             foreach($productionhandoverout as $row){

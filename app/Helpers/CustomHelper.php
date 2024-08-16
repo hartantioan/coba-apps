@@ -5025,8 +5025,8 @@ class CustomHelper {
 					$pir->id,
 					$pir->company_id,
 					$pir->productionFgReceive->place_id,
-					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
+					$pir->productionFgReceive->item->warehouse(),
+					$pir->productionFgReceive->item_id,
 					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					$row->total,
 					'OUT',
@@ -5040,8 +5040,8 @@ class CustomHelper {
 
 				self::sendStock(
 					$pir->productionFgReceive->place_id,
-					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item->warehouse(),
-					$pir->productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,
+					$pir->productionFgReceive->item->warehouse(),
+					$pir->productionFgReceive->item_id,
 					round($row->qty * $row->productionFgReceiveDetail->conversion,3),
 					'OUT',
 					NULL,

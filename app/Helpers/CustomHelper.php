@@ -4191,7 +4191,9 @@ class CustomHelper {
 				}
 			}
 
-			if(!$parentFg){
+			info($total);
+
+			/* if(!$parentFg){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
@@ -4626,7 +4628,7 @@ class CustomHelper {
 						}
 					}
 				}
-			}
+			} */
 
 			if($parentFg){
 				$pir->update([

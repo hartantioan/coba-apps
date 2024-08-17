@@ -4210,9 +4210,9 @@ class CustomHelper {
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
 				$totalbom = 0;
-				info($arrBom);
 				foreach($arrBom as $rowbom){
-					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
+					$rowbom = 0;
+					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',intval($rowbom))->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
@@ -4259,6 +4259,7 @@ class CustomHelper {
 								NULL,
 							);
 							$totalbom += $row->total;
+							$rowbom += $row->total;
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){
@@ -4352,8 +4353,10 @@ class CustomHelper {
 								}
 							}
 							$totalbom += $row->total;
+							$rowbom += $row->total;
 						}
 					}
+					info($rowbom);
 				}
 				info($totalbom);
 				JournalDetail::create([

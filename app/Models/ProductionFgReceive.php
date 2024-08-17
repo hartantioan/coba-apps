@@ -368,7 +368,7 @@ class ProductionFgReceive extends Model
             'shift_id'                  => $this->shift_id,
             'group'                     => $this->group,
             'line_id'                   => $this->line_id,
-            'post_date'                 => date('Y-m-d'),
+            'post_date'                 => $this->post_date,
             'note'                      => 'PRODUCTION RECEIVE FG NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
             'status'                    => '1',
         ]);

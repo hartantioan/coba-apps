@@ -4211,9 +4211,9 @@ class CustomHelper {
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
 				$totalbom = 0;
 				foreach($arrBom as $rowbom){
-					$rowbom = 0;
+					$rowbomtotal = 0;
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',intval($rowbom))->orderBy('id')->get() as $row){
-						$rowbom += $row->total;
+						$rowbomtotal += $row->total;
 						if($row->lookable_type == 'items'){
 							JournalDetail::create([
 								'journal_id'	=> $query->id,

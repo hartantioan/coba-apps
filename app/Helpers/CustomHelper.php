@@ -4229,8 +4229,6 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
-
-							$totalbom += $row->total;
 			
 							self::sendCogs($table_name,
 								$pir->id,
@@ -4259,6 +4257,7 @@ class CustomHelper {
 								NULL,
 								NULL,
 							);
+							$totalbom += $row->total;
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){

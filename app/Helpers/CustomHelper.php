@@ -4260,7 +4260,6 @@ class CustomHelper {
 								NULL,
 							);
 						}elseif($row->lookable_type == 'resources'){
-							$totalbom += $row->total;
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){
 									$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
@@ -4289,6 +4288,7 @@ class CustomHelper {
 											'detailable_type'				=> $row->getTable(),
 											'detailable_id'					=> $row->id,
 										]);
+										$totalbom += $nominal;
 									}
 								}else{
 									JournalDetail::create([
@@ -4305,6 +4305,7 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
+									$totalbom += $row->total;
 								}
 							}else{
 								if($row->cost_distribution_id){
@@ -4334,6 +4335,7 @@ class CustomHelper {
 											'detailable_type'				=> $row->getTable(),
 											'detailable_id'					=> $row->id,
 										]);
+										$totalbom += $nominal;
 									}
 								}else{
 									JournalDetail::create([
@@ -4350,6 +4352,7 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
+									$totalbom += $row->total;
 								}
 							}
 						}

@@ -4186,14 +4186,9 @@ class CustomHelper {
 						$arrBom[] = $row->bom_id;
 					}
 				}
-				if(!$row->is_wip){
-					$total += $row->total;
-				}
 			}
 
-			info($total);
-
-			/* if(!$parentFg){
+			if(!$parentFg){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
@@ -4357,23 +4352,7 @@ class CustomHelper {
 						}
 					}
 				}
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $coawip->id,
-					'line_id'		=> $pir->line_id,
-					'place_id'		=> $pir->place_id,
-					'machine_id'	=> $pir->machine_id,
-					'type'			=> '1',
-					'nominal'		=> $total,
-					'nominal_fc'	=> $total,
-					'note'			=> $pir->productionOrderDetail->productionOrder->code,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-					'detailable_type'=> $row->getTable(),
-					'detailable_id'	=> $row->id,
-				]);
 			}else{
-	
 				foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
 					if($row->lookable_type == 'items'){
 						if($row->is_wip){
@@ -4628,7 +4607,29 @@ class CustomHelper {
 						}
 					}
 				}
-			} */
+			}
+
+			foreach($pir->productionIssueDetail as $row){
+				if(!$row->is_wip){
+					$total += $row->total;
+				}
+			}
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coawip->id,
+				'line_id'		=> $pir->line_id,
+				'place_id'		=> $pir->place_id,
+				'machine_id'	=> $pir->machine_id,
+				'type'			=> '1',
+				'nominal'		=> $total,
+				'nominal_fc'	=> $total,
+				'note'			=> $pir->productionOrderDetail->productionOrder->code,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'detailable_type'=> $row->getTable(),
+				'detailable_id'	=> $row->id,
+			]);
 
 			if($parentFg){
 				$pir->update([

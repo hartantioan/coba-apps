@@ -4186,10 +4186,44 @@ class CustomHelper {
 						$arrBom[] = $row->bom_id;
 					}
 				}
+				if(!$row->is_wip){
+					$total += $row->total;
+				}
+			}
+
+			if(!$parentFg){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coawip->id,
+					'line_id'		=> $pir->line_id,
+					'place_id'		=> $pir->place_id,
+					'machine_id'	=> $pir->machine_id,
+					'type'			=> '1',
+					'nominal'		=> $total,
+					'nominal_fc'	=> $total,
+					'note'			=> $pir->productionOrderDetail->productionOrder->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
 			}
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coawip->id,
+					'line_id'		=> $pir->line_id,
+					'place_id'		=> $pir->place_id,
+					'machine_id'	=> $pir->machine_id,
+					'type'			=> '1',
+					'nominal'		=> $total,
+					'nominal_fc'	=> $total,
+					'note'			=> $pir->productionOrderDetail->productionOrder->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
+				]);
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
@@ -4337,6 +4371,7 @@ class CustomHelper {
 					}
 				}
 			}else{
+	
 				foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
 					if($row->lookable_type == 'items'){
 						if($row->is_wip){
@@ -4592,28 +4627,6 @@ class CustomHelper {
 					}
 				}
 			}
-
-			/* foreach($pir->productionIssueDetail as $row){
-				if(!$row->is_wip){
-					$total += $row->total;
-				}
-			} */
-
-			JournalDetail::create([
-				'journal_id'	=> $query->id,
-				'coa_id'		=> $coawip->id,
-				'line_id'		=> $pir->line_id,
-				'place_id'		=> $pir->place_id,
-				'machine_id'	=> $pir->machine_id,
-				'type'			=> '1',
-				'nominal'		=> $pir->total(),
-				'nominal_fc'	=> $pir->total(),
-				'note'			=> $pir->productionOrderDetail->productionOrder->code,
-				'lookable_type'	=> $table_name,
-				'lookable_id'	=> $table_id,
-				'detailable_type'=> $row->getTable(),
-				'detailable_id'	=> $row->id,
-			]);
 
 			if($parentFg){
 				$pir->update([

@@ -4212,56 +4212,52 @@ class CustomHelper {
 				$totalbom = 0;
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
-						$totalbom += $row->total;
 						if($row->lookable_type == 'items'){
-							if($row->is_wip){
-								//do nothing
-							}else{
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $row->lookable->itemGroup->coa_id,
-									'place_id'		=> $row->itemStock->place_id,
-									'line_id'		=> $row->productionIssue->line_id,
-									'item_id'		=> $row->itemStock->item_id,
-									'warehouse_id'	=> $row->itemStock->warehouse_id,
-									'type'			=> '2',
-									'nominal'		=> $row->total,
-									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->productionOrderDetail->productionOrder->code,
-									'lookable_type'	=> $table_name,
-									'lookable_id'	=> $table_id,
-									'detailable_type'=> $row->getTable(),
-									'detailable_id'	=> $row->id,
-								]);
-				
-								self::sendCogs($table_name,
-									$pir->id,
-									$pir->company_id,
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									$row->total,
-									'OUT',
-									$pir->post_date,
-									NULL,
-									NULL,
-									NULL,
-									$row->getTable(),
-									$row->id,
-								);
-				
-								self::sendStock(
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									'OUT',
-									NULL,
-									NULL,
-									NULL,
-								);
-							}
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->itemGroup->coa_id,
+								'place_id'		=> $row->itemStock->place_id,
+								'line_id'		=> $row->productionIssue->line_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '2',
+								'nominal'		=> $row->total,
+								'nominal_fc'	=> $row->total,
+								'note'			=> $pir->productionOrderDetail->productionOrder->code,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+			
+							self::sendCogs($table_name,
+								$pir->id,
+								$pir->company_id,
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								$row->total,
+								'OUT',
+								$pir->post_date,
+								NULL,
+								NULL,
+								NULL,
+								$row->getTable(),
+								$row->id,
+							);
+			
+							self::sendStock(
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								'OUT',
+								NULL,
+								NULL,
+								NULL,
+							);
+							$totalbom += $row->total;
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){
@@ -4354,6 +4350,7 @@ class CustomHelper {
 									]);
 								}
 							}
+							$totalbom += $row->total;
 						}
 					}
 				}

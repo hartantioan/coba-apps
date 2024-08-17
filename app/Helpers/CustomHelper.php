@@ -4355,7 +4355,7 @@ class CustomHelper {
 							$totalbom += $row->total;
 						}
 					}
-					info($rowbom);
+					info($rowbomtotal);
 				}
 				//info($totalbom);
 				JournalDetail::create([

@@ -214,38 +214,74 @@ class ResetCogsHelper
 
             foreach($productionreceive as $row){
                 if($row->productionBatch()->exists()){
-                    foreach($row->productionBatch as $rowbatch){
-                        $total = $rowbatch->total;
-                        $qty = $rowbatch->qty_real;
-                        $total_final = $totalBefore + $total;
-                        $qty_final = $qtyBefore + $qty;
-                        ItemCogs::create([
-                            'lookable_type'		        => $row->productionReceive->getTable(),
-                            'lookable_id'		        => $row->productionReceive->id,
-                            'detailable_type'	        => $rowbatch->getTable(),
-                            'detailable_id'		        => $rowbatch->id,
-                            'company_id'		        => $row->productionReceive->company_id,
-                            'place_id'			        => $row->place_id,
-                            'warehouse_id'		        => $row->warehouse_id,
-                            'item_id'			        => $row->item_id,
-                            'production_batch_id'       => $rowbatch->id,
-                            'qty_in'			        => $qty,
-                            'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
-                            'total_in'			        => $total,
-                            'qty_final'			        => $qty_final,
-                            'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
-                            'total_final'		        => $total_final,
-                            'date'				        => $dateloop,
-                            'type'				        => 'IN'
-                        ]);
-                        foreach($rowbatch->journalDetail as $rowjournal){
-                            $rowjournal->update([
-                                'nominal_fc'  => $total,
-                                'nominal'     => $total,
+                    if($bomGroup == '1'){
+                        foreach($row->productionBatch as $rowbatch){
+                            $total = $rowbatch->total;
+                            $qty = $rowbatch->qty_real;
+                            $total_final = $totalBefore + $total;
+                            $qty_final = $qtyBefore + $qty;
+                            ItemCogs::create([
+                                'lookable_type'		        => $row->productionReceive->getTable(),
+                                'lookable_id'		        => $row->productionReceive->id,
+                                'detailable_type'	        => $rowbatch->getTable(),
+                                'detailable_id'		        => $rowbatch->id,
+                                'company_id'		        => $row->productionReceive->company_id,
+                                'place_id'			        => $row->place_id,
+                                'warehouse_id'		        => $row->warehouse_id,
+                                'item_id'			        => $row->item_id,
+                                'production_batch_id'       => $rowbatch->id,
+                                'qty_in'			        => $qty,
+                                'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
+                                'total_in'			        => $total,
+                                'qty_final'			        => $qty_final,
+                                'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                                'total_final'		        => $total_final,
+                                'date'				        => $dateloop,
+                                'type'				        => 'IN'
                             ]);
+                            foreach($rowbatch->journalDetail as $rowjournal){
+                                $rowjournal->update([
+                                    'nominal_fc'  => $total,
+                                    'nominal'     => $total,
+                                ]);
+                            }
+                            $qtyBefore = $qty_final;
+                            $totalBefore = $total_final;
                         }
-                        $qtyBefore = $qty_final;
-                        $totalBefore = $total_final;
+                    }else{
+                        foreach($row->productionBatch as $rowbatch){
+                            $total = $rowbatch->total;
+                            $qty = $rowbatch->qty_real;
+                            $total_final = $totalBefore + $total;
+                            $qty_final = $qtyBefore + $qty;
+                            ItemCogs::create([
+                                'lookable_type'		        => $row->productionReceive->getTable(),
+                                'lookable_id'		        => $row->productionReceive->id,
+                                'detailable_type'	        => $rowbatch->getTable(),
+                                'detailable_id'		        => $rowbatch->id,
+                                'company_id'		        => $row->productionReceive->company_id,
+                                'place_id'			        => $row->place_id,
+                                'warehouse_id'		        => $row->warehouse_id,
+                                'item_id'			        => $row->item_id,
+                                'production_batch_id'       => $rowbatch->id,
+                                'qty_in'			        => $qty,
+                                'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
+                                'total_in'			        => $total,
+                                'qty_final'			        => $qty_final,
+                                'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                                'total_final'		        => $total_final,
+                                'date'				        => $dateloop,
+                                'type'				        => 'IN'
+                            ]);
+                            foreach($rowbatch->journalDetail as $rowjournal){
+                                $rowjournal->update([
+                                    'nominal_fc'  => $total,
+                                    'nominal'     => $total,
+                                ]);
+                            }
+                            $qtyBefore = $qty_final;
+                            $totalBefore = $total_final;
+                        }
                     }
                 }else{
                     $total = $row->total;
@@ -765,7 +801,7 @@ class ResetCogsHelper
                     'nominal' => $total / $row->qty,
                     'total'   => $total,
                 ]);
-                /* if($row->productionIssue->productionReceiveIssue()->exists()){
+                if($row->productionIssue->productionReceiveIssue()->exists()){
                     $productionReceive = ProductionReceive::find($row->productionIssue->productionReceiveIssue->production_receive_id);
                     if($productionReceive){
                         $productionReceive->recalculate();
@@ -784,7 +820,7 @@ class ResetCogsHelper
                         $productionFgReceive->recalculate($dateloop);
                         self::gas($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
                     }
-                } */
+                }
                 if($row->productionIssue->journal()->exists()){
                     foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
                         $rowjournal->update([

@@ -4213,6 +4213,7 @@ class CustomHelper {
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',intval($rowbom))->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
+							$totalbom += $row->total;
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
 								'coa_id'		=> $row->lookable->itemGroup->coa_id,
@@ -4257,7 +4258,6 @@ class CustomHelper {
 								NULL,
 								NULL,
 							);
-							$totalbom += $row->total;
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){

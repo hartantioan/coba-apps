@@ -110,12 +110,12 @@ class ProductionIssue extends Model
     }
 
     public function total(){
-        $total = $this->productionIssueDetail()->sum('total');
+        $total = $this->productionIssueDetail()->whereNull('is_wip')->sum('total');
         return $total;
     }
 
     public function totalItem(){
-        $total = $this->productionIssueDetail()->where('lookable_type','items')->sum('total');
+        $total = $this->productionIssueDetail()->whereNull('is_wip')->where('lookable_type','items')->sum('total');
         return $total;
     }
 

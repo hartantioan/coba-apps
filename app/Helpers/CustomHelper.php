@@ -4593,11 +4593,11 @@ class CustomHelper {
 				}
 			}
 
-			foreach($pir->productionIssueDetail as $row){
+			/* foreach($pir->productionIssueDetail as $row){
 				if(!$row->is_wip){
 					$total += $row->total;
 				}
-			}
+			} */
 
 			JournalDetail::create([
 				'journal_id'	=> $query->id,
@@ -4606,8 +4606,8 @@ class CustomHelper {
 				'place_id'		=> $pir->place_id,
 				'machine_id'	=> $pir->machine_id,
 				'type'			=> '1',
-				'nominal'		=> $total,
-				'nominal_fc'	=> $total,
+				'nominal'		=> $pir->total(),
+				'nominal_fc'	=> $pir->total(),
 				'note'			=> $pir->productionOrderDetail->productionOrder->code,
 				'lookable_type'	=> $table_name,
 				'lookable_id'	=> $table_id,

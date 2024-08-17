@@ -4211,9 +4211,7 @@ class CustomHelper {
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
 				$totalbom = 0;
 				foreach($arrBom as $rowbom){
-					$rowbomtotal = 0;
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',intval($rowbom))->orderBy('id')->get() as $row){
-						$rowbomtotal += $row->total;
 						if($row->lookable_type == 'items'){
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
@@ -4231,6 +4229,8 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
+
+							$totalbom += $row->total;
 			
 							self::sendCogs($table_name,
 								$pir->id,
@@ -4259,8 +4259,8 @@ class CustomHelper {
 								NULL,
 								NULL,
 							);
-							$totalbom += $row->total;
 						}elseif($row->lookable_type == 'resources'){
+							$totalbom += $row->total;
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){
 									$lastIndex = count($row->bomDetail->costDistribution->costDistributionDetail) - 1;
@@ -4352,12 +4352,10 @@ class CustomHelper {
 									]);
 								}
 							}
-							$totalbom += $row->total;
 						}
 					}
-					info($rowbomtotal);
 				}
-				//info($totalbom);
+				info($totalbom);
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,

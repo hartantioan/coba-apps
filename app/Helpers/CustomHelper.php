@@ -4209,8 +4209,10 @@ class CustomHelper {
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
+				$totalbom = 0;
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
+						$totalbom += $row->total;
 						if($row->lookable_type == 'items'){
 							if($row->is_wip){
 								//do nothing
@@ -4362,8 +4364,8 @@ class CustomHelper {
 					'place_id'		=> $pir->place_id,
 					'machine_id'	=> $pir->machine_id,
 					'type'			=> '1',
-					'nominal'		=> $total,
-					'nominal_fc'	=> $total,
+					'nominal'		=> $totalbom,
+					'nominal_fc'	=> $totalbom,
 					'note'			=> $pir->productionOrderDetail->productionOrder->code,
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,

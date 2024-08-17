@@ -4209,55 +4209,57 @@ class CustomHelper {
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
-				$totalbom = 0;
 				foreach($arrBom as $rowbom){
-					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',intval($rowbom))->orderBy('id')->get() as $row){
+					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
-							$totalbom += $row->total;
-							JournalDetail::create([
-								'journal_id'	=> $query->id,
-								'coa_id'		=> $row->lookable->itemGroup->coa_id,
-								'place_id'		=> $row->itemStock->place_id,
-								'line_id'		=> $row->productionIssue->line_id,
-								'item_id'		=> $row->itemStock->item_id,
-								'warehouse_id'	=> $row->itemStock->warehouse_id,
-								'type'			=> '2',
-								'nominal'		=> $row->total,
-								'nominal_fc'	=> $row->total,
-								'note'			=> $pir->productionOrderDetail->productionOrder->code,
-								'lookable_type'	=> $table_name,
-								'lookable_id'	=> $table_id,
-								'detailable_type'=> $row->getTable(),
-								'detailable_id'	=> $row->id,
-							]);
-			
-							self::sendCogs($table_name,
-								$pir->id,
-								$pir->company_id,
-								$row->itemStock->place_id,
-								$row->itemStock->warehouse_id,
-								$row->itemStock->item_id,
-								$row->qty,
-								$row->total,
-								'OUT',
-								$pir->post_date,
-								NULL,
-								NULL,
-								NULL,
-								$row->getTable(),
-								$row->id,
-							);
-			
-							self::sendStock(
-								$row->itemStock->place_id,
-								$row->itemStock->warehouse_id,
-								$row->itemStock->item_id,
-								$row->qty,
-								'OUT',
-								NULL,
-								NULL,
-								NULL,
-							);
+							if($row->is_wip){
+								//do nothing
+							}else{
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->itemGroup->coa_id,
+									'place_id'		=> $row->itemStock->place_id,
+									'line_id'		=> $row->productionIssue->line_id,
+									'item_id'		=> $row->itemStock->item_id,
+									'warehouse_id'	=> $row->itemStock->warehouse_id,
+									'type'			=> '2',
+									'nominal'		=> $row->total,
+									'nominal_fc'	=> $row->total,
+									'note'			=> $pir->productionOrderDetail->productionOrder->code,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
+								]);
+				
+								self::sendCogs($table_name,
+									$pir->id,
+									$pir->company_id,
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									$row->total,
+									'OUT',
+									$pir->post_date,
+									NULL,
+									NULL,
+									NULL,
+									$row->getTable(),
+									$row->id,
+								);
+				
+								self::sendStock(
+									$row->itemStock->place_id,
+									$row->itemStock->warehouse_id,
+									$row->itemStock->item_id,
+									$row->qty,
+									'OUT',
+									NULL,
+									NULL,
+									NULL,
+								);
+							}
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){
@@ -4287,7 +4289,6 @@ class CustomHelper {
 											'detailable_type'				=> $row->getTable(),
 											'detailable_id'					=> $row->id,
 										]);
-										$totalbom += $nominal;
 									}
 								}else{
 									JournalDetail::create([
@@ -4304,7 +4305,6 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
-									$totalbom += $row->total;
 								}
 							}else{
 								if($row->cost_distribution_id){
@@ -4334,7 +4334,6 @@ class CustomHelper {
 											'detailable_type'				=> $row->getTable(),
 											'detailable_id'					=> $row->id,
 										]);
-										$totalbom += $nominal;
 									}
 								}else{
 									JournalDetail::create([
@@ -4351,13 +4350,11 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
-									$totalbom += $row->total;
 								}
 							}
 						}
 					}
 				}
-				info($totalbom);
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
@@ -4365,8 +4362,8 @@ class CustomHelper {
 					'place_id'		=> $pir->place_id,
 					'machine_id'	=> $pir->machine_id,
 					'type'			=> '1',
-					'nominal'		=> $totalbom,
-					'nominal_fc'	=> $totalbom,
+					'nominal'		=> $total,
+					'nominal_fc'	=> $total,
 					'note'			=> $pir->productionOrderDetail->productionOrder->code,
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,

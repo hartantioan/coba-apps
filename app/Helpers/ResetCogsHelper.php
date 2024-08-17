@@ -785,15 +785,14 @@ class ResetCogsHelper
                         self::gas($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
                     }
                 } */
-                /* if($row->productionIssue->journal()->exists()){
-                    info($row->productionIssue->total());
+                if($row->productionIssue->journal()->exists()){
                     foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
                         $rowjournal->update([
                             'nominal_fc'  => $row->productionIssue->total(),
                             'nominal'     => $row->productionIssue->total(),
                         ]);
                     }
-                } */
+                }
             }
 
             $productionfgreceivebatch = ProductionFgReceive::whereHas('productionBatchUsage',function($query)use($item_id,$production_batch_id){

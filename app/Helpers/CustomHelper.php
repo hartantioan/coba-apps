@@ -4357,6 +4357,7 @@ class CustomHelper {
 						}
 					}
 				}
+				info($totalbom);
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,

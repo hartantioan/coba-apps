@@ -799,7 +799,7 @@ class ResetCogsHelper
                     'nominal' => $total / $row->qty,
                     'total'   => $total,
                 ]);
-                /* if($row->productionIssue->productionReceiveIssue()->exists()){
+                if($row->productionIssue->productionReceiveIssue()->exists()){
                     $productionReceive = ProductionReceive::where('id',$row->productionIssue->productionReceiveIssue->production_receive_id)->whereIn('status',['2','3'])->first();
                     if($productionReceive){
                         $productionReceive->recalculate();
@@ -811,7 +811,7 @@ class ResetCogsHelper
                             }
                         }
                     }
-                } */
+                }
                 if($row->productionIssue->productionFgReceive()->exists()){
                     $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                     if($productionFgReceive){

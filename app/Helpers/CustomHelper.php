@@ -6045,9 +6045,9 @@ class CustomHelper {
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
 				/* ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
+				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				ResetCogsHelper::gas($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
 				self::accumulateCogs($row->date,$company_id,$place_id,$item_id);
-				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}
 		}

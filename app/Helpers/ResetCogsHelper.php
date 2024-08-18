@@ -979,58 +979,5 @@ class ResetCogsHelper
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get(); */
         }
-
-        if($bomGroup == '2' || $bomGroup == '3'){
-            $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
-            $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
-    
-            $total_final = 0;
-            $qty_final = 0;
-            $price_final = 0;
-            foreach($itemcogs2 as $key2 => $row){
-                if($key2 == 0){
-                    if($old_data2){
-                        if($row->type == 'IN'){
-                            $total_final = $old_data2->total_final + $row->total_in;
-                            $qty_final = $old_data2->qty_final + $row->qty_in;
-                        }elseif($row->type == 'OUT'){
-                            $total_final = $old_data2->total_final - $row->total_out;
-                            $qty_final = $old_data2->qty_final - $row->qty_out;
-                        }
-        
-                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-                    }else{
-                        if($row->type == 'IN'){
-                            $total_final = $row->total_in;
-                            $qty_final = $row->qty_in;
-                        }elseif($row->type == 'OUT'){
-                            $total_final = 0 - $row->total_out;
-                            $qty_final = 0 - $row->qty_out;
-                        }
-            
-                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-                    }
-                    $row->update([
-                        'price_final'	=> $price_final,
-                        'qty_final'		=> $qty_final,
-                        'total_final'	=> $total_final,
-                    ]);
-                }else{
-                    if($row->type == 'IN'){
-                        $total_final += $row->total_in;
-                        $qty_final += $row->qty_in;
-                    }elseif($row->type == 'OUT'){
-                        $total_final -= $row->total_out;
-                        $qty_final -= $row->qty_out;
-                    }
-                    $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-                    $row->update([
-                        'price_final'	=> $price_final,
-                        'qty_final'		=> $qty_final,
-                        'total_final'	=> $total_final,
-                    ]);
-                }
-            }
-        }
     }
 }

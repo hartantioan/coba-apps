@@ -149,6 +149,7 @@ class CustomHelper {
 
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
+		self::accumulateCogs($date,$company_id,$place_id,$item_id);
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
@@ -6043,6 +6044,7 @@ class CustomHelper {
 				
 				/* ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
 				ResetCogsHelper::gas($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
+				self::accumulateCogs($row->date,$company_id,$place_id,$item_id);
 				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}
@@ -6423,5 +6425,66 @@ class CustomHelper {
 		$diff = $date2 - $date1;
 		$days = floor($diff / (60 * 60 * 24));
 		return $days;
+	}
+
+	public static function accumulateCogs($date,$company_id,$place_id,$item_id){
+		$item = Item::find($item_id);
+        $bomPowder = $item->bomPlace($place_id) ? $item->bomPlace($place_id)->first() : NULL;
+        $bomGroup = '';
+        if($bomPowder){
+            $bomGroup = $bomPowder->group; 
+        }
+		if($bomGroup == '2' || $bomGroup == '3'){
+            $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
+            $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
+    
+            $total_final = 0;
+            $qty_final = 0;
+            $price_final = 0;
+            foreach($itemcogs2 as $key2 => $row){
+                if($key2 == 0){
+                    if($old_data2){
+                        if($row->type == 'IN'){
+                            $total_final = $old_data2->total_final + $row->total_in;
+                            $qty_final = $old_data2->qty_final + $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final = $old_data2->total_final - $row->total_out;
+                            $qty_final = $old_data2->qty_final - $row->qty_out;
+                        }
+        
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    }else{
+                        if($row->type == 'IN'){
+                            $total_final = $row->total_in;
+                            $qty_final = $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final = 0 - $row->total_out;
+                            $qty_final = 0 - $row->qty_out;
+                        }
+            
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    }
+                    $row->update([
+                        'price_final'	=> $price_final,
+                        'qty_final'		=> $qty_final,
+                        'total_final'	=> $total_final,
+                    ]);
+                }else{
+                    if($row->type == 'IN'){
+                        $total_final += $row->total_in;
+                        $qty_final += $row->qty_in;
+                    }elseif($row->type == 'OUT'){
+                        $total_final -= $row->total_out;
+                        $qty_final -= $row->qty_out;
+                    }
+                    $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    $row->update([
+                        'price_final'	=> $price_final,
+                        'qty_final'		=> $qty_final,
+                        'total_final'	=> $total_final,
+                    ]);
+                }
+            }
+        }
 	}
 }

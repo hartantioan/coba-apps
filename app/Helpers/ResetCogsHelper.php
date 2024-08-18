@@ -701,8 +701,6 @@ class ResetCogsHelper
                             $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
                             $rowtotal = round($rowbatch->qty * $rowprice,2);
                             $rowqty = $rowbatch->qty;
-                            $total_final = $totalBefore - $rowtotal;
-                            $qty_final = $qtyBefore - $rowqty;
                             $total += $rowtotal;
                             $totalBefore -= $rowtotal;
                             $qtyBefore -= $rowqty;
@@ -718,9 +716,9 @@ class ResetCogsHelper
                                 'qty_out'			        => $rowqty,
                                 'price_out'			      => $rowprice,
                                 'total_out'			      => $rowtotal,
-                                'qty_final'			      => $qty_final,
-                                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
-                                'total_final'		      => $total_final,
+                                'qty_final'			      => $qtyBefore,
+                                'price_final'		      => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
+                                'total_final'		      => $totalBefore,
                                 'date'				        => $dateloop,
                                 'type'				        => 'OUT',
                                 'production_batch_id' => $rowbatch->productionBatch->id,
@@ -801,6 +799,7 @@ class ResetCogsHelper
                     'nominal' => $total / $row->qty,
                     'total'   => $total,
                 ]);
+                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 if($row->productionIssue->productionReceiveIssue()->exists()){
                     $productionReceive = ProductionReceive::where('id',$row->productionIssue->productionReceiveIssue->production_receive_id)->whereIn('status',['2','3'])->first();
                     if($productionReceive){
@@ -814,6 +813,7 @@ class ResetCogsHelper
                         }
                     }
                 }
+                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 if($row->productionIssue->productionFgReceive()->exists()){
                     $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                     if($productionFgReceive){
@@ -914,6 +914,7 @@ class ResetCogsHelper
                 }
                 $totalBefore = $total_final;
                 $qtyBefore = $qty_final;
+                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 self::gas($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
             }
 
@@ -981,7 +982,16 @@ class ResetCogsHelper
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get(); */
         }
+        self::calculateAccumulation($date,$company_id,$place_id,$item_id);
+    }
 
+    public static function calculateAccumulation(string $date = null, int $company_id = null, int $place_id = null, int $item_id = null){
+        $item = Item::find($item_id);
+        $bomPowder = $item->bomPlace($place_id) ? $item->bomPlace($place_id)->first() : NULL;
+        $bomGroup = '';
+        if($bomPowder){
+            $bomGroup = $bomPowder->group; 
+        }
         if($bomGroup == '2' || $bomGroup == '3'){
             $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
             $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
@@ -990,48 +1000,48 @@ class ResetCogsHelper
             $qty_final = 0;
             $price_final = 0;
             foreach($itemcogs2 as $key => $row){
-            if($key == 0){
-                if($old_data2){
-                    if($row->type == 'IN'){
-                        $total_final = $old_data2->total_final + $row->total_in;
-                        $qty_final = $old_data2->qty_final + $row->qty_in;
-                    }elseif($row->type == 'OUT'){
-                        $total_final = $old_data2->total_final - $row->total_out;
-                        $qty_final = $old_data2->qty_final - $row->qty_out;
+                if($key == 0){
+                    if($old_data2){
+                        if($row->type == 'IN'){
+                            $total_final = $old_data2->total_final + $row->total_in;
+                            $qty_final = $old_data2->qty_final + $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final = $old_data2->total_final - $row->total_out;
+                            $qty_final = $old_data2->qty_final - $row->qty_out;
+                        }
+        
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    }else{
+                        if($row->type == 'IN'){
+                            $total_final = $row->total_in;
+                            $qty_final = $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final = 0 - $row->total_out;
+                            $qty_final = 0 - $row->qty_out;
+                        }
+            
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
                     }
-    
-                    $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    $row->update([
+                        'price_final'	=> $price_final,
+                        'qty_final'		=> $qty_final,
+                        'total_final'	=> $total_final,
+                    ]);
                 }else{
                     if($row->type == 'IN'){
-                        $total_final = $row->total_in;
-                        $qty_final = $row->qty_in;
+                        $total_final += $row->total_in;
+                        $qty_final += $row->qty_in;
                     }elseif($row->type == 'OUT'){
-                        $total_final = 0 - $row->total_out;
-                        $qty_final = 0 - $row->qty_out;
+                        $total_final -= $row->total_out;
+                        $qty_final -= $row->qty_out;
                     }
-        
                     $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                    $row->update([
+                        'price_final'	=> $price_final,
+                        'qty_final'		=> $qty_final,
+                        'total_final'	=> $total_final,
+                    ]);
                 }
-                $row->update([
-                'price_final'	=> $price_final,
-                'qty_final'		=> $qty_final,
-                'total_final'	=> $total_final,
-                ]);
-            }else{
-                if($row->type == 'IN'){
-                    $total_final += $row->total_in;
-                    $qty_final += $row->qty_in;
-                }elseif($row->type == 'OUT'){
-                    $total_final -= $row->total_out;
-                    $qty_final -= $row->qty_out;
-                }
-                $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
-                $row->update([
-                    'price_final'	=> $price_final,
-                    'qty_final'		=> $qty_final,
-                    'total_final'	=> $total_final,
-                ]);
-            }
             }
         }
     }

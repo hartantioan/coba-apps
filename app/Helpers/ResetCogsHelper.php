@@ -799,7 +799,6 @@ class ResetCogsHelper
                     'nominal' => $total / $row->qty,
                     'total'   => $total,
                 ]);
-                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 if($row->productionIssue->productionReceiveIssue()->exists()){
                     $productionReceive = ProductionReceive::where('id',$row->productionIssue->productionReceiveIssue->production_receive_id)->whereIn('status',['2','3'])->first();
                     if($productionReceive){
@@ -813,7 +812,6 @@ class ResetCogsHelper
                         }
                     }
                 }
-                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 if($row->productionIssue->productionFgReceive()->exists()){
                     $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                     if($productionFgReceive){
@@ -914,7 +912,6 @@ class ResetCogsHelper
                 }
                 $totalBefore = $total_final;
                 $qtyBefore = $qty_final;
-                self::calculateAccumulation($date,$company_id,$place_id,$item_id);
                 self::gas($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
             }
 
@@ -982,16 +979,7 @@ class ResetCogsHelper
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get(); */
         }
-        self::calculateAccumulation($date,$company_id,$place_id,$item_id);
-    }
 
-    public static function calculateAccumulation(string $date = null, int $company_id = null, int $place_id = null, int $item_id = null){
-        $item = Item::find($item_id);
-        $bomPowder = $item->bomPlace($place_id) ? $item->bomPlace($place_id)->first() : NULL;
-        $bomGroup = '';
-        if($bomPowder){
-            $bomGroup = $bomPowder->group; 
-        }
         if($bomGroup == '2' || $bomGroup == '3'){
             $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
             $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();

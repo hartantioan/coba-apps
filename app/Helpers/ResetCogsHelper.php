@@ -982,5 +982,6 @@ class ResetCogsHelper
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get(); */
         }
+        CustomHelper::accumulateCogs($date,$company_id,$place_id,$item_id);
     }
 }

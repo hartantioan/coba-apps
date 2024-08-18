@@ -731,12 +731,12 @@ class ResetCogsHelper
                             }
                         }else{
                             $cek = ItemCogs::where('detailable_type',$rowbatch->getTable())->where('detailable_id',$rowbatch->id)->count();
+                            $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
+                            $rowprice = $rowtotal / $rowbatch->qty;
+                            $total += $rowtotal;
+                            $totalBefore -= $rowtotal;
+                            $qtyBefore -= $rowbatch->qty;
                             if($cek == 0){
-                                $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
-                                $rowprice = $rowtotal / $rowbatch->qty;
-                                $total += $rowtotal;
-                                $totalBefore -= $rowtotal;
-                                $qtyBefore -= $rowbatch->qty;
                                 ItemCogs::create([
                                     'lookable_type'		        => $row->productionIssue->getTable(),
                                     'lookable_id'		        => $row->productionIssue->id,
@@ -756,12 +756,12 @@ class ResetCogsHelper
                                     'type'				        => 'OUT',
                                     'production_batch_id'       => $rowbatch->productionBatch->id,
                                 ]);
-                                foreach($rowbatch->journalDetail as $rowjournal){
-                                    $rowjournal->update([
-                                        'nominal_fc'  => $rowtotal,
-                                        'nominal'     => $rowtotal,
-                                    ]);
-                                }
+                            }
+                            foreach($rowbatch->journalDetail as $rowjournal){
+                                $rowjournal->update([
+                                    'nominal_fc'  => $rowtotal,
+                                    'nominal'     => $rowtotal,
+                                ]);
                             }
                         }
                     }

@@ -733,6 +733,7 @@ class ResetCogsHelper
                             }
                         }else{
                             $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
+                            info($rowbatch->productionBatch->code.' - '.$rowtotal);
                             $rowprice = $rowtotal / $rowbatch->qty;
                             $total += $rowtotal;
                             $totalBefore -= $rowtotal;

@@ -807,8 +807,8 @@ class ResetCogsHelper
                         $productionReceive->recalculate();
                         foreach($productionReceive->productionReceiveDetail as $rowreceive){
                             if($rowreceive->productionBatch()->exists()){
-                                foreach($rowreceive->productionBatch as $rowbatch){
-                                    self::gas($dateloop,$productionReceive->company_id,$rowbatch->place_id,$rowbatch->item_id,NULL,NULL,$rowbatch->id);
+                                foreach($rowreceive->productionBatch as $rowbatch2){
+                                    self::gas($dateloop,$productionReceive->company_id,$rowbatch2->place_id,$rowbatch2->item_id,NULL,NULL,$rowbatch2->id);
                                 }
                             }
                         }

@@ -730,6 +730,7 @@ class ResetCogsHelper
                                 ]);
                             }
                         }else{
+                            info($rowbatch->productionBatch->code);
                             $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
                             $rowprice = $rowtotal / $rowbatch->qty;
                             $total += $rowtotal;

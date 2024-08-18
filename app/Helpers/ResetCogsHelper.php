@@ -987,8 +987,8 @@ class ResetCogsHelper
             $total_final = 0;
             $qty_final = 0;
             $price_final = 0;
-            foreach($itemcogs2 as $key => $row){
-                if($key == 0){
+            foreach($itemcogs2 as $key2 => $row){
+                if($key2 == 0){
                     if($old_data2){
                         if($row->type == 'IN'){
                             $total_final = $old_data2->total_final + $row->total_in;

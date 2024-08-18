@@ -914,6 +914,7 @@ class ResetCogsHelper
                 }
                 $totalBefore = $total_final;
                 $qtyBefore = $qty_final;
+                self::gas($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
             }
 
             /* $marketingorderdelivery = MarketingOrderDeliveryStock::whereHas('marketingOrderDelivery',function($query)use($dateloop){

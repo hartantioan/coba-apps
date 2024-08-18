@@ -440,6 +440,8 @@ class CustomHelper {
 				}
 			}
 
+			#if sales order disini ya
+
 			if($passed == true){
 				
 				$count = 0;
@@ -4402,6 +4404,8 @@ class CustomHelper {
 										'detailable_type'=> $rowbatchusage->getTable(),
 										'detailable_id'	=> $rowbatchusage->id,
 									]);
+
+									info($rowbatchusage->productionBatch->code);
 					
 									self::sendCogs($table_name,
 										$pir->id,

@@ -508,7 +508,7 @@ class ProductionFgReceive extends Model
         }
 
         foreach($this->productionBatchUsage as $key => $row){
-            $totalCost += round($row->productionBatch->price() * $row->qty,2);
+            $totalCost += $row->productionBatch->totalById($row->id);
             $totalBatch += $row->qty;
         }
 

@@ -64,6 +64,7 @@ use App\Models\WorkOrder;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Bom;
+use App\Models\BomCalculator;
 use App\Models\BomStandard;
 use App\Models\Color;
 use App\Models\DeliveryCost;
@@ -805,6 +806,7 @@ class Select2Controller extends Controller {
                 'list_warehouse'    => $d->warehouseList(),
                 'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
                 'buy_units'         => $d->arrBuyUnits(),
+                'buy_price_now'     => $d->buyPriceNow(),
             ];
         }
 
@@ -4823,10 +4825,7 @@ class Select2Controller extends Controller {
                         ->orWhere('name', 'like', "%$search%")
                         ->orWhere('note', 'like', "%$search%");
                 }
-                $query->where('type','2')->where('status','1')->get();
             });
-            
-            
         })
         ->orderBy('code','DESC')
         ->get();
@@ -4838,6 +4837,32 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'date'              => $d->date,
 
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function bomCalculator(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+       
+        $data = BomCalculator::where(function($query) use($search,$request){
+            $query->where(function($query) use ($search, $request) {
+                if ($search) {
+                    $query->where('name', 'like', "%$search%")
+                        ->orWhere('note', 'like', "%$search%");
+                }
+            });
+        })
+        ->where('status','2')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->name.' | '.$d->note,
             ];
         }
 

@@ -419,6 +419,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('document_tax_for_handover', [Select2Controller::class, 'documentTaxforHandover']);
                 Route::get('production_issue', [Select2Controller::class, 'productionIssue']);
                 Route::get('group_customer', [Select2Controller::class, 'groupCustomer']);
+                Route::get('bom_calculator', [Select2Controller::class, 'bomCalculator']);
             });
 
             Route::prefix('dashboard')->group(function () {

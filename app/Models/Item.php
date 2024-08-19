@@ -50,10 +50,15 @@ class Item extends Model
         'pallet_id',
         'grade_id',
         'brand_id',
+        'bom_calculator_id',
     ];
 
     public function itemGroup(){
         return $this->belongsTo('App\Models\ItemGroup', 'item_group_id', 'id')->withTrashed();
+    }
+
+    public function bomCalculator(){
+        return $this->belongsTo('App\Models\BomCalculator', 'bom_calculator_id', 'id')->withTrashed();
     }
 
     public function type(){
@@ -252,6 +257,15 @@ class Item extends Model
         }
         
         return $arrPrice;
+    }
+
+    public function buyPriceNow(){
+        $pricenow = 0;
+        $price = ItemCogs::where('item_id',$this->id)->orderByDesc('date')->orderByDesc('id')->first();
+        if($price){
+            $pricenow = $price->qty_final > 0 ? round($price->total_final / $price->qty_final,6) : 0;
+        }
+        return CustomHelper::formatConditionalQty(round($pricenow,2));
     }
 
     public function priceNow($place_id,$date){

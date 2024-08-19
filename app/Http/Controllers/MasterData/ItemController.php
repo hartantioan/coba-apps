@@ -32,6 +32,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 use App\Exports\ExportItem;
 use App\Imports\ImportItemMaster;
+use App\Models\BomCalculator;
 use App\Models\ItemBuffer;
 use App\Models\ItemQcParameter;
 use App\Models\ItemUnit;
@@ -344,6 +345,7 @@ class ItemController extends Controller
                     $query->pallet_id           = $request->pallet_id ?? NULL;
                     $query->grade_id            = $request->grade_id ? $request->grade_id : NULL;
                     $query->brand_id            = $request->brand_id ? $request->brand_id : NULL;
+                    $query->bom_calculator_id   = $request->bom_calculator_id ?? NULL;
                     $query->save();
 
                     if($request->arr_unit){
@@ -385,6 +387,7 @@ class ItemController extends Controller
                         'pallet_id'         => $request->pallet_id ?? NULL,
                         'grade_id'          => $request->grade_id ?? NULL,
                         'brand_id'          => $request->brand_id ?? NULL,
+                        'bom_calculator_id' => $request->bom_calculator_id ?? NULL,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){
@@ -457,6 +460,27 @@ class ItemController extends Controller
                                 ]);
                             }
                         }
+                    }
+                }
+
+                if($request->bom_calculator_id){
+                    $bomcalc = BomCalculator::find($request->bom_calculator_id);
+                    if($request->status){
+                        $note = 'DISELESAIKAN OTOMATIS OLEH SISTEM DARI MASTER ITEM.';
+                        $bomcalc->update([
+                            'status'        => '3',
+                            'done_date'     => now(),
+                            'done_note'     => $note,
+                        ]);
+                        CustomHelper::sendNotification($bomcalc->getTable(),$bomcalc->id,'Pengajuan bom calculator Nama. '.$bomcalc->name.' telah diupdate',$note,$bomcalc->user_id);
+                    }else{
+                        $note = 'DIBUKA KEMBALI OTOMATIS OLEH SISTEM DARI MASTER ITEM.';
+                        $bomcalc->update([
+                            'status'        => '2',
+                            'done_date'     => NULL,
+                            'done_note'     => NULL,
+                        ]);
+                        CustomHelper::sendNotification($bomcalc->getTable(),$bomcalc->id,'Pengajuan bom calculator Nama. '.$bomcalc->name.' telah diupdate',$note,$bomcalc->user_id);
                     }
                 }
 
@@ -715,6 +739,7 @@ class ItemController extends Controller
         $item['brand_code'] = $item->brand()->exists() ? $item->brand->code : '';
         $item['brand_name_real'] = $item->brand()->exists() ? $item->brand->name : '';
         $item['used'] = $item->hasChildDocument() ? '1' : '';
+        $item['bom_calculator_data'] = $item->bomCalculator()->exists() ? $item->bomCalculator->name.' | '.$item->bomCalculator->note : '';
         
         $units = [];
         $buffer = [];

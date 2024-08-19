@@ -108,11 +108,11 @@
                                                         <th>No</th>
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
+                                                        <th>Kode & Nama Item FG</th>
                                                         <th>Tgl.Post</th>
-                                                        <th>Qty Output</th>
-                                                        <th>{{ __('translations.grandtotal') }}</th>
+                                                        <th>{{ __('translations.total') }}/M2</th>
                                                         <th>{{ __('translations.note') }}</th>
-                                                        <th>Dokumen</th>
+                                                        <th>Link Item FG</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -162,36 +162,34 @@
                             </select>
                             <label class="" for="company_id">{{ __('translations.company') }}</label>
                         </div>
+                        <div class="input-field col s3">
+                            <input id="name" name="name" type="text" placeholder="Kode & Nama Item FG" value="">
+                            <label class="active" for="name">Kode & Nama Item FG</label>
+                        </div>
                         <div class="input-field col s3 step4">
-                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
+                            <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                             <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                         </div>
                         <div class="input-field col s3 step7">
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
-                        <div class="col s12"></div>
-                        <div class="input-field col s3">
-                            <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this);countAll();">
-                            <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
-                        </div>
-                        <div class="input-field col s3 step8">
-                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="preview();" href="javascript:void(0);">
-                                <i class="material-icons left">remove_red_eye</i> Ambil Data
-                            </a>
+                        <div class="col s12">
+                            <div class="card-alert card gradient-45deg-purple-amber">
+                                <div class="card-content white-text">
+                                    <p>Info : Untuk harga item akan otomatis terambil dari harga realtime per hari ini, jika ada.</p>
+                                </div>
+                            </div>
                         </div>
                         <div class="col s12 step9">
                             <h5>Rincian Item & Resource</h5>
                             <table class="bordered" id="table-detail-body">
                                 <thead>
                                     <tr>
-                                        <th colspan="6"><h5>I. Body I</h5></th>
-                                    </tr>
-                                    <tr>
                                         <th class="center">{{ __('translations.delete') }}</th>
+                                        <th class="center">Tipe</th>
                                         <th class="center">Item/Resource</th>
                                         <th class="center">Qty</th>
-                                        <th class="center">Satuan</th>
                                         <th class="center">Harga @</th>
                                         <th class="center">Total</th>
                                     </tr>
@@ -205,70 +203,19 @@
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="6" class="right-align">
-                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('body')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Body I</a>
-                                        </td>
+                                        <th colspan="5" class="right-align">
+                                            TOTAL
+                                        </th>
+                                        <th colspan="1" class="right-align">
+                                            <span id="total">0,00</span> / M2
+                                        </th>
                                     </tr>
                                 </tfoot>
                             </table>
-                            <table class="bordered mt-1" id="table-detail-glaze">
-                                <thead>
-                                    <tr>
-                                        <th colspan="6"><h5>II. Glaze</h5></th>
-                                    </tr>
-                                    <tr>
-                                        <th class="center">{{ __('translations.delete') }}</th>
-                                        <th class="center">Item/Resource</th>
-                                        <th class="center">Qty</th>
-                                        <th class="center">Satuan</th>
-                                        <th class="center">Harga @</th>
-                                        <th class="center">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-detail-glaze">
-                                    <tr id="empty-detail-glaze">
-                                        <td colspan="6" class="center">
-                                            Tekan Tambah untuk menambahkan baris...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="6" class="right-align">
-                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('glaze')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Glaze</a>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                            <table class="bordered mt-1" id="table-detail-body2">
-                                <thead>
-                                    <tr>
-                                        <th colspan="6"><h5>III. Glaze</h5></th>
-                                    </tr>
-                                    <tr>
-                                        <th class="center">{{ __('translations.delete') }}</th>
-                                        <th class="center">Item/Resource</th>
-                                        <th class="center">Qty</th>
-                                        <th class="center">Satuan</th>
-                                        <th class="center">Harga @</th>
-                                        <th class="center">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body-detail-body">
-                                    <tr id="empty-detail-body">
-                                        <td colspan="6" class="center">
-                                            Tekan Tambah untuk menambahkan baris...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="6" class="right-align">
-                                            <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addLine('body')" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Baris Body I</a>
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                            <div class="center-align mt-1">
+                                <a class="waves-effect waves-light blue btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Item</a>
+                                <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addResource()" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah Resource</a>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -517,10 +464,17 @@
                 $('input').css('border-bottom', '0.5px solid black');
                 $('#temp').val('');
                 M.updateTextFields();
-                resetDetailForm();
                 window.onbeforeunload = function() {
                     return null;
                 };
+                $('#body-detail-body').empty().append(`
+                    <tr id="empty-detail-body">
+                        <td colspan="6" class="center">
+                            Tekan Tambah untuk menambahkan baris...
+                        </td>
+                    </tr>
+                `);
+                countAll();
             }
         });
 
@@ -576,24 +530,232 @@
             $('#name').val('');
         });
 
-        $('#body-detail').on('click', '.delete-data-detail', function() {
+        $('#body-detail-body').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
-            countAll();
-            if($('.row_detail').length == 0){
-                $('#body-detail').append(`
-                    <tr id="empty-detail">
-                        <td colspan="9" class="center">
-                            Tekan Ambil Data untuk melihat...
+            if($('.row_item').length == 0){
+                $('#body-detail-body').append(`
+                    <tr id="empty-detail-body">
+                        <td colspan="6" class="center">
+                            Tekan Tambah untuk menambahkan baris...
                         </td>
                     </tr>
                 `);
             }
+            countAll();
         });
     });
 
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
+
+    function save(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                
+                var formData = new FormData($('#form_data')[0]), passedUnit = true;
+
+                $('select[name^="arr_lookable_id[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedUnit = false;
+                    }
+                    if(parseFloat($('input[name^="arr_total[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0){
+                        passedUnit = false;
+                    }
+                    if(parseFloat($('input[name^="arr_qty[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0){
+                        passedUnit = false;
+                    }
+                    if(parseFloat($('input[name^="arr_price[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) <= 0){
+                        passedUnit = false;
+                    }
+                });
+
+                if(passedUnit){
+                    var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
+                    
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
+                    
+                    $.ajax({
+                        url: '{{ Request::url() }}/create',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        cache: true,
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            $('#validation_alert').hide();
+                            $('#validation_alert').html('');
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            $('input').css('border', 'none');
+                            $('input').css('border-bottom', '0.5px solid black');
+                            loadingClose('.modal-content');
+                            if(response.status == 200) {
+                                success();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else if(response.status == 422) {
+                                $('#validation_alert').show();
+                                $('.modal-content').scrollTop(0);
+                                
+                                swal({
+                                    title: 'Ups! Validation',
+                                    text: 'Check your form.',
+                                    icon: 'warning'
+                                });
+                                $.each(response.error, function(field, errorMessage) {
+                                    $('#' + field).addClass('error-input');
+                                    $('#' + field).css('border', '1px solid red');
+                                    
+                                });
+
+                                $.each(response.error, function(i, val) {
+                                    
+                                    $.each(val, function(i, val) {
+                                        $('#validation_alert').append(`
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>` + val + `</p>
+                                                </div>
+                                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">×</span>
+                                                </button>
+                                            </div>
+                                        `);
+                                    });
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Salah satu item/resource belum dipilih. Nominal, qty, dan total tidak boleh 0.',
+                        icon: 'error'
+                    });
+                }
+            }
+        });
+    }
+
+    function addItem(){
+        if($('#empty-detail-body').length > 0){
+            $('#empty-detail-body').remove();
+        }
+        var count = makeid(10);
+        $('#body-detail-body').append(`
+            <tr class="row_item">
+                <input type="hidden" name="arr_lookable_type[]" value="items">
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+                <td>
+                    ITEM
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" onchange="getRowUnit('` + count + `')"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowQty`+ count +`">
+                </td>
+                <td class="center">
+                    <input name="arr_price[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                </td>
+                <td class="center">
+                    <input name="arr_total[]" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/purchase_item") }}');
+    }
+
+    function addResource(){
+        if($('#empty-detail-body').length > 0){
+            $('#empty-detail-body').remove();
+        }
+        var count = makeid(10);
+        $('#body-detail-body').append(`
+            <tr class="row_item">
+                <input type="hidden" name="arr_lookable_type[]" value="resources">
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+                <td>
+                    RESOURCE
+                </td>
+                <td>
+                    <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]"></select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowQty`+ count +`">
+                </td>
+                <td class="center">
+                    <input name="arr_price[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                </td>
+                <td class="center">
+                    <input name="arr_total[]" type="text" value="0,00" style="text-align:right;" id="arr_total`+ count +`" readonly>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/resource") }}');
+    }
+
+    function countRow(id){
+        if($('#arr_lookable_id' + id).val()){
+            let qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",","."));
+            let total = price * qty;
+            $('#arr_total' + id).val(
+                (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+            );
+        }else{
+            $('#arr_total' + id).val('0,00');
+        }
+        countAll();
+    }
+
+    function getRowUnit(val){
+        $('#rowPrice' + val).val('0,00');
+        if($("#arr_lookable_id" + val).val()){
+            $('#rowPrice' + val).val($("#arr_lookable_id" + val).select2('data')[0].buy_price_now);
+        }
+        countRow(val);
+    }
 
     function getCode(val){
         if(val){
@@ -633,157 +795,14 @@
         }
     }
 
-    function changeDateMinimum(val){
-        if(val){
-            let newcode = $('#code').val().replaceAt(5,val.split('-')[0].toString().substr(-2));
-            if($('#code').val().substring(5, 7) !== val.split('-')[0].toString().substr(-2)){
-                if(newcode.length > 9){
-                    newcode = newcode.substring(0, 9);
-                }
-            }
-            $('#code').val(newcode);
-            $('#code_place_id').trigger('change');
-        }
-    }
-
-    function resetDetailForm(){
-        $('.row_detail').each(function(){
-            $(this).remove();
-        });
-        $('#body-detail').empty().append(`
-            <tr id="empty-detail">
-                <td colspan="9" class="center">
-                    Tekan Ambil Data untuk melihat...
-                </td>
-            </tr>
-        `);
-        $('#temp').val('');
-    }
-
-    function preview(){
-        if($('#post_date').val() && $('#company_id').val()){
-            $.ajax({
-                url: '{{ Request::url() }}/preview',
-                type: 'POST',
-                dataType: 'JSON',
-                data: {
-                    company_id : $('#company_id').val(),
-                    post_date : $('#post_date').val(),
-                    currency_id : $('#currency_id').val(),
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-                beforeSend: function() {
-                    loadingOpen('.modal-content');
-                },
-                success: function(response) {
-                    loadingClose('.modal-content');
-
-                    if(response.status == '200'){
-                        resetDetailForm();
-
-                        $('#empty-detail').remove();
-
-                        if(response.result.length > 0){
-                            $.each(response.result, function(i, val) {
-                                var count = makeid(10);
-                                $('#body-detail').append(`
-                                    <tr class="row_detail ` + (i == (response.length - 1) ? 'teal lighten-4' : '') + `">
-                                        <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
-                                        <input type="hidden" name="arr_type[]" value="` + val.type + `">
-                                        <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                                        <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                        <td class="center">
-                                            ` + (i + 1) + `
-                                        </td>
-                                        <td>
-                                            ` + val.code + `
-                                        </td>
-                                        <td>
-                                            ` + val.type_document + `
-                                        </td>
-                                        <td>
-                                            <input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_fc`+ count +`" readonly>
-                                        </td>
-                                        <td>
-                                            <input name="arr_latest_rate[]" onfocus="emptyThis(this);" type="text" value="` + val.latest_rate + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_latest_rate`+ count +`" readonly>
-                                        </td>
-                                        <td>
-                                            <input name="arr_nominal_rp[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_rp + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_rp`+ count +`" readonly>
-                                        </td>
-                                        <td>
-                                            <input name="arr_nominal_new[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_new`+ count +`" readonly>
-                                        </td>
-                                        <td>
-                                            <input name="arr_balance[]" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_balance`+ count +`" readonly>
-                                        </td>
-                                    </tr>
-                                `);
-                            });
-                            $('#body-detail').append(`
-                                <tr>
-                                    <th class="right-align" colspan="8">{{ __('translations.total') }}</th>
-                                    <th class="right-align" id="total_balance">0,00</th>
-                                </tr>
-                            `);
-                            countAll();
-                        }else{
-                            resetDetailForm();
-                        }
-                    }else{
-                        swal({
-                            title: 'Ups!',
-                            text: response.message,
-                            icon: 'info'
-                        });
-                    }
-
-                    $('.modal-content').scrollTop(0);
-                    $('#note').focus();
-                    M.updateTextFields();
-                },
-                error: function() {
-                    $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
-                    swal({
-                        title: 'Ups!',
-                        text: 'Check your internet connection.',
-                        icon: 'error'
-                    });
-                }
-            });
-        }else{
-            swal({
-                title: 'Ups!',
-                text: 'Silahkan pilih perusahaan dan periode untuk memulai.',
-                icon: 'error'
-            });
-        }
-    }
-
     function countAll(){
-        let currency_rate = parseFloat($('#currency_rate').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0;
-        $('input[name^="arr_nominal_fc[]"]').each(function(index){
-            let rowfc = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-            let rowrp = parseFloat($('input[name^="arr_nominal_rp[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
-            let rownew = rowfc * currency_rate;
-            let rowbalance = rownew - rowrp;
-            $('input[name^="arr_nominal_new[]"]').eq(index).val(
-                (rownew >= 0 ? '' : '-') + formatRupiahIni(rownew.toFixed(2).toString().replace('.',','))
-            );
-            $('input[name^="arr_balance[]"]').eq(index).val(
-                (rowbalance >= 0 ? '' : '-') + formatRupiahIni(rowbalance.toFixed(2).toString().replace('.',','))
-            );
-            grandtotal += rowbalance;
+        let total = 0;
+        $('input[name^="arr_total[]"]').each(function(index){
+            let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            total += rowtotal;
         });
-        $('#total_balance').text(
-            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        $('#total').text(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
     }
 
@@ -856,11 +875,11 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'user_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
+                { name: 'name', className: '' },
                 { name: 'date', className: 'center-align' },
-                { name: 'output', className: 'center-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'note', className: 'center-align' },
-                { name: 'document', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'link_item', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -897,172 +916,6 @@
         $('.dt-buttons').appendTo('#datatable_buttons');
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
-
-    async function checkStock(){
-        var statusStock = '';
-        await $.ajax({
-            url: '{{ Request::url() }}/check_stock',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                company_id : $('#company_id').val(),
-                month : $('#month').val(),
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#detail-fail-stock').empty();
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                statusStock = response.status;
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#checkstock-progress').hide();
-                    $('#checkstock-success').show();
-                    
-                } else {
-                    $('#checkstock-progress').hide();
-                    $('#checkstock-fail').show();
-                    
-                    $.each(response.data, function(i, val) {
-                        if(val.passed == '0'){
-                            $('#detail-fail-stock').append(`
-                                Coa : ` + val.coa_name + ` pada tanggal ` + val.errors[0].date + ` kode jurnal ` + val.errors[0].code + ` dengan catatan  ` + val.errors[0].note + ` nominal ` + val.errors[0].balance + `.<br>
-                            `);
-                        }
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-        
-        return statusStock;
-    }
-
-    async function checkCash(){
-        var statusCash = '';
-        await $.ajax({
-            url: '{{ Request::url() }}/check_cash',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                company_id : $('#company_id').val(),
-                month : $('#month').val(),
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-                $('#detail-fail-cash').empty();
-            },
-            success: function(response) {
-                statusCash = response.status;
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#checkcash-progress').hide();
-                    $('#checkcash-success').show();
-                } else {
-                    $('#checkcash-progress').hide();
-                    $('#checkcash-fail').show();
-
-                    $.each(response.data, function(i, val) {
-                        if(val.passed == '0'){
-                            $('#detail-fail-cash').append(`
-                                Coa : ` + val.coa_name + ` pada tanggal ` + val.errors[0].date + ` kode jurnal ` + val.errors[0].code + ` dengan catatan  ` + val.errors[0].note + ` nominal ` + val.errors[0].balance + `.<br>
-                            `);
-                        }
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-        return statusCash;
-    };
-
-    async function checkQty(){
-        var statusQty = '';
-        await $.ajax({
-            url: '{{ Request::url() }}/check_qty',
-            type: 'POST',
-            dataType: 'JSON',
-            data: {
-                company_id : $('#company_id').val(),
-                month : $('#month').val(),
-            },
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-                $('#detail-fail-qty').empty();
-            },
-            success: function(response) {
-                statusQty = response.status;
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    $('#checkqty-progress').hide();
-                    $('#checkqty-success').show();
-                } else {
-                    $('#checkqty-progress').hide();
-                    $('#checkqty-fail').show();
-
-                    $.each(response.data, function(i, val) {
-                        if(val.passed == '0'){
-                            $('#detail-fail-qty').append(`
-                                Item : ` + val.item_name + ` pada tanggal ` + val.date + ` kode dokumen ` + val.code + ` dengan catatan  ` + val.note + ` jumlah ` + val.balance + `.<br>
-                            `);
-                        }
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
-        return statusQty;
-    };
-
-    function save(){
-		swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(async function (willDelete) {
-            if (willDelete) {           
-                submit();
-            }
-        });
-    }
 
     function submit(){
         var formData = new FormData($('#form_data')[0]);
@@ -1168,67 +1021,57 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
 
-                resetDetailForm();
+                $('#body-detail-body').empty();
                 
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#name').val(response.name);
                 $('#post_date').val(response.post_date);
                 $('#note').val(response.note);
-                $('#currency_rate').val(response.currency_rate);
-
-                $('#empty-detail').remove();
+                $('#total').text(response.total);
 
                 $.each(response.details, function(i, val) {
                     var count = makeid(10);
-                    $('#body-detail').append(`
-                        <tr class="row_detail ` + (i == (response.length - 1) ? 'teal lighten-4' : '') + `">
-                            <input type="hidden" name="arr_coa_id[]" value="` + val.coa_id + `">
-                            <input type="hidden" name="arr_type[]" value="` + val.type + `">
+                    $('#body-detail-body').append(`
+                        <tr class="row_item">
                             <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                             <td class="center">
-                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>
                             </td>
+                            <td>
+                                ` + val.type + `
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_lookable_id` + count + `" name="arr_lookable_id[]" ` + (val.lookable_type == 'items' ? `onchange="getRowUnit('` + count + `')"` : ``) + `></select>
+                            </td>
+                            <td>
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowQty`+ count +`">
+                            </td>
                             <td class="center">
-                                ` + (i + 1) + `
+                                <input name="arr_price[]" onfocus="emptyThis(this);" type="text" value="` + val.price + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                             </td>
-                            <td>
-                                ` + val.code + `
-                            </td>
-                            <td>
-                                ` + val.type_document + `
-                            </td>
-                            <td>
-                                <input name="arr_nominal_fc[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_fc + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_fc`+ count +`" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_latest_rate[]" onfocus="emptyThis(this);" type="text" value="` + val.latest_rate + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_latest_rate`+ count +`" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_nominal_rp[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_rp + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_rp`+ count +`" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_nominal_new[]" onfocus="emptyThis(this);" type="text" value="` + val.nominal_new + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_nominal_new`+ count +`" readonly>
-                            </td>
-                            <td>
-                                <input name="arr_balance[]" onfocus="emptyThis(this);" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="text-align:right;" id="arr_balance`+ count +`" readonly>
+                            <td class="center">
+                                <input name="arr_total[]" type="text" value="` + val.total + `" style="text-align:right;" id="arr_total`+ count +`" readonly>
                             </td>
                         </tr>
                     `);
+                    $('#arr_lookable_id' + count).append(`
+                        <option value="` + val.lookable_id + `">` + val.code + ` - ` + val.name + `</option>
+                    `);
+                    if(val.lookable_type == 'items'){
+                        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/purchase_item") }}');
+                    }
+                    if(val.lookable_type == 'resources'){
+                        select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/resource") }}');
+                    }
                 });
-                $('#body-detail').append(`
-                    <tr>
-                        <th class="right-align" colspan="8">{{ __('translations.total') }}</th>
-                        <th class="right-align" id="total_balance">` + response.total + `</th>
-                    </tr>
-                `);
 
                 $('.modal-content').scrollTop(0);
-                $('#note').focus();
+                $('#name').focus();
                 M.updateTextFields();
             },
             error: function() {
@@ -1501,37 +1344,6 @@
             }
         });
         
-    }
-
-    function viewJournal(id){
-        $.ajax({
-            url: '{{ Request::url() }}/view_journal/' + id,
-            type:'GET',
-            beforeSend: function() {
-                loadingOpen('.modal-content');
-            },
-            complete: function() {
-                
-            },
-            success: function(data){
-                loadingClose('.modal-content');
-                if(data.status == '500'){
-                    M.toast({
-                        html: data.message
-                    });
-                }else{
-                    $('#modal6').modal('open');
-                    $('#title_data').append(``+data.title+``);
-                    $('#code_data').append(data.code);
-                    $('#body-journal-table').append(data.tbody);
-                    $('#user_jurnal').append(`Pengguna : `+data.user);
-                    $('#note_jurnal').append(`Keterangan : `+data.note);
-                    $('#ref_jurnal').append(`Referensi : `+data.reference);
-                    $('#company_jurnal').append(`Perusahaan : `+data.company);
-                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
-                }
-            }
-        });
     }
 
     function startIntro(){

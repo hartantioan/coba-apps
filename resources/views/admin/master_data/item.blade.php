@@ -436,6 +436,10 @@
                                 <label class="active" for="item_group_id">Grup Item</label>
                             </div>
                             <div class="input-field col s12 m4">
+                                <select class="browser-default" id="bom_calculator_id" name="bom_calculator_id"></select>
+                                <label class="active" for="bom_calculator_id">Link Bom Calculator (Jika ada untuk FG)</label>
+                            </div>
+                            <div class="input-field col s12 m4">
                                 <input id="tolerance_gr" name="tolerance_gr" type="text" value="0" onkeyup="formatRupiah(this);">
                                 <label class="active" for="tolerance_gr">Toleransi Penerimaan Qty Barang (%)</label>
                             </div>
@@ -864,7 +868,7 @@
                 $('#uom_unit').val('').trigger('change');
                 M.updateTextFields();
                 $('.stock-unit').text('-');
-                $('#type_id,#size_id,#variety_id,#pattern_id,#pallet_id,#grade_id,#brand_id').empty();
+                $('#type_id,#size_id,#variety_id,#pattern_id,#pallet_id,#grade_id,#brand_id,#bom_calculator_id').empty();
                 $('#item-sale-show').hide();
                 arrCode = [];
                 arrName = [];
@@ -929,6 +933,7 @@
         select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
         select2ServerSide('#size_id', '{{ url("admin/select2/size") }}');
         select2ServerSide('#variety_id', '{{ url("admin/select2/variety") }}');
+        select2ServerSide('#bom_calculator_id', '{{ url("admin/select2/bom_calculator") }}');
 
         $('#pattern_id').select2({
             placeholder: '-- Pilih ya --',
@@ -1652,7 +1657,11 @@
                     $('#is_hide_supplier').prop( "checked", false);
                 }
 
-                
+                if(response.bom_calculator_data){
+                    $('#bom_calculator_id').empty().append(`
+                        <option value="` + response.bom_calculator_id + `">` + response.bom_calculator_data + `</option>
+                    `);
+                }
 
                 if(response.is_sales_item == '1'){
                     $('#is_sales_item').trigger('click');

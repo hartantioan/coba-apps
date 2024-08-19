@@ -112,6 +112,7 @@ class AppServiceProvider extends ServiceProvider
             'bom_standard_details'                  => 'App\Models\BomStandardDetail',
             'production_recalculates'               => 'App\Models\ProductionRecalculate',
             'production_recalculate_details'        => 'App\Models\ProductionRecalculateDetail',
+            'bom_calculators'                       => 'App\Models\BomCalculator',
         ]);
     }
 }

@@ -33,4 +33,14 @@ class BomCalculatorDetail extends Model
     public function lookable(){
         return $this->morphTo();
     }
+
+    public function type(){
+        $type = match ($this->lookable_type) {
+            'items'     => 'ITEM',
+            'resources' => 'RESOURCE',
+            default => 'Invalid',
+        };
+  
+        return $type;
+    }
 }

@@ -23,6 +23,7 @@ use App\Helpers\PrintHelper;
 use App\Models\AdjustRate;
 use App\Models\AdjustRateDetail;
 use App\Models\BomCalculator;
+use App\Models\BomCalculatorDetail;
 use App\Models\Currency;
 use App\Models\GoodReceipt;
 use App\Models\Journal;
@@ -147,10 +148,11 @@ class BomCalculatorController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
+                    $val->name,
                     date('d/m/Y',strtotime($val->post_date)),
-                    CustomHelper::formatConditionalQty($val->output),
                     CustomHelper::formatConditionalQty($val->grandtotal),
                     $val->note,
+                    $val->item()->exists() ? $val->item->code.' - '.$val->item->name : '-',
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -177,151 +179,6 @@ class BomCalculatorController extends Controller
         return response()->json($response);
     }
 
-    public function preview(Request $request){
-        
-        $cek = AdjustRate::where('company_id',$request->company_id)
-                ->where('post_date',$request->post_date)
-                ->where('currency_id',$request->currency_id)
-                ->whereIn('status',['1','2','3'])->first();
-
-        if(!$cek){
-            $result = [];
-
-            $datagr = GoodReceipt::whereDoesntHave('used')->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
-                $query->where('currency_id',$request->currency_id);
-            })->get();
-
-            $dataapdp = PurchaseDownPayment::whereDoesntHave('used')->whereIn('status',['2','3','7'])->where('post_date','<=',$request->post_date)->whereHas('journal',function($query)use($request){
-                $query->where('currency_id',$request->currency_id);
-            })->get();
-
-            $datainvoice = PurchaseInvoice::whereDoesntHave('used')->whereIn('status',['2','3','7'])->where('post_date','<=',$request->post_date)->where('currency_id',$request->currency_id)->get();
-
-            $arrCoa = Coa::where('status','1')->where('currency_id',$request->currency_id)->whereNotNull('is_cash_account')->get();
-
-            foreach($arrCoa as $coacash){
-                $datadebitfc = JournalDetail::whereHas('journal',function($query)use($request){
-                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
-                })->where('coa_id',$coacash->id)->where('type','1')->sum('nominal_fc');
-                $datacreditfc = JournalDetail::whereHas('journal',function($query)use($request){
-                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
-                })->where('coa_id',$coacash->id)->where('type','2')->sum('nominal_fc');
-                $datadebitrp = JournalDetail::whereHas('journal',function($query)use($request){
-                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
-                })->where('coa_id',$coacash->id)->where('type','1')->sum('nominal');
-                $datacreditrp = JournalDetail::whereHas('journal',function($query)use($request){
-                    $query->whereIn('status',['2','3'])->where('post_date','<=',$request->post_date);
-                })->where('coa_id',$coacash->id)->where('type','2')->sum('nominal');
-                $balancefc = $datadebitfc - $datacreditfc;
-                if($balancefc > 0){
-                    $balancerp = $datadebitrp - $datacreditrp;
-                    $currency_rate = round($balancerp / $balancefc,2);
-                    $result[] = [
-                        'coa_id'        => $coacash->id,
-                        'lookable_type' => $coacash->getTable(),
-                        'lookable_id'   => $coacash->id,
-                        'code'          => $coacash->code.' - '.$coacash->name,
-                        'type_document' => 'Kas Mata Uang Asing',
-                        'nominal_fc'    => number_format($balancefc,2,',','.'),
-                        'latest_rate'   => number_format($currency_rate,2,',','.'),
-                        'nominal_rp'    => number_format($balancerp,2,',','.'),
-                        'type'          => '1',
-                    ];
-                }
-            }
-
-            $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.02')->where('company_id',$request->company_id)->first();
-            $coauangmukapembelian = Coa::where('code','100.01.07.01.01')->where('company_id',$request->company_id)->first();
-            $coahutangusaha = Coa::where('code','200.01.03.01.01')->where('company_id',$request->company_id)->first();
-
-            foreach($datagr as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceTotal();
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coahutangusahabelumditagih->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'GRPO',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '2',
-                    ];
-                }
-            }
-
-            foreach($dataapdp as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balancePayment();
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coahutangusaha->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'APDP HUTANG',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '2',
-                    ];
-                }
-            }
-
-            foreach($dataapdp as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balanceInvoice();
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coauangmukapembelian->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'APDP UANG MUKA',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '1',
-                    ];
-                }
-            }
-
-            foreach($datainvoice as $row){
-                $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
-                $total = $row->balancePayment();
-                if($total > 0){
-                    $result[] = [
-                        'coa_id'        => $coahutangusaha->id,
-                        'lookable_type' => $row->getTable(),
-                        'lookable_id'   => $row->id,
-                        'code'          => $row->code,
-                        'type_document' => 'APIN',
-                        'nominal_fc'    => number_format($total,2,',','.'),
-                        'latest_rate'   => number_format($latest_rate,2,',','.'),
-                        'nominal_rp'    => number_format(round($latest_rate * $total,3),2,',','.'),
-                        'type'          => '2',
-                    ];
-                }
-            }
-
-            $response = [
-                'status'    => 200,
-                'message'   => '',
-                'result'    => $result,
-            ];
-
-        }else{
-            $response = [
-                'status'    => 500,
-                'message'   => 'Mohon maaf tanggal '.date('d/m/Y',strtotime($cek->post_date)).' untuk mata uang '.$cek->currency->name.' dan perusahaan '.$cek->company->name.' telah dibuat Perbaikan Kurs, silahkan pilih tanggal lainnya.'
-            ];
-        }
-
-        return response()->json($response);
-    }
-
     function checkArray($array,$val){
         $index = -1;
         foreach($array as $key => $value){
@@ -334,45 +191,35 @@ class BomCalculatorController extends Controller
 
     public function create(Request $request){
 
-        /* DB::beginTransaction();
-        try { */
+        DB::beginTransaction();
+        try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
                 'post_date'			        => 'required',
                 'company_id'		        => 'required',
-                'currency_id'               => 'required',
-                'currency_rate'             => 'required',
-                'note'                      => 'required',
-                'arr_type'                  => 'required|array',
-                'arr_coa_id'                   => 'required|array',
-                'arr_nominal_fc'            => 'required|array',
-                'arr_latest_rate'           => 'required|array',
-                'arr_nominal_rp'            => 'required|array',
-                'arr_nominal_new'           => 'required|array',
-                'arr_balance'               => 'required|array',
+                'name'                      => 'required',
+                'arr_lookable_type'         => 'required|array',
+                'arr_lookable_id'           => 'required|array',
+                'arr_qty'                   => 'required|array',
+                'arr_price'                 => 'required|array',
+                'arr_total'                 => 'required|array',
             ], [
                 'code.required' 				    => 'Kode/No tidak boleh kosong.',
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'post_date.required' 			    => 'Tanggal post tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-                'currency_id.required' 			    => 'Mata Uang tidak boleh kosong.',
-                'currency_rate.required' 			=> 'Kurs tidak boleh kosong.',
-                'note.required' 			        => 'Keterangan / catatan tidak boleh kosong.',
-                'arr_type.required'                 => 'Tipe tidak boleh kosong',
-                'arr_type.array'                    => 'Tipe harus dalam bentuk array.',
-                'arr_coa_id.required'               => 'Coa tidak boleh kosong',
-                'arr_coa_id.array'                  => 'Coa harus dalam bentuk array.',
-                'arr_nominal_fc.required'           => 'Nominal FC tidak boleh kosong',
-                'arr_nominal_fc.array'              => 'Nominal FC harus dalam bentuk array.',
-                'arr_latest_rate.required'          => 'Nominal Kurs Terakhir tidak boleh kosong',
-                'arr_latest_rate.array'             => 'Nominal Kurs Terakhir harus dalam bentuk array.',
-                'arr_nominal_rp.required'           => 'Nominal Rupiah Sisa tidak boleh kosong',
-                'arr_nominal_rp.array'              => 'Nominal Rupiah Sisa harus dalam bentuk array.',
-                'arr_nominal_new.required'          => 'Nominal Rupiah Terbaru tidak boleh kosong',
-                'arr_nominal_new.array'             => 'Nominal Rupiah Terbaru harus dalam bentuk array.',
-                'arr_balance.required'              => 'Nominal Selisih tidak boleh kosong',
-                'arr_balance.array'                 => 'Nominal Selisih harus dalam bentuk array.',
+                'name.required' 			        => 'Nama De tidak boleh kosong.',
+                'arr_lookable_type.required'        => 'Detail tipe item/resource tidak boleh kosong',
+                'arr_lookable_type.array'           => 'Detail tipe item/resource harus dalam bentuk array.',
+                'arr_lookable_id.required'          => 'Detail id item/resource tidak boleh kosong',
+                'arr_lookable_id.array'             => 'Detail id item/resource dalam bentuk array.',
+                'arr_qty.required'                  => 'Qty tidak boleh kosong',
+                'arr_qty.array'                     => 'Qty harus dalam bentuk array.',
+                'arr_price.required'                => 'Harga tidak boleh kosong',
+                'arr_price.array'                   => 'Harga harus dalam bentuk array.',
+                'arr_total.required'                => 'Total tidak boleh kosong',
+                'arr_total.array'                   => 'Total harus dalam bentuk array.',
             ]);
 
             if($validation->fails()) {
@@ -384,7 +231,7 @@ class BomCalculatorController extends Controller
 
                 if($request->temp){
                     
-                    $query = AdjustRate::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = BomCalculator::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -406,7 +253,7 @@ class BomCalculatorController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Adjust Kurs telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'bom calculator telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -415,66 +262,61 @@ class BomCalculatorController extends Controller
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->company_id = $request->company_id;
+                        $query->name = $request->name;
                         $query->post_date = $request->post_date;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->note = $request->note;
                         $query->status = '1';
                         $query->save();
 
-                        $query->adjustRateDetail()->delete();
+                        $query->bomCalculatorDetail()->delete();
 
                     }else{
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Status adjust kurs sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status bom calculator sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode = AdjustRate::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    $query = AdjustRate::create([
+                    $newCode = BomCalculator::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $query = BomCalculator::create([
                         'code'			=> $newCode,
                         'user_id'		=> session('bo_id'),
                         'company_id'    => $request->company_id,
+                        'name'          => $request->name,
                         'post_date'	    => $request->post_date,
-                        'currency_id'   => $request->currency_id,
-                        'currency_rate' => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'status'        => '1',
                         'note'          => $request->note,
                     ]);
                 }
                 
                 if($query) {
-                    $new_currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                    foreach($request->arr_nominal_fc as $key => $row){
-                        $latest_currency_rate = str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key]));
-                        $nominal_rp = str_replace(',','.',str_replace('.','',$row)) * $latest_currency_rate;
-                        $nominal_new = str_replace(',','.',str_replace('.','',$row)) * $new_currency_rate;
-                        $balance = $nominal_new - $nominal_rp;
-                        AdjustRateDetail::create([
-                            'adjust_rate_id'        => $query->id,
-                            'lookable_type'         => $request->arr_lookable_type[$key],
+                    $total = 0;
+                    foreach($request->arr_lookable_type as $key => $row){
+                        $bcd = BomCalculatorDetail::create([
+                            'bom_calculator_id'     => $query->id,
+                            'lookable_type'         => $row,
                             'lookable_id'           => $request->arr_lookable_id[$key],
-                            'coa_id'                => $request->arr_coa_id[$key],
-                            'nominal_fc'            => str_replace(',','.',str_replace('.','',$row)),
-                            'nominal_rate'          => str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key])),
-                            'nominal_rp'            => $nominal_rp,
-                            'nominal_new'           => $nominal_new,
-                            'nominal'               => $balance,
-                            'type'                  => $request->arr_type[$key],
+                            'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'price'                 => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'total'                 => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                         ]);
+                        $total += $bcd->total;
                     }
 
+                    BomCalculator::find($query->id)->update([
+                        'grandtotal'    => $total,
+                    ]);
+
                     CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Adjust Kurs No. '.$query->code,$query->note,session('bo_id'));
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan bom calculator No. '.$query->code,$query->note,session('bo_id'));
 
                     activity()
-                        ->performedOn(new AdjustRate())
+                        ->performedOn(new BomCalculator())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit adjust rate.');
+                        ->log('Add / edit bom calculator.');
 
                     $response = [
                         'status'    => 200,
@@ -488,51 +330,46 @@ class BomCalculatorController extends Controller
                 }
             }
 
-            /* DB::commit(); */
+            DB::commit();
             
             return response()->json($response);
-        /* }catch(\Exception $e){
+        }catch(\Exception $e){
             DB::rollback();
-        } */
+        }
     }
 
     public function rowDetail(Request $request){
-        $data   = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = BomCalculator::where('code',CustomHelper::decrypt($request->id))->first();
         $total = 0;
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
                                 <th class="center">No.</th>
-                                <th class="center">Nomor</th>
-                                <th class="center">Coa</th>
-                                <th class="center">Nominal Sisa (FC)</th>
-                                <th class="center">Kurs Terakhir</th>
-                                <th class="center">Nominal Sisa (Rp)</th>
-                                <th class="center">Nominal Terbaru (Rp)</th>
-                                <th class="center">Nominal Selisih (Rp)</th>
+                                <th class="center">Tipe</th>
+                                <th class="center">Kode & Nama</th>
+                                <th class="center">Qty</th>
+                                <th class="center">Harga Satuan</th>
+                                <th class="center">Total</th>
                             </tr>
                         </thead><tbody>';
         
-        foreach($data->adjustRateDetail as $key => $row){
-            $total += round($row->nominal,2);
+        foreach($data->bomCalculatorDetail as $key => $row){
             $string .= '<tr>
 
                 <td class="center-align">'.($key + 1).'</td>
-                <td>'.$row->lookable->code.'</td>
-                <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
-                <td class="right-align">'.number_format($row->nominal_fc,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal_rate,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal_rp,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal_new,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->nominal,2,',','.').'</td>
+                <td>'.$row->type().'</td>
+                <td>'.$row->lookable->code.' - '.$row->lookable->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->price).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->total).'</td>
             </tr>';
         }
         
         $string .= '</tbody>
                         <tfoot>
                             <tr>
-                                <th colspan="7" class="right-align">TOTAL</th>
-                                <td class="right-align">'.number_format($total,2,',','.').'</td>
+                                <th colspan="5" class="right-align">TOTAL</th>
+                                <th class="right-align">'.CustomHelper::formatConditionalQty($data->grandtotal).' / M2</th>
                             </tr>
                         </tfoot>
                     </table></div>';
@@ -598,31 +435,25 @@ class BomCalculatorController extends Controller
     }
 
     public function show(Request $request){
-        $ret = AdjustRate::where('code',CustomHelper::decrypt($request->id))->first();
+        $ret = BomCalculator::where('code',CustomHelper::decrypt($request->id))->first();
         $ret['code_place_id'] = substr($ret->code,7,2);
-        $ret['currency_rate'] = number_format($ret->currency_rate,2,',','.');
 
         $arr = [];
-        $total = 0;
-        foreach($ret->adjustRateDetail as $row){
+        foreach($ret->bomCalculatorDetail as $row){
             $arr[] = [
-                'coa_id'        => $row->coa_id,
                 'lookable_type' => $row->lookable_type,
                 'lookable_id'   => $row->lookable_id,
                 'code'          => $row->lookable->code,
-                'type_document' => $row->getType(),
-                'nominal_fc'    => number_format($row->nominal_fc,2,',','.'),
-                'latest_rate'   => number_format($row->nominal_rate,2,',','.'),
-                'nominal_rp'    => number_format($row->nominal_rp,2,',','.'),
-                'nominal_new'   => number_format($row->nominal_new,2,',','.'),
-                'balance'       => number_format($row->nominal,2,',','.'),
-                'type'          => $row->type,
+                'name'          => $row->lookable->name,
+                'type'          => $row->type(),
+                'qty'           => CustomHelper::formatConditionalQty($row->qty),
+                'price'         => CustomHelper::formatConditionalQty($row->price),
+                'total'         => CustomHelper::formatConditionalQty($row->total),
             ];
-            $total += $row->nominal;
         }
 
         $ret['details'] = $arr;
-        $ret['total'] = number_format($total,2,',','.');
+        $ret['total'] = CustomHelper::formatConditionalQty($ret->grandtotal);
         				
 		return response()->json($ret);
     }
@@ -659,9 +490,9 @@ class BomCalculatorController extends Controller
                     ->performedOn(new AdjustRate())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the adjust rate data');
+                    ->log('Void the bom calculator data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Adjust Kurs No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'bom calculator No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
@@ -706,7 +537,7 @@ class BomCalculatorController extends Controller
                 ->performedOn(new AdjustRate())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the adjust rate data');
+                ->log('Delete the bom calculator data');
 
             $response = [
                 'status'  => 200,
@@ -742,7 +573,7 @@ class BomCalculatorController extends Controller
                 $pr = AdjustRate::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'Adjust Kurs','a4','portrait','admin.print.accounting.adjust_rate_individual');
+                    $pdf = PrintHelper::print($pr,'bom calculator','a4','portrait','admin.print.accounting.adjust_rate_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -820,7 +651,7 @@ class BomCalculatorController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = AdjustRate::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Adjust Kurs','a4','portrait','admin.print.accounting.adjust_rate_individual');
+                            $pdf = PrintHelper::print($query,'bom calculator','a4','portrait','admin.print.accounting.adjust_rate_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -877,7 +708,7 @@ class BomCalculatorController extends Controller
                         $etNumbersArray = explode(',', $request->tabledata);
                         $query = AdjustRate::where('code', 'LIKE', '%'.$etNumbersArray[$code-1])->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Adjust Kurs','a4','portrait','admin.print.accounting.adjust_rate_individual');
+                            $pdf = PrintHelper::print($query,'bom calculator','a4','portrait','admin.print.accounting.adjust_rate_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -921,7 +752,7 @@ class BomCalculatorController extends Controller
                 
         if($cap){
             $data = [
-                'title'     => 'Adjust Kurs',
+                'title'     => 'bom calculator',
                 'data'      => $cap
             ];
 
@@ -1012,7 +843,7 @@ class BomCalculatorController extends Controller
         $currentDateTime = Date::now();
         $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
         if($pr){
-            $pdf = PrintHelper::print($pr,'Adjust Kurs','a4','portrait','admin.print.accounting.adjust_rate_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'bom calculator','a4','portrait','admin.print.accounting.adjust_rate_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 770, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 780, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

@@ -19,6 +19,7 @@ class BomCalculator extends Model
         'code',
         'user_id',
         'company_id',
+        'name',
         'post_date',
         'note',
         'status',
@@ -34,6 +35,10 @@ class BomCalculator extends Model
         'done_date',
         'done_note',
     ];
+
+    public function item(){
+        return $this->hasOne('App\Models\Item','bom_calculator_id','id')->where('status','1');
+    }
 
     public function deleteUser()
     {

@@ -630,14 +630,14 @@ class ProductionFgReceiveController extends Controller
                     foreach($request->arr_production_batch_id as $key => $row){
                         $pb = ProductionBatch::find($row);
                         if($pb){
-                            $totalCost += round(($pb->total / $pb->qty_real) * str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),2);
-                            ProductionBatchUsage::create([
+                            $pbu = ProductionBatchUsage::create([
                                 'production_batch_id'   => $pb->id,
                                 'lookable_type'         => $query->getTable(),
                                 'lookable_id'           => $query->id,
                                 'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),
                             ]);
                             CustomHelper::updateProductionBatch($pb->id,str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key])),'OUT');
+                            $totalCost += $pbu->productionBatch->totalById($pbu->id);
                             $totalBatch += str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$key]));
                         }
                     }

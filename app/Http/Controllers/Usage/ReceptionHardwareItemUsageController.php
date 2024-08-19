@@ -463,7 +463,6 @@ class ReceptionHardwareItemUsageController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = ReceptionHardwareItemsUsage::find($request->tempe);
-                    $query->date	            = $request->date;
                     $query->location	        = $request->location;
                     $query->division	        = $request->division;
                     $query->info	            = $request->info;

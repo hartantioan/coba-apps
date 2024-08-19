@@ -237,7 +237,7 @@
                                             :
                                         </td>
                                         <td width="70%" style="vertical-align: top;">
-                                            {{ $data->item()->exists() ? $data->item->cod : '-' }}
+                                            {{ $data->item()->exists() ? $data->item->code : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -275,7 +275,7 @@
                     <table class="bordered" border="1" width="100%" class="table-data-item" style="border-collapse:collapse">
                         <thead>
                             <tr>
-                                <th colspan="6" class="center-align">Daftar Target Berdasarkan Marketing Order Plan</th>
+                                <th colspan="6" class="center-align">Daftar Item & Resource Terpakai</th>
                             </tr>
                             <tr>
                                 <th align="center">{{ __('translations.no') }}.</th>
@@ -297,6 +297,10 @@
                                 <td align="right">{{ CustomHelper::formatConditionalQty($row->total) }}</td>
                             </tr>
                             @endforeach
+                            <tr>
+                                <td align="center" colspan="5">TOTAL</td>
+                                <td align="right">{{ CustomHelper::formatConditionalQty($data->grandtotal) }}</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

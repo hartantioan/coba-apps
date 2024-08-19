@@ -478,7 +478,7 @@ class ProductionFgReceiveController extends Controller
                             }
 
                             if($bomAlternative->bom->bomStandard()->exists()){
-                                foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                                foreach($bomAlternative->bom->bomStandard->bomStandardDetail()->where('lookable_type','items')->get() as $rowbom){
                                     if(!in_array($rowbom->lookable_id,$arrItem)){
                                         $arrItem[] = $rowbom->lookable_id;
                                         $arrQty[] = round($rowbom->qty * str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),3);

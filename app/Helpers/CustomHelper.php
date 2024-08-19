@@ -6234,7 +6234,7 @@ class CustomHelper {
 
 	 public static function tgl_indo($tanggal){
 		$bulan = array (
-			1 =>   'Januari',
+			'Januari',
 			'Februari',
 			'Maret',
 			'April',

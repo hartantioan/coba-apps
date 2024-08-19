@@ -93,6 +93,11 @@
                             <div class="card">
                                 <div class="card-content">
                                     <h4 class="card-title">{{ __('translations.list_data') }}</h4>
+                                    <div class="card-alert card gradient-45deg-purple-amber">
+                                        <div class="card-content white-text">
+                                            <p>Info : Status akan dinyatakan SELESAI jika master item telah dibuat dari data BOM Calculator yang tersedia.</p>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="col s12">
                                             <div id="datatable_buttons"></div>

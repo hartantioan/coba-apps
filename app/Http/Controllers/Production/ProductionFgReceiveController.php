@@ -37,6 +37,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Models\UsedData;
 use App\Models\MenuUser;
 use App\Exports\ExportProductionFgReceive;
+use App\Models\ItemCogs;
+
 class ProductionFgReceiveController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
@@ -492,12 +494,15 @@ class ProductionFgReceiveController extends Controller
 
                 foreach($arrItem as $key => $row){
                     $item = Item::find($row);
-                    if($item){
-                        $stock = $item->getStockPlace($request->place_id);
-                        if($stock < $arrQty[$key]){
-                            $arrItemMore[] = $item->code.' - '.$item->name.' Stok : '.CustomHelper::formatConditionalQty($stock).' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
+                    $itemstock = ItemCogs::where('item_id',$row)->where('place_id',$request->place_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                    if($itemstock){
+                        if($itemstock->qty_final < $arrQty[$key]){
+                            $arrItemMore[] = $itemstock->item->code.' - '.$itemstock->item->name.' Stok : '.CustomHelper::formatConditionalQty($itemstock->qty_final).' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
                             $passedStockMaterial = false;
                         }
+                    }else{
+                        $arrItemMore[] = $item->code.' - '.$item->name.' Kebutuhan : '.CustomHelper::formatConditionalQty($arrQty[$key]);
+                        $passedStockMaterial = false;
                     }
                 }
 

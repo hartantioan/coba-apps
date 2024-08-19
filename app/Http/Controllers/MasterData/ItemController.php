@@ -278,7 +278,7 @@ class ItemController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
+            
             $passedDefaultUnit = false;
             $passedBufferStock = true;
 
@@ -363,6 +363,24 @@ class ItemController extends Controller
 			}else{
                 DB::beginTransaction();
                 try {
+                    $passedBomCalculator = true;
+
+                    if($request->bom_calculator_id){
+                        $bomCalculator = BomCalculator::find($request->bom_calculator_id);
+                        if($bomCalculator){
+                            if($bomCalculator->status !== '2'){
+                                $passedBomCalculator = false;
+                            }
+                        }
+                    }
+
+                    if(!$passedBomCalculator){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Bom Calculator telah selesai dan dipakai pada produk lain.'
+                        ]);
+                    }
+
                     $query = Item::create([
                         'code'              => $request->code,
                         'name'			    => $request->name,

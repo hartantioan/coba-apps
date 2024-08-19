@@ -32,6 +32,7 @@ use Illuminate\Http\Request;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\Item;
 use App\Models\ItemUnit;
 use App\Models\User;
 use App\Models\Tax;
@@ -519,6 +520,27 @@ class MarketingOrderController extends Controller
                             'message' => 'Harga item tidak boleh 0.'
                         ]);
                     }
+                }
+
+                $passedNettPrice = true;
+                $arrMessage = [];
+                foreach($request->arr_item as $key => $row){
+                    $item = Item::find($row);
+                    $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
+                    if($item){
+                        $priceNett = $item->cogsSales($codePlace->id,$request->post_date);
+                        if($priceNett <= 0){
+                            $passedNettPrice = false;
+                            $arrMessage[] = 'Item '.$item->code.' - '.$item->name.' belum memiliki harga nett price dari hpp atau kalkulator BOM.';
+                        }
+                    }
+                }
+
+                if(!$passedNettPrice){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => implode(', ',$arrMessage),
+                    ]);
                 }
 
                 $userData = UserData::find($request->billing_address);

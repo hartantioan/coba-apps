@@ -285,9 +285,13 @@ class Item extends Model
 
     public function cogsSales($place_id,$date){
         $pricenow = 0;
-        $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
-        if($price){
-            $pricenow = $price->qty_final > 0 ? round($price->total_final / $price->qty_final,6) : 0;
+        $cogs = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
+        if($cogs){
+            $pricenow = $cogs->qty_final > 0 ? round($cogs->total_final / $cogs->qty_final,6) : 0;
+        }else{
+            if($this->bomCalculator()->exists()){
+                $pricenow = $this->bomCalculator->grandtotal;
+            }
         }
         
         return $pricenow;

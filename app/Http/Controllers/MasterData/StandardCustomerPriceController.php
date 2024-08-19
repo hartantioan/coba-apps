@@ -103,7 +103,7 @@ class StandardCustomerPriceController extends Controller
                     $val->name,
                     $val->group->code,
                     $val->user->name,
-                    $val->price,
+                    number_format($val->price,2,',','.'),
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
                     $val->note,

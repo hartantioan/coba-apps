@@ -555,6 +555,7 @@
 <script>
 
     var arrGreenTile = [], arrPowder = [], arrFg = [];
+    var arrDetail = [], countTemp = [];
 
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
@@ -678,6 +679,8 @@
                 });
             },
             onCloseEnd: function(modal, trigger){
+                arrDetail = [];
+                countTemp = [];
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('input').css('border', 'none');
@@ -762,15 +765,40 @@
         });
 
         $('.body-item-detail-normal').on('click', '.delete-data-item-detail-normal', function() {
-            $('#list-bom-' + $(this).data('id')).remove();
-            $(this).closest('tr').remove();
-            let id = $(this).data('id');
+           
+            let row = $(this).closest('tr').remove();
+            let id = row.data('id');
             let index = -1;
+
+            var array_hapus = [];
+            if(id.includes(',')) {
+                let codeArray = id.split(',');
+                $.each(arrFg, function(i, val) {
+                
+                    $.each(codeArray, function(index_new, part) {
+                   
+                        if(val.code == part){
+                            array_hapus.push(i);
+                            return false;
+                        }
+                       
+                    });
+                });
+                array_hapus.sort(function(a, b) { return b - a; });
+                $.each(array_hapus, function(index_new, part) {
+                   
+                    arrFg.splice(part,1);
+                   
+                });
+            }
             $.each(arrFg, function(i, val) {
+                
                 if(val.code == id){
                     index = i;
                 }
             });
+            $('#list-bom-' + $(this).data('id')).remove();
+          
             if(index >= 0){
                 arrFg.splice(index,1);
             }
@@ -779,8 +807,10 @@
 
         $('.body-item-detail-green').on('click', '.delete-data-item-detail-green', function() {
             $('#list-bom-' + $(this).data('id')).remove();
-            $(this).closest('tr').remove();
-            let id = $(this).data('id');
+            
+            let row = $(this).closest('tr').remove();
+            let id = row.data('id');
+            
             let index = -1;
             $.each(arrGreenTile, function(i, val) {
                 if(val.code == id){
@@ -790,13 +820,14 @@
             if(index >= 0){
                 arrGreenTile.splice(index,1);
             }
+            
             generateSummaryRawmat();
         });
 
         $('.body-item-detail-powder').on('click', '.delete-data-item-detail-powder', function() {
-            $('#list-bom-' + $(this).data('id')).remove();
-            $(this).closest('tr').remove();
-            let id = $(this).data('id');
+            let row = $(this).closest('tr').remove();
+            let id = row.data('id');
+          
             let index = -1;
             $.each(arrPowder, function(i, val) {
                 if(val.code == id){
@@ -804,7 +835,7 @@
                 }
             });
             if(index >= 0){
-                arrGreenTile.splice(index,1);
+                arrPowder.splice(index,1);
             }
             generateSummaryRawmat();
         });
@@ -1024,7 +1055,7 @@
         });
     }
 
-    function removeUsedData(type,id){
+    function removeUsedData(type,id,count){
         $.ajax({
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
@@ -1058,6 +1089,7 @@
                 });
             }
         });
+        $('tr[data-id="' + count + '"]').remove();
     }
 
     function getRowUnit(val,type){
@@ -1102,7 +1134,7 @@
         var count = makeid(10);
         $('.last-row-item-detail-' + type).remove();
         $('#body-item-detail-' + type).append(`
-            <tr class="row_detail_item" data-id="">
+            <tr class="row_detail_item" data-id="` + count + `">
                 <td class="center-align">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + type + `" href="javascript:void(0);" data-id="` + count + `">
                         <i class="material-icons">delete</i>
@@ -1257,7 +1289,7 @@
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + mop.code + `
-                                <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() + `')">close</i>
+                                <i class="material-icons close data-used" data-id="` + mop.id + `" onclick="removeUsedData('` + mop.table + `','` + $('#marketing_order_plan_id').val() +  `')">close</i>
                             </div>
                         `);
                         
@@ -1356,7 +1388,7 @@
                                             <input name="arr_note[]" type="text" required>
                                         </td>
                                     </tr>`;
-                                    if(!$('#temp').val()){
+                                    
                                         if(detail.materials.length > 0){
                                             let arr = [];
                                             arr['code'] = count;
@@ -1366,14 +1398,14 @@
                                             arrFg.push(arr);
                                         }
                                         generateSummaryRawmat();
-                                    }
+                                    
                                 }
                             });
-
+                            let stringData = arrCountNormal.filter(item => typeof item === 'string');
                             datanormal += `</tbody></table>`;
 
                             $('#body-item-detail-normal').append(`
-                                <tr class="row_detail_item" data-id="` + val.mopd_id + `">
+                                <tr class="row_detail_item" data-id="` + stringData + `">
                                     <td class="center-align">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-normal" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -1447,12 +1479,79 @@
                 }
             });
         }else{
+            if($('#temp').val()){
+                arrDetail = [...new Set(arrDetail.filter(item => item))];
+               
+                $.each(arrDetail, function(i, val) {
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_mop',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            id: val,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
 
+                            if(response.status == 500){
+                                swal({
+                                    title: 'Ups!',
+                                    text: response.message,
+                                    icon: 'warning'
+                                });
+                            }else{
+                                var mop = response.mop;
+                                
+                                $.each(mop.details, function(i, val) {
+                                    var count = makeid(10);
+                                    let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
+                                    
+                                    
+                                    let qtyRow = qtyTarget;
+                                    $.each(val.list_bom, function(z, detail) {
+                                        if(detail.type == ''){
+                                            var count = makeid(10);
+                                            
+                                            qtyRow = qtyRow * parseFloat(detail.qty_needed.toString().replaceAll(".", "").replaceAll(",","."));
+
+                                            if(detail.materials.length > 0){
+                                                let arr = [];
+                                                arr['code'] = countTemp[z];
+                                                arr['item_output'] = detail.item_name;
+                                                arr['qty'] = qtyRow.toFixed(3);
+                                                arr['datas'] = detail.materials;
+                                                arrFg.push(arr);
+                                            }
+                                            generateSummaryRawmat();
+                                            
+                                        }
+                                    });
+                                
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                });
+            }
         }
     }
 
     function getBomMaterial(code,type){
-        if(!$('#temp').val()){
             let index = -1;
             $.each(arrGreenTile, function(i, val) {
                 if(val.code == code){
@@ -1471,6 +1570,16 @@
             if(index2 >= 0){
                 arrPowder.splice(index2,1);
             }
+
+            let index3 = -1;
+            $.each(arrFg, function(i, val) {
+                if(val.code == code){
+                    index3 = i;
+                }
+            });
+            if(index3 >= 0){
+                arrFg.splice(index3,1);
+            }
             if($('#arr_bom' + code).val()){
                 let data = $('#arr_bom' + code).select2('data')[0];
                 let arr = [];
@@ -1483,9 +1592,12 @@
                 }else if(type == 'powder'){
                     arrPowder.push(arr);
                 }
+                else if(type == 'normal'){
+                    arrFg.push(arr);
+                }
             }
             generateSummaryRawmat();
-        }
+        
     }
 
     function generateSummaryRawmat(){
@@ -2047,7 +2159,11 @@
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        arrDetail.push(val.mopd_id);
+                        
+                        countTemp.push(count);
                         if(val.mopd_id && $('.row_detail_item[data-id="' + val.mopd_id + '"]').length > 0){
+                           
                             $('.row_detail_item[data-id="' + val.mopd_id + '"] tbody').append(`
                                 <tr>
                                     <input type="hidden" name="arr_type[]" value="` + val.type + `">
@@ -2087,8 +2203,11 @@
                                 </tr>
                             `);
                         }else{
+                          
+                            
+                            
                             $('#body-item-detail-' + val.type).append(`
-                                <tr class="row_detail_item" data-id="` + val.mopd_id + `">
+                                <tr class="row_detail_item" data-id="` + count + `">
                                     <td class="center-align">
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-detail-` + val.type + `" href="javascript:void(0);">
                                             <i class="material-icons">delete</i>
@@ -2150,6 +2269,24 @@
                                     </td>
                                 </tr>
                             `);
+
+                            if(val.type == 'green'){
+                                let arr = [];
+                                arr['code'] = count;
+                                arr['item_output'] = val.item_name;
+                                arr['qty'] = parseFloat($('#arr_detail_qty' + count).val().replaceAll(".", "").replaceAll(",","."));
+                                arr['datas'] = val.materials;
+                                arrGreenTile.push(arr);
+                              
+                            }
+                            if(val.type == 'powder'){
+                                let arr = [];
+                                arr['code'] = count;
+                                arr['item_output'] = val.item_name;
+                                arr['qty'] = parseFloat($('#arr_detail_qty' + count).val().replaceAll(".", "").replaceAll(",","."));
+                                arr['datas'] = val.materials;
+                                arrPowder.push(arr);
+                            }
                         }
                         if(val.bom_id){
                             $('#arr_bom' + count).append(`
@@ -2217,10 +2354,9 @@
                             }
                         });
                     });
-
                     countTarget();
                 }
-                
+                getMarketingOrderPlan();
                 $('.modal-content').scrollTop(0);
                 M.updateTextFields();
             },

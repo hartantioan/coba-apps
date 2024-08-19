@@ -21,6 +21,7 @@ use App\Helpers\PrintHelper;
 use App\Helpers\TreeHelper;
 use App\Models\Line;
 use App\Models\User;
+use App\Models\Bom;
 use App\Models\Menu;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -473,12 +474,15 @@ class ProductionScheduleController extends Controller
         $arrDetail = [];
 
         foreach($po->productionScheduleDetail()->orderBy('id')->get() as $rowdetail){
+            $material = Bom::where('item_id',$rowdetail->item_id)->first();
+            
             $arrDetail[] = [
                 'mopd_id'           => $rowdetail->marketing_order_plan_detail_id ?? '',
                 'bom_id'            => $rowdetail->bom_id ?? '',
                 'bom_code'          => $rowdetail->bom->code.' - '.$rowdetail->bom->name,
                 'production_date'   => $rowdetail->production_date,
                 'item_id'           => $rowdetail->item_id,
+                'item_name'         => $rowdetail->item->name,
                 'item_code'         => $rowdetail->item->code.' - '.$rowdetail->item->name,
                 'qty'               => CustomHelper::formatConditionalQty($rowdetail->qty),
                 'uom'               => $rowdetail->item->uomUnit->code,
@@ -488,6 +492,7 @@ class ProductionScheduleController extends Controller
                 'list_warehouse'    => $rowdetail->item->warehouseList(),
                 'line_id'           => $rowdetail->line_id,
                 'type'              => $rowdetail->type == '1' ? 'powder' : ($rowdetail->type == '2' ? 'green' : 'normal'),
+                'materials'         => $material->getMaterialData(),
             ];
         }
 
@@ -1150,6 +1155,48 @@ class ProductionScheduleController extends Controller
             ]);
         }
     }
+
+    public function getMOP(Request $request){
+        $mop = MarketingOrderPlan::find($request->id);
+       
+        if($mop){
+            $details = [];
+            foreach($mop->marketingOrderPlanDetail as $row){
+                $cekBom = $row->item->bomPlace($request->place_id);
+                if(!$cekBom){
+                    $hasBom = false;
+                }else{
+                    $details[] = [
+                        'mopd_id'           => $row->id,
+                        'item_id'           => $row->item_id,
+                        'item_code'         => $row->item->code,
+                        'item_name'         => $row->item->name,
+                        'qty'               => CustomHelper::formatConditionalQty($row->qty),
+                        'uom'               => $row->item->uomUnit->code,
+                        'request_date'      => date('d/m/Y',strtotime($row->request_date)),
+                        'note'              => $row->note ?? '',
+                        'note2'             => $row->note2 ?? '',
+                        'priority'          => $row->priority,
+                        'has_bom'           => $cekBom ? '1' : '',
+                        'place_id'          => $request->place_id,
+                        'list_warehouse'    => $row->item->warehouseList(),
+                        'list_bom'          => $row->item->listBom(),
+                    ];
+                }
+            }
+            $mop['details']=$details;
+            return response()->json([
+                'status'    => 200,
+                'mop'       => $mop,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Dokumen no. '.$mop->used->lookable->code.' telah dipakai di '.$mop->used->ref.', oleh '.$mop->used->user->name.'.'
+            ]);
+        }
+    }
+
 
     public function removeUsedData(Request $request){
         CustomHelper::removeUsedData($request->type,$request->id);

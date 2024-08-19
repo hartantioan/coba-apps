@@ -517,7 +517,7 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#item_id').empty().append(`
-                    <option value="` + response.item + `">` + response.item['name'] + `</option>
+                    <option value="` + response.item.id + `">` + response.item['name'] + `</option>
                 `);
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);

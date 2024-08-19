@@ -2157,6 +2157,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionScheduleController::class, 'rowDetail']);
                     Route::post('show', [ProductionScheduleController::class, 'show']);
                     Route::post('get_code', [ProductionScheduleController::class, 'getCode']);
+                    Route::post('get_mop', [ProductionScheduleController::class, 'getMOP']);
                     Route::post('print',[ProductionScheduleController::class, 'print']);
                     Route::post('done',[ProductionScheduleController::class, 'done'])->middleware('operation.access:production_schedule,update');
                     Route::post('print_by_range',[ProductionScheduleController::class, 'printByRange']);

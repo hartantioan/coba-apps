@@ -250,7 +250,7 @@
                     {{ __('translations.destination_address') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
+                    {{ $data->destination_address.', '.ucwords(strtolower($data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                 </div>
             </div>
             <div class="col s6 m6 row mt-2">
@@ -311,11 +311,9 @@
                         <th class="center-align">{{ __('translations.qty') }}</th>
                         <th class="center-align">{{ __('translations.unit') }}</th>
                         <th class="center-align">{{ __('translations.price') }}</th>
-                        <th class="center-align">{{ __('translations.margin') }}</th>
                         <th class="center-align">{{ __('translations.disc') }}.1 (%)</th>
                         <th class="center-align">{{ __('translations.disc') }}.2 (%)</th>
                         <th class="center-align">{{ __('translations.disc') }}.3 (Rp)</th>
-                        <th class="center-align">{{ __('translations.other_fee') }}</th>
                         <th class="center-align">{{ __('translations.final_price') }}</th>
                         <th class="center-align">{{ __('translations.total') }}</th>
                     </tr>
@@ -323,28 +321,28 @@
                 <tbody>
                     @foreach($data->marketingOrderDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
+                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
+                        <td class="">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->itemUnit->unit->code }}</td>
-                        <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->margin,2,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_1,2,',','.') }}</td>
-                        <td class="center-align">{{ number_format($row->percent_discount_2,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->discount_3,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->other_fee,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->price_after_discount,2,',','.') }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->price) }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_1) }}</td>
+                        <td class="center-align">{{ CustomHelper::formatConditionalQty($row->percent_discount_2) }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->discount_3) }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->price_after_discount) }}</td>
+                        <td class="right-align">{{ CustomHelper::formatConditionalQty($row->total) }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8">{{ __('translations.note') }}: {{ $row->note }}</td>
-                        <td colspan="4">{{ __('translations.taken_from') }}: {{ $row->place->code.' - Gudang '.$row->warehouse->code.' - Area '.($row->area()->exists() ? $row->area->name : '-') 
-                        }}</td>
+                        <td colspan="11" class="red-text">Harga Per M2 : {{ CustomHelper::formatConditionalQty($row->pricePerMeter()) }} || HPP + 10.000 : {{ CustomHelper::formatConditionalQty($row->price_nett) }}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="4">{{ __('translations.taken_from') }}: {{ $row->place->code }}</td>
                     </tr>
                     
                     @endforeach
                     <tr>
-                        <td colspan="9" rowspan="8">
+                        <td colspan="7" rowspan="8">
                             {{ __('translations.bank_account') }} :
                             {!! $data->company->banks() !!}
                             <div class="mt-3">
@@ -356,28 +354,12 @@
                         </td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.subtotal') }}</td>
-                        <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.disc') }}</td>
-                        <td class="right-align">{{ number_format($data->discount,2,',','.') }}</td>
-                    </tr>
-                    <tr>
                         <td class="right-align" colspan="2">{{ __('translations.total') }}</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2">{{ __('translations.tax') }}</td>
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.total_after_tax') }}</td>
-                        <td class="right-align">{{ number_format($data->total_after_tax,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.rounding') }}</td>
-                        <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
                     </tr>
                     <tr>
                         <td class="right-align" colspan="2"><h6>{{ __('translations.grandtotal') }}</h6></td>

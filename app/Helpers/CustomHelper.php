@@ -453,6 +453,8 @@ class CustomHelper {
 			#if sales order disini ya
 			if($underEbitda){
 				$passed = true;
+			}else{
+				$passed = false;
 			}
 
 			if($passed == true){

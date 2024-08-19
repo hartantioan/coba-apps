@@ -660,42 +660,13 @@ class MarketingOrderDeliveryController extends Controller
         foreach($data->marketingOrderDeliveryDetail as $key => $row){
             $totalqty+=$row->qty;
             $string .= '<tr>
-                <td class="center-align" rowspan="2">'.($key + 1).'</td>
+                <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->note.'</td>
             </tr>';
-            
-            $string .= '
-                <tr>
-                    <td class="center-align">Ambil Item dari : </td>
-                    <td><table class="bordered" id="table-detail-source">
-                    <thead>
-                        <tr>
-                            <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
-                            <th class="center-align">Qty Kirim</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-                        
-            foreach($row->marketingOrderDeliveryStock as $rowdetail){
-                $string .= '<tr>
-                    <td>'.$rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '').'</td>
-                    <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
-
-                </tr>';
-            }
-                    
-            $string .= '</tbody>
-                    </table>
-                    </td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            ';
         }
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>

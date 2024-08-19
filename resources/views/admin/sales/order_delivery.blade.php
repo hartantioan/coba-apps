@@ -96,7 +96,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s6">
                                                 <label for="filter_account" style="font-size:1rem;">Ekspedisi :</label>
                                                 <div class="input-field">
                                                     <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
@@ -206,7 +206,7 @@
                                         <select class="browser-default" id="customer_id" name="customer_id"></select>
                                         <label class="active" for="customer_id">Customer</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step4">
+                                    <div class="input-field col m3 s12 step4 unit-inputs">
                                         <select class="browser-default" id="account_id" name="account_id"></select>
                                         <label class="active" for="account_id">Ekspedisi</label>
                                     </div>
@@ -269,7 +269,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="8">
+                                                        <td colspan="9">
                                                             Silahkan pilih Sales Order...
                                                         </td>
                                                     </tr>
@@ -521,6 +521,7 @@ document.addEventListener('focusin', function (event) {
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                $('.unit-inputs').css('pointer-events','none');
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -587,7 +588,7 @@ document.addEventListener('focusin', function (event) {
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="8">
+                        <td colspan="9">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -1221,7 +1222,7 @@ document.addEventListener('focusin', function (event) {
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="8">
+                            <td colspan="9">
                                 Silahkan pilih Sales Order...
                             </td>
                         </tr>

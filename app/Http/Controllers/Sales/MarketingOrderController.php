@@ -693,7 +693,7 @@ class MarketingOrderController extends Controller
                     foreach($request->arr_item as $key => $row){
                         $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                         $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
-                        
+                        $item = Item::find($row);
                         MarketingOrderDetail::create([
                             'marketing_order_id'            => $query->id,
                             'item_id'                       => $row,
@@ -701,6 +701,7 @@ class MarketingOrderController extends Controller
                             'item_unit_id'                  => $itemUnit->id,
                             'qty_conversion'                => $itemUnit->conversion,
                             'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'price_nett'                    => $item->cogsSales($codePlace->id,$request->post_date) + 10000,
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
                             'percent_tax'                   => $request->arr_tax[$key],
                             'tax_id'                        => $request->arr_tax_id[$key],

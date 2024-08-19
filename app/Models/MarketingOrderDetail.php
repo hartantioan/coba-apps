@@ -21,7 +21,7 @@ class MarketingOrderDetail extends Model
         'item_unit_id',
         'qty_conversion',
         'price',
-        'margin',
+        'price_nett',
         'is_include_tax',
         'percent_tax',
         'tax_id',
@@ -45,6 +45,10 @@ class MarketingOrderDetail extends Model
         };
 
         return $type;
+    }
+
+    public function pricePerMeter(){
+        return $this->price_after_discount / $this->qty_conversion;
     }
 
     public function marketingOrder()
@@ -92,10 +96,10 @@ class MarketingOrderDetail extends Model
     }
 
     public function realPriceAfterGlobalDiscount(){
-        $bobot = $this->total / $this->marketingOrder->subtotal;
+        /* $bobot = $this->total / $this->marketingOrder->subtotal;
         $discountRow = $bobot * $this->marketingOrder->discount;
-        $discountPerItem = $discountRow / $this->qty;
-        $realPrice = $this->price_after_discount - $discountPerItem;
+        $discountPerItem = $discountRow / $this->qty; */
+        $realPrice = $this->price_after_discount/*  - $discountPerItem */;
 
         return $realPrice;
     }

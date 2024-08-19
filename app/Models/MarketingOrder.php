@@ -458,4 +458,16 @@ class MarketingOrder extends Model
 
         return $arr;
     }
+    
+    public function underEbitda(){
+        $under = false;
+        foreach($this->marketingOrderDetail as $row){
+            $cogsPerItem = $row->item->cogsSales($row->place_id,$this->post_date) + 10000;
+            $salePerItem = round($row->price_after_discount / $row->qty_conversion,2);
+            if($salePerItem < $cogsPerItem){
+                $under = true;
+            }
+        }
+        return $under;
+    }
 }

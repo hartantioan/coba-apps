@@ -220,7 +220,6 @@
                                                         <th>Provinsi Tujuan</th>
                                                         <th>Kota Tujuan</th>
                                                         <th>Kecamatan Tujuan</th>
-                                                        <th>KelurahanTujuan</th>
                                                         <th>Sales</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>{{ __('translations.conversion') }}</th>
@@ -375,16 +374,10 @@
                                         <label class="active" for="city_id">{{ __('translations.city') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step19">
-                                        <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
+                                        <select class="select2 browser-default" id="district_id" name="district_id">
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
-                                        <label class="active" for="district_id">{{ __('translations.subdistrict') }}</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step20">
-                                        <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">
-                                            <option value="">--{{ __('translations.select') }}--</option>
-                                        </select>
-                                        <label class="active" for="subdistrict_id">{{ __('translations.urban_village') }}</label>
+                                        <label class="active" for="district_id">{{ __('translations.district') }}</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -733,7 +726,7 @@
             activeSelect2.classList.remove('tab-active');
         }
     });
-    var city = [], district = [], subdistrict = [];
+    var city = [], district = [];
 
     $(function() {
         $("#table-detail th").resizable({
@@ -811,7 +804,7 @@
                     500);
                 }
                 M.updateTextFields();
-                $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
+                $('#province_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
                 $('#billing_address').empty().append(`
@@ -821,7 +814,6 @@
                     return null;
                 };
                 city = [];
-                subdistrict = [];
             }
         });
 
@@ -896,7 +888,7 @@
 
     function getOutletAddress(){
         if($('#outlet_id').val()){
-            $('#province_id,#subdistrict_id,#district_id,#city_id').empty();
+            $('#province_id,#district_id,#city_id').empty();
             $('#destination_address').val($('#outlet_id').select2('data')[0].address);
             $('#province_id').empty().append(`
                 <option value="` + $('#outlet_id').select2('data')[0].province_id + `">` + $('#outlet_id').select2('data')[0].province_name + `</option>
@@ -916,22 +908,13 @@
                 $.each($('#outlet_id').select2('data')[0].cities[index].district, function(i, value) {
                     let selected = '';
                     $('#district_id').append(`
-                        <option value="` + value.id + `" ` + (value.id == $('#outlet_id').select2('data')[0].district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                    `);
-                    if(value.id == $('#outlet_id').select2('data')[0].district_id){
-                        subdistrict = value.subdistrict;
-                    }
-                });
-
-                $.each(subdistrict, function(i, value) {
-                    $('#subdistrict_id').append(`
-                        <option value="` + value.id + `" ` + (value.id == $('#outlet_id').select2('data')[0].subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
+                        <option value="` + value.id + `" ` + (value.id == $('#outlet_id').select2('data')[0].district_id ? 'selected' : '') + `>` + value.name + `</option>
                     `);
                 });
             }
         }else{
             $('destination_address').val('');
-            $('#province_id,#subdistrict_id,#district_id,#city_id').empty().append(`
+            $('#province_id,#district_id,#city_id').empty().append(`
                 <option value="">--{{ __('translations.select') }}--</option>
             `);
         }
@@ -989,7 +972,7 @@
     }
 
     function getCity(){
-        $('#city_id,#subdistrict_id,#district_id').empty().append(`
+        $('#city_id,#district_id').empty().append(`
             <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#province_id').val()){
@@ -1002,12 +985,11 @@
         }else{
             city = [];
             district = [];
-            subdistrict = [];
         }
     }
 
     function getDistrict(){
-        $('#subdistrict_id,#district_id').empty().append(`
+        $('#district_id').empty().append(`
             <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#city_id').val()){
@@ -1021,42 +1003,11 @@
 
             $.each(city[index].district, function(i, value) {
                 $('#district_id').append(`
-                    <option value="` + value.id + `" data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                `);
-            });
-        }else{
-            district = [];
-            subdistrict = [];
-        }
-    }
-
-    function getSubdistrict(){
-        $('#subdistrict_id').empty().append(`
-            <option value="">--{{ __('translations.select') }}--</option>
-        `);
-        if($('#district_id').val()){
-            
-            let index = -1;
-
-            $.each(city, function(i, val) {
-                if(val.id == $('#city_id').val()){
-                    index = i;
-                }
-            });
-
-            $.each(city[index].district, function(i, value) {
-                if(value.id == $('#district_id').val()){
-                    subdistrict = value.subdistrict;
-                }
-            });
-
-            $.each(subdistrict, function(i, value) {
-                $('#subdistrict_id').append(`
                     <option value="` + value.id + `">` + value.name + `</option>
                 `);
             });
         }else{
-            subdistrict = [];
+            district = [];
         }
     }
     
@@ -1379,25 +1330,14 @@
             
             if($("#arr_item" + nil).select2('data')[0].price){
                 if($('#account_id').val() ){
-                    $("#rowPrice" + nil).val(price_f_pricelist);
-                    $("#arr_final_price" + nil).val(price_f_pricelist);
+                    $("#rowPrice" + nil).val(
+                        (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
+                    );
+                    $("#arr_final_price" + nil).val(
+                        (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
+                    );
                 }
             }
-            // if($("#arr_item" + nil).select2('data')[0].list_outletprice.length > 0){
-            //     if($('#account_id').val() && $('#outlet_id').val()){
-            //         let enough = false;
-            //         $.each($("#arr_item" + nil).select2('data')[0].list_outletprice, function(i, value) {
-            //             if(value.account_id == $('#account_id').val() && value.outlet_id == $('#outlet_id').val() && enough == false){
-            //                 $("#rowPrice" + nil).val(value.price);
-            //                 $("#rowDisc1" + nil).val(value.percent_discount_1);
-            //                 $("#rowDisc2" + nil).val(value.percent_discount_2);
-            //                 $("#rowDisc3" + nil).val(value.discount_3);
-            //                 $("#arr_final_price" + nil).val(value.final_price);
-            //                 enough = true;
-            //             }
-            //         });
-            //     }
-            // }
         }else{
             $('#arr_uom_unit' + nil).empty().append(`-`);
             $('#arr_qty_now' + nil).empty().append(`-`);
@@ -1451,7 +1391,7 @@
                             <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
                         </td>
                         <td class="center">
-                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
+                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                             <datalist id="tempPrice` + count + `"></datalist>
                         </td>
                     
@@ -1729,7 +1669,6 @@
                 { name: 'province_id', className: '' },
                 { name: 'city_id', className: '' },
                 { name: 'district_id', className: '' },
-                { name: 'subdistrict_id', className: '' },
                 { name: 'sales_id', className: '' },
                 { name: 'currency_id', className: '' },
                 { name: 'currency_rate', className: 'right-align' },
@@ -2018,7 +1957,7 @@
                 });
                 $('#destination_address').val(response.destination_address);
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
-                $('#subdistrict_id,#district_id,#city_id').empty().append(`
+                $('#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
                 $('#project_id').empty();
@@ -2043,16 +1982,7 @@
                     $.each(response.cities[index].district, function(i, value) {
                         let selected = '';
                         $('#district_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                        `);
-                        if(value.id == response.district_id){
-                            subdistrict = value.subdistrict;
-                        }
-                    });
-
-                    $.each(subdistrict, function(i, value) {
-                        $('#subdistrict_id').append(`
-                            <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
+                            <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + `>` + value.name + `</option>
                         `);
                     });
                 }
@@ -2091,7 +2021,7 @@
                                 <td class="center-align">
                                     <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                         @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -2108,7 +2038,7 @@
                                     <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
                                 </td>
                                 <td class="center">
-                                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`" readonly>
+                                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
                                 
@@ -2152,7 +2082,7 @@
                                 </td>
                             </tr>
                         `);
-                        $('#arr_place' + count).val(val.place_id);
+                        $('#arr_place' + count).val(val.place_code);
                         $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                         if(val.is_include_tax){
                             $('#arr_is_include_tax' + count).prop( "checked", true);
@@ -2535,11 +2465,6 @@
                     intro : 'Kecamatan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
                 },
                 {
-                    title : 'Kelurahan',
-                    element : document.querySelector('.step20'),
-                    intro : 'Kelurahan dimana barang ingin dikirimkan (berdasarkan alamat tujuan).' 
-                },
-                {
                     title : 'Tipe Pembayaran',
                     element : document.querySelector('.step21'),
                     intro : 'Tipe pembayaran SO. Untuk Cash, maka TOP Internal dan TOP Customer akan menjadi 0. Untuk, tipe Credit, maka TOP Internal dan TOP Customer bisa diedit.' 
@@ -2661,7 +2586,7 @@
                         });
                         $('#destination_address').val(response.destination_address);
                         $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
-                        $('#subdistrict_id,#district_id,#city_id').empty().append(`
+                        $('#district_id,#city_id').empty().append(`
                             <option value="">--{{ __('translations.select') }}--</option>
                         `);
                         $('#project_id').empty();
@@ -2686,16 +2611,7 @@
                             $.each(response.cities[index].district, function(i, value) {
                                 let selected = '';
                                 $('#district_id').append(`
-                                    <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + ` data-subdistrict='` + JSON.stringify(value.subdistrict) + `'>` + value.name + `</option>
-                                `);
-                                if(value.id == response.district_id){
-                                    subdistrict = value.subdistrict;
-                                }
-                            });
-
-                            $.each(subdistrict, function(i, value) {
-                                $('#subdistrict_id').append(`
-                                    <option value="` + value.id + `" ` + (value.id == response.subdistrict_id ? 'selected' : '') + `>` + value.name + `</option>
+                                    <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + `>` + value.name + `</option>
                                 `);
                             });
                         }

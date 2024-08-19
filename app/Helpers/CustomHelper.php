@@ -69,6 +69,7 @@ use App\Models\LandedCost;
 use App\Models\ItemCogs;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
+use App\Models\MarketingOrder;
 use App\Models\MaterialRequest;
 use App\Models\ProductionBatch;
 use App\Models\ProductionFgReceive;
@@ -237,6 +238,15 @@ class CustomHelper {
 		->whereHas('approvalTemplateOriginator',function($query){
 			$query->where('user_id',session('bo_id'));
 		})->get();
+
+		$underEbitda = false;
+
+		if($table_name == 'marketing_orders'){
+			$salesOrder = MarketingOrder::find($table_id);
+			if($salesOrder){
+				$underEbitda = $salesOrder->underEbitda();
+			}
+		}
 		
 		$count = 0;
 
@@ -441,6 +451,9 @@ class CustomHelper {
 			}
 
 			#if sales order disini ya
+			if($underEbitda){
+				$passed = true;
+			}
 
 			if($passed == true){
 				
@@ -6045,9 +6058,9 @@ class CustomHelper {
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				
 				/* ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
-				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				ResetCogsHelper::gas($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
 				self::accumulateCogs($row->date,$company_id,$place_id,$item_id);
+				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 				$row->delete();
 			}
 		}

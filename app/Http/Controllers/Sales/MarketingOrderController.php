@@ -323,7 +323,6 @@ class MarketingOrderController extends Controller
                     $val->province->name,
                     $val->city->name,
                     $val->district->name,
-                    $val->subdistrict->name,
                     $val->sales->name,
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
@@ -383,157 +382,148 @@ class MarketingOrderController extends Controller
     }
 
     public function create(Request $request){
-        
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-           /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
-             */'code_place_id'             => 'required',
-            'account_id' 				=> 'required',
-            'company_id'			    => 'required',
-            'type'			            => 'required',
-            'post_date'		            => 'required',
-            'valid_date'		        => 'required',
-            'type_delivery'             => 'required',
-            'sender_id'                 => 'required',
-            'delivery_date'             => 'required',
-            'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
+        /* DB::beginTransaction();
+        try { */
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+            /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
+                */'code_place_id'             => 'required',
+                'account_id' 				=> 'required',
+                'company_id'			    => 'required',
+                'type'			            => 'required',
+                'post_date'		            => 'required',
+                'valid_date'		        => 'required',
+                'type_delivery'             => 'required',
+                'sender_id'                 => 'required',
+                'delivery_date'             => 'required',
+                'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
+                
+                'billing_address'           => 'required',
+                'destination_address'       => 'required',
+                'province_id'               => 'required',
+                'city_id'                   => 'required',
+                'district_id'               => 'required',
+                'payment_type'              => 'required',
+                'top_internal'              => 'required',
+                'top_customer'              => 'required',
             
-            'billing_address'           => 'required',
-            'destination_address'       => 'required',
-            'province_id'               => 'required',
-            'city_id'                   => 'required',
-            'district_id'               => 'required',
-            'subdistrict_id'            => 'required',
-            'payment_type'              => 'required',
-            'top_internal'              => 'required',
-            'top_customer'              => 'required',
-           
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'percent_dp'                => 'required',
-            'sales_id'                  => 'required',
-            'arr_place'                 => 'required|array',
-            'arr_tax_nominal'           => 'required|array',
-            'arr_grandtotal'            => 'required|array',
-            'arr_item'                  => 'required|array',
-            'arr_unit'                  => 'required|array',
-            'arr_qty'                   => 'required|array',
-            'arr_price'                 => 'required|array',
-            'arr_margin'                => 'required|array',
-            'arr_tax'                   => 'required|array',
-            'arr_is_include_tax'        => 'required|array',
-            'arr_disc1'                 => 'required|array',
-            'arr_disc2'                 => 'required|array',
-            'arr_disc3'                 => 'required|array',
-            'arr_other_fee'             => 'required|array',
-            'arr_final_price'           => 'required|array',
-            'arr_total'                 => 'required|array',
-           
-            'discount'                  => 'required',
-            'total'                     => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-            'rounding'                  => 'required',
-            'total_after_tax'           => 'required',
-        ], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai', */
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            'account_id.required' 				=> 'Customer tidak boleh kosong.',
-            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-            'type.required' 			        => 'Tipe Penjualan tidak boleh kosong.',
-            'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-            'valid_date.required' 			    => 'Tanggal valid SO tidak boleh kosong.',
-            'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
-            'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
-            'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
-            'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
-         
-            'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
-            'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
-            'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
-            'city_id.required'                  => 'Kota tujuan tidak boleh kosong.',
-            'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
-            'subdistrict_id.required'           => 'Kelurahan tidak boleh kosong',
-            'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
-            'top_internal.required'             => 'TOP internal tidak boleh kosong.',
-            'top_customer.required'             => 'TOP customer tidak boleh kosong',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'percent_dp'                => 'required',
+                'sales_id'                  => 'required',
+                'arr_place'                 => 'required|array',
+                'arr_tax_nominal'           => 'required|array',
+                'arr_grandtotal'            => 'required|array',
+                'arr_item'                  => 'required|array',
+                'arr_unit'                  => 'required|array',
+                'arr_qty'                   => 'required|array',
+                'arr_price'                 => 'required|array',
+                'arr_tax'                   => 'required|array',
+                'arr_is_include_tax'        => 'required|array',
+                'arr_disc1'                 => 'required|array',
+                'arr_disc2'                 => 'required|array',
+                'arr_disc3'                 => 'required|array',
+                'arr_final_price'           => 'required|array',
+                'arr_total'                 => 'required|array',
             
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
-            'percent_dp.required'               => 'Prosentase DP tidak boleh kosong. Silahkan isi 0 jika memang tidak ada.',
-            'sales_id.required'                 => 'Sales tidak boleh kosong',
-            'arr_place.required'                => 'Plant tidak boleh kosong.',
-            'arr_place.array'                   => 'Plant harus array.',
-            'arr_tax_nominal.required'          => 'Tax nominal tidak boleh kosong.',
-            'arr_tax_nominal.array'             => 'Tax nominal harus array.',
-            'arr_grandtotal.required'           => 'Grantotal baris tidak boleh kosong.',
-            'arr_grandtotal.array'              => 'Grandtotal baris harus array.',
-            'arr_item.required'                 => 'Item baris tidak boleh kosong.',
-            'arr_item.array'                    => 'item baris harus array.',
-            'arr_unit.required'                 => 'Satuan tidak boleh kosong.',
-            'arr_unit.array'                    => 'Satuan harus array.',
-            'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
-            'arr_qty.array'                     => 'Baris qty harus array.',
-            'arr_price.required'                => 'Baris harga tidak boleh kosong.',
-            'arr_price.array'                   => 'Baris harga harus array.',
-            'arr_margin.required'               => 'Harga margin tidak boleh kosong.',
-            'arr_margin.array'                  => 'Harga margin baris harus array.',
-            'arr_tax.required'                  => 'Baris pajak tidak boleh kosong.',
-            'arr_tax.array'                     => 'Baris pajak harus array.',
-            'arr_is_include_tax.required'       => 'Baris termasuk pajak tidak boleh kosong.',
-            'arr_is_include_tax.array'          => 'Baris termasuk pajak harus array.',
-            'arr_disc1.required'                => 'Baris diskon 1 tidak boleh kosong.',
-            'arr_disc1.array'                   => 'Baris diskon 1 harus array.',
-            'arr_disc2.required'                => 'Baris diskon 2 tidak boleh kosong.',
-            'arr_disc2.array'                   => 'Baris diskon 2 harus array.',
-            'arr_disc3.required'                => 'Baris diskon 3 tidak boleh kosong.',
-            'arr_disc3.array'                   => 'Baris diskon 3 harus array.',
-            'arr_other_fee.required'            => 'Baris biaya lain tidak boleh kosong.',
-            'arr_other_fee.array'               => 'Baris biaya lain harus array.',
-            'arr_final_price.required'          => 'Baris harga akhir tidak boleh kosong.',
-            'arr_final_price.array'             => 'Baris harga akhir harus array.',
-            'arr_total.required'                => 'Baris total tidak boleh kosong.',
-            'arr_total.array'                   => 'Baris total harus array.',
-            'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
-          
-            'total.required'                    => 'Total tidak boleh kosong.',
-            'tax.required'                      => 'PPN tidak boleh kosong.',
-            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
-            'rounding.required'                 => 'Rounding tidak boleh kosong.',
-            'total_after_tax.required'          => 'Total setelah pajak tidak boleh kosong.'
-        ]);
+                'discount'                  => 'required',
+                'total'                     => 'required',
+                'tax'                       => 'required',
+                'grandtotal'                => 'required',
+                'rounding'                  => 'required',
+                'total_after_tax'           => 'required',
+            ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                /* 'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.unique'                       => 'Kode telah dipakai', */
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                'account_id.required' 				=> 'Customer tidak boleh kosong.',
+                'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+                'type.required' 			        => 'Tipe Penjualan tidak boleh kosong.',
+                'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
+                'valid_date.required' 			    => 'Tanggal valid SO tidak boleh kosong.',
+                'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
+                'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
+                'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
+                'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
+            
+                'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
+                'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
+                'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
+                'city_id.required'                  => 'Kota tujuan tidak boleh kosong.',
+                'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
+                'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
+                'top_internal.required'             => 'TOP internal tidak boleh kosong.',
+                'top_customer.required'             => 'TOP customer tidak boleh kosong',
+                
+                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                'currency_rate.required'            => 'Konversi mata uang tidak boleh kosong.',
+                'percent_dp.required'               => 'Prosentase DP tidak boleh kosong. Silahkan isi 0 jika memang tidak ada.',
+                'sales_id.required'                 => 'Sales tidak boleh kosong',
+                'arr_place.required'                => 'Plant tidak boleh kosong.',
+                'arr_place.array'                   => 'Plant harus array.',
+                'arr_tax_nominal.required'          => 'Tax nominal tidak boleh kosong.',
+                'arr_tax_nominal.array'             => 'Tax nominal harus array.',
+                'arr_grandtotal.required'           => 'Grantotal baris tidak boleh kosong.',
+                'arr_grandtotal.array'              => 'Grandtotal baris harus array.',
+                'arr_item.required'                 => 'Item baris tidak boleh kosong.',
+                'arr_item.array'                    => 'item baris harus array.',
+                'arr_unit.required'                 => 'Satuan tidak boleh kosong.',
+                'arr_unit.array'                    => 'Satuan harus array.',
+                'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
+                'arr_qty.array'                     => 'Baris qty harus array.',
+                'arr_price.required'                => 'Baris harga tidak boleh kosong.',
+                'arr_price.array'                   => 'Baris harga harus array.',
+                'arr_tax.required'                  => 'Baris pajak tidak boleh kosong.',
+                'arr_tax.array'                     => 'Baris pajak harus array.',
+                'arr_is_include_tax.required'       => 'Baris termasuk pajak tidak boleh kosong.',
+                'arr_is_include_tax.array'          => 'Baris termasuk pajak harus array.',
+                'arr_disc1.required'                => 'Baris diskon 1 tidak boleh kosong.',
+                'arr_disc1.array'                   => 'Baris diskon 1 harus array.',
+                'arr_disc2.required'                => 'Baris diskon 2 tidak boleh kosong.',
+                'arr_disc2.array'                   => 'Baris diskon 2 harus array.',
+                'arr_disc3.required'                => 'Baris diskon 3 tidak boleh kosong.',
+                'arr_disc3.array'                   => 'Baris diskon 3 harus array.',
+                'arr_final_price.required'          => 'Baris harga akhir tidak boleh kosong.',
+                'arr_final_price.array'             => 'Baris harga akhir harus array.',
+                'arr_total.required'                => 'Baris total tidak boleh kosong.',
+                'arr_total.array'                   => 'Baris total harus array.',
+                'discount.required'                 => 'Diskon akhir tidak boleh kosong.',
+            
+                'total.required'                    => 'Total tidak boleh kosong.',
+                'tax.required'                      => 'PPN tidak boleh kosong.',
+                'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
+                'rounding.required'                 => 'Rounding tidak boleh kosong.',
+                'total_after_tax.required'          => 'Total setelah pajak tidak boleh kosong.'
+            ]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
 
-            $passedZero = true;
-            if($request->arr_price){
-                foreach($request->arr_price as $row){
-                    if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
-                        $passedZero = false;
+                $passedZero = true;
+                if($request->arr_price){
+                    foreach($request->arr_price as $row){
+                        if(floatval(str_replace(',','.',str_replace('.','',$row))) == 0){
+                            $passedZero = false;
+                        }
+                    }
+
+                    if(!$passedZero){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Harga item tidak boleh 0.'
+                        ]);
                     }
                 }
 
-                if(!$passedZero){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Harga item tidak boleh 0.'
-                    ]);
-                }
-            }
-
-            $userData = UserData::find($request->billing_address);
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                $userData = UserData::find($request->billing_address);
+                
+                if($request->temp){
                     $query = MarketingOrder::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -601,14 +591,13 @@ class MarketingOrderController extends Controller
                         $query->province_id = $request->province_id;
                         $query->city_id = $request->city_id;
                         $query->district_id = $request->district_id;
-                        $query->subdistrict_id = $request->subdistrict_id;
                         $query->sales_id = $request->sales_id;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
-                       
+                    
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
@@ -623,20 +612,13 @@ class MarketingOrderController extends Controller
                         foreach($query->marketingOrderDetail as $row){
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status sales order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status sales order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrder::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -666,7 +648,6 @@ class MarketingOrderController extends Controller
                         'province_id'               => $request->province_id,
                         'city_id'                   => $request->city_id,
                         'district_id'               => $request->district_id,
-                        'subdistrict_id'            => $request->subdistrict_id,
                         'sales_id'                  => $request->sales_id,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
@@ -683,20 +664,13 @@ class MarketingOrderController extends Controller
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'status'                    => '1',
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
-
-                DB::beginTransaction();
-                try {
-                    
+                
+                if($query) {
+                        
                     foreach($request->arr_item as $key => $row){
                         $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
+                        $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
                         
                         MarketingOrderDetail::create([
                             'marketing_order_id'            => $query->id,
@@ -705,48 +679,46 @@ class MarketingOrderController extends Controller
                             'item_unit_id'                  => $itemUnit->id,
                             'qty_conversion'                => $itemUnit->conversion,
                             'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'margin'                        => str_replace(',','.',str_replace('.','',$request->arr_margin[$key])),
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
                             'percent_tax'                   => $request->arr_tax[$key],
                             'tax_id'                        => $request->arr_tax_id[$key],
                             'percent_discount_1'            => str_replace(',','.',str_replace('.','',$request->arr_disc1[$key])),
                             'percent_discount_2'            => str_replace(',','.',str_replace('.','',$request->arr_disc2[$key])),
                             'discount_3'                    => str_replace(',','.',str_replace('.','',$request->arr_disc3[$key])),
-                            'other_fee'                     => str_replace(',','.',str_replace('.','',$request->arr_other_fee[$key])),
                             'price_after_discount'          => str_replace(',','.',str_replace('.','',$request->arr_final_price[$key])),
                             'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'tax'                           => $request->arr_tax_nominal[$key],
                             'grandtotal'                    => $request->arr_grandtotal[$key],
                             'note'                          => $request->arr_note[$key] ?? NULL,
-                            'place_id'                      => $request->arr_place[$key],
+                            'place_id'                      => $codePlace->id,
                         ]);
                     }
 
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new MarketingOrder())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit sales order.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Sales Order No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
-
-                activity()
-                    ->performedOn(new MarketingOrder())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit sales order.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+            /* DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        } */
 
 		return response()->json($response);
     }
@@ -796,6 +768,7 @@ class MarketingOrderController extends Controller
                 'grandtotal'            => $row->grandtotal,
                 'note'                  => $row->note,
                 'place_id'              => $row->place_id,
+                'place_code'            => $row->place->code,
                 'item_unit_id'          => $row->item_unit_id,
                 'sell_units'            => $row->item->arrSellUnits(),
                 'uom'                   => $row->item->uomUnit->code,
@@ -839,7 +812,7 @@ class MarketingOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="15">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -847,33 +820,27 @@ class MarketingOrderController extends Controller
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Harga</th>
-                                <th class="center-align">Margin</th>
                                 <th class="center-align">Discount 1 (%)</th>
                                 <th class="center-align">Discount 2 (%)</th>
                                 <th class="center-align">Discount 3 (Rp)</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Plant</th>
-                                <th class="center-align">Biaya lain2</th>
                                 <th class="center-align">Harga Final</th>
                                 <th class="center-align">Total</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
-        $totalmargin=0;
         $totaldiskon1=0;
         $totaldiskon2=0;
         $totaldiskon3=0;
-        $totalother=0;
         $totalpriceafterdiscount=0;
         $totals=0;
         
         foreach($data->marketingOrderDetail as $key => $row){
             $totalqty+=$row->qty;
-            $totalmargin+=$row->margin;
             $totaldiskon1+=$row->percent_discount_1;
             $totaldiskon2+=$row->percent_discount_2;
             $totaldiskon3+=$row->discount3;
-            $totalother+=$row->other_fee;
             $totalpriceafterdiscount+=$row->price_after_discount;
             $totals+=$row->total;
             $string .= '<tr>
@@ -882,13 +849,11 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->margin,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->discount_3,2,',','.').'</td>
                 <td class="">'.$row->note.'</td>
                 <td class="center-align">'.$row->place->code.'</td>
-                <td class="right-align">'.number_format($row->other_fee,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->price_after_discount,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
             </tr>';
@@ -897,12 +862,10 @@ class MarketingOrderController extends Controller
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalmargin, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon1, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon2, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon3, 2, ',', '.') . '</td>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalother, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpriceafterdiscount, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
             </tr>  
@@ -910,27 +873,19 @@ class MarketingOrderController extends Controller
 
         $string .= '
                     <tr>
-                        <td class="right-align" colspan="13">Diskon</td>
-                        <td class="right-align">'.number_format($data->discount,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13">Total</td>
+                        <td class="right-align" colspan="11">Total</td>
                         <td class="right-align">'.number_format($data->total,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="13">PPN</td>
+                        <td class="right-align" colspan="11">PPN</td>
                         <td class="right-align">'.number_format($data->tax,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="13">Total Setelah PPN</td>
+                        <td class="right-align" colspan="11">Total Setelah PPN</td>
                         <td class="right-align">'.number_format($data->total_after_tax,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="13">Rounding</td>
-                        <td class="right-align">'.number_format($data->rounding,2,',','.').'</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="13" style="font-size:20px !important;"><b>Grandtotal</b></td>
+                        <td class="right-align" colspan="11" style="font-size:20px !important;"><b>Grandtotal</b></td>
                         <td class="right-align" style="font-size:20px !important;"><b>'.number_format($data->grandtotal,2,',','.').'</b></td>
                     </tr>';
         

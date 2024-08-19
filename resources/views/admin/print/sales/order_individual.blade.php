@@ -300,7 +300,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->destination_address.', '.ucwords(strtolower($data->subdistrict->name.' - '.$data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
+                                            {{ $data->destination_address.', '.ucwords(strtolower($data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -331,7 +331,7 @@
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->itemUnit->unit->code }}</td>
-                                    <td align="right">{{ number_format($row->price - $row->margin,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->percent_discount_1,2,',','.') }}%</td>
                                     <td align="right">{{ number_format($row->percent_discount_2,2,',','.') }}%</td>
                                     <td align="right">{{ number_format($row->discount_3,2,',','.') }}</td>

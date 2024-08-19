@@ -706,6 +706,10 @@ class ItemController extends Controller
                                 <th>Brand</th>
                                 <th>'.($data->brand()->exists() ? $data->brand->code.'-'.$data->brand->name : '-').'</th>
                             </tr>
+                            <tr>
+                                <th>Bom Calculator</th>
+                                <th>'.($data->bomCalculator()->exists() ? $data->bomCalculator->name.'-'.$data->bomCalculator->note : '-').'</th>
+                            </tr>
                         </thead>
                     </table>';
 		

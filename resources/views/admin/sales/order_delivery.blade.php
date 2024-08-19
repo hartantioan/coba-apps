@@ -262,6 +262,7 @@
                                                         <th class="center">{{ __('translations.stock') }}</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
+                                                        <th class="center">{{ __('translations.warehouse') }}</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
@@ -730,14 +731,14 @@ document.addEventListener('focusin', function (event) {
 
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
-                                
+                                console.log(val);
                                 $('#body-item').append(`
                                     <tr class="row_item" data-id="` + response.id + `">
                                         <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + $('#marketing_order_id').val() + `">
                                         <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                        <td rowspan="2" id="row-main` + count + `">
+                                        <td rowspan="1" id="row-main` + count + `">
                                             ` + no + `
                                         </td>
                                         <td>
@@ -756,6 +757,9 @@ document.addEventListener('focusin', function (event) {
                                             <span id="arr_unit` + count + `">` + val.unit + `</span>
                                         </td>
                                         <td>
+                                            <span class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">` + val.warehouse + `</span>
+                                        </td>
+                                        <td>
                                             <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                         </td>
                                         <td class="center">
@@ -764,30 +768,8 @@ document.addEventListener('focusin', function (event) {
                                             </a>
                                         </td>
                                     </tr>
-                                    <tr class="btn_stock" data-id="` + response.id + `">
-                                        <td>
-                                            <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.qty_conversion + `');" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Tambah Asal Item
-                                            </a>
-                                        </td>
-                                        <td colspan="6">
-                                            <table class="bordered" id="table-detail-source` + count + `">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Asal Plant, Gudang, Area, Shading</th>
-                                                        <th>Qty Akan Dikirim (satuan jual)</th>
-                                                        <th>{{ __('translations.delete') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-detail-source` + count + `">
-                                                    <tr id="empty-detail-source` + count + `">
-                                                        <td class="center-align" colspan="3">Data sumber belum ditambahkan.</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
                                 `);
+                               
                                 no++;
                             });
                         }
@@ -1352,6 +1334,19 @@ document.addEventListener('focusin', function (event) {
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var account_id = $('#filter_account').val();
+        var company = $('#filter_company').val();
+        var marketing_order = $('#filter_marketing_order').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account_id=" + account_id + "&company=" + company + "&marketing_order=" + marketing_order + "&end_date=" + end_date + "&start_date=" + start_date ;
+       
+    }
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -1598,12 +1593,14 @@ document.addEventListener('focusin', function (event) {
                     let no = 1;
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        console.log(val);
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + val.mo + `">
+                                <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + val.id + `">
                                 <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                 <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
                                 <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
-                                <td rowspan="2" id="row-main` + count + `">
+                                <td rowspan="1" id="row-main` + count + `">
                                     ` + no + `
                                 </td>
                                 <td>
@@ -1622,6 +1619,9 @@ document.addEventListener('focusin', function (event) {
                                     <span id="arr_unit` + count + `">` + val.unit + `</span>
                                 </td>
                                 <td>
+                                    <span class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">` + val.warehouse + `</span>
+                                </td>
+                                <td>
                                     <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
                                 </td>
                                 <td class="center">
@@ -1630,31 +1630,9 @@ document.addEventListener('focusin', function (event) {
                                     </a>
                                 </td>
                             </tr>
-                            <tr class="btn_stock" data-id="` + val.mo + `">
-                                <td>
-                                    <a class="waves-effect waves-light blue btn-small" onclick="addSource('` + count + `',` + val.id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');" href="javascript:void(0);">
-                                        <i class="material-icons left">add</i> Tambah Asal Item
-                                    </a>
-                                </td>
-                                <td colspan="6">
-                                    <table class="bordered" id="table-detail-source` + count + `">
-                                        <thead>
-                                            <tr>
-                                                <th>Asal Plant, Gudang, Area, Shading</th>
-                                                <th>Qty Akan Dikirim (satuan jual)</th>
-                                                <th>{{ __('translations.delete') }}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-detail-source` + count + `">
-                                            <tr id="empty-detail-source` + count + `">
-                                                <td class="center-align" colspan="3">Data sumber belum ditambahkan.</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
                         `);
 
+                        
                         $.each(val.detail_stock, function(j, value) {
                             var count2 = makeid(10);
                             if($('#empty-detail-source' + count).length > 0){

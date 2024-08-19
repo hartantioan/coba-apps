@@ -286,26 +286,6 @@
                                 <tr>
                                     <td colspan="5">Keterangan: {{ $row->note }}</td>
                                 </tr>
-                                <tr>
-                                    <td colspan="5">
-                                        <table border="1" style="border-collapse:collapse">
-                                            <thead>
-                                                <tr>
-                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Asal Plant - Gudang - Area - Shading</th>
-                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Kirim</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($row->marketingOrderDeliveryStock as $rowdetail)
-                                                    <tr>
-                                                        <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '') }}</td>
-                                                        <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </td>
-                                </tr>
                                 @endforeach
                             </tbody>
                         </table>

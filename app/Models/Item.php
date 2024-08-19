@@ -175,6 +175,11 @@ class Item extends Model
         return $warehouse->warehouse_id;
     }
 
+    public function warehouseName(){
+        $warehouse = $this->itemGroup->itemGroupWarehouse()->first();
+        return $warehouse->warehouse->name;
+    }
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="gradient-45deg-green-teal medium-small white-text padding-3">Active</span>',

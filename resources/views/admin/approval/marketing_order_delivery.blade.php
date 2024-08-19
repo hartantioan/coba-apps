@@ -228,26 +228,7 @@
                     <tr>
                         <td colspan="5">{{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
-                    <tr>
-                        <td colspan="4">
-                            <table class="striped">
-                                <thead>
-                                    <tr>
-                                        <th class="center-align">{{ __('translations.plant_origin-warehouse-area-shading') }}</th>
-                                        <th class="center-align">{{ __('translations.qty_sent') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($row->marketingOrderDeliveryStock as $rowdetail)
-                                        <tr>
-                                            <td>{{ $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '') }}</td>
-                                            <td class="right-align">{{ CustomHelper::formatConditionalQty($rowdetail->qty) }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
+                    
                     @endforeach
                     <tr>
                         <td colspan="6">

@@ -1,10 +1,12 @@
 <?php
 
 namespace App\Http\Controllers\Sales;
+use App\Exports\ExportTransactionPageOrderDelivery;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\ItemStock;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
@@ -139,6 +141,10 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
+
+                if($request->marketing_order_id){
+                    $query->whereIn('marketing_order_id',$request->marketing_order_id);
+                }
                 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
@@ -190,6 +196,10 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
+
+                if($request->marketing_order_id){
+                    $query->whereIn('marketing_order_id',$request->marketing_order_id);
+                }
                 
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
@@ -224,7 +234,7 @@ class MarketingOrderDeliveryController extends Controller
                     $val->user->name,
                     $val->company->name,
                     $val->account->name,
-                    $val->customer->name,
+                    $val->customer->name ?? '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->note_internal,
@@ -293,6 +303,7 @@ class MarketingOrderDeliveryController extends Controller
                         'item_name'     => $row->item->code.' - '.$row->item->name,
                         'place_id'      => $row->place_id,
                         'place_name'    => $row->place->code,
+                        'warehouse'     => $row->item->warehouseName(),
                         'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlaceWithUnsentSales($row->place_id) / $row->qty_conversion,3)),
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
                         'unit'          => $row->itemUnit->unit->code,
@@ -310,6 +321,18 @@ class MarketingOrderDeliveryController extends Controller
         }
 
         return response()->json($data);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $account_id = $request->account_id? $request->account_id : '';
+        $company = $request->company ? $request->company : '';
+        $marketing_order = $request->marketing_order ? $request->marketing_order:'';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageOrderDelivery($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'marketing_order_delivery_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){
@@ -333,7 +356,6 @@ class MarketingOrderDeliveryController extends Controller
             'delivery_date'		        => 'required',
             'arr_modi'                  => 'required|array',
             'arr_item'                  => 'required|array',
-            'arr_item_stock'            => 'required|array',
             'arr_place'                 => 'required|array',
             'arr_qty'                   => 'required|array',
         ], [
@@ -351,8 +373,6 @@ class MarketingOrderDeliveryController extends Controller
             'arr_modi.array'                    => 'Data detail sales order harus array.',
             'arr_item.required'                 => 'Item baris tidak boleh kosong.',
             'arr_item.array'                    => 'item baris harus array.',
-            'arr_item_stock.required'           => 'Stok item tidak boleh kosong.',
-            'arr_item_stock.array'              => 'Stok item harus array.',
             'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
             'arr_qty.array'                     => 'Baris qty harus array.',
             'arr_place.required'                => 'Baris plant tidak boleh kosong.',
@@ -379,15 +399,15 @@ class MarketingOrderDeliveryController extends Controller
             $grandtotalUnsentModDp = $user->grandtotalUnsentModDp();
             $grandtotalUnsentDoCredit = $user->grandtotalUninvoiceDoCredit();
             $grandtotalUnsentDoDp = $user->grandtotalUninvoiceDoDp();
-
+           
             $arrmo = array_unique($request->arr_mo);
-
+            
             $total = 0;
             $tax = 0;
             $grandtotal = 0;
             $totalCredit = 0;
             $totalDp = 0;
-            
+
             foreach($arrmo as $rowmo){
                 $cekmo = MarketingOrder::find($rowmo);
 
@@ -431,81 +451,14 @@ class MarketingOrderDeliveryController extends Controller
                 $passedCreditLimit = false;
             }
 
-            $errorMessage = [];
+            
 
-            if($request->arr_modi){
-                foreach($request->arr_modi as $key => $row){
-                    $qtysell = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])));
-                    $qtystock = 0;
-                    foreach($request->arr_stock_id as $key2 => $rowstock){
-                        if($rowstock == $row){
-                            $qtystock += floatval(str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key2])));
-                        }
-                    }
-                    if($qtystock < $qtysell){
-                        $passedQty = false;
-                    }
-                    if($qtystock > $qtysell){
-                        $passedSentMore = false;
-                    }
-                }
-
-                if(!$passedQty){
-                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kurang dari stok saat ini';
-                }
-
-                if(!$passedSentMore){
-                    $errorMessage[] = 'Salah satu / lebih item memiliki qty kirim lebih besar dari pesanan';
-                }
-            }
-
-            $passedStock = true;
-            $arrStock = [];
-
-            if($request->arr_item_stock){
-                foreach($request->arr_item_stock as $key => $row){
-                    $index = -1;
-                    foreach($arrStock as $key2 => $rowstock){
-                        if($rowstock['item_stock_id'] == $row){
-                            $index = $key2;
-                        }
-                    }
-                    if($index >= 0){
-                        $arrStock[$index]['qty'] += str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key]));
-                    }else{
-                        $arrStock[] = [
-                            'item_stock_id' => $row,
-                            'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key])),
-                            'conversion'    => str_replace(',','.',str_replace('.','',$request->arr_stock_conversion[$key])),
-                        ];
-                    }
-                }
-            }
-
-            foreach($arrStock as $rowstock){
-                $itemstock = ItemStock::find($rowstock['item_stock_id']);
-                if($itemstock){
-                    $qtyconversion = $rowstock['qty'] * $rowstock['conversion'];
-                    $stock = $itemstock->balanceWithUnsent();
-                    if($stock < $qtyconversion){
-                        $errorMessage[] = 'Item '.$itemstock->item->code.' - '.$itemstock->item->name.' kurang dari stok. Kebutuhan '.CustomHelper::formatConditionalQty($qtyconversion).' sedangkan stok '.CustomHelper::formatConditionalQty($stock);
-                    }
-                }
-            }
-
-            if(count($errorMessage) > 0){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => implode('. ',$errorMessage)
-                ]);
-            }
-
-            if(!$passedCreditLimit){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
-                ]);
-            }
+            // if(!$passedCreditLimit){
+            //     return response()->json([
+            //         'status'  => 500,
+            //         'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
+            //     ]);
+            // }
             
 			if($request->temp){
                 DB::beginTransaction();
@@ -557,11 +510,7 @@ class MarketingOrderDeliveryController extends Controller
 
                         $query->save();
                         
-                        foreach($query->marketingOrderDeliveryDetail as $row){
-                            $row->marketingOrderDeliveryStock()->delete();
-                            $row->delete();
-                        }
-
+            
                         DB::commit();
                     }else{
                         return response()->json([
@@ -574,7 +523,7 @@ class MarketingOrderDeliveryController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                try {
+          
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDelivery::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -593,13 +542,13 @@ class MarketingOrderDeliveryController extends Controller
                     ]);
 
                     DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
+                
 			}
 			
 			if($query) {
-
+                foreach($query->marketingOrderDeliveryDetail as $row){
+                    $row->delete();
+                }
                 DB::beginTransaction();
                 try {
                     
@@ -612,16 +561,7 @@ class MarketingOrderDeliveryController extends Controller
                             'note'                          => $request->arr_note[$key],
                             'place_id'                      => $request->arr_place[$key],
                         ]);
-                        foreach($request->arr_stock_id as $key2 => $rowstock){
-                            if($rowstock == $row){
-                                $querydetail2 = MarketingOrderDeliveryStock::create([
-                                    'marketing_order_delivery_detail_id'    => $querydetail->id,
-                                    'marketing_order_detail_id'             => $row,
-                                    'item_stock_id'                         => $request->arr_item_stock[$key2],
-                                    'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty_source[$key2])),
-                                ]);
-                            }
-                        }
+                        
                     }
 
                     DB::commit();
@@ -666,21 +606,13 @@ class MarketingOrderDeliveryController extends Controller
         foreach($po->marketingOrderDeliveryDetail as $row){
             $arrstock = [];
 
-            foreach($row->marketingOrderDeliveryStock as $rowstock){
-                $arrstock[] = [
-                    'item_stock_id'     => $rowstock->item_stock_id,
-                    'item_stock_name'   => $rowstock->itemStock->place->code.' &#9830; Gudang : '.$rowstock->itemStock->warehouse->name.' &#9830; Area : '.($rowstock->itemStock->area()->exists() ? $rowstock->itemStock->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($rowstock->itemStock->qty).' '.$rowstock->itemStock->item->uomUnit->code.' &#9830; Shading : '.($rowstock->itemStock->itemShading()->exists() ? $rowstock->itemStock->itemShading->code : '-'),
-                    'qty'               => CustomHelper::formatConditionalQty($rowstock->qty),
-                    'qty_stock'         => CustomHelper::formatConditionalQty(($rowstock->itemStock->qty / $row->marketingOrderDetail->qty_conversion)),
-                ];
-            }
-
             $arr[] = [
                 'so_no'                 => $row->marketingOrderDetail->marketingOrder->code,
                 'mo'                    => $row->marketingOrderDetail->marketing_order_id,
                 'id'                    => $row->marketing_order_detail_id,
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
+                'warehouse'             => $row->item->warehouseName(),
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'qty_original'          => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty),
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,

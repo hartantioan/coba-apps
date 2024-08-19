@@ -75,10 +75,6 @@ class MarketingOrderDeliveryDetail extends Model
         });
     }
 
-    public function marketingOrderDeliveryStock(){
-        return $this->hasMany('App\Models\MarketingOrderDeliveryStock');
-    }
-
     public function balanceInvoice(){
         $qtytotal = $this->qty - $this->qtyReturn();
 

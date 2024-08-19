@@ -2388,6 +2388,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('create',[MarketingOrderDeliveryController::class, 'create'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::post('update_send_status',[MarketingOrderDeliveryController::class, 'updateSendStatus'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::get('approval/{id}',[MarketingOrderDeliveryController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('export_from_page',[MarketingOrderDeliveryController::class, 'exportFromTransactionPage']);
                     Route::get('print_individual/{id}',[MarketingOrderDeliveryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryController::class, 'voidStatus'])->middleware('operation.access:marketing_order_delivery,void');
                     Route::post('destroy', [MarketingOrderDeliveryController::class, 'destroy'])->middleware('operation.access:marketing_order_delivery,delete');

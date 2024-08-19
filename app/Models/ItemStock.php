@@ -90,19 +90,9 @@ class ItemStock extends Model
         });
     }
 
-    public function marketingOrderDeliveryStockNotSent(){
-        return $this->hasMany('App\Models\MarketingOrderDeliveryStock','item_stock_id','id')->whereHas('marketingOrderDeliveryDetail',function($query){
-            $query->whereHas('marketingOrderDelivery',function($query){
-                $query->whereIn('status',['1','2','3'])->whereDoesntHave('marketingOrderDeliveryProcess');
-            });
-        });
-    }
-
     public function balanceWithUnsent(){
         $balance = $this->qty;
-        foreach($this->marketingOrderDeliveryStockNotSent as $row){
-            $balance -= round($row->qty * $row->marketingOrderDetail->qty_conversion,3);
-        }
+        
         return $balance;
     }
 

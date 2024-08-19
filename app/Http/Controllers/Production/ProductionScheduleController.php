@@ -1192,7 +1192,7 @@ class ProductionScheduleController extends Controller
         }else{
             return response()->json([
                 'status'    => 500,
-                'message'   => 'Dokumen no. '.$mop->used->lookable->code.' telah dipakai di '.$mop->used->ref.', oleh '.$mop->used->user->name.'.'
+                'message'   => 'error'
             ]);
         }
     }

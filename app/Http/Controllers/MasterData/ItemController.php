@@ -368,17 +368,16 @@ class ItemController extends Controller
                     if($request->bom_calculator_id){
                         $bomCalculator = BomCalculator::find($request->bom_calculator_id);
                         if($bomCalculator){
-                            if($bomCalculator->status !== '2'){
+                            if($bomCalculator->item()->exists()){
                                 $passedBomCalculator = false;
                             }
+                            if(!$passedBomCalculator){
+                                return response()->json([
+                                    'status'  => 500,
+                                    'message' => 'Bom Calculator telah selesai dan dipakai pada produk lain '.$bomCalculator->item->code.' - '.$bomCalculator->item->name,
+                                ]);
+                            }
                         }
-                    }
-
-                    if(!$passedBomCalculator){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Bom Calculator telah selesai dan dipakai pada produk lain.'
-                        ]);
                     }
 
                     $query = Item::create([

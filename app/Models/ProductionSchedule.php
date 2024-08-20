@@ -243,4 +243,19 @@ class ProductionSchedule extends Model
                     ->log('Add / edit production order from production schedule approval.');
         }
     }
+
+    public function listMOP(){
+        $arr = [];
+        if($this->productionScheduleTarget()->exists()){
+            foreach($this->productionScheduleTarget as $row_taget){
+                $arr []= $row_taget->marketingOrderPlanDetail->marketingOrderPlan->code;
+            }
+            $arr = array_unique($arr);
+            $string = implode(',', $arr);
+            return $string;
+        }else{
+            $string = '-';
+            return $string;
+        }
+    }
 }

@@ -349,6 +349,7 @@
                                     <th class="center">Referensi</th>
                                     <th class="center">{{ __('translations.type') }}</th>
                                     <th class="center">Tgl.Tenggat</th>
+                                    <th class="center">Invoice Vendor</th>
                                     <th class="center">{{ __('translations.note') }}</th>
                                     <th class="center">Bayar</th>
                                 </tr>
@@ -362,6 +363,7 @@
                                     <td>{{ $row->getCode() }}</td>
                                     <td align="center">{{ $row->type() }}</td>
                                     <td align="center">{{ $row->purchaseInvoice() ? date('d/m/Y',strtotime($row->lookable->due_date)) : '-' }}</td>
+                                    <td align="center">{{ $row->vendor() }}</td>
                                     <td>{{ $row->note }}</td>
                                     <td align="right" style="font-family: Arial, Helvetica, sans-serif">{{ $data->currency->code.number_format($row->nominal,2,',','.') }}</td>
                                 </tr>

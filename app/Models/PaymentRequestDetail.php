@@ -153,6 +153,15 @@ class PaymentRequestDetail extends Model
           return $type;
     }
 
+    public function vendor(){
+        $type = match ($this->lookable_type) {
+            'purchase_invoices'         => $this->lookable->invoice_no,
+            default                     => '-',
+          };
+  
+          return $type;
+    }
+
     public function getAccountCode(){
         $code = match ($this->lookable_type) {
             'fund_requests'             => $this->lookable->account->employee_no,

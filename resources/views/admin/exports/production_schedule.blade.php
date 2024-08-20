@@ -59,10 +59,10 @@
                     <td>{{ $row_detail->note }}</td>
                     <td>{{ $row_detail->qty }}</td>
                     <td>{{ $row_detail->item->uomUnit->code }}</td>
-                    <td>{{ date('d/m/Y',strtotime($row->production_date)) }}</td>
+                    <td>{{ date('d/m/Y',strtotime($row_detail->production_date)) }}</td>
                     <td>{{ $row_detail->warehouse->name }}</td>
                     <td>{{ ($row_detail->line()->exists() ? $row_detail->line->code : '-') }}</td>
-                    <td>{{ ($row_detail->marketingOrderPlanDetail()->exists() ? $row_detail->marketingOrderPlanDetail->marketingOrderPlan->code : '-') }}</td>
+                    <td>{{ ($row->listMOP()) }}</td>
                 </tr>
                 @php
                     $no++;

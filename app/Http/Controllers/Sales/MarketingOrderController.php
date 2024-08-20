@@ -418,6 +418,7 @@ class MarketingOrderController extends Controller
                 'arr_item'                  => 'required|array',
                 'arr_unit'                  => 'required|array',
                 'arr_qty'                   => 'required|array',
+                'arr_qty_uom'               => 'required|array',
                 'arr_price'                 => 'required|array',
                 'arr_tax'                   => 'required|array',
                 'arr_is_include_tax'        => 'required|array',
@@ -474,6 +475,8 @@ class MarketingOrderController extends Controller
                 'arr_unit.array'                    => 'Satuan harus array.',
                 'arr_qty.required'                  => 'Baris qty tidak boleh kosong.',
                 'arr_qty.array'                     => 'Baris qty harus array.',
+                'arr_qty_uom.required'              => 'Baris qty tidak boleh kosong.',
+                'arr_qty_uom.array'                 => 'Baris qty harus array.',
                 'arr_price.required'                => 'Baris harga tidak boleh kosong.',
                 'arr_price.array'                   => 'Baris harga harus array.',
                 'arr_tax.required'                  => 'Baris pajak tidak boleh kosong.',
@@ -689,7 +692,7 @@ class MarketingOrderController extends Controller
                 }
                 
                 if($query) {
-                        
+                    $marginprice = $query->account->getStandarPrice($request->post_date);
                     foreach($request->arr_item as $key => $row){
                         $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                         $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
@@ -700,8 +703,9 @@ class MarketingOrderController extends Controller
                             'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             'item_unit_id'                  => $itemUnit->id,
                             'qty_conversion'                => $itemUnit->conversion,
+                            'qty_uom'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
                             'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
-                            'price_nett'                    => $item->cogsSales($codePlace->id,$request->post_date) + 10000,
+                            'price_nett'                    => $item->cogsSales($codePlace->id,$request->post_date) + $marginprice,
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
                             'percent_tax'                   => $request->arr_tax[$key],
                             'tax_id'                        => $request->arr_tax_id[$key],
@@ -775,6 +779,7 @@ class MarketingOrderController extends Controller
                 'item_id'               => $row->item_id,
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'qty_uom'               => CustomHelper::formatConditionalQty($row->qty_uom),
                 'unit'                  => $row->itemUnit->unit->code,
                 'price'                 => number_format($row->price,2,',','.'),
                 'margin'                => number_format($row->margin,2,',','.'),
@@ -835,13 +840,15 @@ class MarketingOrderController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="15">Daftar Item</th>
+                                <th class="center-align" colspan="17">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">Item</th>
-                                <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th>
+                                <th class="center-align">Qty Jual</th>
+                                <th class="center-align">Satuan Jual</th>
+                                <th class="center-align">Qty Stock</th>
+                                <th class="center-align">Satuan Stock</th>
                                 <th class="center-align">Harga</th>
                                 <th class="center-align">Discount 1 (%)</th>
                                 <th class="center-align">Discount 2 (%)</th>
@@ -853,6 +860,7 @@ class MarketingOrderController extends Controller
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
+        $totalqtyuom=0;
         $totaldiskon1=0;
         $totaldiskon2=0;
         $totaldiskon3=0;
@@ -861,6 +869,7 @@ class MarketingOrderController extends Controller
         
         foreach($data->marketingOrderDetail as $key => $row){
             $totalqty+=$row->qty;
+            $totalqtyuom+=$row->qty_uom;
             $totaldiskon1+=$row->percent_discount_1;
             $totaldiskon2+=$row->percent_discount_2;
             $totaldiskon3+=$row->discount3;
@@ -871,6 +880,8 @@ class MarketingOrderController extends Controller
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->itemUnit->unit->code.'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty_uom).'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="right-align">'.number_format($row->price,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_1,2,',','.').'</td>
                 <td class="center-align">'.number_format($row->percent_discount_2,2,',','.').'</td>
@@ -884,6 +895,8 @@ class MarketingOrderController extends Controller
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;">  </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqtyuom, 3, ',', '.') . '</td>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="2">  </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon1, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldiskon2, 2, ',', '.') . '</td>
@@ -896,19 +909,19 @@ class MarketingOrderController extends Controller
 
         $string .= '
                     <tr>
-                        <td class="right-align" colspan="11">Total</td>
+                        <td class="right-align" colspan="13">Total</td>
                         <td class="right-align">'.number_format($data->total,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="11">PPN</td>
+                        <td class="right-align" colspan="13">PPN</td>
                         <td class="right-align">'.number_format($data->tax,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="11">Total Setelah PPN</td>
+                        <td class="right-align" colspan="13">Total Setelah PPN</td>
                         <td class="right-align">'.number_format($data->total_after_tax,2,',','.').'</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="11" style="font-size:20px !important;"><b>Grandtotal</b></td>
+                        <td class="right-align" colspan="13" style="font-size:20px !important;"><b>Grandtotal</b></td>
                         <td class="right-align" style="font-size:20px !important;"><b>'.number_format($data->grandtotal,2,',','.').'</b></td>
                     </tr>';
         

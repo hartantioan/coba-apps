@@ -20,6 +20,7 @@ class MarketingOrderDetail extends Model
         'qty',
         'item_unit_id',
         'qty_conversion',
+        'qty_uom',
         'price',
         'price_nett',
         'is_include_tax',
@@ -48,7 +49,7 @@ class MarketingOrderDetail extends Model
     }
 
     public function pricePerMeter(){
-        return $this->price_after_discount / $this->qty_conversion;
+        return $this->price_after_discount;
     }
 
     public function marketingOrder()

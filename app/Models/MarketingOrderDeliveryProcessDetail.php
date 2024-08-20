@@ -33,7 +33,7 @@ class MarketingOrderDeliveryProcessDetail extends Model
     }
 
     public function getTotal(){
-        $total = $this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
+        $total = $this->qty_uom * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
         return $total;
     }
 

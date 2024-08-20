@@ -292,14 +292,14 @@ class MarketingOrder extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->marketingOrderDelivery()->exists()){
-            $hasRelation = true;
-        }
-
         foreach($this->marketingOrderDetail as $row){
             if($row->marketingOrderDeliveryDetail()->exists()){
                 $hasRelation = true;
             }
+        }
+
+        if($this->marketingOrderDownPaymentDetail()->exists()){
+            $hasRelation = true;
         }
 
         return $hasRelation;
@@ -462,8 +462,9 @@ class MarketingOrder extends Model
     public function underEbitda(){
         $under = false;
         foreach($this->marketingOrderDetail as $row){
-            $cogsPerItem = $row->item->cogsSales($row->place_id,$this->post_date) + 10000;
-            $salePerItem = round($row->price_after_discount / $row->qty_conversion,2);
+            $standardprice = $this->account->getStandarPrice($this->post_date);
+            $cogsPerItem = $row->item->cogsSales($row->place_id,$this->post_date) + $standardprice;
+            $salePerItem = round($row->price_after_discount,2);
             if($salePerItem < $cogsPerItem){
                 $under = true;
             }

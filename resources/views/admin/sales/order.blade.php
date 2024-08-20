@@ -446,14 +446,13 @@
                                                     <tr>
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
-                                                        <th class="center">Qty Skrg</th>
+                                                        <th class="center">Qty</th>
                                                         <th class="center">Qty Sementara</th>
-                                                        <th class="center">Satuan UoM</th>
-                                                        <th class="center">Qty Pesanan</th>
-                                                        <th class="center">Satuan Pesanan</th>
-                                                        <th class="center">Qty Konversi</th>
+                                                        <th class="center">Qty Pesan (Stok)</th>
+                                                        <th class="center">Satuan Stok</th>
                                                         <th class="center">{{ __('translations.price') }}</th>
-                                                       
+                                                        <th class="center">Qty Jual</th>
+                                                        <th class="center">Satuan Jual</th>
                                                         <th class="center">
                                                             PPN
                                                             <label class="pl-2">
@@ -1378,23 +1377,22 @@
                         </td>
                         <td class="right-align" id="arr_qty_now` + count + `">0,000</td>
                         <td class="right-align" id="arr_qty_temporary` + count + `">0,000</td>
+                        <td class="center">
+                            <input name="arr_qty_uom[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
+                        </td>
                         <td class="center-align" id="arr_uom_unit` + count + `">-</td>
+                        <td class="center">
+                            <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                            <datalist id="tempPrice` + count + `"></datalist>
+                        </td>
                         <td>
-                            <input name="arr_qty[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
+                            <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
                         </td>
                         <td class="center">
                             <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
                                 <option value="">--Silahkan pilih item--</option>
                             </select>
                         </td>
-                        <td class="center">
-                            <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
-                        </td>
-                        <td class="center">
-                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                            <datalist id="tempPrice` + count + `"></datalist>
-                        </td>
-                    
                         <td>
                             <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `')();">
                                 <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
@@ -1771,6 +1769,7 @@
                 formData.delete("arr_item[]");
                 formData.delete("arr_unit[]");
                 formData.delete("arr_qty[]");
+                formData.delete("arr_qty_uom[]");
                 formData.delete("arr_price[]");
                 formData.delete("arr_tax[]");
                 formData.delete("arr_is_include_tax[]");
@@ -1788,7 +1787,8 @@
                         formData.append('arr_grandtotal[]',$('input[name^="arr_grandtotal"]').eq(index).val());
                         formData.append('arr_item[]',$('select[name^="arr_item"]').eq(index).val());
                         formData.append('arr_unit[]',($('select[name^="arr_unit[]"]').eq(index).val() ? $('select[name^="arr_unit[]"]').eq(index).val() : '' ));
-                        formData.append('arr_qty[]',$('input[name^="arr_qty"]').eq(index).val());
+                        formData.append('arr_qty[]',$('input[name^="arr_qty[]"]').eq(index).val());
+                        formData.append('arr_qty_uom[]',$('input[name^="arr_qty_uom[]"]').eq(index).val());
                         formData.append('arr_price[]',$('input[name^="arr_price"]').eq(index).val());
                        
                         formData.append('arr_tax[]',$('select[name^="arr_tax"]').eq(index).val());
@@ -2027,21 +2027,22 @@
                                 </td>
                                 <td class="right-align" id="arr_qty_now` + count + `">` + val.qty_now + `</td>
                                 <td class="right-align" id="arr_qty_temporary` + count + `">` + val.qty_commited + `</td>
+                                <td class="center">
+                                    <input name="arr_qty_uom[]" type="text" value="` + val.qty_uom + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
+                                </td>
                                 <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
-                                <td>
-                                    <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                                </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
-                                </td>
-                                <td class="center">
-                                    <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                    <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                     <datalist id="tempPrice` + count + `"></datalist>
                                 </td>
-                                
+                                <td>
+                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
+                                        <option value="">--Silahkan pilih item--</option>
+                                    </select>
+                                </td>
                                 <td>
                                     <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                         <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
@@ -2090,8 +2091,6 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        
-                       
                         $('#arr_item' + count).select2({
                             placeholder: '-- Kosong --',
                             minimumInputLength: 1,
@@ -2123,7 +2122,7 @@
                             `);
                         });
                         $('#arr_unit' + count).val(val.item_unit_id);
-                        $('#rowQty' + count).trigger('keyup');
+                        $('#rowQtyUom' + count).trigger('keyup');
                     });
                 }
                 
@@ -2261,23 +2260,25 @@
 
     function countRow(id){
         if($('#arr_unit' + id).val()){
-            var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
+            var qty = parseFloat($('#rowQtyUom' + id).val().replaceAll(".", "").replaceAll(",",".")),
             conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString()),
-            qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
+            qtylimit = parseFloat($('#rowQtyUom' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
             price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
             disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
 
             qtylimit = (qtylimit / conversion).toFixed(3);
-            var qtykonversi = qty * conversion.toFixed(3);
+            var qtykonversi = (qty / conversion).toFixed(3);
             if(qtylimit > 0){
                 if(qty > qtylimit){
                     qty = qtylimit;
-                    $('#rowQty' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
+                    $('#rowQtyUom' + id).val(formatRupiahIni(parseFloat(qty).toFixed(3).toString().replace('.',',')));
                 }
             }
-            $('#arr_konversi' + id).text(formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',',')) + ' m2');
+            $('#rowQty' + id).val(
+                (qtykonversi >= 0 ? '' : '-') + formatRupiahIni(parseFloat(qtykonversi).toFixed(3).toString().replace('.',','))
+            );
             price = price;
 
             var finalpricedisc1 = price - (price * (disc1 / 100));
@@ -2570,18 +2571,25 @@
                         $('#account_id').append(`
                             <option value="` + response.account_id + `">` + response.account_name + `</option>
                         `);
+                        $('#limit').text(response.deposit);
                         $('#company_id').val(response.company_id).formSelect();
+                        $('#type').val(response.type).formSelect();
                         $('#post_date').val(response.post_date);
                         $('#valid_date').val(response.valid_date);
                         $('#document_no').val(response.document_no);
                         $('#type_delivery').val(response.type_delivery).formSelect();
                         $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                         $('#delivery_date').val(response.delivery_date);
-                        $('#shipment_address').val(response.shipment_address);
+                        $('#transportation_id').empty().append(`
+                            <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
+                        `);
+                        $('#outlet_id').empty().append(`
+                            <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
+                        `);
                         $('#billing_address').empty();
                         $.each(response.user_data, function(i, val) {
                             $('#billing_address').append(`
-                                <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.title + ` ` + val.content + `</option>
+                                <option value="` + val.id + `" ` + (val.id == response.user_data_id ? 'selected' : '') + `>` + val.npwp + ` ` + val.address + `</option>
                             `);
                         });
                         $('#destination_address').val(response.destination_address);
@@ -2625,7 +2633,7 @@
                         $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
-                        
+                    
                         $('#total').val(response.total);
                         $('#tax').val(response.tax);
                         $('#total_after_tax').val(response.total_after_tax);
@@ -2650,28 +2658,28 @@
                                         <td class="center-align">
                                             <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
                                                 @foreach ($place as $rowplace)
-                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="right-align" id="arr_qty_now` + count + `">` + val.item_stock_qty + `</td>
-                                        <td class="right-align" id="arr_qty_temporary` + count + `">` + val.item_stock_qty + `</td>
+                                        <td class="right-align" id="arr_qty_now` + count + `">` + val.qty_now + `</td>
+                                        <td class="right-align" id="arr_qty_temporary` + count + `">` + val.qty_commited + `</td>
+                                        <td class="center">
+                                            <input name="arr_qty_uom[]" type="text" value="` + val.qty_uom + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
+                                        </td>
                                         <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
-                                        <td>
-                                            <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;width:100px;" id="rowQty`+ count +`">
-                                        </td>
-                                        
                                         <td class="center">
-                                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');"></select>
-                                        </td>
-                                        <td class="center">
-                                            <div name="arr_konversi[]"  style="text-align:right;" id="arr_konversi`+ count +`">
-                                        </td>
-                                        <td class="center">
-                                            <input list="tempPrice` + count + `" name="arr_price[]" class="browser-default" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
+                                            <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
                                             <datalist id="tempPrice` + count + `"></datalist>
                                         </td>
-                                        
+                                        <td>
+                                            <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]" onchange="countRow('` + count + `');">
+                                                <option value="">--Silahkan pilih item--</option>
+                                            </select>
+                                        </td>
                                         <td>
                                             <select class="browser-default" id="arr_tax` + count + `" name="arr_tax[]" onchange="countRow('` + count + `');">
                                                 <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
@@ -2712,7 +2720,7 @@
                                         </td>
                                     </tr>
                                 `);
-                                $('#arr_place' + count).val(val.place_id);
+                                $('#arr_place' + count).val(val.place_code);
                                 $("#arr_tax" + count + " option[data-id='" + val.tax_id + "']").prop("selected",true);
                                 if(val.is_include_tax){
                                     $('#arr_is_include_tax' + count).prop( "checked", true);
@@ -2720,8 +2728,6 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
-                                
-                               
                                 $('#arr_item' + count).select2({
                                     placeholder: '-- Kosong --',
                                     minimumInputLength: 1,
@@ -2753,6 +2759,7 @@
                                     `);
                                 });
                                 $('#arr_unit' + count).val(val.item_unit_id);
+                                $('#rowQtyUom' + count).trigger('keyup');
                             });
                         }
                         

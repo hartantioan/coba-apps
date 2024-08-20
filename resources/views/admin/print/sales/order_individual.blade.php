@@ -314,8 +314,10 @@
                                 <tr>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }} Jual</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }} Jual</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }} Stok</th>
+                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }} Stok</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.price') }}</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.disc') }} 1</th>
                                     <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.disc') }} 2</th>
@@ -331,6 +333,8 @@
                                     <td>{{ $row->item->code.' - '.$row->item->name }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                                     <td align="center">{{ $row->itemUnit->unit->code }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty_uom) }}</td>
+                                    <td align="center">{{ $row->item->uomUnit->code }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->percent_discount_1,2,',','.') }}%</td>
                                     <td align="right">{{ number_format($row->percent_discount_2,2,',','.') }}%</td>
@@ -339,7 +343,7 @@
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="10">Keterangan: {{ $row->note }}</td>
+                                    <td colspan="12">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

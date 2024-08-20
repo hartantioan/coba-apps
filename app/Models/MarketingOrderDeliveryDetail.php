@@ -95,9 +95,4 @@ class MarketingOrderDeliveryDetail extends Model
 
         return $total;
     }
-
-    public function getPriceHpp(){
-        $price = $this->cogs / $this->qty;
-        return $price;
-    }
 }

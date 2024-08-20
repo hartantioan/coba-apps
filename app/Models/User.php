@@ -185,6 +185,15 @@ class User extends Authenticatable
         return '<img src="'.$path_img.'" width="70px">';
     }
 
+    public function getStandarPrice($date){
+        $total = 0;
+        $data = StandardCustomerPrice::where('group_id',$this->group_id)->where('start_date','>=',$date)->where('end_date','<=',$date)->where('status','1')->first();
+        if($data){
+            $total = $data->price;
+        }
+        return $total;
+    }
+
     public static function generateCode($type, $kind, $place_id)
     {
         $prefix = '';

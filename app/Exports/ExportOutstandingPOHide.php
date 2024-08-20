@@ -12,13 +12,14 @@ use App\Models\PurchaseOrder;
 
 class ExportOutstandingPOHide implements FromView,ShouldAutoSize
 {
-    protected $start_date,$end_date,$mode;
+    protected $start_date,$end_date,$mode,$search;
 
-    public function __construct($start_date,string $end_date,string $mode)
+    public function __construct($start_date,string $end_date,string $mode,string $search)
     {
         $this->start_date = $start_date ? $start_date : '';
-        $this->end_date = $end_date ? $end_date : '';
-        $this->mode     = $mode ? $mode : '';
+        $this->end_date   = $end_date ? $end_date : '';
+        $this->mode       = $mode ? $mode : '';
+        $this->search     = $search ? $search : '';
     }
     public function view(): View
     {
@@ -32,7 +33,32 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
             // } else if($this->end_date) {
             //     $query->whereDate('post_date','<=', $this->end_date);
             // }
-
+            if($this->search){
+                $query->where(function($query){
+                    $query->where('code', 'like', "%$this->search%")
+                        ->orWhere('document_no', 'like', "%$this->search%")
+                        ->orWhere('note', 'like', "%$this->search%")
+                        ->orWhere('subtotal', 'like', "%$this->search%")
+                        ->orWhere('discount', 'like', "%$this->search%")
+                        ->orWhere('total', 'like', "%$this->search%")
+                        ->orWhere('tax', 'like', "%$this->search%")
+                        ->orWhere('grandtotal', 'like', "%$this->search%")
+                        ->orWhereHas('user',function($query){
+                            $query->where('name','like',"%$this->search%")
+                                ->orWhere('employee_no','like',"%$this->search%");
+                        })
+                        ->orWhereHas('supplier',function($query){
+                            $query->where('name','like',"%$this->search%")
+                                ->orWhere('employee_no','like',"%$this->search%");
+                        })
+                        ->orWhereHas('purchaseOrderDetail',function($query) {
+                            $query->whereHas('item',function($query){
+                                $query->where('code','like',"%$this->search%")
+                                    ->orWhere('name','like',"%$this->search%");
+                            });
+                        });
+                });
+            }
             if($this->mode == 1){
                 
             }

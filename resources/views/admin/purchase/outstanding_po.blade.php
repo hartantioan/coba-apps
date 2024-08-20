@@ -47,6 +47,10 @@
                                                     </select>
                                                     <label class="" for="mode">Mode Data</label>
                                                 </div>
+                                                <div class="input-field col m3 s12">
+                                                    <input id="searchs" name="searchs" type="text" placeholder="Cari...">
+                                                    <label class="" for="searchs">Search</label>
+                                                </div>
                                                 {{-- <div class="input-field col m3 s12">
                                                     <input id="start_date" name="start_date" type="date" placeholder="Tgl. posting" value="{{ date('Y-m').'-01' }}">
                                                     <label class="active" for="start_date">Tanggal Awal</label>
@@ -99,8 +103,8 @@
     function getOutstanding(){
         $('#show-result').hide();
         $('#content-result').html('');
-        var startDatekuy = $('#start_date').val();
-        var endDatekuy = $('#end_date').val();
+        
+        let searchValue = $('#searchs').val();
         var modes = $('#mode').val();
         $.ajax({
             url: '{{ Request::url() }}/get_outstanding',
@@ -109,7 +113,8 @@
             data: {
                 startDate: null,
                 endDate: null,
-                mode:modes,
+                mode: modes,
+                search: searchValue,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -148,6 +153,7 @@
             }
         });
     }
+
 
     function printPreview(code,aslicode){
         swal({

@@ -39,8 +39,8 @@ class OutstandingPurchaseOrderController extends Controller
     {
         $start_date = $request->startDate;
         $end_date = $request->endDate;
-
-        $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query)use($start_date,$end_date){
+        $search = $request->search;
+        $data = PurchaseOrderDetail::whereHas('purchaseOrder',function($query)use($start_date,$end_date,$search){
                     $query->whereIn('status',['2'])->where('inventory_type','1');
                     if($start_date && $end_date) {
                         $query->whereDate('post_date', '>=', $start_date)
@@ -50,6 +50,33 @@ class OutstandingPurchaseOrderController extends Controller
                     } else if($end_date) {
                         $query->whereDate('post_date','<=', $end_date);
                     };
+
+                    if($search){
+                        $query->where(function($query)use($search){
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('document_no', 'like', "%$search%")
+                                ->orWhere('note', 'like', "%$search%")
+                                ->orWhere('subtotal', 'like', "%$search%")
+                                ->orWhere('discount', 'like', "%$search%")
+                                ->orWhere('total', 'like', "%$search%")
+                                ->orWhere('tax', 'like', "%$search%")
+                                ->orWhere('grandtotal', 'like', "%$search%")
+                                ->orWhereHas('user',function($query) use($search){
+                                    $query->where('name','like',"%$search%")
+                                        ->orWhere('employee_no','like',"%$search%");
+                                })
+                                ->orWhereHas('supplier',function($query)use($search){
+                                    $query->where('name','like',"%$search%")
+                                        ->orWhere('employee_no','like',"%$search%");
+                                })
+                                ->orWhereHas('purchaseOrderDetail',function($query) use($search) {
+                                    $query->whereHas('item',function($query) use($search){
+                                        $query->where('code','like',"%$search%")
+                                            ->orWhere('name','like',"%$search%");
+                                    });
+                                });
+                        });
+                    }
                 })->whereNull('status')->get();
        
         $string = '<div class="row pt-1 pb-1"><div class="col s12"><div style="overflow-x:auto;"><table style="min-width:100%;max-width:100%;">

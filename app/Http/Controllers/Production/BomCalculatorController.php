@@ -757,7 +757,7 @@ class BomCalculatorController extends Controller
                 'data'      => $cap
             ];
 
-            return view('admin.approval.adjust_rate', $data);
+            return view('admin.approval.bom_calculator', $data);
         }else{
             abort(404);
         }

@@ -257,6 +257,7 @@
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center">Keterangan 1</th>
                                                         <th class="center">Keterangan 2</th>
+                                                        <th class="center">Req.Customer</th>
                                                         <th class="center">Tgl.Request</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
@@ -269,12 +270,12 @@
                                                         <td class="right-align" id="total-mop">
                                                             0,000
                                                         </td>
-                                                        <td class="left-align" colspan="5">
+                                                        <td class="left-align" colspan="6">
                                                             M<sup>2</sup>
                                                         </td>
                                                     </tr>
                                                     <tr id="custom-add">
-                                                        <td colspan="8">
+                                                        <td colspan="9">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah
                                                             </a>
@@ -1287,7 +1288,13 @@
                                     <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value=" ` + val.note2 + `" required>
                                 </td>
                                 <td>
-                                    <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required>
+                                    <label>
+                                        <input type="checkbox" id="arr_check_request` + count + `" value="1" onclick="unLockDate('` + count + `');" ` + (val.request_date ? 'checked' : '') + `>
+                                        <span>Ya/Tidak</span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <input name="arr_request_date[]" type="date" value="` + val.request_date + `" min="{{ date('Y-m-d') }}" required ` + (val.request_date ? '' : 'readonly') + ` id="arr_request_date` + count + `">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1508,7 +1515,13 @@
                     <input name="arr_note2[]" type="text" placeholder="Keterangan barang 2..." value="-" required>
                 </td>
                 <td>
-                    <input name="arr_request_date[]" type="date" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                    <label>
+                        <input type="checkbox" id="arr_check_request` + count + `" value="1" onclick="unLockDate('` + count + `');">
+                        <span>Ya/Tidak</span>
+                    </label>
+                </td>
+                <td>
+                    <input name="arr_request_date[]" type="date" value="" min="{{ date('Y-m-d') }}" required readonly id="arr_request_date` + count + `">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
@@ -1518,6 +1531,15 @@
             </tr>
         `);
         select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item_parent") }}');
+    }
+
+    function unLockDate(id){
+        if($('#arr_check_request' + id).is(':checked')){
+            $('#arr_request_date' + id).attr('readonly',false);
+        }else{
+            $('#arr_request_date' + id).attr('readonly',true);
+            $('#arr_request_date' + id).val('');
+        }
     }
 
     String.prototype.replaceAt = function(index, replacement) {

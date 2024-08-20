@@ -455,7 +455,7 @@ class MarketingOrderPlanController extends Controller
                 'item_name'             => $row->item->name,
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
                 'unit'                  => $row->item->uomUnit->code,
-                'request_date'          => $row->request_date,
+                'request_date'          => $row->request_date ?? '',
                 'note'                  => $row->note ?? '',
                 'note2'                 => $row->note2 ?? '',
             ];

@@ -15,7 +15,7 @@ class StandardCustomerPriceController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Relasi BOM',
+            'title'     => 'Harga Standard Customer',
             'content'   => 'admin.master_data.standard_customer_price',
         ];
 

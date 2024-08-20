@@ -192,6 +192,10 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
     }
 
+    public function marketingOrderDeliveryProcessDetail(){
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail','marketing_order_delivery_process_id','id');
+    }
+
     public function getSendStatusTracking(){
         $status = false;
 
@@ -231,13 +235,13 @@ class MarketingOrderDeliveryProcess extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if($row->marketingOrderReturnDetail()->exists()){
                 $hasRelation = true;
             }
         }
 
-        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if($row->marketingOrderInvoiceDetail()->exists()){
                 $hasRelation = true;
             }
@@ -250,21 +254,18 @@ class MarketingOrderDeliveryProcess extends Model
         $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
         
         if($journal){
-            foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-                $priceout = $row->item->priceNow($row->place_id,$this->post_date);
-				$nominal = round($row->qty * $row->item->sell_convert * $priceout,2);
+            foreach($this->marketingOrderDeliveryProcessDetail as $row){
+                $total = $row->getHpp();
 
                 $row->update([
-                    'price'     => $priceout,
-                    'total'     => $nominal
+                    'total'     => $total
                 ]);
 
-                if($journal){
-                    foreach($journal->journalDetail()->where('item_id',$row->item_id)->get() as $rowupdate){
-                        $rowupdate->update([
-                            'nominal'   => $nominal
-                        ]);
-                    }
+                foreach($row->journalDetail as $rowjournal){
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
                 }
             }
         }
@@ -277,7 +278,7 @@ class MarketingOrderDeliveryProcess extends Model
     public function balanceInvoice(){
         $total = 0;
 
-        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
             $total += $row->balanceInvoice();
         }
 
@@ -288,7 +289,7 @@ class MarketingOrderDeliveryProcess extends Model
         #linkkan ke AR Invoice
         $query = $this;
         $passed = true;
-        foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($query->marketingOrderDeliveryProcessDetail as $row){
             if($row->marketingOrderInvoiceDetail()->exists()){
                 $passed = false;
             }
@@ -303,7 +304,7 @@ class MarketingOrderDeliveryProcess extends Model
                 $passedDp = false;
                 $passedTaxSeries = false;
                 
-                foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                foreach($query->marketingOrderDeliveryProcessDetail as $row){
                     $total += $row->getTotal();
                     $tax += $row->getTax();
                     $total_after_tax += $row->getGrandtotal();
@@ -374,7 +375,7 @@ class MarketingOrderDeliveryProcess extends Model
                         'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
                     ]);
 
-                    foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $rowdata){
+                    foreach($query->marketingOrderDeliveryProcessDetail as $key => $rowdata){
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $querymoi->id,
                             'lookable_type'                 => $rowdata->getTable(),
@@ -429,7 +430,7 @@ class MarketingOrderDeliveryProcess extends Model
             'user_id'		=> $modp->user_id,
             'company_id'    => $modp->company_id,
             'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->post_date)).'00'),
-            'lookable_type'	=> 'marketing_order_delivery_processes',
+            'lookable_type'	=> $modp->getTable(),
             'lookable_id'	=> $modp->id,
             'post_date'		=> $modp->post_date,
             'note'			=> $modp->note_internal.' - '.$modp->note_external,
@@ -438,64 +439,69 @@ class MarketingOrderDeliveryProcess extends Model
         
         $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
 
-        foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+            $hpp = $row->getHpp();
 
-            foreach($row->marketingOrderDeliveryStock as $rowstock){
-                $hpp = $rowstock->getHpp();
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coabdp->id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '1',
+                'nominal'		=> $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
 
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                    'coa_id'		=> $coabdp->id,
-                    'place_id'		=> $rowstock->itemStock->place_id,
-                    'item_id'		=> $rowstock->itemStock->item_id,
-                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
-                    'type'			=> '1',
-                    'nominal'		=> $hpp,
-                    'nominal_fc'    => $hpp,
-                    'note'          => 'Item dikirimkan / keluar dari gudang.'
-                ]);
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '2',
+                'nominal'		=> $hpp,
+                'nominal_fc'    => $hpp,
+                'note'          => 'Item dikirimkan / keluar dari gudang.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
 
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'coa_id'		=> $rowstock->itemStock->item->itemGroup->coa_id,
-                    'place_id'		=> $rowstock->itemStock->place_id,
-                    'item_id'		=> $rowstock->itemStock->item_id,
-                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
-                    'type'			=> '2',
-                    'nominal'		=> $hpp,
-                    'nominal_fc'    => $hpp,
-                    'note'          => 'Item dikirimkan / keluar dari gudang.'
-                ]);
+            CustomHelper::sendCogs($modp->getTable(),
+                $modp->id,
+                $row->itemStock->place->company_id,
+                $row->itemStock->place_id,
+                $row->itemStock->warehouse_id,
+                $row->itemStock->item_id,
+                $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                $hpp,
+                'OUT',
+                $modp->post_date,
+                $row->itemStock->area_id,
+                $row->itemStock->item_shading_id,
+                $row->itemStock->production_batch_id,
+                $row->getTable(),
+                $row->id,
+            );
 
-                CustomHelper::sendCogs('marketing_order_delivery_processes',
-                    $modp->id,
-                    $rowstock->itemStock->place->company_id,
-                    $rowstock->itemStock->place_id,
-                    $rowstock->itemStock->warehouse_id,
-                    $rowstock->itemStock->item_id,
-                    $rowstock->qty * $row->marketingOrderDetail->qty_conversion,
-                    $hpp,
-                    'OUT',
-                    $modp->post_date,
-                    $rowstock->itemStock->area_id,
-                    $rowstock->itemStock->item_shading_id,
-                );
-
-                CustomHelper::sendStock(
-                    $rowstock->itemStock->place_id,
-                    $rowstock->itemStock->warehouse_id,
-                    $rowstock->itemStock->item_id,
-                    $rowstock->qty * $row->marketingOrderDetail->qty_conversion,
-                    'OUT',
-                    $rowstock->itemStock->area_id,
-                    $rowstock->itemStock->item_shading_id,
-                );
-
-                $rowstock->update([
-                    'cogs'  => $hpp
-                ]);
-            }
+            CustomHelper::sendStock(
+                $row->itemStock->place_id,
+                $row->itemStock->warehouse_id,
+                $row->itemStock->item_id,
+                $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                'OUT',
+                $row->itemStock->area_id,
+                $row->itemStock->item_shading_id,
+                $row->itemStock->production_batch_id,
+            );
         }
     }
 
@@ -516,37 +522,42 @@ class MarketingOrderDeliveryProcess extends Model
         $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
         $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first();
 
-        foreach($modp->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+        foreach($modp->marketingOrderDeliveryProcessDetail as $row){
+            $hpp = $row->getHpp();
 
-            foreach($row->marketingOrderDeliveryStock as $rowstock){
-                $hpp = $rowstock->cogs;
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coahpp->id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '1',
+                'nominal'		=> $hpp,
+                'nominal_fc'	=> $hpp,
+                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
 
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                    'coa_id'		=> $coahpp->id,
-                    'place_id'		=> $rowstock->itemStock->place_id,
-                    'item_id'		=> $rowstock->itemStock->item_id,
-                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
-                    'type'			=> '1',
-                    'nominal'		=> $hpp,
-                    'nominal_fc'	=> $hpp,
-                    'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
-                ]);
-
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
-                    'coa_id'		=> $coabdp->id,
-                    'place_id'		=> $rowstock->itemStock->place_id,
-                    'item_id'		=> $rowstock->itemStock->item_id,
-                    'warehouse_id'	=> $rowstock->itemStock->warehouse_id,
-                    'type'			=> '2',
-                    'nominal'		=> $hpp,
-                    'nominal_fc'	=> $hpp,
-                    'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.'
-                ]);
-            }
+            JournalDetail::create([
+                'journal_id'	=> $query->id,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'coa_id'		=> $coabdp->id,
+                'place_id'		=> $row->itemStock->place_id,
+                'item_id'		=> $row->itemStock->item_id,
+                'warehouse_id'	=> $row->itemStock->warehouse_id,
+                'type'			=> '2',
+                'nominal'		=> $hpp,
+                'nominal_fc'	=> $hpp,
+                'note'          => 'Dokumen Surat Jalan telah kembali ke admin penagihan.',
+                'lookable_type'	=> $modp->getTable(),
+                'lookable_id'	=> $modp->id,
+                'detailable_type'=> $row->getTable(),
+                'detailable_id'	=> $row->id,
+            ]);
         }
     }
 

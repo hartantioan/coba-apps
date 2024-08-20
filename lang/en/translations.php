@@ -131,6 +131,7 @@ return [
     'sent_date'     => 'Sent Date',
     'shiping_type'  => 'Shipping Type',
     'item_group'    => 'Item Group',
+    'group'         => 'Group',
     'item/service'  => 'Item/Service',
     'disc'          => 'Disc',
     'subtotal'      => 'Subtotal',

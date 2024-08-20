@@ -131,6 +131,7 @@ return [
     'sent_date'      => '发送日期',
     'shiping_type'   => '运输类型',
     'item_group'     => '项目组',
+    'group'          => '团体',
     'item/service'   => '项目/服务',
     'disc'           => '折扣',
     'subtotal'       => '小计',

@@ -131,6 +131,7 @@ return [
     'sent_date'      => 'Tanggal Dikirim',
     'shiping_type'   => 'Jenis Pengiriman',
     'item_group'     => 'Grup Barang',
+    'group'          => 'Grup',
     'item/service'   => 'Barang/Layanan',
     'disc'           => 'Diskon',
     'subtotal'       => 'Subtotal',

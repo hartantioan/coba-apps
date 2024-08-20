@@ -28,6 +28,14 @@
     .select-wrapper, .select2-container {
         height:3.6rem !important;
     }
+    
+    table.bordered th {
+        border:1px solid black !important;
+    }
+
+    table.bordered td {
+        border:1px solid black !important;
+    }
 </style>
 <!-- BEGIN: Page Main-->
 <div id="main">
@@ -276,8 +284,9 @@
                                             <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center">No.</th>
                                                         <th class="center">{{ __('translations.item') }}</th>
-                                                        <th class="center">Barang dari</th>
+                                                        <th class="center">SO/MO</th>
                                                         <th class="center">Qty Pesanan</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
@@ -285,7 +294,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="5">
+                                                        <td colspan="6">
                                                             Silahkan pilih Jadwal Kirim...
                                                         </td>
                                                     </tr>
@@ -978,22 +987,17 @@ document.addEventListener('focusin', function (event) {
                             `);
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
-
-                                let stock = '<ol>';
-
-                                $.each(val.stocks, function(i, value){
-                                    stock += '<li>' + value.stock_name + ' Qty : ' + value.qty + '</li>';
-                                });
-
-                                stock += '</ol>';
                                 
                                 $('#body-item').append(`
-                                    <tr class="row_item" data-id="` + response.id + `">
+                                    <tr class="row_item" data-id="` + response.id + `" style="background-color:` + getRandomColor() + `;">
+                                        <td rowspan="2" class="center-align">
+                                            ` + (i+1) + `
+                                        </td>
                                         <td>
                                             ` + val.item_name + `
                                         </td>
                                         <td id="arr_warehouse_name` + count + `">
-                                            ` + stock + `
+                                            ` + val.sales_order + `
                                         </td>
                                         <td class="center-align">
                                             ` + val.qty + `
@@ -1003,6 +1007,42 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                         <td>
                                             ` + val.note + `
+                                        </td>
+                                    </tr>
+                                    <tr class="row_item" data-id="` + response.id + `">
+                                        <td>
+                                            Ambil Dari :
+                                        </td>
+                                        <td colspan="4">
+                                            <table class="bordered" id="table-detail-` + count + `">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center" colspan="4">
+                                                            <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id" onchange="getItemInformation();"></select>
+                                                            <a class="waves-effect waves-light cyan btn-small mt-5 mr-1 right" onclick="getItem();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                        </th>
+                                                        <th class="center" colspan="3">
+                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Silahkan arahkan cursor disini dan mulai scan..." data-id="` + val.modd_id + `">
+                                                        </th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">Area</th>
+                                                        <th class="center">Shading</th>
+                                                        <th class="center">Batch</th>
+                                                        <th class="center">Qty</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item-` + count + `">
+                                                    <tr id="last-row-item">
+                                                        <td colspan="7">
+                                                            Silahkan pilih Jadwal Kirim...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </td>
                                     </tr>
                                 `);
@@ -1582,7 +1622,7 @@ document.addEventListener('focusin', function (event) {
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="7">
+                            <td colspan="6">
                                 Silahkan pilih Jadwal Kirim...
                             </td>
                         </tr>

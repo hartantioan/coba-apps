@@ -59,7 +59,7 @@
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->getProductionBatchCodesAttribute()}}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
-                    <td>{{ $row_detail->warehouse->code}}</td>
+                    <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionIssue()->exists() ? $row_detail->productionOrderDetail->listIssue() : '-' }}</td>
                 </tr>

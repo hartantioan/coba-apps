@@ -57,7 +57,7 @@
                     <td>{{ $row_detail->qtyReject() }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->item->uomUnit->code }}</td>
                     <td>{{ ($row_detail->productionScheduleDetail->line()->exists() ? $row_detail->productionScheduleDetail->line->code : '-') }}</td>
-                    <td>{{ $row_detail->productionScheduleDetail->warehouse->code }}</td>
+                    <td>{{ $row_detail->productionScheduleDetail->warehouse->name }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->type() }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->productionSchedule->code }}</td>
                 </tr>

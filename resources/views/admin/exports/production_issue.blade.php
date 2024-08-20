@@ -16,8 +16,11 @@
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
+            <th>Type Item / Resource</th>
             <th>Kode Item / Resource</th>
             <th>Nama Item / Resource</th>
+            <th>Kode Target Item / Resource</th>
+            <th>Nama Target Item / Resource</th>
             <th>Qty Planned</th>
             <th>Qty Real</th>
             <th>Group item</th>
@@ -26,6 +29,7 @@
             <th>Nominal Real</th>
             <th>Total Planned</th>
             <th>Total Real</th>
+            <th>Batch</th>
             <th>{{ __('translations.line') }}</th>
             <th>Gudang</th>
             <th>Based On</th>
@@ -53,6 +57,9 @@
                     <td>{{ $row->user->employee_no }}</td>
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                    <td>{{ $row_detail->typeItem()}}</td>
+                    <td>{{ $row_detail->lookable->code}}</td>
+                    <td>{{ $row_detail->lookable->name }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->code}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->name }}</td>
                     <td>{{ $row_detail->qty_planned}}</td>
@@ -63,8 +70,9 @@
                     <td>{{ number_format($row_detail->nominal ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->total_planned ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->total ,3,',','.') }}</td>
+                    <td>{{ ($row_detail->productionBatchUsage()->exists() ? $row_detail->listBatch() : '-') }}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
-                    <td>{{ ($row_detail->warehouse()->exists() ? $row_detail->warehouse->code : '-') }}</td>
+                    <td>{{ ($row_detail->warehouse()->exists() ? $row_detail->warehouse->name : '-') }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>
 
                 </tr>

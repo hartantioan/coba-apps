@@ -110,6 +110,16 @@ class ProductionIssueDetail extends Model
         return $type;
     }
 
+    public function typeItem(){
+        $type = match ($this->lookable_type) {
+            'items' => 'Item',
+            'resources' => 'Resource',
+            default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function item(){
         if($this->lookable_type == 'items'){
             return $this->belongsTo('App\Models\Item', 'lookable_id', 'id')->withTrashed();
@@ -132,5 +142,14 @@ class ProductionIssueDetail extends Model
             $arr .= $row->productionBatch->code.' - '.CustomHelper::formatConditionalQty($row->qty).'<br>';
         }
         return $arr;
+    }
+
+    public function listBatch(){
+        $arr = [];
+        foreach($this->productionBatchUsage as $row){
+            $arr[]= $row->productionBatch->code;
+        }
+        $string = implode(',', $arr);
+        return $string;
     }
 }

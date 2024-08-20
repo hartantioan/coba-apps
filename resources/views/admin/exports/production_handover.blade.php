@@ -57,8 +57,8 @@
                     <td>{{ $row_detail->qty}}</td>                
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
-                    <td>{{ $row_detail->warehouse->code}}</td>
-                    <td>{{ ($row_detail->area()->exists() ? $row_detail->area->code : '-') }}</td>
+                    <td>{{ $row_detail->warehouse->name}}</td>
+                    <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->productionFgReceive->code }}</td>
                 </tr>
                 @php

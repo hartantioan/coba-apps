@@ -797,56 +797,6 @@ document.addEventListener('focusin', function (event) {
         }
     }
 
-    function addSource(id,mod,place,item,conversion){
-        var count = makeid(10);
-        if($('#empty-detail-source' + id).length > 0){
-            $('#empty-detail-source' + id).remove();
-        }
-        $('#body-detail-source' + id).append(`
-            <tr>
-                <input type="hidden" name="arr_stock_id[]" value="` + mod + `">
-                <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count + `" value="` + conversion + `">
-                <td>
-                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="getStock('` + count + `')"></select>
-                </td>
-                <td>
-                    <input name="arr_qty_source[]" class="browser-default" type="text" value="0,000" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count + `')" data-qty="0,000" style="text-align:right;width:100%;" id="rowQtySource`+ count +`">
-                </td>
-                <td class="center-align">
-                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + id + `" onclick="removeRow(this,'` + id + `')" href="javascript:void(0);">
-                        <i class="material-icons">delete</i>
-                    </a>
-                </td>
-            </tr>
-        `);
-        $('#arr_item_stock' + count).select2({
-            placeholder: '-- Kosong --',
-            minimumInputLength: 1,
-            allowClear: true,
-            cache: true,
-            width: 'resolve',
-            dropdownParent: $('body').parent(),
-            ajax: {
-                url: '{{ url("admin/select2/item_stock_by_place_item") }}',
-                type: 'GET',
-                dataType: 'JSON',
-                data: function(params) {
-                    return {
-                        search: params.term,
-                        place_id : place,
-                        item_id : item,
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data.items
-                    }
-                }
-            },
-            escapeMarkup: function (text) { return text; },
-        });
-    }
-
     function getStock(id){
         if($('#arr_item_stock' + id).val()){
             let datastock = $('#arr_item_stock' + id).select2('data')[0], conversion = parseFloat($('#arr_stock_conversion' + id).val().replaceAll(".", "").replaceAll(",","."));
@@ -1632,60 +1582,6 @@ document.addEventListener('focusin', function (event) {
                                 </td>
                             </tr>
                         `);
-
-                        
-                        $.each(val.detail_stock, function(j, value) {
-                            var count2 = makeid(10);
-                            if($('#empty-detail-source' + count).length > 0){
-                                $('#empty-detail-source' + count).remove();
-                            }
-                            $('#body-detail-source' + count).append(`
-                                <tr>
-                                    <input type="hidden" name="arr_stock_id[]" value="` + val.id + `">
-                                    <input type="hidden" name="arr_stock_conversion[]" id="arr_stock_conversion` + count2 + `" value="` + val.conversion + `">
-                                    <td>
-                                        <select class="browser-default" id="arr_item_stock` + count2 + `" name="arr_item_stock[]" onchange="getStock('` + count2 + `')"></select>
-                                    </td>
-                                    <td>
-                                        <input name="arr_qty_source[]" class="browser-default" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);countRowStock('` + count2 + `')" data-qty="` + value.qty_stock + `" style="text-align:right;width:100%;" id="rowQtySource`+ count2 +`">
-                                    </td>
-                                    <td class="center-align">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-source" data-id="` + count2 + `" onclick="removeRow(this,'` + count2 + `')" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            `);
-                            $('#arr_item_stock' + count2).append(`
-                                <option value="` + value.item_stock_id + `">` + value.item_stock_name + `</option>
-                            `);
-                            $('#arr_item_stock' + count2).select2({
-                                placeholder: '-- Kosong --',
-                                minimumInputLength: 1,
-                                allowClear: true,
-                                cache: true,
-                                width: 'resolve',
-                                dropdownParent: $('body').parent(),
-                                ajax: {
-                                    url: '{{ url("admin/select2/item_stock_by_place_item") }}',
-                                    type: 'GET',
-                                    dataType: 'JSON',
-                                    data: function(params) {
-                                        return {
-                                            search: params.term,
-                                            place_id : val.place_id,
-                                            item_id : val.item_id,
-                                        };
-                                    },
-                                    processResults: function(data) {
-                                        return {
-                                            results: data.items
-                                        }
-                                    }
-                                },
-                                escapeMarkup: function (text) { return text; },
-                            });
-                        });
 
                         no++;
                     });

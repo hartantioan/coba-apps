@@ -16,7 +16,7 @@ class MarketingOrderReturnDetail extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'marketing_order_return_id',
-        'marketing_order_delivery_detail_id',
+        'marketing_order_delivery_process_detail_id',
         'item_id',
         'qty',
         'note',
@@ -25,9 +25,9 @@ class MarketingOrderReturnDetail extends Model
         'area_id',
     ];
 
-    public function marketingOrderDeliveryDetail()
+    public function marketingOrderDeliveryProcessDetail()
     {
-        return $this->belongsTo('App\Models\MarketingOrderDeliveryDetail', 'marketing_order_delivery_detail_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\MarketingOrderDeliveryProcessDetail', 'marketing_order_delivery_process_detail_id', 'id')->withTrashed();
     }
 
     public function marketingOrderReturn()

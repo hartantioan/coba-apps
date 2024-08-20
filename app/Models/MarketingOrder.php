@@ -136,7 +136,7 @@ class MarketingOrder extends Model
 
     public function paymentType(){
         $type = match ($this->payment_type) {
-            '1' => 'Cash Before Delivery',
+            '1' => 'DP',
             '2' => 'Credit',
             default => 'Invalid',
         };

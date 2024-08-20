@@ -108,7 +108,7 @@
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_type" onchange="loadDataTable()">
                                                         <option value="">{{ __('translations.all') }}</option>
-                                                        <option value="1">Cash Before Delivery</option>
+                                                        <option value="1">DP</option>
                                                         <option value="2">Credit</option>
                                                     </select>
                                                 </div>
@@ -249,7 +249,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="type" name="type">
-                                            <option value="1">Cash Before Delivery</option>
+                                            <option value="1">DP</option>
                                             <option value="2">Credit</option>
                                         </select>
                                         <label class="" for="type">{{ __('translations.type') }}</label>

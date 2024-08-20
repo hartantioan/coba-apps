@@ -110,7 +110,7 @@ class MarketingOrderDownPayment extends Model
 
     public function type(){
         $type = match ($this->type) {
-          '1' => 'Cash Before Delivery',
+          '1' => 'DP',
           '2' => 'Credit',
           default => 'Invalid',
         };

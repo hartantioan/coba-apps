@@ -61,19 +61,6 @@ class MarketingOrderDeliveryDetail extends Model
     public function place(){
         return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
-    
-    public function marketingOrderReturnDetail()
-    {
-        return $this->hasMany('App\Models\MarketingOrderReturnDetail')->whereHas('marketingOrderReturn',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
-
-    public function marketingOrderInvoiceDetail(){
-        return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
-            $query->whereIn('status',['2','3']);
-        });
-    }
 
     public function balanceInvoice(){
         $qtytotal = $this->qty - $this->qtyReturn();
@@ -85,8 +72,19 @@ class MarketingOrderDeliveryDetail extends Model
         return $qtytotal;
     }
 
+    public function marketingOrderDeliveryProcessDetail()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail')->whereHas('marketingOrderDeliveryProcess',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
     public function qtyReturn(){
-        return $this->marketingOrderReturnDetail()->sum('qty');
+        $total = 0;
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            $total += $row->qtyReturn();
+        }
+        return $total;
     }
 
     public function getBalanceQtySentMinusReturn(){

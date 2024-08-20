@@ -156,10 +156,8 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Petugas</th>
-                                                        <th>{{ __('translations.customer') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>Ekspedisi</th>
-                                                        <th>Sales Order</th>
                                                         <th>MOD</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Nama Supir</th>
@@ -170,7 +168,6 @@
                                                         <th>Catatan Eksternal</th>
                                                         <th>Tgl.Kembali SJ</th>
                                                         <th>Bukti Kembali</th>
-                                                        <th>Alamat Tujuan</th>
                                                         <th>Tracking</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -999,7 +996,7 @@ document.addEventListener('focusin', function (event) {
                                         <td id="arr_warehouse_name` + count + `">
                                             ` + val.sales_order + `
                                         </td>
-                                        <td class="center-align">
+                                        <td class="center-align main-qty" data-id="` + count + `">
                                             ` + val.qty + `
                                         </td>
                                         <td class="center-align">
@@ -1010,19 +1007,18 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                     </tr>
                                     <tr class="row_item" data-id="` + response.id + `">
-                                        <td>
-                                            Ambil Dari :
-                                        </td>
-                                        <td colspan="4">
+                                        <td colspan="5">
                                             <table class="bordered" id="table-detail-` + count + `">
                                                 <thead>
                                                     <tr>
-                                                        <th class="center" colspan="4">
-                                                            <select class="browser-default" id="production_fg_receive_detail_id" name="production_fg_receive_detail_id" onchange="getItemInformation();"></select>
-                                                            <a class="waves-effect waves-light cyan btn-small mt-5 mr-1 right" onclick="getItem();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                        <th class="center" colspan="2" width="40%">
+                                                            <select class="browser-default" id="item_stock_id` + count + `"></select>
                                                         </th>
+                                                        <th class="center" colspan="2" width="20%">
+                                                            <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                        </div>
                                                         <th class="center" colspan="3">
-                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Silahkan arahkan cursor disini dan mulai scan..." data-id="` + val.modd_id + `">
+                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `');">
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -1036,9 +1032,9 @@ document.addEventListener('focusin', function (event) {
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item-` + count + `">
-                                                    <tr id="last-row-item">
+                                                    <tr id="last-row-item-` + count + `">
                                                         <td colspan="7">
-                                                            Silahkan pilih Jadwal Kirim...
+                                                            Silahkan pilih Stock / Gudang...
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -1046,6 +1042,32 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                     </tr>
                                 `);
+                                $('#item_stock_id' + count).select2({
+                                    placeholder: '-- Pilih asal stock / gudang --',
+                                    minimumInputLength: 1,
+                                    allowClear: true,
+                                    cache: true,
+                                    width: 'resolve',
+                                    dropdownParent: $('body').parent(),
+                                    ajax: {
+                                        url: '{{ url("admin/select2/item_stock_by_place_item") }}',
+                                        type: 'GET',
+                                        dataType: 'JSON',
+                                        data: function(params) {
+                                            return {
+                                                search: params.term,
+                                                place_id: val.place_id,
+                                                item_id: val.item_id,
+                                                qty_conversion: val.conversion,
+                                            };
+                                        },
+                                        processResults: function(data) {
+                                            return {
+                                                results: data.items
+                                            }
+                                        }
+                                    }
+                                });
                             });
                         }
                     }
@@ -1069,6 +1091,71 @@ document.addEventListener('focusin', function (event) {
                 <option value="">--Kosong / Tambah baru--</option>
             `);
             $('#post_date').val('{{ date("Y-m-d") }}');
+        }
+    }
+
+    function getStock(id,modd){
+        if($('#item_stock_id' + id).val()){
+            if($('#last-row-item-' + id).length > 0){
+                $('#last-row-item-' + id).remove();
+            }
+            let datakuy = $('#item_stock_id' + id).select2('data')[0];
+            let count = makeid(10);
+            $('#body-item-' + id).append(`
+                <tr class="row_item_detail_` + id + `">
+                    <input type="hidden" name="arr_modd_id[]" value="` + modd + `">
+                    <input type="hidden" name="arr_item_stock_id[]" value="` + datakuy.id + `">
+                    <td>
+                        ` + datakuy.place + `
+                    </td>
+                    <td>
+                        ` + datakuy.warehouse + `
+                    </td>
+                    <td>
+                        ` + datakuy.area + `
+                    </td>
+                    <td>
+                        ` + datakuy.shading + `
+                    </td>
+                    <td>
+                        ` + datakuy.batch + `
+                    </td>
+                    <td>
+                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + datakuy.qty + `" class="rowQtyDetail` + id + `">
+                    </td>
+                    <td class="center-align">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + id + `');">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+        }
+        $('#item_stock_id' + id).empty();
+    }
+
+    function removeRow(element,id){
+        $(element).parent().parent().remove();
+        if($('.row_item_detail_' + id).length == 0){
+            $('#body-item-' + id).append(`
+                <tr id="last-row-item-` + id + `">
+                    <td colspan="7">
+                        Silahkan pilih Stock / Gudang...
+                    </td>
+                </tr>
+            `);
+        }
+    }
+
+    function checkMax(element){
+        var qty = parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")), 
+            qtylimit = parseFloat($(element).data('max').toString().replaceAll(".", "").replaceAll(",","."));
+
+        if(qtylimit > 0){
+            if(qty > qtylimit){
+                qty = qtylimit;
+                $(element).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
+            }
         }
     }
 
@@ -1717,10 +1804,8 @@ document.addEventListener('focusin', function (event) {
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
-                { name: 'customer_id', searchable: false, orderable: false, className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'account_id', className: '' },
-                { name: 'marketing_order_no', searchable: false, orderable: false, className: '' },
                 { name: 'marketing_order_delivery_no', searchable: false, orderable: false, className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'driver_name', className: '' },
@@ -1731,9 +1816,8 @@ document.addEventListener('focusin', function (event) {
                 { name: 'note_external', className: '' },
                 { name: 'return_date', searchable: false, orderable: false, className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
-                { name: 'delivery_address', searchable: false, orderable: false, className: '' },
                 { name: 'status_tracking', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1810,16 +1894,35 @@ document.addEventListener('focusin', function (event) {
             icon: 'warning',
             dangerMode: true,
             buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+                var formData = new FormData($('#form_data')[0]), passedQty = true;
+
+                $(".main-qty").each(function(){
+                    let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
+                    $(".rowQtyDetail" + id).each(function(index){
+                        qtyStock += parseFloat($(".rowQtyDetail" + id).eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                    });
+                    if(qtyStock !== qty){
+                        passedQty = false;
+                    }
+                });
+
+                if(!passedQty){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Qty yang akan dikirim dan qty stock tidak sama. Silahkan cek kembali.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
                 
@@ -2128,18 +2231,6 @@ document.addEventListener('focusin', function (event) {
                 });
             }
         });
-    }
-
-    function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",","."));
-
-        if(qtylimit > 0){
-            if(qty > qtylimit){
-                qty = qtylimit;
-                $('#rowQty' + id).val(formatRupiahIni(qty.toFixed(3).toString().replace('.',',')));
-            }
-        }
     }
 
     var printService = new WebSocketPrinter({

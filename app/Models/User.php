@@ -450,9 +450,9 @@ class User extends Authenticatable
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                    $query->whereHas('marketingOrderDeliveryProcess');
-                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
+                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
+                })->get() as $rowmod){
                     $totalDo += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
                 }
             }
@@ -465,9 +465,9 @@ class User extends Authenticatable
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                    $query->whereHas('marketingOrderDeliveryProcess');
-                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
+                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
+                })->get() as $rowmod){
                     $totalDo += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
                 }
             }

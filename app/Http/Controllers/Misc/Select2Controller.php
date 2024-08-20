@@ -2538,16 +2538,30 @@ class Select2Controller extends Controller {
         $search     = $request->search;
         $place      = $request->place_id;
         $item       = $request->item_id;
-        $data = ItemStock::where('item_id',$item)
-                    ->where('place_id',$place)
-                    ->get();
+        $qty_conversion = $request->qty_conversion;
+        $data       = ItemStock::where(function($query) use($search){
+                            $query->whereHas('itemShading',function($query) use($search){
+                                $query->where('code', 'like', "%$search%");
+                            })->orWhereHas('productionBatch',function($query) use($search){
+                                $query->where('code', 'like', "%$search%");
+                            });
+                        })
+                        ->where('item_id',$item)
+                        ->where('place_id',$place)
+                        ->where('qty','>',0)
+                        ->get();
 
         foreach($data as $d) {
             if($d->balanceWithUnsent() > 0){
                 $response[] = [
-                    'id'    => $d->id,
-                    'text' 	=> $d->place->code.' &#9830; Gudang : '.$d->warehouse->name.' &#9830; Area : '.($d->area()->exists() ? $d->area->name : '-').' &#9830; Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent()).' '.$d->item->uomUnit->code.' &#9830; Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
-                    'qty'   => CustomHelper::formatConditionalQty($d->balanceWithUnsent()),
+                    'id'        => $d->id,
+                    'text' 	    => $d->place->code.' / Gudang : '.$d->warehouse->name.' / Area : '.($d->area()->exists() ? $d->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion).' '.$d->item->uomUnit->code.' / Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
+                    'place'     => $d->place->code,
+                    'warehouse' => $d->warehouse->name,
+                    'area'      => $d->area->code,
+                    'shading'   => $d->itemShading->code,
+                    'batch'     => $d->productionBatch->code,
+                    'qty'       => CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion),
                 ];
             }
         }

@@ -27,6 +27,7 @@ use App\Models\UserDriver;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\User;
 use App\Models\MenuUser;
 use Illuminate\Support\Facades\Validator;
@@ -84,10 +85,8 @@ class MarketingOrderDeliveryProcessController extends Controller
             'id',
             'code',
             'user_id',
-            'customer_id',
             'company_id',
             'account_id',
-            'marketing_order_no',
             'marketing_order_delivery_no',
             'post_date',
             'driver_name',
@@ -241,10 +240,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->user->name,
-                    $val->marketingOrderDelivery->marketingOrder->account->name,
                     $val->company->name,
                     $val->account->name,
-                    $val->marketingOrderDelivery->marketingOrder->code,
                     $val->marketingOrderDelivery->code,
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->driver_name,
@@ -255,10 +252,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->note_external,
                     $val->return_date ? date('d/m/Y',strtotime($val->return_date)) : '-',
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
-                    $val->marketingOrderDelivery->marketingOrder->destination_address
-                    .' - '.ucwords(strtolower($val->marketingOrderDelivery->marketingOrder->subdistrict->name
-                    .' - '.$val->marketingOrderDelivery->marketingOrder->city->name
-                    .' '.$val->marketingOrderDelivery->marketingOrder->province->name)),
                     $val->statusTracking(),
                     $val->status(),
                     (
@@ -280,7 +273,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Switch ke MOD lain" onclick="switchDocument(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">call_split</i></button>
+                        <!-- <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Switch ke MOD lain" onclick="switchDocument(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">call_split</i></button> -->
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Tracking" onclick="getTracking(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_shipping</i></button>
                         <a href="delivery_order/driver/'.CustomHelper::encrypt($val->code).'?d='.CustomHelper::encrypt($val->driver_name).'&p='.CustomHelper::encrypt($val->driver_hp).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Driver Update Tracking" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -331,6 +324,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
                         'note'          => $row->note,
+                        'place_id'      => $row->marketingOrderDetail->place_id,
+                        'conversion'    => $row->marketingOrderDetail->qty_conversion,
                     ];
                 }
 
@@ -375,6 +370,9 @@ class MarketingOrderDeliveryProcessController extends Controller
             'driver_hp'                     => 'required',
             'vehicle_name'                  => 'required',
             'vehicle_no'                    => 'required',
+            'arr_modd_id'                   => 'required|array',
+            'arr_item_stock_id'             => 'required|array',
+            'arr_qty'                       => 'required|array',
         ], [
             'code.required' 	                    => 'Kode tidak boleh kosong.',
             /* 'code.string'                           => 'Kode harus dalam bentuk string.',
@@ -388,6 +386,12 @@ class MarketingOrderDeliveryProcessController extends Controller
             'driver_hp.required'                    => 'No HP/WA supir tidak boleh kosong.',
             'vehicle_name.required'                 => 'Nama/Tipe kendaraan tidak boleh kosong.',
             'vehicle_no.required'                   => 'Nopol kendaraan tidak boleh kosong.',
+            'arr_modd_id.required'                  => 'Detail item tidak boleh kosong.',
+            'arr_modd_id.array'                     => 'Detail item harus array.',
+            'arr_item_stock_id.required'            => 'Detail stock tidak boleh kosong.',
+            'arr_item_stock_id.array'               => 'Detail stock harus array.',
+            'arr_qty.required'                      => 'Detail qty tidak boleh kosong.',
+            'arr_qty.array'                         => 'Detail qty harus array.',
         ]);
 
         if($validation->fails()) {
@@ -407,6 +411,28 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'name'      => $request->driver_name,
                     'hp'        => $request->driver_hp,
                 ])->id;
+            }
+
+            if($request->arr_item_stock_id){
+                $passedQty = true;
+                foreach($request->arr_item_stock_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
+                    $itemstock = ItemStock::find($row);
+                    $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    if($itemstock){
+                        if($itemstock->balanceWithUnsent() < $qtyNeeded){
+                            $passedQty = false;
+                        }
+                    }else{
+                        $passedQty = false;
+                    }
+                }
+                if(!$passedQty){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada.'
+                    ]);
+                }
             }
             
 			if($request->temp){
@@ -512,6 +538,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                             }
                         }
 
+                        $query->marketingOrderDeliveryProcessDetail()->delete();
+
                         DB::commit();
                     }else{
                         return response()->json([
@@ -557,6 +585,20 @@ class MarketingOrderDeliveryProcessController extends Controller
 			}
 			
 			if($query) {
+
+                foreach($request->arr_item_stock_id as $key => $row){
+                    $querydetail = MarketingOrderDeliveryProcessDetail::create([
+                        'marketing_order_delivery_process_id'   => $query->id,
+                        'marketing_order_delivery_detail_id'    => $request->arr_modd_id[$key],
+                        'item_stock_id'                         => $row,
+                        'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                        'total'                                 => 0,
+                    ]);
+                    $total = $querydetail->getHpp();
+                    $querydetail->update([
+                        'total' => $total,
+                    ]);
+                }
 
                 if(!$request->tempSwitch){
                     MarketingOrderDeliveryProcessTrack::create([
@@ -625,52 +667,32 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan</th>
+                                <th class="center-align">Shading</th>
+                                <th class="center-align">Area</th>
+                                <th class="center-align">Batch</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
         $totalqty=0;
-        foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row){
+        foreach($data->marketingOrderDeliveryProcessDetail as $key => $row){
             $totalqty+=$row->qty;
             $string .= '<tr>
-                <td class="center-align" rowspan="2">'.($key + 1).'</td>
-                <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
-                <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->marketingOrderDetail->itemUnit->unit->code.'</td>
-                <td class="">'.$row->note.'</td>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.'</td>
+                <td class="center-align">'.$row->marketingOrderDeliveryDetail->item->code.' - '.$row->marketingOrderDeliveryDetail->item->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code.'</td>
+                <td class="">'.$row->itemStock->itemShading->code.'</td>
+                <td class="">'.$row->itemStock->area->code.'</td>
+                <td class="">'.$row->itemStock->productionBatch->code.'</td>
+                <td class="">'.$row->marketingOrderDeliveryDetail->note.'</td>
             </tr>';
-
-            $string .= '
-                <tr>
-                    <td class="center-align">Ambil Item dari : </td>
-                    <td colspan="5"><table class="bordered" id="table-detail-source">
-                    <thead>
-                        <tr>
-                            <th class="center-align">Asal Plant - Gudang - Area - Shading</th>
-                            <th class="center-align">Qty Kirim</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-                        
-            foreach($row->marketingOrderDeliveryStock as $rowdetail){
-                $string .= '<tr>
-                    <td>'.$rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : '').'</td>
-                    <td class="right-align">'.CustomHelper::formatConditionalQty($rowdetail->qty).'</td>
-
-                </tr>';
-            }
-                    
-            $string .= '</tbody>
-                    </table>
-                    </td>
-                </tr>
-            ';
         }
         $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
-            </tr>  
-        ';
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
+                <td class="center-align" colspan="5"></td>
+            </tr>';
         
         $string .= '</tbody></table></div>';
 

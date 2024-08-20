@@ -404,7 +404,6 @@ class PurchaseOrderController extends Controller
             $nomor = $start + 1;
             foreach($query_data as $val) {
                 $dis = '';
-                $voidbutton = '';
                 // if($val->isOpenPeriod()){
 
                 //     $dis = 'style="cursor: default;

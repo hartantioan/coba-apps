@@ -76,6 +76,7 @@ class User extends Authenticatable
         'spkp',
         'id_program_lama',
         'is_special_lock_user',
+        'type_body',
     ];
 
     protected $hidden = [
@@ -225,6 +226,8 @@ class User extends Authenticatable
                 $prefix = 'S';
             }elseif($type == '4'){
                 $prefix = 'E';
+            }elseif($type == '5'){
+                $prefix = 'B';
             }
     
             $query = User::withTrashed()->selectRaw('type, RIGHT(employee_no, 6) as code')

@@ -641,6 +641,11 @@ class UserController extends Controller
                     $query->top_internal    = $request->top_internal;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->gender          = $request->gender;
+
+                    $query->type_body       = $request->type_body;
+                    $query->nib             = $request->nib;
+                    $query->sppkp            = $request->sppkp;
+
                     $query->married_status  = $request->type == '1' ? $request->married_status : NULL;
                     $query->married_date    = $request->type == '1' ? $request->married_date : NULL;
                     $query->children        = $request->type == '1' ? $request->children : NULL;
@@ -684,6 +689,11 @@ class UserController extends Controller
                         'office_no'             => $request->office_no ? $request->office_no : NULL,
                         'limit_credit'          => $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : 0,
                         'count_limit_credit'    => 0,
+
+                        'type_body'             => $request->type_body,
+                        'sppkp'                  => $request->sppkp,
+                        'nib'                   => $request->nib,
+
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,
                         'status'                => $request->status ? $request->status : '2',

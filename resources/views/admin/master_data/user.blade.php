@@ -107,6 +107,7 @@
                                                 <option value="2">{{ __('translations.customer') }}</option>
                                                 <option value="3">Supplier</option>
                                                 <option value="4">Ekspedisi</option>
+                                                <option value="5">Broker</option>
                                             </select>
                                         </div>
 
@@ -183,6 +184,7 @@
                                 <option value="2">{{ __('translations.customer') }}</option>
                                 <option value="3">Supplier</option>
                                 <option value="4">Ekspedisi</option>
+                                <option value="5">Broker</option>
                             </select>
                             <label for="type">Tipe Partner Bisnis</label>
                         </div>
@@ -198,6 +200,14 @@
                         <div class="input-field col s12 m3">
                             <input id="employee_no" name="employee_no" type="text" placeholder="Kode BP...">
                             <label class="active" for="employee_no">Kode/NIK (Kosongkan untuk autogenerate)</label>
+                        </div>
+                        <div class="input-field col s12 m3 customer_inputs">
+                            <select id="type_body" name="type_body" onchange="">
+                                <option value="1">PT</option>
+                                <option value="2">CV</option>
+                                <option value="3">Perorangan</option>
+                            </select>
+                            <label for="type_body">Tipe Perusahaan Customer</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col s12 m3 employee_inputs">
@@ -225,7 +235,15 @@
                             <input id="id_card_address" name="id_card_address" type="text" placeholder="Alamat KTP">
                             <label class="active" for="id_card_address">Alamat KTP / Identitas</label>
                         </div>
-                        <div class="input-field col s12 m6 step5" id="manager_select">
+                        <div class="input-field col s12 m3 customer_inputs">
+                            <input id="nib" name="nib" type="text" placeholder="NIB">
+                            <label class="active" for="nib">NIB</label>
+                        </div>
+                        <div class="input-field col s12 m3 customer_inputs">
+                            <input id="sppkp" name="sppkp" type="text" placeholder="SPPKP">
+                            <label class="active" for="sppkp">SPPKP</label>
+                        </div>
+                        <div class="input-field col s12 m6" id="manager_select">
                             
                         </div>
                         <div class="col s12"></div>
@@ -319,6 +337,14 @@
                                 <option value="2">Non-Staff</option>
                             </select>
                             <label for="employee_type">Tipe Pegawai</label>
+                        </div>
+                        <div class="input-field col s12 m3 employee_inputs">
+                            <select class="form-control" id="place_id" name="place_id">
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>
+                            <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
                         </div>
                         <div class="input-field col s12 m3 employee_inputs">
                             <select class="form-control" id="place_id" name="place_id">
@@ -2112,7 +2138,7 @@
         }else{
             $('.other_inputs').show();
             $('.employee_inputs').hide();
-            if($(element).val() == '2'){
+            if($(element).val() == '2' || $(element).val() == '5' ){
                 $('.customer_inputs').show();
             }else{
                 $('.customer_inputs').hide();
@@ -2123,7 +2149,10 @@
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
-
+        let type =  document.getElementById('type').value;
+        let typeBody = document.getElementById('type_body').value;
+        let nib = document.getElementById('nib').value.trim();
+        let sppkp = document.getElementById('sppkp').value.trim();
         formData.delete('arr_id_data[]');
         formData.delete('arr_id_data_destination[]');
         formData.delete('arr_address_destination[]');
@@ -2188,71 +2217,89 @@
             formData.append('arr_city_destination[]',($('select[name^="arr_city_destination[]"]').eq(index).val() ? $('select[name^="arr_city_destination[]"]').eq(index).val() : ''));
             formData.append('arr_district_destination[]',($('select[name^="arr_district_destination[]"]').eq(index).val() ? $('select[name^="arr_district_destination[]"]').eq(index).val() : ''));
         });
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
+        let boleh = 0;
+        if(type == '1' || type == '3' || type == '4' ){
+            boleh = 0;
+        }else{
+            if (typeBody !== '3') {
+                if (!nib || !sppkp) {
+                    boleh = 1
+                }
+            }
+        }
+        if(boleh == 0){
+            $.ajax({
+                url: '{{ Request::url() }}/create',
+                type: 'POST',
+                dataType: 'JSON',
+                data: formData,
+                contentType: false,
+                processData: false,
+                cache: true,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alert').hide();
+                    $('#validation_alert').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
 
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
-
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                    if(response.status == 200) {
+                        success();
+                        M.toast({
+                            html: response.message
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
+                    } else if(response.status == 422) {
+                        $('#validation_alert').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        $.each(response.error, function(i, val) {
+                            $.each(val, function(i, val) {
+                                $('#validation_alert').append(`
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>` + val + `</p>
+                                        </div>
+                                        <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                `);
+                            });
+                        });
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
                     });
                 }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
-                });
-            }
-        });
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Check NIB SPKPP',
+                icon: 'error'
+            });
+        }
+       
     }
 
     function success(){
@@ -2286,9 +2333,12 @@
                 $('#email').val(response.email);
                 $("#address").val(response.address);
                 $('#type').val(response.type).trigger('change').formSelect();
-
+                $('#nib').val(response.nib);
+                $('#sppkp').val(response.sppkp);
                 refreshGroup();
-                
+                if(response.type_body){
+                    $('#type_body').val(response.type_body).trigger('change').formSelect();
+                }
                 $('#province_id,#country_id').empty();
 
                 if(response.province_id){

@@ -72,6 +72,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Prefix</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>Konversi ke Box</th>
                                                         <th>Harga per Satuan Jual</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -114,6 +115,10 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <input id="box_conversion" name="box_conversion" type="text" value="0,00" onkeyup="formatRupiah(this);">
+                            <label class="active" for="box_conversion">Konversi ke satuan Box</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);">
@@ -236,6 +241,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'prefix_code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'box_conversion', className: 'right-align' },
                 { name: 'nominal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -345,6 +351,7 @@
                 $('#prefix_code').val(response.prefix_code);
                 $('#name').val(response.name);
                 $('#nominal').val(response.nominal);
+                $('#box_conversion').val(response.box_conversion);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

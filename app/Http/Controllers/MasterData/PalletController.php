@@ -28,6 +28,7 @@ class PalletController extends Controller
             'code',
             'prefix_code',
             'name',
+            'box_conversion',
             'nominal',
         ];
 
@@ -82,6 +83,7 @@ class PalletController extends Controller
                     $val->code,
                     $val->prefix_code,
                     $val->name,
+                    number_format($val->box_conversion,3,',','.'),
                     number_format($val->nominal,2,',','.'),
                     $val->status(),
                     '
@@ -132,6 +134,7 @@ class PalletController extends Controller
                     $query->code            = $request->code;
                     $query->prefix_code     = $request->prefix_code ?? NULL;
                     $query->name	        = $request->name;
+                    $query->box_conversion	= str_replace(',','.',str_replace('.','',$request->box_conversion));
                     $query->nominal	        = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
@@ -146,6 +149,7 @@ class PalletController extends Controller
                         'code'          => $request->code,
                         'prefix_code'   => $request->prefix_code ?? NULL,
                         'name'			=> $request->name,
+                        'box_conversion'=> str_replace(',','.',str_replace('.','',$request->box_conversion)),
                         'nominal'       => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'        => $request->status ? $request->status : '2'
                     ]);

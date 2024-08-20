@@ -19,6 +19,7 @@ class Pallet extends Model
         'prefix_code',
         'name',
         'nominal',
+        'box_conversion',
         'status'
     ];
 

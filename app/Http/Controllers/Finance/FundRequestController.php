@@ -1181,6 +1181,8 @@ class FundRequestController extends Controller
                             $row->delete();
                         }
 
+                        $query->checklistDocumentList()->delete();
+
                         DB::commit();
                     }else{
                         return response()->json([

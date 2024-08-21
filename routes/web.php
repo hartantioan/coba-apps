@@ -307,6 +307,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('coa_journal', [Select2Controller::class, 'coaJournal']);
                 Route::get('raw_coa', [Select2Controller::class, 'rawCoa']);
                 Route::get('employee', [Select2Controller::class, 'employee']);
+                Route::get('broker', [Select2Controller::class, 'broker']);
                 Route::get('user', [Select2Controller::class, 'user']);
                 Route::get('supplier', [Select2Controller::class, 'supplier']);
                 Route::get('customer', [Select2Controller::class, 'customer']);

@@ -617,6 +617,7 @@ class MarketingOrderController extends Controller
                         $query->city_id = $request->city_id;
                         $query->district_id = $request->district_id;
                         $query->sales_id = $request->sales_id;
+                        $query->broker_id = $request->broker_id ?? NULL;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->percent_dp = str_replace(',','.',str_replace('.','',$request->percent_dp));
@@ -674,6 +675,7 @@ class MarketingOrderController extends Controller
                         'city_id'                   => $request->city_id,
                         'district_id'               => $request->district_id,
                         'sales_id'                  => $request->sales_id,
+                        'broker_id'                 => $request->broker_id ?? NULL,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'percent_dp'                => str_replace(',','.',str_replace('.','',$request->percent_dp)),
@@ -770,6 +772,7 @@ class MarketingOrderController extends Controller
         $po['user_data'] = $po->account->getBillingAddress();
         $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
         $po['outlet_name'] = $po->outlet->code.' - '.$po->outlet->name;
+        $po['broker_name'] = $po->broker()->exists() ? $po->broker->employee_no.' - '.$po->broker->name : '';
         $po['deposit'] = $po->account->deposit;
         $arr = [];
         

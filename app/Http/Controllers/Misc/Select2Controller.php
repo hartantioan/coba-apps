@@ -719,6 +719,30 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function broker(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->where('type','5')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text'          => $d->employee_no.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function user(Request $request)
     {
         $response = [];

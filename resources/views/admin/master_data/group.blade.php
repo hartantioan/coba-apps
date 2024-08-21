@@ -122,6 +122,7 @@
                                 <option value="2">{{ __('translations.customer') }}</option>
                                 <option value="3">Supplier</option>
                                 <option value="4">Ekspedisi</option>
+                                <option value="5">Broker</option>
                             </select>
                             <label for="type">Tipe Partner Bisnis</label>
                         </div>

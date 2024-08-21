@@ -221,6 +221,7 @@
                                                         <th>Kota Tujuan</th>
                                                         <th>Kecamatan Tujuan</th>
                                                         <th>Sales</th>
+                                                        <th>Broker</th>
                                                         <th>{{ __('translations.currency') }}</th>
                                                         <th>{{ __('translations.conversion') }}</th>
                                                         <th>% DP</th>
@@ -433,6 +434,10 @@
                                     <div class="input-field col m3 s12 step29">
                                         <select class="browser-default" id="sales_id" name="sales_id"></select>
                                         <label class="active" for="sales_id">Sales</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="broker_id" name="broker_id"></select>
+                                        <label class="active" for="broker_id">Broker</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -784,7 +789,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#limit').text('0,00');
-                $('#account_id,#sender_id,#sales_id,#project_id,#transportation_id,#outlet_id').empty();
+                $('#account_id,#sender_id,#sales_id,#project_id,#transportation_id,#outlet_id,#broker_id').empty();
                 $('#total,#tax,#grandtotal,#rounding,#balance').val('0,00');
                 $('.row_item').each(function(){
                     $(this).remove();
@@ -878,6 +883,7 @@
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#sales_id,#filter_sales', '{{ url("admin/select2/employee") }}');
+        select2ServerSide('#broker_id', '{{ url("admin/select2/broker") }}');
         select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/supplier_vendor") }}');
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
@@ -1668,6 +1674,7 @@
                 { name: 'city_id', className: '' },
                 { name: 'district_id', className: '' },
                 { name: 'sales_id', className: '' },
+                { name: 'broker_id', className: '' },
                 { name: 'currency_id', className: '' },
                 { name: 'currency_rate', className: 'right-align' },
                 { name: 'percent_dp', className: 'center-align' },
@@ -1994,6 +2001,9 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#percent_dp').val(response.percent_dp);
                 $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
+                if(response.broker_name){
+                    $('#broker_id').empty().append(`<option value="` + response.broker_id + `">` + response.broker_name + `</option>`);
+                }
                 $('#note_internal').val(response.note_internal);
                 $('#note_external').val(response.note_external);
             

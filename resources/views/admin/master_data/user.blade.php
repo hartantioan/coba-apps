@@ -167,11 +167,11 @@
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
-                <div class="card-alert card blue">
+                {{-- <div class="card-alert card blue">
                     <div class="card-content white-text">
                         <p>Info : Untuk penambahan BP Supplier & Ekspedisi dibuka akses hanya pak Sandi.</p>
                     </div>
-                </div>
+                </div> --}}
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
@@ -207,7 +207,7 @@
                                 <option value="2">CV</option>
                                 <option value="3">Perorangan</option>
                             </select>
-                            <label for="type_body">Tipe Perusahaan Customer</label>
+                            <label for="type_body">Tipe Perusahaan Customer / Broker</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col s12 m3 employee_inputs">

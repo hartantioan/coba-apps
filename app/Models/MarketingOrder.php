@@ -45,6 +45,7 @@ class MarketingOrder extends Model
         'district_id',
         'subdistrict_id',
         'sales_id',
+        'broker_id',
         'currency_id',
         'currency_rate',
         'percent_dp',
@@ -116,6 +117,10 @@ class MarketingOrder extends Model
 
     public function sales(){
         return $this->belongsTo('App\Models\User','sales_id','id')->withTrashed();
+    }
+
+    public function broker(){
+        return $this->belongsTo('App\Models\User','broker_id','id')->withTrashed();
     }
 
     public function province(){

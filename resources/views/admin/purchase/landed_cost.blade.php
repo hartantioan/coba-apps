@@ -2393,6 +2393,7 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                M.updateTextFields();
                 if(response.status == 200){
                     $('#modal1').modal('open');
                     if(response.document){
@@ -2429,7 +2430,6 @@
                     $('#grandtotal').val(response.grandtotal);
 
                     var totalproporsional = 0, totalall = 0;
-                    console.log(response.details);
                     if(response.details.length > 0){
                         $('#last-row-item').remove();
 
@@ -2556,7 +2556,6 @@
                     
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
-                    M.updateTextFields();
                 }else{
                     M.toast({
                         html: response.message

@@ -115,7 +115,11 @@ class LandedCostController extends Controller
             $goods_receipt = [];
             $landed_cost = [];
 
-            $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->get();
+            $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->where(function($query){
+                $query->whereHas('goodReceiptDetail',function($query){
+                    $query->whereDoesntHave('landedCostDetail');
+                });
+            })->get();
             
             foreach($datagr as $row){
                 if(!$row->used()->exists()){

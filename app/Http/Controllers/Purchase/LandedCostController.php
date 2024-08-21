@@ -1491,7 +1491,7 @@ class LandedCostController extends Controller
         $currency = $request->currency? $request->currency : '';
         $supplier = $request->supplier? $request->supplier : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportLandedCostTransactionPage($search,$post_date,$end_date,$currency,$supplier,$status,$modedata), 'purchase_request_'.uniqid().'.xlsx');
+		return Excel::download(new ExportLandedCostTransactionPage($search,$post_date,$end_date,$currency,$supplier,$status,$modedata), 'landed_cost_'.uniqid().'.xlsx');
     }
     
     public function removeUsedData(Request $request){

@@ -22,6 +22,7 @@
             <th>Qty Real</th>
             <th>Qty Reject</th>
             <th>Satuan Produksi</th>
+            <th>Total Real</th>
             <th>No Batch</th>
             <th>Line</th>
             <th>Gudang</th>
@@ -57,6 +58,7 @@
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->qty_reject}}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
+                    <td>{{ $row_detail->total}}</td>
                     <td>{{ $row_detail->getProductionBatchCodesAttribute()}}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ $row_detail->warehouse->name}}</td>

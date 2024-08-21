@@ -2965,14 +2965,12 @@
     function exportExcel(){
         var search = table.search();
         var status = $('#filter_status').val();
-        
-        var supplier = $('#filter_supplier').val();
         var currency = $('#filter_currency').val();
         var start_date = $('#start_date').val();
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
       
     }
 

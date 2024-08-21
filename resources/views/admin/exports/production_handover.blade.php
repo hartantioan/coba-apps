@@ -59,7 +59,7 @@
                     <td>{{ $row_detail->qty}}</td>                
                     <td>{{ $row_detail->productionFgReceiveDetail->itemUnit->unit->code}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
-                    <td>{{ $row_detail->productionFgReceiveDetail->conversion * $row_detail->qty}}</td>
+                    <td>{{ round($row_detail->productionFgReceiveDetail->conversion * $row_detail->qty,3) }}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>

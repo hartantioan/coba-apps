@@ -346,14 +346,6 @@
                             </select>
                             <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
                         </div>
-                        <div class="input-field col s12 m3 employee_inputs">
-                            <select class="form-control" id="place_id" name="place_id">
-                                @foreach ($place as $rowplace)
-                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                @endforeach
-                            </select>
-                            <label class="" for="place_id">Plant (Untuk nomor pegawai)</label>
-                        </div>
                         <div class="col s12 mt-1">
                             <div class="input-field col s12 m3 customer_inputs" style="display:none;">
                                 <div class="switch mb-1">

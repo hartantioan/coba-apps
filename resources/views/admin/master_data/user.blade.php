@@ -1121,6 +1121,7 @@
                 $('#manager_select').empty();
                 refreshGroup();
                 $('#name').prop('readonly',false);
+                $('.row_info,.row_bank,.row_destination,.row_destination_doc,.row_driver').remove();
             }
         });
        

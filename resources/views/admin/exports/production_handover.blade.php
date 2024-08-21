@@ -23,6 +23,8 @@
             <th>Qty Diterima</th>
             <th>Satuan</th>
             <th>Konversi</th>
+            <th>Qty Stock</th>
+            <th>Satuan Stock</th>
             <th>Gudang</th>
             <th>Area</th>
             <th>Based On</th>
@@ -55,8 +57,10 @@
                     <td>{{ $row_detail->productionFgReceiveDetail->pallet_no}}</td>
                     <td>{{ $row_detail->shading}}</td> 
                     <td>{{ $row_detail->qty}}</td>                
-                    <td>{{ $row_detail->item->uomUnit->code}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->itemUnit->unit->code}}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->conversion}}</td>
+                    <td>{{ $row_detail->productionFgReceiveDetail->conversion * $row_detail->qty}}</td>
+                    <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ ($row_detail->area()->exists() ? $row_detail->area->name : '-') }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->productionFgReceive->code }}</td>

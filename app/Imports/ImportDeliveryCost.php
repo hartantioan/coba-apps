@@ -1,76 +1,120 @@
 <?php
 
 namespace App\Imports;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
 
 use App\Models\DeliveryCost;
 
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Validators\ValidationException;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
-class ImportDeliveryCost implements ToModel,WithHeadingRow, WithValidation,WithBatchInserts
+use App\Exceptions\RowImportException;
+
+use App\Models\Region;
+use App\Models\User;
+
+use DateTime;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\OnEachRow;
+use Maatwebsite\Excel\Row;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+class ImportDeliveryCost implements WithMultipleSheets
 {
-    public function model(array $row)
-    {
-        /* $date_from = intval($row['valid_from']); */
-        return new DeliveryCost([
-            'code' => $row['code'],
-            'user_id' => session('bo_id'),
-            'account_id' => $row['account_id'],
-            'name' => $row['name'],
-            'valid_from' => Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['valid_from'])),
-            'valid_to' => Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row['valid_to'])),
-            'from_city_id' => $row['from_city_id'],
-            'from_subdistrict_id' => $row['from_subdistrict_id'],
-            'to_city_id' => $row['to_city_id'],
-            'to_subdistrict_id' => $row['to_subdistrict_id'],
-            'tonnage' => $row['tonnage'],
-            'nominal' => $row['nominal'],
-            'status'=> $row['status'],
-        ]);
-    }
-    public function rules(): array
+    protected $error = '';
+    protected $temp = [];
+
+    public function sheets(): array
     {
         return [
-            '*.code' => 'required|unique:delivery_costs,code',
-            '*.account_id' => 'nullable',
-            '*.name' => 'required|string',
-            '*.valid_from' => 'required',
-            '*.valid_to' => 'required',
-            '*.from_city_id' => 'required|numeric',
-            '*.from_subdistrict_id' => 'required|numeric',
-            '*.to_city_id' => 'required|numeric',
-            '*.to_subdistrict_id' => 'required|numeric',
-            '*.tonnage' => 'required|numeric',
-            '*.nominal' => 'required|numeric',
-            '*.status' => 'required',
+            0 => new handleDC(),
         ];
     }
+}
+class handleDC implements OnEachRow, WithHeadingRow
+{
+    public $error = null;
+    protected $temp;
 
-    public function onFailure(Failure ...$failures)
+
+    public function onRow(Row $row)
     {
-        $errors = [];
+        DB::beginTransaction();
+        try {
+            if (isset($row['code']) && $row['code']) {
+               
 
-        foreach ($failures as $failure) {
-            $errors[] = [
-                'row' => $failure->row(),
-                'attribute' => $failure->attribute(),
-                'errors' => $failure->errors(),
-                'values' => $failure->values(),
-            ];
+                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage'];$nominal = $row['nominal'];
+                $account = User::where('employee_no', explode('#', $row['supplier_ekspedisi'])[0])->first();
+                
+                $city = str_replace(',', '.', explode('#', $row['from_city'])[0]);
+                $city_id_from = Region::where('code',$city)->first()->id; 
+                $from_sub_district = str_replace(',', '.', explode('#', $row['from_subdistrict'])[0]);
+                $sub_district_id_from = Region::where('code',$from_sub_district)->first()->id;
+
+                $tocity  = str_replace(',', '.', explode('#', $row['to_city'])[0]);
+                $city_id_to = Region::where('code',$tocity)->first()->id; 
+                $to_sub_district  = str_replace(',', '.', explode('#', $row['to_subdistrict'])[0]);
+                $sub_district_id_to = Region::where('code',$to_sub_district)->first()->id;
+                
+                if(!$account && $this->error ==null){
+                    $this->error = "Ekspedisi dan Supplier.";
+                }elseif(!$code && $this->error ==null){
+                    $this->error = "Kode.";
+                }elseif(!$name && $this->error ==null){
+                    $this->error = "Nama";
+                }elseif(!$city_id_to && $this->error ==null){
+                    $this->error = "Kota Tujuan";
+                }elseif(!$sub_district_id_to && $this->error ==null){
+                    $this->error = "Kecamatan Tujuan";
+                }elseif(!$city_id_from && $this->error ==null){
+                    $this->error = "Kota Awal";
+                }elseif(!$sub_district_id_from && $this->error ==null){
+                    $this->error = "Kecamatan Awal";
+                }elseif(!$tonnage && $this->error ==null){
+                    $this->error = "tonnage";
+                }elseif(!$nominal && $this->error ==null){
+                    $this->error = "nominal";
+                }
+
+                $dateTime1 = DateTime::createFromFormat('U', ($row['valid_from'] - 25569) * 86400);
+                $dateFormatted1 = $dateTime1->format('Y/m/d');
+                $dateTime2 = DateTime::createFromFormat('U', ($row['valid_to'] - 25569) * 86400);
+                $dateFormatted2 = $dateTime2->format('Y/m/d');
+              
+                    $query = DeliveryCost::create([
+                        'code' => $row['code'],
+                        'user_id' => session('bo_id'),
+                        'account_id' => $account->id,
+                        'name' => $row['name'],
+                        'valid_from' => $dateFormatted1,
+                        'valid_to' => $dateFormatted2,
+                        'from_city_id' => $city_id_from,
+                        'from_subdistrict_id' => $sub_district_id_from,
+                        'to_city_id' => $city_id_to,
+                        'to_subdistrict_id' => $sub_district_id_to,
+                        'tonnage' => $row['tonnage'],
+                        'nominal' => $row['nominal'],
+                        'status'=> 1
+                    ]);
+                
+                    activity()
+                        ->performedOn(new DeliveryCost())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit from excel Delivery cost data.');
+               
+            }else{
+                return null;
+            } 
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+            $sheet='Header';
+            throw new RowImportException($e->getMessage(), $row->getIndex(),$this->error,$sheet);
         }
-
-        throw new ValidationException(null, null, $errors);
     }
-
-    public function batchSize(): int
+    
+    public function startRow(): int
     {
-        return 1000;
+        return 2; // If you want to skip the first row (heading row)
     }
 }

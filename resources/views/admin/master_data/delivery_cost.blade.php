@@ -30,7 +30,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal2">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal_import">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
@@ -225,11 +225,11 @@
     </div>
 </div>
 
-<div id="modal2" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:70%;">
+<div id="modal_import" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>import Excel</h4>
+                <h4>{{ __('translations.import') }} Excel</h4>
                 <div class="col s12">
                     <div id="validation_alertImport" style="display:none;"></div>
                 </div>
@@ -237,7 +237,7 @@
                     @csrf
                     <div class="file-field input-field col m6 s12">
                         <div class="btn">
-                            <span>Dokumen</span>
+                            <span>Dokumen Excel</span>
                             <input type="file" class="form-control-file" id="fileExcel" name="file">
                         </div>
                         <div class="file-path-wrapper">
@@ -245,7 +245,7 @@
                         </div>
                     </div>
                     <div class="input-field col m6 s12">
-                        Download format disini : <a href="{{ asset(Storage::url('format_imports/format_delivery_cost.xlsx')) }}" target="_blank">File</a>
+                        <h6>Anda bisa menggunakan fitur upload dokumen excel. Silahkan klik <a href="{{-- {{ asset(Storage::url('format_imports/format_copas_ap_invoice_2.xlsx')) }} --}}{{ Request::url() }}/get_import_excel" target="_blank">disini</a> untuk mengunduh. Untuk Satuan dan Grup Item, silahkan pilih dari dropdown yang tersedia.</h6>
                     </div>
                     <div class="input-field col m12 s12">
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
@@ -424,7 +424,7 @@
             }
         });
 
-        $('#modal2').modal({
+        $('#modal_import').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 
@@ -432,6 +432,99 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_dataimport')[0].reset();
             }
+        });
+
+        $('#form_dataimport').submit(function(event) {
+            event.preventDefault();
+
+            var formData = new FormData(this);
+
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    $('#validation_alertImport').hide();
+                    $('#validation_alertImport').html('');
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 200) {
+                        successImport();
+                        M.toast({
+                            html: response.message
+                        });
+                    } else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        
+                       
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                },
+                error: function(response) {
+                    loadingClose('.modal-content');
+                    console.log(response);
+                    if(response.status === 422) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+
+                        swal({
+                            title: 'Ups! Validation',
+                            text: 'Check your form.',
+                            icon: 'warning'
+                        });
+
+                        let errorMessage = '';
+                        response.responseJSON.errors.forEach(function(error) {
+                            errorMessage += error.errors.join('\n') + '\n';
+                        });
+
+                        $('#validation_alertImport').html(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    <p>${errorMessage}</p>
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `).show();
+                    }else if(response.status === 400 || response.status === 432) {
+                        $('#validation_alertImport').show();
+                        $('.modal-content').scrollTop(0);
+                        console.log(response);
+                        let errorMessage = response.status === 400 ? 
+                            `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` : 
+                            `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
+
+                        $('#validation_alertImport').append(`
+                            <div class="card-alert card red">
+                                <div class="card-content white-text">
+                                    ${errorMessage}
+                                </div>
+                                <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                        `);
+                    } else {
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                }
+            });
         });
 
         $(".select2").select2({
@@ -728,7 +821,7 @@
 
     function successImport(){
         loadDataTable();
-        $('#modal2').modal('close');
+        $('#modal_import').modal('close');
     }
 
 

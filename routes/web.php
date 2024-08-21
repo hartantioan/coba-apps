@@ -102,6 +102,7 @@ use App\Http\Controllers\MasterData\UserDateController;
 use App\Http\Controllers\MasterData\UserItemController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
 use App\Http\Controllers\MasterData\StandardCustomerPriceController;
+use App\Http\Controllers\MasterData\DiscountCustomerController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
 use App\Http\Controllers\MasterData\TransportationController;
@@ -1251,6 +1252,21 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [StandardCustomerPriceController::class, 'destroy'])->middleware('operation.access:standar_customer_price,delete');
                     });
 
+                    Route::prefix('customer_discount')->middleware('operation.access:customer_discount,view')->group(function () {
+                        Route::get('/',[DiscountCustomerController::class, 'index']);
+                        Route::get('datatable',[DiscountCustomerController::class, 'datatable']);
+                        Route::get('row_detail',[DiscountCustomerController::class, 'rowDetail']);
+                        Route::post('show', [DiscountCustomerController::class, 'show']);
+                        Route::post('print',[DiscountCustomerController::class, 'print']);
+                        Route::get('export',[DiscountCustomerController::class, 'export']);
+                        Route::get('export_from_page',[DiscountCustomerController::class, 'exportFromTransactionPage']);
+                        Route::post('import',[DiscountCustomerController::class, 'import'])->middleware('operation.access:customer_discount,update');
+                        Route::post('import_master',[DiscountCustomerController::class, 'importMaster'])->middleware('operation.access:customer_discount,update');
+                        Route::post('create',[DiscountCustomerController::class, 'create'])->middleware('operation.access:customer_discount,update');
+                        Route::post('destroy', [DiscountCustomerController::class, 'destroy'])->middleware('operation.access:customer_discount,delete');
+                    });
+
+
                     Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {
                         Route::get('/',[ItemPricelistController::class, 'index']);
                         Route::post('import',[ItemPricelistController::class, 'import'])->middleware('operation.access:item_pricelist,update');
@@ -1277,6 +1293,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[DeliveryCostController::class, 'index']);
                         Route::get('datatable',[DeliveryCostController::class, 'datatable']);
                         Route::post('show', [DeliveryCostController::class, 'show']);
+                        Route::get('get_import_excel',[DeliveryCostController::class, 'getImportExcel']);
                         Route::post('import',[DeliveryCostController::class, 'import'])->middleware('operation.access:delivery_cost,update');
                         Route::post('create',[DeliveryCostController::class, 'create'])->middleware('operation.access:delivery_cost,update');
                         Route::post('destroy', [DeliveryCostController::class, 'destroy'])->middleware('operation.access:delivery_cost,delete');

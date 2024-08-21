@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\DeliveryCost;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportDeliveryCost;
+use App\Exceptions\RowImportException;
+use App\Exports\ExportTemplateDeliveryCost;
 use App\Models\Transportation;
 
 class DeliveryCostController extends Controller
@@ -335,59 +337,23 @@ class DeliveryCostController extends Controller
 
     public function import(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'file' => [
-                'required',
-                'mimes:xlsx',
-                'max:2048',
-                function ($attribute, $value, $fail) {
-                    $rows = Excel::toArray([], $value)[0];
-                    if (count($rows) < 2) {
-                        $fail('The file must contain at least two rows.');
-                    }
-                }
-            ]
-        ]);
-
-        if ($validator->fails()) {
-            $response = [
-                'status' => 432,
-                'error'  => $validator->errors()
-            ];
-            return response()->json($response);
-        }
-
         try {
             Excel::import(new ImportDeliveryCost, $request->file('file'));
-
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
+        } catch (RowImportException $e) {
             return response()->json([
-                'status'    => 200,
-                'message'   => 'Import sukses!'
-            ]);
-        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            $failures = $e->failures();
-
-            $errors = [];
-            foreach ($failures as $failure) {
-                $errors[] = [
-                    'row' => $failure->row(),
-                    'attribute' => $failure->attribute(),
-                    'errors' => $failure->errors(),
-                    'values' => $failure->values(),
-                ];
-            }
-            $response = [
-                'status' => 422,
-                'error'  => $errors
-            ];
-
-            return response()->json($response);
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
         } catch (\Exception $e) {
-            $response = [
-                'status'  => 500,
-                'message' => "Data failed to save"
-            ];
-            return response()->json($response);
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
         }
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateDeliveryCost(), 'format_template_delivery_cost_'.uniqid().'.xlsx');
     }
 }

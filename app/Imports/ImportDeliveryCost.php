@@ -8,6 +8,7 @@ use App\Models\DeliveryCost;
 use App\Exceptions\RowImportException;
 
 use App\Models\Region;
+use App\Models\Transportation;
 use App\Models\User;
 
 use DateTime;
@@ -55,6 +56,7 @@ class handleDC implements OnEachRow, WithHeadingRow
                 $to_sub_district  = str_replace(',', '.', explode('#', $row['to_subdistrict'])[0]);
                 $sub_district_id_to = Region::where('code',$to_sub_district)->first()->id;
                 
+                $transport = Transportation::where('code', explode('#', $row['transport'])[0])->first();
                 if(!$account && $this->error ==null){
                     $this->error = "Ekspedisi dan Supplier.";
                 }elseif(!$code && $this->error ==null){
@@ -73,6 +75,8 @@ class handleDC implements OnEachRow, WithHeadingRow
                     $this->error = "tonnage";
                 }elseif(!$nominal && $this->error ==null){
                     $this->error = "nominal";
+                }elseif(!$transport && $this->error ==null){
+                    $this->error = "Transportasi";
                 }
 
                 $dateTime1 = DateTime::createFromFormat('U', ($row['valid_from'] - 25569) * 86400);
@@ -91,6 +95,7 @@ class handleDC implements OnEachRow, WithHeadingRow
                         'from_subdistrict_id' => $sub_district_id_from,
                         'to_city_id' => $city_id_to,
                         'to_subdistrict_id' => $sub_district_id_to,
+                        'transportation_id' => $transport->id,
                         'tonnage' => $row['tonnage'],
                         'nominal' => $row['nominal'],
                         'status'=> 1

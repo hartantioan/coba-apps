@@ -9,14 +9,16 @@ use Illuminate\Support\Facades\DB;
 use App\Models\DeliveryCost;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ImportDeliveryCost;
+use App\Models\Transportation;
 
 class DeliveryCostController extends Controller
 {
     public function index()
     {
         $data = [
-            'title'     => 'Biaya Pengiriman',
-            'content'   => 'admin.master_data.delivery_cost',
+            'title'             => 'Biaya Pengiriman',
+            'transport'         => Transportation::where('status','1')->get(),
+            'content'           => 'admin.master_data.delivery_cost',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -28,6 +30,7 @@ class DeliveryCostController extends Controller
             'code',
             'name',
             'account_id',
+            'transportation_id',
             'valid_from',
             'valid_to',
             'from_city_id',
@@ -157,6 +160,7 @@ class DeliveryCostController extends Controller
                     $val->code,
                     $val->name,
                     $val->account->name ?? '',
+                    $val->transportation->name,
                     date('d/m/Y',strtotime($val->valid_from)),
                     date('d/m/Y',strtotime($val->valid_to)),
                     $val->fromCity->name,
@@ -200,6 +204,7 @@ class DeliveryCostController extends Controller
             'to_city_id'            => 'required',
             'to_subdistrict_id'     => 'required',
             'account_id'            => 'required',
+            'transportation_id'     => 'required',
             'tonnage'               => 'required',
             'nominal'               => 'required',
         ], [
@@ -213,6 +218,7 @@ class DeliveryCostController extends Controller
             'to_city_id.required'           => 'Tujuan kota tidak boleh kosong.',
             'to_subdistrict_id.required'    => 'Tujuan kecamatan tidak boleh kosong.',
             'account_id.required'           => 'Partner Bisnis tidak boleh kosong.',
+            'transportation_id.required'    => 'Jenis kendaraan tidak boleh kosong.',
             'tonnage.required'              => 'Tonase tidak boleh kosong.',
             'nominal.required'              => 'Nominal harga tidak boleh kosong.',
         ]);
@@ -232,6 +238,7 @@ class DeliveryCostController extends Controller
                     $query->code                = $request->code;
                     $query->user_id             = session('bo_id');
                     $query->account_id          = $request->account_id;
+                    $query->transportation_id   = $request->transportation_id;
                     $query->name	            = $request->name;
                     $query->valid_from          = $request->valid_from;
                     $query->valid_to            = $request->valid_to;
@@ -248,6 +255,7 @@ class DeliveryCostController extends Controller
                         'code'                  => $request->code,
                         'user_id'               => session('bo_id'),
                         'account_id'            => $request->account_id,
+                        'transportation_id'     => $request->transportation_id,
                         'name'			        => $request->name,
                         'valid_from'            => $request->valid_from,
                         'valid_to'              => $request->valid_to,
@@ -296,7 +304,7 @@ class DeliveryCostController extends Controller
         $dc['to_subdistrict_list'] = $dc->toCity->getSubdistrict();
         $dc['tonnage'] = number_format($dc->tonnage,2,',','.');
         $dc['nominal'] = number_format($dc->nominal,2,',','.');
-        $dc['account_name'] = $dc->account->name;
+        $dc['account_name'] = $dc->account()->exists() ? $dc->account->name : '';
         				
 		return response()->json($dc);
     }

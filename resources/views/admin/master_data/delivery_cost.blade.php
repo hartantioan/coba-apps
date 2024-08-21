@@ -100,6 +100,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.bussiness_partner') }}</th>
+                                                        <th>Tipe Transport</th>
                                                         <th>{{ __('translations.valid_date') }}</th>
                                                         <th>{{ __('translations.valid_until') }}</th>
                                                         <th>{{ __('translations.starting_city') }}</th>
@@ -137,22 +138,53 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
+                            <select class="browser-default" id="account_id" name="account_id"></select>
+                            <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <select class="form-control" id="transportation_id" name="transportation_id">
+                                @foreach ($transport as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label class="active" for="transportation_id">Jenis Kendaraan</label>
+                        </div>
+                        <div class="input-field col s12 m4">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input id="valid_from" name="valid_from" type="date" max="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_from">{{ __('translations.valid_from') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input id="valid_to" name="valid_to" type="date" max="{{ date('9999'.'-12-31') }}" min="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_to">{{ __('translations.valid_until') }}</label>
+                        </div>
+                        <div class="input-field col m4 s12">
+                            <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
+                        </div>
+                        <div class="input-field col m4 s12">
+                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
+                        </div>
+                        <div class="input-field col s12 m4">
+                            <div class="switch mb-1">
+                                <label for="status">{{ __('translations.status') }}</label>
+                                <label>
+                                    {{ __('translations.non_active') }}
+                                    <input checked type="checkbox" id="status" name="status" value="1">
+                                    <span class="lever"></span>
+                                   {{ __('translations.active') }}
+                                </label>
+                            </div>
                         </div>
                         <div class="col s12">
                             <h6>{{ __('translations.origin') }}</h6>
@@ -178,29 +210,6 @@
                                     <option value="">--{{ __('translations.select') }}--</option>
                                 </select>
                                 <label class="active" for="to_subdistrict_id">{{ __('translations.district') }}</label>
-                            </div>
-                        </div>
-                        <div class="input-field col m6 s12">
-                            <select class="browser-default" id="account_id" name="account_id"></select>
-                            <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
-                        </div>
-                        <div class="input-field col m6 s12">
-                            <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
-                        </div>
-                        <div class="input-field col m6 s12">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <div class="switch mb-1">
-                                <label for="status">{{ __('translations.status') }}</label>
-                                <label>
-                                    {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                   {{ __('translations.active') }}
-                                </label>
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -411,6 +420,7 @@
                 $('#from_subdistrict_id,#to_subdistrict_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);
+                $('#account_id').empty();
             }
         });
 
@@ -490,6 +500,7 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'account_id', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'valid_from', className: 'center-align' },
                 { name: 'valid_to', className: 'center-align' },
                 { name: 'from_city', className: 'center-align' },
@@ -623,6 +634,7 @@
                 $('#valid_to').val(response.valid_to);
                 $('#tonnage').val(response.tonnage);
                 $('#nominal').val(response.nominal);
+                $('#transportation_id').val(response.transportation_id).formSelect();
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);

@@ -18,6 +18,7 @@ class DeliveryCost extends Model
         'code',
         'user_id',
         'account_id',
+        'transportation_id',
         'name',
         'valid_from',
         'valid_to',
@@ -32,6 +33,10 @@ class DeliveryCost extends Model
 
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
+    }
+
+    public function transportation(){
+        return $this->belongsTo('App\Models\Transportation','transportation_id','id')->withTrashed();
     }
 
     public function account(){

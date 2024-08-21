@@ -27,8 +27,8 @@ class DeliveryCost extends Model
         'to_city_id',
         'to_subdistrict_id',
         'tonnage',
+        'qty_tonnage',
         'ritage',
-        'nominal',
         'status',
     ];
 

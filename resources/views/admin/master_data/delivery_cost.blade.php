@@ -107,9 +107,9 @@
                                                         <th>{{ __('translations.starting_subdistrict') }}</th>
                                                         <th>{{ __('translations.destination_city') }}</th>
                                                         <th>{{ __('translations.destination_subdistrict') }}</th>
+                                                        <th>Tonase (Kg)</th>
                                                         <th>{{ __('translations.tonnage') }}</th>
                                                         <th>{{ __('translations.ritage') }}</th>
-                                                        <th>{{ __('translations.price') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -169,16 +169,16 @@
                             <label class="active" for="valid_to">{{ __('translations.valid_until') }}</label>
                         </div>
                         <div class="input-field col m4 s12">
+                            <input id="qty_tonnage" name="qty_tonnage" type="text" placeholder="Berat Tonase" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="qty_tonnage">Berat Tonase</label>
+                        </div>
+                        <div class="input-field col m4 s12">
                             <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="ritage" name="ritage" type="text" placeholder="Ritase" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="ritage"></label>
-                        </div>
-                        <div class="input-field col m4 s12">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
                         </div>
                         <div class="input-field col s12 m4">
                             <div class="switch mb-1">
@@ -500,9 +500,9 @@
                 { name: 'from_subdistrict', className: 'center-align' },
                 { name: 'to_city', className: 'center-align' },
                 { name: 'to_subdistrict', className: 'center-align' },
+                { name: 'qty_tonnage', className: 'center-align' },
                 { name: 'tonnage', className: 'center-align' },
                 { name: 'ritage', className: 'center-align' },
-                { name: 'nominal', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -628,7 +628,7 @@
                 $('#valid_to').val(response.valid_to);
                 $('#tonnage').val(response.tonnage);
                 $('#ritage').val(response.ritage);
-                $('#nominal').val(response.nominal);
+                $('#qty_tonnage').val(response.qty_tonnage);
                 $('#transportation_id').val(response.transportation_id).formSelect();
                 $('#account_id').empty().append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>

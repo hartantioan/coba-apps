@@ -43,7 +43,7 @@ class handleDC implements OnEachRow, WithHeadingRow
             if (isset($row['code']) && $row['code']) {
                
 
-                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage'];$ritage = $row['ritage'];$nominal = $row['nominal'];
+                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage_price'];$ritage = $row['ritage_price'];$tonnage_weight = $row['tonnage_weight'];
                 $account = User::where('employee_no', explode('#', $row['supplier_ekspedisi'])[0])->first();
                 
                 $city = str_replace(',', '.', explode('#', $row['from_city'])[0]);
@@ -75,8 +75,8 @@ class handleDC implements OnEachRow, WithHeadingRow
                     $this->error = "tonnage";
                 }elseif(!$ritage && $this->error ==null){
                     $this->error = "ritage";
-                }elseif(!$nominal && $this->error ==null){
-                    $this->error = "nominal";
+                }elseif(!$tonnage_weight && $this->error ==null){
+                    $this->error = "berat tonase";
                 }elseif(!$transport && $this->error ==null){
                     $this->error = "Transportasi";
                 }
@@ -100,7 +100,7 @@ class handleDC implements OnEachRow, WithHeadingRow
                         'transportation_id' => $transport->id,
                         'tonnage' => $row['tonnage'],
                         'ritage' => $row['ritage'],
-                        'nominal' => $row['nominal'],
+                        'qty_tonnage' => $row['tonnage_weight'],
                         'status'=> 1
                     ]);
                 

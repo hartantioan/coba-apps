@@ -39,9 +39,9 @@ class DeliveryCostController extends Controller
             'from_subdistrict_id',
             'to_city_id',
             'to_subdistrict_id',
+            'qty_tonnage',
             'tonnage',
             'ritage',
-            'nominal',
         ];
 
         $start  = $request->start;
@@ -170,9 +170,9 @@ class DeliveryCostController extends Controller
                     $val->fromSubdistrict->name,
                     $val->toCity->name,
                     $val->toSubdistrict->name,
+                    number_format($val->qty_tonnage,3,',','.'),
                     number_format($val->tonnage,2,',','.'),
                     number_format($val->ritage,2,',','.'),
-                    number_format($val->nominal,2,',','.'),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -254,7 +254,7 @@ class DeliveryCostController extends Controller
                     $query->to_subdistrict_id   = $request->to_subdistrict_id;
                     $query->tonnage             = str_replace(',','.',str_replace('.','',$request->tonnage));
                     $query->ritage              = str_replace(',','.',str_replace('.','',$request->ritage));
-                    $query->nominal             = str_replace(',','.',str_replace('.','',$request->nominal));
+                    $query->qty_tonnage         = str_replace(',','.',str_replace('.','',$request->qty_tonnage));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
                 }else{
@@ -272,7 +272,7 @@ class DeliveryCostController extends Controller
                         'to_subdistrict_id'     => $request->to_subdistrict_id,
                         'tonnage'               => str_replace(',','.',str_replace('.','',$request->tonnage)),
                         'ritage'                => str_replace(',','.',str_replace('.','',$request->ritage)),
-                        'nominal'               => str_replace(',','.',str_replace('.','',$request->nominal)),
+                        'qty_tonnage'           => str_replace(',','.',str_replace('.','',$request->qty_tonnage)),
                         'status'                => $request->status ? $request->status : '2'
                     ]);
                 }
@@ -312,7 +312,7 @@ class DeliveryCostController extends Controller
         $dc['to_subdistrict_list'] = $dc->toCity->getSubdistrict();
         $dc['tonnage'] = number_format($dc->tonnage,2,',','.');
         $dc['ritage'] = number_format($dc->ritage,2,',','.');
-        $dc['nominal'] = number_format($dc->nominal,2,',','.');
+        $dc['qty_tonnage'] = number_format($dc->nominal,3,',','.');
         $dc['account_name'] = $dc->account()->exists() ? $dc->account->name : '';
         				
 		return response()->json($dc);

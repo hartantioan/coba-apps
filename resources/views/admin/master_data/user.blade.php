@@ -383,11 +383,11 @@
                         </div>
                         <div class="col s12 mt-3">
                             <ul class="tabs">
-                                <li class="tab col m3"><a class="active" href="#rekform">Rekening</a></li>
-                                <li class="tab col m3"><a href="#dataform">Alamat Penagihan</a></li>
+                                <li class="tab col m2"><a class="active" href="#rekform">Rekening</a></li>
+                                <li class="tab col m2"><a href="#dataform">Alamat Penagihan</a></li>
                                 <li class="tab col m3 other_inputs" style="display:none;"><a href="#destinationform">Alamat Pengiriman Barang</a></li>
                                 <li class="tab col m3 other_inputs" style="display:none;"><a href="#destinationdocform">Alamat Pengiriman Dokumen</a></li>
-                                <li class="tab col m3 other_inputs" style="display:none;"><a href="#driverform">Daftar Supir</a></li>
+                                <li class="tab col m2 other_inputs" style="display:none;"><a href="#driverform">Daftar Supir</a></li>
                             </ul>
                             <div id="rekform" class="col s12 active">
                                 <h5 class="center">Daftar Rekening</h5>
@@ -1901,7 +1901,7 @@
             checked = 'checked';
         }
         var code = makeid(10);
-        $('#last-row-destination').before(`
+        $('#last-row-destination-doc').before(`
             <tr class="row_destination_doc">
                 <input type="hidden" name="arr_id_data_document[]" value="">
                 <td class="center">

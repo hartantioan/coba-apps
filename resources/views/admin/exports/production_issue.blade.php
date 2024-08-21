@@ -25,8 +25,6 @@
             <th>Qty Real</th>
             <th>Group item</th>
             <th>{{ __('translations.unit') }}</th>
-            <th>Nominal Planned</th>
-            <th>Nominal Real</th>
             <th>Total Planned</th>
             <th>Total Real</th>
             <th>Batch</th>
@@ -66,8 +64,6 @@
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->itemGroup->code }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->uomUnit->code }}</td>
-                    <td>{{ number_format($row_detail->nominal_planned ,3,',','.') }}</td>
-                    <td>{{ number_format($row_detail->nominal ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->total_planned ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->total ,3,',','.') }}</td>
                     <td>{{ ($row_detail->productionBatchUsage()->exists() ? $row_detail->listBatch() : '-') }}</td>

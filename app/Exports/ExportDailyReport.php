@@ -168,7 +168,7 @@ class ExportDailyReport implements FromView,ShouldAutoSize,WithTitle
         //     }
         // }
         $distinctDatesCount = count($distinctDates);
-        return view('admin.exports.attendance_daily_report_new_mix', [
+        return view('admin.exports.attendance_daily_report_v3', [
             'data' => $attendanceDetail,
             'date' => $distinctDates,
             'user_id'=>$distinctUsers,

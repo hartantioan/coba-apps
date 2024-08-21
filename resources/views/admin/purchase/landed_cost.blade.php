@@ -2392,8 +2392,8 @@
                 loadingOpen('#main');
             },
             success: function(response) {
+                loadingClose('#main');
                 if(response.status == 200){
-                    loadingClose('#main');
                     $('#modal1').modal('open');
                     if(response.document){
                         const baseUrl = 'http://127.0.0.1:8000/storage/';

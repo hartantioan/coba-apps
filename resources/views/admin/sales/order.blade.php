@@ -220,6 +220,7 @@
                                                         <th>Provinsi Tujuan</th>
                                                         <th>Kota Tujuan</th>
                                                         <th>Kecamatan Tujuan</th>
+                                                        <th>Telepon</th>
                                                         <th>Sales</th>
                                                         <th>Broker</th>
                                                         <th>{{ __('translations.currency') }}</th>
@@ -379,6 +380,10 @@
                                             <option value="">--{{ __('translations.select') }}--</option>
                                         </select>
                                         <label class="active" for="district_id">{{ __('translations.district') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="phone" name="phone" type="text" placeholder="No.Kontak Customer">
+                                        <label class="active" for="phone">No.Kontak Customer</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -947,7 +952,7 @@
     }
 
     function getTopCustomer(){
-        
+        $('#phone').val('');
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
@@ -967,6 +972,7 @@
                     <option value="">--Data tidak ditemukan--</option>
                 `); 
             }
+            $('#phone').val($('#account_id').select2('data')[0].phone);
         }else{
             $('#top_internal,#top_customer').val('0');
             $('#valid_date').val('{{ date("Y-m-d") }}');
@@ -1673,6 +1679,7 @@
                 { name: 'province_id', className: '' },
                 { name: 'city_id', className: '' },
                 { name: 'district_id', className: '' },
+                { name: 'phone', className: '' },
                 { name: 'sales_id', className: '' },
                 { name: 'broker_id', className: '' },
                 { name: 'currency_id', className: '' },
@@ -1686,7 +1693,7 @@
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'rounding', className: 'right-align' },
                 { name: 'balance', className: 'right-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -2006,7 +2013,7 @@
                 }
                 $('#note_internal').val(response.note_internal);
                 $('#note_external').val(response.note_external);
-            
+                $('#phone').val(response.phone);
                 $('#total').val(response.total);
                 $('#tax').val(response.tax);
                 $('#total_after_tax').val(response.total_after_tax);
@@ -2646,7 +2653,7 @@
                         }
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
-                    
+                        $('#phone').val(response.phone);
                         $('#total').val(response.total);
                         $('#tax').val(response.tax);
                         $('#total_after_tax').val(response.total_after_tax);

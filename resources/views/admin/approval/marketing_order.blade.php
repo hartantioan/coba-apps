@@ -252,6 +252,12 @@
                 <div class="col s8">
                     {{ $data->destination_address.', '.ucwords(strtolower($data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                 </div>
+                <div class="col s4">
+                    Kontak Customer / Penerima
+                </div>
+                <div class="col s8">
+                    {{ $data->phone }}
+                </div>
             </div>
             <div class="col s6 m6 row mt-2">
                 <div class="col s12 center-align">

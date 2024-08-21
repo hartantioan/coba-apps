@@ -44,6 +44,7 @@ class MarketingOrder extends Model
         'city_id',
         'district_id',
         'subdistrict_id',
+        'phone',
         'sales_id',
         'broker_id',
         'currency_id',

@@ -115,6 +115,7 @@ class MarketingOrderController extends Controller
             'province_id',
             'city_id',
             'district_id',
+            'phone',
             'sales_id',
             'currency_id',
             'currency_rate',
@@ -148,6 +149,7 @@ class MarketingOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('phone', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -224,6 +226,7 @@ class MarketingOrderController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('phone', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -324,6 +327,7 @@ class MarketingOrderController extends Controller
                     $val->province->name,
                     $val->city->name,
                     $val->district->name,
+                    $val->phone,
                     $val->sales->name,
                     $val->broker()->exists() ? $val->broker->name : '-',
                     $val->currency->name,
@@ -405,6 +409,7 @@ class MarketingOrderController extends Controller
                 'province_id'               => 'required',
                 'city_id'                   => 'required',
                 'district_id'               => 'required',
+                'phone'                     => 'required',
                 'payment_type'              => 'required',
                 'top_internal'              => 'required',
                 'top_customer'              => 'required',
@@ -456,6 +461,7 @@ class MarketingOrderController extends Controller
                 'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',
                 'city_id.required'                  => 'Kota tujuan tidak boleh kosong.',
                 'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
+                'phone.required'                    => 'Telepon customer tidak boleh kosong.',
                 'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
                 'top_internal.required'             => 'TOP internal tidak boleh kosong.',
                 'top_customer.required'             => 'TOP customer tidak boleh kosong',
@@ -617,6 +623,7 @@ class MarketingOrderController extends Controller
                         $query->province_id = $request->province_id;
                         $query->city_id = $request->city_id;
                         $query->district_id = $request->district_id;
+                        $query->phone = $request->phone;
                         $query->sales_id = $request->sales_id;
                         $query->broker_id = $request->broker_id ?? NULL;
                         $query->currency_id = $request->currency_id;
@@ -675,6 +682,7 @@ class MarketingOrderController extends Controller
                         'province_id'               => $request->province_id,
                         'city_id'                   => $request->city_id,
                         'district_id'               => $request->district_id,
+                        'phone'                     => $request->phone,
                         'sales_id'                  => $request->sales_id,
                         'broker_id'                 => $request->broker_id ?? NULL,
                         'currency_id'               => $request->currency_id,

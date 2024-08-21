@@ -337,6 +337,7 @@ return [
     'starting_subdistrict' => '始发区',
     'destination_subdistrict' => '目的区',
     'tonnage'           => '吨位',
+    'ritage'            => '里塔格',
     'valid_from'        => '有效起始日期',
     'origin'            => '起源',
     'subdistrict'       => '病房',

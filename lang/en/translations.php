@@ -336,6 +336,7 @@ return [
     'starting_subdistrict' => 'Starting Subdistrict',
     'destination_subdistrict' => 'Destination Subdistrict', 
     'tonnage'           => 'Tonnage',
+    'ritage'            => 'Ritage',
     'valid_from'        => 'Valid From',
     'origin'            => 'Origin',
     'subdistrict'       => 'Subdistrict',

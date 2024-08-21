@@ -337,6 +337,7 @@ return [
     'starting_subdistrict' => 'Kecamatan Asal',
     'destination_subdistrict' => 'Kecamatan Tujuan',
     'tonnage'           => 'Tonase',
+    'ritage'            => 'Ritase',
     'valid_from'        => 'Berlaku Dari',
     'origin'            => 'Asal',
     'subdistrict'       => 'Kelurahan',

@@ -1877,6 +1877,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[GoodReceiptPOController::class, 'datatable']);
                     Route::get('row_detail',[GoodReceiptPOController::class, 'rowDetail']);
                     Route::post('show', [GoodReceiptPOController::class, 'show']);
+                    Route::post('update_multiple_lc',[GoodReceiptPOController::class, 'updateMultipleLc'])->middleware('operation.access:good_receipt_po,update');
                     Route::post('done',[GoodReceiptPOController::class, 'done'])->middleware('operation.access:good_receipt_po,update');
                     Route::post('get_code', [GoodReceiptPOController::class, 'getCode']);
                     Route::post('print',[GoodReceiptPOController::class, 'print']);

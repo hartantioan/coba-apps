@@ -129,6 +129,7 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">No.Surat Jalan</th>
+                                                        <th rowspan="2">Multiple LC?</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
@@ -1268,6 +1269,56 @@
         });
     }
 
+    function multiple(id){
+        var msg = '';
+        swal({
+            title: "Apakah anda yakin membuka multi LC?",
+            text: "Data yang sudah terupdate bisa dikembalikan dengan menekan tombol ini.",
+            buttons: true,
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/update_multiple_lc',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id: id,
+                        msg : message
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        if(response.status == 200) {
+                            loadDataTable();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
@@ -1320,6 +1371,7 @@
                 { name: 'date_doc', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'delivery_no', className: 'center-align' },
+                { name: 'is_multiple_lc', className: 'center-align' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

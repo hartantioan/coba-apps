@@ -83,6 +83,7 @@ class GoodReceiptPOController extends Controller
             'document_date',
             'note',
             'delivery_no',
+            'is_multiple_lc',
         ];
 
         $start  = $request->start;
@@ -251,7 +252,8 @@ class GoodReceiptPOController extends Controller
                     date('d/m/Y',strtotime($val->document_date)),
                     $val->note,
                     $val->delivery_no,
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->isMultipleLC(),
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -277,6 +279,7 @@ class GoodReceiptPOController extends Controller
                         
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text btn-small" data-popup="tooltip" title="Multiple LC" onclick="multiple(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">share</i></button>
                         <!-- <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> -->
 					'
                 ];
@@ -1584,6 +1587,37 @@ class GoodReceiptPOController extends Controller
                 $response = [
                     'status'  => 500,
                     'message' => 'Data tidak bisa diselesaikan karena status bukan MENUNGGU / PROSES.'
+                ];
+            }
+
+            return response()->json($response);
+        }
+    }
+
+    public function updateMultipleLc(Request $request){
+        $query_done = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+
+        if($query_done){
+
+            if(in_array($query_done->status,['2','3'])){
+                $query_done->update([
+                    'is_multiple_lc'    => $query_done->is_multiple_lc ? NULL : '1',
+                ]);
+    
+                activity()
+                        ->performedOn(new GoodReceipt())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query_done)
+                        ->log('Change multiple landed cost status the Good Receipt data');
+    
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data berhasil diupdate.'
+                ];
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
                 ];
             }
 

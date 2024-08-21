@@ -118,7 +118,7 @@ class LandedCostController extends Controller
             $datagr = GoodReceipt::whereIn('status',['2','3'])->where('account_id',$request->id)->where(function($query){
                 $query->whereHas('goodReceiptDetail',function($query){
                     $query->whereDoesntHave('landedCostDetail');
-                });
+                })->orWhere('is_multiple_lc','1');
             })->get();
             
             foreach($datagr as $row){

@@ -30,6 +30,7 @@ class GoodReceipt extends Model
         'delivery_no',
         'document',
         'note',
+        'is_multiple_lc',
         'status',
         'total',
         'tax',
@@ -213,6 +214,15 @@ class GoodReceipt extends Model
         $html .= '</ol>';
 
         return $html;
+    }
+
+    public function isMultipleLC(){
+        $multiple = match ($this->is_multiple_lc) {
+            '1' => 'Ya',
+            default => 'Tidak',
+        };
+  
+        return $multiple;
     }
 
     public function hasChildDocument(){

@@ -2392,170 +2392,176 @@
                 loadingOpen('#main');
             },
             success: function(response) {
-                loadingClose('#main');
-                $('#modal1').modal('open');
-                if(response.document){
-                    const baseUrl = 'http://127.0.0.1:8000/storage/';
-                    const filePath = response.document.replace('public/', '');
-                    const fileUrl = baseUrl + filePath;
-                    displayFile(fileUrl);
-                }
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#supplier_id').empty();
-                if(response.supplier_name){
-                    $('#supplier_id').append(`
-                        <option value="` + response.supplier_id + `">` + response.supplier_name + `</option>
-                    `);
-                }
-                $('#account_id').empty();
-                if(response.account_name){
-                    $('#account_id').append(`
-                        <option value="` + response.account_id + `">` + response.account_name + `</option>
-                    `);
-                }
-                $('#reference').val(response.reference);
-                $('#currency_id').val(response.currency_id).formSelect();
-                $('#currency_rate').val(response.currency_rate);
-                $('#company_id').val(response.company_id).formSelect();
-                $('#post_date').val(response.post_date);
+                if(response.status == 200){
+                    loadingClose('#main');
+                    $('#modal1').modal('open');
+                    if(response.document){
+                        const baseUrl = 'http://127.0.0.1:8000/storage/';
+                        const filePath = response.document.replace('public/', '');
+                        const fileUrl = baseUrl + filePath;
+                        displayFile(fileUrl);
+                    }
+                    $('#temp').val(id);
+                    $('#code_place_id').val(response.code_place_id).formSelect();
+                    $('#code').val(response.code);
+                    $('#supplier_id').empty();
+                    if(response.supplier_name){
+                        $('#supplier_id').append(`
+                            <option value="` + response.supplier_id + `">` + response.supplier_name + `</option>
+                        `);
+                    }
+                    $('#account_id').empty();
+                    if(response.account_name){
+                        $('#account_id').append(`
+                            <option value="` + response.account_id + `">` + response.account_name + `</option>
+                        `);
+                    }
+                    $('#reference').val(response.reference);
+                    $('#currency_id').val(response.currency_id).formSelect();
+                    $('#currency_rate').val(response.currency_rate);
+                    $('#company_id').val(response.company_id).formSelect();
+                    $('#post_date').val(response.post_date);
 
-                $('#note').val(response.note);
-                $('#total').val(response.total);
-                $('#tax').val(response.tax);
-                $('#wtax').val(response.wtax);
-                $('#grandtotal').val(response.grandtotal);
+                    $('#note').val(response.note);
+                    $('#total').val(response.total);
+                    $('#tax').val(response.tax);
+                    $('#wtax').val(response.wtax);
+                    $('#grandtotal').val(response.grandtotal);
 
-                var totalproporsional = 0, totalall = 0;
-                console.log(response.details);
-                if(response.details.length > 0){
-                    $('#last-row-item').remove();
+                    var totalproporsional = 0, totalall = 0;
+                    console.log(response.details);
+                    if(response.details.length > 0){
+                        $('#last-row-item').remove();
 
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
+                        $('.row_item').each(function(){
+                            $(this).remove();
+                        });
 
-                    $.each(response.details, function(i, val) {
-                        totalall += val.totalrow;
-                    });
+                        $.each(response.details, function(i, val) {
+                            totalall += val.totalrow;
+                        });
 
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10), rowproporsional = (val.totalrow / totalall) * 100;
-                        totalproporsional += rowproporsional;
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10), rowproporsional = (val.totalrow / totalall) * 100;
+                            totalproporsional += rowproporsional;
+                            $('#body-item').append(`
+                                <tr class="row_item">
+                                    <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_total[]" value="` + val.totalrow + `">
+                                    <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
+                                    <input type="hidden" name="arr_stock[]" value="` + val.stock + `">
+                                    <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
+                                    <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
+                                    <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
+                                    <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
+                                    <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
+                                    <input type="hidden" name="arr_project[]" value="` + val.project_id + `">
+                                    <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
+                                    <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
+                                    <td>
+                                    ` + response.code + ` 
+                                    </td>
+                                    <td>
+                                    ` + val.item_name + ` 
+                                    </td>
+                                    <td class="center">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.place_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.line_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.machine_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.department_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.warehouse_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.project_name + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + formatRupiahIni(roundTwoDecimal(val.totalrow).toString().replace('.',',')) + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + formatRupiahIni(roundTwoDecimal(rowproporsional).toString().replace('.',',')) + `
+                                    </td>
+                                    <td class="center">
+                                        <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" style="width: 100%"></select>
+                                    </div>
+                                    <td class="center">
+                                        <input name="arr_price[]" class="browser-default nominalitem" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`" readonly>
+                                    </td>
+                                </tr>
+                            `);
+                                
+                            if(val.stock == 0){
+                                if(val.coa_id){
+                                    $('#arr_coa' + count).append(`
+                                        <option value="` + val.coa_id + `">` + val.coa_name + `</option>
+                                    `);
+                                }
+                            }else{
+                                $('#arr_coa' + count).append(`
+                                    <option value="" class="center-align">-- Stok tersedia --</option>
+                                `).select();
+                            }
+                        });
+
+                        $.each(response.fees, function(i, val) {
+                            $('#arr_fee_nominal' + val.id).val(val.total);
+                            $('#arr_temp_nominal' + val.id).val(val.total);
+                            if(val.is_include_tax == '1'){
+                                $('#arr_fee_include_tax' + val.id).prop('checked',true);
+                            }else{
+                                $('#arr_fee_include_tax' + val.id).prop('checked',false);
+                            }
+                            $('#arr_fee_tax' + val.id).val(val.percent_tax);
+                            $('#arr_fee_tax_rp' + val.id).val(val.tax);
+                            $('#arr_fee_wtax' + val.id).val(val.percent_wtax);
+                            $('#arr_fee_wtax_rp' + val.id).val(val.wtax);
+                            $('#arr_fee_grandtotal' + val.id).val(val.grandtotal);
+                        });
+
                         $('#body-item').append(`
                             <tr class="row_item">
-                                <input type="hidden" name="arr_item[]" value="` + val.item_id + `">
-                                <input type="hidden" name="arr_total[]" value="` + val.totalrow + `">
-                                <input type="hidden" name="arr_qty[]" value="` + val.qtyRaw + `">
-                                <input type="hidden" name="arr_stock[]" value="` + val.stock + `">
-                                <input type="hidden" name="arr_place[]" value="` + val.place_id + `">
-                                <input type="hidden" name="arr_line[]" value="` + val.line_id + `">
-                                <input type="hidden" name="arr_machine[]" value="` + val.machine_id + `">
-                                <input type="hidden" name="arr_department[]" value="` + val.department_id + `">
-                                <input type="hidden" name="arr_warehouse[]" value="` + val.warehouse_id + `">
-                                <input type="hidden" name="arr_project[]" value="` + val.project_id + `">
-                                <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
-                                <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
-                                <td>
-                                ` + response.code + ` 
-                                </td>
-                                <td>
-                                ` + val.item_name + ` 
-                                </td>
-                                <td class="center">
-                                    ` + val.qty + `
-                                </td>
-                                <td class="center">
-                                    ` + val.unit + `
-                                </td>
-                                <td class="center">
-                                    ` + val.place_name + `
-                                </td>
-                                <td class="center">
-                                    ` + val.line_name + `
-                                </td>
-                                <td class="center">
-                                    ` + val.machine_name + `
-                                </td>
-                                <td class="center">
-                                    ` + val.department_name + `
-                                </td>
-                                <td class="center">
-                                    ` + val.warehouse_name + `
-                                </td>
-                                <td class="center">
-                                    ` + val.project_name + `
+                                <td class="right-align" colspan="9">
+                                    TOTAL
                                 </td>
                                 <td class="right-align">
-                                    ` + formatRupiahIni(roundTwoDecimal(val.totalrow).toString().replace('.',',')) + `
+                                    ` + formatRupiahIni(roundTwoDecimal(totalall).toString().replace('.',',')) + `
                                 </td>
                                 <td class="right-align">
-                                    ` + formatRupiahIni(roundTwoDecimal(rowproporsional).toString().replace('.',',')) + `
+                                    ` + formatRupiahIni(roundTwoDecimal(totalproporsional).toString().replace('.',',')) + `
                                 </td>
                                 <td class="center">
-                                    <select class="browser-default" id="arr_coa` + count + `" name="arr_coa[]" style="width: 100%"></select>
-                                </div>
+                                    -
+                                </td>
                                 <td class="center">
-                                    <input name="arr_price[]" class="browser-default nominalitem" type="text" value="` + val.nominal + `" onkeyup="formatRupiah(this);" style="text-align:right;width:100% !important;" id="rowPrice`+ count +`" readonly>
+                                    -
                                 </td>
                             </tr>
                         `);
-                            
-                        if(val.stock == 0){
-                            if(val.coa_id){
-                                $('#arr_coa' + count).append(`
-                                    <option value="` + val.coa_id + `">` + val.coa_name + `</option>
-                                `);
-                            }
-                        }else{
-                            $('#arr_coa' + count).append(`
-                                <option value="" class="center-align">-- Stok tersedia --</option>
-                            `).select();
-                        }
-                    });
-
-                    $.each(response.fees, function(i, val) {
-                        $('#arr_fee_nominal' + val.id).val(val.total);
-                        $('#arr_temp_nominal' + val.id).val(val.total);
-                        if(val.is_include_tax == '1'){
-                            $('#arr_fee_include_tax' + val.id).prop('checked',true);
-                        }else{
-                            $('#arr_fee_include_tax' + val.id).prop('checked',false);
-                        }
-                        $('#arr_fee_tax' + val.id).val(val.percent_tax);
-                        $('#arr_fee_tax_rp' + val.id).val(val.tax);
-                        $('#arr_fee_wtax' + val.id).val(val.percent_wtax);
-                        $('#arr_fee_wtax_rp' + val.id).val(val.wtax);
-                        $('#arr_fee_grandtotal' + val.id).val(val.grandtotal);
-                    });
-
-                    $('#body-item').append(`
-                        <tr class="row_item">
-                            <td class="right-align" colspan="9">
-                                TOTAL
-                            </td>
-                            <td class="right-align">
-                                ` + formatRupiahIni(roundTwoDecimal(totalall).toString().replace('.',',')) + `
-                            </td>
-                            <td class="right-align">
-                                ` + formatRupiahIni(roundTwoDecimal(totalproporsional).toString().replace('.',',')) + `
-                            </td>
-                            <td class="center">
-                                -
-                            </td>
-                            <td class="center">
-                                -
-                            </td>
-                        </tr>
-                    `);
+                        
+                        /* countAll(); */
+                    }
                     
-                    /* countAll(); */
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }else{
+                    M.toast({
+                        html: response.message
+                    });
                 }
-                
-                $('.modal-content').scrollTop(0);
-                $('#note').focus();
-                M.updateTextFields();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

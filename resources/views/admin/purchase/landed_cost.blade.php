@@ -2394,7 +2394,11 @@
             success: function(response) {
                 loadingClose('#main');
                 M.updateTextFields();
-                if(response.status == 200){
+                if(response.status == 500){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
                     $('#modal1').modal('open');
                     if(response.document){
                         const baseUrl = 'http://127.0.0.1:8000/storage/';
@@ -2556,12 +2560,6 @@
                     
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
-                }else{
-                    swal({
-                        title: 'Ups!',
-                        text: response.message,
-                        icon: 'warning'
-                    });
                 }
             },
             error: function() {

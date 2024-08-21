@@ -2557,8 +2557,10 @@
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                 }else{
-                    M.toast({
-                        html: response.message
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
                     });
                 }
             },

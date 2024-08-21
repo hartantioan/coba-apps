@@ -2430,6 +2430,7 @@
                 var totalproporsional = 0, totalall = 0;
                 
                 if(response.details.length > 0){
+                    console.log(response.details);
                     $('#last-row-item').remove();
 
                     $('.row_item').each(function(){

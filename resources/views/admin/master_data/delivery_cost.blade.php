@@ -153,7 +153,7 @@
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="transportation_id">Jenis Kendaraan</label>
+                            <label class="" for="transportation_id">Jenis Kendaraan</label>
                         </div>
                         <div class="input-field col s12 m4">
                             <input id="name" name="name" type="text" placeholder="Nama">

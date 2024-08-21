@@ -1,5 +1,9 @@
 <!-- BEGIN: Page Main-->
 <style>
+    .modal {
+        top:0px !important;
+    }
+
     body.tab-active input:focus {
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
@@ -30,6 +34,16 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
+                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
+                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
+                            <i class="material-icons right">local_printshop</i>
+                        </a>
+                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="exportExcel();">
+                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                            <span class="hide-on-small-onl">Excel</span>
+                            <i class="material-icons right">view_list</i>
+                        </a>
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal_import">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
@@ -50,8 +64,8 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_status" style="font-size:1rem;">Status :</label>
+                                            <div class="col m3 s6 ">
+                                                <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()">
                                                         <option value="">{{ __('translations.all') }}</option>
@@ -60,23 +74,11 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="filter_account" style="font-size:1rem;">{{ __('translations.bussiness_partner') }} :</label>
-                                                <div class="input-field">
-                                                    <select class="browser-default" id="filter_account" name="filter_account" style="width:100% !important;" onchange="loadDataTable()"></select>
-                                                </div>
+                                            <div class="col m3 s6 ">
+                                                
                                             </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
-                                                <div class="input-field col s12">
-                                                <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
-                                                </div>
-                                            </div>
-                                            <div class="col m4 s6 ">
-                                                <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
-                                                <div class="input-field col s12">
-                                                    <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
-                                                </div>
+                                            <div class="col m6 s6 ">
+                                                
                                             </div>
                                         </div>  
                                     </div>
@@ -98,18 +100,17 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
-                                                        <th>{{ __('translations.name') }}</th>
-                                                        <th>{{ __('translations.bussiness_partner') }}</th>
-                                                        <th>Tipe Transport</th>
-                                                        <th>{{ __('translations.valid_date') }}</th>
-                                                        <th>{{ __('translations.valid_until') }}</th>
-                                                        <th>{{ __('translations.starting_city') }}</th>
-                                                        <th>{{ __('translations.starting_subdistrict') }}</th>
-                                                        <th>{{ __('translations.destination_city') }}</th>
-                                                        <th>{{ __('translations.destination_subdistrict') }}</th>
-                                                        <th>{{ __('translations.tonnage') }}</th>
-                                                        <th>{{ __('translations.price') }}</th>
-                                                        <th>{{ __('translations.status') }}</th>
+                                                        <th>{{ __('translations.user') }}</th>
+                                                        <th>Pelanggan</th>
+                                                        <th>Kota</th>
+                                                        <th>Brand</th>
+                                                        <th>Variant Item</th>
+                                                        <th>Tipe Pembayaran</th>
+                                                        <th>Disc 1</th>
+                                                        <th>Disc 2</th>
+                                                        <th>Disc 3</th>
+                                                        <th>Post Date</th>
+                                                        <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
                                                 </thead>
@@ -120,7 +121,6 @@
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -128,88 +128,78 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
-                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} Standar Harga Pelanggan</h4>
                 <form class="row" id="form_data" onsubmit="return false;">
                     <div class="col s12">
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m4">
+                        <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
-                        <div class="input-field col s12 m4">
+                        <div class="input-field col m3 s12">
                             <select class="browser-default" id="account_id" name="account_id"></select>
-                            <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
+                            <label class="active" for="account_id">Customer </label>
                         </div>
-                        <div class="input-field col s12 m4">
-                            <select class="form-control" id="transportation_id" name="transportation_id">
-                                @foreach ($transport as $row)
-                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
-                                @endforeach
+                        <div class="input-field col m3 s12">
+                            <select class="browser-default" id="brand_id" name="brand_id" onchange="generateCode();"></select>
+                            <label class="active" for="brand_id">{{ __('translations.brand') }}</label>
+                        </div>
+                        <div class="col s12"></div>
+                        <div class="input-field col s12 m3 ">
+                            <select id="type_id" name="type_id" onchange="">
+                                <option value="1">HT</option>
+                                <option value="2">GLAZED</option>
                             </select>
-                            <label class="active" for="transportation_id">Jenis Kendaraan</label>
+                            <label for="type_id">Variant Item</label>
                         </div>
-                        <div class="input-field col s12 m4">
-                            <input id="name" name="name" type="text" placeholder="Nama">
-                            <label class="active" for="name">{{ __('translations.name') }}</label>
+                        <div class="input-field col s12 m3 ">
+                            <select id="payment_type" name="payment_type" onchange="">
+                                <option value="1">Kas</option>
+                                <option value="2">Kredit</option>
+                            </select>
+                            <label for="payment_type">Tipe Pembayaran</label>
                         </div>
-                        <div class="input-field col s12 m4">
-                            <input id="valid_from" name="valid_from" type="date" max="{{ date('Y-m-d') }}">
-                            <label class="active" for="valid_from">{{ __('translations.valid_from') }}</label>
+                        
+                        <div class="input-field col m3 s12">
+                            <select class="browser-default" id="city_id" name="city_id"></select>
+                            <label class="active" for="city_id">city </label>
                         </div>
-                        <div class="input-field col s12 m4">
-                            <input id="valid_to" name="valid_to" type="date" max="{{ date('9999'.'-12-31') }}" min="{{ date('Y-m-d') }}">
-                            <label class="active" for="valid_to">{{ __('translations.valid_until') }}</label>
+                        <div class="col s12"></div>
+                        <div class="input-field col s12 m2">
+                            <input id="disc1" name="disc1" type="text" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="disc1">Diskon 1</label>
                         </div>
-                        <div class="input-field col m4 s12">
-                            <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
+                        <div class="input-field col s12 m2">
+                            <input id="disc2" name="disc2" type="text" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="disc2">Diskon 2</label>
                         </div>
-                        <div class="input-field col m4 s12">
-                            <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="nominal">{{ __('translations.nominal') }}</label>
+                        <div class="input-field col s12 m2">
+                            <input id="disc3" name="disc3" type="text" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="disc3">Diskon 3</label>
                         </div>
-                        <div class="input-field col s12 m4">
-                            <div class="switch mb-1">
-                                <label for="status">{{ __('translations.status') }}</label>
-                                <label>
-                                    {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                   {{ __('translations.active') }}
-                                </label>
-                            </div>
-                        </div>
-                        <div class="col s12">
-                            <h6>{{ __('translations.origin') }}</h6>
-                            <div class="input-field col m6 s12">
-                                <select class="browser-default" id="from_city_id" name="from_city_id" onchange="getSubdistrict('from')"></select>
-                                <label class="active" for="from_city_id">{{ __('translations.city') }}</label>
-                            </div>
-                            <div class="input-field col m6 s12">
-                                <select class="select2 browser-default" id="from_subdistrict_id" name="from_subdistrict_id">
-                                    <option value="">--{{ __('translations.select') }}--</option>
-                                </select>
-                                <label class="active" for="from_subdistrict_id">{{ __('translations.district') }}</label>
-                            </div>
-                        </div>
-                        <div class="col s12">
-                            <h6>Tujuan</h6>
-                            <div class="input-field col m6 s12">
-                                <select class="browser-default" id="to_city_id" name="to_city_id" onchange="getSubdistrict('to')"></select>
-                                <label class="active" for="to_city_id">{{ __('translations.city') }}</label>
-                            </div>
-                            <div class="input-field col m6 s12">
-                                <select class="select2 browser-default" id="to_subdistrict_id" name="to_subdistrict_id">
-                                    <option value="">--{{ __('translations.select') }}--</option>
-                                </select>
-                                <label class="active" for="to_subdistrict_id">{{ __('translations.district') }}</label>
+                        <div class="col s12"></div>
+                        
+                        <div class="col s12 m6 row">
+                            <div class="input-field col s12">
+                              
+                                <div class="switch mb-1">
+                                    <label for="status">{{ __('translations.status') }}</label>
+                                    <label class="right">
+                                        {{ __('translations.non_active') }}
+                                        <input checked type="checkbox" id="status" name="status" value="1">
+                                        <span class="lever"></span>
+                                        {{ __('translations.active') }}
+                                    </label>
+                                </div>
+                               
                             </div>
                         </div>
                         <div class="col s12 mt-3">
@@ -224,7 +214,6 @@
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
-
 <div id="modal_import" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;max-width:90%;min-width:90%;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -251,6 +240,19 @@
                         <button type="submit" class="btn cyan btn-primary btn-block right">Kirim</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_detail">
+
             </div>
         </div>
     </div>
@@ -294,28 +296,14 @@
     });
     $(function() {
 
-        loadDataTable();
-        
-        $('#modal1').modal({
-            dismissible: false,
+        $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#name').focus();
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
-                $('#form_data')[0].reset();
-                $('#temp').val('');
-                M.updateTextFields();
-                $('#from_city_id,#to_city_id').empty();
-                $('#from_subdistrict_id,#to_subdistrict_id').empty().append(`
-                    <option value="">--{{ __('translations.select') }}--</option>
-                `);
-                $('#account_id').empty();
+                $('#show_detail').empty();
             }
         });
 
@@ -421,31 +409,63 @@
                 }
             });
         });
+        loadDataTable();
 
-        $(".select2").select2({
-            dropdownAutoWidth: true,
-            width: '100%',
+        $('#datatable_serverside').on('click', 'button', function(event) {
+            event.stopPropagation();      
+        });
+        
+        $('#modal1').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+                $('#prefix').focus();
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data')[0].reset();
+                $('#temp').val('');
+                $('#group_id').empty();
+               
+                M.updateTextFields();
+            }
         });
 
-        select2ServerSide('#from_city_id,#to_city_id', '{{ url("admin/select2/city") }}');
-        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}')
-
+        select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
+        select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
     });
 
-    function getSubdistrict(type){
-        if($('#' + type + '_city_id').val()){
-            $('#' + type + '_subdistrict_id').empty();
-            $.each($('#' + type + '_city_id').select2('data')[0].subdistrict, function(i, value) {
-                $('#' + type + '_subdistrict_id').append(`
-                    <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
-                `);
-            });
-        }else{
-            $('#' + type + '_subdistrict_id').empty().append(`
-                <option value="">--{{ __('translations.select') }}--</option>
-            `);
-        }
-    }
+
+
+    function rowDetail(data) {
+        $.ajax({
+            url: '{{ Request::url() }}/row_detail',
+            type: 'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            data: {
+                id: data
+            },
+            success: function(response) {
+                $('#modal4').modal('open');
+                $('#show_detail').html(response);
+                loadingClose('.modal-content');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+	}
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
@@ -458,15 +478,12 @@
             "deferRender": true,
             "destroy": true,
             "iDisplayInLength": 10,
-            "order": [[1, 'asc']],
+            "order": [[2, 'asc']],
             ajax: {
                 url: '{{ Request::url() }}/datatable',
                 type: 'GET',
                 data: {
                     status : $('#filter_status').val(),
-                    account_id : $('#filter_account').val(),
-                    start_date : $('#start_date').val(),
-                    finish_date : $('#finish_date').val(),
                 },
                 beforeSend: function() {
                     loadingOpen('#datatable_serverside');
@@ -484,110 +501,121 @@
                 }
             },
             columns: [
-                { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'account_id', className: 'center-align' },
-                { name: 'type', className: 'center-align' },
-                { name: 'valid_from', className: 'center-align' },
-                { name: 'valid_to', className: 'center-align' },
-                { name: 'from_city', className: 'center-align' },
-                { name: 'from_subdistrict', className: 'center-align' },
-                { name: 'to_city', className: 'center-align' },
-                { name: 'to_subdistrict', className: 'center-align' },
-                { name: 'tonnage', className: 'center-align' },
-                { name: 'nominal', className: 'center-align' },
+                { name: 'id', searchable: false, className: 'center-align' },
+                { name: 'code', className: '' },
+                { name: 'name', className: '' },
+                { name: 'group_id', className: 'center-align' },
+                { name: 'user_id', className: '' },
+                { name: 'price', className: '' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'start_date', className: 'center-align' },
+                { name: 'end_date', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
-                'columnsToggle' 
-            ]
+                'columnsToggle',
+                'selectNone' 
+            ],
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
+                    selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
+                }
+            },
+            select: {
+                style: 'multi'
+            },
         });
         $('.dt-buttons').appendTo('#datatable_buttons');
-        
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
-        
 	}
 
     function save(){
-
-        swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
-            }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                var formData = new FormData($('#form_data')[0]);
+			
+        var formData = new FormData($('#form_data')[0]);
         
-                $.ajax({
-                    url: '{{ Request::url() }}/create',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    cache: true,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        $('#validation_alert').hide();
-                        $('#validation_alert').html('');
-                        loadingOpen('.modal-content');
-                    },
-                    success: function(response) {
-                        loadingClose('.modal-content');
-                        if(response.status == 200) {
-                            success();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else if(response.status == 422) {
-                            $('#validation_alert').show();
-                            $('.modal-content').scrollTop(0);
-                            
-                            swal({
-                                title: 'Ups! Validation',
-                                text: 'Check your form.',
-                                icon: 'warning'
-                            });
+        $.ajax({
+            url: '{{ Request::url() }}/create',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    
+                    
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
 
-                            $.each(response.error, function(i, val) {
-                                $.each(val, function(i, val) {
-                                    $('#validation_alert').append(`
-                                        <div class="card-alert card red">
-                                            <div class="card-content white-text">
-                                                <p>` + val + `</p>
-                                            </div>
-                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">×</span>
-                                            </button>
-                                        </div>
-                                    `);
-                                });
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('.modal-content');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
                         });
-                    }
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
                 });
             }
         });
@@ -596,6 +624,11 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function successImport(){
+        loadDataTable();
+        $('#modal_import').modal('close');
     }
 
     function show(id){
@@ -615,46 +648,52 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
+                
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#valid_from').val(response.valid_from);
-                $('#valid_to').val(response.valid_to);
-                $('#tonnage').val(response.tonnage);
-                $('#nominal').val(response.nominal);
-                $('#transportation_id').val(response.transportation_id).formSelect();
-                $('#account_id').empty().append(`
-                    <option value="` + response.account_id + `">` + response.account_name + `</option>
-                `);
-                $('#from_city_id').empty().append(`
-                    <option value="` + response.from_city_id + `">` + response.from_city_name + `</option>
-                `);
-                $('#to_city_id').empty().append(`
-                    <option value="` + response.to_city_id + `">` + response.to_city_name + `</option>
-                `);
 
-                $('#from_subdistrict_id').empty();
-                $.each(response.from_subdistrict_list, function(i, value) {
-                    $('#from_subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                if(response.type_id){
+                    $('#type_id').val(response.type_id).trigger('change').formSelect();
+                }
+                if(response.payment_type){
+                    $('#payment_type').val(response.payment_type).trigger('change').formSelect();
+                }
+
+                $('#disc1').val(response.disc1);
+                $('#disc2').val(response.disc2);
+                $('#disc3').val(response.disc3);
+                $('#group_id').empty();
+                if(response.account_id){
+                    $('#account_id').append(`
+                        <option value="` + response.account['id'] + `">` + response.account['employee_no'] + ` || ` + response.account['name'] + `</option>
                     `);
-                });
+                }
 
-                $('#to_subdistrict_id').empty();
-                $.each(response.to_subdistrict_list, function(i, value) {
-                    $('#to_subdistrict_id').append(`
-                        <option value="` + value.id + `">` + value.code + ` ` + value.name + `</option>
+                if(response.brand_id){
+                    $('#brand_id').append(`
+                        <option value="` + response.brand['id'] + `">` + response.brand['code'] + ` || ` + response.brand['name'] + `</option>
                     `);
-                });
+                }
+                
+                if(response.city_id){
+                    $('#city_id').append(`
+                        <option value="` + response.city['id'] + `">` + response.city['code'] + ` || ` + response.city['name'] + `</option>
+                    `);
+                }
+              
 
-                $('#from_subdistrict_id').val(response.from_subdistrict_id).trigger('change');
-                $('#to_subdistrict_id').val(response.to_subdistrict_id).trigger('change');
+               
+
+              
+
 
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{
                     $('#status').prop( "checked", false);
                 }
+
                 $('.modal-content').scrollTop(0);
                 $('#code').focus();
                 M.updateTextFields();
@@ -714,10 +753,133 @@
         });
     }
 
-    function successImport(){
-        loadDataTable();
-        $('#modal_import').modal('close');
+    var printService = new WebSocketPrinter({
+        onConnect: function () {
+            
+        },
+        onDisconnect: function () {
+            /* M.toast({
+                html: 'Aplikasi penghubung printer tidak terinstall. Silahkan hubungi tim EDP.'
+            }); */
+        },
+        onUpdate: function (message) {
+            
+        },
+    });
+
+    function print(){
+        var search = window.table.search(), status = $('#filter_status').val(), type = $('#filter_type').val(), company = $('#filter_company').val(), account = $('#filter_account').val();
+        arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(2)').text().trim();
+            arr_id_temp.push(poin);
+           
+        });
+        
+        $.ajax({
+            url: '{{ Request::url() }}/print',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                arr_id: arr_id_temp,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                printService.submit({
+                    'type': 'INVOICE',
+                    'url': response.message
+                })
+                
+               
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+    function saveImport(){
+        var formData = new FormData($('#form_dataImport')[0]);
+        
+        $.ajax({
+            url: '{{ Request::url() }}/import',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alertImport').hide();
+                $('#validation_alertImport').html('');
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                if(response.status == 200) {
+                    success();
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alertImport').show();
+                    $('.modal-content').scrollTop(0);
+                    
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alertImport').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
     }
 
-
+    function exportExcel(){
+        var search = window.table.search();
+        var status = $('#filter_status').val();
+        
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status;
+    }
 </script>

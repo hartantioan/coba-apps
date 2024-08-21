@@ -1259,6 +1259,7 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [DiscountCustomerController::class, 'show']);
                         Route::post('print',[DiscountCustomerController::class, 'print']);
                         Route::get('export',[DiscountCustomerController::class, 'export']);
+                        Route::get('get_import_excel',[DiscountCustomerController::class, 'getImportExcel']);
                         Route::get('export_from_page',[DiscountCustomerController::class, 'exportFromTransactionPage']);
                         Route::post('import',[DiscountCustomerController::class, 'import'])->middleware('operation.access:customer_discount,update');
                         Route::post('import_master',[DiscountCustomerController::class, 'importMaster'])->middleware('operation.access:customer_discount,update');

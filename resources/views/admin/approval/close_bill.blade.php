@@ -214,14 +214,26 @@
             </thead>
             <tbody>
                 @foreach($data->closeBillDetail as $key => $row)
-                <tr>
-                    <td class="center-align">{{ ($key + 1) }}</td>
-                    <td class="center-align">{{ $row->outgoingPayment->code }}</td>
-                    <td class="center-align">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
-                    <td class="center-align">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
-                    <td class="">{{ $row->note }}</td>
-                    <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
-                </tr>
+                    @if($row->outgoingPayment()->exists())
+                    <tr>
+                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="center-align">{{ $row->outgoingPayment->code }}</td>
+                        <td class="center-align">{{ $row->outgoingPayment->account->employee_no.' - '.$row->outgoingPayment->account->name }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->outgoingPayment->pay_date)) }}</td>
+                        <td>{{ $row->note }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
+                    </tr>
+                    @endif
+                    @if($row->personalCloseBill()->exists())
+                    <tr>
+                        <td class="center-align">{{ ($key + 1) }}</td>
+                        <td class="center-align">{{ $row->personalCloseBill->code }}</td>
+                        <td class="center-align">{{ $row->personalCloseBill->user->employee_no.' - '.$row->personalCloseBill->user->name }}</td>
+                        <td class="center-align">{{ date('d/m/Y',strtotime($row->personalCloseBill->post_date)) }}</td>
+                        <td>{{ $row->note }}</td>
+                        <td class="right-align">{{ number_format($row->nominal,2,',','.') }}</td>
+                    </tr>
+                    @endif
                 @endforeach
             </tbody>
         </table>

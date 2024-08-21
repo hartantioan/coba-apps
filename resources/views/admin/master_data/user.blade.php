@@ -1938,7 +1938,7 @@
             </tr>
         `);
         select2ServerSide('#arr_country_document' + code, '{{ url("admin/select2/country") }}');
-        $('#arr_province_destination' + code).select2({
+        $('#arr_province_document' + code).select2({
             dropdownAutoWidth: true,
             width: '100%',
         });

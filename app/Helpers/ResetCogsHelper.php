@@ -375,8 +375,8 @@ class ResetCogsHelper
                 $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
                 $total_final = $totalBefore + $total;
                 $qty_final = $qtyBefore + $qty;
-                /* $cek = ItemCogs::where('detailable_type',$row->getTable())->where('detailable_id',$row->id)->where('production_batch_id',$row->productionBatch->id)->where('item_shading_id',$row->item_shading_id)->where('area_id',$row->area_id)->where('item_id',$row->item_id)->get();
-                if($cek){ */
+                $cek = ItemCogs::where('detailable_type',$row->getTable())->where('detailable_id',$row->id)->where('production_batch_id',$row->productionBatch->id)->where('item_shading_id',$row->item_shading_id)->where('area_id',$row->area_id)->where('item_id',$row->item_id)->count();
+                if($cek == 0){
                     ItemCogs::create([
                         'lookable_type'		    => $row->productionHandover->getTable(),
                         'lookable_id'		      => $row->productionHandover->id,
@@ -398,7 +398,7 @@ class ResetCogsHelper
                         'date'				        => $dateloop,
                         'type'				        => 'IN',
                     ]);
-                /* } */
+                }
                 foreach($row->journalDetail as $rowjournal){
                     $rowjournal->update([
                         'nominal_fc'  => $row->total,

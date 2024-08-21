@@ -163,11 +163,13 @@ class StandardCustomerPriceController extends Controller
                     $cek = StandardCustomerPrice::where('group_id',$request->group_id)->get();
                     $sama = 0;
                     foreach($cek as $row_cek){
-                        if (($request->start_date >= $row_cek->start_date && $request->start_date <= $row_cek->end_date) ||
-                        ($request->end_date >= $row_cek->start_date && $request->end_date <= $row_cek->end_date) || 
-                        ($request->start_date <= $row_cek->start_date && $request->end_date >= $row_cek->end_date)) {
-                            $sama = 1; 
-                            break; 
+                        if($row_cek->id != $query->id){
+                            if (($request->start_date >= $row_cek->start_date && $request->start_date <= $row_cek->end_date) ||
+                            ($request->end_date >= $row_cek->start_date && $request->end_date <= $row_cek->end_date) || 
+                            ($request->start_date <= $row_cek->start_date && $request->end_date >= $row_cek->end_date)) {
+                                $sama = 1; 
+                                break; 
+                            }
                         }
                     }
                     if ($sama == 0) {

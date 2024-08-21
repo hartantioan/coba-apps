@@ -325,6 +325,7 @@ class MarketingOrderController extends Controller
                     $val->city->name,
                     $val->district->name,
                     $val->sales->name,
+                    $val->broker()->exists() ? $val->broker->name : '-',
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
                     $val->percent_dp,

@@ -2641,6 +2641,9 @@
                         $('#currency_rate').val(response.currency_rate);
                         $('#percent_dp').val(response.percent_dp);
                         $('#sales_id').empty().append(`<option value="` + response.sales_id + `">` + response.sales_name + `</option>`);
+                        if(response.broker_name){
+                            $('#broker_id').empty().append(`<option value="` + response.broker_id + `">` + response.broker_name + `</option>`);
+                        }
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
                     

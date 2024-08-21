@@ -299,6 +299,12 @@
                 <div class="col s8">
                     {{ number_format($data->percent_dp,2,',','.') }} %
                 </div>
+                <div class="col s4">
+                    Broker
+                </div>
+                <div class="col s8">
+                    {{ $data->broker()->exists() ? $data->broker->name : '-' }}
+                </div>
             </div>
         </div>
         

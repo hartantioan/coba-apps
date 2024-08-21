@@ -285,6 +285,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserDestination');
     }
 
+    public function userDestinationDocument(){
+        return $this->hasMany('App\Models\UserDestinationDocument');
+    }
+
     public function getBillingAddress(){
         $arr = [];
         foreach($this->userData as $row){

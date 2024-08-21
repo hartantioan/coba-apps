@@ -41,6 +41,7 @@ use App\Helpers\PrintHelper;
 use App\Imports\ImportUser;
 use App\Models\NonStaffCompany;
 use App\Models\UserDestination;
+use App\Models\UserDestinationDocument;
 
 class UserController extends Controller
 {
@@ -813,6 +814,33 @@ class UserController extends Controller
                     }
                 }
 
+                if($request->arr_address_document){
+                    $query->userDestination()->whereNotIn('id',$request->arr_id_data_document)->delete();
+                    $checked = isset($request->check_document) ? intval($request->check_document) : '';
+                    foreach($request->arr_address_document as $key => $row){
+                        if($request->arr_id_data_document[$key]){
+                            UserDestinationDocument::find(intval($request->arr_id_data_document[$key]))->update([
+                                'address'       => $request->arr_address_document[$key] ?? NULL,
+                                'country_id'    => $request->arr_country_document[$key] ?? NULL,
+                                'province_id'   => $request->arr_province_document[$key] ?? NULL,
+                                'city_id'       => $request->arr_city_document[$key] ?? NULL,
+                                'district_id'   => $request->arr_district_document[$key] ?? NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }else{
+                            UserDestinationDocument::create([
+                                'user_id'	    => $query->id,
+                                'address'       => $request->arr_address_document[$key] ?? NULL,
+                                'country_id'    => $request->arr_country_document[$key] ?? NULL,
+                                'province_id'   => $request->arr_province_document[$key] ?? NULL,
+                                'city_id'       => $request->arr_city_document[$key] ?? NULL,
+                                'district_id'   => $request->arr_district_document[$key] ?? NULL,
+                                'is_default'    => $key == $checked ? '1' : '0',
+                            ]);
+                        }
+                    }
+                }
+
                 if($request->arr_driver_name){
                     $query->userDriver()->whereNotIn('id',$request->arr_id_driver)->delete();
                     foreach($request->arr_driver_name as $key => $row){
@@ -1343,6 +1371,7 @@ class UserController extends Controller
 
         $datas = [];
         $destinations = [];
+        $documents = [];
 
         foreach($user->userData as $row){
 			$datas[] = [
@@ -1376,9 +1405,25 @@ class UserController extends Controller
                 'is_default'        => $row->is_default
             ];
 		}
+
+        foreach($user->userDestinationDocument as $row){
+			$documents[] = [
+                'id'                => $row->id,
+                'address'           => $row->address,
+                'country_id'        => $row->country_id ? $row->country_id : '',
+                'country_name'      => $row->country()->exists() ? $row->country->code.' - '.$row->country->name : '',
+                'province_id'       => $row->province_id ? $row->province_id : '',
+                'city_id'           => $row->city_id ? $row->city_id : '',
+                'city_name'         => $row->city()->exists() ? $row->city->code.' - '.$row->city->name : '',
+                'district_id'       => $row->district_id ? $row->district_id : '',
+                'district_name'     => $row->district()->exists() ? $row->district->code.' - '.$row->district->name : '',
+                'is_default'        => $row->is_default
+            ];
+		}
 		
 		$user['datas'] = $datas;
         $user['destinations'] = $destinations;
+        $user['documents'] = $documents;
 
         $drivers = [];
 

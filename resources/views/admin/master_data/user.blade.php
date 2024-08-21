@@ -393,7 +393,8 @@
                             <ul class="tabs">
                                 <li class="tab col m3"><a class="active" href="#rekform">Rekening</a></li>
                                 <li class="tab col m3"><a href="#dataform">Alamat Penagihan</a></li>
-                                <li class="tab col m3 other_inputs" style="display:none;"><a href="#destinationform">Alamat Pengiriman</a></li>
+                                <li class="tab col m3 other_inputs" style="display:none;"><a href="#destinationform">Alamat Pengiriman Barang</a></li>
+                                <li class="tab col m3 other_inputs" style="display:none;"><a href="#destinationdocform">Alamat Pengiriman Dokumen</a></li>
                                 <li class="tab col m3 other_inputs" style="display:none;"><a href="#driverform">Daftar Supir</a></li>
                             </ul>
                             <div id="rekform" class="col s12 active">
@@ -454,7 +455,7 @@
                                 </p>
                             </div>
                             <div id="destinationform" class="col s12" style="overflow:auto;min-width:100%;">
-                                <h5 class="center">Daftar Alamat Pengiriman</h5>
+                                <h5 class="center">Daftar Alamat Pengiriman Barang</h5>
                                 <p class="mt-2 mb-2">
                                     <table class="bordered" style="min-width:100%;">
                                         <thead>
@@ -472,6 +473,33 @@
                                             <tr id="last-row-destination">
                                                 <td colspan="10" class="center">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDestination()" href="javascript:void(0);">
+                                                        <i class="material-icons left">add</i> Tambah Alamat
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p>
+                            </div>
+                            <div id="destinationdocform" class="col s12" style="overflow:auto;min-width:100%;">
+                                <h5 class="center">Daftar Alamat Pengiriman Dokumen</h5>
+                                <p class="mt-2 mb-2">
+                                    <table class="bordered" style="min-width:100%;">
+                                        <thead>
+                                            <tr>
+                                                <th class="center">Default</th>
+                                                <th class="center">{{ __('translations.address') }}</th>
+                                                <th class="center">Negara</th>
+                                                <th class="center">{{ __('translations.province') }}</th>
+                                                <th class="center">{{ __('translations.city') }}</th>
+                                                <th class="center">{{ __('translations.district') }}</th>
+                                                <th width="5%" class="center">{{ __('translations.delete') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-destination-doc">
+                                            <tr id="last-row-destination-doc">
+                                                <td colspan="10" class="center">
+                                                    <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addDestinationDoc()" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah Alamat
                                                     </a>
                                                 </td>
@@ -1873,6 +1901,112 @@
         });
     }
 
+    function addDestinationDoc(){
+        var count = $('input[name^="arr_address_document"]').length;
+        var checked = '';
+       
+        if(count < 1){
+            checked = 'checked';
+        }
+        var code = makeid(10);
+        $('#last-row-destination').before(`
+            <tr class="row_destination_doc">
+                <input type="hidden" name="arr_id_data_document[]" value="">
+                <td class="center">
+                    <label>
+                        <input class="with-gap" name="check_document" type="radio" value="` + count + `" `+checked+`>
+                        <span>Pilih</span>
+                    </label>
+                </td>
+                <td class="center">
+                    <input name="arr_address_document[]" type="text" placeholder="Alamat Kantor">
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_country_document` + code + `" name="arr_country_document[]"></select>
+                </td>
+                <td class="center">
+                    <select class="browser-default select2" id="arr_province_document` + code + `" name="arr_province_document[]">
+                        <option value="">--Silahkan pilih--</option>
+                        @foreach($province as $row)
+                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_city_document` + code + `" name="arr_city_document[]"></select>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_district_document` + code + `" name="arr_district_document[]"></select>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-destination" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+            </tr>
+        `);
+        select2ServerSide('#arr_country_document' + code, '{{ url("admin/select2/country") }}');
+        $('#arr_province_destination' + code).select2({
+            dropdownAutoWidth: true,
+            width: '100%',
+        });
+        $('#arr_city_document'+ code).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/city_by_province") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        province: $('#arr_province_document' + code).select2().find(":selected").data("code"),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        $('#arr_city_document'+ code).bind('change', function() {
+            if(!$(this).val()){
+                $('#arr_district_document'+ code).empty();
+            }
+        });
+
+        $('#arr_district_document'+ code).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/district_by_city") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        city: $('#arr_city_document' + code).select2('data')[0].code,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+    }
+
     function addBank(){
         var count = $('input[name^="arr_bank"]').length;
         var checked = '';
@@ -2708,6 +2842,131 @@
                                     return {
                                         search: params.term,
                                         city: $('#arr_city_destination' + count).select2('data')[0].code,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+
+                if(response.documents.length > 0){
+                    $.each(response.documents, function(i, val) {
+                        var count = makeid(10);
+                        $('#last-row-destination-doc').before(`
+                            <tr class="row_destination_doc">
+                                <input type="hidden" name="arr_id_data_document[]" value="` + val.id + `">
+                                <td class="center">
+                                    <label>
+                                        <input class="with-gap" name="check_document" type="radio" value="` + i + `" ` + (val.is_default == '1' ? 'checked' : '') + `>
+                                        <span>Pilih</span>
+                                    </label>
+                                </td>
+                                <td class="center">
+                                    <input name="arr_address_document[]" type="text" placeholder="Alamat Kantor" value="` + val.address + `">
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_country_document` + count + `" name="arr_country_document[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default select2" id="arr_province_document` + count + `" name="arr_province_document[]">
+                                        <option value="">--Silahkan pilih--</option>
+                                        @foreach($province as $row)
+                                            <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' - '.$row->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_city_document` + count + `" name="arr_city_document[]"></select>
+                                </td>
+                                <td class="center">
+                                    <select class="browser-default" id="arr_district_document` + count + `" name="arr_district_document[]"></select>
+                                </td>
+                                
+                                <td class="center">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-document" href="javascript:void(0);">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                        if(val.country_id){
+                            $('#arr_country_document' + count).append(`
+                                <option value="` + val.country_id + `">` + val.country_name + `</option>
+                            `);
+                        }
+                        select2ServerSide('#arr_country_document' + count, '{{ url("admin/select2/country") }}');
+                        $('#arr_province_document' + count).select2({
+                            dropdownAutoWidth: true,
+                            width: '100%',
+                        });
+
+                        if(val.province_id){
+                            $('#arr_province_document' + count).val(val.province_id).trigger('change');
+                        }
+
+                        if(val.city_id){
+                            $('#arr_city_document' + count).append(`
+                                <option value="` + val.city_id + `">` + val.city_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_city_document'+ count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/city_by_province") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        province: $('#arr_province_document' + count).select2().find(":selected").data("code"),
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+
+                        $('#arr_city_document'+ count).bind('change', function() {
+                            if(!$(this).val()){
+                                $('#arr_district'+ count).empty();
+                            }
+                        });
+
+                        if(val.district_id){
+                            $('#arr_district_document' + count).append(`
+                                <option value="` + val.district_id + `">` + val.district_name + `</option>
+                            `);
+                        }
+
+                        $('#arr_district_document'+ count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/district_by_city") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        city: $('#arr_city_document' + count).select2('data')[0].code,
                                     };
                                 },
                                 processResults: function(data) {

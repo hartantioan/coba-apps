@@ -43,7 +43,7 @@ class handleDC implements OnEachRow, WithHeadingRow
             if (isset($row['code']) && $row['code']) {
                
 
-                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage'];$nominal = $row['nominal'];
+                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage'];$ritage = $row['ritage'];$nominal = $row['nominal'];
                 $account = User::where('employee_no', explode('#', $row['supplier_ekspedisi'])[0])->first();
                 
                 $city = str_replace(',', '.', explode('#', $row['from_city'])[0]);
@@ -73,6 +73,8 @@ class handleDC implements OnEachRow, WithHeadingRow
                     $this->error = "Kecamatan Awal";
                 }elseif(!$tonnage && $this->error ==null){
                     $this->error = "tonnage";
+                }elseif(!$ritage && $this->error ==null){
+                    $this->error = "ritage";
                 }elseif(!$nominal && $this->error ==null){
                     $this->error = "nominal";
                 }elseif(!$transport && $this->error ==null){
@@ -97,6 +99,7 @@ class handleDC implements OnEachRow, WithHeadingRow
                         'to_subdistrict_id' => $sub_district_id_to,
                         'transportation_id' => $transport->id,
                         'tonnage' => $row['tonnage'],
+                        'ritage' => $row['ritage'],
                         'nominal' => $row['nominal'],
                         'status'=> 1
                     ]);

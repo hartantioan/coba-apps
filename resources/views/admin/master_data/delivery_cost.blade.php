@@ -108,6 +108,7 @@
                                                         <th>{{ __('translations.destination_city') }}</th>
                                                         <th>{{ __('translations.destination_subdistrict') }}</th>
                                                         <th>{{ __('translations.tonnage') }}</th>
+                                                        <th>{{ __('translations.ritage') }}</th>
                                                         <th>{{ __('translations.price') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -153,7 +154,7 @@
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
                                 @endforeach
                             </select>
-                            <label class="active" for="transportation_id">Jenis Kendaraan</label>
+                            <label class="" for="transportation_id">Jenis Kendaraan</label>
                         </div>
                         <div class="input-field col s12 m4">
                             <input id="name" name="name" type="text" placeholder="Nama">
@@ -170,6 +171,10 @@
                         <div class="input-field col m4 s12">
                             <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
+                        </div>
+                        <div class="input-field col m4 s12">
+                            <input id="ritage" name="ritage" type="text" placeholder="Ritase" onkeyup="formatRupiah(this)" value="0">
+                            <label class="active" for="ritage"></label>
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="nominal" name="nominal" type="text" placeholder="Nominal" onkeyup="formatRupiah(this)" value="0">
@@ -496,6 +501,7 @@
                 { name: 'to_city', className: 'center-align' },
                 { name: 'to_subdistrict', className: 'center-align' },
                 { name: 'tonnage', className: 'center-align' },
+                { name: 'ritage', className: 'center-align' },
                 { name: 'nominal', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
@@ -621,6 +627,7 @@
                 $('#valid_from').val(response.valid_from);
                 $('#valid_to').val(response.valid_to);
                 $('#tonnage').val(response.tonnage);
+                $('#ritage').val(response.ritage);
                 $('#nominal').val(response.nominal);
                 $('#transportation_id').val(response.transportation_id).formSelect();
                 $('#account_id').empty().append(`

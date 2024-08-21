@@ -40,6 +40,7 @@ class DeliveryCostController extends Controller
             'to_city_id',
             'to_subdistrict_id',
             'tonnage',
+            'ritage',
             'nominal',
         ];
 
@@ -170,6 +171,7 @@ class DeliveryCostController extends Controller
                     $val->toCity->name,
                     $val->toSubdistrict->name,
                     number_format($val->tonnage,2,',','.'),
+                    number_format($val->ritage,2,',','.'),
                     number_format($val->nominal,2,',','.'),
                     $val->status(),
                     '
@@ -208,6 +210,7 @@ class DeliveryCostController extends Controller
             'account_id'            => 'required',
             'transportation_id'     => 'required',
             'tonnage'               => 'required',
+            'ritage'                => 'required',
             'nominal'               => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
@@ -222,6 +225,7 @@ class DeliveryCostController extends Controller
             'account_id.required'           => 'Partner Bisnis tidak boleh kosong.',
             'transportation_id.required'    => 'Jenis kendaraan tidak boleh kosong.',
             'tonnage.required'              => 'Tonase tidak boleh kosong.',
+            'ritage.required'               => 'Ritase tidak boleh kosong.',
             'nominal.required'              => 'Nominal harga tidak boleh kosong.',
         ]);
 
@@ -249,6 +253,7 @@ class DeliveryCostController extends Controller
                     $query->to_city_id          = $request->to_city_id;
                     $query->to_subdistrict_id   = $request->to_subdistrict_id;
                     $query->tonnage             = str_replace(',','.',str_replace('.','',$request->tonnage));
+                    $query->ritage              = str_replace(',','.',str_replace('.','',$request->ritage));
                     $query->nominal             = str_replace(',','.',str_replace('.','',$request->nominal));
                     $query->status              = $request->status ? $request->status : '2';
                     $query->save();
@@ -266,6 +271,7 @@ class DeliveryCostController extends Controller
                         'to_city_id'            => $request->to_city_id,
                         'to_subdistrict_id'     => $request->to_subdistrict_id,
                         'tonnage'               => str_replace(',','.',str_replace('.','',$request->tonnage)),
+                        'ritage'                => str_replace(',','.',str_replace('.','',$request->ritage)),
                         'nominal'               => str_replace(',','.',str_replace('.','',$request->nominal)),
                         'status'                => $request->status ? $request->status : '2'
                     ]);
@@ -305,6 +311,7 @@ class DeliveryCostController extends Controller
         $dc['from_subdistrict_list'] = $dc->fromCity->getSubdistrict();
         $dc['to_subdistrict_list'] = $dc->toCity->getSubdistrict();
         $dc['tonnage'] = number_format($dc->tonnage,2,',','.');
+        $dc['ritage'] = number_format($dc->ritage,2,',','.');
         $dc['nominal'] = number_format($dc->nominal,2,',','.');
         $dc['account_name'] = $dc->account()->exists() ? $dc->account->name : '';
         				

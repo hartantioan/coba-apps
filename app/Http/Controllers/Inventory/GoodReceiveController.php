@@ -325,7 +325,7 @@ class GoodReceiveController extends Controller
             foreach($request->arr_item as $key => $row){
                 if(isset($request->arr_total[$key]) && isset($request->arr_qty[$key])){
                     if(str_replace(',','.',str_replace('.','',$request->arr_total[$key])) == 0 || str_replace(',','.',str_replace('.','',$request->arr_qty[$key])) == 0){
-                        $passed = false;
+                        //$passed = false;
                     }
                 }else{
                     $passed = false;

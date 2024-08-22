@@ -446,7 +446,6 @@
                                                             $formattedMinute = sprintf('%02d', $minute);
                                                         @endphp
                                                         <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span> dengan keterangan : <span style="font-weight: bold">{{ $row->note }}</span></div>
-                                                  
                                                     </td>
                                                 </tr>
                                                 @endforeach

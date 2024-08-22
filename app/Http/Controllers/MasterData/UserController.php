@@ -305,6 +305,7 @@ class UserController extends Controller
         $infos = [];
         $drivers = [];
         $destinations = [];
+        $documents = [];
 
         foreach($data->userBank as $row){
             $banks[] = $row->bank.' No. rek '.$row->no.' Cab. '.$row->branch.' '.$row->isDefault();
@@ -324,6 +325,14 @@ class UserController extends Controller
             $city = $row->city()->exists() ? $row->city->name : '';
             $district = $row->district()->exists() ? $row->district->name : '';
             $destinations[] = $row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
+        }
+
+        foreach($data->userDestinationDocument as $row){
+            $country = $row->country()->exists() ? $row->country->name : '';
+            $province = $row->province()->exists() ? $row->province->name : '';
+            $city = $row->city()->exists() ? $row->city->name : '';
+            $district = $row->district()->exists() ? $row->district->name : '';
+            $documents[] = $row->address.' - '.$district.' - '.$city.' - '.$province.' - '.$country.' '.$row->isDefault();
         }
 
         foreach($data->userDriver as $row){
@@ -445,8 +454,12 @@ class UserController extends Controller
                                 <th>'.implode('<br>',$infos).'</th>
                             </tr>
                             <tr>
-                                <th>Alamat Pengiriman</th>
+                                <th>Alamat Pengiriman Barang</th>
                                 <th>'.implode('<br>',$destinations).'</th>
+                            </tr>
+                            <tr>
+                                <th>Alamat Pengiriman Dokumen</th>
+                                <th>'.implode('<br>',$documents).'</th>
                             </tr>
                             <tr>
                                 <th>Daftar Supir</th>

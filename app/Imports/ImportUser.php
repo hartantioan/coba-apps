@@ -9,6 +9,7 @@ use App\Exceptions\RowImportException;
 use App\Models\BomStandard;
 use App\Models\Company;
 use App\Models\Country;
+use App\Models\Group;
 use App\Models\Place;
 use App\Models\Region;
 use App\Models\UserBank;
@@ -65,7 +66,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                 }
                 $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
                 $city_id = Region::where('code',$city)->first()->id; 
-               
+                
                 $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
                 $province_id = Region::where('code',$province)->first()->id;
                  
@@ -79,6 +80,8 @@ class handleUser implements OnEachRow, WithHeadingRow
                 $type_pegawai = explode('#', $row['tipe_pegawai'])[0];
                 
                 $place = Place::where('code', explode('#', $row['plant'])[1])->first();
+
+                $group = Group::where('code', $type_group)->first();
 
                 $company = Company::where('id', explode('#', $row['perusahaan'])[0])->first();
                 
@@ -114,7 +117,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'limit_credit'      => $row['limit_kredit'],
                         'top'               => $row['top'],
                         'top_internal'      => $row['top_internal'],
-                        'group_id'          => $type_group,
+                        'group_id'          => $group->id,
                         'employee_type'     => $type_pegawai,
                         'company_id'        => $company->id,
                         'office_no'         => $row['no_kantor'],

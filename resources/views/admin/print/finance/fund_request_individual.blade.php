@@ -429,13 +429,13 @@
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                     <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
                                 </td>
-                                <td class="center-align" width="70%">
+                                <td width="70%">
                                     <table class="table-bot1" width="100%" border="0">
                                         @if($data->approval())
                                             @foreach ($data->approval() as $detail)
                                                 @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
                                                 <tr>
-                                                    <td class="center-align" width="100%">
+                                                    <td width="100%" align="left" style="font-size:10px;">
                                                         @php
                                                             $carbonInstance = Carbon::parse($row->updated_at);
                                                             $dayName = $carbonInstance->format('l');

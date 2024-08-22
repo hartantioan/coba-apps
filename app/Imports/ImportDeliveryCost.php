@@ -98,9 +98,9 @@ class handleDC implements OnEachRow, WithHeadingRow
                         'to_city_id' => $city_id_to,
                         'to_subdistrict_id' => $sub_district_id_to,
                         'transportation_id' => $transport->id,
-                        'tonnage' => $row['tonnage'],
-                        'ritage' => $row['ritage'],
-                        'qty_tonnage' => $row['tonnage_weight'],
+                        'tonnage' => $tonnage,
+                        'ritage' => $ritage,
+                        'qty_tonnage' => $tonnage_weight,
                         'status'=> 1
                     ]);
                 

@@ -43,7 +43,7 @@ class handleDC implements OnEachRow, WithHeadingRow
             if (isset($row['code']) && $row['code']) {
                
 
-                $code = $row['code'];$name = $row['name'];$tonnage = $row['tonnage_price'];$ritage = $row['ritage_price'];$tonnage_weight = $row['tonnage_weight'];
+                $code = $row['code'];$name = $row['name'];$tonnage = $row['kg_price'];$ritage = $row['ritage_price'];$tonnage_weight = $row['tonnage_weight'];
                 $account = User::where('employee_no', explode('#', $row['supplier_ekspedisi'])[0])->first();
                 
                 $city = str_replace(',', '.', explode('#', $row['from_city'])[0]);

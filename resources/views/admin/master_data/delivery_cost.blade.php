@@ -107,9 +107,9 @@
                                                         <th>{{ __('translations.starting_subdistrict') }}</th>
                                                         <th>{{ __('translations.destination_city') }}</th>
                                                         <th>{{ __('translations.destination_subdistrict') }}</th>
-                                                        <th>Tonase (Kg)</th>
-                                                        <th>{{ __('translations.tonnage') }}</th>
-                                                        <th>{{ __('translations.ritage') }}</th>
+                                                        <th>{{ __('translations.tonnage') }} (KG)</th>
+                                                        <th> Harga/Kg(Rp.) </th>
+                                                        <th> Harga/Ritase(Rp.) </th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>

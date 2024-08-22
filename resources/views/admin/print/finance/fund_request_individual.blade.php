@@ -385,30 +385,6 @@
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
-                                            <table class="table-bot1" width="100%" border="0">
-                                                @if($data->approval())
-                                                    @foreach ($data->approval() as $detail)
-                                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                                        <tr>
-                                                            <td class="center-align" width="100%">
-                                                                @php
-                                                                    $carbonInstance = Carbon::parse($row->updated_at);
-                                                                    $dayName = $carbonInstance->format('l');
-                                                                    $hour = $carbonInstance->hour;
-                                                                    $minute = $carbonInstance->minute;
-                                                                    $date = $carbonInstance->format('d/m/Y');
-                                                                    $formattedHour = sprintf('%02d', $hour);
-                                                                    $formattedMinute = sprintf('%02d', $minute);
-                                                                @endphp
-                                                                <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span> dengan keterangan : <span style="font-weight: bold">{{ $row->note }}</span></div>
-                                                          
-                                                            </td>
-                                                        </tr>
-                                                        @endforeach
-                                                    @endforeach
-                                                @endif
-                                            
-                                            </table>
                                         </td>
                                         
                                     </tr>
@@ -443,7 +419,7 @@
                         </div>
                         <table class="table-bot1" width="100%" border="0">
                             <tr>
-                                <td class="center-align">
+                                <td class="center-align" width="30%">
                                     {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
                                     <br>
                                     Dibuat oleh,
@@ -453,22 +429,32 @@
                                     <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
                                     <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
                                 </td>
-                                @if($data->approval())
-                                    @foreach ($data->approval() as $detail)
-                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td class="center-align">
-                                                {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                                @if($row->user->signature)
-                                                    <div>{!! $row->user->signature() !!}</div>
-                                                @endif
-                                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                                @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
-                                            </td>
-                                        @endforeach
-                                    @endforeach
-                                @endif
+                                <td class="center-align" width="70%">
+                                    <table class="table-bot1" width="100%" border="0">
+                                        @if($data->approval())
+                                            @foreach ($data->approval() as $detail)
+                                                @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                                <tr>
+                                                    <td class="center-align" width="100%">
+                                                        @php
+                                                            $carbonInstance = Carbon::parse($row->updated_at);
+                                                            $dayName = $carbonInstance->format('l');
+                                                            $hour = $carbonInstance->hour;
+                                                            $minute = $carbonInstance->minute;
+                                                            $date = $carbonInstance->format('d/m/Y');
+                                                            $formattedHour = sprintf('%02d', $hour);
+                                                            $formattedMinute = sprintf('%02d', $minute);
+                                                        @endphp
+                                                        <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span> dengan keterangan : <span style="font-weight: bold">{{ $row->note }}</span></div>
+                                                  
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            @endforeach
+                                        @endif
+                                    
+                                    </table>
+                                </td>
                             </tr>
                         </table>  
                     </div>

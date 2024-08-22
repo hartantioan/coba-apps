@@ -106,9 +106,9 @@
                                                         <th>Brand</th>
                                                         <th>Variant Item</th>
                                                         <th>Tipe Pembayaran</th>
-                                                        <th>Disc 1</th>
-                                                        <th>Disc 2</th>
-                                                        <th>Disc 3</th>
+                                                        <th>Disc 1 (%)</th>
+                                                        <th>Disc 2 (%)</th>
+                                                        <th>Disc 3 (Rp)</th>
                                                         <th>Post Date</th>
                                                         <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
@@ -175,15 +175,15 @@
                         <div class="col s12"></div>
                         <div class="input-field col s12 m2">
                             <input id="disc1" name="disc1" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="disc1">Diskon 1</label>
+                            <label class="active" for="disc1">Diskon 1 (%)</label>
                         </div>
                         <div class="input-field col s12 m2">
                             <input id="disc2" name="disc2" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="disc2">Diskon 2</label>
+                            <label class="active" for="disc2">Diskon 2 (%)</label>
                         </div>
                         <div class="input-field col s12 m2">
                             <input id="disc3" name="disc3" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="disc3">Diskon 3</label>
+                            <label class="active" for="disc3">Diskon 3 (Rp)</label>
                         </div>
                         <div class="col s12"></div>
                         

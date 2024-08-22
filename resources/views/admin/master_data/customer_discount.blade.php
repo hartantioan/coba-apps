@@ -162,8 +162,8 @@
                         </div>
                         <div class="input-field col s12 m3 ">
                             <select id="payment_type" name="payment_type" onchange="">
-                                <option value="1">Kas</option>
-                                <option value="2">Kredit</option>
+                                <option value="1">DP</option>
+                                <option value="2">Credit</option>
                             </select>
                             <label for="payment_type">Tipe Pembayaran</label>
                         </div>

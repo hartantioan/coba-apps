@@ -67,8 +67,8 @@ class CustomerDiscount extends Model
 
     public function paymentType(){
         $status = match ($this->payment_type) {
-          '1' => 'Kas',
-          '2' => 'Kredit',
+          '1' => 'DP',
+          '2' => 'Credit',
           default => '<span class="gradient-45deg-amber-amber medium-small white-text padding-3">Invalid</span>',
         };
 

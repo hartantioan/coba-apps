@@ -163,7 +163,7 @@ class DeliveryCostController extends Controller
                     $val->code,
                     $val->name,
                     $val->account->name ?? '',
-                    $val->transportation->name,
+                    $val->transportation->name ?? '',
                     date('d/m/Y',strtotime($val->valid_from)),
                     date('d/m/Y',strtotime($val->valid_to)),
                     $val->fromCity->name,
@@ -312,7 +312,7 @@ class DeliveryCostController extends Controller
         $dc['to_subdistrict_list'] = $dc->toCity->getSubdistrict();
         $dc['tonnage'] = number_format($dc->tonnage,2,',','.');
         $dc['ritage'] = number_format($dc->ritage,2,',','.');
-        $dc['qty_tonnage'] = number_format($dc->nominal,3,',','.');
+        $dc['qty_tonnage'] = number_format($dc->qty_tonnage,3,',','.');
         $dc['account_name'] = $dc->account()->exists() ? $dc->account->name : '';
         				
 		return response()->json($dc);

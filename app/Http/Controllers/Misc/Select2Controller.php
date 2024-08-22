@@ -89,6 +89,7 @@ use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
 use App\Models\ItemPriceList;
+use App\Models\CustomerDiscount;
 use App\Models\Group;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -873,6 +874,8 @@ class Select2Controller extends Controller {
         $search   = $request->search;
         $account_id   = $request->account_id;
         $date   = $request->date;
+        $city   = $request->city;
+        $payment_type   = $request->payment_type;
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
@@ -888,6 +891,12 @@ class Select2Controller extends Controller {
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
             ->first() ?? 0;
+
+            $cek_discount = CustomerDiscount::where('account_id',$user->id)
+            ->where('brand_id',$d->brand_id)
+            ->where('city_id',$city)
+            ->where('payment_type',$payment_type)
+            ->first() ?? 0;
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
@@ -900,6 +909,9 @@ class Select2Controller extends Controller {
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
                 'price'             => $cek_price->price ?? 0,
+                'disc1'             => $cek_discount->disc1 ?? 0,
+                'disc2'             => $cek_discount->disc2 ?? 0,
+                'disc3'             => $cek_discount->disc3 ?? 0,
                 'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
                 'stock_com'         => CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)),
             ];

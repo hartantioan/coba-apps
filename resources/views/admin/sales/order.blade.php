@@ -267,6 +267,11 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
+                                    <div class="card-alert card red">
+                                        <div class="card-content white-text">
+                                            <p>Mengganti data pelanggan akan menghapus data produk detail (HATI HATI) data yang telah terhapus tidak dapat dikembalikan</p>
+                                        </div>
+                                    </div>
                                     <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
@@ -282,8 +287,9 @@
                                     </div>
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
-                                        <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();"></select>
+                                        <select class="browser-default" id="account_id" name="account_id" onchange="getTopCustomer();clearDetail();"></select>
                                         <label class="active" for="account_id">{{ __('translations.customer') }}</label>
+                                        
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="select2 browser-default" id="billing_address" name="billing_address">
@@ -950,7 +956,15 @@
             }
         }
     }
-
+    function clearDetail(){
+        $('#body-item').empty().append(`
+            <tr id="last-row-item">
+                <td colspan="19">
+                    Silahkan tambahkan baris ...
+                </td>
+            </tr>
+        `);
+    }
     function getTopCustomer(){
         $('#phone').val('');
         if($('#account_id').val()){
@@ -1295,6 +1309,9 @@
     
     function getRowUnit(nil){
         var price_f_pricelist  = parseFloat($("#arr_item" + nil).select2('data')[0].price);
+        var disc_1  = parseFloat($("#arr_item" + nil).select2('data')[0].disc1);
+        var disc_2  = parseFloat($("#arr_item" + nil).select2('data')[0].disc2);
+        var disc_3  = parseFloat($("#arr_item" + nil).select2('data')[0].disc3);
         $('#tempPrice' + nil).empty();
         $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
@@ -1305,6 +1322,10 @@
 
             $('#arr_unit' + nil).empty();
 
+            $('#rowDisc1' + nil).val(disc_1);
+            $('#rowDisc2' + nil).val(disc_2);
+            $('#rowDisc3' + nil).val(disc_3);
+            
             $.each($("#arr_item" + nil).select2('data')[0].sell_units, function(i, value) {
                 $('#arr_unit' + nil).append(`
                     <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
@@ -1463,6 +1484,8 @@
                                 search: params.term,
                                 account_id: $('#account_id').val(),
                                 date: $('#post_date').val(),
+                                city: $('#city_id').val(),
+                                payment_type: $('#payment_type').val(),
                             };
                         },
                         processResults: function(data) {
@@ -2124,6 +2147,8 @@
                                         search: params.term,
                                         account_id: $('#account_id').val(),
                                         date: $('#post_date').val(),
+                                        city: $('#city_id').val(),
+                                        payment_type: $('#payment_type').val(),
                                     };
                                 },
                                 processResults: function(data) {
@@ -2764,6 +2789,8 @@
                                                 search: params.term,
                                                 account_id: $('#account_id').val(),
                                                 date: $('#post_date').val(),
+                                                city: $('#city_id').val(),
+                                                payment_type: $('#payment_type').val(),
                                             };
                                         },
                                         processResults: function(data) {

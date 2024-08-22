@@ -170,15 +170,15 @@
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="qty_tonnage" name="qty_tonnage" type="text" placeholder="Berat Tonase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="qty_tonnage">Berat Tonase</label>
+                            <label class="active" for="qty_tonnage">Tonase (KG)</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="tonnage" name="tonnage" type="text" placeholder="Tonase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="tonnage">{{ __('translations.tonnage') }}</label>
+                            <label class="active" for="tonnage">Harga/Kg(Rp.)</label>
                         </div>
                         <div class="input-field col m4 s12">
                             <input id="ritage" name="ritage" type="text" placeholder="Ritase" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="ritage"></label>
+                            <label class="active" for="ritage">Harga/Ritase(Rp.)</label>
                         </div>
                         <div class="input-field col s12 m4">
                             <div class="switch mb-1">

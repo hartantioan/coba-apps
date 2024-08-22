@@ -435,7 +435,7 @@
                                             @foreach ($data->approval() as $detail)
                                                 @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
                                                 <tr>
-                                                    <td width="100%" align="left" style="font-size:10px;">
+                                                    <td width="100%" align="left" style="font-size:11px !important;">
                                                         @php
                                                             $carbonInstance = Carbon::parse($row->updated_at);
                                                             $dayName = $carbonInstance->format('l');

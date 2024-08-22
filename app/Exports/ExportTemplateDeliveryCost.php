@@ -10,8 +10,9 @@ use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
+use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
 
-class ExportTemplateDeliveryCost implements WithEvents
+class ExportTemplateDeliveryCost extends \PhpOffice\PhpSpreadsheet\Cell\StringValueBinder implements WithCustomValueBinder, WithEvents
 {
     use Exportable, RegistersEventListeners;
     public static function beforeExport(BeforeExport $event)

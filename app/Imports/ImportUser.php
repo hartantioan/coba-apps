@@ -14,6 +14,7 @@ use App\Models\Region;
 use App\Models\UserBank;
 use App\Models\UserData;
 use App\Models\UserDestination;
+use App\Models\UserDestinationDocument;
 use App\Models\UserDriver;
 use DateTime;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -38,6 +39,7 @@ class ImportUser implements WithMultipleSheets
             2 => new handleUserData($this->temp),
             3 => new handleUserDestination($this->temp),
             4 => new handleUserDriver($this->temp),
+            5 => new handleUserDestinationDocument($this->temp),
         ];
     }
 }
@@ -312,7 +314,7 @@ class handleUserDestination implements OnEachRow, WithHeadingRow
                                 'city_id'           => $city_id,
                                 'district_id'       => $district_id,
                                 'country_id'        => $country_id,
-                                'is_default' => empty($row['default']) ? '0' : $row['default'],
+                                'is_default'        => empty($row['default']) ? '0' : $row['default'],
                             ]);
                             
                         }else{
@@ -369,6 +371,74 @@ class handleUserDriver implements OnEachRow, WithHeadingRow
         }catch (\Exception $e) {
             DB::rollback();
             $sheet='Driver User';
+            throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
+        }
+    }
+   
+    public function startRow(): int
+    {
+        return 2; // If you want to skip the first row (heading row)
+    }
+}
+
+class handleUserDestinationDocument implements OnEachRow, WithHeadingRow
+{
+    public $error = null;
+    protected $temp;
+
+    public function __construct(&$temp)
+    {
+        $this->temp = &$temp;
+    }
+    public function onRow(Row $row)
+    {
+        DB::beginTransaction();
+        try {
+            if ($row['no_header']) {
+                foreach($this->temp as $row1){
+                  
+                    if ($row1['no'] == $row['no_header']) {
+                       
+                        $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
+                        $district_id = Region::where('code',$district)->first()->id; 
+                        $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
+                        $city_id = Region::where('code',$city)->first()->id; 
+                        $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
+                        $province_id = Region::where('code',$province)->first()->id; 
+                        $country =  explode('#', $row['negara'])[0];
+                        $country_id= Country::where('code',$country)->first()->id;
+                        if(!$district_id && $this->error ==null){
+                            $this->error = "Kecamatan.";
+                        }elseif(!$city_id && $this->error ==null){
+                            $this->error = "Kota.";
+                        }elseif(!$province_id && $this->error ==null){
+                            $this->error = "Provinsi.";
+                        }elseif(!$country_id && $this->error ==null){
+                            $this->error = "Negara.";
+                        }
+                        if (!$this->error) {
+                           
+                            $query = UserDestinationDocument::create([
+                                'user_id'           => $row1['id'],
+                                'address'           => $row['alamat'],
+                                'province_id'       => $province_id,
+                                'city_id'           => $city_id,
+                                'district_id'       => $district_id,
+                                'country_id'        => $country_id,
+                                'is_default'        => empty($row['default']) ? '0' : $row['default'],
+                            ]);
+                            
+                        }else{
+                            $sheet='User Destination Document';
+                            throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
+                        }
+                    }
+                }
+            } 
+            DB::commit();
+        }catch (\Exception $e) {
+            DB::rollback();
+            $sheet='User Destination';
             throw new RowImportException($e->getMessage(), $row->getIndex(),null,$sheet);
         }
     }

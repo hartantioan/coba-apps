@@ -912,6 +912,7 @@ class CustomHelper {
 				$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$ip->company_id)->first();
 				$coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first();
 				$coapiutangusaha = Coa::where('code','100.01.03.01.01')->where('company_id',$ip->company_id)->first();
+				$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$ip->company_id)->first();
 
 				foreach($ip->incomingPaymentDetail as $row){
 					if($row->lookable_type == 'coas'){
@@ -995,6 +996,39 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
+						}elseif($row->lookable_type == 'marketing_order_down_payments'){
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $coauangmuka->id,
+								'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> $row->lookable->total * $row->lookable->currency_rate,
+								'nominal_fc'	=> $row->lookable->total,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+				
+							if($row->lookable->tax > 0){
+								JournalDetail::create([
+									'journal_id'	=> $query->id,
+									'coa_id'		=> $row->lookable->taxId->coa_sale_id,
+									'account_id'	=> $row->lookable->taxId->coaSale->bp_journal ? $account_id : NULL,
+									'type'			=> '2',
+									'nominal'		=> $row->lookable->tax * $data->currency_rate,
+									'nominal_fc'	=> $row->lookable->tax,
+									'lookable_type'	=> $table_name,
+									'lookable_id'	=> $table_id,
+									'detailable_type'=> $row->getTable(),
+									'detailable_id'	=> $row->id,
+									'note'			=> $row->lookable->tax_no,
+								]);
+							}
+							self::addDeposit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
+							$row->lookable->update([
+								'status'	=> '3'
+							]);
 						}else{
 							JournalDetail::create([
 								'journal_id'	=> $query->id,
@@ -1009,9 +1043,6 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
-							if($row->lookable_type == 'marketing_order_down_payments'){
-								self::addDeposit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
-							}
 						}
 						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
@@ -4073,7 +4104,7 @@ class CustomHelper {
 
 		}elseif($table_name == 'marketing_order_down_payments'){
 
-			$modp = MarketingOrderDownPayment::find($table_id);
+			/* $modp = MarketingOrderDownPayment::find($table_id);
 
 			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$modp->company_id)->first();
 			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$modp->company_id)->first();
@@ -4126,7 +4157,7 @@ class CustomHelper {
 				]);
 			}
 
-			CustomHelper::addCountLimitCredit($modp->account_id,$modp->grandtotal * $modp->currency_rate);
+			CustomHelper::addCountLimitCredit($modp->account_id,$modp->grandtotal * $modp->currency_rate); */
 
 		}elseif($table_name == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($table_id);

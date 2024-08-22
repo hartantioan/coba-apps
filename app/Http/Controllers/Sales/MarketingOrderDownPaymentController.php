@@ -407,7 +407,7 @@ class MarketingOrderDownPaymentController extends Controller
                     }
                     if(in_array($query->status,['1','6'])){
 
-                        CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+                        /* CustomHelper::removeDeposit($query->account_id,$query->grandtotal); */
 
                         if($request->has('document')) {
                             if($query->document){
@@ -1069,7 +1069,7 @@ class MarketingOrderDownPaymentController extends Controller
     
                 CustomHelper::sendNotification('marketing_order_down_payments',$query->id,'AR Down Payment No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('marketing_order_down_payments',$query->id);
-                CustomHelper::removeJournal('marketing_order_down_payments',$query->id);
+                /* CustomHelper::removeJournal('marketing_order_down_payments',$query->id); */
 
                 $response = [
                     'status'  => 200,
@@ -1929,7 +1929,7 @@ class MarketingOrderDownPaymentController extends Controller
                 ];
             }else{
                 
-                CustomHelper::removeDeposit($query->account_id,$query->grandtotal);
+                /* CustomHelper::removeDeposit($query->account_id,$query->grandtotal); */
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                
                 $query->update([

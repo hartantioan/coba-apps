@@ -385,6 +385,30 @@
                                             <div class="mt-3">
                                                 Catatan : {{ $data->note }}
                                             </div>
+                                            <table class="table-bot1" width="100%" border="0">
+                                                @if($data->approval())
+                                                    @foreach ($data->approval() as $detail)
+                                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
+                                                        <tr>
+                                                            <td class="center-align" width="100%">
+                                                                @php
+                                                                    $carbonInstance = Carbon::parse($row->updated_at);
+                                                                    $dayName = $carbonInstance->format('l');
+                                                                    $hour = $carbonInstance->hour;
+                                                                    $minute = $carbonInstance->minute;
+                                                                    $date = $carbonInstance->format('d/m/Y');
+                                                                    $formattedHour = sprintf('%02d', $hour);
+                                                                    $formattedMinute = sprintf('%02d', $minute);
+                                                                @endphp
+                                                                <div>{{ $row->approvalTemplateStage->approvalStage->approval->document_text }} <span style="font-weight: bold">{{ $row->user->name }}</span> Hari <span style="font-weight: bold">{{CustomHelper::hariIndo($dayName)}}</span>  tanggal <span style="font-weight: bold">{{$date}}</span>  jam <span style="font-weight: bold">{{$formattedHour}}:{{$formattedMinute}}</span> dengan keterangan : <span style="font-weight: bold">{{ $row->note }}</span></div>
+                                                          
+                                                            </td>
+                                                        </tr>
+                                                        @endforeach
+                                                    @endforeach
+                                                @endif
+                                            
+                                            </table>
                                         </td>
                                         
                                     </tr>

@@ -884,7 +884,7 @@ class Select2Controller extends Controller {
                 ->where(function($query) use($search){
                     $query->whereNotNull('is_sales_item');
                 })
-                ->whereHas('productionBatch')->get();
+                ->whereDoesntHave('fgGroup')->get();
         $user = User::find($account_id);
         foreach($data as $d) {
             $cek_price = ItemPricelist::where('group_id',$user->group_id)

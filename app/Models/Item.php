@@ -866,7 +866,13 @@ class Item extends Model
     }
 
     public function getStockArrayPlace($arr){
-        $total = $this->itemStock()->whereIn('place_id',$arr)->sum('qty');
+        $total = 0;
+        foreach($arr as $row){
+            $data = $this->itemCogs()->where('place_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
+            if($data){
+                $total += $data->qty_final;
+            }
+        }
 
         return $total;
     }

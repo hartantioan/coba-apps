@@ -570,6 +570,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'driver_hp'                     => $request->driver_hp,
                         'vehicle_name'                  => $request->vehicle_name,
                         'vehicle_no'                    => $request->vehicle_no,
+                        'weight_netto'                  => 0,
                         'note_internal'                 => $request->note_internal,
                         'note_external'                 => $request->note_external,
                         'status'                        => '1',

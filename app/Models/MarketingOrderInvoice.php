@@ -93,16 +93,16 @@ class MarketingOrderInvoice extends Model
         return $this->hasMany('App\Models\MarketingOrderInvoiceDetail');
     }
 
-    public function marketingOrderInvoiceDeliveryProcess()
+    public function marketingOrderInvoiceDeliveryProcessDetail()
     {
-        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details');
     }
 
     public function listDeliveryProcess(){
         $arr = [];
-        foreach($this->marketingOrderInvoiceDeliveryProcess as $row){
-            if(!in_array($row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code,$arr)){
-                $arr[] = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+        foreach($this->marketingOrderInvoiceDeliveryProcessDetail as $row){
+            if(!in_array($row->lookable->marketingOrderDeliveryProcess->code,$arr)){
+                $arr[] = $row->lookable->marketingOrderDeliveryProcess->code;
             }
         }
 

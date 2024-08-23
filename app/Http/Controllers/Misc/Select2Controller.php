@@ -88,7 +88,7 @@ use App\Models\Size;
 use App\Models\Type;
 use App\Models\UserBank;
 use App\Models\Variety;
-use App\Models\ItemPriceList;
+use App\Models\ItemPricelist;
 use App\Models\CustomerDiscount;
 use App\Models\Group;
 use Illuminate\Support\Carbon;
@@ -886,7 +886,7 @@ class Select2Controller extends Controller {
                 })->get();
         $user = User::find($account_id);
         foreach($data as $d) {
-            $cek_price = ItemPriceList::where('group_id',$user->group_id)
+            $cek_price = ItemPricelist::where('group_id',$user->group_id)
             ->where('item_id',$d->id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)

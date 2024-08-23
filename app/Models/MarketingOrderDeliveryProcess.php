@@ -295,7 +295,7 @@ class MarketingOrderDeliveryProcess extends Model
             }
         }
         if($passed){
-            if($query->marketingOrderDelivery->marketingOrder->account->is_ar_invoice){
+            if($query->marketingOrderDelivery->customer->is_ar_invoice){
                 $total = 0;
                 $tax = 0;
                 $total_after_tax = 0;
@@ -303,17 +303,19 @@ class MarketingOrderDeliveryProcess extends Model
                 $arrDownPayment = [];
                 $passedDp = false;
                 $passedTaxSeries = false;
+                $percent_dp = 0;
                 
                 foreach($query->marketingOrderDeliveryProcessDetail as $row){
                     $total += $row->getTotal();
                     $tax += $row->getTax();
                     $total_after_tax += $row->getGrandtotal();
+                    $percent_dp = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->percent_dp;
                 }
 
-                if($query->marketingOrderDelivery->marketingOrder->percent_dp > 0){
-                    $tempDownpayment = $total_after_tax * ($query->marketingOrderDelivery->marketingOrder->percent_dp / 100);
+                if($percent_dp > 0){
+                    $tempDownpayment = $total_after_tax * ($percent_dp / 100);
                     $tempBalance = $tempDownpayment;
-                    foreach($query->marketingOrderDelivery->marketingOrder->account->marketingOrderDownPayment()->orderBy('code')->get() as $row){
+                    foreach($query->marketingOrderDelivery->customer->marketingOrderDownPayment()->orderBy('code')->get() as $row){
                         if($tempBalance > 0){
                             $balanceInvoice = $row->balanceInvoice();
                             if($balanceInvoice > 0){
@@ -353,17 +355,17 @@ class MarketingOrderDeliveryProcess extends Model
                     $menu = Menu::where('table_name','marketing_order_invoices')->first();
                     $prefixCode = $menu->document_code;
                     $code = MarketingOrderInvoice::generateCode($prefixCode.date('y',strtotime($query->return_date)).substr($query->code,7,2));
-                    $dueDate = date('Y-m-d', strtotime($query->return_date. ' + '.$query->marketingOrderDelivery->marketingOrder->account->top.' days'));
+                    $dueDate = date('Y-m-d', strtotime($query->return_date. ' + '.$query->marketingOrderDelivery->customer->top.' days'));
                     $querymoi = MarketingOrderInvoice::create([
                         'code'			                => $code,
                         'user_id'		                => $query->user_id,
-                        'account_id'                    => $query->marketingOrderDelivery->marketingOrder->account_id,
+                        'account_id'                    => $query->marketingOrderDelivery->customer_id,
                         'company_id'                    => $query->company_id,
                         'post_date'                     => $query->return_date,
                         'due_date'                      => $dueDate,
                         'document_date'                 => $query->return_date,
                         'status'                        => '1',
-                        'type'                          => $query->marketingOrderDelivery->marketingOrder->payment_type,
+                        'type'                          => $query->marketingOrderDelivery->getTypePayment(),
                         'total'                         => $total,
                         'tax'                           => $tax,
                         'total_after_tax'               => $total_after_tax,
@@ -380,15 +382,15 @@ class MarketingOrderDeliveryProcess extends Model
                             'marketing_order_invoice_id'    => $querymoi->id,
                             'lookable_type'                 => $rowdata->getTable(),
                             'lookable_id'                   => $rowdata->id,
-                            'qty'                           => $rowdata->qty,
-                            'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
-                            'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
-                            'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
-                            'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                            'qty'                           => $rowdata->qty * $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                            'price'                         => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount(),
+                            'is_include_tax'                => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
+                            'percent_tax'                   => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                            'tax_id'                        => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id,
                             'total'                         => $rowdata->getTotal(),
                             'tax'                           => $rowdata->getTax(),
                             'grandtotal'                    => $rowdata->getGrandtotal(),
-                            'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$query->code,
+                            'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$query->code,
                         ]);
                     }
 
@@ -444,7 +446,7 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
                 'coa_id'		=> $coabdp->id,
                 'place_id'		=> $row->itemStock->place_id,
                 'item_id'		=> $row->itemStock->item_id,
@@ -527,7 +529,7 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'account_id'	=> $coahpp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
                 'coa_id'		=> $coahpp->id,
                 'place_id'		=> $row->itemStock->place_id,
                 'item_id'		=> $row->itemStock->item_id,
@@ -544,7 +546,7 @@ class MarketingOrderDeliveryProcess extends Model
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,
-                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->marketingOrder->account_id : NULL,
+                'account_id'	=> $coabdp->bp_journal ? $modp->marketingOrderDelivery->customer_id : NULL,
                 'coa_id'		=> $coabdp->id,
                 'place_id'		=> $row->itemStock->place_id,
                 'item_id'		=> $row->itemStock->item_id,

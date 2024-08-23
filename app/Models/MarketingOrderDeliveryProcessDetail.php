@@ -39,8 +39,8 @@ class MarketingOrderDeliveryProcessDetail extends Model
 
     public function getTax(){
         $tax = 0;
-        if($this->marketingOrderDetail->tax_id > 0){
-            $tax = $this->getTotal() * ($this->marketingOrderDetail->percent_tax / 100);
+        if($this->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id > 0){
+            $tax = $this->getTotal() * ($this->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100);
         }
         return $tax;
     }

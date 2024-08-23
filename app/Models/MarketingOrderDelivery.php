@@ -44,6 +44,14 @@ class MarketingOrderDelivery extends Model
         'done_note',
     ];
 
+    public function getTypePayment(){
+        $payment = '';
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $payment = $row->marketingOrderDetail->marketingOrder->payment_type;
+        }
+        return $payment;
+    }
+
     public function transportation()
     {
         return $this->belongsTo('App\Models\Transportation', 'transportation_id', 'id')->withTrashed();

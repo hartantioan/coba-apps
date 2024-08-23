@@ -3547,11 +3547,11 @@ class CustomHelper {
 			$dp_tax = 0;
 			$coa_sale_id = null;
 
-			foreach($moi->marketingOrderInvoiceDeliveryProcess as $key => $row){
-				$rowtotal = $row->total * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
-				$rowtax = $row->tax * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
-				$rowaftertax = $row->grandtotal * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
-				$rowrounding = ((($row->total / $moi->total) * $moi->rounding) * $row->lookable->marketingOrderDelivery->marketingOrder->currency_rate);
+			foreach($moi->marketingOrderInvoiceDeliveryProcessDetail as $key => $row){
+				$rowtotal = $row->total * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->currency_rate;
+				$rowtax = $row->tax * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->currency_rate;
+				$rowaftertax = $row->grandtotal * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->currency_rate;
+				$rowrounding = ((($row->total / $moi->total) * $moi->rounding) * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->currency_rate);
 
 				if($rowtotal > 0){
 					JournalDetail::create([
@@ -3572,7 +3572,7 @@ class CustomHelper {
 				}
 
 				if($rowtax > 0){
-					$coa_sale_id = $row->lookable->marketingOrderDetail->taxId->coaSale;
+					$coa_sale_id = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->taxId->coaSale;
 				}
 
 				if($rowrounding > 0 || $rowrounding < 0){
@@ -3595,12 +3595,12 @@ class CustomHelper {
 				$total_after_tax += $rowaftertax;
 				$rounding += $rowrounding;
 
-				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDelivery->code) < 0){
-					$arrNote[] = $row->lookable->marketingOrderDelivery->code;
+				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->code) < 0){
+					$arrNote[] = $row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->code;
 				}
 
-				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code) < 0){
-					$arrNote[] = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+				if(self::checkArrayRaw($arrNote,$row->lookable->marketingOrderDeliveryProcess->code) < 0){
+					$arrNote[] = $row->lookable->marketingOrderDeliveryProcess->code;
 				}
 			}
 

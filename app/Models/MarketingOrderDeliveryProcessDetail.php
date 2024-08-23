@@ -32,8 +32,12 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();
     }
 
+    public function realPriceAfterGlobalDiscount(){
+        return $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
+    }
+
     public function getTotal(){
-        $total = $this->qty_uom * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
+        $total = $this->qty * $this->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $this->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
         return $total;
     }
 

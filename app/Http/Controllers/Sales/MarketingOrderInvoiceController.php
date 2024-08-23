@@ -24,6 +24,7 @@ use App\Helpers\PrintHelper;
 use App\Models\User;
 use App\Models\Menu;
 use App\Models\CancelDocument;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\MenuUser;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
@@ -503,21 +504,21 @@ class MarketingOrderInvoiceController extends Controller
 			if($query) {
 
                 foreach($request->arr_lookable_id as $key => $row){
-                    if($request->arr_lookable_type[$key] == 'marketing_order_delivery_details'){
-                        $rowdata = MarketingOrderDeliveryDetail::find($row);
+                    if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
+                        $rowdata = MarketingOrderDeliveryProcessDetail::find($row);
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $query->id,
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $row,
                             'qty'                           => $rowdata->qty,
-                            'price'                         => $rowdata->marketingOrderDetail->realPriceAfterGlobalDiscount(),
-                            'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
-                            'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
-                            'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                            'price'                         => $rowdata->realPriceAfterGlobalDiscount(),
+                            'is_include_tax'                => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
+                            'percent_tax'                   => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                            'tax_id'                        => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id,
                             'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
                             'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
                             'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
-                            'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDelivery->marketingOrderDeliveryProcess->code,
+                            'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDeliveryProcess->code,
                         ]);
                     }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
                         $rowdata = MarketingOrderDownPayment::find($row);
@@ -598,17 +599,17 @@ class MarketingOrderInvoiceController extends Controller
         $totals=0;
         $totalppn=0;
         $totalgrandtotal=0;
-        foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row){
+        foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row){
             $totalqty+=$row->qty;
             $totals+=$row->total;
             $totalppn+=$row->tax;
             $totalgrandtotal+=$row->grandtotal;
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
-                <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
-                <td class="center-align">'.$row->lookable->item->name.'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDeliveryProcess->code.'</td>
+                <td class="center-align">'.$row->lookable->itemStock->item->name.'</td>
                 <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
-                <td class="center-align">'.$row->lookable->marketingOrderDetail->itemUnit->unit->code.'</td>
+                <td class="center-align">'.$row->lookable->itemStock->item->uomUnit->code.'</td>
                 <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
@@ -1116,10 +1117,10 @@ class MarketingOrderInvoiceController extends Controller
         $arrDp = [];
         $arrUsed = [];
         
-        foreach($po->marketingOrderInvoiceDeliveryProcess as $row){
-            $type = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->getTable();
-            $id = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->id;
-            $code = $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;
+        foreach($po->marketingOrderInvoiceDeliveryProcessDetail as $row){
+            $type = $row->lookable->marketingOrderDeliveryProcess->getTable();
+            $id = $row->lookable->marketingOrderDeliveryProcess->id;
+            $code = $row->lookable->marketingOrderDeliveryProcess->code;
 
             $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
 
@@ -1139,11 +1140,11 @@ class MarketingOrderInvoiceController extends Controller
                 'tax'                                   => number_format($row->tax,2,',','.'),
                 'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
                 'code'                                  => $code,
-                'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
-                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty),
-                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn()),
-                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn()),
-                'unit'                                  => $row->lookable->item->sellUnit->code,
+                'item_name'                             => $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name,
+                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                'unit'                                  => $row->lookable->itemStock->item->uomUnit->code,
                 'price'                                 => number_format($row->price,2,',','.'),
                 'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
                 'is_include_tax'                        => $row->is_include_tax,

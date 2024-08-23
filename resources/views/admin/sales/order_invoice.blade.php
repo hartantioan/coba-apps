@@ -239,7 +239,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="type" name="type">
-                                            <option value="1">Cash Before Delivery</option>
+                                            <option value="1">DP</option>
                                             <option value="2">Credit</option>
                                         </select>
                                         <label class="" for="type">{{ __('translations.type') }}</label>
@@ -2339,13 +2339,13 @@
             (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
 
-        /* if(tax > 0){
+        if(tax > 0){
             $('#textTax').show();
             getTaxSeries();
         }else{
             $('#textTax').hide();
             $('#tax_no').val('');
-        } */
+        }
     }
 
     function startIntro(){

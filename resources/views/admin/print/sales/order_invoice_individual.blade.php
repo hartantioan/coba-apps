@@ -179,7 +179,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="80%">
-                                            {!! $data->account->name.' <br> '.$data->account->address.' '.$data->account->subdistrict->name.' '.$data->account->district->name.' '.$data->account->city->name.' '.$data->account->province->name.' ('.$data->account->phone.' / '.$data->account->office_no.')' !!}
+                                            {!! $data->account->name.' <br> ('.$data->account->phone.' / '.$data->account->office_no.')' !!}
                                         </td>
                                     </tr>
                                 </table>
@@ -226,14 +226,14 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row)
+                                @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                                 <tr>
                                     <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                    <td align="">{{ $row->lookable->item->name }}</td>
-                                    <td align="">{{ $row->lookable->marketingOrderDelivery->code }}</td>
-                                    <td align="">{{ $row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code }}</td>
+                                    <td align="">{{ $row->lookable->itemStock->item->name }}</td>
+                                    <td align="">{{ $row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->code }}</td>
+                                    <td align="">{{ $row->lookable->marketingOrderDeliveryProcess->code }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->lookable->marketingOrderDetail->itemUnit->unit->code }}</td>
+                                    <td align="center">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
                                     <td align="right">{{ number_format($row->price,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->tax,2,',','.') }}</td>

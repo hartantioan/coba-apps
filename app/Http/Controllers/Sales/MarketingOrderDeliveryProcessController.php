@@ -55,6 +55,7 @@ class MarketingOrderDeliveryProcessController extends Controller
     
     public function index(Request $request)
     {
+        /* MarketingOrderDeliveryProcess::find(1)->createInvoice(); */
         $lastSegment = request()->segment(count(request()->segments()));
        
         $menu = Menu::where('url', $lastSegment)->first();

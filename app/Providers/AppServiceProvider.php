@@ -113,6 +113,7 @@ class AppServiceProvider extends ServiceProvider
             'production_recalculates'               => 'App\Models\ProductionRecalculate',
             'production_recalculate_details'        => 'App\Models\ProductionRecalculateDetail',
             'bom_calculators'                       => 'App\Models\BomCalculator',
+            'marketing_order_delivery_process_details'=> 'App\Models\MarketingOrderDeliveryProcessDetail',
         ]);
     }
 }

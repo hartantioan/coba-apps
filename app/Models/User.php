@@ -230,7 +230,7 @@ class User extends Authenticatable
             }
         }else{
             if($type == '2'){
-                $prefix = 'C';
+                $prefix = 'P';
             }elseif($type == '3'){
                 $prefix = 'S';
             }elseif($type == '4'){

@@ -75,7 +75,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                
                 $gender =  explode('#', $row['jenis_kelamin'])[0];
                 $status_married =  explode('#', $row['status_pernikahan'])[0];
-                $type_group =  explode('#', $row['kelompok_bisnis'])[0];
+                $type_group =  explode('#', $row['group_bp'])[0];
                 $type = explode('#', $row['type'])[0];
                 $type_pegawai = explode('#', $row['tipe_pegawai'])[0];
                 

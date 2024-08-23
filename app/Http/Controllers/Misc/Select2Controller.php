@@ -883,7 +883,8 @@ class Select2Controller extends Controller {
                 ->where('status','1')
                 ->where(function($query) use($search){
                     $query->whereNotNull('is_sales_item');
-                })->get();
+                })
+                ->whereHas('productionBatch')->get();
         $user = User::find($account_id);
         foreach($data as $d) {
             $cek_price = ItemPricelist::where('group_id',$user->group_id)

@@ -277,6 +277,11 @@ class PurchaseOrderDetail extends Model
         return $this->hasMany('App\Models\GoodScale','purchase_order_detail_id','id')->where('status_qc','1')->whereIn('status',['2','3']);
     }
 
+    public function goodScaleRealTime()
+    {
+        return $this->hasMany('App\Models\GoodScale','purchase_order_detail_id','id')->whereIn('status',['2','3']);
+    }
+
     public function balanceInvoice(){
         $total = round($this->getArrayTotal()['grandtotal'],2);
 

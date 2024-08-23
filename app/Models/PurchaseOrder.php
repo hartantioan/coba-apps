@@ -398,6 +398,10 @@ class PurchaseOrder extends Model
             if($row->purchaseInvoiceDetail()->exists()){
                 $hasRelation = true;
             }
+
+            if($row->goodScaleRealTime()->exists()){
+                $hasRelation = true;
+            }
         }
 
         if($this->purchaseDownPaymentDetail()->exists()){

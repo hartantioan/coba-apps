@@ -2980,7 +2980,6 @@ class Select2Controller extends Controller {
                 'province'      => $d->province->name,
                 'city'          => $d->city->name,
                 'district'      => $d->district->name,
-                'subdistrict'   => $d->subdistrict->name,
                 'type'          => $d->getTable(),
                 'post_date'     => date('d/m/Y',strtotime($d->post_date)),
                 'note'          => ($d->note_internal ? $d->note_internal : '').' - '.($d->note_external ? $d->note_external : ''),

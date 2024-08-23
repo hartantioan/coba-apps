@@ -85,7 +85,7 @@
                                                         <th>{{ __('translations.phone_number') }}</th>
                                                         <th>{{ __('translations.province') }}</th>
                                                         <th>{{ __('translations.city') }}</th>
-                                                        <th>{{ __('translations.subdistrict') }}</th>
+                                                        <th>{{ __('translations.district') }}</th>
                                                         <th>{{ __('translations.urban_village') }}</th>
                                                         <th>Gmap</th>
                                                         <th>{{ __('translations.status') }}</th>

@@ -329,7 +329,7 @@
                         </div>
                         <div class="input-field col s12 m3" id="group_select">
                             <select id="group_id" name="group_id"></select>
-                            <label for="group_id">Kelompok Partner Bisnis</label>
+                            <label for="group_id">Group BP</label>
                         </div>
                         <div class="input-field col s12 m3 employee_inputs">
                             <select id="employee_type" name="employee_type">

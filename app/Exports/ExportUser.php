@@ -36,7 +36,7 @@ class ExportUser implements FromCollection, WithTitle, WithHeadings, WithCustomS
         'PROVINSI',
         'NO IDENTITAS',
         'ALAMAT IDENTITAS',
-        'GROUP',
+        'GROUP BP',
         'PERUSAHAAN',
         'PLANT',
         'POSISI',

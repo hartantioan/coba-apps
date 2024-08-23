@@ -846,6 +846,13 @@ document.addEventListener('focusin', function (event) {
                 };
                 $('#user_driver_id').empty().append(`<option value="">--Silakan pilih MOD--</option>`);
                 $('#driver_name,#driver_hp').prop("readonly", false);
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="6">
+                            Silahkan pilih Jadwal Kirim...
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -2070,6 +2077,40 @@ document.addEventListener('focusin', function (event) {
 
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
+                        let details = ``;
+
+                        $.each(val.details, function(i, value) {
+                            let countdetail = makeid(10);
+                            details += `
+                            <tr class="row_item_detail_` + count + `">
+                                <input type="hidden" name="arr_modd_id[]" value="` + val.id + `">
+                                <input type="hidden" name="arr_item_stock_id[]" value="` + value.id + `">
+                                <td>
+                                    ` + value.place_name + `
+                                </td>
+                                <td>
+                                    ` + value.warehouse_name + `
+                                </td>
+                                <td>
+                                    ` + value.area_name + `
+                                </td>
+                                <td>
+                                    ` + value.shading + `
+                                </td>
+                                <td>
+                                    ` + value.batch + `
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty_max + `" class="rowQtyDetail` + count + `">
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + count + `');">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            `;
+                        });
 
                         $('#body-item').append(`
                             <tr class="row_item" data-id="` + response.marketing_order_delivery_id + `" style="background-color:` + getRandomColor() + `;">
@@ -2101,7 +2142,7 @@ document.addEventListener('focusin', function (event) {
                                                     <select class="browser-default" id="item_stock_id` + count + `"></select>
                                                 </th>
                                                 <th class="center" colspan="2" width="20%">
-                                                    <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                    <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                 </div>
                                                 <th class="center" colspan="3">
                                                     <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `');">
@@ -2118,11 +2159,7 @@ document.addEventListener('focusin', function (event) {
                                             </tr>
                                         </thead>
                                         <tbody id="body-item-` + count + `">
-                                            <tr id="last-row-item-` + count + `">
-                                                <td colspan="7">
-                                                    Silahkan pilih Stock / Gudang...
-                                                </td>
-                                            </tr>
+                                            ` + details + `
                                         </tbody>
                                     </table>
                                 </td>

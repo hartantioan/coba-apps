@@ -1092,15 +1092,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $po['responseStatus'] = 200;
         $po['code_place_id'] = substr($po->code,7,2);
         $po['marketing_order_delivery_code'] = $po->marketingOrderDelivery->code;
-        $po['outlet'] = $po->marketingOrderDelivery->marketingOrder->outlet->name;
-        $po['sender'] = $po->marketingOrderDelivery->account->name;
-        $po['address'] = $po->marketingOrderDelivery->marketingOrder->destination_address;
-        $po['province'] = $po->marketingOrderDelivery->marketingOrder->province->name;
-        $po['city'] = $po->marketingOrderDelivery->marketingOrder->city->name;
-        $po['district'] = $po->marketingOrderDelivery->marketingOrder->district->name;
-        $po['subdistrict'] = $po->marketingOrderDelivery->marketingOrder->subdistrict->name;
 
-        $arr = [];
         $drivers = [];
 
         foreach($po->account->userDriver as $row){
@@ -1128,20 +1120,27 @@ class MarketingOrderDeliveryProcessController extends Controller
             $moddd['qty'] = CustomHelper::formatConditionalQty($moddd->qty);
             $moddd['unit'] = $moddd->marketingOrderDetail->itemUnit->unit->code;
             $moddd['place_id'] = $moddd->place_id;
-            $moddd['details'] = [];
+            $moddd['conversion'] = $moddd->marketingOrderDetail->qty_conversion;
+            $details = [];
             foreach($po->marketingOrderDeliveryProcessDetail()->where('marketing_order_delivery_detail_id',$rowmod)->get() as $row){
-                $moddd['details'][] = [
-                    'item_name'     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                $details[] = [
+                    'id'            => $row->id,
+                    'item_name'     => $row->itemStock->place->code.' / Gudang : '.$row->itemStock->warehouse->name.' / Area : '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($row->itemStock->balanceWithUnsent() / $moddd->marketingOrderDetail->qty_conversion).' '.$row->itemStock->item->uomUnit->code.' / Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
                     'place_name'    => $row->itemStock->place->code,
+                    'warehouse_name'=> $row->itemStock->warehouse->name,
+                    'area_name'     => $row->itemStock->area()->exists() ? $row->itemStock->area->code : '-',
+                    'shading'       => $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-',
+                    'batch'         => $row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-',
                     'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                    'unit'          => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
-                    'note'          => $row->note,
+                    'qty_max'       => CustomHelper::formatConditionalQty($row->qty + ($row->itemStock->qty / $moddd->marketingOrderDetail->qty_conversion)),
                 ];
             }
+            $moddd['details'] = $details;
+            $arrResult[] = $moddd;
         }
         
 
-        $po['details'] = $arr;
+        $po['details'] = $arrResult;
         				
 		return response()->json($po);
     }

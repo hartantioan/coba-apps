@@ -6,7 +6,7 @@ namespace App\Imports;
 use App\Models\User;
 
 use App\Exceptions\RowImportException;
-use App\Models\BomStandard;
+use App\Models\Brand;
 use App\Models\Company;
 use App\Models\Country;
 use App\Models\Group;
@@ -78,12 +78,16 @@ class handleUser implements OnEachRow, WithHeadingRow
                 $type_group =  explode('#', $row['group_bp'])[0];
                 $type = explode('#', $row['type'])[0];
                 $type_pegawai = explode('#', $row['tipe_pegawai'])[0];
+
+                $payment_type = explode('#', $row['payment_type'])[0];
                 
                 $place = Place::where('code', explode('#', $row['plant'])[1])->first();
 
                 $group = Group::where('code', $type_group)->first();
 
                 $company = Company::where('id', explode('#', $row['perusahaan'])[0])->first();
+
+                $brand = Brand::where('code', explode('#', $row['brand'])[1])->first();
                 
                 if(!$district_id && $this->error ==null){
                     $this->error = "Kecamatan.";
@@ -116,7 +120,8 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'type'              => $type,
                         'limit_credit'      => $row['limit_kredit'],
                         'top'               => $row['top'],
-                        'top_internal'      => $row['top_internal'],
+                        'top_internal'      => $row['top_internal_in_java'],
+                        'top_internal_out_java'      => $row['top_internal_out_java'],
                         'group_id'          => $group->id,
                         'employee_type'     => $type_pegawai,
                         'company_id'        => $company->id,
@@ -130,6 +135,8 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'country_id'        => $country_id,
                         'nib'               => $row['nib'],
                         'sppkp'             => $row['sppkp'],
+                        'sales_payment_type'=> $payment_type,
+                        'brand_id'          => $brand->id,
                         'status'            => 1,
                     ]);
 

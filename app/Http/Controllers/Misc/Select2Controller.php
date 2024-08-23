@@ -1285,6 +1285,7 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $typegrpo = $request->type ?? '';
+        
         $data = PurchaseOrder::where(function($query) use($search, $request, $typegrpo){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
@@ -1306,6 +1307,7 @@ class Select2Controller extends Controller {
                     if($request->item_id){
                         $query->where('item_id',$request->item_id);
                     }
+                   
                     if($typegrpo){
                         if($typegrpo == '2'){
                             $query->whereHas('goodScale',function($query){

@@ -653,6 +653,13 @@ class UserController extends Controller
                     $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : ($query->limit_credit > 0 ? $query->limit_credit : 0);
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
+
+                    $query->top_internal_out_java = $request->top_internal_out_java ? $request->top_internal_out_java : NULL;
+                    $query->brand_id             = $request->brand_id ? $request->brand_id : NULL;
+                    $query->sales_payment_type    = $request->sales_payment_type;
+
+
+
                     $query->status          = $request->status ? $request->status : '2';
                     $query->gender          = $request->gender;
 
@@ -710,6 +717,10 @@ class UserController extends Controller
 
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,
+                        'top_internal_out_java' => $request->top_internal_out_java ? $request->top_internal_out_java : NULL,
+                        'brand_id'              => $request->brand_id ? $request->brand_id : NULL,
+                        'sales_payment_type'    => $request->sales_payment_type,
+
                         'status'                => $request->status ? $request->status : '2',
                         'gender'                => $request->gender ? $request->gender : NULL,
                         'married_status'        => $request->type == '1' ? ($request->married_status ? $request->married_status : NULL) :NULL,

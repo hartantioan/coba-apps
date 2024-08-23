@@ -77,6 +77,10 @@ class User extends Authenticatable
         'id_program_lama',
         'is_special_lock_user',
         'type_body',
+
+        'brand_id',
+        'sales_payment_type',
+        'top_internal_out_java',
     ];
 
     protected $hidden = [

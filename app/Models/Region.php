@@ -17,7 +17,8 @@ class Region extends Model
     protected $fillable = [
         'code',
         'name',
-        'country_id'
+        'country_id',
+        'category_region'
     ];
 
     public function getDistrict(){
@@ -112,5 +113,15 @@ class Region extends Model
     public function country()
     {
         return $this->belongsTo('App\Models\Country', 'country_id', 'id')->withTrashed();
+    }
+
+    public function type(){
+        $status = match ($this->status) {
+          '1' => 'DALAM PULAU JAWA',
+          '2' => 'LUAR PULAU JAWA',
+          default => '-',
+        };
+
+        return $status;
     }
 }

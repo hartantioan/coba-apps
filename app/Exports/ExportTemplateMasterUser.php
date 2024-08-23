@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Brand;
 use App\Models\Country;
 use App\Models\Group;
 use App\Models\Region;
@@ -32,6 +33,7 @@ class ExportTemplateMasterUser implements WithEvents
         $district =Region::whereRaw('LENGTH(code) = 8')->get();
         $country = Country::where('status',1)->get();
         $group = Group::where('status','1')->get();
+        $brand = Brand::where('status','1')->get();
         $startRow = 2;
         foreach($district as $row){
             $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
@@ -49,6 +51,7 @@ class ExportTemplateMasterUser implements WithEvents
         foreach($province as $row){
             $event->getWriter()->getSheetByIndex(8)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(8)->setCellValue('B'.$startRow,$row->name);
+            $event->getWriter()->getSheetByIndex(8)->setCellValue('D'.$startRow,$row->type());
             $startRow++;
         }
        
@@ -64,6 +67,13 @@ class ExportTemplateMasterUser implements WithEvents
         foreach($group as $row){
             $event->getWriter()->getSheetByIndex(10)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(10)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+
+        $startRow = 2;
+        foreach($brand as $row){
+            $event->getWriter()->getSheetByIndex(11)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(11)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
         

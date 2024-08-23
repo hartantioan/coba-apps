@@ -235,6 +235,17 @@
                             <input id="id_card_address" name="id_card_address" type="text" placeholder="Alamat KTP">
                             <label class="active" for="id_card_address">Alamat KTP / Identitas</label>
                         </div>
+                        <div class="input-field col s12 m3">
+                            <select id="sales_payment_type" name="sales_payment_type">
+                                <option value="1">DP</option>
+                                <option value="2">Kredit</option>
+                            </select>
+                            <label for="sales_payment_type">Tipe Pembayaran Sales</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <select class="select2 browser-default" id="brand_id" name="brand_id"></select>
+                            <label for="brand_id" class="active" >Brand</label>
+                        </div>
                         <div class="input-field col s12 m3 customer_inputs">
                             <input id="nib" name="nib" type="text" placeholder="NIB">
                             <label class="active" for="nib">NIB</label>
@@ -305,7 +316,11 @@
                         </div>
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
-                            <label class="active" for="top_internal">TOP Internal</label>
+                            <label class="active" for="top_internal">TOP Internal Dalam Jawa</label>
+                        </div>
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
+                            <input id="top_internal_out_java" name="top_internal_out_java" type="number" min="0" step="1" value="0">
+                            <label class="active" for="top_internal_out_java">TOP Internal Luar Jawa</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
@@ -331,6 +346,7 @@
                             <select id="group_id" name="group_id"></select>
                             <label for="group_id">Group BP</label>
                         </div>
+                        
                         <div class="input-field col s12 m3 employee_inputs">
                             <select id="employee_type" name="employee_type">
                                 <option value="1">Staff</option>
@@ -1278,6 +1294,7 @@
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
         select2ServerSide('#arr_user', '{{ url("admin/select2/employee") }}');
+        select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
 
         $('#body-bank').on('click', '.delete-data-bank', function() {
             $(this).closest('tr').remove();

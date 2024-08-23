@@ -265,6 +265,7 @@ class StandardCustomerPriceController extends Controller
         $scp = StandardCustomerPrice::find($request->id);
         $scp['group'] = $scp->group;
         $scp['user'] = $scp->user;
+        $scp['price'] = number_format($scp->price,2,',','.');
  		return response()->json($scp);
     }
 

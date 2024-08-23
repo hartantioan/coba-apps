@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Accounting\AccountingReportController;
 use App\Http\Controllers\Accounting\AdjustRateController;
 use App\Http\Controllers\Production\BomCalculatorController;
+use App\Http\Controllers\Finance\PaymentRequestDateReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
@@ -2741,6 +2742,14 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[UnbilledAPController::class, 'index']);
                         Route::post('filter_by_date',[UnbilledAPController::class, 'filterByDate']);
                         Route::get('export',[UnbilledAPController::class, 'export']);
+                    });
+
+                    Route::prefix('payment_request_date')->middleware('operation.access:payment_request_date,view')->group(function () {
+                        Route::get('/',[PaymentRequestDateReportController::class, 'index']);
+                        Route::post('filter',[PaymentRequestDateReportController::class, 'filter']);
+                        Route::post('filter_detail',[PaymentRequestDateReportController::class, 'filterDetail']);
+                        Route::post('show_detail',[PaymentRequestDateReportController::class, 'showDetail']);
+                        Route::get('export',[PaymentRequestDateReportController::class, 'export']);
                     });
 
                     Route::prefix('outstanding_ap')->middleware('operation.access:outstanding_ap,view')->group(function () {

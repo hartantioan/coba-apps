@@ -2071,23 +2071,18 @@ document.addEventListener('focusin', function (event) {
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
 
-                        let stock = '<ol>';
-
-                        $.each(val.stocks, function(i, value){
-                            stock += '<li>' + value.stock_name + ' Qty : ' + value.qty + '</li>';
-                        });
-
-                        stock += '</ol>';
-
                         $('#body-item').append(`
-                            <tr class="row_item" data-id="` + response.id + `">
+                            <tr class="row_item" data-id="` + response.marketing_order_delivery_id + `" style="background-color:` + getRandomColor() + `;">
+                                <td rowspan="2" class="center-align">
+                                    ` + (i+1) + `
+                                </td>
                                 <td>
                                     ` + val.item_name + `
                                 </td>
                                 <td id="arr_warehouse_name` + count + `">
-                                    ` + stock + `
+                                    ` + val.sales_order + `
                                 </td>
-                                <td class="center-align">
+                                <td class="center-align main-qty" data-id="` + count + `">
                                     ` + val.qty + `
                                 </td>
                                 <td class="center-align">
@@ -2097,7 +2092,68 @@ document.addEventListener('focusin', function (event) {
                                     ` + val.note + `
                                 </td>
                             </tr>
+                            <tr class="row_item" data-id="` + response.id + `">
+                                <td colspan="5">
+                                    <table class="bordered" id="table-detail-` + count + `">
+                                        <thead>
+                                            <tr>
+                                                <th class="center" colspan="2" width="40%">
+                                                    <select class="browser-default" id="item_stock_id` + count + `"></select>
+                                                </th>
+                                                <th class="center" colspan="2" width="20%">
+                                                    <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                </div>
+                                                <th class="center" colspan="3">
+                                                    <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `');">
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th class="center">Plant</th>
+                                                <th class="center">Gudang</th>
+                                                <th class="center">Area</th>
+                                                <th class="center">Shading</th>
+                                                <th class="center">Batch</th>
+                                                <th class="center">Qty</th>
+                                                <th class="center">Hapus</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-item-` + count + `">
+                                            <tr id="last-row-item-` + count + `">
+                                                <td colspan="7">
+                                                    Silahkan pilih Stock / Gudang...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
                         `);
+                        $('#item_stock_id' + count).select2({
+                            placeholder: '-- Pilih asal stock / gudang --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/item_stock_by_place_item") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        place_id: val.place_id,
+                                        item_id: val.item_id,
+                                        qty_conversion: val.conversion,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
                     });
                 }
                 

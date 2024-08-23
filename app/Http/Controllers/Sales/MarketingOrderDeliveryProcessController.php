@@ -1111,24 +1111,34 @@ class MarketingOrderDeliveryProcessController extends Controller
         }
 
         $po['drivers'] = $drivers;
+
+        $modd = [];
+        $arrResult = [];
+        foreach($po->marketingOrderDeliveryProcessDetail()->orderBy('id')->get() as $row){
+            if(!in_array($row->marketing_order_delivery_detail_id,$modd)){
+                $modd[] = $row->marketing_order_delivery_detail_id;
+            }
+        }
         
-        foreach($po->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-            $stocks = [];
-            foreach($row->marketingOrderDeliveryStock as $rowdetail){
-                $stocks[] = [
-                    'stock_name'    => $rowdetail->itemStock->place->code.' - '.$rowdetail->itemStock->warehouse->name.' - '.($rowdetail->itemStock->area()->exists() ? $rowdetail->itemStock->area->name : '').' - '.($rowdetail->itemStock->itemShading()->exists() ? $rowdetail->itemStock->itemShading->code : ''),
-                    'qty'           => CustomHelper::formatConditionalQty($rowdetail->qty),
+        foreach($modd as $rowmod){
+            $moddd = MarketingOrderDeliveryDetail::find($rowmod);
+            $moddd['item_name'] = $moddd->item->code.' - '.$moddd->item->name;
+            $moddd['sales_order'] = $moddd->marketingOrderDetail->marketingOrder->code;
+            $moddd['qty'] = CustomHelper::formatConditionalQty($moddd->qty);
+            $moddd['unit'] = $moddd->marketingOrderDetail->itemUnit->unit->code;
+            $moddd['place_id'] = $moddd->place_id;
+            $moddd['details'] = [];
+            foreach($po->marketingOrderDeliveryProcessDetail()->where('marketing_order_delivery_detail_id',$rowmod)->get() as $row){
+                $moddd['details'][] = [
+                    'item_name'     => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+                    'place_name'    => $row->itemStock->place->code,
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty),
+                    'unit'          => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                    'note'          => $row->note,
                 ];
             }
-            $arr[] = [
-                'item_name'     => $row->item->code.' - '.$row->item->name,
-                'place_name'    => $row->place->code,
-                'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                'unit'          => $row->marketingOrderDetail->itemUnit->unit->code,
-                'note'          => $row->note,
-                'stocks'        => $stocks,
-            ];
         }
+        
 
         $po['details'] = $arr;
         				

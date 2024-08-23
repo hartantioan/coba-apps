@@ -253,8 +253,8 @@
                                         <label class="active" for="driver_hp">HP/WA Supir</label>
                                     </div>
                                     <div class="input-field col m3 s12 step9">
-                                        <input id="vehicle_name" name="vehicle_name" type="text" placeholder="Tipe Kendaraan">
-                                        <label class="active" for="vehicle_name">Tipe Kendaraan</label>
+                                        <input id="vehicle_name" name="vehicle_name" type="text" placeholder="Nama Kendaraan">
+                                        <label class="active" for="vehicle_name">Nama Kendaraan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step10">
                                         <input id="vehicle_no" name="vehicle_no" type="text" placeholder="Nopol Kendaraan">

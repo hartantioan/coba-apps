@@ -85,9 +85,14 @@ class MarketingOrderDeliveryController extends Controller
             'send_status',
             'code',
             'user_id',
+            'user_update_id',
             'company_id',
             'account_id',
             'customer_id',
+            'destination_address',
+            'district_id',
+            'city_id',
+            'transportation_id',
             'post_date',
             'delivery_date',
             'note_internal',
@@ -108,6 +113,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
+                            ->orWhere('destination_address','like',"%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -163,6 +169,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
+                            ->orWhere('destination_address','like',"%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -232,9 +239,14 @@ class MarketingOrderDeliveryController extends Controller
                     ',
                     $val->code,
                     $val->user->name,
+                    $val->userUpdate()->exists() ? $val->userUpdate->name : '-',
                     $val->company->name,
                     $val->account->name,
                     $val->customer->name ?? '-',
+                    $val->destination_address,
+                    $val->district->name,
+                    $val->city->name,
+                    $val->transportation->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->note_internal,
@@ -306,14 +318,20 @@ class MarketingOrderDeliveryController extends Controller
                         'warehouse'     => $row->item->warehouseName(),
                         'qty_stock'     => CustomHelper::formatConditionalQty(round($row->item->getStockPlaceWithUnsentSales($row->place_id) / $row->qty_conversion,3)),
                         'qty'           => CustomHelper::formatConditionalQty($row->balanceQtyMod()),
+                        'qty_uom'       => CustomHelper::formatConditionalQty(round($row->balanceQtyMod() * $row->qty_conversion,3)),
                         'unit'          => $row->itemUnit->unit->code,
                         'note'          => $row->note,
                         'qty_conversion'=> CustomHelper::formatConditionalQty($row->qty_conversion),
                         'code'          => $data->code,
+                        'uom_unit'      => $row->item->uomUnit->code,
                     ];
                 }
 
                 $data['details'] = $details;
+                $data['district_name'] = $data->district->name;
+                $data['city_name'] = $data->city->name;
+                $data['province_name'] = $data->province->name;
+                $data['transportation_name'] = $data->transportation->name; 
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada Sales Order No. '.$data->code.' sudah menjadi MOD. Data tidak bisa ditambahkan.';
@@ -465,7 +483,7 @@ class MarketingOrderDeliveryController extends Controller
                 try {
                     $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    $approved = false;
+                    /* $approved = false;
                     $revised = false;
 
                     if($query->approval()){
@@ -493,29 +511,33 @@ class MarketingOrderDeliveryController extends Controller
                             'status'  => 500,
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
-                    }
-                    if(in_array($query->status,['1','6'])){
+                    } */
+                    if(in_array($query->status,['2'])){
 
-                        $query->user_id = session('bo_id');
-                        $query->code = $request->code;
+                        $query->user_update_id = session('bo_id');
+                        $query->update_time = date('Y-m-d H:i:s');
+                        /* $query->code = $request->code; */
                         $query->account_id = $request->account_id;
-                        $query->company_id = $request->company_id;
+                        /* $query->company_id = $request->company_id;
                         $query->customer_id = $request->customer_id;
                         $query->post_date = $request->post_date;
                         $query->delivery_date = $request->delivery_date;
+                        $query->destination_address = $request->destination_address;
+                        $query->city_id = $request->tempCity;
+                        $query->district_id = $request->tempDistrict;
+                        $query->transportation_id = $request->tempTransport;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
                         $query->send_status = NULL;
-                        $query->status = '1';
+                        $query->status = '1'; */
 
                         $query->save();
-                        
             
                         DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status Marketing Order Delivery detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status Marketing Order Delivery hanya bisa diupdate untuk status dokumen PROSES.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -536,6 +558,10 @@ class MarketingOrderDeliveryController extends Controller
                         'customer_id'	            => $request->customer_id,
                         'post_date'                 => $request->post_date,
                         'delivery_date'             => $request->delivery_date,
+                        'destination_address'       => $request->destination_address,
+                        'city_id'                   => $request->tempCity,
+                        'district_id'               => $request->tempDistrict,
+                        'transportation_id'         => $request->tempTransport,
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,
                         'status'                    => '1',
@@ -546,39 +572,43 @@ class MarketingOrderDeliveryController extends Controller
 			}
 			
 			if($query) {
-                foreach($query->marketingOrderDeliveryDetail as $row){
-                    $row->delete();
-                }
-                DB::beginTransaction();
-                try {
-                    
-                    foreach($request->arr_modi as $key => $row){
-                        $querydetail = MarketingOrderDeliveryDetail::create([
-                            'marketing_order_delivery_id'   => $query->id,
-                            'marketing_order_detail_id'     => $row,
-                            'item_id'                       => $request->arr_item[$key],
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'note'                          => $request->arr_note[$key],
-                            'place_id'                      => $request->arr_place[$key],
-                        ]);
-                        
+                if(!$request->temp){
+                    foreach($query->marketingOrderDeliveryDetail as $row){
+                        $row->delete();
                     }
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
+                    DB::beginTransaction();
+                    try {
+                        foreach($request->arr_modi as $key => $row){
+                            $querydetail = MarketingOrderDeliveryDetail::create([
+                                'marketing_order_delivery_id'   => $query->id,
+                                'marketing_order_detail_id'     => $row,
+                                'item_id'                       => $request->arr_item[$key],
+                                'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'note'                          => $request->arr_note[$key],
+                                'place_id'                      => $request->arr_place[$key],
+                            ]);
+                        }
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                    $query->updateGrandtotal();
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code.' Tahap 1',$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                    activity()
+                        ->performedOn(new MarketingOrderDelivery())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add marketing order delivery.');
+                }else{
+                    CustomHelper::sendApprovalWithoutDelete($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code.' Tahap 2',$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                    activity()
+                        ->performedOn(new MarketingOrderDelivery())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Edit marketing order delivery.');
                 }
-
-                $query->updateGrandtotal();
-
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Marketing Order Delivery No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
-
-                activity()
-                    ->performedOn(new MarketingOrderDelivery())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit marketing order delivery.');
 
 				$response = [
 					'status'    => 200,
@@ -597,9 +627,18 @@ class MarketingOrderDeliveryController extends Controller
 
     public function show(Request $request){
         $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
+        if($po->status !== '2'){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
+            ]);
+        }
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->employee_no.' - '.$po->account->name;
         $po['customer_name'] = $po->customer->employee_no.' - '.$po->customer->name;
+        $po['district_name'] = $po->district->name;
+        $po['city_name'] = $po->city->name;
+        $po['transportation_name'] = $po->transportation->name;
 
         $arr = [];
         
@@ -607,6 +646,7 @@ class MarketingOrderDeliveryController extends Controller
             $arrstock = [];
 
             $arr[] = [
+                'marketing_order_id'    => $row->marketingOrderDetail->marketing_order_id,
                 'so_no'                 => $row->marketingOrderDetail->marketingOrder->code,
                 'mo'                    => $row->marketingOrderDetail->marketing_order_id,
                 'id'                    => $row->marketing_order_detail_id,
@@ -614,13 +654,21 @@ class MarketingOrderDeliveryController extends Controller
                 'item_name'             => $row->item->code.' - '.$row->item->name,
                 'warehouse'             => $row->item->warehouseName(),
                 'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'qty_uom'               => CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDetail->qty_conversion,3)),
                 'qty_original'          => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty),
                 'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
                 'note'                  => $row->note,
                 'place_id'              => $row->place_id,
-                'conversion'            => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty_conversion),
+                'qty_conversion'        => CustomHelper::formatConditionalQty($row->marketingOrderDetail->qty_conversion),
                 'detail_stock'          => $arrstock,
                 'stock'                 => CustomHelper::formatConditionalQty(round($row->item->getStockPlace($row->place_id) / $row->marketingOrderDetail->qty_conversion,3)),
+                'district_name'         => $row->marketingOrderDetail->marketingOrder->district->name,
+                'city_name'             => $row->marketingOrderDetail->marketingOrder->city->name,
+                'province_name'         => $row->marketingOrderDetail->marketingOrder->province->name,
+                'transportation_name'   => $row->marketingOrderDetail->marketingOrder->transportation->name,
+                'payment_type'          => $row->marketingOrderDetail->marketingOrder->payment_type,
+                'down_payment'          => $row->marketingOrderDetail->marketingOrder->percent_dp,
+                'uom_unit'              => $row->item->uomUnit->code,
             ];
             
         }
@@ -1890,24 +1938,32 @@ class MarketingOrderDeliveryController extends Controller
     public function updateSendStatus(Request $request){
         $data = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
-            if(!$data->marketingOrderDeliveryProcess()->exists()){
-                $data->update([
-                    'send_status'   => $request->status ? $request->status : NULL,
-                ]);
-
-                CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status pengiriman dokumen anda telah dinyatakan '.$data->sendStatus().'.',session('bo_id'));
-
+            if($data->status !== '3'){
                 $response = [
-                    'status'  => 200,
-                    'message' => 'Status berhasil dirubah.',
-                    'value'   => $data->send_status ? $data->send_status : '',
+                    'status'  => 500,
+                    'message' => 'Maaf, data tidak bisa diupdate, karena dokumen SELESAI saja yang bisa dirubah.',
+                    'value'   => '',
                 ];
             }else{
-                $response = [
-                    'status'  => 422,
-                    'message' => 'Maaf, data sudah dijadikan Surat Jalan.',
-                    'value'   => $data->send_status ? $data->send_status : '',
-                ];
+                if(!$data->marketingOrderDeliveryProcess()->exists()){
+                    $data->update([
+                        'send_status'   => $request->status ? $request->status : NULL,
+                    ]);
+    
+                    CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status pengiriman dokumen anda telah dinyatakan '.$data->sendStatus().'.',session('bo_id'));
+    
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Status berhasil dirubah.',
+                        'value'   => $data->send_status ? $data->send_status : '',
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 422,
+                        'message' => 'Maaf, data sudah dijadikan Surat Jalan.',
+                        'value'   => $data->send_status ? $data->send_status : '',
+                    ];
+                }
             }
         }else{
             $response = [

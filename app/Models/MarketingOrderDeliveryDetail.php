@@ -29,7 +29,7 @@ class MarketingOrderDeliveryDetail extends Model
     }
 
     public function getTotal(){
-        $total = $this->qty * $this->marketingOrderDetail->realPriceAfterGlobalDiscount();
+        $total = $this->qty * $this->marketingOrderDetail->realPriceAfterGlobalDiscount() * $this->marketingOrderDetail->qty_conversion;
         if($this->marketingOrderDetail->tax_id > 0 && $this->marketingOrderDetail->is_include_tax == '1'){
             $total = $total / (1 + ($this->marketingOrderDetail->percent_tax / 100));
         }

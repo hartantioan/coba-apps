@@ -214,6 +214,280 @@ class CustomHelper {
 		return $passed;
 	}
 
+	public static function sendApprovalWithoutDelete($table_name,$table_id,$note){
+		#delete approvalsource yang tidak punya matrix
+		ApprovalSource::whereDoesntHave('lookable')->delete();
+		
+		$data = DB::table($table_name)->where('id',$table_id)->first();
+
+		$approvalTemplate = ApprovalTemplate::where('status','1')
+		->whereHas('approvalTemplateMenu',function($query) use($table_name){
+			$query->where('table_name',$table_name);
+		})
+		->whereHas('approvalTemplateOriginator',function($query){
+			$query->where('user_id',session('bo_id'));
+		})->get();
+		
+		$count = 0;
+
+		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
+
+		foreach($approvalTemplate as $row){
+			
+			$source = ApprovalSource::create([
+				'code'			=> strtoupper(uniqid()),
+				'user_id'		=> session('bo_id'),
+				'date_request'	=> date('Y-m-d H:i:s'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'note'			=> $note,
+			]);
+
+			$passed = true;
+
+			$isGroupItem = false;
+
+			if($row->approvalTemplateItemGroup()->exists()){
+				$isGroupItem = true;
+			}
+
+			#if check nominal
+			if($row->is_check_nominal){
+				if($row->sign !== '~'){
+					if($isGroupItem){
+						#groupitem, checknominal dan bukanrange
+						$arrGroupItem = [];
+						$passedGroupItem = false;
+
+						foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+							$arrGroupItem[] = $rowgroupitem->item_group_id;
+						}
+
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->item()->exists()){
+								$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+								if(in_array($topGroupId,$arrGroupItem)){
+									$passedGroupItem = true;
+								}
+							}
+						}
+
+						if($passedGroupItem){
+							if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
+					}elseif($row->is_coa_detail){
+						$passedGroupCoa = false;
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->coa()->exists()){
+								$passedGroupCoa = true;
+							}
+						}
+						if($passedGroupCoa){
+							if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
+					}else{
+						#checknominal dan bukanrange
+						if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
+							$passed = false;
+						}
+					}					
+				}else{
+					if($isGroupItem){
+						#groupitem, checknominal dan range
+						$arrGroupItem = [];
+						$passedGroupItem = false;
+
+						foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+							$arrGroupItem[] = $rowgroupitem->item_group_id;
+						}
+
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->item()->exists()){
+								$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+								if(in_array($topGroupId,$arrGroupItem)){
+									$passedGroupItem = true;
+								}
+							}
+						}
+
+						if($passedGroupItem){
+							if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
+					}elseif($row->is_coa_detail){
+						$passedGroupCoa = false;
+						foreach($source->lookable->details as $rowdetail){
+							if($rowdetail->coa()->exists()){
+								$passedGroupCoa = true;
+							}
+						}
+						if($passedGroupCoa){
+							if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}else{
+							$passed = false;
+						}
+					}else{
+						#checknominal dan range
+						if(!self::compareRange($data->grandtotal * $currency_rate,$row->nominal,$row->nominal_final)){
+							$passed = false;
+						}
+					}
+				}
+			}
+
+			#if check benchmark
+			if($row->is_check_benchmark){
+				if($isGroupItem){
+					#groupitem, checknominal dan bukanrange
+					$arrGroupItem = [];
+					$passedGroupItem = false;
+
+					foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+						$arrGroupItem[] = $rowgroupitem->item_group_id;
+					}
+
+					foreach($source->lookable->details as $rowdetail){
+						if($rowdetail->item()->exists()){
+							$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+							if(in_array($topGroupId,$arrGroupItem)){
+								$passedGroupItem = true;
+							}
+						}
+					}
+
+					if($passedGroupItem){
+						$totalDoc = 0;
+						$totalBench = 0;
+						$percentDiff = 0;
+						foreach($source->lookable->details as $rowdetail){
+							$priceDoc = round(($rowdetail->priceAfterDiscount() * $currency_rate) / $rowdetail->qty_conversion,2);
+							$priceBench = $rowdetail->item->lastBenchmarkPricePlant($rowdetail->place_id);
+							$totalDoc += $priceDoc * $rowdetail->qty_conversion * $rowdetail->qty;
+							$totalBench += $priceBench * $rowdetail->qty_conversion * $rowdetail->qty;
+						}
+						$percentDiff = $totalBench > 0 ? ((($totalDoc - $totalBench) / $totalBench) * 100) : 0;
+						if($row->sign !== '~'){
+							if(!self::compare($percentDiff,$row->sign,$row->nominal)){
+								$passed = false;
+							}
+						}else{
+							if(!self::compareRange($percentDiff,$row->nominal,$row->nominal_final)){
+								$passed = false;
+							}
+						}
+					}else{
+						$passed = false;
+					}
+				}
+			}
+
+			#if group item saja tanpa check nominal dan check benchmark
+			if(!$row->is_check_nominal && !$row->is_check_benchmark &&$isGroupItem){
+				$arrGroupItem = [];
+				$passedGroupItem = false;
+				foreach($row->approvalTemplateItemGroup as $rowgroupitem){
+					$arrGroupItem[] = $rowgroupitem->item_group_id;
+				}
+
+				foreach($source->lookable->details as $rowdetail){
+					if($rowdetail->item()->exists()){
+						$topGroupId = $rowdetail->item->itemGroup->getTopParent($rowdetail->item->itemGroup);
+						if(in_array($topGroupId,$arrGroupItem)){
+							$passedGroupItem = true;
+						}
+					}
+				}
+
+				if(!$passedGroupItem){
+					$passed = false;
+				}
+
+				if($row->is_coa_detail){
+					$passedGroupCoa = false;
+					foreach($source->lookable->details as $rowdetail){
+						if($rowdetail->coa()->exists()){
+							$passedGroupCoa = true;
+						}
+					}
+					if($passedGroupCoa){
+						$passed = true;
+					}else{
+						$passed = false;
+					}
+				}
+			}
+
+			if($passed == true){
+				
+				$count = 0;
+
+				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
+					$status = $count == 0 ? '1': '0';
+					foreach($rowTemplateStage->approvalStage->approvalStageDetail as $rowStageDetail){
+						ApprovalMatrix::create([
+							'code'							=> strtoupper(Str::random(30)),
+							'approval_template_stage_id'	=> $rowTemplateStage->id,
+							'approval_source_id'			=> $source->id,
+							'user_id'						=> $rowStageDetail->user_id,
+							'date_request'					=> date('Y-m-d H:i:s'),
+							'status'						=> $status
+						]);
+					}
+					$count++;
+					
+				}
+				
+			}
+		}
+		
+		if($count == 0){
+			DB::table($table_name)->where('id',$table_id)->update([
+				'status'	=> '2'
+			]);
+
+			#lek misal g ada approval
+			if($table_name == 'material_requests'){
+				$mr = MaterialRequest::find($table_id);
+				$mr->materialRequestDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
+			if($table_name == 'good_issue_requests'){
+				$mr = GoodIssueRequest::find($table_id);
+				$mr->goodIssueRequestDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
+			if($table_name == 'production_schedules'){
+				$ps = ProductionSchedule::find($table_id);
+				$ps->productionScheduleDetail()->update([
+					'status'	=> '1'
+				]);
+			}
+
+			if(isset($data->account_id)){
+				self::sendJournal($table_name,$table_id,$data->account_id);
+			}else{
+				self::sendJournal($table_name,$table_id,null);
+			}
+		}
+	}
+
 	public static function sendApproval($table_name,$table_id,$note){
 		#delete approvalsource yang tidak punya matrix
 		/* ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete(); */
@@ -1873,8 +2147,15 @@ class CustomHelper {
 
 		}elseif($table_name == 'marketing_order_delivery_processes'){
 
-			
-
+		}elseif($table_name == 'marketing_order_deliveries'){
+			$mod = MarketingOrderDelivery::find($table_id);
+			if($mod){
+				if($mod->status == '2' && $mod->user_update_id){
+					$mod->update([
+						'status'	=> '3',
+					]);
+				}
+			}
 		}elseif($table_name == 'good_issues'){
 
 			$gr = GoodIssue::find($table_id);

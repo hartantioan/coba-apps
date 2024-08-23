@@ -18,11 +18,17 @@ class MarketingOrderDelivery extends Model
     protected $fillable = [
         'code',
         'user_id',
+        'user_update_id',
+        'update_time',
         'company_id',
         'account_id',
         'customer_id',
         'post_date',
         'delivery_date',
+        'destination_address',
+        'city_id',
+        'district_id',
+        'transportation_id',
         'note_internal',
         'note_external',
         'status',
@@ -38,6 +44,19 @@ class MarketingOrderDelivery extends Model
         'done_note',
     ];
 
+    public function transportation()
+    {
+        return $this->belongsTo('App\Models\Transportation', 'transportation_id', 'id')->withTrashed();
+    }
+
+    public function city(){
+        return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function district(){
+        return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
@@ -46,6 +65,11 @@ class MarketingOrderDelivery extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function userUpdate()
+    {
+        return $this->belongsTo('App\Models\User', 'user_update_id', 'id')->withTrashed();
     }
 
     public function customer()

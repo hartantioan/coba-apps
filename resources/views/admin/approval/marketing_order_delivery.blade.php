@@ -202,6 +202,12 @@
                 <div class="col s8">
                     {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                 </div>
+                <div class="col s4">
+                    Alamat Pengiriman
+                </div>
+                <div class="col s8">
+                    {{ $data->destination_address }}
+                </div>
             </div>
         </div>
         

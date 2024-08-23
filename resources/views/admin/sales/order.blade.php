@@ -895,7 +895,7 @@
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#sales_id,#filter_sales', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#broker_id', '{{ url("admin/select2/broker") }}');
-        select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/supplier_vendor") }}');
+        select2ServerSide('#sender_id,#filter_sender', '{{ url("admin/select2/vendor") }}');
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#project_id', '{{ url("admin/select2/project") }}');
         select2ServerSide('#transportation_id', '{{ url("admin/select2/transportation") }}');

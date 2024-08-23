@@ -258,6 +258,15 @@
                                             {{ $data->account->phone.' / '.$data->account->office_no }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            Alamat Pengiriman
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->destination_address }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                         </tr>

@@ -2866,6 +2866,21 @@ class Select2Controller extends Controller {
             if($request->account_id){
                 $query->where('account_id',$request->account_id);
             }
+            if($request->district_id){
+                $query->where('district_id',$request->district_id);
+            }
+            if($request->city_id){
+                $query->where('city_id',$request->city_id);
+            }
+            if($request->transportation_id){
+                $query->where('transportation_id',$request->transportation_id);
+            }
+            if($request->payment_type){
+                $query->where('payment_type',$request->payment_type);
+            }
+            if($request->down_payment){
+                $query->where('percent_dp',floatval($request->down_payment));
+            }
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

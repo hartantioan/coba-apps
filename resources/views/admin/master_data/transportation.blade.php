@@ -71,6 +71,7 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>Kategori Kendaraan</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -100,16 +101,23 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m3">
+                            <select id="category_transportation" name="category_transportation">
+                                <option value="1">TRONTON</option>
+                                <option value="2">COLD DIESEL</option>
+                            </select>
+                            <label for="category_transportation">Kategori Kendaraan</label>
+                        </div>
+                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="order">{{ __('translations.status') }}</label>
                                 <label>
@@ -225,6 +233,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
+                { name: 'category_transportation', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -331,6 +340,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
+                $('#category_transportation').val(response.category_transportation).formSelect();
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

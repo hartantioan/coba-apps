@@ -18,6 +18,7 @@ class Transportation extends Model
         'user_id',
         'code',
         'name',
+        'category_transportation',
         'status'
     ];
 
@@ -39,5 +40,15 @@ class Transportation extends Model
         }
 
         return $status;
+    }
+
+    public function categoryTransportation(){
+        $category_transportation = match ($this->category_transportation) {
+          '1' => 'TRONTON',
+          '2' => 'COLT DIESEL',
+          default => '-',
+        };
+
+        return $category_transportation;
     }
 }

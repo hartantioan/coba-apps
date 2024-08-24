@@ -32,6 +32,8 @@ class ExportRegion extends DefaultValueBinder implements WithCustomValueBinder, 
         'KABUPATEN',
         'KODE KECAMATAN', 
         'NAMA KECAMATAN',
+        'AREA PEMASARAN',
+        'KATEGORI PROVINSI',
     ];
 
     public function collection()
@@ -58,6 +60,8 @@ class ExportRegion extends DefaultValueBinder implements WithCustomValueBinder, 
                 'KABUPATEN'=>$row->city(),
                 'KODE KECAMATAN'=>$row->code, 
                 'NAMA KECAMATAN'=>$row->name,
+                'AREA PEMASARAN'=>$row->saleArea(),
+                'KATEGORI PROVINSI'=>$row->type(),
             ];
 
         }

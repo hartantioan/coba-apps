@@ -83,6 +83,8 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>Area Pemasaran (Provinsi)</th>
+                                                        <th>Kategori Provinsi</th>
                                                         <th>{{ __('translations.parent') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -114,7 +116,7 @@
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
                             <select class="browser-default" id="parent_id" name="parent_id" onchange="getNewCode(this);"></select>
-                            <label class="active" for="parent_id">{{ __('translations.parent') }}</label>
+                            <label class="active" for="parent_id">{{ __('translations.parent') }} (JIKA ADA)</label>
                         </div>
                         <div class="input-field col s12 m6">
                             <input id="code" name="code" type="text" placeholder="Kode Daerah (Auto dari Parent)" readonly>
@@ -123,6 +125,27 @@
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama Daerah">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select id="sale_area" name="sale_area">
+                                <option value="">PILIH UNTUK PROVINSI</option>
+                                <option value="1">SUMATERA</option>
+                                <option value="2">DKI JAKARTA JABAR</option>
+                                <option value="3">BALI NUSRA</option>
+                                <option value="4">JAWA TENGAH</option>
+                                <option value="5">JAWA TIMUR</option>
+                                <option value="6">KALIMANTAN</option>
+                                <option value="7">SULAWESI</option>
+                            </select>
+                            <label for="sale_area">Area Pemasaran</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select id="category_region" name="category_region">
+                                <option value="">PILIH UNTUK PROVINSI</option>
+                                <option value="1">DALAM PULAU JAWA</option>
+                                <option value="2">LUAR PULAU JAWA</option>
+                            </select>
+                            <label for="category_region">Area Pemasaran</label>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -179,7 +202,6 @@
                 
             },
             onOpenEnd: function(modal, trigger) { 
-                $('#parent_id').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -230,6 +252,8 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
+                { name: 'sale_area', className: '' },
+                { name: 'category_region', className: '' },
                 { name: 'parent', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -372,9 +396,9 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-
+                $('#sale_area').val(response.sale_area).formSelect();
+                $('#category_region').val(response.category_region).formSelect();
                 $('.modal-content').scrollTop(0);
-                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {

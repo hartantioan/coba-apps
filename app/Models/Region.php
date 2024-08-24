@@ -18,8 +18,24 @@ class Region extends Model
         'code',
         'name',
         'country_id',
-        'category_region'
+        'sale_area',
+        'category_region',
     ];
+
+    public function saleArea(){
+        $sale_area = match ($this->sale_area) {
+            '1' => 'SUMATERA',
+            '2' => 'DKI JAKARTA JABAR',
+            '3' => 'BALI NUSRA',
+            '4' => 'JAWA TENGAH',
+            '5' => 'JAWA TIMUR',
+            '6' => 'KALIMANTAN',
+            '7' => 'SULAWESI',
+            default => '-',
+          };
+  
+          return $sale_area;
+    }
 
     public function getDistrict(){
         $arr = [];
@@ -116,12 +132,12 @@ class Region extends Model
     }
 
     public function type(){
-        $status = match ($this->status) {
+        $category_region = match ($this->category_region) {
           '1' => 'DALAM PULAU JAWA',
           '2' => 'LUAR PULAU JAWA',
           default => '-',
         };
 
-        return $status;
+        return $category_region;
     }
 }

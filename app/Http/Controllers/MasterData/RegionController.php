@@ -78,7 +78,8 @@ class RegionController extends Controller
             'id',
             'code',
             'name',
-            'phone_code',
+            'sale_area',
+            'category_region',
         ];
 
         $start  = $request->start;
@@ -129,6 +130,8 @@ class RegionController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
+                    $val->saleArea(),
+                    $val->type(),
                     $val->parentRegion(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -170,12 +173,23 @@ class RegionController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            if($request->sale_area || $request->category_region){
+                if(strlen($request->code) > 2){
+                    return response()->json([
+                        'status'  => 500,
+					    'message' => 'Data area pemasaran dan kategori provinsi hanya untuk provinsi.'
+                    ]);
+                }
+            }
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = Region::find($request->temp);
                     $query->code        = $request->code;
                     $query->name        = $request->name;
+                    $query->sale_area   = $request->sale_area;
+                    $query->category_region = $request->category_region;
                     $query->save();
                     DB::commit();
                 }catch(\Exception $e){
@@ -185,8 +199,10 @@ class RegionController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = Region::create([
-                        'code'          => $request->code,
-                        'name'			=> $request->name,
+                        'code'              => $request->code,
+                        'name'			    => $request->name,
+                        'sale_area'         => $request->sale_area,
+                        'category_region'   => $request->category_region,
                     ]);
                     DB::commit();
                 }catch(\Exception $e){

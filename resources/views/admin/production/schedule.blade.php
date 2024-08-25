@@ -239,7 +239,7 @@
                                                         <th class="center" style="min-width:150px;">Satuan UoM</th>
                                                         <th class="center" style="min-width:150px;">Keterangan 1</th>
                                                         <th class="center" style="min-width:150px;">Keterangan 2</th>
-                                                        <th class="center" style="min-width:150px;">Tgl.Request</th>
+                                                        <th class="center" style="min-width:150px;">Tgl.Barang Jadi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">

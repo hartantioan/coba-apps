@@ -544,7 +544,7 @@ class ProductionScheduleController extends Controller
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">Qty</th>
                                 <th class="center-align">Satuan UoM</th>
-                                <th class="center-align">Tgl.Request</th>
+                                <th class="center-align">Tgl.Barang Jadi</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';

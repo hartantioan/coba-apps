@@ -377,6 +377,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('marketing_order_by_account', [Select2Controller::class, 'marketingOrderByAccount']);
                 Route::get('marketing_order_form_dp', [Select2Controller::class, 'marketingOrderFormDP']);
                 Route::get('marketing_order_delivery', [Select2Controller::class, 'marketingOrderDelivery']);
+                Route::get('marketing_order_delivery_scale', [Select2Controller::class, 'marketingOrderDeliveryScale']);
                 Route::get('marketing_order_delivery_process', [Select2Controller::class, 'marketingOrderDeliveryProcess']);
                 Route::get('marketing_order_down_payment', [Select2Controller::class, 'marketingOrderDownPayment']);
                 Route::get('marketing_order_down_payment_paid', [Select2Controller::class, 'marketingOrderDownPaymentPaid']);

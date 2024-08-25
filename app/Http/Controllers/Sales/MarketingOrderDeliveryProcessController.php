@@ -95,7 +95,8 @@ class MarketingOrderDeliveryProcessController extends Controller
             'vehicle_name',
             'vehicle_no',
             'note_internal',
-            'note_external'
+            'note_external',
+            'weight_netto',
         ];
 
         $start  = $request->start;
@@ -251,6 +252,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->vehicle_no,
                     $val->note_internal,
                     $val->note_external,
+                    CustomHelper::formatConditionalQty($val->weight_netto),
                     $val->return_date ? date('d/m/Y',strtotime($val->return_date)) : '-',
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->statusTracking(),
@@ -1184,6 +1186,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            if($request->weight_netto <= 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
+                ]);
+            }
             if($request->status_tracking == '5'){
                 return response()->json([
                     'status'  => 500,
@@ -1333,6 +1341,9 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
+                    $query->marketingOrderDelivery->update([
+                        'status'    => '2'
+                    ]);
                 }
                 
                 $query->update([

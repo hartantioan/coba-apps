@@ -162,6 +162,7 @@
                                                         <th>Kecamatan</th>
                                                         <th>Kota/Kabupaten</th>
                                                         <th>Tipe Transport</th>
+                                                        <th>Tipe Pengiriman</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Kirim</th>
                                                         <th>Catatan Internal</th>
@@ -243,7 +244,7 @@
                                     <div class="col m6 s12">
                                         <div class="card-alert card green" id="alert-phase1">
                                             <div class="card-content white-text">
-                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, dan Prosentase DP adalah sama.</p>
+                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman dan Prosentase DP adalah sama.</p>
                                             </div>
                                         </div>
                                         <div class="card-alert card green hide" id="alert-phase2">
@@ -283,6 +284,7 @@
                                         <input type="hidden" id="tempTransport" name="tempTransport">
                                         <input type="hidden" id="tempPayment" name="tempPayment">
                                         <input type="hidden" id="tempDownPayment" name="tempDownPayment">
+                                        <input type="hidden" id="tempTypeDelivery" name="tempTypeDelivery">
                                     </div>
                                 </fieldset>
                             </div>
@@ -587,7 +589,7 @@ document.addEventListener('focusin', function (event) {
                 tempAccount = null;
                 paymentType = null;
                 $('#district-info,#city-info,#transportation-info').text('-');
-                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment').val('');
+                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment,#tempTypeDelivery').val('');
                 $('.second-inputs').css('pointer-events','auto');
                 $('.first-inputs').css('pointer-events','auto');
                 $('#alert-phase1').removeClass('hide');
@@ -680,6 +682,7 @@ document.addEventListener('focusin', function (event) {
                         transportation_id: $('#tempTransport').val(),
                         payment_type: $('#tempPayment').val(),
                         down_payment: $('#tempDownPayment').val(),
+                        type_delivery: $('#tempTypeDelivery').val(),
                     };
                 },
                 processResults: function(data) {
@@ -785,6 +788,7 @@ document.addEventListener('focusin', function (event) {
                         $('#tempTransport').val(response.transportation_id);
                         $('#tempPayment').val(response.payment_type);
                         $('#tempDownPayment').val(response.percent_dp);
+                        $('#tempTypeDelivery').val(response.type_delivery);
                         $('#district-info').text(response.district_name);
                         $('#city-info').text(response.city_name);
                         $('#transportation-info').text(response.transportation_name);
@@ -1340,6 +1344,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'district_id', className: '' },
                 { name: 'city_id', className: '' },
                 { name: 'transportation_id', className: '' },
+                { name: 'type_delivery', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },
@@ -1674,6 +1679,7 @@ document.addEventListener('focusin', function (event) {
                             `);
                             $('#tempPayment').val(val.payment_type);
                             $('#tempDownPayment').val(val.down_payment);
+                            $('#tempTypeDelivery').val(val.type_delivery);
                             no++;
                         });
                     }

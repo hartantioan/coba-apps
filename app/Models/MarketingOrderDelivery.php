@@ -29,6 +29,7 @@ class MarketingOrderDelivery extends Model
         'city_id',
         'district_id',
         'transportation_id',
+        'type_delivery',
         'note_internal',
         'note_external',
         'status',
@@ -43,6 +44,16 @@ class MarketingOrderDelivery extends Model
         'done_date',
         'done_note',
     ];
+
+    public function deliveryType(){
+        $type = match ($this->type_delivery) {
+            '1' => 'Loco',
+            '2' => 'Franco',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
 
     public function getTypePayment(){
         $payment = '';
@@ -112,6 +123,11 @@ class MarketingOrderDelivery extends Model
     public function marketingOrderDeliveryProcess()
     {
         return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['1','2','3']);
+    }
+
+    public function goodScale()
+    {
+        return $this->hasOne('App\Models\GoodScale')->whereIn('status',['2','3']);
     }
 
     public function used(){

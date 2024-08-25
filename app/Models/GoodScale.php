@@ -28,6 +28,7 @@ class GoodScale extends Model
         'place_id',
         'warehouse_id',
         'post_date',
+        'type',
         'delivery_no',
         'vehicle_no',
         'driver',
@@ -48,6 +49,7 @@ class GoodScale extends Model
         'viscosity',
         'residue',
         'purchase_order_detail_id',
+        'marketing_order_delivery_id',
         'item_id',
         'qty_in',
         'qty_out',
@@ -79,6 +81,11 @@ class GoodScale extends Model
     public function purchaseOrderDetail()
     {
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
+    }
+
+    public function marketingOrderDelivery()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderDelivery', 'marketing_order_delivery_id', 'id')->withTrashed();
     }
 
     public function goodReceiptDetail(){
@@ -262,6 +269,16 @@ class GoodScale extends Model
         return $status;
     }
 
+    public function type(){
+        $type = match ($this->type) {
+          '1' => 'Timbang Barang Masuk (Pembelian)',
+          '2' => 'Timbang Barang Keluar (Penjualan)',
+          default => 'Invalid',
+        };
+
+        return $type;
+    }
+
     public function qualityCheck(){
         $status = match ($this->is_quality_check) {
           '1' => 'Ya',
@@ -324,7 +341,12 @@ class GoodScale extends Model
     }
 
     public function referencePO(){
-        return $this->purchaseOrderDetail->purchaseOrder->code;
+        if($this->purchaseOrderDetail()->exists()){
+            return $this->purchaseOrderDetail->purchaseOrder->code;
+        }
+        if($this->marketingOrderDelivery()->exists()){
+            return $this->marketingOrderDelivery->code;
+        }
     }
     
     public function journal(){

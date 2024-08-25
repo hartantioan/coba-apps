@@ -211,7 +211,7 @@ class DeliveryCostController extends Controller
             'transportation_id'     => 'required',
             'tonnage'               => 'required',
             'ritage'                => 'required',
-            'nominal'               => 'required',
+            'qty_tonnage'           => 'required',
         ], [
             'code.required' 	            => 'Kode tidak boleh kosong.',
             'code.unique'                   => 'Kode telah terpakai.',
@@ -226,7 +226,7 @@ class DeliveryCostController extends Controller
             'transportation_id.required'    => 'Jenis kendaraan tidak boleh kosong.',
             'tonnage.required'              => 'Tonase tidak boleh kosong.',
             'ritage.required'               => 'Ritase tidak boleh kosong.',
-            'nominal.required'              => 'Nominal harga tidak boleh kosong.',
+            'qty_tonnage.required'          => 'Berat tonase harga tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -308,8 +308,10 @@ class DeliveryCostController extends Controller
         $dc = DeliveryCost::find($request->id);
         $dc['from_city_name'] = $dc->fromCity->name;
         $dc['to_city_name'] = $dc->toCity->name;
-        $dc['from_subdistrict_list'] = $dc->fromCity->getSubdistrict();
-        $dc['to_subdistrict_list'] = $dc->toCity->getSubdistrict();
+        $dc['from_subdistrict_name'] = $dc->fromSubdistrict->name;
+        $dc['to_subdistrict_name'] = $dc->toSubdistrict->name;
+        $dc['from_subdistrict_list'] = $dc->fromCity->getDistrict();
+        $dc['to_subdistrict_list'] = $dc->toCity->getDistrict();
         $dc['tonnage'] = number_format($dc->tonnage,2,',','.');
         $dc['ritage'] = number_format($dc->ritage,2,',','.');
         $dc['qty_tonnage'] = number_format($dc->qty_tonnage,3,',','.');

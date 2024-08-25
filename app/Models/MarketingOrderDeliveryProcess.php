@@ -30,6 +30,7 @@ class MarketingOrderDeliveryProcess extends Model
         'driver_hp',
         'vehicle_name',
         'vehicle_no',
+        'weight_netto',
         'note_internal',
         'note_external',
         'status',
@@ -560,6 +561,20 @@ class MarketingOrderDeliveryProcess extends Model
                 'detailable_type'=> $row->getTable(),
                 'detailable_id'	=> $row->id,
             ]);
+        }
+    }
+
+    public function deliveryCost(){
+        $price = 0;
+        $typeTransport = $this->marketingOrderDelivery->transportation->category_transportation;
+        $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
+        $cityFrom = $place->city_id;
+        $districtFrom = $place->district_id;
+        $cityTo = $this->marketingOrderDelivery->city_id;
+        $districtTo = $this->marketingOrderDelivery->district_id;
+        $deliveryCost = DeliveryCost::where('account_id',$this->account_id)->where('valid_from','<=',$this->post_date)->where('valid_to','>=',$this->post_date)->where('transportation_id',$this->marketingOrderDelivery->transportation_id)->where('from_city_id',$cityFrom)->where('from_subdistrict_id',$districtFrom)->where('to_city_id',$cityTo)->where('to_subdistrict_id',$districtTo)->where('status','1')->orderByDesc('id')->first();
+        if($deliveryCost){
+            
         }
     }
 

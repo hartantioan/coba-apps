@@ -200,7 +200,7 @@
                                             {{ $data->user->name }}
                                         </td>
                                     </tr>
-                                    @if($data->item->is_hide_supplier)
+                                    @if($data->item()->exists() && $data->item->is_hide_supplier)
 
                                     @else
                                         <tr>
@@ -246,10 +246,15 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Nomor PO
+                                            Nomor PO/MOD
                                          </td>
                                          <td>
-                                             {{ $data->purchaseOrderDetail->purchaseOrder->code }}
+                                            @if ($data->purchaseOrderDetail()->exists())
+                                                {{ $data->purchaseOrderDetail->purchaseOrder->code }}
+                                            @endif
+                                            @if ($data->marketingOrderDelivery()->exists())
+                                                {{ $data->marketingOrderDelivery->code }}
+                                            @endif
                                           </td>
                                     </tr>
                                     {{-- <tr>
@@ -277,7 +282,7 @@
                                             Item
                                         </td>
                                         <td width="60%">
-                                             {{ $data->item->code.' - '.$data->item->name }}
+                                             {{ $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '-' }}
                                         </td>
                                     </tr>
                                     <tr>
@@ -285,7 +290,7 @@
                                             Satuan
                                         </td>
                                         <td>
-                                             {{ $data->itemUnit->unit->code }}
+                                             {{ $data->itemUnit()->exists() ? $data->itemUnit->unit->code : '-' }}
                                         </td>
                                     </tr>
                                     <tr>

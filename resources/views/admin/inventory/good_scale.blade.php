@@ -167,10 +167,11 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
-                                                        <th>Ref.PO</th>
+                                                        <th>Ref.PO/MOD</th>
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.company') }}</th>
                                                         <th>{{ __('translations.date') }}</th>
+                                                        <th>Tipe</th>
                                                         <th>No.SJ</th>
                                                         <th>No.Kendaraan</th>
                                                         <th>Supir</th>
@@ -250,15 +251,20 @@
                                 <label class="ac" for="company_id">{{ __('translations.company') }}</label>
                             </div>
                             <div class="input-field col m3 s12">
+                                <select class="form-control" id="type" name="type" onchange="changeMode(this.value);">
+                                    <option value="1">Timbang Barang Masuk (Pembelian)</option>
+                                    <option value="2">Timbang Barang Keluar (Penjualan)</option>
+                                </select>
+                            </div>
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>
                                 <label class="active" for="item_id">{{ __('translations.item') }}</label>
                             </div>
                             <div class="input-field col m3 s12" id="div-account">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
-                                <label class="active" for="account_id">Supplier</label>
+                                <label class="active" for="account_id">Supplier/Ekspedisi</label>
                             </div>
-                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <select class="form-control" id="place_id" name="place_id">
                                     @foreach ($place as $rowplace)
@@ -267,21 +273,24 @@
                                 </select>
                                 <label class="" for="place_id">{{ __('translations.plant') }}</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="warehouse_id" name="warehouse_id">
                                     <option value="">--Silahkan pilih item--</option>
                                 </select>
                                 <label class="active" for="warehouse_id">{{ __('translations.warehouse') }}</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="purchase_order_detail_id" name="purchase_order_detail_id" onchange="getPurchaseOrderQty();"></select>
                                 <label class="active" for="purchase_order_detail_id">Purchase Order</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 hide">
+                                <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id"></select>
+                                <label class="active" for="marketing_order_delivery_id">Jadwal Kirim</label>
+                            </div>
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_po">Qty PO</label>
                             </div>
-                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m2 s9">
                                 <input id="qty_in" name="qty_in" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_in">Qty Bruto</label>
@@ -294,13 +303,14 @@
                                 <input id="qty_out" name="qty_out" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_out">Qty Tara</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="item_unit_id" name="item_unit_id" required>
                                     <option value="">--Silahkan pilih item--</option>    
                                 </select>
                                 <label class="active" for="item_unit_id">{{ __('translations.unit') }}</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="col m12 12"></div>
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <div class="switch mb-1">
                                     <label for="status">{{ __('translations.quality_check') }}</label>
                                     <label class="right">
@@ -311,7 +321,6 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                 <label class="active" for="note">{{ __('translations.note') }}</label>
@@ -321,7 +330,7 @@
                                 <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. diterima" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                 <label class="active" for="post_date">Tgl. Diterima</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 hide-inputs">
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Pengiriman">
                                 <label class="active" for="delivery_no">Nomor Pengiriman / SJ</label>
                             </div>
@@ -329,7 +338,6 @@
                                 <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Kendaraan">
                                 <label class="active" for="vehicle_no">Nomor Kendaraan</label>
                             </div>
-                            <div class="col m12 s12 l12"></div>
                             <div class="input-field col m3 s12">
                                 <input id="driver" name="driver" type="text" placeholder="Nama Supir">
                                 <label class="active" for="driver">Nama Supir</label>
@@ -395,6 +403,7 @@
                         <div class="row">
                             <input type="hidden" id="tempPlace">
                             <input type="hidden" id="tempGoodScale" name="tempGoodScale">
+                            <input type="hidden" id="tempType" name="tempType">
                             <div class="input-field col m3 s12">
                                 <div id="codeUpdate" class="mt-2">
 
@@ -424,7 +433,7 @@
                                 <div id="purchaseOrderUpdate" class="mt-2">
 
                                 </div>
-                                <label class="active" for="purchaseOrderUpdate">Purchase Order</label>
+                                <label class="active" for="purchaseOrderUpdate">Purchase Order / Marketing Order Delivery</label>
                             </div>
                             <div class="input-field col m3 s12">
                                 <div id="qtyInUpdate" class="mt-2">
@@ -838,6 +847,7 @@
     let interval;
 
     $(function() {
+
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
             
@@ -891,6 +901,7 @@
                 $('#qtyOutUpdate,#qtyBalanceUpdate').val('0,000');
                 $('#tempPlace').val('');
                 $('#tempGoodScale').val('');
+                $('#tempType').val('');
                 $('#previewImageIn').attr('src','');
                 clearGetWeight();
                 $('.icon-stop-start-out').text('play_arrow');
@@ -958,6 +969,8 @@
                     });
                 }
                 $('#div-account').removeClass('hide');
+                $('#marketing_order_delivery_id').empty();
+                $('#type').val('1').formSelect();
             }
         });
 
@@ -1049,7 +1062,25 @@
         });
 
         select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item_scale") }}');
+        select2ServerSide('#marketing_order_delivery_id', '{{ url("admin/select2/marketing_order_delivery_scale") }}');
     });
+
+    function changeMode(val){
+        $('#item_id,#account_id,#purchase_order_detail_id,#marketing_order_delivery_id').empty();
+        $('#warehouse_id,#item_unit_id,#delivery_no').val('');
+        $('#qty_in,#qty_out').val('0,000');
+        if(val == '1'){
+            $('.hide-inputs').removeClass('hide');
+            $('#is_quality_check').prop( "checked", true);
+            $('#marketing_order_delivery_id').parent().addClass('hide');
+            select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
+        }else if(val == '2'){
+            $('#is_quality_check').prop( "checked", false);
+            $('.hide-inputs').addClass('hide');
+            $('#marketing_order_delivery_id').parent().removeClass('hide');
+            select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
+        }
+    }
 
     function stopStart(){
         if($('.icon-stop-start').text() == 'stop'){
@@ -1196,6 +1227,7 @@
                 { name: 'name', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'delivery_no', className: 'center-align' },
                 { name: 'vehicle_no', className: 'center-align' },
                 { name: 'driver', className: 'center-align' },
@@ -1296,12 +1328,20 @@
                 success: function(response) {
                     if($('#modal1').hasClass('open')){
                         if(!$('#temp').val()){
-                            $('#qty_in').val(response);
+                            if($('#type').val() == '1'){
+                                $('#qty_in').val(response);
+                            }else{
+                                $('#qty_out').val(response);
+                            }
                             /* countBalance(); */
                         }
                     }
                     if($('#modal6').hasClass('open')){
-                        $('#qtyOutUpdate').val(response);
+                        if($('#tempType').val() == '1'){
+                            $('#qtyOutUpdate').val(response);
+                        }else{
+                            $('#qtyInUpdate').text(response);
+                        }
                         countBalance();
                     }
                 }
@@ -1907,27 +1947,40 @@
             },
             success: function(response) {
                 loadingClose('#main');
-                $('#modal6').modal('open');
-                $('#tempPlace').val(response.place_id);
-                $('#tempGoodScale').val(response.id);
-                $('#previewImageIn').attr('src',response.image_in);
-                $('#codeUpdate').text(response.code);
-                $('#supplierUpdate').text(response.account_name);
-                $('#plantUpdate').text(response.place_code);
-                $('#warehouseUpdate').text(response.warehouse_name);
-                $('#purchaseOrderUpdate').text(response.purchase_code);
-                $('#qtyInUpdate').text(response.qty_in);
-                $('#unitUpdate').text(response.unit);
-                $('#noteUpdate').text(response.note);
-
-                if(response.is_hide){
-                    $('.supplier-class').addClass('hide');
+                if(response.status == '5'){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Data telah ditutup.',
+                        icon: 'warning'
+                    });
                 }else{
-                    $('.supplier-class').removeClass('hide');
+                    $('#modal6').modal('open');
+                    $('#tempPlace').val(response.place_id);
+                    $('#tempGoodScale').val(response.id);
+                    $('#tempType').val(response.type);
+                    $('#previewImageIn').attr('src',response.image_in);
+                    $('#codeUpdate').text(response.code);
+                    $('#supplierUpdate').text(response.account_name);
+                    $('#plantUpdate').text(response.place_code);
+                    $('#warehouseUpdate').text(response.warehouse_name);
+                    $('#purchaseOrderUpdate').text(response.purchase_code);
+                    if(response.type == '1'){
+                        $('#qtyInUpdate').text(response.qty_in);
+                    }else{
+                        $('#qtyOutUpdate').val(response.qty_out);
+                    }
+                    $('#unitUpdate').text(response.unit);
+                    $('#noteUpdate').text(response.note);
+
+                    if(response.is_hide){
+                        $('.supplier-class').addClass('hide');
+                    }else{
+                        $('.supplier-class').removeClass('hide');
+                    }
+                    
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
                 }
-                
-                $('.modal-content').scrollTop(0);
-                M.updateTextFields();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -2051,6 +2104,7 @@
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
                 $('#note').val(response.note);
+                $('#type').val(response.type).formSelect();
                 $('#delivery_no').val(response.delivery_no);
                 $('#vehicle_no').val(response.vehicle_no);
                 $('#driver').val(response.driver);

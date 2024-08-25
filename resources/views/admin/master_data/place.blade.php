@@ -91,7 +91,7 @@
                                                         <th>{{ __('translations.type') }}</th>
                                                         <th>{{ __('translations.province') }}</th>
                                                         <th>{{ __('translations.city') }}</th>
-                                                        <th>{{ __('translations.subdistrict') }}</th>
+                                                        <th>{{ __('translations.district') }}</th>
                                                         <th>{{ __('translations.urban_village') }}</th>
                                                         <th>{{ __('translations.capacity') }}</th>
                                                         <th>{{ __('translations.status') }}</th>

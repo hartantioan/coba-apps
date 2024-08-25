@@ -21,6 +21,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Models\Item;
 use App\Models\ItemUnit;
+use App\Models\MarketingOrderDelivery;
 use App\Models\Menu;
 use App\Models\MenuUser;
 use Illuminate\Support\Facades\Date;
@@ -80,6 +81,7 @@ class GoodScaleController extends Controller
             'user_id',
             'company_id',
             'post_date',
+            'type',
             'delivery_no',
             'vehicle_no',
             'driver',
@@ -185,6 +187,13 @@ class GoodScaleController extends Controller
                 if($val->alreadyChecked()){
                     $updateBtn = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small disable" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>';
                 }
+
+                $buttons = $val->status == '5' ? '-' : '<button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
+                '.$updateBtn.'
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Informasi Timbangan" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>';
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -192,6 +201,7 @@ class GoodScaleController extends Controller
                     $val->user->name,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->type(),
                     $val->delivery_no,
                     $val->vehicle_no,
                     $val->driver,
@@ -223,9 +233,9 @@ class GoodScaleController extends Controller
                         )
                     ),
                     $val->place->code,
-                    $val->warehouse->name,
-                    $val->item->code.' - '.$val->item->name,
-                    CustomHelper::formatConditionalQty($val->purchaseOrderDetail->qty),
+                    $val->warehouse()->exists() ? $val->warehouse->name : '-',
+                    $val->item()->exists() ? $val->item->code.' - '.$val->item->name : '-',
+                    $val->purchaseOrderDetail()->exists() ? CustomHelper::formatConditionalQty($val->purchaseOrderDetail->qty) : '-',
                     CustomHelper::formatConditionalQty($val->qty_in),
                     CustomHelper::formatConditionalQty($val->qty_out),
                     CustomHelper::formatConditionalQty($val->qty_balance),
@@ -234,15 +244,8 @@ class GoodScaleController extends Controller
                     CustomHelper::formatConditionalQty($val->water_content),
                     CustomHelper::formatConditionalQty($val->viscosity),
                     CustomHelper::formatConditionalQty($val->residue),
-                    $val->itemUnit->unit->code,
-                    '
-                        <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-                        '.$updateBtn.'
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Informasi Timbangan" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
-					',
+                    $val->itemUnit()->exists() ? $val->itemUnit->unit->code : '-',
+                    $buttons,
                 ];
 
                 $nomor++;
@@ -354,13 +357,13 @@ class GoodScaleController extends Controller
             'driver'                    => 'required',
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
-            'item_id'                   => 'required',
+            /* 'item_id'                   => 'required',
             'warehouse_id'              => 'required',
-            'purchase_order_detail_id'  => 'required',
+            'purchase_order_detail_id'  => 'required', */
             'qty_po'                    => 'required',
             'qty_in'                    => 'required',
             'qty_out'                   => 'required',
-            'item_unit_id'              => 'required',
+            /* 'item_unit_id'              => 'required', */
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -369,13 +372,13 @@ class GoodScaleController extends Controller
             'driver.required'                   => 'Nama supir tidak boleh kosong.',
             'place_id.required'                 => 'Plant tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-            'item_id.required'                  => 'Item tidak boleh kosong.',
+            /* 'item_id.required'                  => 'Item tidak boleh kosong.',
             'warehouse_id.required'             => 'Gudang tidak boleh kosong.',
-            'purchase_order_detail_id.required' => 'PO tidak boleh kosong.',
+            'purchase_order_detail_id.required' => 'PO tidak boleh kosong.', */
             'qty_po.required'                   => 'Qty PO tidak boleh kosong.',
             'qty_in.required'                   => 'Qty timbang masuk tidak boleh kosong.',
             'qty_out.required'                  => 'Qty timbang keluar tidak boleh kosong.',
-            'item_unit_id.required'             => 'Satuan item tidak boleh kosong.',
+            /* 'item_unit_id.required'             => 'Satuan item tidak boleh kosong.', */
 		]);
 
         if($validation->fails()) {
@@ -401,16 +404,19 @@ class GoodScaleController extends Controller
 
                 }
 
-                $itemUnit = ItemUnit::find($request->item_unit_id);
-                $pod = PurchaseOrderDetail::find($request->purchase_order_detail_id);
-                $item = Item::find($request->item_id);
+                $itemUnit = $request->item_unit_id ? ItemUnit::find($request->item_unit_id) : NULL;
+                $pod = $request->purchase_order_detail_id ? PurchaseOrderDetail::find($request->purchase_order_detail_id) : NULL;
+                $item = $request->item_id ? Item::find($request->item_id) : NULL;
 
-                if($item->is_quality_check && !$request->is_quality_check){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Item terpilih masuk ke dalam kategori wajib dicek QC, silahkan centang PENGECEKAN QC.'
-                    ]);
+                if($request->item_id){
+                    if($item->is_quality_check && !$request->is_quality_check){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Item terpilih masuk ke dalam kategori wajib dicek QC, silahkan centang PENGECEKAN QC.'
+                        ]);
+                    }
                 }
+                
                 if($request->temp){
                 
                     $query = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -475,8 +481,9 @@ class GoodScaleController extends Controller
                         $query->account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
                         $query->company_id = $request->company_id;
                         $query->place_id = $request->place_id;
-                        $query->warehouse_id = $request->warehouse_id;
+                        $query->warehouse_id = $request->warehouse_id ?? NULL;
                         $query->post_date = $request->post_date;
+                        $query->type = $request->type;
                         $query->delivery_no = $request->delivery_no;
                         $query->vehicle_no = $request->vehicle_no;
                         $query->driver = $request->driver;
@@ -484,15 +491,16 @@ class GoodScaleController extends Controller
                         $query->image_in = $desiredPath ? $desiredPath : NULL;
                         $query->time_scale_in = date('Y-m-d H:i:s');
                         $query->note = $request->note;
-                        $query->purchase_order_detail_id = $request->purchase_order_detail_id;
-                        $query->item_id = $request->item_id;
+                        $query->purchase_order_detail_id = $request->purchase_order_detail_id ?? NULL;
+                        $query->marketing_order_delivery_id = $request->marketing_order_delivery_id ?? NULL;
+                        $query->item_id = $request->item_id ?? NULL;
                         $query->qty_in = str_replace(',','.',str_replace('.','',$request->qty_in));
                         $query->qty_out = str_replace(',','.',str_replace('.','',$request->qty_out));
                         $query->qty_balance = 0;
                         $query->qty_qc = 0;
                         $query->qty_final = 0;
-                        $query->item_unit_id = $request->item_unit_id;
-                        $query->qty_conversion = $itemUnit->conversion;
+                        $query->item_unit_id = $request->item_unit_id ?? NULL;
+                        $query->qty_conversion = $itemUnit ? $itemUnit->conversion : NULL;
                         $query->is_quality_check = $request->is_quality_check ?? NULL;
                         $query->water_content = 0;
                         $query->status = '1';
@@ -532,8 +540,9 @@ class GoodScaleController extends Controller
                         'account_id'                => $request->account_id ?? $pod->purchaseOrder->account_id,
                         'company_id'                => $request->company_id,
                         'place_id'                  => $request->place_id,
-                        'warehouse_id'              => $request->warehouse_id,
+                        'warehouse_id'              => $request->warehouse_id ?? NULL,
                         'post_date'                 => $request->post_date,
+                        'type'                      => $request->type,
                         'delivery_no'               => $request->delivery_no,
                         'vehicle_no'                => $request->vehicle_no,
                         'driver'                    => $request->driver,
@@ -541,15 +550,16 @@ class GoodScaleController extends Controller
                         'image_in'                  => $desiredPath ? $desiredPath : NULL,
                         'time_scale_in'             => date('Y-m-d H:i:s'),
                         'note'                      => $request->note,
-                        'purchase_order_detail_id'  => $request->purchase_order_detail_id,
-                        'item_id'                   => $request->item_id,
+                        'purchase_order_detail_id'  => $request->purchase_order_detail_id ?? NULL,
+                        'marketing_order_delivery_id' => $request->marketing_order_delivery_id ?? NULL,
+                        'item_id'                   => $request->item_id ?? NULL,
                         'qty_in'                    => str_replace(',','.',str_replace('.','',$request->qty_in)),
                         'qty_out'                   => str_replace(',','.',str_replace('.','',$request->qty_out)),
                         'qty_balance'               => 0,
                         'qty_qc'                    => 0,
                         'qty_final'                 => 0,
-                        'item_unit_id'              => $request->item_unit_id,
-                        'qty_conversion'            => $itemUnit->conversion,
+                        'item_unit_id'              => $request->item_unit_id ?? NULL,
+                        'qty_conversion'            => $itemUnit ? $itemUnit->conversion : NULL,
                         'is_quality_check'          => $request->is_quality_check ?? NULL,
                         'water_content'             => 0,
                         'status'                    => '1',
@@ -677,15 +687,16 @@ class GoodScaleController extends Controller
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
         $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
         $data['image_in'] = $data->imageIn();
-        $data['item_name'] = $data->item->code.' - '.$data->item->name;
-        $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code;
-        $data['qty_po'] = CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty);
+        $data['item_name'] = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '';
+        $data['purchase_code'] = $data->purchaseOrderDetail()->exists() ? $data->purchaseOrderDetail->purchaseOrder->code : ($data->marketingOrderDelivery()->exists() ? $data->marketingOrderDelivery->code : '');
+        $data['qty_po'] = $data->purchaseOrderDetail()->exists() ? CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty) : '';
         $data['qty_in'] = CustomHelper::formatConditionalQty($data->qty_in);
+        $data['qty_out'] = CustomHelper::formatConditionalQty($data->qty_out);
         $data['place_code'] = $data->place->code;
-        $data['warehouse_name'] = $data->warehouse->name;
-        $data['buy_units'] = $data->item->arrBuyUnits();
+        $data['warehouse_name'] = $data->warehouse()->exists() ? $data->warehouse->name : '-';
+        $data['buy_units'] = $data->item()->exists() ? $data->item->arrBuyUnits() : '';
         $data['is_hide'] = $data->item->is_hide_supplier ?? '';
-        $data['unit'] = $data->itemUnit->unit->code;
+        $data['unit'] = $data->itemUnit()->exists() ? $data->itemUnit->unit->code : '';
 
         return response()->json($data);
     }
@@ -726,29 +737,49 @@ class GoodScaleController extends Controller
 
         $gs = GoodScale::find($request->tempGoodScale);
 
+        if($gs->type == '2'){
+            if($gs->marketingOrderDelivery()->exists()){
+                if(!$gs->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Maaf, anda tidak bisa menimbang, karena Surat Jalan tidak ditemukan dari MOD yang terhubung.'
+                    ]);
+                }
+            }
+        }
+
         if($gs){
-            $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
-            $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
-            $balancegrpo = $gs->purchaseOrderDetail->qtyGR();
-            $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
-            $percent_balance = round(($balance / $gs->purchaseOrderDetail->qty) * 100,2);
-            if($percent_balance > $tolerance_gr){
-                $overtolerance = true;
+            $qty_in = 0;
+            if($gs->type == '1'){
+                $balanceweight = $gs->qty_in - str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
+                $tolerance_gr = $gs->item->tolerance_gr ? $gs->item->tolerance_gr : 0;
+                $balancegrpo = $gs->purchaseOrderDetail->qtyGR();
+                $balance = ($balanceweight + $balancegrpo) - $gs->purchaseOrderDetail->qty;
+                $percent_balance = round(($balance / $gs->purchaseOrderDetail->qty) * 100,2);
+                if($percent_balance > $tolerance_gr){
+                    $overtolerance = true;
+                }
+    
+                if($overtolerance){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
+                    ]);
+                }
+
+                $qty_qc = 0;
+                $qty_final = $balanceweight;
+
+                $qty_qc = round((($gs->water_content / 100) * $balanceweight),3);
+
+                $qty_final -= $qty_qc;
+            }else{
+                $balanceweight = str_replace(',','.',str_replace('.','',$request->qtyBalanceUpdate));
+                $qty_in = $gs->qty_out + $balanceweight;
+
+                $qty_qc = 0;
+                $qty_final = $balanceweight;
             }
-
-            if($overtolerance){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
-                ]);
-            }
-
-            $qty_qc = 0;
-            $qty_final = $balanceweight;
-
-            $qty_qc = round((($gs->water_content / 100) * $balanceweight),3);
-
-            $qty_final -= $qty_qc;
     
             $adapo = false;
             $idgs = 0;
@@ -763,6 +794,7 @@ class GoodScaleController extends Controller
                 $newFile = 'public/good_scales/'.$imageName;
                 Storage::put($newFile,base64_decode($image));
             }
+            $gs->qty_in = $qty_in > 0 ? $qty_in : $gs->qty_in;
             $gs->qty_out = str_replace(',','.',str_replace('.','',$request->qtyOutUpdate));
             $gs->qty_balance = $balanceweight;
             $gs->qty_qc = $qty_qc;
@@ -771,6 +803,14 @@ class GoodScaleController extends Controller
             $gs->image_out = $newFile ? $newFile : NULL;
             $gs->note = $request->noteUpdate;
             $gs->save();
+
+            if($gs->marketingOrderDelivery()->exists()){
+                if($gs->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
+                    $gs->marketingOrderDelivery->marketingOrderDeliveryProcess->update([
+                        'weight_netto' => $qty_final,
+                    ]);
+                }
+            }
     
             /* if($adapo){
                 if($idgs > 0){
@@ -859,6 +899,13 @@ class GoodScaleController extends Controller
                     'message' => 'Data telah dicek QC dan tidak bisa dirubah.'
                 ];
             }else{
+                if($query->marketingOrderDelivery()->exists()){
+                    if($query->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
+                        $query->marketingOrderDelivery->marketingOrderDeliveryProcess->update([
+                            'weight_netto' => 0,
+                        ]);
+                    }
+                }
                
                 $query->update([
                     'status'    => '5',

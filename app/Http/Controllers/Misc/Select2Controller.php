@@ -2884,6 +2884,9 @@ class Select2Controller extends Controller {
             if($request->down_payment){
                 $query->where('percent_dp',floatval($request->down_payment));
             }
+            if($request->type_delivery){
+                $query->where('type_delivery',floatval($request->type_delivery));
+            }
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -3019,15 +3022,49 @@ class Select2Controller extends Controller {
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])
         ->whereNotNull('send_status')
+        ->whereDoesntHave('marketingOrderDeliveryProcess')
         ->get();
 
         foreach($data as $d) {
-            if(!$d->marketingOrderDeliveryProcess()->exists()){
-                $response[] = [
-                    'id'   			=> $d->id,
-                    'text' 			=> $d->code,
-                ];
-            }
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function marketingOrderDeliveryScale(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = MarketingOrderDelivery::where(function($query) use($search){
+            $query->where('code', 'like', "%$search%")
+                ->orWhere('note_internal','like',"%$search%")
+                ->orWhere('note_external','like',"%$search%")
+                ->orWhereHas('user',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('account',function($query) use ($search){
+                    $query->where('name','like',"%$search%")
+                        ->orWhere('employee_no','like',"%$search%");
+                });
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['3'])
+        ->whereNotNull('send_status')
+        ->whereDoesntHave('marketingOrderDeliveryProcess')
+        ->whereDoesntHave('goodScale')
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code,
+            ];
         }
 
         return response()->json(['items' => $response]);

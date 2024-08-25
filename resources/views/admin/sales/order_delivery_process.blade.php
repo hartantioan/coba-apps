@@ -166,6 +166,7 @@
                                                         <th>Nopol Kendaraan</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
+                                                        <th>Berat (KG)</th>
                                                         <th>Tgl.Kembali SJ</th>
                                                         <th>Bukti Kembali</th>
                                                         <th>Tracking</th>
@@ -1821,6 +1822,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'vehicle_no', className: '' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
+                { name: 'weight_netto', className: 'right-align' },
                 { name: 'return_date', searchable: false, orderable: false, className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'status_tracking', searchable: false, orderable: false, className: 'center-align' },

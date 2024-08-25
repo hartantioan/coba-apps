@@ -93,6 +93,7 @@ class MarketingOrderDeliveryController extends Controller
             'district_id',
             'city_id',
             'transportation_id',
+            'type_delivery',
             'post_date',
             'delivery_date',
             'note_internal',
@@ -247,6 +248,7 @@ class MarketingOrderDeliveryController extends Controller
                     $val->district->name,
                     $val->city->name,
                     $val->transportation->name,
+                    $val->deliveryType(),
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->note_internal,
@@ -562,6 +564,7 @@ class MarketingOrderDeliveryController extends Controller
                         'city_id'                   => $request->tempCity,
                         'district_id'               => $request->tempDistrict,
                         'transportation_id'         => $request->tempTransport,
+                        'type_delivery'             => $request->tempTypeDelivery,
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,
                         'status'                    => '1',
@@ -668,6 +671,7 @@ class MarketingOrderDeliveryController extends Controller
                 'transportation_name'   => $row->marketingOrderDetail->marketingOrder->transportation->name,
                 'payment_type'          => $row->marketingOrderDetail->marketingOrder->payment_type,
                 'down_payment'          => $row->marketingOrderDetail->marketingOrder->percent_dp,
+                'type_delivery'         => $row->marketingOrderDetail->marketingOrder->type_delivery,
                 'uom_unit'              => $row->item->uomUnit->code,
             ];
             

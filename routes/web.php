@@ -104,6 +104,7 @@ use App\Http\Controllers\MasterData\UserItemController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
 use App\Http\Controllers\MasterData\StandardCustomerPriceController;
 use App\Http\Controllers\MasterData\DiscountCustomerController;
+use App\Http\Controllers\MasterData\DeliveryCostStandardController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
 use App\Http\Controllers\MasterData\TransportationController;
@@ -1269,6 +1270,7 @@ Route::prefix('admin')->group(function () {
                     });
 
 
+
                     Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {
                         Route::get('/',[ItemPricelistController::class, 'index']);
                         Route::post('import',[ItemPricelistController::class, 'import'])->middleware('operation.access:item_pricelist,update');
@@ -1289,6 +1291,22 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [TransportationController::class, 'show']);
                         Route::post('create', [TransportationController::class, 'create'])->middleware('operation.access:transportation,update');
                         Route::post('destroy', [TransportationController::class, 'destroy'])->middleware('operation.access:transportation,delete');
+                    });
+
+                    
+                    Route::prefix('delivery_cost_standard')->middleware('operation.access:delivery_cost_standard,view')->group(function () {
+                        Route::get('/',[DeliveryCostStandardController::class, 'index']);
+                        Route::get('datatable',[DeliveryCostStandardController::class, 'datatable']);
+                        Route::get('row_detail',[DeliveryCostStandardController::class, 'rowDetail']);
+                        Route::post('show', [DeliveryCostStandardController::class, 'show']);
+                        Route::post('print',[DeliveryCostStandardController::class, 'print']);
+                        Route::get('export',[DeliveryCostStandardController::class, 'export']);
+                        Route::get('get_import_excel',[DeliveryCostStandardController::class, 'getImportExcel']);
+                        Route::get('export_from_page',[DeliveryCostStandardController::class, 'exportFromTransactionPage']);
+                        Route::post('import',[DeliveryCostStandardController::class, 'import'])->middleware('operation.access:delivery_cost_standard,update');
+                        Route::post('import_master',[DeliveryCostStandardController::class, 'importMaster'])->middleware('operation.access:delivery_cost_standard,update');
+                        Route::post('create',[DeliveryCostStandardController::class, 'create'])->middleware('operation.access:delivery_cost_standard,update');
+                        Route::post('destroy', [DeliveryCostStandardController::class, 'destroy'])->middleware('operation.access:delivery_cost_standard,delete');
                     });
 
                     Route::prefix('delivery_cost')->middleware('operation.access:delivery_cost,view')->group(function () {

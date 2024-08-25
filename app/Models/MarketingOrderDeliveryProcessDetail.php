@@ -96,7 +96,7 @@ class MarketingOrderDeliveryProcessDetail extends Model
 
     public function getPriceHpp(){
         $pricenow = 0;
-        $cogs = ItemCogs::where('item_id',$this->itemStock->item_id)->where('place_id',$this->itemStock->place_id)->where('warehouse_id',$this->itemStock->warehouse_id)->where('item_shading_id',$this->itemStock->item_shading_id)->where('production_batch_id',$this->itemStock->production_batch_id)->whereDate('date','<=',$this->marketingOrderDeliveryProcess->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+        $cogs = ItemCogs::where('item_id',$this->itemStock->item_id)->where('place_id',$this->itemStock->place_id)->where('warehouse_id',$this->itemStock->warehouse_id)->where('item_shading_id',$this->itemStock->item_shading_id)->where('production_batch_id',$this->itemStock->production_batch_id)->where('date','<=',$this->marketingOrderDeliveryProcess->post_date)->orderByDesc('date')->orderByDesc('id')->first();
         if($cogs){
             $pricenow = $cogs->qty_final > 0 ? round($cogs->total_final / $cogs->qty_final,6) : 0;
         }

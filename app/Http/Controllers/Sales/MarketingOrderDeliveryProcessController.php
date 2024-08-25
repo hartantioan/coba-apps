@@ -27,6 +27,7 @@ use App\Models\UserDriver;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\ItemCogs;
 use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\User;
 use App\Models\MenuUser;
@@ -415,15 +416,29 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'hp'        => $request->driver_hp,
                 ])->id;
             }
+            $arrStockId = [];
+            $arrQtyNeeded = [];
+            if($request->arr_item_stock_id){
+                foreach($request->arr_item_stock_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
+                    $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                    if(!in_array($row,$arrStockId)){
+                        $arrStockId[] = $row;
+                        $arrQtyNeeded[] = $qtyNeeded;
+                    }else{
+                        $index = array_search($row,$arrStockId);
+                        $arrQtyNeeded[$index] += $qtyNeeded;
+                    }
+                }
+            }
 
             if($request->arr_item_stock_id){
                 $passedQty = true;
-                foreach($request->arr_item_stock_id as $key => $row){
-                    $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
+                foreach($arrStockId as $key => $row){
                     $itemstock = ItemStock::find($row);
-                    $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                    if($itemstock){
-                        if($itemstock->balanceWithUnsent() < $qtyNeeded){
+                    $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                    if($itemcogs){
+                        if($itemcogs->qty_final < $arrQtyNeeded[$key]){
                             $passedQty = false;
                         }
                     }else{
@@ -433,7 +448,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if(!$passedQty){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada.'
+                        'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih.'
                     ]);
                 }
             }
@@ -1342,9 +1357,9 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if(in_array($query->status,['2','3'])){
                     CustomHelper::removeJournal($query->getTable(),$query->id);
                     CustomHelper::removeCogs($query->getTable(),$query->id);
-                    $query->marketingOrderDelivery->update([
+                    /* $query->marketingOrderDelivery->update([
                         'status'    => '2'
-                    ]);
+                    ]); */
                 }
                 
                 $query->update([

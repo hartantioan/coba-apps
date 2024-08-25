@@ -255,6 +255,7 @@
                                     <option value="1">Timbang Barang Masuk (Pembelian)</option>
                                     <option value="2">Timbang Barang Keluar (Penjualan)</option>
                                 </select>
+                                <label class="ac" for="type">Tipe Timbang</label>
                             </div>
                             <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>

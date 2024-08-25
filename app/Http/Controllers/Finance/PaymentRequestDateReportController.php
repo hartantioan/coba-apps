@@ -59,6 +59,7 @@ class PaymentRequestDateReportController extends Controller
                         <th class="center-align">No Purchase Invoice</th>
                         <th class="center-align">Vendor</th>
                         <th class="center-align">No Vendor</th>
+                        <th class="center-align">Tgl.Bayar</th>
                         <th class="center-align">Status</th>
                     </tr>
                 </thead><tbody>';
@@ -71,6 +72,7 @@ class PaymentRequestDateReportController extends Controller
                     <td class="center-align">'.$row->lookable->code.'</td>
                     <td class="center-align">'.$row->lookable->account->name.'</td>
                     <td class="center-align">'.$row->lookable->invoice_no.'</td>
+                    <td class="center-align">'.date('d/m/Y',strtotime($row->paymentRequest->pay_date)).'</td>
                     <td class="center-align">'.$row->paymentRequest->status().'</td>
                 </tr>';
             }

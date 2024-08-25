@@ -6,6 +6,7 @@
             <th class="center-align">No Purchase Invoice</th>
             <th class="center-align">Vendor</th>
             <th class="center-align">No Vendor</th>
+            <th class="center-align">Tgl.Bayar</th>
             <th class="center-align">Status</th>
         </tr>
     </thead>
@@ -19,6 +20,7 @@
                 <td >{{ $row['invoice_code'] }}</td>
                 <td >{{ $row['vendor'] }}</td>
                 <td >{{ $row['invoice_no'] }}</td>
+                <td >{{ $row['pay_date'] }}</td>
                 <td >{{ $row['status'] }}</td>
                 
             </tr>

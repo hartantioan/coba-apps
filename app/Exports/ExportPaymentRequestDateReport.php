@@ -49,6 +49,7 @@ class ExportPaymentRequestDateReport implements FromView,ShouldAutoSize
                     'invoice_no' => $row->lookable->invoice_no,
                     'status' => $row->paymentRequest->statusRaw(),
                     'vendor' => $row->lookable->account->name,
+                    'pay_date' => date('d/m/Y',strtotime($row->paymentRequest->pay_date)),
                 ];
             
                 $array_filter[]=$data_tempura;

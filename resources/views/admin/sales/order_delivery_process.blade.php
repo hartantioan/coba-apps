@@ -1554,6 +1554,7 @@ document.addEventListener('focusin', function (event) {
                             $('#status_tracking option:not([disabled]):first').attr("selected",true);
                             $('#imageTracking' + response.param).css("filter", "");
                             $('#dateTracking' + response.param).text(response.date);
+                            loadDataTable();
                         } else if(response.status == 422) {
                             $('#validation_alert_tracking').show();
                             $('.modal-content').scrollTop(0);

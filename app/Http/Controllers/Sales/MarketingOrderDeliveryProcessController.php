@@ -1186,12 +1186,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            if($request->weight_netto <= 0){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
-                ]);
-            }
             if($request->status_tracking == '5'){
                 return response()->json([
                     'status'  => 500,
@@ -1209,6 +1203,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'user_id'                               => session('bo_id'),
                     'marketing_order_delivery_process_id'   => $data->id,
                     'status'                                => $request->status_tracking,
+                ]);
+            }
+
+            if($data->weight_netto <= 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
                 ]);
             }
 

@@ -51,7 +51,7 @@ class PaymentRequestDateReportController extends Controller
         $table = '<div class="col s12" style="overflow:auto;"><table>
                 <thead>
                     <tr>
-                        <th class="center-align" colspan="23">Daftar PYR</th>
+                        <th class="center-align" colspan="7">Daftar PYR</th>
                     </tr>
                     <tr>
                         <th class="center-align">No.</th>
@@ -78,7 +78,7 @@ class PaymentRequestDateReportController extends Controller
             }
         }else{
             $table .= '<tr>
-                <td class="center-align" colspan="5">data tidak ditemukan.</td>
+                <td class="center-align" colspan="7">data tidak ditemukan.</td>
             </tr>';
         }
         $table .= '</tbody></table></div>

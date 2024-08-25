@@ -19,7 +19,7 @@ class DeliveryCostStandardController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'Diskon Customer',
+            'title'     => 'Standard Harga Pengiriman',
             'content'   => 'admin.master_data.delivery_cost_standard',
         ];
 

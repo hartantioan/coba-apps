@@ -1220,7 +1220,7 @@
     }
 
     function checkQtyReject(code){
-        let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
+        /* let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
         let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
         let balance = qtyMax - qty;
         let qtyReject = parseFloat($('#rowQtyReject' + code).val().replaceAll(".", "").replaceAll(",","."));
@@ -1228,18 +1228,18 @@
             if(qtyReject > balance){
                 $('#rowQtyReject' + code).val(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
             }
-        }
+        } */
     }
 
     function applyReject(code){
-        let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
+        /* let qtyMax = parseFloat($('#rowQty' + code).data('max').replaceAll(".", "").replaceAll(",","."));
         let qty = parseFloat($('#rowQty' + code).val().replaceAll(".", "").replaceAll(",","."));
         let balance = qtyMax - qty;
         if(balance >= 0){
             $('#rowQtyReject' + code).val(formatRupiahIni(balance.toFixed(3).toString().replace('.',',')));
         }else{
             $('#rowQtyReject' + code).val('0,000');
-        }
+        } */
     }
 
     function getProductionOrder(data){

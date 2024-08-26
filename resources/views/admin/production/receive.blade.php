@@ -1292,7 +1292,7 @@
                             ` + datakuy.item_receive_code + ` - ` + datakuy.item_receive_name + `
                         </td>
                         <td class="right-align">
-                            ` + datakuy.item_receive_qty + `
+                            ` + datakuy.item_receive_balance + `
                         </td>
                         <td class="center">
                             <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + datakuy.item_receive_qty + `" onkeyup="formatRupiahNoMinus(this);applyReject('` + count + `');" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" data-max="` + datakuy.item_receive_qty + `" required>

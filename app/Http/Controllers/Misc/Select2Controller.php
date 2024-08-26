@@ -4603,6 +4603,7 @@ class Select2Controller extends Controller {
                 'item_receive_name'             => $d->productionScheduleDetail->item->name,
                 'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
                 'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
+                'item_receive_balance'          => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty - $d->qtyReceive()),
                 'line'                          => $d->productionScheduleDetail->line->code,
                 'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
                 'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,

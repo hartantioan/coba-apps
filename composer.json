@@ -5,7 +5,7 @@
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "require": {
-        "php": "^8.2.4",
+        "php": "^8.1.0",
         "barryvdh/laravel-dompdf": "^2.0",
         "cboden/ratchet": "^0.4.4",
         "dipeshsukhia/laravel-html-minify": "^3.0",

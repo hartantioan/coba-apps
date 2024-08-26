@@ -234,6 +234,13 @@
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                                     </div>
+                                    <div class="col m12 s12">
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>Info Penting! : MOD yang bisa ditarik adalah MOD yang memiliki status SELESAI dan pernah ditarik ke form Timbangan.</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </fieldset>
                             </div>
                             <div class="col s12">

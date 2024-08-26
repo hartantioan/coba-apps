@@ -249,12 +249,7 @@
                                             Nomor PO/MOD
                                          </td>
                                          <td>
-                                            @if ($data->purchaseOrderDetail()->exists())
-                                                {{ $data->purchaseOrderDetail->purchaseOrder->code }}
-                                            @endif
-                                            @if ($data->marketingOrderDelivery()->exists())
-                                                {{ $data->marketingOrderDelivery->code }}
-                                            @endif
+                                            {{ $data->referencePO() }}
                                           </td>
                                     </tr>
                                     {{-- <tr>

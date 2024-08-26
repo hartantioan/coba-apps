@@ -402,6 +402,10 @@
                                                         <th class="center">Coa</th>
                                                         <th class="center">Ket.1</th>
                                                         <th class="center">Ket.2</th>
+                                                        <th class="center">Debit FC</th>
+                                                        <th class="center">Kredit FC</th>
+                                                        <th class="center">Debit Rp</th>
+                                                        <th class="center">Kredit Rp</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
                                                         <th class="center">{{ __('translations.line') }}</th>
@@ -409,10 +413,7 @@
                                                         <th class="center">{{ __('translations.division') }}</th>
                                                         <th class="center">Proyek</th>
                                                       
-                                                        <th class="center">Debit FC</th>
-                                                        <th class="center">Kredit FC</th>
-                                                        <th class="center">Debit Rp</th>
-                                                        <th class="center">Kredit Rp</th>
+                                                        
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
@@ -1974,6 +1975,18 @@
                                                         <input type="text" name="arr_note_cost2[]" placeholder="Keterangan 2..." value="" data-id="` + countdetail + `">
                                                     </td>
                                                     <td class="center">
+                                                        <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + (value.type == '1' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="` + (value.type == '2' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input class="browser-default" type="text" name="arr_nominal_debit[]" value="` + (value.type == '1' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                                                    </td>
+                                                    <td class="right-align">
+                                                        <input class="browser-default" type="text" name="arr_nominal_credit[]" value="` + (value.type == '2' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                                                    </td>
+                                                    <td class="center">
                                                         <select class="browser-default" id="arr_cost_distribution_cost` + countdetail + `" name="arr_cost_distribution_cost[]"></select> 
                                                     </td>
                                                     <td class="center">
@@ -2011,18 +2024,7 @@
                                                         <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
                                                     </td>
                                                     
-                                                    <td class="center">
-                                                        <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + (value.type == '1' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                                                    </td>
-                                                    <td class="right-align">
-                                                        <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="` + (value.type == '2' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                                                    </td>
-                                                    <td class="right-align">
-                                                        <input class="browser-default" type="text" name="arr_nominal_debit[]" value="` + (value.type == '1' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
-                                                    </td>
-                                                    <td class="right-align">
-                                                        <input class="browser-default" type="text" name="arr_nominal_credit[]" value="` + (value.type == '2' ? value.nominal : '0,00') + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
-                                                    </td>
+                                                    
                                                     <td class="center">
                                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                                             <i class="material-icons">delete</i>
@@ -2900,6 +2902,18 @@
                                     <input type="text" name="arr_note_cost2[]" placeholder="Keterangan 2..." value="` + val.note2 + `" data-id="` + countdetail + `">
                                 </td>
                                 <td class="center">
+                                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + val.nominal_debit_fc + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                                </td>
+                                <td class="right-align">
+                                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="` + val.nominal_credit_fc + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
+                                </td>
+                                <td class="right-align">
+                                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="` + val.nominal_debit + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                                </td>
+                                <td class="right-align">
+                                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="` + val.nominal_credit + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
+                                </td>
+                                <td class="center">
                                     <select class="browser-default" id="arr_cost_distribution_cost` + countdetail + `" name="arr_cost_distribution_cost[]"></select> 
                                 </td>
                                 <td class="center">
@@ -2937,18 +2951,7 @@
                                     <select class="browser-default" id="arr_project` + countdetail + `" name="arr_project[]"></select>
                                 </td>
                                 
-                                <td class="center">
-                                    <input class="browser-default" type="text" name="arr_nominal_debit_fc[]" value="` + val.nominal_debit_fc + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td class="right-align">
-                                    <input class="browser-default" type="text" name="arr_nominal_credit_fc[]" value="` + val.nominal_credit_fc + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);countAll();">
-                                </td>
-                                <td class="right-align">
-                                    <input class="browser-default" type="text" name="arr_nominal_debit[]" value="` + val.nominal_debit + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
-                                </td>
-                                <td class="right-align">
-                                    <input class="browser-default" type="text" name="arr_nominal_credit[]" value="` + val.nominal_credit + `" data-id="` + countdetail + `" onkeyup="formatRupiah(this);" readonly>
-                                </td>
+                                
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-detail" href="javascript:void(0);">
                                         <i class="material-icons">delete</i>

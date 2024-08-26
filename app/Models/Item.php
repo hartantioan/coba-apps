@@ -437,6 +437,14 @@ class Item extends Model
         return $this->hasMany('App\Models\FgGroup','parent_id','id');
     }
 
+    public function arrayItemChildRelation(){
+        $arr = [];
+        foreach($this->fgGroup as $row){
+            $arr[] = $row->item_id;
+        }
+        return $arr;
+    }
+
     public function parentFg()
     {
         return $this->hasOne('App\Models\FgGroup','item_id','id');

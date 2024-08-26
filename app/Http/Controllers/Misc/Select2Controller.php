@@ -4815,7 +4815,7 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%");
                 })
                 ->where(function($query)use($request,$po_id){
-                    if($request->pod_id){
+                    /* if($request->pod_id){
                         $query->where('lookable_type','production_receive_details')
                             ->whereHasMorph('lookable',[ProductionReceiveDetail::class],function($query)use($po_id){
                                 $query->whereHas('productionReceive',function($query)use($po_id){
@@ -4824,9 +4824,10 @@ class Select2Controller extends Controller {
                                     });
                                 });
                             });
-                    }
+                    } */
                 })
-                ->whereIn('item_id',$pod->getItemIdBomChild())
+                /* ->whereIn('item_id',$pod->getItemIdBomChild()) */
+                ->whereIn('item_id',$pod->productionScheduleDetail->item->arrayItemChildRelation())
                 ->whereDoesntHave('used')
                 ->where('qty','>',0)
                 ->orderBy('created_at')

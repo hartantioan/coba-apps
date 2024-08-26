@@ -30,4 +30,27 @@ class ItemUnit extends Model
     public function unit(){
         return $this->belongsTo('App\Models\Unit','unit_id','id')->withTrashed();
     }
+
+    public function sellUnitRaw(){
+        $hide = match ($this->is_sell_unit) {
+            '1' => 'Ya',
+            default => 'Tidak',
+          };
+        return $hide;
+    }
+
+    public function buyUnitRaw(){
+        $hide = match ($this->is_buy_unit) {
+            '1' => 'Ya',
+            default => 'Tidak',
+          };
+        return $hide;
+    }
+    public function defaultRaw(){
+        $hide = match ($this->is_default) {
+            '1' => 'V',
+            default => 'Tidak',
+          };
+        return $hide;
+    }
 }

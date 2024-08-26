@@ -617,7 +617,7 @@ class Item extends Model
                     ];
                 }
                 $data1['details'] = $details;
-            }else{
+            }/* else{
                 $secondBom = $firstBom->bomParentMap()->latest()->first();
                 if($secondBom){
                     $data2 = [
@@ -763,7 +763,7 @@ class Item extends Model
                     }
                     $arr[] = $data2;
                 }
-            }
+            } */
             $arr[] = $data1;
         }
 

@@ -152,38 +152,30 @@
         <header>
             <table border="0" width="100%">
                 <tr>
-                    <td width="83%" class="left-align">
-                        <tr>
-                            <td align="center">
-                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
-                                    {{ $data->code }}
-                                </span>
-                            </td>
-                        </tr>
+                    <td width="34%">
+                        <img src="{{ $image }}" width="50%" style="top:5px; width:80%">
+                    </td>
+                    <td width="33%" align="center">
+                        <h5 style="margin-top:0px;">DELIVERY ORDER</h5>
+                        <h5 style="margin-top:-15px;">{{ $data->code }}</h5>
+                        <div>
+                            <small style="font-size:10px">Tanggal:</small>
+                            <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
+                        </div>
+                    </td>
+                    <td width="33%">
+                        {{-- <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="top:50px;width:100%;right:75px;" height="" />
                         <tr>
                             <td style="margin-top: -2px;">
                                 <small style="font-size:10px">Tanggal:</small>
                                 <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
                             </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 style="margin-top: -2px">Surat Jalan</h5>
-                            </td>
-                        </tr>
-                    </td>
-                    <td width="33%" class="right-align">
-                    </td>
-                    
-                    <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:100px;right:75px;" height="10%" />
+                        </tr> --}}
                     </td>
                 </tr>
-                
             </table>
         </header>
-        <main>
+        <main style="margin-top:25px;">
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
@@ -192,66 +184,75 @@
                             <td width="50%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="30%">
-                                            Customer
+                                        <td width="35%">
+                                            PLANT
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->marketingOrderDelivery->marketingOrder->account->name }}
+                                        <td width="65%">
+                                            {{ $data->getPlace() }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>
-                                            Telepon
+                                        <td width="35%">
+                                            WAREHOUSE
                                         </td>
                                         <td width="1%">:</td>
-                                        <td>
-                                            {{ $data->marketingOrderDelivery->marketingOrder->account->phone.' / '.$data->marketingOrderDelivery->marketingOrder->account->office_no }}
+                                        <td width="65%">
+                                            {{ $data->getWarehouse() }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="30%">
-                                            Ekspedisi
+                                        <td width="35%">
+                                            NO. MOD
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->account->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="30%">
-                                            Outlet
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->marketingOrderDelivery->marketingOrder->outlet->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="30%">
-                                            Telepon
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->marketingOrderDelivery->marketingOrder->outlet->phone }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="30%">
-                                            MOD
-                                        </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
+                                        <td width="65%">
                                             {{ $data->marketingOrderDelivery->code }}
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td width="30%">
-                                            SO & Ref
+                                        <td width="35%">
+                                            NAMA EKSPEDISI
                                         </td>
                                         <td width="1%">:</td>
-                                        <td width="70%">
-                                            {{ $data->marketingOrderDelivery->marketingOrder->code.' - '.$data->marketingOrderDelivery->marketingOrder->document_no }}
+                                        <td width="65%">
+                                            {{ $data->account->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="35%">
+                                            SHIPPING TYPE
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="65%">
+                                            {{ $data->marketingOrderDelivery->deliveryType() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="35%">
+                                            JENIS TRANSPORT
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="65%">
+                                            {{ $data->marketingOrderDelivery->transportation->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="35%">
+                                            NOMOR POLISI
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="65%">
+                                            {{ $data->vehicle_no }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="35%">
+                                            NAMA SOPIR
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width=65%">
+                                            {{ $data->driver_name }}
                                         </td>
                                     </tr>
                                 </table>
@@ -260,47 +261,65 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="30%">
-                                            Tipe Pengiriman
+                                            PO CUSTOMER
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="70%">
-                                            {{ $data->marketingOrderDelivery->marketingOrder->deliveryType() }}
+                                            {{ $data->getPoCustomer() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%">
+                                            CUSTOMER
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="70%">
+                                            {{ $data->marketingOrderDelivery->customer->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="30%">
+                                            OUTLET NAME
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="70%">
+                                            {{ strtoupper($data->getOutlet()) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Tgl.Kirim
+                                            PROJECT NAME
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ date('d/m/Y',strtotime($data->post_date)) }}
+                                            {{ strtoupper($data->getProject()) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Almt Tujuan
+                                            ALAMAT
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->marketingOrderDelivery->marketingOrder->destination_address.', '.ucwords(strtolower($data->marketingOrderDelivery->marketingOrder->subdistrict->name.' - '.$data->marketingOrderDelivery->marketingOrder->city->name.' - '.$data->marketingOrderDelivery->marketingOrder->province->name)) }}
+                                            {{ strtoupper($data->marketingOrderDelivery->destination_address) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Supir
+                                            KECAMATAN
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->driver_name.' - '.$data->driver_hp }}
+                                            {{ strtoupper($data->marketingOrderDelivery->district->name) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Kendaraan
+                                            KOTA
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->vehicle_name.' - '.$data->vehicle_no }}
+                                            {{ strtoupper($data->marketingOrderDelivery->city->name) }}
                                         </td>
                                     </tr>
                                 </table>
@@ -312,24 +331,21 @@
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.code') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
+                                    <th>NAMA BARANG</th>
+                                    <th>BATCH</th>
+                                    <th>QTY</th>
+                                    <th>UOM</th>
+                                    <th>QTY PALET</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($data->marketingOrderDelivery->marketingOrderDeliveryDetail as $key => $row)
+                                @foreach($data->marketingOrderDeliveryProcessDetail as $key => $row)
                                 <tr>
-                                    <td align="center">{{ ($key + 1) }}</td>
-                                    <td>{{ $row->item->code }}</td>
-                                    <td>{{ $row->item->name }}</td>
+                                    <td>{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
+                                    <td></td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                    <td align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
                                     <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                                    <td align="center">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="5">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

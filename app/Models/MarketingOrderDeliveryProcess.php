@@ -50,6 +50,40 @@ class MarketingOrderDeliveryProcess extends Model
         'done_note',
     ];
 
+    public function getPoCustomer(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,$arr)){
+                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getOutlet(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet()->exists()){
+                if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name,$arr)){
+                    $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name;
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getProject(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project()->exists()){
+                if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name,$arr)){
+                    $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name;
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function totalQty(){
         $total = 0;
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
@@ -72,6 +106,20 @@ class MarketingOrderDeliveryProcess extends Model
         }
 
         return $document;
+    }
+
+    public function getPlace(){
+        return substr($this->code,7,2);
+    }
+
+    public function getWarehouse(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->itemStock->warehouse->name,$arr)){
+                $arr[] = $row->itemStock->warehouse->name;
+            }
+        }
+        return implode(', ',$arr);
     }
 
     public function deleteFile(){

@@ -225,14 +225,14 @@
                 <tbody>
                     @foreach($data->marketingOrderDeliveryDetail as $key => $row)
                     <tr>
-                        <td class="center-align" rowspan="3">{{ ($key + 1) }}</td>
+                        <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->marketingOrder->code }}</td>
                         <td class="center-align">{{ $row->item->code.' - '.$row->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
                         <td class="center-align">{{ $row->marketingOrderDetail->itemUnit->unit->code }}</td>
                     </tr>
                     <tr>
-                        <td colspan="5">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="4">{{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
                     
                     @endforeach

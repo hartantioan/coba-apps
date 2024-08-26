@@ -6213,7 +6213,7 @@ class CustomHelper {
 							'account_id'	=> $row->wTaxMaster->coaPurchase->bp_journal ? $account_id : NULL,
 							'department_id'	=> $row->department_id ? $row->department_id : NULL,
 							'project_id'	=> $row->lookable->purchaseOrderDetail->project_id ? $row->lookable->purchaseOrderDetail->project_id : NULL,
-							'type'			=> '2',
+							'type'			=> '1',
 							'nominal'		=> $row->wtax * $currency_rate_invoice,
 							'nominal_fc'	=> $type == '1' || $type == '2' ? $row->wtax * $currency_rate_invoice : $row->wtax,
 							'note'			=> 'VOID CANCEL '.$row->purchaseInvoice->tax_cut_no ? $row->purchaseInvoice->tax_cut_no : '',

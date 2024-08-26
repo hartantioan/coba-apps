@@ -90,7 +90,9 @@ use App\Models\UserBank;
 use App\Models\Variety;
 use App\Models\ItemPricelist;
 use App\Models\CustomerDiscount;
+use App\Models\DeliveryCostStandard;
 use App\Models\Group;
+use App\Models\StandardCustomerPrice;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -875,6 +877,7 @@ class Select2Controller extends Controller {
         $account_id   = $request->account_id;
         $date   = $request->date;
         $city   = $request->city;
+        $district = $request->district;
         $payment_type   = $request->payment_type;
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
@@ -886,18 +889,36 @@ class Select2Controller extends Controller {
                 })
                 ->whereDoesntHave('fgGroup')->get();
         $user = User::find($account_id);
+        $transportation = Transportation::find($request->transportation_id);
         foreach($data as $d) {
             $cek_price = ItemPricelist::where('group_id',$user->group_id)
             ->where('item_id',$d->id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
+            ->where('status','1')
+            ->first() ?? 0;
+            
+            $cek_delivery = DeliveryCostStandard::where('category_transportation',$transportation->category_transportation)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->where('city_id',$city)
+            ->where('district_id',$district)
+            ->where('status','1')
+            ->first() ?? 0;
+
+            $cek_type = StandardCustomerPrice::where('group_id',$user->group_id)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->where('status','1')
             ->first() ?? 0;
 
             $cek_discount = CustomerDiscount::where('account_id',$user->id)
             ->where('brand_id',$d->brand_id)
             ->where('city_id',$city)
             ->where('payment_type',$payment_type)
+            ->where('status','1')
             ->first() ?? 0;
+            
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.' - '.$d->name,
@@ -910,6 +931,8 @@ class Select2Controller extends Controller {
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
                 'price'             => $cek_price->price ?? 0,
+                'price_delivery'    => $cek_delivery->price ?? 0,
+                'price_bp'          => $cek_type->price ?? 0,
                 'disc1'             => $cek_discount->disc1 ?? 0,
                 'disc2'             => $cek_discount->disc2 ?? 0,
                 'disc3'             => $cek_discount->disc3 ?? 0,

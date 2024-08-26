@@ -466,6 +466,9 @@
                                                         <th class="center">Qty Sementara</th>
                                                         <th class="center">Qty Pesan (Stok)</th>
                                                         <th class="center">Satuan Stok</th>
+                                                        <th class="center">Harga Dasar</th>
+                                                        <th class="center">Harga Ongkir</th>
+                                                        <th class="center">Harga BP</th>
                                                         <th class="center">{{ __('translations.price') }}</th>
                                                         <th class="center">Qty Jual</th>
                                                         <th class="center">Satuan Jual</th>
@@ -488,7 +491,7 @@
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="19">
+                                                        <td colspan="22">
                                                             Silahkan tambahkan baris ...
                                                         </td>
                                                     </tr>
@@ -809,7 +812,7 @@
                 if($('.row_item').length == 0 && $('#last-row-item').length == 0){
                     $('#body-item').append(`
                         <tr id="last-row-item">
-                            <td colspan="19">
+                            <td colspan="22">
                                 Silahkan tambahkan baris ...
                             </td>
                         </tr>
@@ -881,7 +884,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
-                        <td colspan="19">
+                        <td colspan="22">
                             Silahkan tambahkan baris ...
                         </td>
                     </tr>
@@ -959,7 +962,7 @@
     function clearDetail(){
         $('#body-item').empty().append(`
             <tr id="last-row-item">
-                <td colspan="19">
+                <td colspan="22">
                     Silahkan tambahkan baris ...
                 </td>
             </tr>
@@ -1308,11 +1311,11 @@
     }
     
     function getRowUnit(nil){
-        var price_f_pricelist  = parseFloat($("#arr_item" + nil).select2('data')[0].price);
+        var price_f_pricelist  = parseFloat($("#arr_item" + nil).select2('data')[0].price), price_delivery = parseFloat($("#arr_item" + nil).select2('data')[0].price_delivery), price_bp = parseFloat($("#arr_item" + nil).select2('data')[0].price_bp);
         var disc_1  = parseFloat($("#arr_item" + nil).select2('data')[0].disc1);
         var disc_2  = parseFloat($("#arr_item" + nil).select2('data')[0].disc2);
         var disc_3  = parseFloat($("#arr_item" + nil).select2('data')[0].disc3);
-        $('#tempPrice' + nil).empty();
+        /* $('#tempPrice' + nil).empty(); */
         $("#arr_warehouse" + nil).empty();
         if($("#arr_item" + nil).val()){
 
@@ -1344,7 +1347,7 @@
                 `);
             }
 
-            if($("#arr_item" + nil).select2('data')[0].old_prices.length > 0){
+            /* if($("#arr_item" + nil).select2('data')[0].old_prices.length > 0){
                 $.each($("#arr_item" + nil).select2('data')[0].old_prices, function(i, value) {
                     if($('#account_id').val()){
                         if(value.customer_id == $('#account_id').val()){
@@ -1358,15 +1361,25 @@
                         `);
                     }
                 });
-            }
+            } */
             
             if($("#arr_item" + nil).select2('data')[0].price){
                 if($('#account_id').val() ){
-                    $("#rowPrice" + nil).val(
+                    $("#rowPriceList" + nil).val(
                         (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
                     );
+                    $("#rowPriceDelivery" + nil).val(
+                        (parseFloat(price_delivery) >= 0 ? '' : '-') + formatRupiahIni(price_delivery.toFixed(2).toString().replace('.',','))
+                    );
+                    $("#rowPriceTypeBp" + nil).val(
+                        (parseFloat(price_bp) >= 0 ? '' : '-') + formatRupiahIni(price_bp.toFixed(2).toString().replace('.',','))
+                    );
+                    let final = parseFloat(price_f_pricelist) + parseFloat(price_delivery) + parseFloat(price_bp);
+                    $("#rowPrice" + nil).val(
+                        (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
+                    );
                     $("#arr_final_price" + nil).val(
-                        (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
+                        (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
                     );
                 }
             }
@@ -1381,6 +1394,9 @@
                 <option value="">--Silahkan pilih item--</option>
             `);
             $("#rowPrice" + nil).val('0,00');
+            $("#rowPriceDelivery" + nil).val('0,00');
+            $("#rowPriceTypeBp" + nil).val('0,00');
+            $("#rowPriceList" + nil).val('0,00');
             $("#rowDisc1" + nil).val('0');
             $("#rowDisc2" + nil).val('0');
             $("#rowDisc3" + nil).val('0');
@@ -1389,7 +1405,7 @@
     }
 
     function addItem(){
-        if($('#account_id').val()){
+        if($('#account_id').val() && $('#transportation_id').val() && $('#city_id').val() && $('#district_id').val()){
             if($('#code_place_id').val()){
                 var selectedValue = $('#code_place_id').val();
                 var selectedText = $('#code_place_id option:selected').text();
@@ -1415,8 +1431,16 @@
                         </td>
                         <td class="center-align" id="arr_uom_unit` + count + `">-</td>
                         <td class="center">
-                            <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                            <datalist id="tempPrice` + count + `"></datalist>
+                            <input name="arr_price_list[]" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input name="arr_price_delivery[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`">
+                        </td>
+                        <td class="center">
+                            <input name="arr_price_type_bp[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                        </td>
+                        <td class="center">
+                            <input name="arr_price[]" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPrice`+ count +`" readonly>
                         </td>
                         <td>
                             <input name="arr_qty[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
@@ -1485,7 +1509,9 @@
                                 account_id: $('#account_id').val(),
                                 date: $('#post_date').val(),
                                 city: $('#city_id').val(),
+                                district: $('#district_id').val(),
                                 payment_type: $('#payment_type').val(),
+                                transportation_id: $('#transportation_id').val(),
                             };
                         },
                         processResults: function(data) {
@@ -1505,7 +1531,7 @@
         }else{
             swal({
                 title: '!',
-                text: 'Harap Pilih Customer Terlebih dahulu.',
+                text: 'Harap Pilih Customer, Jenis Transportasi, Kota, dan Kecamatan harus dipilih terlebih dahulu.',
                 icon: 'error'
             });
         }
@@ -1807,6 +1833,9 @@
                 formData.delete("arr_unit[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_qty_uom[]");
+                formData.delete("arr_price_list[]");
+                formData.delete("arr_price_delivery[]");
+                formData.delete("arr_price_type_bp[]");
                 formData.delete("arr_price[]");
                 formData.delete("arr_tax[]");
                 formData.delete("arr_is_include_tax[]");
@@ -1826,7 +1855,10 @@
                         formData.append('arr_unit[]',($('select[name^="arr_unit[]"]').eq(index).val() ? $('select[name^="arr_unit[]"]').eq(index).val() : '' ));
                         formData.append('arr_qty[]',$('input[name^="arr_qty[]"]').eq(index).val());
                         formData.append('arr_qty_uom[]',$('input[name^="arr_qty_uom[]"]').eq(index).val());
-                        formData.append('arr_price[]',$('input[name^="arr_price"]').eq(index).val());
+                        formData.append('arr_price[]',$('input[name^="arr_price[]"]').eq(index).val());
+                        formData.append('arr_price_list[]',$('input[name^="arr_price_list[]"]').eq(index).val());
+                        formData.append('arr_price_delivery[]',$('input[name^="arr_price_delivery[]"]').eq(index).val());
+                        formData.append('arr_price_type_bp[]',$('input[name^="arr_price_type_bp[]"]').eq(index).val());
                        
                         formData.append('arr_tax[]',$('select[name^="arr_tax"]').eq(index).val());
                         formData.append('arr_tax_id[]',$('option:selected','select[name^="arr_tax"]').eq(index).data('id'));
@@ -2072,8 +2104,16 @@
                                 </td>
                                 <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
                                 <td class="center">
-                                    <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                                    <datalist id="tempPrice` + count + `"></datalist>
+                                    <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_price_delivery[]" type="text" value="` + val.price_delivery + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`">
+                                </td>
+                                <td class="center">
+                                    <input name="arr_price_type_bp[]" type="text" value="` + val.price_type_bp + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                                </td>
+                                <td class="center">
+                                    <input name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPrice`+ count +`" readonly>
                                 </td>
                                 <td>
                                     <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>
@@ -2302,10 +2342,15 @@
 
     function countRow(id){
         if($('#arr_unit' + id).val()){
+            let pricelist = parseFloat($('#rowPriceList' + id).val().replaceAll(".", "").replaceAll(",",".")), pricedelivery = parseFloat($('#rowPriceDelivery' + id).val().replaceAll(".", "").replaceAll(",",".")), pricetype = parseFloat($('#rowPriceTypeBp' + id).val().replaceAll(".", "").replaceAll(",",".")), pricenew = 0;
+            pricenew = pricelist + pricedelivery + pricetype;
+            $('#rowPrice' + id).val(
+                (pricenew >= 0 ? '' : '-') + formatRupiahIni(parseFloat(pricenew).toFixed(2).toString().replace('.',','))
+            );
             var qty = parseFloat($('#rowQtyUom' + id).val().replaceAll(".", "").replaceAll(",",".")),
             conversion = parseFloat($('#arr_unit' + id).find(':selected').data('conversion').toString()),
             qtylimit = parseFloat($('#rowQtyUom' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")), 
-            price = parseFloat($('#rowPrice' + id).val().replaceAll(".", "").replaceAll(",",".")),
+            price = pricenew,
             disc1 = parseFloat($('#rowDisc1' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc2 = parseFloat($('#rowDisc2' + id).val().replaceAll(".", "").replaceAll(",",".")), 
             disc3 = parseFloat($('#rowDisc3' + id).val().replaceAll(".", "").replaceAll(",","."));
@@ -2714,8 +2759,16 @@
                                         </td>
                                         <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
                                         <td class="center">
-                                            <input list="tempPrice` + count + `" name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;" id="rowPrice`+ count +`">
-                                            <datalist id="tempPrice` + count + `"></datalist>
+                                            <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price_delivery[]" type="text" value="` + val.price_delivery + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`">
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price_type_bp[]" type="text" value="` + val.price_type_bp + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price[]" type="text" value="` + val.price + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" id="rowPrice`+ count +`" readonly>
                                         </td>
                                         <td>
                                             <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;border-bottom:none;" id="rowQty`+ count +`" readonly>

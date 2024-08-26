@@ -27,6 +27,7 @@ use App\Models\Journal;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
 use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\MarketingOrderDeliveryStock;
 use App\Models\MarketingOrderReturnDetail;
 use App\Models\ProductionFgReceive;
@@ -921,67 +922,55 @@ class ResetCogsHelper
                 self::gas($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
             }
 
-            /* $marketingorderdelivery = MarketingOrderDeliveryStock::whereHas('marketingOrderDelivery',function($query)use($dateloop){
-                $query->whereHas('marketingOrderDeliveryProcess',function($query)use($dateloop){
+            $marketingorderdelivery = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-                });
-            })->whereHas('itemStock',function($query){
+            })->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                $query->where('status','2');
+            })->whereHas('itemStock',function($query)use($item_id){
                 $query->where('item_id',$item_id);
             })->get();
 
-            foreach($goodissue as $row){
-                $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+            foreach($marketingorderdelivery as $row){
+                $price = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
                 $total = round($row->qty * $price,2);
                 $qty = $row->qty;
                 $total_final = $totalBefore - $total;
                 $qty_final = $qtyBefore - $qty;
                 ItemCogs::create([
-                'lookable_type'		    => $row->goodIssue->getTable(),
-                'lookable_id'		      => $row->goodIssue->id,
-                'detailable_type'	    => $row->getTable(),
-                'detailable_id'		    => $row->id,
-                'company_id'		      => $row->goodIssue->company_id,
-                'place_id'			      => $row->itemStock->place_id,
-                'warehouse_id'		    => $row->itemStock->warehouse_id,
-                'item_id'			        => $row->itemStock->item_id,
-                'qty_out'			        => $qty,
-                'price_out'			      => $price,
-                'total_out'			      => $total,
-                'qty_final'			      => $qty_final,
-                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
-                'total_final'		      => $total_final,
-                'date'				        => $dateloop,
-                'type'				        => 'OUT',
-                'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
-                'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
-                'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+                    'lookable_type'		    => $row->marketingOrderDeliveryProcess->getTable(),
+                    'lookable_id'		    => $row->marketingOrderDeliveryProcess->id,
+                    'detailable_type'	    => $row->getTable(),
+                    'detailable_id'		    => $row->id,
+                    'company_id'		    => $row->marketingOrderDeliveryProcess->company_id,
+                    'place_id'			    => $row->itemStock->place_id,
+                    'warehouse_id'		    => $row->itemStock->warehouse_id,
+                    'item_id'			    => $row->itemStock->item_id,
+                    'qty_out'			    => $qty,
+                    'price_out'			    => $price,
+                    'total_out'			    => $total,
+                    'qty_final'			    => $qty_final,
+                    'price_final'		    => $qty_final > 0 ? $total_final / $qty_final : 0,
+                    'total_final'		    => $total_final,
+                    'date'				    => $dateloop,
+                    'type'				    => 'OUT',
+                    'area_id'               => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+                    'item_shading_id'       => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+                    'production_batch_id'   => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
                 ]);
                 foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
-                }
-                $row->update([
-                'price' => $price,
-                'total' => $total
-                ]);
-                if($row->goodReturnIssueDetail()->exists()){
-                foreach($row->goodReturnIssueDetail as $rowretur){
-                    $rowretur->update([
-                    'total'   => round($price * $rowretur->qty,2),
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
                     ]);
                 }
-                }
+                $row->update([
+                    'total' => $total
+                ]);
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;
-                $gi = GoodIssue::find($row->good_issue_id);
-                if($gi){
-                $gi->updateGrandtotal();
-                }
             }
 
-            $marketingorderreturn = MarketingOrderReturnDetail::whereHas('marketingOrderReturn',function($query)use($dateloop){
+            /* $marketingorderreturn = MarketingOrderReturnDetail::whereHas('marketingOrderReturn',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
             })->where('item_id',$item_id)->get(); */
         }

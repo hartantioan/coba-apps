@@ -716,6 +716,9 @@ class MarketingOrderController extends Controller
                             'qty_conversion'                => $itemUnit->conversion,
                             'qty_uom'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
                             'price'                         => str_replace(',','.',str_replace('.','',$request->arr_price[$key])),
+                            'price_list'                    => str_replace(',','.',str_replace('.','',$request->arr_price_list[$key])),
+                            'price_delivery'                => str_replace(',','.',str_replace('.','',$request->arr_price_delivery[$key])),
+                            'price_type_bp'                 => str_replace(',','.',str_replace('.','',$request->arr_price_type_bp[$key])),
                             'price_nett'                    => $item->cogsSales($codePlace->id,$request->post_date) + $marginprice,
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
                             'percent_tax'                   => $request->arr_tax[$key],
@@ -785,7 +788,7 @@ class MarketingOrderController extends Controller
         $po['deposit'] = $po->account->deposit;
         $arr = [];
         
-        foreach($po->marketingOrderDetail as $row){
+        foreach($po->marketingOrderDetail()->orderBy('id')->get() as $row){
             $arr[] = [
                 'id'                    => $row->id,
                 'item_id'               => $row->item_id,
@@ -794,6 +797,9 @@ class MarketingOrderController extends Controller
                 'qty_uom'               => CustomHelper::formatConditionalQty($row->qty_uom),
                 'unit'                  => $row->itemUnit->unit->code,
                 'price'                 => number_format($row->price,2,',','.'),
+                'price_delivery'        => number_format($row->price_delivery,2,',','.'),
+                'price_list'            => number_format($row->price_list,2,',','.'),
+                'price_type_bp'         => number_format($row->price_type_bp,2,',','.'),
                 'margin'                => number_format($row->margin,2,',','.'),
                 'is_include_tax'        => $row->is_include_tax ? $row->is_include_tax : '',
                 'percent_tax'           => number_format($row->percent_tax,2,',','.'),

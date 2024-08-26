@@ -923,9 +923,10 @@ class ResetCogsHelper
             }
 
             $marketingorderdelivery = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query)use($dateloop){
-                $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
-            })->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                $query->where('status','2');
+                $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop)
+                    ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                    $query->where('status','2');
+                });
             })->whereHas('itemStock',function($query)use($item_id){
                 $query->where('item_id',$item_id);
             })->get();

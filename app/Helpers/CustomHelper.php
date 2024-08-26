@@ -37,6 +37,7 @@ use App\Models\GoodReceiptMain;
 use App\Models\GoodReceive;
 use App\Models\GoodReturnIssue;
 use App\Models\GoodReturnPO;
+use App\Models\GoodScale;
 use App\Models\IncomingPayment;
 use App\Models\InventoryRevaluation;
 use App\Models\InventoryTransferIn;
@@ -997,6 +998,68 @@ class CustomHelper {
 
 		}elseif($table_name == 'good_issue_requests'){
 
+		}elseif($table_name == 'good_scales'){
+			$gs = GoodScale::find($table_id);
+
+			if($gs){
+				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0){
+					$place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
+
+					$query = Journal::create([
+						'user_id'		=> session('bo_id'),
+						'company_id'	=> $gs->company_id,
+						'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $gs->id,
+						'post_date'		=> $data->post_date,
+						'note'			=> 'GOOD SCALE NO - '.$gs->account->employee_no,
+						'status'		=> '3',
+					]);
+
+					$coabiayakirim = Coa::where('code','600.01.02.02.01')->where('company_id',$gs->company_id)->first();
+					$coahutangusahabelumditagih = Coa::where('code','200.01.03.01.06')->where('company_id',$gs->company_id)->first();
+
+					foreach($gs->goodScaleDetail as $row){
+						if($row->lookable_type == 'marketing_order_deliveries'){
+							if($row->lookable->type_delivery == '2' && $row->lookable->marketingOrderDeliveryProcess()->exists()){
+								$delivery_cost = $row->total;
+								if($delivery_cost > 0){
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'account_id'	=> $coabiayakirim->bp_journal ? $gs->account_id : NULL,
+										'coa_id'		=> $coabiayakirim->id,
+										'place_id'      => $place->id,
+										'type'			=> '1',
+										'nominal'		=> $delivery_cost,
+										'nominal_fc'    => $delivery_cost,
+										'note'          => 'Biaya Kirim dari Timbangan No. '.$gs->code.' untuk DO No. '.$row->lookable->marketingOrderDeliveryProcess->code,
+										'lookable_type'	=> $gs->getTable(),
+										'lookable_id'	=> $gs->id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
+									]);
+						
+									JournalDetail::create([
+										'journal_id'	=> $query->id,
+										'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
+										'coa_id'		=> $coahutangusahabelumditagih->id,
+										'place_id'      => $place->id,
+										'type'			=> '2',
+										'nominal'		=> $delivery_cost,
+										'nominal_fc'    => $delivery_cost,
+										'note'          => 'Biaya Kirim dari Timbangan No. '.$gs->code.' untuk DO No. '.$row->lookable->marketingOrderDeliveryProcess->code,
+										'lookable_type'	=> $gs->getTable(),
+										'lookable_id'	=> $gs->id,
+										'detailable_type'=> $row->getTable(),
+										'detailable_id'	=> $row->id,
+									]);
+								}
+							}
+						}
+					}
+				}
+			}
+			
 		}elseif($table_name == 'leave_requests'){
 			$lr = LeaveRequest::find($table_id);
 			$user= $lr->account;

@@ -284,10 +284,6 @@
                                 <select class="browser-default" id="purchase_order_detail_id" name="purchase_order_detail_id" onchange="getPurchaseOrderQty();"></select>
                                 <label class="active" for="purchase_order_detail_id">Purchase Order</label>
                             </div>
-                            <div class="input-field col m3 s12 hide">
-                                <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id"></select>
-                                <label class="active" for="marketing_order_delivery_id">Jadwal Kirim</label>
-                            </div>
                             <div class="input-field col m3 s12 hide-inputs">
                                 <input id="qty_po" name="qty_po" type="text" onkeyup="formatRupiahNoMinus(this);" value="0,000" readonly>
                                 <label class="active" for="qty_po">Qty PO</label>
@@ -357,11 +353,34 @@
                                    Clear
                                 </a>
                             </div>
-                            <div class="col m4 s12">
+                            <div class="col m6 s12">
                                 <div id="fileName"></div>
                                 <img src="" alt="Preview" id="imagePreview" style="display: none;">
                             </div>
-                            <div class="col m12 s12">
+                            <div class="col m6 s12 hide">
+                                <table class="bordered" style="border: 1px solid;" id="table-detail-mod">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">{{ __('translations.no') }}.</th>
+                                            <th class="center">No. MOD (Jadwal Kirim)</th>
+                                            <th class="center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-mod">
+                                        <tr id="last-row-mod">
+                                            <td class="center-align" colspan="3">
+                                                Silahkan tambah dengan tombol dibawah
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <td colspan="3" class="center-align">
+                                            <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addMod();"><i class="material-icons right">add_circle_outline</i> Tambah MOD</a>
+                                        </td>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="col m12 s12 mt-2">
                                 <div class="input-field col m4 s12 select">
                                     <select id="videoSource" name="videoSource" class="browser-default"></select>
                                     <label for="videoSource" class="active">Sumber Kamera: </label>
@@ -498,6 +517,69 @@
     </div>
     <div class="modal-footer">
         <button class="btn waves-effect waves-light mr-1 submit" onclick="saveUpdate();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal7" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="col m3 s12">
+                
+            </div>
+            <div class="col m6 s12">
+                <h4 id="title_data" style="text-align:center"></h4>
+                <h5 id="code_data" style="text-align:center"></h5>
+            </div>
+            <div class="col m3 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
+            </div>
+        </div>
+        <div class="divider mb-1 mt-2"></div>
+        <div class="row">
+            <div class="col" id="user_jurnal">
+            </div>
+            <div class="col" id="post_date_jurnal">
+            </div>
+            <div class="col" id="note_jurnal">
+            </div>
+            <div class="col" id="ref_jurnal">
+            </div>
+            <div class="col" id="company_jurnal">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
+                <thead>
+                        <tr>
+                            <th class="center-align" rowspan="2">No</th>
+                            <th class="center-align" rowspan="2">Coa</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.plant') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.line') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.engine') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.division') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.warehouse') }}</th>
+                            <th class="center-align" rowspan="2">Proyek</th>
+                            <th class="center-align" rowspan="2">Ket.1</th>
+                            <th class="center-align" rowspan="2">Ket.2</th>
+                            <th class="center-align" colspan="2">Mata Uang Asli</th>
+                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                        </tr>
+                        <tr>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
+                            <th class="center-align">Debit</th>
+                            <th class="center-align">Kredit</th>
+                        </tr>
+                    
+                </thead>
+                <tbody id="body-journal-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -920,6 +1002,24 @@
             },
             dismissible:false,
         });
+
+        $('#modal7').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
+                $('#post_date_jurnal').empty();
+            }
+        });
         
         $('#modal1').modal({
             dismissible: false,
@@ -970,8 +1070,15 @@
                     });
                 }
                 $('#div-account').removeClass('hide');
-                $('#marketing_order_delivery_id').empty();
                 $('#type').val('1').formSelect();
+                $('#body-mod').empty().append(`
+                    <tr id="last-row-mod">
+                        <td class="center-align" colspan="3">
+                            Silahkan tambah dengan tombol dibawah
+                        </td>
+                    </tr>
+                `);
+                resetMod();
             }
         });
 
@@ -1054,8 +1161,17 @@
             }
         });
 
-        $('#body-item').on('click', '.delete-data-item', function() {
+        $('#body-mod').on('click', '.delete-data-mod', function() {
             $(this).closest('tr').remove();
+            if($('.row_mod').length == 0){
+                $('#body-mod').append(`
+                    <tr id="last-row-mod">
+                        <td class="center-align" colspan="3">
+                            Silahkan tambah dengan tombol dibawah
+                        </td>
+                    </tr>
+                `);
+            }
         });
 
         $("#table-detail th").resizable({
@@ -1063,22 +1179,94 @@
         });
 
         select2ServerSide('#item_id', '{{ url("admin/select2/purchase_item_scale") }}');
-        select2ServerSide('#marketing_order_delivery_id', '{{ url("admin/select2/marketing_order_delivery_scale") }}');
     });
 
+    var arrMod = [];
+
+    function resetMod(){
+        arrMod = [];
+        $('select[name^="arr_marketing_order_delivery_id[]"]').each(function(index){
+            if($(this).val()){
+                arrMod.push($(this).val());
+            }
+        });
+    }
+
+    function addMod(){
+        if($('#type').val() == '2'){
+            if($('#last-row-mod').length > 0){
+                $('#last-row-mod').remove();
+            }
+            let no = $('.row_mod').length + 1;
+            let count = makeid(10);
+            $('#body-mod').append(`
+                <tr class="row_mod">
+                    <td class="center-align">
+                        ` + no + `
+                    </td>
+                    <td>
+                        <select class="browser-default" id="arr_marketing_order_delivery_id` + count + `" name="arr_marketing_order_delivery_id[]" onchange="resetMod();"></select>
+                    </td>
+                    <td class="center">
+                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-mod" href="javascript:void(0);">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </td>
+                </tr>
+            `);
+            $('#arr_marketing_order_delivery_id' + count).select2({
+                placeholder: '-- Kosong --',
+                minimumInputLength: 1,
+                allowClear: true,
+                cache: true,
+                width: 'resolve',
+                dropdownParent: $('body').parent(),
+                ajax: {
+                    url: '{{ url("admin/select2/marketing_order_delivery_scale") }}',
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: function(params) {
+                        return {
+                            search: params.term,
+                            arrmod: arrMod,
+                        };
+                    },
+                    processResults: function(data) {
+                        return {
+                            results: data.items
+                        }
+                    }
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Tipe timbang untuk MOD harus penjualan.',
+                icon: 'warning'
+            });
+        }
+    }
+
     function changeMode(val){
-        $('#item_id,#account_id,#purchase_order_detail_id,#marketing_order_delivery_id').empty();
+        $('#item_id,#account_id,#purchase_order_detail_id').empty();
         $('#warehouse_id,#item_unit_id,#delivery_no').val('');
         $('#qty_in,#qty_out').val('0,000');
+        $('#body-mod').empty().append(`
+            <tr id="last-row-mod">
+                <td class="center-align" colspan="3">
+                    Silahkan tambah dengan tombol dibawah
+                </td>
+            </tr>
+        `);
         if(val == '1'){
             $('.hide-inputs').removeClass('hide');
             $('#is_quality_check').prop( "checked", true);
-            $('#marketing_order_delivery_id').parent().addClass('hide');
+            $('#table-detail-mod').parent().addClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
         }else if(val == '2'){
             $('#is_quality_check').prop( "checked", false);
             $('.hide-inputs').addClass('hide');
-            $('#marketing_order_delivery_id').parent().removeClass('hide');
+            $('#table-detail-mod').parent().removeClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
         }
     }
@@ -1332,7 +1520,8 @@
                             if($('#type').val() == '1'){
                                 $('#qty_in').val(response);
                             }else{
-                                $('#qty_out').val(response);
+                                /* $('#qty_out').val(response); */
+                                $('#qty_out').val('10.000,000');
                             }
                             /* countBalance(); */
                         }
@@ -1341,7 +1530,8 @@
                         if($('#tempType').val() == '1'){
                             $('#qtyOutUpdate').val(response);
                         }else{
-                            $('#qtyInUpdate').text(response);
+                            /* $('#qtyInUpdate').text(response); */
+                            $('#qtyInUpdate').text('25.000,000');
                         }
                         countBalance();
                     }
@@ -1698,6 +1888,37 @@
         });
     }
 
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal7').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
+                }
+            }
+        });
+    }
+
     function save(){
 		swal({
             title: "Apakah anda yakin ingin simpan?",
@@ -1711,11 +1932,25 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedUnit = true;
+                var formData = new FormData($('#form_data')[0]), passedMod = true;
 
                 var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
+                
+                if($('#type').val() == '2'){
+                    if($('select[name^="arr_marketing_order_delivery_id[]"]').length == 0){
+                        passedMod = false;
+                    }
+                }
 
-                if(passedUnit){
+                if($('select[name^="arr_marketing_order_delivery_id[]"]').length > 0){
+                    $('select[name^="arr_marketing_order_delivery_id[]"]').each(function(index){
+                        if(!$(this).val()){
+                            passedMod = false;
+                        }
+                    });
+                }
+
+                if(passedMod){
                     if(s){
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
@@ -1799,7 +2034,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Salah satu item belum diatur satuannya.',
+                        text: 'Untuk tipe timbang Penjualan harus memilih MOD / Jadwal Kirim.',
                         icon: 'error'
                     });
                 }

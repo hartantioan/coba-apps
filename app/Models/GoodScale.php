@@ -49,7 +49,6 @@ class GoodScale extends Model
         'viscosity',
         'residue',
         'purchase_order_detail_id',
-        'marketing_order_delivery_id',
         'item_id',
         'qty_in',
         'qty_out',
@@ -81,11 +80,6 @@ class GoodScale extends Model
     public function purchaseOrderDetail()
     {
         return $this->belongsTo('App\Models\PurchaseOrderDetail', 'purchase_order_detail_id', 'id')->withTrashed();
-    }
-
-    public function marketingOrderDelivery()
-    {
-        return $this->belongsTo('App\Models\MarketingOrderDelivery', 'marketing_order_delivery_id', 'id')->withTrashed();
     }
 
     public function goodReceiptDetail(){
@@ -344,9 +338,13 @@ class GoodScale extends Model
         if($this->purchaseOrderDetail()->exists()){
             return $this->purchaseOrderDetail->purchaseOrder->code;
         }
-        if($this->marketingOrderDelivery()->exists()){
-            return $this->marketingOrderDelivery->code;
+        $data = [];
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable_type == 'marketing_order_deliveries'){
+                $data[] = $row->lookable->code;
+            }
         }
+        return implode(', ',$data);
     }
     
     public function journal(){
@@ -487,6 +485,12 @@ class GoodScale extends Model
     {
         return $this->hasMany('App\Models\PrintCounter','lookable_id','id')->where('lookable_type',$this->table);
     }
+
+    public function goodScaleDetail()
+    {
+        return $this->hasMany('App\Models\GoodScaleDetail');
+    }
+
     public function isOpenPeriod(){
         $monthYear = substr($this->post_date, 0, 7); // '2023-02'
 

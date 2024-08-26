@@ -3046,6 +3046,7 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
+        ->whereHas('goodScaleDetail')
         ->get();
 
         foreach($data as $d) {
@@ -3062,6 +3063,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
+        $arrmod = $request->arrmod ?? NULL;
         $data = MarketingOrderDelivery::where(function($query) use($search){
             $query->where('code', 'like', "%$search%")
                 ->orWhere('note_internal','like',"%$search%")
@@ -3074,19 +3076,24 @@ class Select2Controller extends Controller {
                     $query->where('name','like',"%$search%")
                         ->orWhere('employee_no','like',"%$search%");
                 });
+            
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['3'])
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
-        ->whereDoesntHave('goodScale')
-        ->get();
+        ->whereDoesntHave('goodScaleDetail')
+        ->where(function($query)use($arrmod){
+            if($arrmod){
+                $query->whereNotIn('id',$arrmod);
+            }
+        })->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code,
+                'text' 			=> $d->code.' - '.date('d/m/Y',strtotime($d->post_date)),
             ];
         }
 

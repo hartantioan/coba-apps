@@ -50,6 +50,14 @@ class MarketingOrderDeliveryProcess extends Model
         'done_note',
     ];
 
+    public function totalQty(){
+        $total = 0;
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            $total += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+        }
+        return $total;
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
@@ -439,43 +447,8 @@ class MarketingOrderDeliveryProcess extends Model
             'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);
-
-        $place = Place::where('code',substr($modp->code,7,2))->where('status','1')->first();
         
         $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
-        $coabiayakirim = Coa::where('code','600.01.02.02.01')->where('company_id',$modp->company_id)->first();
-        $coahutangusahabelumditagih = Coa::where('code','200.01.03.01.06')->where('company_id',$modp->company_id)->first();
-
-        if($modp->marketingOrderDelivery->type_delivery == '2'){
-            $delivery_cost = $modp->deliveryCost();
-            if($delivery_cost > 0){
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'account_id'	=> $coabiayakirim->bp_journal ? $modp->account_id : NULL,
-                    'coa_id'		=> $coabiayakirim->id,
-                    'place_id'      => $place->id,
-                    'type'			=> '1',
-                    'nominal'		=> $delivery_cost,
-                    'nominal_fc'    => $delivery_cost,
-                    'note'          => 'Franco SJ/DO No.'.$modp->code,
-                    'lookable_type'	=> $modp->getTable(),
-                    'lookable_id'	=> $modp->id,
-                ]);
-    
-                JournalDetail::create([
-                    'journal_id'	=> $query->id,
-                    'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $modp->account_id : NULL,
-                    'coa_id'		=> $coahutangusahabelumditagih->id,
-                    'place_id'      => $place->id,
-                    'type'			=> '2',
-                    'nominal'		=> $delivery_cost,
-                    'nominal_fc'    => $delivery_cost,
-                    'note'          => 'Franco SJ/DO No.'.$modp->code,
-                    'lookable_type'	=> $modp->getTable(),
-                    'lookable_id'	=> $modp->id,
-                ]);
-            }
-        }
 
         foreach($modp->marketingOrderDeliveryProcessDetail as $row){
             $hpp = $row->getHpp();
@@ -599,7 +572,7 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
-    public function deliveryCost(){
+    public function deliveryCost($qty){
         $price = 0;
         $total = 0;
         $typeTransport = $this->marketingOrderDelivery->transportation->category_transportation;
@@ -612,7 +585,7 @@ class MarketingOrderDeliveryProcess extends Model
         if($deliveryCost){
             if($typeTransport == '1'){
                 $price = $deliveryCost->tonnage;
-                $total = round($price * $this->weight_netto,2);
+                $total = round($price * $qty,2);
             }elseif($typeTransport == '2'){
                 $price = $deliveryCost->ritage;
                 $total = round($price,2);

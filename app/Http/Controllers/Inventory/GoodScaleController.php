@@ -19,6 +19,7 @@ use App\Models\Place;
 use App\Models\Department;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\GoodScaleDetail;
 use App\Models\Item;
 use App\Models\ItemUnit;
 use App\Models\MarketingOrderDelivery;
@@ -188,12 +189,18 @@ class GoodScaleController extends Controller
                     $updateBtn = '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small disable" data-popup="tooltip" title="Update Timbangan" onclick="update(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">add_box</i></button>';
                 }
 
+                if($val->journal()->exists()){
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
+                }else{
+                    $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light grey darken-3 white-tex btn-small disabled" data-popup="tooltip" title="Journal" ><i class="material-icons dp48">note</i></button>';
+                }
+
                 $buttons = $val->status == '5' ? '-' : '<button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
                 '.$updateBtn.'
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Update Informasi Timbangan" onclick="updateInformation(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">contact_phone</i></button>
                 <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>';
+                <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button> '.$btn_jurnal;
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
@@ -354,6 +361,7 @@ class GoodScaleController extends Controller
             'code_place_id'             => 'required',
             'company_id'                => 'required',
             'vehicle_no'                => 'required',
+            'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
             'driver'                    => 'required',
             'place_id'                  => 'required',
 			'post_date'		            => 'required',
@@ -369,6 +377,7 @@ class GoodScaleController extends Controller
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
             'company_id.required'               => 'Perusahaan tidak boleh kosong.',
             'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
+            'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
             'driver.required'                   => 'Nama supir tidak boleh kosong.',
             'place_id.required'                 => 'Plant tidak boleh kosong.',
 			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
@@ -569,6 +578,18 @@ class GoodScaleController extends Controller
                 
                 if($query) {
 
+                    if($request->arr_marketing_order_delivery_id){
+                        foreach($request->arr_marketing_order_delivery_id as $row){
+                            GoodScaleDetail::create([
+                                'good_scale_id'     => $query->id,
+                                'lookable_type'     => 'marketing_order_deliveries',
+                                'lookable_id'       => $row,
+                                'qty'               => 0,
+                                'total'             => 0,
+                            ]);
+                        }
+                    }
+
                     CustomHelper::sendApproval('good_scales',$query->id,$query->note);
                     CustomHelper::sendNotification('good_scales',$query->id,'Pengajuan Timbangan Truk No. '.$query->code,$query->note,session('bo_id'));
 
@@ -688,7 +709,7 @@ class GoodScaleController extends Controller
         $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
         $data['image_in'] = $data->imageIn();
         $data['item_name'] = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '';
-        $data['purchase_code'] = $data->purchaseOrderDetail()->exists() ? $data->purchaseOrderDetail->purchaseOrder->code : ($data->marketingOrderDelivery()->exists() ? $data->marketingOrderDelivery->code : '');
+        $data['purchase_code'] = $data->purchaseOrderDetail()->exists() ? $data->purchaseOrderDetail->purchaseOrder->code : $data->referencePO();
         $data['qty_po'] = $data->purchaseOrderDetail()->exists() ? CustomHelper::formatConditionalQty($data->purchaseOrderDetail->qty) : '';
         $data['qty_in'] = CustomHelper::formatConditionalQty($data->qty_in);
         $data['qty_out'] = CustomHelper::formatConditionalQty($data->qty_out);
@@ -738,12 +759,14 @@ class GoodScaleController extends Controller
         $gs = GoodScale::find($request->tempGoodScale);
 
         if($gs->type == '2'){
-            if($gs->marketingOrderDelivery()->exists()){
-                if(!$gs->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Maaf, anda tidak bisa menimbang, karena Surat Jalan tidak ditemukan dari MOD yang terhubung.'
-                    ]);
+            foreach($gs->goodScaleDetail as $row){
+                if($row->lookable_type == 'marketing_order_deliveries'){
+                    if(!$row->lookable->marketingOrderDeliveryProcess()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Maaf, anda tidak bisa menimbang, karena Surat Jalan tidak ditemukan dari MOD yang terhubung.'
+                        ]);
+                    }
                 }
             }
         }
@@ -804,13 +827,34 @@ class GoodScaleController extends Controller
             $gs->note = $request->noteUpdate;
             $gs->save();
 
-            if($gs->marketingOrderDelivery()->exists()){
-                if($gs->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
-                    $gs->marketingOrderDelivery->marketingOrderDeliveryProcess->update([
-                        'weight_netto' => $qty_final,
-                    ]);
+            $totalProportional = 0;
+            foreach($gs->goodScaleDetail as $row){
+                if($row->lookable_type == 'marketing_order_deliveries'){
+                    if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                        $totalProportional += $row->lookable->marketingOrderDeliveryProcess->totalQty();
+                    }
                 }
             }
+
+            if($totalProportional > 0){
+                foreach($gs->goodScaleDetail as $row){
+                    if($row->lookable_type == 'marketing_order_deliveries'){
+                        if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                            $bobot = round($row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional,3);
+                            $qty = round($qty_final * $bobot,3);
+                            $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+                            $row->lookable->marketingOrderDeliveryProcess->update([
+                                'weight_netto' => $qty,
+                            ]);
+                            $row->update([
+                                'qty'   => $qty,
+                                'total' => $total,
+                            ]);
+                        }
+                    }
+                }
+                CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
+            }            
     
             /* if($adapo){
                 if($idgs > 0){
@@ -899,13 +943,17 @@ class GoodScaleController extends Controller
                     'message' => 'Data telah dicek QC dan tidak bisa dirubah.'
                 ];
             }else{
-                if($query->marketingOrderDelivery()->exists()){
-                    if($query->marketingOrderDelivery->marketingOrderDeliveryProcess()->exists()){
-                        $query->marketingOrderDelivery->marketingOrderDeliveryProcess->update([
-                            'weight_netto' => 0,
-                        ]);
+                foreach($query->goodScaleDetail as $row){
+                    if($row->lookable_type == 'marketing_order_deliveries'){
+                        if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                            $row->lookable->marketingOrderDeliveryProcess->update([
+                                'weight_netto' => 0,
+                            ]);
+                        }
                     }
                 }
+
+                CustomHelper::removeJournal($query->getTable(),$query->id);
                
                 $query->update([
                     'status'    => '5',
@@ -1280,5 +1328,76 @@ class GoodScaleController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function viewJournal(Request $request,$id){
+        $total_debit_asli = 0;
+        $total_debit_konversi = 0;
+        $total_kredit_asli = 0;
+        $total_kredit_konversi = 0;
+        $query = GoodScale::where('code',CustomHelper::decrypt($id))->first();
+        if($query->journal()->exists()){
+            $response = [
+                'title'     => 'Journal',
+                'status'    => 200,
+                'message'   => $query->journal,
+                'user'      => $query->user->name,
+                'reference' => $query->code,
+                'company'   => $query->company()->exists() ? $query->company->name : '-',
+                'code'      => $query->journal->code,
+                'note'      => $query->note,
+                'post_date' => date('d/m/Y',strtotime($query->post_date)),
+            ];
+            $string='';
+            foreach($query->journal->journalDetail()->where(function($query){
+            $query->whereHas('coa',function($query){
+                $query->orderBy('code');
+            })
+            ->orderBy('type');
+        })->get() as $key => $row){
+                if($row->type == '1'){
+                    $total_debit_asli += $row->nominal_fc;
+                    $total_debit_konversi += $row->nominal;
+                }
+                if($row->type == '2'){
+                    $total_kredit_asli += $row->nominal_fc;
+                    $total_kredit_konversi += $row->nominal;
+                }
+                
+                $string .= '<tr>
+                    <td class="center-align">'.($key + 1).'</td>
+                    <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
+                    <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
+                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
+                    <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
+                    <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>
+                    <td class="center-align">'.($row->warehouse_id ? $row->warehouse->name : '-').'</td>
+                    <td class="center-align">'.($row->project_id ? $row->project->name : '-').'</td>
+                    <td class="center-align">'.($row->note ? $row->note : '').'</td>
+                    <td class="center-align">'.($row->note2 ? $row->note2 : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal_fc,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '1' ? number_format($row->nominal,2,',','.') : '').'</td>
+                    <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
+                </tr>';
+
+                
+            }
+            $string .= '<tr>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_asli, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
+            </tr>';
+            $response["tbody"] = $string; 
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data masih belum di approve.'
+            ]; 
+        }
+        return response()->json($response);
     }
 }

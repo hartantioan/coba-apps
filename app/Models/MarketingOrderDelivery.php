@@ -125,9 +125,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['1','2','3']);
     }
 
-    public function goodScale()
+    public function goodScaleDetail()
     {
-        return $this->hasOne('App\Models\GoodScale')->whereIn('status',['2','3']);
+        return $this->hasOne('App\Models\GoodScaleDetail','lookable_id',$this->id)->where('lookable_type',$this->getTable())->whereHas('goodScale',function($query){
+            $query->whereIn('status',['2','3']);
+        });
     }
 
     public function used(){

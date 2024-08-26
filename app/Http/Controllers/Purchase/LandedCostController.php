@@ -692,7 +692,7 @@ class LandedCostController extends Controller
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','6'])){
 
                         if($request->has('file')) {
                             if($query->document){

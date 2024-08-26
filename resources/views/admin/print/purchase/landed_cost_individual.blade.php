@@ -213,6 +213,14 @@
                                     </tr>
                                     <tr>
                                         <td>
+                                            Supplier
+                                        </td>
+                                        <td>
+                                            {{ $data->supplier->name }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
                                             No. Referensi
                                         </td>
                                         <td>

@@ -31,6 +31,7 @@ class Region extends Model
             '5' => 'JAWA TIMUR',
             '6' => 'KALIMANTAN',
             '7' => 'SULAWESI',
+            '8' => 'MALUKU PAPUA',
             default => '-',
           };
   

@@ -136,6 +136,7 @@
                                 <option value="5">JAWA TIMUR</option>
                                 <option value="6">KALIMANTAN</option>
                                 <option value="7">SULAWESI</option>
+                                <option value="8">MALUKU PAPUA</option>
                             </select>
                             <label for="sale_area">Area Pemasaran</label>
                         </div>

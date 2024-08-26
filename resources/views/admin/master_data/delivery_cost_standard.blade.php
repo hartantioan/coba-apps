@@ -159,7 +159,7 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">
-                            <label class="active" for="price">Cost</label>
+                            <label class="active" for="price">Cost / M2</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <input id="note" name="note" type="text" >

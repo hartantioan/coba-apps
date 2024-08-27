@@ -81,14 +81,10 @@ class MarketingOrderInvoiceDetail extends Model
     }
 
     public function arrBalanceMemo(){
-        $bobot = $this->total / $this->marketingOrderInvoice->total;
-        $total = round($bobot * $this->marketingOrderInvoice->total,2);
-        $tax = round($bobot * $this->marketingOrderInvoice->tax,2);
-        $total_after_tax = round($bobot * $this->marketingOrderInvoice->total_after_tax,2);
-        $rounding = round($bobot * $this->marketingOrderInvoice->rounding,2);
-        $grandtotal = round($bobot * $this->marketingOrderInvoice->grandtotal,2);
-        $downpayment = round($bobot * $this->marketingOrderInvoice->downpayment,2);
-        $balance = round($bobot * $this->marketingOrderInvoice->balance,2);
+        $total = round($this->total,2);
+        $tax = round($this->tax,2);
+        $grandtotal = round($this->grandtotal,2);
+        $balance = round($this->grandtotal,2);
 
         $arr = [];
 
@@ -99,11 +95,8 @@ class MarketingOrderInvoiceDetail extends Model
         $arr = [
             'total'             => $total,
             'tax'               => $tax,
-            'total_after_tax'   => $total_after_tax,
-            'rounding'          => $rounding,
             'grandtotal'        => $grandtotal,
-            'downpayment'       => $downpayment,
-            'balance'           => $balance,
+            'balance'           => $balance
         ];
 
         return $arr;

@@ -1179,6 +1179,12 @@
                     }
                 });
 
+                $('input[name^="arr_batch_no[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
                 $('select[name^="arr_item[]"]').each(function(index){
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_shading[]',($('#arr_shading' + $(this).data('id')).length > 0 ? ($('#arr_shading' + $(this).data('id')).val() ? $('#arr_shading' + $(this).data('id')).val() : '' )  : ''));
@@ -1267,7 +1273,7 @@
                 }else{
                     swal({
                         title: 'Ups!',
-                        text: 'Plant & gudang tujuan, serta coa tidak boleh kosong.',
+                        text: 'Plant & gudang tujuan, coa, dan batch produksi tidak boleh kosong.',
                         icon: 'error'
                     });
                 }

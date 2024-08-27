@@ -582,7 +582,7 @@ class MarketingOrderDeliveryProcess extends Model
         $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first();
 
         foreach($modp->marketingOrderDeliveryProcessDetail as $row){
-            $hpp = $row->getHpp();
+            $hpp = $row->total;
 
             JournalDetail::create([
                 'journal_id'	=> $query->id,

@@ -521,7 +521,7 @@ class PurchaseOrderController extends Controller
                 $details = [];
 
                 if($request->type == 'po'){
-                    foreach($data->purchaseRequestDetail()->whereNull('status')->get() as $row){
+                    foreach($data->purchaseRequestDetail()/* ->whereNull('status') */->get() as $row){
                         if($row->qtyBalance() > 0){
                             $details[] = [
                                 'reference_id'                  => $row->id,

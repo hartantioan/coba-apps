@@ -857,12 +857,14 @@
                 }
                 optionShading += '</select>';
                 $('#shading' + val).append(optionShading);
-                $('#batch' + val).append(`
-                    <input name="arr_batch_no[]" type="text" placeholder="Akan membuat baru." id="arr_batch_no` + val + `">
-                `);
             }else{
                 $('#area' + val).append(` - `);
                 $('#shading' + val).append(` - `);
+            }
+            if($("#arr_item" + val).select2('data')[0].bom_group){
+                $('#batch' + val).append(`
+                    <input name="arr_batch_no[]" type="text" placeholder="Akan membuat baru." id="arr_batch_no` + val + `">
+                `);
             }
         }else{
             $("#arr_item" + val).empty();

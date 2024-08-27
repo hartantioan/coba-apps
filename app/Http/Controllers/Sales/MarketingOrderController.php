@@ -785,7 +785,7 @@ class MarketingOrderController extends Controller
         $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
         $po['outlet_name'] = $po->outlet->code.' - '.$po->outlet->name;
         $po['broker_name'] = $po->broker()->exists() ? $po->broker->employee_no.' - '.$po->broker->name : '';
-        $po['deposit'] = $po->account->deposit;
+        $po['deposit'] = number_format($po->account->deposit,2,',','.');
         $arr = [];
         
         foreach($po->marketingOrderDetail()->orderBy('id')->get() as $row){

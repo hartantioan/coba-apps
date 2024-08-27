@@ -740,68 +740,75 @@
                                 if($('#last-row-item').length > 0){
                                     $('#last-row-item').remove();
                                 }
-                                let no = $('.row_item').length + 1;
-                                let count = makeid(10);
-                                $('#body-item').append(`
-                                    <tr class="row_item">
-                                        <input type="hidden" name="arr_prfd_id[]" value="` + response.data.id + `">
-                                        <input type="hidden" name="arr_item_id[]" value="` + response.data.item_id + `">
-                                        <td class="center">
-                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
-                                                <i class="material-icons">delete</i>
-                                            </a>
-                                        </td>
-                                        <td class="center-align">
-                                            ` + no + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.pallet_no + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.item_code + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.item_name + `
-                                        </td>
-                                        <td>
-                                            ` + response.data.shading + `
-                                        </td>
-                                        <td class="center">
-                                            <input name="arr_qty[]" type="text" value="` + response.data.qty + `" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);">
-                                        </td>
-                                        <td class="center-align">
-                                            ` + response.data.unit + `
-                                        </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
-                                                @foreach ($place as $rowplace)
-                                                    <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
-                                                <option value="">--Silahkan pilih item--</option>
-                                            </select>
-                                        </td>
-                                        <td class="center-align">
-                                            <select class="browser-default" id="arr_area_id` + count + `" name="arr_area_id[]"></select>
-                                        </td>
-                                    </tr>
-                                `);
+                                if($('input[name^="arr_prfd_id[]"][value="' + response.data.id + '"]').length > 0){
+                                    let count = parseFloat($('input[name^="arr_prfd_id[]"][value="' + response.data.id + '"]').parent().find('input[name^="arr_qty[]"]').val().replaceAll(".", "").replaceAll(",",".")) + 1;
+                                    $('input[name^="arr_prfd_id[]"][value="' + response.data.id + '"]').parent().find('input[name^="arr_qty[]"]').val(
+                                        formatRupiahIni(count.toFixed(3).toString().replace('.',','))
+                                    );
+                                }else{
+                                    let no = $('.row_item').length + 1;
+                                    let count = makeid(10);
+                                    $('#body-item').append(`
+                                        <tr class="row_item">
+                                            <input type="hidden" name="arr_prfd_id[]" value="` + response.data.id + `">
+                                            <input type="hidden" name="arr_item_id[]" value="` + response.data.item_id + `">
+                                            <td class="center">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                            <td class="center-align">
+                                                ` + no + `
+                                            </td>
+                                            <td>
+                                                ` + response.data.pallet_no + `
+                                            </td>
+                                            <td>
+                                                ` + response.data.item_code + `
+                                            </td>
+                                            <td>
+                                                ` + response.data.item_name + `
+                                            </td>
+                                            <td>
+                                                ` + response.data.shading + `
+                                            </td>
+                                            <td class="center">
+                                                <input name="arr_qty[]" type="text" value="1,000" style="text-align:right;width:100%;" id="arr_qty`+ count +`" data-item="` + response.data.item_id + `" onkeyup="formatRupiahNoMinus(this);">
+                                            </td>
+                                            <td class="center-align">
+                                                ` + response.data.unit + `
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                    @foreach ($place as $rowplace)
+                                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                    <option value="">--Silahkan pilih item--</option>
+                                                </select>
+                                            </td>
+                                            <td class="center-align">
+                                                <select class="browser-default" id="arr_area_id` + count + `" name="arr_area_id[]"></select>
+                                            </td>
+                                        </tr>
+                                    `);
 
-                                if(response.data.list_warehouse.length > 0){
-                                    $('#arr_warehouse' + count).empty();
-                                    $.each(response.data.list_warehouse, function(i, val) {
-                                        $('#arr_warehouse' + count).append(`
-                                            <option value="` + val.id + `">` + val.name + `</option>
-                                        `);
-                                    });
+                                    if(response.data.list_warehouse.length > 0){
+                                        $('#arr_warehouse' + count).empty();
+                                        $.each(response.data.list_warehouse, function(i, val) {
+                                            $('#arr_warehouse' + count).append(`
+                                                <option value="` + val.id + `">` + val.name + `</option>
+                                            `);
+                                        });
+                                    }
+
+                                    select2ServerSide('#arr_area_id' + count, '{{ url("admin/select2/area") }}');
+
+                                    $('#arr_qty_reject' + count).trigger('keyup');
                                 }
-
-                                select2ServerSide('#arr_area_id' + count, '{{ url("admin/select2/area") }}');
-
-                                $('#arr_qty_reject' + count).trigger('keyup');
 
                                 $('.modal-content').scrollTop(400);
                                 M.updateTextFields();

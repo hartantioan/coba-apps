@@ -183,4 +183,18 @@ class GoodReceive extends Model
     public function getRequesterByItem($item_id){
         return $this->user->name;
     }
+
+    public function hasChildDocument(){
+        $hasRelation = false;
+
+        foreach($this->goodReceiveDetail as $row){
+            if($row->productionBatch()->exists()){
+                if($row->productionBatch->productionBatchUsage()->exists()){
+                    $hasRelation = true;
+                }
+            }
+        }
+
+        return $hasRelation;
+    }
 }

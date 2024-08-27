@@ -2008,7 +2008,7 @@ class CustomHelper {
 					$gr->post_date,
 					$row->area_id,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-					NULL,
+					$row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
 					$row->getTable(),
 					$row->id,
 				);
@@ -2021,7 +2021,7 @@ class CustomHelper {
 					'IN',
 					$row->area_id ? $row->area_id : NULL,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-					NULL,
+					$row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
 				);
 			}
 

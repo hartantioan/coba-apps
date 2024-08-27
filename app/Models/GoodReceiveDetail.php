@@ -32,6 +32,7 @@ class GoodReceiveDetail extends Model
         'department_id',
         'area_id',
         'item_shading_id',
+        'batch_no',
         'project_id',
     ];
 
@@ -121,6 +122,10 @@ class GoodReceiveDetail extends Model
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse', 'warehouse_id', 'id')->withTrashed();
+    }
+
+    public function productionBatch(){
+        return $this->hasOne('App\Models\ProductionBatch','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function line()

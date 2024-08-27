@@ -30,6 +30,7 @@ use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
 use App\Models\MenuUser;
+use App\Models\ProductionBatch;
 use Illuminate\Support\Str;
 use App\Models\UsedData;
 class GoodReceiveController extends Controller
@@ -321,6 +322,7 @@ class GoodReceiveController extends Controller
             $passedSerialQty = true;
             $passedArea = true;
             $arrErrorSerial = [];
+            $passedBatch = true;
 
             foreach($request->arr_item as $key => $row){
                 if(isset($request->arr_total[$key]) && isset($request->arr_qty[$key])){
@@ -359,6 +361,20 @@ class GoodReceiveController extends Controller
                         $passedEmptySerial = false;
                     }
                 }
+
+                if($request->arr_batch_no[$key]){
+                    $cek = ProductionBatch::where('code',$request->arr_batch_no[$key])->first();
+                    if($cek){
+                        $passedBatch = false;
+                    }
+                }
+            }
+
+            if(!$passedBatch){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Salah satu batch telah terpakai.'
+                ]);
             }
 
             if(!$passed){
@@ -534,6 +550,7 @@ class GoodReceiveController extends Controller
                             'department_id'         => isset($request->arr_department[$key]) ? $request->arr_department[$key] : NULL,
                             'area_id'               => $request->arr_area[$key] ? $request->arr_area[$key] : NULL,
                             'item_shading_id'       => $request->arr_shading[$key] ? $request->arr_shading[$key] : NULL,
+                            'batch_no'              => $request->arr_batch_no[$key] ? $request->arr_batch_no[$key] : NULL,
                             'project_id'            => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
                         ]);
 
@@ -549,6 +566,21 @@ class GoodReceiveController extends Controller
                             }
                         }
 
+                        if($request->arr_batch_no[$key]){
+                            ProductionBatch::create([
+                                'code'              => $request->arr_batch_no[$key],
+                                'item_id'           => $row,
+                                'place_id'          => $place,
+                                'warehouse_id'      => $warehouse,
+                                'area_id'           => $request->arr_area[$key],
+                                'item_shading_id'   => $request->arr_shading[$key],
+                                'lookable_type'     => $grd->getTable(),
+                                'lookable_id'       => $grd->id,
+                                'qty'               => $grd->qty,
+                                'qty_real'          => $grd->qty,
+                                'total'             => $grd->total,
+                            ]);
+                        }
                     }
 
                     CustomHelper::sendApproval('good_receives',$query->id,$query->note);
@@ -614,6 +646,7 @@ class GoodReceiveController extends Controller
                                 <th class="center-align">Divisi</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Batch</th>
                                 <th class="center-align">Proyek</th>
                             </tr>
                         </thead><tbody>';
@@ -638,6 +671,7 @@ class GoodReceiveController extends Controller
                 <td class="center-align">'.$row->getDepartment().'</td>
                 <td class="center-align">'.($row->area()->exists() ? $row->area->name : '-').'</td>
                 <td class="center-align">'.($row->itemShading()->exists() ? $row->itemShading->code : '-').'</td>
+                <td class="center-align">'.($row->batch_no ?? '-').'</td>
                 <td class="center-align">'.($row->project()->exists() ? $row->project->name : '-').'</td>
             </tr><tr>
                 <td colspan="18">No.Serial : '.$row->listSerial().'</td>
@@ -751,6 +785,8 @@ class GoodReceiveController extends Controller
                 'is_sales_item'             => $row->item->is_sales_item ? $row->item->is_sales_item : '',
                 'list_serial'               => $row->listSerial(),
                 'list_warehouse'            => $row->item->warehouseList(),
+                'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : '',
+                'batch_no'                  => $row->batch_no ?? '',
             ];
         }
 
@@ -770,6 +806,14 @@ class GoodReceiveController extends Controller
                     'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                 ]);
             }
+
+            if($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data batch telah digunakan pada form lainnya.'
+                ];
+            }
+
             $array_minus_stock=[];
           
             foreach($query->goodReceiveDetail as $row_good_receive_detail){
@@ -804,6 +848,9 @@ class GoodReceiveController extends Controller
 
                 foreach($query->goodReceiveDetail as $row){
                     $row->itemSerial()->delete();
+                    if($row->productionBatch()->exists()){
+                        $row->productionBatch()->delete();
+                    }
                 }
 
                 CustomHelper::removeJournal('good_receives',$query->id);

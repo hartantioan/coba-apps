@@ -253,13 +253,14 @@
                                                     <th class="center" width="150px">{{ __('translations.division') }}</th>
                                                     <th class="center" width="150px">{{ __('translations.area') }}</th>
                                                     <th class="center" width="150px">{{ __('translations.shading') }}</th>
+                                                    <th class="center" width="150px">{{ __('translations.batch') }}</th>
                                                     <th class="center">Proyek</th>
                                                     <th class="center">{{ __('translations.delete') }}</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="body-item">
                                                 <tr id="last-row-item">
-                                                    <td colspan="20">
+                                                    <td colspan="21">
                                                         
                                                     </td>
                                                 </tr>
@@ -810,6 +811,7 @@
         $("#arr_place_warehouse" + val).empty();
         $('#area' + val).empty();
         $('#shading' + val).empty();
+        $('#batch' + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
             if($("#arr_item" + val).select2('data')[0].price_list.length){
@@ -855,6 +857,9 @@
                 }
                 optionShading += '</select>';
                 $('#shading' + val).append(optionShading);
+                $('#batch' + val).append(`
+                    <input name="arr_batch_no[]" type="text" placeholder="Akan membuat baru." id="arr_batch_no` + val + `">
+                `);
             }else{
                 $('#area' + val).append(` - `);
                 $('#shading' + val).append(` - `);
@@ -868,6 +873,7 @@
             `);
             $('#area' + val).append(` - `);
             $('#shading' + val).append(` - `);
+            $('#batch' + val).append(` - `);
         }
     }
 
@@ -1067,6 +1073,9 @@
                 <td class="center" id="shading` + count + `">
                     -
                 </td>
+                <td class="center" id="batch` + count + `">
+                    -
+                </td>
                 <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                 </td>
@@ -1147,6 +1156,7 @@
 
                 formData.delete("arr_area[]");
                 formData.delete("arr_shading[]");
+                formData.delete("arr_batch_no[]");
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
                 formData.delete("arr_project[]");
@@ -1170,6 +1180,7 @@
                 $('select[name^="arr_item[]"]').each(function(index){
                     formData.append('arr_area[]',($('#arr_area' + $(this).data('id')).length > 0 ? ($('#arr_area' + $(this).data('id')).val() ? $('#arr_area' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_shading[]',($('#arr_shading' + $(this).data('id')).length > 0 ? ($('#arr_shading' + $(this).data('id')).val() ? $('#arr_shading' + $(this).data('id')).val() : '' )  : ''));
+                    formData.append('arr_batch_no[]',($('#arr_batch_no' + $(this).data('id')).length > 0 ? ($('#arr_batch_no' + $(this).data('id')).val() ? $('#arr_batch_no' + $(this).data('id')).val() : '' )  : ''));
                     formData.append('arr_line[]',($('#arr_line' + $(this).data('id')).val() ? $('#arr_line' + $(this).data('id')).val() : '' ));
                     formData.append('arr_machine[]',($('#arr_machine' + $(this).data('id')).val() ? $('#arr_machine' + $(this).data('id')).val() : '' ));
                     formData.append('arr_project[]',($('#arr_project' + $(this).data('id')).val() ? $('#arr_project' + $(this).data('id')).val() : '' ));
@@ -1386,6 +1397,9 @@
                                 </td>
                                 <td class="center" id="shading` + count + `">
                                     -
+                                </td>
+                                <td class="center" id="batch` + count + `">
+                                    ` + (val.batch_no ? `<input name="arr_batch_no[]" type="text" value="` + val.batch_no + `" placeholder="Akan membuat baru." id="arr_batch_no` + val + `">` : ` - `) + `
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>

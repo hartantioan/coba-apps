@@ -161,7 +161,7 @@ class IncomingPaymentController extends Controller
                         'type'                  => $row->getTable(),
                         'code'                  => $row->code,
                         'post_date'             => date('d/m/Y',strtotime($row->post_date)),
-                        'grandtotal'            => number_format($row->balance,2,',','.'),
+                        'grandtotal'            => number_format($row->grandtotal,2,',','.'),
                         'memo'                  => number_format($row->totalPayMemo(),2,',','.'),
                         'balance'               => number_format($row->balancePaymentIncoming(),2,',','.'),
                     ];

@@ -20,21 +20,21 @@ class MarketingOrderInvoice extends Model
         'user_id',
         'account_id',
         'company_id',
+        'marketing_order_delivery_process_id',
         'post_date',
         'due_date',
         'document_date',
         'status',
         'type',
-        'total',
-        'tax',
-        'total_after_tax',
-        'rounding',
-        'grandtotal',
-        'downpayment',
-        'balance',
         'document',
         'tax_no',
+        'tax_id',
         'note',
+        'subtotal',
+        'downpayment',
+        'total',
+        'tax',
+        'grandtotal',
         'void_id',
         'void_note',
         'void_date',
@@ -45,9 +45,19 @@ class MarketingOrderInvoice extends Model
         'done_note',
     ];
 
+    public function taxMaster()
+    {
+        return $this->belongsTo('App\Models\Tax', 'tax_id', 'id')->withTrashed();
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
+
+    public function marketingOrderDeliveryProcess()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();
     }
 
     public function user()
@@ -231,7 +241,7 @@ class MarketingOrderInvoice extends Model
     }
 
     public function balance(){
-        $total = $this->balance;
+        $total = $this->grandtotal;
 
         foreach($this->marketingOrderInvoiceDetail as $row){
             foreach($row->marketingOrderMemoDetail as $momd){
@@ -353,7 +363,7 @@ class MarketingOrderInvoice extends Model
     }
 
     public function balancePaymentIncoming(){
-        $total = $this->balance - $this->totalPayMemo();
+        $total = $this->grandtotal - $this->totalPayMemo();
         return $total;
     }
 
@@ -385,7 +395,7 @@ class MarketingOrderInvoice extends Model
     }
 
     public function getPercentPayment(){
-        $total = $this->balance - $this->totalMemo();
+        $total = $this->grandtotal - $this->totalMemo();
         $percent = $total > 0 ? round(($this->totalPay() / $total) * 100) : 0;
         return $percent;
     }

@@ -50,12 +50,12 @@
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
-                    font-size:11px !important;
+                    font-size:9px !important;
                 }
         
                 table > thead > tr > th {
                     
-                    font-size:13px !important;
+                    font-size:11px !important;
                     font-weight: 800 !important;
                 }
                 td{
@@ -66,11 +66,11 @@
         
             @media print {
                 .invoice-print-area {
-                    font-size:13px !important;
+                    font-size:11px !important;
                 }
         
                 table > thead > tr > th {
-                    font-size:15px !important;
+                    font-size:13px !important;
                     font-weight: 800 !important;
                 }
         
@@ -105,7 +105,7 @@
                 }
         
                 .invoice-info {
-                    font-size:12px !important;
+                    font-size:10px !important;
                 }
         
                 .modal {
@@ -154,19 +154,25 @@
                         <img src="{{ $image }}" width="50%" style="width:60%;">
                     </td>
                     <td width="33%" align="center">
-                        <span class="invoice-number mr-1" style="font-size:18px;font-weight:800;margin-bottom:0px">
-                            Invoice {{ $data->code }}
-                        </span>
+                        <h5 style="margin-top:0px;">INVOICE</h5>
+                        <h5 style="margin-top:-15px;">{{ $data->code }}</h5>
                     </td>
-                    <td width="33%" align="center">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:60%;right:75px;height:25px;"/><br>
-                        {{ $data->code }}
+                    <td width="33%">
+                        {{-- <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:60%;right:75px;height:25px;"/><br>
+                        {{ $data->code }} --}}
+                        <h6 style="margin-top:0px;">{{ $data->company->name }}</h6>
+                        <div style="margin-top:-25px;font-size:8px;">
+                            {{ $data->company->npwp_address }}
+                        </div>
+                        <div style="font-size:8px;">
+                            {{ $data->company->npwp_no }}
+                        </div>
                     </td>
                 </tr>
             </table>
         </header>
         <main>
-            <div class="card">
+            <div class="card" style="margin-top:15px;">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
                     <table border="0" width="100%">
@@ -208,39 +214,66 @@
                             </td>
                         </tr>
                     </table>
+
+                    <table border="0" width="100%">
+                        <tr>
+                            <td width="60%" class="left-align">
+                                <table border="0" width="100%">
+                                    <tr>
+                                        <td width="20%">
+                                            No. MOD
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="80%">
+                                            {{ $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td width="20%">
+                                            No. DO
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="80%">
+                                            {{ $data->marketingOrderDeliveryProcess->code }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td width="40%" class="left-align">
+                               
+                            </td>
+                        </tr>
+                    </table>
                     
                     <div class="invoice-product-details mt-2" style="overflow:auto;">
-                        <table border="1" style="border-collapse:collapse" width="100%">
+                        <table style="border-collapse:collapse;border:none;" width="100%">
                             <thead>
                                 <tr>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.item') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">NO.MOD</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">NO.SJ</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.qty') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.unit') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.price') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                    <th>No.</th>
+                                    <th>Nama Barang</th>
+                                    <th>Palet</th>
+                                    <th>{{ __('translations.qty') }}</th>
+                                    <th>UoM</th>
+                                    <th>Harga</th>
+                                    <th>Disc 1 (%)</th>
+                                    <th>Disc 2 (%)</th>
+                                    <th>Disc (Rp)</th>
+                                    <th>{{ __('translations.subtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                                 <tr>
-                                    <td align="center" rowspan="2">{{ ($key + 1) }}</td>
-                                    <td align="">{{ $row->lookable->itemStock->item->name }}</td>
-                                    <td align="">{{ $row->lookable->marketingOrderDeliveryDetail->marketingOrderDelivery->code }}</td>
-                                    <td align="">{{ $row->lookable->marketingOrderDeliveryProcess->code }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                    <td align="center">{{ ($key + 1) }}</td>
+                                    <td align="">{{ $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td align="center">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->price,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,2,',','.') }}</td>
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->tax,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->grandtotal,2,',','.') }}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="10">Keterangan: {{ $row->note }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -254,109 +287,51 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Rekening :<br>
-                                        {!! $data->company->banks() !!}
-                                        <div class="mt-3">
-                                            Catatan : {{ $data->note }}
-                                        </div>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->balance) }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
                                     </td>
                                     
                                 </tr>
                             </table>
                         </div>
                         <div class="column2">
-                            <table style="border-collapse:collapse;" width="74%">
+                            <table style="border:none;" width="74%">
                                 <tr class="break-row">
-                                    <td align="right">Total</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->total,2,',','.') }}</td>
+                                    <td align="right">Subtotal</td>
+                                    <td align="right" align="right">{{ number_format($data->subtotal,2,',','.') }}</td>
                                 </tr>
-                                @if($data->tax > 0)
-                                <tr class="break-row">
-                                    <td align="right">PPN</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->tax,2,',','.') }}</td>
-                                </tr>
-                                <tr class="break-row">
-                                    <td align="right">Total Setelah PPN</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->total_after_tax,2,',','.') }}</td>
-                                </tr>
-                                @endif
-                                @if($data->rounding > 0)
-                                <tr class="break-row">
-                                    <td align="right">Pembulatan</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->rounding,2,',','.') }}</td>
-                                </tr>
-                                @endif
-                                @if($data->rounding > 0)
-                                <tr class="break-row">
-                                    <td align="right">Grandtotal</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                                </tr>
-                                @endif
-                                @if($data->downpayment > 0)
                                 <tr class="break-row">
                                     <td align="right">Downpayment</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->downpayment,2,',','.') }}</td>
+                                    <td align="right" align="right">{{ number_format($data->downpayment,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
-                                    <td align="right">Sisa Tagihan</td>
-                                    <td align="right" align="right" style="border:0.6px solid black;">{{ number_format($data->balance,2,',','.') }}</td>
+                                    <td align="right">Total</td>
+                                    <td align="right" align="right">{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
-                                @endif
+                                <tr class="break-row">
+                                    <td align="right">PPN</td>
+                                    <td align="right" align="right">{{ number_format($data->tax,2,',','.') }}</td>
+                                </tr>
+                                <tr class="break-row">
+                                    <td align="right">Grandtotal</td>
+                                    <td align="right" align="right">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                </tr>
                             </table>
                         </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col">
-                                {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->document_date) !!}
-                            </div>
-                            <div class="col">
-                                
-                            </div>
-                        </div>
-                        <table class="mt-3" width="100%" border="0">
-                            <tr>
-                                <td>
-                                    Dibuat oleh,
-                                    @if($data->user->signature)
-                                        <div>{!! $data->user->signature() !!}</div>
-                                    @endif
-                                    <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
-                                </td>
-                                @if($data->approval())
-                                    @foreach ($data->approval() as $detail)
-                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td>
-                                                {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                                @if($row->user->signature)
-                                                    <div>{!! $row->user->signature() !!}</div>
-                                                @endif
-                                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                                @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
-                                            </td>
-                                        @endforeach
-                                    @endforeach
-                                @endif
-                            </tr>
-                        </table>  
                     </div>
 
-                    @if($data->marketingOrderInvoiceDownPayment()->exists())
+                    {{-- @if($data->marketingOrderInvoiceDownPayment()->exists())
                     <div class="invoice-product-details break-row" style="overflow:auto;margin-top:25px;">
                         <div align="center">Downpayment Terpakai</div>
                         <table border="1" style="border-collapse:collapse" width="100%">
                             <thead>
                                 <tr>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.no') }}.</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Dokumen</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.note') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
+                                    <th>{{ __('translations.no') }}.</th>
+                                    <th>Dokumen</th>
+                                    <th>{{ __('translations.note') }}</th>
+                                    <th>{{ __('translations.total') }}</th>
+                                    <th>{{ __('translations.tax') }}</th>
+                                    <th>{{ __('translations.grandtotal') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -373,7 +348,7 @@
                             </tbody>
                         </table>
                     </div>
-                    @endif
+                    @endif --}}
                 </div>
             </div>
         </main>

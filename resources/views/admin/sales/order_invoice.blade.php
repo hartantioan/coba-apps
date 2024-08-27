@@ -166,13 +166,11 @@
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Seri Pajak</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
+                                                        <th rowspan="2">{{ __('translations.subtotal') }}</th>
+                                                        <th rowspan="2">Downpayment</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
-                                                        <th rowspan="2">Total Stl PPN</th>
-                                                        <th rowspan="2">Rounding</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
-                                                        <th rowspan="2">Downpayment</th>
-                                                        <th rowspan="2">Balance</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
@@ -214,6 +212,8 @@
                                     <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="tempTaxId" name="tempTaxId">
+                                        <input type="hidden" id="tempTaxPercent" name="tempTaxPercent">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
@@ -397,6 +397,18 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
+                                            <td>Subtotal</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="subtotal" name="subtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Uang Muka (AR DP)</td>
+                                            <td class="right-align">
+                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <td>Total</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
@@ -409,33 +421,9 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>Total Setelah Pajak</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="total_after_tax" name="total_after_tax" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Rounding</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
-                                            </td>
-                                        </tr>
-                                        <tr>
                                             <td>Grandtotal</td>
                                             <td class="right-align">
                                                 <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Uang Muka (AR DP)</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="downpayment" name="downpayment" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Sisa</td>
-                                            <td class="right-align">
-                                                <input class="browser-default" id="balance" name="balance" type="text" value="0,00" style="text-align:right;width:100%;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -866,7 +854,8 @@
             onCloseEnd: function(modal, trigger){
                 clearButton.click();
                 $('#form_data')[0].reset();
-                $('#temp').val('');
+                $('#temp,#tempTaxId').val('');
+                $('#tempTaxPercent').val('0,00');
                 $('#account_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -1022,6 +1011,9 @@
     });
 
     function getMarketingOrderDelivery(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
         if($('#marketing_order_delivery_process_id').val()){
             $.ajax({
                 url: '{{ Request::url() }}/send_used_data',
@@ -1113,9 +1105,11 @@
                                     </td>
                                 </tr>
                             `);
+                            $('#tempTaxId').val(val.tax_id);
+                            $('#tempTaxPercent').val(val.percent_tax);
                         });
 
-                        $('#marketing_order_delivery_process_id').empty();
+                        /* $('#marketing_order_delivery_process_id').empty(); */
 
                         countAll();
                     }
@@ -1734,14 +1728,12 @@
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'tax_no', className: '' },
                 { name: 'note', className: '' },
+                { name: 'subtotal', className: 'right-align' },
+                { name: 'downpayment', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
-                { name: 'total_after_tax', className: 'right-align' },
-                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'downpayment', className: 'right-align' },
-                { name: 'balance', className: 'right-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -1976,14 +1968,18 @@
                 $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
-                $('#total').val(response.total);
+                $('#subtotal').val(response.subtotal);
                 $('#tax').val(response.tax);
-                $('#total_after_tax').val(response.total_after_tax);
-                $('#rounding').val(response.rounding);
+                $('#total').val(response.total);
                 $('#grandtotal').val(response.grandtotal);
                 $('#downpayment').val(response.downpayment);
-                $('#balance').val(response.balance);
                 $('#tax_no').val(response.tax_no);
+                $('#marketing_order_delivery_process_id').empty();
+                if(response.modp_code){
+                    $('#markeing_order_delivery_process_id').append(`
+                        <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
+                    `);
+                }
 
                 if(response.details.length > 0){
                     if($('.data-used').length > 0){
@@ -2089,7 +2085,7 @@
                                     ` + val.note + `
                                 </td>
                                 <td class="center">
-                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.grandtotal + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
+                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.total_used + `" data-nominal="` + val.balance + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `')" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
                                 </td>
                                 <td class="center">
                                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-dp" href="javascript:void(0);">
@@ -2291,29 +2287,29 @@
     }
 
     function countAll(){
-        let total = 0, tax = 0, total_after_tax = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), grandtotal = 0, downpayment = 0, balance = 0;
+        let total = 0, tax = 0, subtotal = 0, grandtotal = 0, downpayment = 0, percentTax = parseFloat($('#tempTaxPercent').val());
 
         $('input[name^="arr_total[]"]').each(function(index){
-            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+            subtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
-
-        $('input[name^="arr_tax[]"]').each(function(index){
-            tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        /* tax = Math.floor(tax); */
-
-        $('input[name^="arr_total_after_tax[]"]').each(function(index){
-            total_after_tax += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-        });
-
-        grandtotal = total_after_tax + rounding;
 
         $('input[name^="arr_grandtotal[]"]').each(function(index){
             downpayment += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
 
-        balance = grandtotal - downpayment;
+        total = subtotal - downpayment;
+
+        tax = Math.floor(total * (percentTax / 100));
+
+        grandtotal = total + tax;
+
+        $('#subtotal').val(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(subtotal).toString().replace('.',','))
+        );
+
+        $('#downpayment').val(
+            (downpayment >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',','))
+        );
 
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total).toString().replace('.',','))
@@ -2323,20 +2319,8 @@
             (tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(tax).toString().replace('.',','))
         );
 
-        $('#total_after_tax').val(
-            (total_after_tax >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(total_after_tax).toString().replace('.',','))
-        );
-
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
-        );
-
-        $('#downpayment').val(
-            (downpayment >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(downpayment).toString().replace('.',','))
-        );
-
-        $('#balance').val(
-            (balance >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(balance).toString().replace('.',','))
         );
 
         if(tax > 0){

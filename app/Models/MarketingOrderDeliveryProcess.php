@@ -370,7 +370,7 @@ class MarketingOrderDeliveryProcess extends Model
                 }
 
                 if($percent_dp > 0){
-                    $tempDownpayment = $total_after_tax * ($percent_dp / 100);
+                    $tempDownpayment = $total;
                     $tempBalance = $tempDownpayment;
                     foreach($query->marketingOrderDelivery->customer->marketingOrderDownPayment()->orderBy('code')->get() as $row){
                         if($tempBalance > 0){
@@ -389,9 +389,9 @@ class MarketingOrderDeliveryProcess extends Model
                                     'is_include_tax'=> $row->is_include_tax,
                                     'percent_tax'   => $row->percent_tax,
                                     'tax_id'        => $row->tax_id,
-                                    'total'         => $nominal / (1 + ($row->percent_tax / 100)),
-                                    'tax'           => ($nominal / (1 + ($row->percent_tax / 100))) * ($row->percent_tax / 100),
-                                    'grandtotal'    => $nominal,
+                                    'total'         => $nominal,
+                                    'tax'           => $nominal * ($row->percent_tax / 100),
+                                    'grandtotal'    => $nominal + ($nominal * ($row->percent_tax / 100)),
                                 ];
                                 $downpayment += $nominal;
                                 $tempBalance -= $nominal;
@@ -418,6 +418,7 @@ class MarketingOrderDeliveryProcess extends Model
                         'user_id'		                => $query->user_id,
                         'account_id'                    => $query->marketingOrderDelivery->customer_id,
                         'company_id'                    => $query->company_id,
+                        'marketing_order_delivery_process_id' => $this->id,
                         'post_date'                     => $query->return_date,
                         'due_date'                      => $dueDate,
                         'document_date'                 => $query->return_date,

@@ -96,7 +96,7 @@
                                                             <th rowspan="2">{{ __('translations.action') }}</th>
                                                         </tr>
                                                         <tr>
-                                                            <th>{{ __('translations.number') }}/th>
+                                                            <th>{{ __('translations.number') }}</th>
                                                             <th>{{ __('translations.name') }}</th>
                                                             <th>{{ __('translations.address') }}</th>
                                                         </tr>

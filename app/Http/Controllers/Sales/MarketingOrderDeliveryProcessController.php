@@ -1309,7 +1309,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
                 if($datakuy){
                     $datakuy->createJournalReceiveDocument();
-                    /* $datakuy->createInvoice(); */
+                    $datakuy->createInvoice();
                 }
 
                 CustomHelper::sendNotification($datakuy->getTable(),$datakuy->id,'Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali','Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali.',session('bo_id'));

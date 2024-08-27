@@ -95,11 +95,11 @@ class MarketingOrderInvoiceController extends Controller
             'type',
             'document',
             'note',
+            'subtotal',
+            'downpayment',
             'total',
             'tax',
             'grandtotal',
-            'downpayment',
-            'balance'
         ];
 
         $start  = $request->start;
@@ -117,8 +117,8 @@ class MarketingOrderInvoiceController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('downpayment', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -169,8 +169,8 @@ class MarketingOrderInvoiceController extends Controller
                             ->orWhere('total', 'like', "%$search%")
                             ->orWhere('tax', 'like', "%$search%")
                             ->orWhere('grandtotal', 'like', "%$search%")
+                            ->orWhere('subtotal', 'like', "%$search%")
                             ->orWhere('downpayment', 'like', "%$search%")
-                            ->orWhere('balance', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
@@ -248,13 +248,11 @@ class MarketingOrderInvoiceController extends Controller
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->tax_no,
                     $val->note,
+                    number_format($val->subtotal,2,',','.'),
+                    number_format($val->downpayment,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->total_after_tax,2,',','.'),
-                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                    number_format($val->downpayment,2,',','.'),
-                    number_format($val->balance,2,',','.'),
                     $val->status(),
                     (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
@@ -336,6 +334,7 @@ class MarketingOrderInvoiceController extends Controller
             /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
              */'code_place_id'                 => 'required',
             'company_id'			        => 'required',
+            'marketing_order_delivery_process_id' => 'required',
             'account_id'	                => 'required',
             'post_date'		                => 'required',
             'due_date'                      => 'required',
@@ -348,6 +347,7 @@ class MarketingOrderInvoiceController extends Controller
            /*  'code.string'                           => 'Kode harus dalam bentuk string.',
             'code.min'                              => 'Kode harus minimal 18 karakter.',
             'code.unique'                           => 'Kode telah dipakai.', */
+            'marketing_order_delivery_process_id.required' => 'Surat jalan harus dipilih.',
             'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
             'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
@@ -433,18 +433,18 @@ class MarketingOrderInvoiceController extends Controller
                         $query->code = $request->code;
                         $query->account_id = $request->account_id;
                         $query->company_id = $request->company_id;
+                        $query->marketing_order_delivery_process_id = $request->marketing_order_delivery_process_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
                         $query->document_date = $request->document_date;
                         $query->status = '1';
                         $query->type = $request->type;
+                        $query->tax_id = $request->tempTaxId ?? NULL;
+                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
+                        $query->downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
-                        $query->total_after_tax = str_replace(',','.',str_replace('.','',$request->total_after_tax));
-                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
-                        $query->balance = str_replace(',','.',str_replace('.','',$request->balance));
                         $query->document = $document;
                         $query->tax_no = $request->tax_no;
                         $query->note = $request->note;
@@ -477,18 +477,18 @@ class MarketingOrderInvoiceController extends Controller
                         'user_id'		                => session('bo_id'),
                         'account_id'                    => $request->account_id,
                         'company_id'                    => $request->company_id,
+                        'marketing_order_delivery_process_id' => $request->marketing_order_delivery_process_id,
                         'post_date'                     => $request->post_date,
                         'due_date'                      => $request->due_date,
                         'document_date'                 => $request->document_date,
                         'status'                        => '1',
                         'type'                          => $request->type,
+                        'tax_id'                        => $request->tempTaxId ?? NULL,
+                        'subtotal'                      => str_replace(',','.',str_replace('.','',$request->subtotal)),
+                        'downpayment'                   => str_replace(',','.',str_replace('.','',$request->downpayment)),
                         'total'                         => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'                           => str_replace(',','.',str_replace('.','',$request->tax)),
-                        'total_after_tax'               => str_replace(',','.',str_replace('.','',$request->total_after_tax)),
-                        'rounding'                      => str_replace(',','.',str_replace('.','',$request->rounding)),
                         'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'downpayment'                   => str_replace(',','.',str_replace('.','',$request->downpayment)),
-                        'balance'                       => str_replace(',','.',str_replace('.','',$request->balance)),
                         'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_invoices') : NULL,
                         'tax_no'                        => $request->tax_no,
                         'note'                          => $request->note,
@@ -522,20 +522,21 @@ class MarketingOrderInvoiceController extends Controller
                         ]);
                     }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
                         $rowdata = MarketingOrderDownPayment::find($row);
-                        $rowgrandtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
-                        $bobot = $rowgrandtotal / $rowdata->grandtotal;
+                        $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                        $rowtax = floor($rowtotal * ($rowdata->taxMaster->percentage / 100));
+                        $rowgrandtotal = $rowtotal + $rowtax;
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $query->id,
                             'lookable_type'                 => $request->arr_lookable_type[$key],
                             'lookable_id'                   => $row,
                             'qty'                           => 1,
-                            'price'                         => round($bobot * $rowdata->total,2),
+                            'price'                         => $rowtotal,
                             'is_include_tax'                => $rowdata->is_include_tax,
                             'percent_tax'                   => $rowdata->percent_tax,
                             'tax_id'                        => $rowdata->tax_id,
-                            'total'                         => round($bobot * $rowdata->total,2),
-                            'tax'                           => round($bobot * $rowdata->tax,2),
-                            'grandtotal'                    => round($bobot * $rowdata->grandtotal,2),
+                            'total'                         => $rowtotal,
+                            'tax'                           => $rowtax,
+                            'grandtotal'                    => $rowgrandtotal,
                             'note'                          => $rowdata->code,
                         ]);
                         
@@ -660,22 +661,18 @@ class MarketingOrderInvoiceController extends Controller
         $string .= '<div class="col s12 mt-3"><table style="min-width:100%;">
                         <thead>
                             <tr>
+                                <th class="center-align">Subtotal</th>
+                                <th class="center-align">Downpayment</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
-                                <th class="center-align">Total Stl.Pajak</th>
-                                <th class="center-align">Rounding</th>
                                 <th class="center-align">Grandtotal</th>
-                                <th class="center-align">Downpayment</th>
-                                <th class="center-align">Sisa</th>
                             </tr>
                             <tr>
-                                <th class="center-align gradient-45deg-amber-amber"><h6 class="white-text">'.number_format($data->total,2,',','.').'</h6></th>
-                                <th class="center-align gradient-45deg-indigo-blue"><h6 class="white-text">'.number_format($data->tax,2,',','.').'</h6></th>
-                                <th class="center-align gradient-45deg-brown-brown"><h6 class="white-text">'.number_format($data->total_after_tax,2,',','.').'</h6></th>
-                                <th class="center-align gradient-45deg-deep-orange-orange"><h6 class="white-text">'.number_format($data->rounding,2,',','.').'</h6></th>
-                                <th class="center-align gradient-45deg-purple-deep-orange"><h6 class="white-text">'.number_format($data->grandtotal,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-amber-amber"><h6 class="white-text">'.number_format($data->subtotal,2,',','.').'</h6></th>
                                 <th class="center-align gradient-45deg-light-blue-cyan"><h6 class="white-text">'.number_format($data->downpayment,2,',','.').'</h6></th>
-                                <th class="center-align gradient-45deg-green-teal"><h6 class="white-text">'.number_format($data->balance,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-brown-brown"><h6 class="white-text">'.number_format($data->total,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-indigo-blue"><h6 class="white-text">'.number_format($data->tax,2,',','.').'</h6></th>
+                                <th class="center-align gradient-45deg-purple-deep-orange"><h6 class="white-text">'.number_format($data->grandtotal,2,',','.').'</h6></th>
                             </tr>
                         </thead></table></div>';
 
@@ -1100,13 +1097,13 @@ class MarketingOrderInvoiceController extends Controller
         $po = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->code.' - '.$po->account->name;
-        $po['total'] = number_format($po->total,2,',','.');
+        $po['subtotal'] = number_format($po->subtotal,2,',','.');
         $po['tax'] = number_format($po->tax,2,',','.');
-        $po['total_after_tax'] = number_format($po->total_after_tax,2,',','.');
-        $po['rounding'] = number_format($po->rounding,2,',','.');
+        $po['total'] = number_format($po->total,2,',','.');
         $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
         $po['downpayment'] = number_format($po->downpayment,2,',','.');
-        $po['balance'] = number_format($po->balance,2,',','.');
+        $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
+        $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
 
         if($po->tax_no){
             $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];
@@ -1175,6 +1172,7 @@ class MarketingOrderInvoiceController extends Controller
                 'grandtotal'=> number_format($row->lookable->grandtotal,2,',','.'),
                 'balance'   => number_format($row->lookable->balanceInvoice(),2,',','.'),
                 'note'      => $row->lookable->note,
+                'total_used'=> number_format($row->total,2,',','.'),
             ];
         }
 

@@ -200,32 +200,32 @@
             <table class="bordered">
                 <thead>
                     <tr>
-                        <th class="center-align">{{ __('translations.no') }}.</th>
-                        <th class="center-align">{{ __('translations.item') }}</th>
-                        <th class="center-align">{{ __('translations.qty') }}</th>
-                        <th class="center-align">{{ __('translations.unit') }}</th>
-                        <th class="center-align">{{ __('translations.price') }}</th>
-                        <th class="center-align">{{ __('translations.total') }}</th>
-                        <th class="center-align">{{ __('translations.including_tax') }}</th>
-                        <th class="center-align">{{ __('translations.tax') }}</th>
-                        <th class="center-align">{{ __('translations.grandtotal') }}</th>
+                        <th class="center-align">No.</th>
+                        <th class="center-align">Surat Jalan</th>
+                        <th class="center-align">Item</th>
+                        <th class="center-align">Qty</th>
+                        <th class="center-align">Satuan</th>
+                        <th class="center-align">Keterangan</th>
+                        <th class="center-align">Total</th>
+                        <th class="center-align">PPN</th>
+                        <th class="center-align">Grandtotal</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($data->marketingOrderInvoiceDeliveryProcess as $key => $row)
+                    @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                     <tr>
                         <td class="center-align" rowspan="2">{{ ($key + 1) }}</td>
-                        <td class="center-align">{{ $row->lookable->item->name }}</td>
+                        <td class="center-align">{{ $row->lookable->marketingOrderDeliveryProcess->code }}</td>
+                        <td class="center-align">{{ $row->lookable->itemStock->item->name }}</td>
                         <td class="center-align">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
-                        <td class="center-align">{{ $row->lookable->marketingOrderDetail->itemUnit->unit->code }}</td>
-                        <td class="right-align">{{ number_format($row->price,2,',','.') }}</td>
+                        <td class="center-align">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
+                        <td class="">{{ $row->note_internal.' - '.$row->note_external }}</td>
                         <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
-                        <td class="center-align">{{ $row->isIncludeTax() }}</td>
                         <td class="right-align">{{ number_format($row->tax,2,',','.') }}</td>
                         <td class="right-align">{{ number_format($row->grandtotal,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="8">{{ __('translations.note') }}: {{ $row->note }}</td>
+                        <td colspan="9">{{ __('translations.note') }}: {{ $row->note }}</td>
                     </tr>
                     
                     @endforeach
@@ -239,6 +239,14 @@
                         </td>
                     </tr>
                     <tr>
+                        <td class="right-align" colspan="2">{{ __('translations.subtotal') }}</td>
+                        <td class="right-align">{{ number_format($data->subtotal,2,',','.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="right-align" colspan="2">{{ __('translations.dp') }}</td>
+                        <td class="right-align">{{ number_format($data->downpayment,2,',','.') }}</td>
+                    </tr>
+                    <tr>
                         <td class="right-align" colspan="2">{{ __('translations.total') }}</td>
                         <td class="right-align">{{ number_format($data->total,2,',','.') }}</td>
                     </tr>
@@ -247,29 +255,13 @@
                         <td class="right-align">{{ number_format($data->tax,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.after_tax') }}</td>
-                        <td class="right-align">{{ number_format($data->total_after_tax,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.rounding') }}</td>
-                        <td class="right-align">{{ number_format($data->rounding,2,',','.') }}</td>
-                    </tr>
-                    <tr>
                         <td class="right-align" colspan="2">{{ __('translations.grandtotal') }}</td>
                         <td class="right-align">{{ number_format($data->grandtotal,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2">{{ __('translations.dp') }}</td>
-                        <td class="right-align">{{ number_format($data->downpayment,2,',','.') }}</td>
-                    </tr>
-                    <tr>
-                        <td class="right-align" colspan="2"><h6>{{ __('translations.residual') }}</h6></td>
-                        <td class="right-align"><h6>{{ number_format($data->balance,2,',','.') }}</h6></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colspan="9">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->balance) }}</i></th>
+                        <th colspan="9">{{ __('translations.regarded') }} : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}</i></th>
                     </tr>
                 </tfoot>
             </table>

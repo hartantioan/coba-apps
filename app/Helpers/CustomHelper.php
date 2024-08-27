@@ -1362,7 +1362,7 @@ class CustomHelper {
 									'note'			=> $row->lookable->tax_no,
 								]);
 							}
-							self::addDeposit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
+							self::addDeposit($row->lookable->account_id,floatval($row->lookable->total * $ip->currency_rate));
 							$row->lookable->update([
 								'status'	=> '3'
 							]);
@@ -3599,7 +3599,66 @@ class CustomHelper {
 				'status'		=> '3'
 			]);
 
-			$total = 0;
+			$place = Place::where('code',substr($moi->code,7,2))->where('status','1')->first();
+
+			JournalDetail::create([
+				'journal_id'	=> $query->id,
+				'coa_id'		=> $coapenjualan->id,
+				'account_id'	=> $coapenjualan->bp_journal ? $moi->account_id : NULL,
+				'place_id'		=> $place->id,
+				'type'			=> '2',
+				'nominal'		=> $moi->subtotal,
+				'nominal_fc'	=> $moi->subtotal,
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+			]);
+
+			if($moi->downpayment > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coauangmuka->id,
+					'account_id'	=> $coauangmuka->bp_journal ? $account_id : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> '1',
+					'nominal'		=> $moi->downpayment,
+					'nominal_fc'	=> $moi->downpayment,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+			}
+
+			if($moi->tax > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $moi->taxMaster->coa_sale_id,
+					'account_id'	=> $moi->taxMaster->coaSale->bp_journal ? $moi->account_id : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> '2',
+					'nominal'		=> $moi->tax,
+					'nominal_fc'	=> $moi->tax,
+					'note'			=> 'No Seri Pajak : '.$moi->tax_no,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+			}
+
+			if($moi->grandtotal > 0){
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $coapiutang->id,
+					'account_id'	=> $coapiutang->bp_journal ? $moi->account_id : NULL,
+					'place_id'		=> $place->id,
+					'type'			=> '1',
+					'nominal'		=> $moi->grandtotal,
+					'nominal_fc'	=> $moi->grandtotal,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+				]);
+			}
+
+			CustomHelper::addCountLimitCredit($moi->account_id,$moi->grandtotal);
+
+			/* $total = 0;
 			$tax = 0;
 			$total_after_tax = 0;
 			$rounding = 0;
@@ -3726,7 +3785,7 @@ class CustomHelper {
 				]);
 			}
 
-			CustomHelper::addCountLimitCredit($moi->account_id,$balance);
+			CustomHelper::addCountLimitCredit($moi->account_id,$balance); */
 
 			$journal = Journal::find($query->id);
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);

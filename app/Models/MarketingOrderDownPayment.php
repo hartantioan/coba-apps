@@ -249,10 +249,10 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function balanceInvoice(){
-        $total = $this->grandtotal;
+        $total = $this->total;
 
         foreach($this->marketingOrderInvoiceDetail as $row){
-            $total -= $row->grandtotal;
+            $total -= $row->total;
         }
 
         foreach($this->marketingOrderMemoDetail as $row){
@@ -266,7 +266,7 @@ class MarketingOrderDownPayment extends Model
         $total = $this->totalPay();
 
         foreach($this->marketingOrderInvoiceDetail as $row){
-            $total -= $row->grandtotal;
+            $total -= $row->total;
         }
 
         return $total;
@@ -307,7 +307,7 @@ class MarketingOrderDownPayment extends Model
             $total += $row->total;
         }
 
-        return $total;
+        return $total - $this->tax;
     }
 
     public function totalPayByDate($date){
@@ -328,17 +328,17 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function arrBalanceInvoice(){
-        $balance = $this->grandtotal;
+        $balance = $this->total;
 
         foreach($this->marketingOrderInvoiceDetail as $row){
-            $balance -= $row->grandtotal;
+            $balance -= $row->total;
         }
 
         foreach($this->marketingOrderMemoDetail as $row){
             $balance -= $row->balance;
         }
 
-        $bobot = $balance / $this->grandtotal;
+        $bobot = $balance / $this->total;
 
         $arr = [
             'total'         => number_format(round($bobot * $this->total,2),2,',','.'),

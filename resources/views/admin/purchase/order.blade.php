@@ -175,7 +175,7 @@
                                             </div>
                                             <div class="card-alert card green">
                                                 <div class="card-content white-text">
-                                                    <p>Info : 1 PO hanya untuk 50 baris item tidak bisa lebih.</p>
+                                                    <p>Info : 1 PO hanya untuk 60 baris item tidak bisa lebih.</p>
                                                 </div>
                                             </div>
                                             <div id="datatable_buttons"></div>
@@ -1402,10 +1402,10 @@
                         if(response.details.length > 0){
                             let countItem = $('.row_item').length + response.details.length;
 
-                            if(countItem > 50){
+                            if(countItem > 60){
                                 swal({
                                     title: 'Ups!',
-                                    text: 'Satu PO tidak boleh memiliki baris item lebih dari 50.',
+                                    text: 'Satu PO tidak boleh memiliki baris item lebih dari 60.',
                                     icon: 'error'
                                 });
                                 removeUsedData(response.id,type);
@@ -1783,7 +1783,7 @@
         if(countItem > 49){
             swal({
                 title: 'Ups!',
-                text: 'Satu PO tidak boleh memiliki baris item lebih dari 50.',
+                text: 'Satu PO tidak boleh memiliki baris item lebih dari 60.',
                 icon: 'error'
             });
             return false;

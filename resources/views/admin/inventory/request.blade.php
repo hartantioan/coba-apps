@@ -1935,6 +1935,19 @@
     }
 
     function addItem(){
+
+
+        let countItem = $('.row_item').length;
+
+        if(countItem > 59){
+            swal({
+                title: 'Ups!',
+                text: 'Satu PO tidak boleh memiliki baris item lebih dari 60.',
+                icon: 'error'
+            });
+            return false;
+        }
+
         var count = makeid(10);
         $('#last-row-item').before(`
             <tr class="row_item">

@@ -4845,20 +4845,29 @@ class Select2Controller extends Controller {
         $data = ProductionBatch::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%");
                 })
-                ->where(function($query)use($request,$po_id){
-                    /* if($request->pod_id){
-                        $query->where('lookable_type','production_receive_details')
-                            ->whereHasMorph('lookable',[ProductionReceiveDetail::class],function($query)use($po_id){
-                                $query->whereHas('productionReceive',function($query)use($po_id){
-                                    $query->whereHas('productionOrderDetail',function($query)use($po_id){
-                                        $query->where('production_order_id',$po_id);
+                ->where(function($query)use($request,$po_id,$pod){
+                    $query->where(function($query)use($request,$po_id,$pod){
+                        if($request->pod_id){
+                            $query->where('lookable_type','production_receive_details')
+                                ->whereHasMorph('lookable',[ProductionReceiveDetail::class],function($query)use($po_id){
+                                    $query->whereHas('productionReceive',function($query)use($po_id){
+                                        $query->whereHas('productionOrderDetail',function($query)use($po_id){
+                                            $query->where('production_order_id',$po_id);
+                                        });
                                     });
+                                })
+                                ->whereIn('item_id',$pod->getItemIdBomChild());
+                        }
+                    })
+                    ->orWhere(function($query)use($request,$pod){
+                        $query->whereIn('item_id',$pod->getItemIdBomChild())
+                            ->whereHas('item',function($query){
+                                $query->whereHas('bom',function($query){
+                                    $query->where('group','3');
                                 });
                             });
-                    } */
+                    });
                 })
-                ->whereIn('item_id',$pod->getItemIdBomChild())
-                /* ->whereIn('item_id',$pod->productionScheduleDetail->item->arrayItemChildRelation()) */
                 ->whereDoesntHave('used')
                 ->where('qty','>',0)
                 ->orderBy('created_at')

@@ -365,12 +365,15 @@ class MarketingOrderDeliveryProcess extends Model
                 $passedDp = false;
                 $passedTaxSeries = false;
                 $percent_dp = 0;
+                $tax_id = 0;
+                $tax_no = '';
                 
                 foreach($query->marketingOrderDeliveryProcessDetail as $row){
                     $total += $row->getTotal();
                     $tax += $row->getTax();
                     $total_after_tax += $row->getGrandtotal();
                     $percent_dp = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->percent_dp;
+                    $tax_id = $row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id;
                 }
 
                 if($percent_dp > 0){
@@ -436,6 +439,8 @@ class MarketingOrderDeliveryProcess extends Model
                         'downpayment'                   => $downpayment,
                         'balance'                       => $balance,
                         'document'                      => NULL,
+                        'tax_no'                        => TaxSeries::getTaxCode($this->company_id,$this->post_date),
+                        'tax_id'                        => $tax_id,
                         'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
                     ]);
 

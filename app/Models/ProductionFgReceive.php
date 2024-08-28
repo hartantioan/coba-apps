@@ -342,6 +342,10 @@ class ProductionFgReceive extends Model
                 'place_id'                      => $itemStock->place_id,
                 'warehouse_id'                  => $itemStock->warehouse_id,
             ]);
+            $row->update([
+                'lookable_type'     => $querydetail->getTable(),
+                'lookable_id'       => $querydetail->id,
+            ]);
             if($query){
                 CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
@@ -373,7 +377,7 @@ class ProductionFgReceive extends Model
             'status'                    => '1',
         ]);
 
-        foreach($this->productionBatchUsage as $row){
+        /* foreach($this->productionBatchUsage as $row){
             $total = $row->productionBatch->totalById($row->id);
             $price = $total / $row->qty;
             $itemStock = ItemStock::where('item_id',$row->productionBatch->item_id)->where('place_id',$row->productionBatch->place_id)->where('warehouse_id',$row->productionBatch->warehouse_id)->where('production_batch_id',$row->productionBatch->id)->first();
@@ -398,7 +402,7 @@ class ProductionFgReceive extends Model
                 'warehouse_id'                  => $itemStock->warehouse_id,
                 'is_wip'                        => '1',
             ]);
-        }
+        } */
 
         foreach($this->productionFgReceiveDetail as $key => $row){
             

@@ -114,6 +114,11 @@ class GoodReceiveDetail extends Model
         return $this->belongsTo('App\Models\GoodReceive', 'good_receive_id', 'id')->withTrashed();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\GoodReceive', 'good_receive_id', 'id')->withTrashed();
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

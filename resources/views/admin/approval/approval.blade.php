@@ -468,6 +468,8 @@
                         if($(this).is(':checked')){
                             formData.append('arr_status_material_request[]',$(this).val());
                             countChecked++;
+                        }else{
+                            passed = false;
                         }
                     });
                     if(countChecked == 0){

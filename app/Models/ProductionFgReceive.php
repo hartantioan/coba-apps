@@ -303,6 +303,8 @@ class ProductionFgReceive extends Model
         $menu = Menu::where('url', $lastSegment)->first();
 
         foreach($this->productionBatchUsage as $row){
+            $bom = $row->productionBatch->item->bomPlaceFirst($this->place_id);
+
             $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
 
             $query = ProductionIssue::create([
@@ -327,7 +329,7 @@ class ProductionFgReceive extends Model
                 'production_order_detail_id'    => $this->production_order_detail_id,
                 'lookable_type'                 => 'items',
                 'lookable_id'                   => $row->productionBatch->item_id,
-                'bom_id'                        => NULL,
+                'bom_id'                        => $bom ? $bom->id : NULL,
                 'bom_detail_id'                 => NULL,
                 'qty'                           => $row->qty,
                 'nominal'                       => $price,

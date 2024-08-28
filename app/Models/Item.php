@@ -582,6 +582,16 @@ class Item extends Model
         }
     }
 
+    public function bomPlaceFirst($place_id)
+    {
+        $data = $this->bom()->where('place_id',intval($place_id))->orderByDesc('id')->first();
+        if($data){
+            return $data;
+        }else{
+            return '';
+        }
+    }
+
     public function bom()
     {
         return $this->hasMany('App\Models\Bom','item_id','id')->where('status','1');

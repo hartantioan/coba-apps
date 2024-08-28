@@ -185,6 +185,7 @@ class PalletController extends Controller
     public function show(Request $request){
         $pl = Pallet::find($request->id);
         $pl['nominal'] = CustomHelper::formatConditionalQty($pl->nominal);
+        $pl['box_conversion'] = CustomHelper::formatConditionalQty($pl->box_conversion);
         				
 		return response()->json($pl);
     }

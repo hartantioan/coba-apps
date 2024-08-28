@@ -21,7 +21,7 @@ return new class extends Migration
             $table->bigInteger('line_id')->nullable();
             $table->bigInteger('area_id')->nullable();
             $table->bigInteger('shift_id')->nullable();
-            $table->bigInteger('group')->nullable();
+            $table->string('group')->nullable();
             $table->bigInteger('machine_id')->nullable();
             $table->string('document')->nullable();
             $table->string('note')->nullable();

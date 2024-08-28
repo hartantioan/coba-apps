@@ -116,6 +116,7 @@ class AppServiceProvider extends ServiceProvider
             'production_recalculate_details'        => 'App\Models\ProductionRecalculateDetail',
             'bom_calculators'                       => 'App\Models\BomCalculator',
             'marketing_order_delivery_process_details'=> 'App\Models\MarketingOrderDeliveryProcessDetail',
+            'production_working_hours'              => 'App\Models\ProductionWorkingHour',
         ]);
     }
 }

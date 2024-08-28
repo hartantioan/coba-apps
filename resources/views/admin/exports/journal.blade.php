@@ -30,6 +30,7 @@
             <th>Kredit Real</th>
             <th>Debit Convert</th>
             <th>Kredit Convert</th>
+            <th>Kode Refrensi</th>
         </tr>
     </thead>
     <tbody>
@@ -68,6 +69,7 @@
                 <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal_fc,2,',','.') : '') }}</td>
                 <td align="right">{{ ($rowdetail->type == '1' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
                 <td align="right">{{ ($rowdetail->type == '2' ? number_format($rowdetail->nominal,2,',','.') : '') }}</td>
+                <td align="left">{{$row->lookable->code?? '-'}}</td>
             </tr>
             @php
                 $no++;

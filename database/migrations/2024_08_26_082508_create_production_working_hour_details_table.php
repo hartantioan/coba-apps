@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('production_working_hour_details', function (Blueprint $table) {
             $table->id();
-            
+            $table->bigInteger('production_working_hour_id')->nullable()->index();
+            $table->char('type',1)->nullable();
+            $table->text('note')->nullable();
+            $table->text('working_hour')->nullable();
             $table->timestamps();
+            $table->softDeletes('deleted_at');
         });
     }
 

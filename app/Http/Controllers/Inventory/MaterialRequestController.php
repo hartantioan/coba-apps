@@ -596,6 +596,9 @@ class MaterialRequestController extends Controller
                     //     ]);
                     // }
                     if(in_array($query->status,['1','2','6'])){
+                        if($query->status == '2'){
+                            CustomHelper::removeApproval($query->getTable(),$query->id);
+                        }
                         if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){

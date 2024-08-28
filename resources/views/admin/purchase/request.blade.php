@@ -1565,7 +1565,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedUnit = true;
+                var formData = new FormData($('#form_data')[0]), passedUnit = true, passedRequester = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1586,6 +1586,21 @@
                         passedUnit = false;
                     }
                 });
+
+                $('input[name^="arr_requester[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedRequester = false;
+                    }
+                });
+
+                if(!passedRequester){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Requester tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
 
                 if(passedUnit){
                     var path = window.location.pathname;

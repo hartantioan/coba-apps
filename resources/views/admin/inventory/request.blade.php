@@ -1210,7 +1210,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true;
+                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true, passedRequester = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1231,6 +1231,9 @@
                     formData.append('arr_project[]',($(this).val() ? $(this).val() : ''));
                 });
                 $('input[name^="arr_requester[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passedRequester = false;
+                    }
                     formData.append('arr_requester[]',($(this).val() ? $(this).val() : ''));
                 });
 
@@ -1257,6 +1260,15 @@
                         passedDepartment = false;
                     }
                 });
+
+                if(!passedRequester){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Requester tidak boleh kosong.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
 
                 if(!passedDepartment){
                     swal({

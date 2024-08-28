@@ -93,6 +93,7 @@ class MarketingOrderDeliveryController extends Controller
             'district_id',
             'city_id',
             'transportation_id',
+            'cost_delivery_type',
             'type_delivery',
             'post_date',
             'delivery_date',
@@ -248,6 +249,7 @@ class MarketingOrderDeliveryController extends Controller
                     $val->district->name,
                     $val->city->name,
                     $val->transportation->name,
+                    $val->costDeliveryType(),
                     $val->deliveryType(),
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->delivery_date)),
@@ -333,7 +335,8 @@ class MarketingOrderDeliveryController extends Controller
                 $data['district_name'] = $data->district->name;
                 $data['city_name'] = $data->city->name;
                 $data['province_name'] = $data->province->name;
-                $data['transportation_name'] = $data->transportation->name; 
+                $data['transportation_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
+                $data['cost_delivery_type'] = $data->transportation()->exists() ? $data->transportation->category_transportation : '';
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada Sales Order No. '.$data->code.' sudah menjadi MOD. Data tidak bisa ditambahkan.';
@@ -374,6 +377,7 @@ class MarketingOrderDeliveryController extends Controller
             'customer_id'		        => 'required',
             'post_date'		            => 'required',
             'delivery_date'		        => 'required',
+            'cost_delivery_type'		=> 'required',
             'arr_modi'                  => 'required|array',
             'arr_item'                  => 'required|array',
             'arr_place'                 => 'required|array',
@@ -389,6 +393,7 @@ class MarketingOrderDeliveryController extends Controller
             'customer_id.required' 	            => 'Customer tidak boleh kosong.',
             'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
             'delivery_date.required' 			=> 'Tanggal kirim tidak boleh kosong.',
+            'cost_delivery_type.required' 		=> 'Metode Hitung Ongkir tidak boleh kosong.',
             'arr_modi.required'                 => 'Data detail sales order tidak boleh kosong.',
             'arr_modi.array'                    => 'Data detail sales order harus array.',
             'arr_item.required'                 => 'Item baris tidak boleh kosong.',
@@ -520,6 +525,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->update_time = date('Y-m-d H:i:s');
                         /* $query->code = $request->code; */
                         $query->account_id = $request->account_id;
+                        $query->cost_delivery_type = $request->cost_delivery_type;
                         /* $query->company_id = $request->company_id;
                         $query->customer_id = $request->customer_id;
                         $query->post_date = $request->post_date;
@@ -564,6 +570,7 @@ class MarketingOrderDeliveryController extends Controller
                         'city_id'                   => $request->tempCity,
                         'district_id'               => $request->tempDistrict,
                         'transportation_id'         => $request->tempTransport,
+                        'cost_delivery_type'        => $request->cost_delivery_type,
                         'type_delivery'             => $request->tempTypeDelivery,
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,

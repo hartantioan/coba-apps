@@ -29,6 +29,7 @@ class MarketingOrderDelivery extends Model
         'city_id',
         'district_id',
         'transportation_id',
+        'cost_delivery_type',
         'type_delivery',
         'note_internal',
         'note_external',
@@ -50,6 +51,16 @@ class MarketingOrderDelivery extends Model
             '1' => 'Loco',
             '2' => 'Franco',
           default => 'Invalid',
+        };
+
+        return $type;
+    }
+
+    public function costDeliveryType(){
+        $type = match ($this->cost_delivery_type) {
+            '1' => 'Tonase',
+            '2' => 'Ritase',
+            default => 'Invalid',
         };
 
         return $type;

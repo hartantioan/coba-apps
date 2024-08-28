@@ -624,7 +624,7 @@ class MarketingOrderDeliveryProcess extends Model
     public function deliveryCost($qty){
         $price = 0;
         $total = 0;
-        $typeTransport = $this->marketingOrderDelivery->transportation->category_transportation;
+        $typeTransport = $this->marketingOrderDelivery->cost_delivery_type;
         $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
         $cityFrom = $place->city_id;
         $districtFrom = $place->district_id;

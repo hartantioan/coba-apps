@@ -162,6 +162,7 @@
                                                         <th>Kecamatan</th>
                                                         <th>Kota/Kabupaten</th>
                                                         <th>Tipe Transport</th>
+                                                        <th>Metode Hitung Ongkir</th>
                                                         <th>Tipe Pengiriman</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Kirim</th>
@@ -265,6 +266,13 @@
                                     <div class="input-field col m3 s12 step4 second-inputs">
                                         <select class="browser-default" id="account_id" name="account_id"></select>
                                         <label class="active" for="account_id">Ekspedisi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 second-inputs">
+                                        <select class="form-control" id="cost_delivery_type" name="cost_delivery_type">
+                                            <option value="1">Tonase</option>
+                                            <option value="2">Ritase</option>
+                                        </select>
+                                        <label class="" for="cost_delivery_type">Metode Hitung Ongkir</label>
                                     </div>
                                     <div class="input-field col m6 s12 first-inputs">
                                         <textarea class="materialize-textarea" id="destination_address" name="destination_address" placeholder="Alamat Tujuan" rows="3"></textarea>
@@ -793,6 +801,9 @@ document.addEventListener('focusin', function (event) {
                         $('#city-info').text(response.city_name);
                         $('#transportation-info').text(response.transportation_name);
                         $('#destination_address').val(response.destination_address);
+                        if(response.cost_delivery_type){
+                            $('#cost_delivery_type').val(response.cost_delivery_type).formSelect();
+                        }
 
                         if(response.details.length > 0){
                             $('#list-used-data').append(`
@@ -1344,12 +1355,13 @@ document.addEventListener('focusin', function (event) {
                 { name: 'district_id', className: '' },
                 { name: 'city_id', className: '' },
                 { name: 'transportation_id', className: '' },
+                { name: 'cost_delivery_type', className: '' },
                 { name: 'type_delivery', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

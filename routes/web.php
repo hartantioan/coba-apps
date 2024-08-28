@@ -718,12 +718,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [BrandController::class, 'destroy'])->middleware('operation.access:brand,delete');
                     });
 
-                    Route::prefix('pallet')->middleware('operation.access:pallet,view')->group(function () {
+                    Route::prefix('packing')->middleware('operation.access:packing,view')->group(function () {
                         Route::get('/',[PalletController::class, 'index']);
                         Route::get('datatable',[PalletController::class, 'datatable']);
                         Route::post('show', [PalletController::class, 'show']);
-                        Route::post('create',[PalletController::class, 'create'])->middleware('operation.access:pallet,update');
-                        Route::post('destroy', [PalletController::class, 'destroy'])->middleware('operation.access:pallet,delete');
+                        Route::post('create',[PalletController::class, 'create'])->middleware('operation.access:packing,update');
+                        Route::post('destroy', [PalletController::class, 'destroy'])->middleware('operation.access:packing,delete');
                     });
 
                     Route::prefix('item_group')->middleware('operation.access:item_group,view')->group(function () {

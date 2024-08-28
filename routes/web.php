@@ -138,6 +138,7 @@ use App\Http\Controllers\Purchase\PurchaseProgressController;
 use App\Http\Controllers\Purchase\PaymentProgressController;
 
 use App\Http\Controllers\Production\MarketingOrderPlanController;
+use App\Http\Controllers\Production\ProductionWorkingHourController;
 use App\Http\Controllers\Production\ProductionScheduleController;
 use App\Http\Controllers\Production\ProductionOrderController;
 use App\Http\Controllers\Production\ProductionIssueReceiveController;
@@ -2354,6 +2355,27 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionRecalculateController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionRecalculateController::class, 'voidStatus'])->middleware('operation.access:production_recalculate,void');
                     Route::post('destroy', [ProductionRecalculateController::class, 'destroy'])->middleware('operation.access:production_recalculate,delete');
+                });
+
+                Route::prefix('production_working_hour')->middleware(['operation.access:production_working_hour,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionWorkingHourController::class, 'index']);
+                    Route::get('datatable',[ProductionWorkingHourController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionWorkingHourController::class, 'rowDetail']);
+                    Route::post('show', [ProductionWorkingHourController::class, 'show']);
+                    Route::post('get_code', [ProductionWorkingHourController::class, 'getCode']);
+                    Route::post('print',[ProductionWorkingHourController::class, 'print']);
+                    Route::post('done',[ProductionWorkingHourController::class, 'done'])->middleware('operation.access:production_working_hour,update');
+                    Route::post('send_used_data',[ProductionWorkingHourController::class, 'sendUsedData'])->middleware('operation.access:production_working_hour,update');
+                    Route::post('remove_used_data', [ProductionWorkingHourController::class, 'removeUsedData']);
+                    Route::post('print_by_range',[ProductionWorkingHourController::class, 'printByRange']);
+                    Route::get('export',[ProductionWorkingHourController::class, 'export']);
+                    Route::get('export_from_page',[ProductionWorkingHourController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree',[ProductionWorkingHourController::class, 'viewStructureTree']);
+                    Route::post('create',[ProductionWorkingHourController::class, 'create'])->middleware('operation.access:production_working_hour,update');
+                    Route::get('approval/{id}',[ProductionWorkingHourController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionWorkingHourController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionWorkingHourController::class, 'voidStatus'])->middleware('operation.access:production_working_hour,void');
+                    Route::post('destroy', [ProductionWorkingHourController::class, 'destroy'])->middleware('operation.access:production_working_hour,delete');
                 });
 
                 Route::prefix('production_report')->middleware('direct.access')->group(function () {

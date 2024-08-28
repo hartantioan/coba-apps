@@ -439,7 +439,7 @@ class MarketingOrderDeliveryProcess extends Model
                         'downpayment'                   => $downpayment,
                         'balance'                       => $balance,
                         'document'                      => NULL,
-                        'tax_no'                        => TaxSeries::getTaxCode($this->company_id,$this->post_date),
+                        'tax_no'                        => '',
                         'tax_id'                        => $tax_id,
                         'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
                     ]);

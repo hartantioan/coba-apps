@@ -132,6 +132,10 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
 
+    public function marketingOrderInvoice(){
+        return $this->hasOne('App\Models\MarketingOrderInvoice')->whereIn('status',['1','2','3']);
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();

@@ -27,6 +27,10 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrderDeliveryDetail', 'marketing_order_delivery_detail_id', 'id')->withTrashed();
     }
 
+    public function productionBatchUsage(){
+        return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function marketingOrderDeliveryProcess()
     {
         return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();

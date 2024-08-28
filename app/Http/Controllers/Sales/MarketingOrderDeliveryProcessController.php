@@ -31,6 +31,8 @@ use App\Models\ItemCogs;
 use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\User;
 use App\Models\MenuUser;
+use App\Models\ProductionBatch;
+use App\Models\ProductionBatchUsage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -556,6 +558,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                             }
                         }
 
+                        foreach($query->marketingOrderDeliveryProcessDetail as $row){
+                            foreach($row->productionBatchUsage as $rowdetail){
+                                CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                                $rowdetail->delete();
+                            }
+                            $row->delete();
+                        }
+
                         $query->marketingOrderDeliveryProcessDetail()->delete();
 
                         DB::commit();
@@ -617,6 +627,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $querydetail->update([
                         'total' => $total,
                     ]);
+                    ProductionBatchUsage::create([
+                        'production_batch_id'   => $querydetail->itemStock->production_batch_id,
+                        'lookable_type'         => $querydetail->getTable(),
+                        'lookable_id'           => $querydetail->id,
+                        'qty'                   => $querydetail->qty,
+                    ]);
+                    CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,$querydetail->qty,'OUT');
                 }
 
                 if(!$request->tempSwitch){
@@ -1369,6 +1386,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                     /* $query->marketingOrderDelivery->update([
                         'status'    => '2'
                     ]); */
+                }
+
+                foreach($query->marketingOrderDeliveryProcessDetail as $row){
+                    foreach($row->productionBatchUsage as $rowdetail){
+                        CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                        $rowdetail->delete();
+                    }
+                    $row->delete();
                 }
     
                 activity()

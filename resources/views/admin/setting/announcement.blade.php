@@ -207,11 +207,11 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'document_text', className: 'center-align' },
-                { name: 'document_text', className: 'center-align' },
+                { name: 'name', className: '' },
+                { name: 'name', className: '' },
+                { name: 'name', className: '' },
+                { name: 'document_text', className: '' },
+                { name: 'document_text', className: '' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ]

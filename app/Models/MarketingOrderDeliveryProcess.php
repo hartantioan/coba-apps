@@ -415,6 +415,10 @@ class MarketingOrderDeliveryProcess extends Model
                 }
 
                 if($passedDp){
+                    $arrayTax = TaxSeries::getTaxCode($this->company_id,$this->post_date);
+                    if($arrayTax['status'] == 200){
+                        $tax_no = $arrayTax['no'];
+                    }
                     $balance = $total_after_tax - $downpayment;
                     $menu = Menu::where('table_name','marketing_order_invoices')->first();
                     $prefixCode = $menu->document_code;
@@ -439,7 +443,7 @@ class MarketingOrderDeliveryProcess extends Model
                         'downpayment'                   => $downpayment,
                         'balance'                       => $balance,
                         'document'                      => NULL,
-                        'tax_no'                        => '',
+                        'tax_no'                        => $tax_no,
                         'tax_id'                        => $tax_id,
                         'note'                          => 'Dibuat otomatis setelah Surat Jalan No. '.$query->code,
                     ]);

@@ -44,6 +44,11 @@ class GoodReceiptDetail extends Model
         return $this->belongsTo('App\Models\GoodReceipt', 'good_receipt_id', 'id')->withTrashed();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\GoodReceipt', 'good_receipt_id', 'id')->withTrashed();
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

@@ -85,7 +85,7 @@ class MenuController extends Controller
             $temp = $row->item_id;
         } */
 
-        /* $item = Item::all();
+        /* $item = Item::find(4661);
         $startdate = '2024-08-01';
 
         foreach($item as $row){

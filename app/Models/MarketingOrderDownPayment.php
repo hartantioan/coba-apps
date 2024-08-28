@@ -307,7 +307,7 @@ class MarketingOrderDownPayment extends Model
             $total += $row->total;
         }
 
-        return $total - $this->tax;
+        return $total;
     }
 
     public function totalPayByDate($date){

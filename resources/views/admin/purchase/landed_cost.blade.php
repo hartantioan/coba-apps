@@ -2463,7 +2463,7 @@
                                     <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `">
                                     <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `">
                                     <td>
-                                    ` + response.code + ` 
+                                    ` + val.reference + ` 
                                     </td>
                                     <td>
                                     ` + val.item_name + ` 

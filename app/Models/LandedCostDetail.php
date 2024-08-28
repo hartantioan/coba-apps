@@ -143,4 +143,12 @@ class LandedCostDetail extends Model
 
         return $item_cogs ? $item_cogs->price_final : 0;
     }
+
+    public function getReference(){
+        if($this->lookable_type == 'good_receipt_details'){
+            return $this->lookable->goodReceipt->code;
+        }else{
+            return '';
+        }
+    }
 }

@@ -1042,7 +1042,7 @@ class LandedCostController extends Controller
         foreach($lc->landedCostDetail as $row){
             $arr[] = [
                 'item_id'                   => $row->item_id,
-                'item_name'                 => $row->item->name.' - '.$row->item->name,
+                'item_name'                 => $row->item->code.' - '.$row->item->name,
                 'qtyRaw'                    => $row->qty,
                 'totalrow'                  => $row->lookable->total,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
@@ -1065,6 +1065,7 @@ class LandedCostController extends Controller
                 'coa_id'                    => $row->coa_id ? $row->coa_id : '',
                 'coa_name'                  => $row->coa_id ? $row->coa->code.' - '.$row->coa->name : '',
                 'stock'                     => $row->item->getStockPlace($row->place_id),
+                'reference'                 => $row->getReference(),
             ];
 
             $lc['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;

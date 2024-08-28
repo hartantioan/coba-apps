@@ -322,7 +322,7 @@ class MarketingOrderController extends Controller
                     $val->top_internal,
                     $val->top_customer,
                     $val->billing_address,
-                    $val->outlet->name,
+                    $val->outlet()->exists() ? $val->outlet->name : '-',
                     $val->destination_address,
                     $val->province->name,
                     $val->city->name,

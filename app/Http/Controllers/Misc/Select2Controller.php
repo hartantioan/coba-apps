@@ -2922,7 +2922,7 @@ class Select2Controller extends Controller {
                     'id'   			=> $d->id,
                     'text' 			=> $d->code.' - '.$d->account->name,
                     'account_id' 	=> $d->account_id,
-                    'outlet'        => $d->outlet->name,
+                    'outlet'        => $d->outlet()->exists() ? $d->outlet->name : '-',
                     'address'       => $d->destination_address,
                     'province'      => $d->province->name,
                     'city'          => $d->city->name,

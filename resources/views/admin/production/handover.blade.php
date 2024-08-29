@@ -205,13 +205,18 @@
                                             <input class="file-path validate" type="text">
                                         </div>
                                     </div>
-                                    <div class="input-field col m3 s12">
+                                    <div class="col s12 m12"></div>
+                                    <div class="input-field col m2 s12">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id"></select>
                                         <label class="active" for="production_fg_receive_id">Daftar Receive FG</label>
+                                    </div>
+                                    <div class="input-field col m1 s12 center-align">
+                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text" onclick="getAccountData('1');" id="btn-show"><i class="material-icons right">receipt</i></a>
+                                        <label class="active">&nbsp;</label>
                                     </div>
                                     <div class="col m6 s12">
                                         <h6><b>Receive FG Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
@@ -438,6 +443,49 @@
     </div>
 </div>
 
+<div id="modal_pdo" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Order Produksi <b id="account_name"></b></h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i>List Production Receive FG
+                                </div>
+                                <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi"></div>
+                                    <i class="right">Pilih salah satu item untuk digunakan di Production Handover.</i>
+                                    <table id="table_pdo" class="display" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No. Receive FG</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Pengguna</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tanggal Post</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No Production Issue</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Barang</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Catatan</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="body-detail-pdo"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocuments('main');">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row" >
@@ -560,7 +608,56 @@
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
-
+        $('#modal_pdo').modal({
+            onOpenStart: function(modal,trigger) {
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi = $('#table_pdo').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                        },
+                        "select": {
+                        }
+                    },
+                    select: {
+                        style: 'single'
+                    }
+                });
+                
+                $('#table_pdo_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi');
+                $('select[name="table_pdo_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-pdo').empty();
+                
+                $('#table_pdo').DataTable().clear().destroy();
+            }
+        });
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -868,6 +965,72 @@
         }
     }
 
+    function getAccountData(kind){
+        $.ajax({
+            url: '{{ Request::url() }}/get_account_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: $('#account_id').val()
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+
+                if(kind == '1'){
+                    $('#modal_pdo').modal('open');
+                
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-pdo').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.user + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.issue_list + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.status + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                }
+                
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
 
@@ -999,8 +1162,49 @@
             $('#qty').val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
         }
     }
+    function setInitialValue(initialId) {
 
-    function getItem(){
+        $.ajax({
+            url: '{{ url("admin/select2/production_fg_receive") }}',
+            type: 'GET',
+            dataType: 'JSON',
+            data: {
+                id: initialId
+            },
+            success: function(data) {
+                if (data.items[0] && data.items[0].id) {
+                    let newOption = new Option(data.items[0].text, data.items[0].id, true, true);
+                    $('#production_order_detail_id').append(newOption);
+                }
+            }
+        });
+    }
+
+    function applyDocuments(type){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let passed = true, arr_id = [], arr_type = [], sametype = true;
+
+                if(type == 'main'){
+                    $.map(table_multi.rows('.selected').nodes(), function (item) {
+                        arr_id.push($(item).data('id'));
+                        setInitialValue($(item).data('id'));
+                    });
+                }
+                $('#modal_pdo').modal('close');
+            }
+        });
+    }
+    function getItem(data){
         if($('#production_fg_receive_detail_id').val() && $('#area_id').val() && parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")) > 0){
             let datakuy = $('#production_fg_receive_detail_id').select2('data')[0];
             $('#last-row-item').remove();

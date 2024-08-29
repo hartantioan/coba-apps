@@ -63,7 +63,7 @@ class ExportTemplateMasterItem implements WithEvents
         $startRow = 2;
         foreach($type as $row){
             $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->code);
-            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
 

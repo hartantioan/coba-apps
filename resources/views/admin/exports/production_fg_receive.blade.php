@@ -3,6 +3,7 @@
         <tr align="center">
             <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
+            <th>Keterangan</th>
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
@@ -25,6 +26,7 @@
             <th>Konversi</th>
             <th>Qty Produksi</th>
             <th>{{ __('translations.unit') }}</th>
+            <th>List No Issue</th>
             <th>Palet</th>
             <th>Grade</th>
             <th>Based On</th>
@@ -39,6 +41,7 @@
                 <tr align="center">
                     <td>{{ $no }}</td>
                     <td>{{ $row->code }}</td>
+                    <td>{{ $row->note }}</td>
                     <td>{!! $row->statusRaw() !!}</td>
                     <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                     <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
@@ -61,6 +64,7 @@
                     <td>{{ $row_detail->conversion}}</td>
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
+                    <td>{{ $row->productionIssueList()}}</td>
                     <td>{{ $row_detail->pallet->code}}</td>
                     <td>{{ $row_detail->grade->code}}</td>
                     <td>{{ $row->productionOrderDetail->productionOrder->code }}</td>

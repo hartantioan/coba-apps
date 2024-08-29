@@ -3758,6 +3758,7 @@ class Select2Controller extends Controller {
 
     public function productionFgReceive(Request $request)
     {
+        $initialId = $request->id;
         $response = [];
         $search   = $request->search;
         $data = ProductionFgReceive::where(function($query) use($search){
@@ -3772,6 +3773,15 @@ class Select2Controller extends Controller {
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])
         ->get();
+
+        if($initialId){
+            $data_tamba =ProductionFgReceive::where('id',$initialId)
+            ->get();
+            if($data_tamba){
+                $data = $data_tamba;
+            }
+            
+        }
 
         foreach($data as $d) {
             $response[] = [

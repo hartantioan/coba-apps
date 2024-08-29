@@ -1227,6 +1227,39 @@ class ProductionHandoverController extends Controller
             return response()->json($response);
         }
     }
+
+    public function getAccountData(Request $request){
+        $account = User::find($request->id);
+
+        $details = [];
+        $downpayments = [];
+        $data = ProductionFgReceive::where(function($query){
+           
+        })
+        ->whereDoesntHave('used')
+        ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+        ->whereIn('status',['2'])
+        ->get();
+        
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Line : '.$d->line->code.' - '.$d->item->code.' - '.$d->item->name,
+                'code'          => $d->code,
+                'user'          => $d->user->name,
+                'post_date'     => $d->post_date,
+                'issue_list'    => $d->productionIssueList(),
+                'item_name'     => $d->item->name,
+                'note'          => $d->note,
+                'status'        => $d->status(),
+            ];
+        }
+       
+
+        $account['details'] = $response;
+
+        return response()->json($account);
+    }
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
         $status = $request->status? $request->status : '';

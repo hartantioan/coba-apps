@@ -2311,6 +2311,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('production_handover')->middleware(['operation.access:production_handover,view','lockacc'])->group(function () {
                     Route::get('/',[ProductionHandoverController::class, 'index']);
+                    Route::post('get_account_data', [ProductionHandoverController::class, 'getAccountData']);
                     Route::get('datatable',[ProductionHandoverController::class, 'datatable']);
                     Route::get('row_detail',[ProductionHandoverController::class, 'rowDetail']);
                     Route::post('show', [ProductionHandoverController::class, 'show']);

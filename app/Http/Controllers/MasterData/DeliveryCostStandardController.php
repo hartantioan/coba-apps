@@ -105,9 +105,9 @@ class DeliveryCostStandardController extends Controller
                     $val->categoryTransportation(),
                     $val->city->name,
                     $val->district->name,
+                    number_format($val->price,2,',','.'),
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
-                    number_format($val->price,2,',','.'),
                     $val->note,
                     $val->status(),
                     '

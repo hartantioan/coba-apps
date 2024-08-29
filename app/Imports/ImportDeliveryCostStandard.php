@@ -37,13 +37,23 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
 
     public function onRow(Row $row)
     {
+        $check = null;
         DB::beginTransaction();
         try {
             if (isset($row['kota']) && $row['kota']) {
+
+                if(isset($row['code']) && $row['code']){
+                    $check = ModelsDeliveryCostStandard::where('code',$row['code'])->first();
+                    
+                }
                 $price = $row['harga']; $note = $row['keterangan'];
                 $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
                 $city_id = Region::where('code',$city)->first()->id;
                 $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
+                $firstFiveChars = substr($district, 0, 5);
+                if($firstFiveChars != $city){
+                    $this->error = "kecamatan bukan dari kota yang sama";
+                }
                 $district_id = Region::where('code',$district)->first()->id;
                 $categoryTransportation = explode('#', $row['kategori_transportasi'])[0];
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal_start'] - 25569) * 86400);
@@ -61,28 +71,50 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 }elseif(!$district && $this->error ==null){
                     $this->error = "kecamatan";
                 }
-              
-                    $query = ModelsDeliveryCostStandard::create([
-                        'code' => Str::random(10),
-                        'user_id' => session('bo_id'),
-                        'city_id' => $city_id,
-                        'district_id' => $district_id,
-                        'category_transportation' => $categoryTransportation,
-                        'price' => $price,
-                        'start_date' => $dateFormatted1,
-                        'end_date' => $dateFormatted2,
-                        'note' => $note,
-                        'status'=> 1
-                    ]);
-                
+                if(!$this->error){
+                    if($check){
+                        $query = $check;
+                        $check->user_id = session('bo_id');
+                        $check->city_id = $city_id;
+                        $check->district_id = $district_id;
+                        $check->category_transportation = $categoryTransportation;
+                        $check->price = $price;
+                        $check->start_date = $dateFormatted1;
+                        $check->end_date = $dateFormatted2;
+                        $check->note = $note;
+                        $check->status = 1;
+
+                        $check->save();
+                    }else{
+                        $query = ModelsDeliveryCostStandard::create([
+                            'code' => Str::random(10),
+                            'user_id' => session('bo_id'),
+                            'city_id' => $city_id,
+                            'district_id' => $district_id,
+                            'category_transportation' => $categoryTransportation,
+                            'price' => $price,
+                            'start_date' => $dateFormatted1,
+                            'end_date' => $dateFormatted2,
+                            'note' => $note,
+                            'status'=> 1
+                        ]);
+                    }
+                    
                     activity()
                         ->performedOn(new ModelsDeliveryCostStandard())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
                         ->log('Add / edit from excel customer discount data.');
                
-            }else{
-                return null;
+                }else{
+                    $sheet='Header';
+                    throw new RowImportException('ada yang salah', $row->getIndex(),$this->error,$sheet);
+                }
+                    
+            }
+            else{
+                $sheet='header';
+                throw new RowImportException('Belum ada Kota', $row->getIndex(),$this->error,$sheet);
             } 
             DB::commit();
         }catch (\Exception $e) {

@@ -4645,7 +4645,7 @@ class CustomHelper {
 				}
 			}
 
-			/* if(!$parentFg){
+			if(!$parentFg){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
@@ -4659,11 +4659,11 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 				]);
-			} */
+			}
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){
-				JournalDetail::create([
+				/* JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
 					'line_id'		=> $pir->line_id,
@@ -4677,7 +4677,7 @@ class CustomHelper {
 					'lookable_id'	=> $table_id,
 					'detailable_type'=> $row->getTable(),
 					'detailable_id'	=> $row->id,
-				]);
+				]); */
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){

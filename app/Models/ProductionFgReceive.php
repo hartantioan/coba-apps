@@ -518,7 +518,7 @@ class ProductionFgReceive extends Model
         })->get() as $row){{
             foreach($row->productionIssueDetail as $rowdetail){
                 foreach($rowdetail->productionBatchUsage as $rowbatch){
-                    $totalCost += $rowbatch->productionBatch->totalById($row->id);
+                    $totalCost += $rowbatch->productionBatch->totalById($rowbatch->id);
                     $totalBatch += $rowbatch->qty;
                 }
             }

@@ -498,7 +498,7 @@ class ProductionRecalculateController extends Controller
                 <td>'.$row->productionIssue->code.'</td>
                 <td>'.$row->productionBatch->code.'</td>
                 <td>'.$row->productionIssue->productionOrderDetail->productionOrder->code.'</td>
-                <td>'.date('d/m/Y',strtotime($row->productionIssue->productionReceiveIssue->productionReceive->post_date)).'</td>
+                <td>'.$row->productionIssue->getListReceiveDate().'</td>
                 <td>'.$row->resource->code.' - '.$row->resource->name.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->lookable->total).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->total).'</td>

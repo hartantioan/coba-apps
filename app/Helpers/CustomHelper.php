@@ -5270,9 +5270,11 @@ class CustomHelper {
 			]);
 
 			foreach($pir->productionReceiveIssue as $row){
-				$row->productionIssue->update([
-					'status'	=> '3'
-				]);
+				if($row->productionIssue->balanceQtyGr() <= 0){
+					$row->productionIssue->update([
+						'status'	=> '3'
+					]);
+				}
 			}
 
 		}elseif($table_name == 'production_fg_receives'){

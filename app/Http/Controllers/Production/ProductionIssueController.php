@@ -184,7 +184,7 @@ class ProductionIssueController extends Controller
                     $val->place->code,
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
-                    (
+                    /* (
                         ($val->status == 3 && is_null($val->done_id)) ? 'SYSTEM' :
                         (
                             ($val->status == 3 && !is_null($val->done_id)) ? $val->doneUser->name :
@@ -198,7 +198,8 @@ class ProductionIssueController extends Controller
                                 )
                             )
                         )
-                    ),
+                    ), */   
+                    $val->balanceQtyGr(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
@@ -404,6 +405,7 @@ class ProductionIssueController extends Controller
                 }
                 
                 if($query) {
+                    $grandtotal = 0;
                     foreach($request->arr_qty as $key => $row){
                         $qty_planned = 0;
                         $nominal_planned = 0;
@@ -491,7 +493,14 @@ class ProductionIssueController extends Controller
                                 }
                             }
                         }
+                        $grandtotal += $total;
                     }
+
+                    $query->update([
+                        'grandtotal'    => $grandtotal,
+                        'used'          => 0,
+                        'balance'       => 0,
+                    ]);
 
                     CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));

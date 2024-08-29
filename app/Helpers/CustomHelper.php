@@ -5278,6 +5278,8 @@ class CustomHelper {
 		}elseif($table_name == 'production_fg_receives'){
 
 			$pir = ProductionFgReceive::find($table_id);
+
+			$pir->createProductionIssue();
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -5389,8 +5391,6 @@ class CustomHelper {
 					);
 				}
 			}
-
-			$pir->createProductionIssue();
 
 		}elseif($table_name == 'production_handovers'){
 

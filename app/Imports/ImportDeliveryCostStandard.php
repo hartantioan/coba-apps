@@ -74,6 +74,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 if(!$this->error){
                     if($check){
                         $query = $check;
+                        $check->code = $row['code'];
                         $check->user_id = session('bo_id');
                         $check->city_id = $city_id;
                         $check->district_id = $district_id;
@@ -87,7 +88,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                         $check->save();
                     }else{
                         $query = ModelsDeliveryCostStandard::create([
-                            'code' => Str::random(10),
+                            'code' => $row['code'],
                             'user_id' => session('bo_id'),
                             'city_id' => $city_id,
                             'district_id' => $district_id,

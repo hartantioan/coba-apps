@@ -2775,7 +2775,7 @@ class Select2Controller extends Controller {
             if($request->place_id){
                 $query->where('place_id',$request->place_id);
             }
-        })->where('name', 'like', "%$search%")->get();
+        })->where('type','2')->where('name', 'like', "%$search%")->get();
 
         foreach($data as $d) {
             $response[] = [

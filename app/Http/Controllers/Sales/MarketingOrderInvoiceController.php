@@ -375,7 +375,7 @@ class MarketingOrderInvoiceController extends Controller
             $limit = $user->limit_credit;
             $creditNow = $user->count_limit_credit;
             $balanceNow = $limit - $creditNow - $user->grandtotalUninvoiceDoCredit() - $user->grandtotalUnsentModCredit();
-            $creditInvoice = str_replace(',','.',str_replace('.','',$request->balance));
+            $creditInvoice = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
             if($creditInvoice > $balanceNow){
                 return response()->json([
@@ -1228,7 +1228,7 @@ class MarketingOrderInvoiceController extends Controller
                     foreach($query->marketingOrderInvoiceDownPayment as $row){
                         CustomHelper::addDeposit($row->lookable->account_id,$row->grandtotal * $row->lookable->currency_rate);
                     }
-                    CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
+                    CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
                 }
 
                 $query->update([
@@ -1307,7 +1307,7 @@ class MarketingOrderInvoiceController extends Controller
             $query->marketingOrderInvoiceDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
-            CustomHelper::removeCountLimitCredit($query->account_id,$query->balance);
+            CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
 
             activity()
                 ->performedOn(new MarketingOrderInvoice())

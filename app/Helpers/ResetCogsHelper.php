@@ -852,7 +852,7 @@ class ResetCogsHelper
                 }
             }
 
-            $productionfgreceivebatch = ProductionFgReceive::whereHas('productionBatchUsage',function($query)use($item_id,$production_batch_id){
+            /* $productionfgreceivebatch = ProductionFgReceive::whereHas('productionBatchUsage',function($query)use($item_id,$production_batch_id){
                 $query->whereHas('productionBatch',function($query)use($item_id,$production_batch_id){
                     $query->where('item_id',$item_id)->where(function($query)use($production_batch_id){
                         if($production_batch_id){
@@ -894,7 +894,7 @@ class ResetCogsHelper
                         ]);
                     }
                 }
-            }
+            } */
 
             $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
                 $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);

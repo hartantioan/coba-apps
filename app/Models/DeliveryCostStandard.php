@@ -17,7 +17,7 @@ class DeliveryCostStandard extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'category_transportation',
+        'transportation_id',
         'city_id',
         'district_id',
         'price',
@@ -39,14 +39,8 @@ class DeliveryCostStandard extends Model
         return $this->belongsTo('App\Models\Region','district_id','id')->withTrashed();
     }
 
-    public function categoryTransportation(){
-        $type = match ($this->category_transportation) {
-            '1' => 'Tronton',
-            '2' => 'Colt Diesel',
-            default => '',
-        };
-  
-        return $type;
+    public function transportation(){
+        return $this->belongsTo('App\Models\Transportation','transportation_id','id')->withTrashed();
     }
 
     public function status(){

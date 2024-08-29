@@ -30,7 +30,7 @@ class DeliveryCostStandardController extends Controller
         $column = [
             'code',
             'user_id',
-            'category_transportation',
+            'transportation_id',
             'city_id',
             'district_id',
             'price',
@@ -102,13 +102,14 @@ class DeliveryCostStandardController extends Controller
                     $nomor,
                     $val->code,
                     $val->user->name,
-                    $val->categoryTransportation(),
+                    $val->transportation->name ?? '-',
                     $val->city->name,
                     $val->district->name,
                     number_format($val->price,2,',','.'),
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
                     $val->note,
+                    $val->city->getProvince(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -136,7 +137,7 @@ class DeliveryCostStandardController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
           
-            'category_transportation'        => 'required',
+            'transportation_id'              => 'required',
             'city_id'                        => 'required',
             'district_id'                    => 'required',
             'price'                          => 'required',
@@ -144,7 +145,7 @@ class DeliveryCostStandardController extends Controller
             'start_date'                     => 'required',
             'end_date'                       => 'required',
 		], [
-            'category_transportation.required'                       => 'Transportasi Tidak boleh kosong',
+            'transportation_id.required'                       => 'Transportasi Tidak boleh kosong',
             'city_id.required'                          => 'Kota tidak boleh kosong.',
             'district_id.required'                         => 'District tidak boleh kosong.',
             'price.required'                          => 'Harga tidak boleh kosong.',
@@ -169,7 +170,7 @@ class DeliveryCostStandardController extends Controller
                     $query->city_id = $request->city_id;
                     $query->district_id = $request->district_id;
                     
-                    $query->category_transportation = $request->category_transportation;
+                    $query->transportation_id = $request->transportation_id;
 
                     $query->start_date      = $request->start_date;
                     $query->end_date        = $request->end_date;
@@ -195,7 +196,7 @@ class DeliveryCostStandardController extends Controller
                         'note'                      => $request->note,
                         'payment_type'              => $request->payment_type,
                         'price'                     => str_replace(',','.',str_replace('.','',$request->price)),
-                        'category_transportation'   => $request->category_transportation,
+                        'transportation_id'         => $request->transportation_id,
                         'start_date'                => $request->start_date,
                         'end_date'                  => $request->end_date,
                         'status'                    => $request->status ? $request->status : '2'

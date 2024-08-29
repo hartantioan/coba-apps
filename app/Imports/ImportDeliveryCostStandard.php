@@ -6,6 +6,7 @@ use App\Exceptions\RowImportException;
 use App\Http\Controllers\MasterData\DeliveryCostController;
 use App\Models\DeliveryCostStandard as ModelsDeliveryCostStandard;
 use App\Models\Region;
+use App\Models\Transportation;
 use App\Models\User;
 
 use DateTime;
@@ -55,7 +56,8 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                     $this->error = "kecamatan bukan dari kota yang sama";
                 }
                 $district_id = Region::where('code',$district)->first()->id;
-                $categoryTransportation = explode('#', $row['kategori_transportasi'])[0];
+                $categoryTransportation = explode('#', $row['transportasi'])[0];
+                $transportation_id = Transportation::where('code',$categoryTransportation)->first()->id;
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal_start'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');
                 $dateTime2 = DateTime::createFromFormat('U', ($row['tanggal_selesai'] - 25569) * 86400);
@@ -79,7 +81,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                         $check->user_id = session('bo_id');
                         $check->city_id = $city_id;
                         $check->district_id = $district_id;
-                        $check->category_transportation = $categoryTransportation;
+                        $check->transportation_id = $transportation_id;
                         $check->price = $price;
                         $check->start_date = $dateFormatted1;
                         $check->end_date = $dateFormatted2;
@@ -93,7 +95,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                             'user_id' => session('bo_id'),
                             'city_id' => $city_id,
                             'district_id' => $district_id,
-                            'category_transportation' => $categoryTransportation,
+                            'transportation_id' => $transportation_id,
                             'price' => $price,
                             'start_date' => $dateFormatted1,
                             'end_date' => $dateFormatted2,

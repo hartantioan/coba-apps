@@ -20,7 +20,7 @@
                 <td>{{ $key + 1 }}.</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row->user->name }}</td>
-                <td>{{ $row->categoryTransportation() }}</td>
+                <td>{{ $row->transportation->name }}</td>
                 <td>{{ $row->city->name }}</td>
                 <td>{{ $row->district->name }}</td>
                 <td>{{ $row->price }}</td>

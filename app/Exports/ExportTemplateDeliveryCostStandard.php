@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Region;
+use App\Models\Transportation;
 use App\Models\User;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
@@ -20,10 +21,11 @@ class ExportTemplateDeliveryCostStandard extends \PhpOffice\PhpSpreadsheet\Cell\
         $event->writer->getSheetByIndex(0); #header
         $event->writer->getSheetByIndex(1); 
         $event->writer->getSheetByIndex(2);
+        $event->writer->getSheetByIndex(3);
 
         $city =  Region::whereRaw('LENGTH(code) = 5')->get();
         $district = Region::whereRaw('LENGTH(code) = 8')->get();
-        
+        $transportation = Transportation::where('status',1)->get();
         $startRow = 2;
         foreach($city as $row){
             $event->getWriter()->getSheetByIndex(1)->setCellValue('A'.$startRow,$row->code);
@@ -34,6 +36,12 @@ class ExportTemplateDeliveryCostStandard extends \PhpOffice\PhpSpreadsheet\Cell\
         foreach($district as $row){
             $event->getWriter()->getSheetByIndex(2)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(2)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+        $startRow = 2;
+        foreach($transportation as $row){
+            $event->getWriter()->getSheetByIndex(3)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(3)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
         

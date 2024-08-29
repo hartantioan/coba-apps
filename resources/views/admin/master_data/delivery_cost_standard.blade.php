@@ -108,6 +108,7 @@
                                                         <th>Tanggal Mulai</th>
                                                         <th>Tanggal Akhir</th>
                                                         <th>Keterangan</th>
+                                                        <th>Provinsi</th>
                                                         <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -142,11 +143,10 @@
                             <label class="active" for="account_id">Customer </label>
                         </div> --}}
                         <div class="input-field col s12 m3 ">
-                            <select id="category_transportation" name="category_transportation" onchange="">
-                                <option value="1">Tronton</option>
-                                <option value="2">Colt Diesel</option>
+                            <select id="transportation_id"  class="browser-default" name="transportation_id" >
+                               
                             </select>
-                            <label for="category_transportation">Tipe Transportasi</label>
+                            <label for="transportation_id">Tipe Transportasi</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col m3 s12">
@@ -428,6 +428,7 @@
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/customer") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        select2ServerSide('#transportation_id', '{{ url("admin/select2/transportation") }}');
         select2ServerSide('#district_id', '{{ url("admin/select2/district") }}');
     });
 
@@ -503,6 +504,7 @@
                 { name: 'start_date', className: 'center-align' },
                 { name: 'end_date', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'province', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
@@ -643,8 +645,10 @@
                 $('#end_date').val(response.end_date);
                 $('#note').val(response.note);
 
-                if(response.category_transportation){
-                    $('#category_transportation').val(response.category_transportation).trigger('change').formSelect();
+                if(response.transportation_id){
+                    $('#transportation_id').append(`
+                        <option value="` + response.transportation['id'] + `">` + response.transportation['code'] + ` || ` + response.transportation['name'] + `</option>
+                    `);
                 }
                 
 

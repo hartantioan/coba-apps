@@ -1064,7 +1064,7 @@
         }).then(function (willDelete) {
             if (willDelete) {
                 
-                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true;
+                var formData = new FormData($('#form_data')[0]), passedPlaceWarehouse = true, passedUnit = true, passedDepartment = true, passedRequester = true;
 
                 formData.delete("arr_line[]");
                 formData.delete("arr_machine[]");
@@ -1086,6 +1086,9 @@
                 });
                 $('input[name^="arr_requester[]"]').each(function(index){
                     formData.append('arr_requester[]',($(this).val() ? $(this).val() : ''));
+                    if(!$(this).val()){
+                        passedRequester = false;
+                    }
                 });
 
                 $('select[name^="arr_warehouse[]"]').each(function(index){
@@ -1111,6 +1114,15 @@
                         passedDepartment = false;
                     }
                 });
+
+                if(!passedRequester){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Requester wajib diiisi.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
 
                 if(!passedDepartment){
                     swal({

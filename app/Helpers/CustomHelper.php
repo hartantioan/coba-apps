@@ -4645,7 +4645,7 @@ class CustomHelper {
 				}
 			}
 
-			if(!$parentFg){
+			/* if(!$parentFg){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coawip->id,
@@ -4659,7 +4659,7 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 				]);
-			}
+			} */
 
 			#lek misal item receive fg kelompokkan dri child
 			if($pir->productionFgReceive()->exists() && count($arrBom) > 0){

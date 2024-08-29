@@ -62,7 +62,8 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 $dateFormatted2 = $dateTime2->format('Y/m/d');
                 if(!$categoryTransportation && $this->error ==null){
                     $this->error = "Kategori Transportasi";
-                }elseif(!$price && $this->error ==null){
+                }elseif(!$price && $this->error ==null && $price != '0'){
+                    
                     $this->error = "Harga";
                 }elseif(!$note && $this->error ==null){
                     $this->error = "Keterangan ";

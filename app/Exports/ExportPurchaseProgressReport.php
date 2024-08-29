@@ -61,6 +61,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     'status'    => $row_item_request->statusRaw(),
                     'done_user'    => ($row_item_request->status == 3 && is_null($row_item_request->done_id)) ? 'sistem' : (($row_item_request->status == 3 && !is_null($row_item_request->done_id)) ? $row_item_request->doneUser->name : ''),
                     'done_date'    => $row_item_request->done_date,
+                    'warehouse'    => $row_item_request_detail->warehouse->name,
                 ];
                 $max_count_pr = 1;
             

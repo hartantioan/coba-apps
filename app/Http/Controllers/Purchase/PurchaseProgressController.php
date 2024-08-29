@@ -90,6 +90,7 @@ class PurchaseProgressController extends Controller
                     'status'       => $row_item_request->status(),
                     'done_user'    => ($row_item_request->status == 3 && is_null($row_item_request->done_id)) ? 'sistem' : (($row_item_request->status == 3 && !is_null($row_item_request->done_id)) ? $row_item_request->doneUser->name : ''),
                     'done_date'    => $row_item_request->done_date,
+                    'warehouse'    => $row_item_request_detail->warehouse->name,
                 ];
                 $max_count_pr = 1;
             
@@ -337,6 +338,7 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<thead>';
         $tableHtml .= '<tr>';
         $tableHtml .= '<th>Item</th>';
+        $tableHtml .= '<th>Gudang</th>';
         $tableHtml .= '<th>Created</th>';
         $tableHtml .= '<th>IR Code</th>';
         $tableHtml .= '<th>IR Date</th>';
@@ -404,6 +406,7 @@ class PurchaseProgressController extends Controller
                         if($masuk == 1){
                             if ($prIndex === 0 && $poIndex === 0 && $grpoIndex === 0) {
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['item'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['warehouse'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['user'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_code'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_date'] . '</td>';

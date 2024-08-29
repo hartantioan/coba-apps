@@ -359,19 +359,20 @@ class MarketingOrderDeliveryProcess extends Model
             if($query->marketingOrderDelivery->customer->is_ar_invoice){
                 $total = 0;
                 $tax = 0;
-                $total_after_tax = 0;
+                $grandtotal = 0;
                 $downpayment = 0;
                 $arrDownPayment = [];
                 $passedDp = false;
                 $passedTaxSeries = false;
+                $subtotal = 0;
                 $percent_dp = 0;
                 $tax_id = 0;
                 $tax_no = '';
                 
                 foreach($query->marketingOrderDeliveryProcessDetail as $row){
-                    $total += $row->getTotal();
+                    $subtotal += $row->getTotal();
                     $tax += $row->getTax();
-                    $total_after_tax += $row->getGrandtotal();
+                    $grandtotal += $row->getGrandtotal();
                     $percent_dp = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->percent_dp;
                     $tax_id = $row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id;
                 }
@@ -419,7 +420,7 @@ class MarketingOrderDeliveryProcess extends Model
                     if($arrayTax['status'] == 200){
                         $tax_no = $arrayTax['no'];
                     }
-                    $balance = $total_after_tax - $downpayment;
+                    $total = $subtotal - $downpayment;
                     $menu = Menu::where('table_name','marketing_order_invoices')->first();
                     $prefixCode = $menu->document_code;
                     $code = MarketingOrderInvoice::generateCode($prefixCode.date('y',strtotime($query->return_date)).substr($query->code,7,2));
@@ -435,13 +436,11 @@ class MarketingOrderDeliveryProcess extends Model
                         'document_date'                 => $query->return_date,
                         'status'                        => '1',
                         'type'                          => $query->marketingOrderDelivery->getTypePayment(),
+                        'subtotal'                      => $subtotal,
+                        'downpayment'                   => $downpayment,
                         'total'                         => $total,
                         'tax'                           => $tax,
-                        'total_after_tax'               => $total_after_tax,
-                        'rounding'                      => 0,
-                        'grandtotal'                    => $total_after_tax,
-                        'downpayment'                   => $downpayment,
-                        'balance'                       => $balance,
+                        'grandtotal'                    => $grandtotal,
                         'document'                      => NULL,
                         'tax_no'                        => $tax_no,
                         'tax_id'                        => $tax_id,

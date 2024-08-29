@@ -4917,10 +4917,12 @@ class Select2Controller extends Controller {
                 ->get();
 
         foreach($data as $d) {
+            $balanceused = $d->balanceQtyGr();
+            $balance = $balanceused > 0 ? CustomHelper::formatConditionalQty($balanceused) : 0;
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group/* .' / '.$d->listItemAndQty() */,
-                'note'          => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' )',
+                'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group.' - SISA : '.$balance,
+                'note'          => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' ) SISA : '.$balance,
             ];
         }
 

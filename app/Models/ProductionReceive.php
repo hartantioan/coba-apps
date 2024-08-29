@@ -239,8 +239,20 @@ class ProductionReceive extends Model
 
     public function totalIssueExcept($id){
         $total = 0;
+        $totalQty = 0;
+        $totalReject = 0;
+        foreach($this->productionReceiveDetail as $row){
+            $totalQty += $row->qty;
+            $totalReject += $row->qty_reject;
+        }
         foreach($this->productionReceiveIssue()->where('production_issue_id','<>',$id)->get() as $row){
-            $total += $row->productionIssue->total();
+            $rowissue = $row->productionIssue->total();
+            $rowbalance = $row->productionIssue->balanceQty();
+            if($rowbalance > 0){
+                $total += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+            }else{
+                $total += $row->productionIssue->total();
+            }
         }
         return $total;
     }
@@ -262,12 +274,20 @@ class ProductionReceive extends Model
 
     public function recalculate(){
         $totalQty = 0;
+        $totalReject = 0;
         foreach($this->productionReceiveDetail as $row){
             $totalQty += $row->qty;
+            $totalReject += $row->qty_reject;
         }
         $totalIssue = 0;
         foreach($this->productionReceiveIssue as $key => $row){
-            $totalIssue += $row->productionIssue->total();
+            $rowissue = $row->productionIssue->total();
+            $rowbalance = $row->productionIssue->balanceQty();
+            if($rowbalance > 0){
+                $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+            }else{
+                $totalIssue += $rowissue;
+            }
         }
         foreach($this->productionReceiveDetail as $row){
             $rowtotal = round(($row->qty / $totalQty) * $totalIssue,2);
@@ -285,12 +305,20 @@ class ProductionReceive extends Model
 
     public function recalculateAndResetCogs(){
         $totalQty = 0;
+        $totalReject = 0;
         foreach($this->productionReceiveDetail as $row){
             $totalQty += $row->qty;
+            $totalReject += $row->qty_reject;
         }
         $totalIssue = 0;
         foreach($this->productionReceiveIssue as $key => $row){
-            $totalIssue += $row->productionIssue->total();
+            $rowissue = $row->productionIssue->total();
+            $rowbalance = $row->productionIssue->balanceQty();
+            if($rowbalance > 0){
+                $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+            }else{
+                $totalIssue += $rowissue;
+            }
         }
         foreach($this->productionReceiveDetail as $row){
             $rowtotal = round(($row->qty / $totalQty) * $totalIssue,2);

@@ -361,12 +361,12 @@ class ProductionReceiveController extends Controller
                             }
                         }
                     }
-                    if(!$passedIssue){
+                    /* if(!$passedIssue){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Terdapat Production Issue yang telah dipakai pada receive lainnya. Silahkan cek kembali inputan anda.'
                         ]);
-                    }
+                    } */
                 }
                 
                 $arrItemReject = [];
@@ -596,8 +596,10 @@ class ProductionReceiveController extends Controller
                     }
 
                     $totalQty = 0;
+                    $totalReject = 0;
                     foreach($request->arr_qty as $key => $row){
                         $totalQty += str_replace(',','.',str_replace('.','',$row));
+                        $totalReject += str_replace(',','.',str_replace('.','',$request->arr_qty_reject[$key]));
                     }
 
                     foreach($request->arr_qty as $key => $row){
@@ -643,7 +645,13 @@ class ProductionReceiveController extends Controller
 
                     $totalIssue = 0;
                     foreach($queryupdate->productionReceiveIssue as $key => $row){
-                        $totalIssue += $row->productionIssue->total();
+                        $rowissue = $row->productionIssue->total();
+                        $rowbalance = $row->productionIssue->balanceQty();
+                        if($rowbalance > 0){
+                            $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+                        }else{
+                            $totalIssue += $rowissue;
+                        }
                     }
 
                     foreach($queryupdate->productionReceiveDetail as $row){

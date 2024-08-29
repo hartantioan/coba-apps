@@ -104,7 +104,7 @@ class ProductionIssue extends Model
     }
 
     public function productionReceiveIssue(){
-        return $this->hasOne('App\Models\ProductionReceiveIssue','production_issue_id','id')->whereHas('productionReceive',function($query){
+        return $this->hasMany('App\Models\ProductionReceiveIssue','production_issue_id','id')->whereHas('productionReceive',function($query){
             $query->whereIn('status',['1','2','3']);
         });
     }
@@ -270,5 +270,38 @@ class ProductionIssue extends Model
         }
 
         return implode(' / ',$arr);
+    }
+
+    public function balanceQty(){
+        $qty = 0;
+        if($this->productionOrderDetail->productionScheduleDetail->bom->group == '3'){
+            foreach($this->productionIssueDetail()->whereHas('productionBatchUsage')->get() as $row){
+                $qty += $row->qty;
+            }
+        }
+        return round($qty,3);
+    }
+
+    public function balanceQtyGr(){
+        $qty = 0;
+        if($this->productionOrderDetail->productionScheduleDetail->bom->group == '3'){
+            foreach($this->productionIssueDetail()->whereHas('productionBatchUsage')->get() as $row){
+                $qty += $row->qty;
+            }
+            foreach($this->productionReceiveIssue as $row){
+                foreach($row->productionReceive->productionReceiveDetail as $rowreceive){
+                    $qty -= ($rowreceive->qty + $rowreceive->qty_reject);
+                }  
+            }
+        }
+        return round($qty,3);
+    }
+
+    public function getListReceiveDate(){
+        $arr = [];
+        foreach($this->productionReceiveIssue as $row){
+            $arr[] = date('d/m/Y',strtotime($row->productionReceive->post_date));
+        }
+        return implode(', ',$arr);
     }
 }

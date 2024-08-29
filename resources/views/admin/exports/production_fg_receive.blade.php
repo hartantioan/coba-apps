@@ -25,6 +25,7 @@
             <th>Konversi</th>
             <th>Qty Produksi</th>
             <th>{{ __('translations.unit') }}</th>
+            <th>Nilai Rupiah</th>
             <th>Palet</th>
             <th>Grade</th>
             <th>Based On</th>
@@ -61,6 +62,7 @@
                     <td>{{ $row_detail->conversion}}</td>
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
+                    <td>{{ $nominal ? CustomHelper::formatConditionalQty($row_detail->total) : ''}}</td>
                     <td>{{ $row_detail->pallet->code}}</td>
                     <td>{{ $row_detail->grade->code}}</td>
                     <td>{{ $row->productionOrderDetail->productionOrder->code }}</td>

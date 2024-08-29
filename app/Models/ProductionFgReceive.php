@@ -513,10 +513,16 @@ class ProductionFgReceive extends Model
             $totalQty += $row->qty;
         }
 
-        foreach($this->productionBatchUsage as $key => $row){
-            $totalCost += $row->productionBatch->totalById($row->id);
-            $totalBatch += $row->qty;
-        }
+        foreach($this->productionIssue()->whereHas('productionIssueDetail',function($query){
+            $query->whereHas('productionBatchUsage');
+        })->get() as $row){{
+            foreach($row->productionIssueDetail as $rowdetail){
+                foreach($rowdetail->productionBatchUsage as $rowbatch){
+                    $totalCost += $rowbatch->productionBatch->totalById($row->id);
+                    $totalBatch += $rowbatch->qty;
+                }
+            }
+        }}
 
         $totalCostAll = $totalCost;
         

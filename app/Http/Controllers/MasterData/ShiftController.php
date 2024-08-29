@@ -43,7 +43,7 @@ class ShiftController extends Controller
             'code',
             'production_code',
             'place_id',
-            // 'department_id',
+            'type',
             'name',
         ];
 
@@ -114,6 +114,7 @@ class ShiftController extends Controller
                     $val->place->code,
                   /*   $val->department->name, */
                     $val->name,
+                    $val->type(),
                     $val->time_in,
                     $val->time_out,
                     $val->tolerant,
@@ -208,7 +209,7 @@ class ShiftController extends Controller
                     $query->production_code     = $request->production_code ?? '';
                     $query->edit_id             = session('bo_id');
                     $query->place_id            = $request->place_id;
-                  /*   $query->department_id       = $request->department_id; */
+                    $query->type                = $request->type;
                     $query->name                = $request->name;
                     $query->is_next_day         = $request->is_next_day;
                     // $query->total_shift         = $request->total_shift;
@@ -236,7 +237,7 @@ class ShiftController extends Controller
                         'name'			    => $request->name,
                         'user_id'           => session('bo_id'),
                         'place_id'          => $request->place_id,
-                        /* 'department_id'     => $request->department_id, */
+                        'type'              => $request->type,
                         // 'total_shift'       => $request->total_shift,
                         'time_in'           => $request->time_in,
                         'time_out'          => $request->time_out,

@@ -24,6 +24,7 @@ class Shift extends Model
         'tolerant',
         'time_in',
         'time_out',
+        'type',
         'total_shift',
         'is_next_day',
         'status'
@@ -74,5 +75,21 @@ class Shift extends Model
         $no = str_pad($code, 6, 0, STR_PAD_LEFT);
 
         return 'SH'.$no;
+    }
+
+    public function type(){
+        switch($this->type) {
+            case '1':
+                $type = 'Karyawan';
+                break;
+            case '2':
+                $type = 'Produksi';
+                break;
+            default:
+                $type = '-';
+                break;
+        }
+
+        return $type;
     }
 }

@@ -83,6 +83,7 @@
                                                         <th>Kode Produksi</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
+                                                        <th>Tipe</th>
                                                         <th>Time In</th>
                                                         <th>Time Out</th>
                                                         <th>Toleransi</th>
@@ -130,6 +131,13 @@
                         <div class="input-field col s4">
                             <input id="time_out" name="time_out" type="text" placeholder="Time out" class="timepicker">
                             <label class="active" for="time_out">Time Out</label>
+                        </div>
+                        <div class="input-field col s4">
+                            <select class="form-control" id="type" name="type">
+                                <option value="1">Karyawan</option>
+                                <option value="2">Produksi</option>
+                            </select>
+                            <label class="" for="place_id">Tipe</label>
                         </div>
                         <div class="input-field col s4">
                             <input id="tolerant" name="tolerant" type="text" placeholder="Toleransi Waktu(jam)">
@@ -348,7 +356,7 @@
                 { name: 'place', className: 'center-align' },
                /*  { name: 'department', className: 'center-align' }, */
                 { name: 'name', className: 'center-align' },
-               
+                { name: 'tipe', className: 'center-align' },
                 { name: 'time_in', className: 'center-align' },
                 { name: 'time_out', className: 'center-align' },
                 { name: 'Toleransi', className: 'center-align' },
@@ -485,6 +493,7 @@
                 $('#name').val(response.name);
                 $('#production_code').val(response.production_code);
                 $('#place_id').val(response.place_id).formSelect();
+                $('#type').val(response.type).formSelect();
                 /* $('#department_id').val(response.department_id).formSelect(); */
                 $('#tolerant').val(response.tolerant);
                 $('#time_in').val(response.time_in);

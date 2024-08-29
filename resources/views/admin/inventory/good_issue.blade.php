@@ -1497,6 +1497,12 @@
                     }
                 });
 
+                $('input[name^="arr_requester[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
                 $('select[name^="arr_inventory_coa"]').each(function(index){
                     if(!$(this).val() && !$('select[name^="arr_coa[]"]').eq(index).val()){
                         passed = false;
@@ -1591,7 +1597,7 @@
                     }else{
                         swal({
                             title: 'Ups!',
-                            text: 'Mohon maaf, stok item / qty / coa tidak boleh kosong atau diisi 0. Dan coa atau tipe pengeluaran harus dipilih salah satu.',
+                            text: 'Mohon maaf, requester / stok item / qty / coa tidak boleh kosong atau diisi 0. Dan coa atau tipe pengeluaran harus dipilih salah satu.',
                             icon: 'warning'
                         });
                     }

@@ -18,7 +18,6 @@ class Transportation extends Model
         'user_id',
         'code',
         'name',
-        'category_transportation',
         'status'
     ];
 

@@ -25,7 +25,6 @@ class TransportationController extends Controller
             'id',
             'code',
             'name',
-            'category_transportation',
         ];
 
         $start  = $request->start;
@@ -76,7 +75,6 @@ class TransportationController extends Controller
                     $val->id,
                     $val->code,
                     $val->name,
-                    $val->categoryTransportation(),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -124,7 +122,7 @@ class TransportationController extends Controller
                     $query->user_id         = session('bo_id');
                     $query->code            = $request->code;
                     $query->name	        = $request->name;
-                    $query->category_transportation = $request->category_transportation;
+                   
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
@@ -138,7 +136,7 @@ class TransportationController extends Controller
                         'user_id'       => session('bo_id'),
                         'code'          => $request->code,
                         'name'			=> $request->name,
-                        'category_transportation' => $request->category_transportation,
+                       
                         'status'        => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();

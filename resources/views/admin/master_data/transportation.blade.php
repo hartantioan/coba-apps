@@ -111,13 +111,6 @@
                             <label class="active" for="name">{{ __('translations.name') }}</label>
                         </div>
                         <div class="input-field col s12 m3">
-                            <select id="category_transportation" name="category_transportation">
-                                <option value="1">TRONTON</option>
-                                <option value="2">COLD DIESEL</option>
-                            </select>
-                            <label for="category_transportation">Kategori Kendaraan</label>
-                        </div>
-                        <div class="input-field col s12 m3">
                             <div class="switch mb-1">
                                 <label for="order">{{ __('translations.status') }}</label>
                                 <label>
@@ -233,7 +226,7 @@
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
-                { name: 'category_transportation', className: 'center-align' },
+              
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -340,7 +333,7 @@
                 $('#temp').val(id);
                 $('#code').val(response.code);
                 $('#name').val(response.name);
-                $('#category_transportation').val(response.category_transportation).formSelect();
+               
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);
                 }else{

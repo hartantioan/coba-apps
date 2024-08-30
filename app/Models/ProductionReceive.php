@@ -281,11 +281,13 @@ class ProductionReceive extends Model
         }
         $totalIssue = 0;
         foreach($this->productionReceiveIssue as $key => $row){
-            $rowissue = $row->productionIssue->total();
-            $rowbalance = $row->productionIssue->balanceQty();
-            if($rowbalance > 0){
-                $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+            if($row->productionReceiveIssueDetail()->exists()){
+                foreach($row->productionReceiveIssueDetail as $rowdetail){
+                    $rowtotal = $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id);
+                    $totalIssue += round($rowdetail->qty * ($rowtotal / $rowdetail->productionBatchUsage->qty),2);
+                }
             }else{
+                $rowissue = $row->productionIssue->total();
                 $totalIssue += $rowissue;
             }
         }
@@ -312,11 +314,12 @@ class ProductionReceive extends Model
         }
         $totalIssue = 0;
         foreach($this->productionReceiveIssue as $key => $row){
-            $rowissue = $row->productionIssue->total();
-            $rowbalance = $row->productionIssue->balanceQty();
-            if($rowbalance > 0){
-                $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+            if($row->productionReceiveIssueDetail()->exists()){
+                foreach($row->productionReceiveIssueDetail as $rowdetail){
+                    $totalIssue += round($rowdetail->qty * ($rowdetail->productionBatchUsage->qty / $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id)),2);
+                }
             }else{
+                $rowissue = $row->productionIssue->total();
                 $totalIssue += $rowissue;
             }
         }

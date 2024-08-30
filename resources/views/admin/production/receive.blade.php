@@ -281,7 +281,7 @@
                         </div>
                         <div class="row">
                             <div class="col s12">
-                                <fieldset style="min-width: 100%;">
+                                <fieldset>
                                     <legend>3. Detail Issue Production Order</legend>
                                     <div class="col m12 s12">
                                         <div class="col s12" style="overflow:auto;min-width:100%;">
@@ -291,18 +291,19 @@
                                                         <tr>
                                                             <th class="center">{{ __('translations.no') }}.</th>
                                                             <th class="center">No. Production Issue</th>
+                                                            <th class="center">Daftar Batch Terpakai</th>
                                                             <th class="center">Hapus</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="body-issue">
                                                         <tr id="last-row-issue">
-                                                            <td class="center-align" colspan="3">
+                                                            <td class="center-align" colspan="4">
                                                                 Silahkan tambah dengan tombol dibawah
                                                             </td>
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
-                                                        <td colspan="3" class="center-align">
+                                                        <td colspan="4" class="center-align">
                                                             <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addIssue();"><i class="material-icons right">add_circle_outline</i> Tambah Issue</a>
                                                         </td>
                                                     </tfoot>
@@ -841,7 +842,7 @@
                 $('#production_order_detail_id').attr('tabindex','-1');
                 $('#body-issue').empty().append(`
                     <tr id="last-row-issue">
-                        <td class="center-align" colspan="3">
+                        <td class="center-align" colspan="4">
                             Silahkan tambah dengan tombol dibawah
                         </td>
                     </tr>
@@ -1248,7 +1249,7 @@
             $('.row_issue').remove();
             $('#body-issue').append(`
                 <tr id="last-row-issue">
-                    <td class="center-align" colspan="3">
+                    <td class="center-align" colspan="4">
                         Silahkan tambah dengan tombol dibawah
                     </td>
                 </tr>
@@ -1385,6 +1386,19 @@
         $(element).parent().parent().remove();
     }
 
+    function removeBatchIssue(element,id){
+        $(element).parent().parent().remove();
+        if($('.row_batch_usage' + id).length == 0){
+            $('#body-issue-batch' + id).empty().append(`
+                <tr id="last-row-issue-batch` + id + `">
+                    <td class="center-align" colspan="3">
+                        Hanya untuk issue yang memiliki batch dan WIP 2.
+                    </td>
+                </tr>
+            `);
+        }
+    }
+
     var arrIssue = [];
 
     function resetIssue(){
@@ -1394,6 +1408,59 @@
                 arrIssue.push($(this).val());
             }
         });
+    }
+
+    function checkMaxBatchQty(id){
+        let qtyMax = parseFloat($('#arr_issue_batch_usage_qty' + id).data('max').replaceAll(".", "").replaceAll(",","."));
+        let qty = parseFloat($('#arr_issue_batch_usage_qty' + id).val().replaceAll(".", "").replaceAll(",","."));
+        if(qty > qtyMax){
+            $('#arr_issue_batch_usage_qty' + id).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
+        }
+    }
+
+    function getBatchIssue(id){
+        $('#body-issue-batch' + id).empty();
+        if($('#arr_production_issue_id' + id).val()){
+            let data = $('#arr_production_issue_id' + id).select2('data')[0];
+            if(data.list_batch_usage.length > 0){
+                $.each(data.list_batch_usage, function(i, val) {
+                    let count = makeid(10);
+                    $('#body-issue-batch' + id).append(`
+                        <tr class="row_batch_usage` + id + `">
+                            <input type="hidden" value="` + val.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
+                            <input type="hidden" value="` + val.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
+                            <td>
+                                ` + val.batch_no + `
+                            </td>
+                            <td>
+                                <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + count + `')" style="text-align:right;" data-max="` + val.qty + `">
+                            </td>
+                            <td>
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + id + `');">
+                                    <i class="material-icons">delete</i>
+                                </a> 
+                            </td>
+                        </tr>
+                    `);
+                });
+            }else{
+                $('#body-issue-batch' + id).append(`
+                    <tr id="last-row-issue-batch` + id + `">
+                        <td class="center-align" colspan="3">
+                            Issue ini bukan untuk WIP 3 atau tidak terdapat penggunaan batch disana.
+                        </td>
+                    </tr>
+                `);
+            }
+        }else{
+            $('#body-issue-batch' + id).append(`
+                <tr id="last-row-issue-batch` + id + `">
+                    <td class="center-align" colspan="3">
+                        Hanya untuk issue yang memiliki batch dan WIP 2.
+                    </td>
+                </tr>
+            `);
+        }
     }
 
     function addIssue(){
@@ -1409,7 +1476,25 @@
                         ` + no + `
                     </td>
                     <td>
-                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();"></select>
+                        <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');"></select>
+                    </td>
+                    <td id="batch-used` + count + `">
+                        <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
+                            <thead>
+                                <tr>
+                                    <th class="center">Batch</th>
+                                    <th class="center">Qty Terpakai</th>
+                                    <th class="center">Hapus</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-issue-batch` + count + `">
+                                <tr id="last-row-issue-batch` + count + `">
+                                    <td class="center-align" colspan="3">
+                                        Hanya untuk issue yang memiliki batch dan WIP 2.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </td>
                     <td class="center">
                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -2131,9 +2216,27 @@
                                 ` + (i + 1) + `
                             </td>
                             <td>
-                                <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]">
+                                <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');">
                                     <option value="` + val.production_issue_id + `">` + val.production_issue_name + `</option>    
                                 </select>
+                            </td>
+                            <td id="batch-used` + count + `">
+                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Batch</th>
+                                            <th class="center">Qty Terpakai</th>
+                                            <th class="center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-issue-batch` + count + `">
+                                        <tr id="last-row-issue-batch` + count + `">
+                                            <td class="center-align" colspan="3">
+                                                Hanya untuk issue yang memiliki batch dan WIP 2.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </td>
                             <td class="center">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
@@ -2167,6 +2270,30 @@
                             }
                         }
                     });
+
+                    if(val.details.length > 0){
+                        $('#body-issue-batch' + count).empty();
+                        $.each(val.details, function(i, value) {
+                            let countdata = makeid(10);
+                            $('#body-issue-batch' + count).append(`
+                                <tr class="row_batch_usage` + count + `">
+                                    <input type="hidden" value="` + value.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
+                                    <input type="hidden" value="` + value.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
+                                    <td>
+                                        ` + value.batch_no + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + countdata + `')" style="text-align:right;" data-max="` + value.qty + `">
+                                    </td>
+                                    <td>
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + count + `');">
+                                            <i class="material-icons">delete</i>
+                                        </a> 
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
                 });
 
                 resetIssue();

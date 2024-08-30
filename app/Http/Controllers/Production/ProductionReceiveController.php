@@ -36,6 +36,7 @@ use App\Models\UsedData;
 use App\Models\MenuUser;
 use App\Exports\ExportProductionReceive;
 use App\Models\ItemCogs;
+use App\Models\ProductionReceiveIssueDetail;
 
 class ProductionReceiveController extends Controller
 {
@@ -316,8 +317,8 @@ class ProductionReceiveController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -554,7 +555,10 @@ class ProductionReceiveController extends Controller
                             $row->delete();
                         }
 
-                        $query->productionReceiveIssue()->delete();
+                        foreach($query->productionReceiveIssue as $row){
+                            $row->productionReceiveIssueDetail()->delete();
+                            $row->delete();
+                        }
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -588,10 +592,21 @@ class ProductionReceiveController extends Controller
 
                     if($request->arr_production_issue_id){
                         foreach($request->arr_production_issue_id as $key => $row){
-                            ProductionReceiveIssue::create([
+                            $pri = ProductionReceiveIssue::create([
                                 'production_receive_id' => $query->id,
                                 'production_issue_id'   => $row,
                             ]);
+                            if($request->arr_issue_batch_production_issue_id){
+                                foreach($request->arr_issue_batch_production_issue_id as $key2 => $rowissuebatch){
+                                    if($rowissuebatch == $row){
+                                        ProductionReceiveIssueDetail::create([
+                                            'production_receive_issue_id'   => $pri->id,
+                                            'production_batch_usage_id'     => $request->arr_issue_batch_usage_id[$key2],
+                                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_issue_batch_usage_qty[$key2])),
+                                        ]);
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -645,11 +660,13 @@ class ProductionReceiveController extends Controller
 
                     $totalIssue = 0;
                     foreach($queryupdate->productionReceiveIssue as $key => $row){
-                        $rowissue = $row->productionIssue->total();
-                        $rowbalance = $row->productionIssue->balanceQty();
-                        if($rowbalance > 0){
-                            $totalIssue += round(($totalQty + $totalReject) * ($rowissue / $rowbalance),2);
+                        if($row->productionReceiveIssueDetail()->exists()){
+                            foreach($row->productionReceiveIssueDetail as $rowdetail){
+                                $rowtotal = $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id);
+                                $totalIssue += round($rowdetail->qty * ($rowtotal / $rowdetail->productionBatchUsage->qty),2);
+                            }
                         }else{
+                            $rowissue = $row->productionIssue->total();
                             $totalIssue += $rowissue;
                         }
                     }
@@ -688,10 +705,10 @@ class ProductionReceiveController extends Controller
                 }
             }
         
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
 		return response()->json($response);
     }
@@ -704,9 +721,19 @@ class ProductionReceiveController extends Controller
         $issue = [];
 
         foreach($po->productionReceiveIssue as $rowissue){
+            $details = [];
+            foreach($rowissue->productionReceiveIssueDetail as $row){
+                $details[] = [
+                    'batch_no'                  => $row->productionBatchUsage->productionBatch->code,
+                    'production_issue_id'       => $rowissue->production_issue_id,
+                    'production_batch_usage_id' => $row->production_batch_usage_id,
+                    'qty'                       => CustomHelper::formatConditionalQty($row->productionBatchUsage->balanceQty()),
+                ];
+            }
             $issue[] = [
                 'production_issue_id'   => $rowissue->production_issue_id,
-                'production_issue_name' => $rowissue->productionIssue->code.' Tgl. '.date('d/m/Y',strtotime($rowissue->productionIssue->post_date)).' Shift '.$rowissue->productionIssue->shift->code.' Group '.$rowissue->productionIssue->group
+                'production_issue_name' => $rowissue->productionIssue->code.' Tgl. '.date('d/m/Y',strtotime($rowissue->productionIssue->post_date)).' Shift '.$rowissue->productionIssue->shift->code.' Group '.$rowissue->productionIssue->group,
+                'details'               => $details,
             ];
         }
 
@@ -824,14 +851,15 @@ class ProductionReceiveController extends Controller
             </tr>  
         ';
 
-        $string .= '</tbody></table></div><div class="col s12 mt-2"><table style="width:350px !important;" class="bordered" id="table-detail-row">
+        $string .= '</tbody></table></div><div class="col s12 mt-2"><table style="width:600px !important;" class="bordered" id="table-detail-row">
         <thead>
             <tr>
-                <th class="center-align" colspan="2" style="font-size:20px !important;">Daftar Production Issue Terpakai</th>
+                <th class="center-align" colspan="3" style="font-size:20px !important;">Daftar Production Issue Terpakai</th>
             </tr>
             <tr>
                 <th class="center">No.</th>
                 <th class="center">No. Production Issue</th>
+                <th class="center">List Batch Terpakai</th>
             </tr>
         </thead><tbody>';
 
@@ -839,6 +867,7 @@ class ProductionReceiveController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'.</td>
                 <td>'.$row->productionIssue->code.'</td>
+                <td>'.$row->listBatchUsed().'</td>
             </tr>';
         }
 

@@ -29,4 +29,23 @@ class ProductionReceiveIssue extends Model
     {
         return $this->belongsTo('App\Models\ProductionIssue', 'production_issue_id', 'id')->withTrashed();
     }
+
+    public function productionReceiveIssueDetail()
+    {
+        return $this->hasMany('App\Models\ProductionReceiveIssueDetail');
+    }
+
+    public function listBatchUsed(){
+        if($this->productionReceiveIssueDetail()->exists()){
+            $arr = '<ol>';
+            foreach($this->productionReceiveIssueDetail as $row){
+                $arr .= '<li>'.$row->productionBatchUsage->productionBatch->code.' Qty Terpakai : '.CustomHelper::formatConditionalQty($row->qty).'</li>';
+            }
+            $arr .= '</ol>';
+        }else{
+            $arr = '';
+        }
+        
+        return $arr;
+    }
 }

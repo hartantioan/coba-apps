@@ -4893,6 +4893,7 @@ class Select2Controller extends Controller {
                 'text' 			    => $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group.' - SISA : '.$balance,
                 'note'              => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' ) SISA : '.$balance,
                 'list_batch_usage'  => $d->productionOrderDetail->productionScheduleDetail->bom->group == '3' ? $arrBatchUsage : [],
+                'wajib_batch'       => $d->productionOrderDetail->productionScheduleDetail->bom->group == '3' ? '1' : '',
             ];
         }
 

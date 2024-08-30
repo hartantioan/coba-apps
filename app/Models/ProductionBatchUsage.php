@@ -34,4 +34,15 @@ class ProductionBatchUsage extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+
+    public function productionReceiveIssueDetail(){
+        return $this->hasMany('App\Models\ProductionReceiveIssueDetail','production_batch_usage_id','id');
+    }
+
+    public function balanceQty(){
+        $qty = $this->qty;
+        $used = $this->productionReceiveIssueDetail()->sum('qty');
+        $balance = $qty - $used;
+        return $balance;
+    }
 }

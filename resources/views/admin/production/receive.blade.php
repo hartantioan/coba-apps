@@ -1890,7 +1890,7 @@
                 formData.delete("arr_qty_batch[]");
                 formData.delete("arr_production_issue_id[]");
 
-                let passedInput = true, passedQty = true, passedProductionIssue = true;
+                let passedInput = true, passedQty = true, passedProductionIssue = true, totalQtyReceive = 0;
 
                 if($('#tempGroup').val() == '1' || $('#tempGroup').val() == '3'){
                     if($('select[name^="arr_production_issue_id[]"]').length == 0){
@@ -1916,6 +1916,7 @@
 
                 $('input[name^="arr_qty[]"]').each(function(index){
                     let count = makeid(10), rowtotal = 0, element = this;
+                    totalQtyReceive += (parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_qty_reject[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")));
                     if($(element).val() == '' || $(element).val() == '0'){
                         passedInput = false;
                     }
@@ -1946,10 +1947,20 @@
                     }
                 });
 
+                if($('input[name^="arr_issue_batch_usage_qty[]"]').length > 0){
+                    let totalBatchIssue = 0;
+                    $('input[name^="arr_issue_batch_usage_qty[]"]').each(function(index){
+                        totalBatchIssue += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                    });
+                    if(totalBatchIssue !== totalQtyReceive){
+                        passedQty = false;
+                    }
+                }
+
                 if(!passedQty){
                     swal({
                         title: 'Ups! Maaf.',
-                        text: 'Qty diterima dan qty batch tidak sama. Selain itu batch tidak boleh kosong.',
+                        text: 'Qty diterima dan qty batch tidak sama. Selain itu batch tidak boleh kosong. Apalagi qty batch terpakai dengan qty diterima harus sama.',
                         icon: 'error'
                     });
 

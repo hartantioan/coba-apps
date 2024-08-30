@@ -6971,7 +6971,7 @@ class CustomHelper {
 					}
 				}
 				$row['list_bom'] = $newarr;
-				$datanew = $row;
+				$datanew[] = $row;
 			}
 		}else{
 			$datanew = $data;

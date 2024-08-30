@@ -1286,6 +1286,7 @@
         if($('.data-used').length > 0){
             $('.data-used').trigger('click');
         }
+        $('#note').val('');
         $('#body-batch').empty().append(`
             <tr id="last-row-batch">
                 <td class="center-align" colspan="5">
@@ -1300,6 +1301,7 @@
             $('#conversion').val(datakuy.conversion);
             $('#qty-unit').text(datakuy.uom_unit);
             $('#sell-unit').text(datakuy.sell_unit);
+            $('#note').val('NO. ' + datakuy.prod_no + ' (' + datakuy.item_name + ')');
         }else{
             $('#item_name').val('');
             $('#qty-unit,#sell-unit').text('-');

@@ -4713,6 +4713,7 @@ class Select2Controller extends Controller {
                     'id'        => $d->id,
                     'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                     'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                    'prod_no'   => $d->productionOrder->code,
                     'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
                     'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
                     'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),

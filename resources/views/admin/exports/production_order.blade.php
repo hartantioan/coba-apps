@@ -3,7 +3,6 @@
         <tr align="center">
             <th>{{ __('translations.no') }}.</th>
             <th>No. Dokumen</th>
-            <th>Keterangan</th>
             <th>{{ __('translations.status') }}</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
@@ -17,6 +16,7 @@
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
+            <th>Keterangan</th>
             <th>Kode Item</th>
             <th>{{ __('translations.item') }}</th>
             <th>Qty Planned</th>
@@ -38,7 +38,7 @@
                 <tr align="center">
                     <td>{{ $no }}</td>
                     <td>{{ $row->code }}</td>
-                    <td>{{ $row->note }}</td>
+                    
                     <td>{!! $row->statusRaw() !!}</td>
                     <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                     <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
@@ -52,6 +52,7 @@
                     <td>{{ $row->user->employee_no }}</td>
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                    <td>{{ $row->note }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->item->code}}</td>
                     <td>{{ $row_detail->productionScheduleDetail->item->name }}</td>
                     <td>{{ $row_detail->productionScheduleDetail->qty}}</td>

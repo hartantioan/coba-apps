@@ -6966,11 +6966,13 @@ class CustomHelper {
 		if($item_id){
 			foreach($data as $row){
 				$index = -1;
+				$newarr = [];
 				foreach($row['list_bom'] as $key => $rowbom){
-					if($rowbom['item_id'] == $item_id){
-						unset($rowbom[$key]);
+					if($rowbom['item_id'] !== $item_id){
+						$newarr[] = $rowbom;
 					}
 				}
+				$row['list_bom'] = $newarr;
 			}
 		}
 		return $data;

@@ -3294,7 +3294,7 @@ class Select2Controller extends Controller {
                     'total'             => number_format($d->total,2,',','.'),
                     'tax'               => number_format($d->tax,2,',','.'),
                     'grandtotal'        => number_format($d->grandtotal,2,',','.'),
-                    'balance'           => number_format($d->balanceInvoicePaid(),2,',','.'),
+                    'balance'           => number_format($d->balanceInvoicePaidTotal(),2,',','.'),
                     'note'              => $d->note ? $d->note : '',
                     'tax_no'            => $d->tax_no ? $d->tax_no : '-',
                 ];

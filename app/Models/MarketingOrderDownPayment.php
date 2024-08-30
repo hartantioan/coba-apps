@@ -266,6 +266,16 @@ class MarketingOrderDownPayment extends Model
         $total = $this->totalPay();
 
         foreach($this->marketingOrderInvoiceDetail as $row){
+            $total -= $row->grandtotal;
+        }
+
+        return $total;
+    }
+
+    public function balanceInvoicePaidTotal(){
+        $total = $this->total;
+
+        foreach($this->marketingOrderInvoiceDetail as $row){
             $total -= $row->total;
         }
 

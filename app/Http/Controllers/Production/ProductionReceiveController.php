@@ -727,7 +727,8 @@ class ProductionReceiveController extends Controller
                     'batch_no'                  => $row->productionBatchUsage->productionBatch->code,
                     'production_issue_id'       => $rowissue->production_issue_id,
                     'production_batch_usage_id' => $row->production_batch_usage_id,
-                    'qty'                       => CustomHelper::formatConditionalQty($row->productionBatchUsage->balanceQty()),
+                    'qty'                       => CustomHelper::formatConditionalQty($row->qty),
+                    'qty_max'                   => CustomHelper::formatConditionalQty($row->productionBatchUsage->balanceQty() + $row->qty),
                 ];
             }
             $issue[] = [

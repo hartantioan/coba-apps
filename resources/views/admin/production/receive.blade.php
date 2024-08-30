@@ -2283,7 +2283,7 @@
                                         ` + value.batch_no + `
                                     </td>
                                     <td>
-                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + countdata + `')" style="text-align:right;" data-max="` + value.qty + `">
+                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMaxBatchQty('` + countdata + `')" style="text-align:right;" data-max="` + value.qty_max + `">
                                     </td>
                                     <td>
                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + count + `');">

@@ -368,7 +368,7 @@
                                     <label for="is_ar_invoice">Auto Generate SJ -> AR Invoice</label>
                                     <label>
                                         {{ __('translations.no') }}
-                                        <input checked type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
+                                        <input type="checkbox" id="is_ar_invoice" name="is_ar_invoice" value="1">
                                         <span class="lever"></span>
                                         {{ __('translations.yes') }}
                                     </label>

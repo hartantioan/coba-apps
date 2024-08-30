@@ -1976,7 +1976,7 @@
                 $('#tax_no').val(response.tax_no);
                 $('#marketing_order_delivery_process_id').empty();
                 if(response.modp_code){
-                    $('#markeing_order_delivery_process_id').append(`
+                    $('#marketing_order_delivery_process_id').append(`
                         <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
                     `);
                 }

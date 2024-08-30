@@ -899,7 +899,7 @@ class Select2Controller extends Controller {
             ->where('status','1')
             ->first() ?? 0;
             
-            $cek_delivery = DeliveryCostStandard::where('category_transportation',$transportation->category_transportation)
+            $cek_delivery = DeliveryCostStandard::where('transportation_id',$transportation->id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
             ->where('city_id',$city)

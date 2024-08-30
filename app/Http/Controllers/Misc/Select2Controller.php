@@ -3085,9 +3085,12 @@ class Select2Controller extends Controller {
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
         ->whereDoesntHave('goodScaleDetail')
-        ->where(function($query)use($arrmod){
+        ->where(function($query)use($arrmod,$request){
             if($arrmod){
                 $query->whereNotIn('id',$arrmod);
+            }
+            if($request->account_id){
+                $query->where('account_id',$request->account_id);
             }
         })->get();
 
@@ -4874,10 +4877,22 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $balanceused = $d->balanceQtyGr();
             $balance = $balanceused > 0 ? CustomHelper::formatConditionalQty($balanceused) : 0;
+            $arrBatchUsage = [];
+            foreach($d->productionIssueDetail()->whereHas('productionBatchUsage')->get() as $row){
+                foreach($row->productionBatchUsage as $rowbatch){
+                    $arrBatchUsage[] = [
+                        'batch_no'                  => $rowbatch->productionBatch->code,
+                        'production_issue_id'       => $d->id,
+                        'production_batch_usage_id' => $rowbatch->id,
+                        'qty'                       => CustomHelper::formatConditionalQty($rowbatch->balanceQty()),
+                    ];
+                }
+            }
             $response[] = [
-                'id'   			=> $d->id,
-                'text' 			=> $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group.' - SISA : '.$balance,
-                'note'          => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' ) SISA : '.$balance,
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' Tgl. '.date('d/m/Y',strtotime($d->post_date)).' Shift '.$d->shift->code.' Group '.$d->group.' - SISA : '.$balance,
+                'note'              => 'PRODUCTION ISSUE NO. '.$d->code.' ( '.$d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name.' ) SISA : '.$balance,
+                'list_batch_usage'  => $d->productionOrderDetail->productionScheduleDetail->bom->group == '3' ? $arrBatchUsage : [],
             ];
         }
 

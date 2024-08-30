@@ -166,7 +166,7 @@ class DeliveryCostStandardController extends Controller
                     $query = DeliveryCostStandard::find($request->temp);
                   
                     $query->user_id = session('bo_id');
-                    
+                    $query->code = $request->code;
                     $query->city_id = $request->city_id;
                     $query->district_id = $request->district_id;
                     
@@ -189,7 +189,7 @@ class DeliveryCostStandardController extends Controller
                
                    
                     $query = DeliveryCostStandard::create([
-                        'code'			            => Str::random(10),
+                        'code'			            => $request->code,
                         'user_id'			        => session('bo_id'),
                         'city_id'	                => $request->city_id,
                         'district_id'               => $request->district_id,

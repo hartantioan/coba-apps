@@ -71,9 +71,9 @@ class handleDC implements OnEachRow, WithHeadingRow
                     $this->error = "Kota Awal";
                 }elseif(!$sub_district_id_from && $this->error ==null){
                     $this->error = "Kecamatan Awal";
-                }elseif(!$tonnage && $this->error ==null){
+                }elseif(!$tonnage && $this->error ==null && $tonnage != '0'){
                     $this->error = "tonnage";
-                }elseif(!$ritage && $this->error ==null){
+                }elseif(!$ritage && $this->error ==null && $ritage != '0'){
                     $this->error = "ritage";
                 }elseif(!$tonnage_weight && $this->error ==null){
                     $this->error = "berat tonase";

@@ -8,7 +8,7 @@
             <th>{{ __('translations.item') }}</th>
             <th>Keterangan </th>
             <th>{{ __('translations.location') }}</th>
-            <th>{{ __('translations.date') }}</th>
+           
             <th>Tanggal Penyerahan</th>
             <th>Keterangan Penyerahan</th>
             <th>User(Bersangkutan)</th>
@@ -30,7 +30,6 @@
                 <td>{{ $row->hardwareItem->item ?? '' }}</td>
                 <td>{{ $row->hardwareItem->detail1 ?? '' }}</td>
                 <td>{{ $row->location }}</td>
-                <td>{{ $row->date }}</td>
                 <td>{{ $row->reception_date }}</td>
                 <td>{{ $row->info }}</td>
                 <td>{{ $row->account->name ?? '' }}</td>

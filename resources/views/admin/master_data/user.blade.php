@@ -324,19 +324,19 @@
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
-                            <label class="active" for="province_id">{{ __('translations.province') }}</label>
+                            <label class="active" for="province_id">{{ __('translations.province') }} PIC</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="city_id" name="city_id" onchange="getDistrict();">
                                 <option value="">--{{ __('translations.select') }}--</option>
                             </select>
-                            <label class="active" for="city_id">{{ __('translations.city') }}</label>
+                            <label class="active" for="city_id">{{ __('translations.city') }} PIC</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="select2 browser-default" id="district_id" name="district_id">
                                 <option value="">--{{ __('translations.select') }}--</option>
                             </select>
-                            <label class="active" for="district_id">{{ __('translations.district') }}</label>
+                            <label class="active" for="district_id">{{ __('translations.district') }} PIC</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="country_id" name="country_id"></select>
@@ -346,7 +346,12 @@
                             <select id="group_id" name="group_id"></select>
                             <label for="group_id">Group BP</label>
                         </div>
-                        
+                        <div class="input-field col s12 m3 customer_inputs">
+                            <select class="select2 browser-default" id="province_area_id" name="province_area_id">
+                                <option value="">--{{ __('translations.select') }}--</option>
+                            </select>
+                            <label class="active" for="province_area_id">{{ __('translations.province') }} Pemasaran</label>
+                        </div>
                         <div class="input-field col s12 m3 employee_inputs">
                             <select id="employee_type" name="employee_type">
                                 <option value="1">Staff</option>
@@ -1291,6 +1296,7 @@
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
+        select2ServerSide('#province_area_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
         select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
         select2ServerSide('#arr_user', '{{ url("admin/select2/employee") }}');

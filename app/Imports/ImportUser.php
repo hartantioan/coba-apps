@@ -58,36 +58,39 @@ class handleUser implements OnEachRow, WithHeadingRow
         DB::beginTransaction();
         try {
             if (isset($row['nama']) && $row['nama']) {
-                $district = str_replace(',', '.', explode('#', $row['kecamatan'])[0]);
+                $district = str_replace(',', '.', explode('#', $row['kecamatan_pic'])[0]);
                 $district_id = Region::where('code',$district)->first()->id;
                 if (!isset($row['no']) && !$row['no']) {
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),'tidak ada nomor',$sheet); 
                 }
-                $city = str_replace(',', '.', explode('#', $row['kota'])[0]);
+                $city = str_replace(',', '.', explode('#', $row['kota_pic'])[0]);
                 $city_id = Region::where('code',$city)->first()->id; 
                 
-                $province = str_replace(',', '.', explode('#', $row['provinsi'])[0]);
+                $province = str_replace(',', '.', explode('#', $row['provinsi_pic'])[0]);
                 $province_id = Region::where('code',$province)->first()->id;
                  
                 $country =  explode('#', $row['negara_asal'])[0];
                 $country_id= Country::where('code',$country)->first()->id;
                
                 $gender =  explode('#', $row['jenis_kelamin'])[0];
-                $status_married =  explode('#', $row['status_pernikahan'])[0];
+                $status_married =  explode('#', $row['status_pernikahan'])[0] ?? null;
                 $type_group =  explode('#', $row['group_bp'])[0];
                 $type = explode('#', $row['type'])[0];
                 $type_pegawai = explode('#', $row['tipe_pegawai'])[0];
 
                 $payment_type = explode('#', $row['payment_type'])[0];
                 
-                $place = Place::where('code', explode('#', $row['plant'])[1])->first();
+                $place = Place::where('code', explode('#', $row['plant'])[1]  ?? null)->first() ?? '-';
 
                 $group = Group::where('code', $type_group)->first();
 
-                $company = Company::where('id', explode('#', $row['perusahaan'])[0])->first();
+                $company_id = Company::where('id', explode('#', $row['perusahaan'])[0])->first()->id ?? null;
 
-                $brand = Brand::where('code', explode('#', $row['brand'])[1])->first();
+                $brand = Brand::where('code', explode('#', $row['brand'])[1] ?? null)->first()->id ?? null;
+
+                $provinceArea = str_replace(',', '.', explode('#', $row['provinsi_pemasaran'])[0]);
+                $province_area_id = Region::where('code',$provinceArea)->first()->id;
                 
                 if(!$district_id && $this->error ==null){
                     $this->error = "Kecamatan.";
@@ -113,6 +116,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'name'              => $row['nama'],
                         'username'          => $row['code_bp'] ?? User::generateCode($type, $type_pegawai, $place->id),
                         'province_id'       => $province_id,
+                        'area_province_id'  => $province_area_id,
                         'city_id'           => $city_id,
                         'district_id'       => $district_id,
                         'id_card'           => $row['no_ktp'],
@@ -124,7 +128,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'top_internal_out_java'      => $row['top_internal_out_java'],
                         'group_id'          => $group->id,
                         'employee_type'     => $type_pegawai,
-                        'company_id'        => $company->id,
+                        'company_id'        => $company_id ?? null,
                         'office_no'         => $row['no_kantor'],
                         'email'             => $row['email'],
                         'deposit'           => $row['deposit'],
@@ -136,7 +140,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'nib'               => $row['nib'],
                         'sppkp'             => $row['sppkp'],
                         'sales_payment_type'=> $payment_type,
-                        'brand_id'          => $brand->id,
+                        'brand_id'          => $brand ?? null,
                         'status'            => 1,
                     ]);
 

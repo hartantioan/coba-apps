@@ -641,6 +641,7 @@ class UserController extends Controller
                     $query->company_id	    = $request->company_id ? $request->company_id : NULL;
                     $query->place_id	    = $request->type == '1' ? $request->place_id : NULL;
                     $query->province_id     = $request->province_id;
+                    $query->area_province_id= $request->province_area_id;
                     $query->city_id         = $request->city_id;
                     $query->district_id     = $request->district_id;
                     $query->tax_id          = $request->tax_id;
@@ -699,6 +700,8 @@ class UserController extends Controller
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
                         'place_id'	            => $request->type == '1' ? $request->place_id : NULL,
                         'province_id'	        => $request->province_id ? $request->province_id : NULL,
+                        
+                        'area_province_id'	    => $request->province_area_id ? $request->province_area_id : NULL,
                         'city_id'               => $request->city_id ? $request->city_id : NULL,
                         'district_id'           => $request->district_id ? $request->district_id : NULL,
                         'tax_id'                => $request->tax_id ? $request->tax_id : NULL,

@@ -138,15 +138,15 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        {{-- <div class="input-field col m3 s12">
-                            <select class="browser-default" id="account_id" name="account_id"></select>
-                            <label class="active" for="account_id">Customer </label>
-                        </div> --}}
+                        <div class="input-field col s12 m3">
+                            <input id="code" name="code" type="text" >
+                            <label class="active" for="code">Kode</label>
+                        </div>
                         <div class="input-field col s12 m3 ">
                             <select id="transportation_id"  class="browser-default" name="transportation_id" >
                                
                             </select>
-                            <label for="transportation_id">Tipe Transportasi</label>
+                            <label class="active" for="transportation_id">Tipe Transportasi</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col m3 s12">
@@ -641,6 +641,7 @@
                 $('#modal1').modal('open');
                 
                 $('#temp').val(id);
+                $('#code').val(response.code);
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);
                 $('#note').val(response.note);

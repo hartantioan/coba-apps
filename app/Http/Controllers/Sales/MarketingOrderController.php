@@ -333,7 +333,7 @@ class MarketingOrderController extends Controller
                     $val->broker()->exists() ? $val->broker->name : '-',
                     $val->currency->name,
                     number_format($val->currency_rate,2,',','.'),
-                    $val->percent_dp,
+                    number_format($val->percent_dp,2,',','.'),
                     $val->note_internal,
                     $val->note_external,
                     number_format($val->discount,2,',','.'),

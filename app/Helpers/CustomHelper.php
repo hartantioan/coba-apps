@@ -6945,10 +6945,9 @@ class CustomHelper {
 	}
 
 	public static function splitBomArray($data){
-		$newdata = [];
 		$newarray = [];
 		$arritem = [];
-		$arrdata = [];
+		$arrqty = 0;
 		foreach($data as $row){
 			foreach($row['list_bom'] as $rowbom){
 				$newarray[] = $rowbom;
@@ -6958,11 +6957,25 @@ class CustomHelper {
 		foreach($newarray as $row){
 			if(!in_array($row['item_id'],$arritem)){
 				$arritem[] = $row['item_id'];
+				$arrqty = 0;
 			}else{
 				$index = array_search($row['item_id'],$arritem);
 				$item_id = $row['item_id'];
 			}
 		}
-		return $item_id;
+		if($item_id){
+			foreach($data as $row){
+				$index = -1;
+				foreach($row['list_bom'] as $key => $rowbom){
+					if($rowbom['item_id'] == $item_id){
+						$index = $key;
+					}
+				}
+				if($index >= 0){
+					array_splice($row['list_bom'],$index,1);
+				}
+			}
+		}
+		return $data;
 	}
 }

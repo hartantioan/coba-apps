@@ -6959,7 +6959,6 @@ class CustomHelper {
 			if(!in_array($row['item_id'],$arritem)){
 				$arritem[] = $row['item_id'];
 			}else{
-				$index = array_search($row['item_id'],$arritem);
 				$item_id = $row['item_id'];
 			}
 		}

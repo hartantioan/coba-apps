@@ -6963,19 +6963,6 @@ class CustomHelper {
 				$item_id = $row['item_id'];
 			}
 		}
-		if($item_id){
-			foreach($data as $row){
-				$arraykey = -1;
-				foreach($row['list_bom'] as $key => $rowbom){
-					if($rowbom['item_id'] == $item_id){
-						$arraykey = $key;
-					}
-				}
-				if($arraykey >= 0){
-					array_splice($row['list_bom'],$arraykey,1);
-				}
-			}
-		}
-		return $data;
+		return $item_id;
 	}
 }

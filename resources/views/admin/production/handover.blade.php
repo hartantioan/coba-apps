@@ -211,7 +211,7 @@
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id"></select>
+                                        <select class="browser-default" id="production_fg_receive_id" name="production_fg_receive_id" onchange="getNote();"></select>
                                         <label class="active" for="production_fg_receive_id">Daftar Receive FG</label>
                                     </div>
                                     <div class="input-field col m1 s12 center-align">
@@ -934,6 +934,14 @@
             $('#text-barcode').val('');
         });
     });
+
+    function getNote(){
+        $('#note').val('');
+        if($('#production_fg_receive_id').val()){
+            let datakuy = $('#production_fg_receive_id').select2('data')[0];
+            $('#note').val('NO. ' + datakuy.prod_no + ' (' + datakuy.item_name + ')');
+        }
+    }
 
     function getItemInformation(){
         if($("#production_fg_receive_detail_id").val()){

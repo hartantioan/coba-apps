@@ -3790,6 +3790,8 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->place->code.' - Line : '.$d->line->code.' - '.$d->item->code.' - '.$d->item->name,
+                'item_name'     => $d->productionOrderDetail->productionScheduleDetail->item->code.' - '.$d->productionOrderDetail->productionScheduleDetail->item->name,
+                'prod_no'       => $d->productionOrderDetail->productionOrder->code,
             ];
         }
 

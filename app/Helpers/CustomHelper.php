@@ -6959,13 +6959,12 @@ class CustomHelper {
 				$arritem[] = $row['item_id'];
 				$arrqty = 0;
 			}else{
-				$index = array_search($row['item_id'],$arritem);
 				$item_id = $row['item_id'];
 			}
 		}
 		if($item_id){
+			info('gas');
 			foreach($data as $row){
-				$index = -1;
 				$newarr = [];
 				foreach($row['list_bom'] as $key => $rowbom){
 					if($rowbom['item_id'] !== $item_id){

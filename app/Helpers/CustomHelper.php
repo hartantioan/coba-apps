@@ -6947,7 +6947,7 @@ class CustomHelper {
 	public static function splitBomArray($data){
 		$newarray = [];
 		$arritem = [];
-		$arrqty = 0;
+		$datanew = [];
 		foreach($data as $row){
 			foreach($row['list_bom'] as $rowbom){
 				$newarray[] = $rowbom;
@@ -6963,7 +6963,6 @@ class CustomHelper {
 			}
 		}
 		if($item_id){
-			info('gas');
 			foreach($data as $row){
 				$newarr = [];
 				foreach($row['list_bom'] as $key => $rowbom){
@@ -6972,8 +6971,11 @@ class CustomHelper {
 					}
 				}
 				$row['list_bom'] = $newarr;
+				$datanew = $row;
 			}
+		}else{
+			$datanew = $data;
 		}
-		return $data;
+		return $datanew;
 	}
 }

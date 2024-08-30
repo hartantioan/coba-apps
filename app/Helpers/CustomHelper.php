@@ -6943,4 +6943,39 @@ class CustomHelper {
             }
         /* } */
 	}
+
+	public static function splitBomArray($data){
+		$newdata = [];
+		$newarray = [];
+		$arritem = [];
+		$arrdata = [];
+		foreach($data as $row){
+			foreach($row['list_bom'] as $rowbom){
+				$newarray[] = $rowbom;
+			}
+		}
+		$item_id = NULL;
+		foreach($newarray as $row){
+			if(!in_array($row['item_id'],$arritem)){
+				$arritem[] = $row['item_id'];
+			}else{
+				$index = array_search($row['item_id'],$arritem);
+				$item_id = $row['item_id'];
+			}
+		}
+		if($item_id){
+			foreach($data as $row){
+				$arraykey = -1;
+				foreach($row['list_bom'] as $key => $rowbom){
+					if($rowbom['item_id'] == $item_id){
+						$arraykey = $key;
+					}
+				}
+				if($arraykey >= 0){
+					array_splice($row['list_bom'],$arraykey,1);
+				}
+			}
+		}
+		return $data;
+	}
 }

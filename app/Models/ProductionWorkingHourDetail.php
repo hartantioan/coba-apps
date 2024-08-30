@@ -19,17 +19,22 @@ class ProductionWorkingHourDetail extends Model
         'type',
         'note',
         'working_hour',
+        'production_order_id',
     ];
 
     public function type(){
-        info($this->type);
+
         $type = match ($this->type) {
             '1' => 'Production',
             '2' => 'Non-Production',
 
             default => 'Invalid',
         };
-        info($type);
+        
         return $type;
+    }
+
+    public function productionOrder(){
+        return $this->belongsTo('App\Models\ProductionOrder','production_order_id','id')->withTrashed();
     }
 }

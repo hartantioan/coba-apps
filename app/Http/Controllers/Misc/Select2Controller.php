@@ -4359,57 +4359,12 @@ class Select2Controller extends Controller {
         ->get();
 
         foreach($data as $d) {
-            $bomdetail = [];
-            $qtyBobotOutput = round($d->productionScheduleDetail->qty / $d->productionScheduleDetail->bom->qty_output,3);
-            foreach($d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
-                $query->whereNotNull('is_default');
-            })->get() as $row){
-                $qty_planned = $row->qty * $qtyBobotOutput;
-                
-                $bomdetail[] = [
-                    'bom_id'            => $row->bom->id,
-                    'bom_detail_id'     => $row->id,
-                    'name'              => $row->lookable->code.' - '.$row->lookable->name,
-                    'unit'              => $row->lookable->uomUnit->code,
-                    'lookable_type'     => $row->lookable_type,
-                    'lookable_id'       => $row->lookable_id,
-                    'qty_planned'       => CustomHelper::formatConditionalQty($qty_planned),
-                    'nominal_planned'   => number_format($row->nominal,2,',','.'),
-                    'total_planned'     => number_format($row->nominal * $qty_planned,2,',','.'),
-                    'qty_bom'           => CustomHelper::formatConditionalQty($row->qty),
-                    'nominal_bom'       => number_format($row->nominal,2,',','.'),
-                    'total_bom'         => number_format($row->total,2,',','.'),
-                    'description'       => $row->description ?? '',
-                    'type'              => $row->type(),
-                    'list_stock'        => $row->lookable_type == 'items' ? $row->item->currentStockPerPlace($row->bom->place_id) : [],
-                    'issue_method'      => $row->issue_method,
-                    'has_bom'           => $row->lookable_type == 'items' ? ($row->lookable->bom()->exists() ? '1' : '') : '',
-                    /* 'list_batch'        => $row->lookable_type == 'items' ? $row->lookable->listBatch() : [], */
-                ];
-            }
 
             $response[] = [
                 'id'   			                => $d->id,
-                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' - '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                'text' 			                => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)),
                 'table'                         => $d->getTable(),
                 'code'                          => $d->code,
-                'item_receive_id'               => $d->productionScheduleDetail->item_id,
-                'item_receive_code'             => $d->productionScheduleDetail->item->code,
-                'item_receive_name'             => $d->productionScheduleDetail->item->name,
-                'item_receive_unit_uom'         => $d->productionScheduleDetail->item->uomUnit->code,
-                'item_receive_qty'              => CustomHelper::formatConditionalQty($d->productionScheduleDetail->qty),
-                'line'                          => $d->productionScheduleDetail->line->code,
-                'list_shading'                  => $d->productionScheduleDetail->item->arrShading(),
-                'place_id'                      => $d->productionScheduleDetail->productionSchedule->place_id,
-                'place_code'                    => $d->productionScheduleDetail->productionSchedule->place->code,
-                'line_id'                       => $d->productionScheduleDetail->line_id,
-                'line_code'                     => $d->productionScheduleDetail->line->code,
-                'warehouse_id'                  => $d->productionScheduleDetail->warehouse_id,
-                'warehouse_name'                => $d->productionScheduleDetail->warehouse->name,
-                'bom_id'                        => $d->productionScheduleDetail->bom_id,
-                'qty_bom_output'                => CustomHelper::formatConditionalQty($d->productionScheduleDetail->bom->qty_output),
-                'is_fg'                         => $d->productionScheduleDetail->item->is_sales_item ?? '',
-                'bom_detail'                    => $bomdetail,
             ];
         }
 

@@ -6968,11 +6968,8 @@ class CustomHelper {
 				$index = -1;
 				foreach($row['list_bom'] as $key => $rowbom){
 					if($rowbom['item_id'] == $item_id){
-						$index = $key;
+						unset($rowbom[$key]);
 					}
-				}
-				if($index >= 0){
-					array_splice($row['list_bom'],$index,1);
 				}
 			}
 		}

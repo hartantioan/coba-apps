@@ -1172,7 +1172,7 @@ class MarketingOrderInvoiceController extends Controller
                 'total'     => number_format($row->lookable->total,2,',','.'),
                 'tax'       => number_format($row->lookable->tax,2,',','.'),
                 'grandtotal'=> number_format($row->lookable->grandtotal,2,',','.'),
-                'balance'   => number_format($row->lookable->balanceInvoice(),2,',','.'),
+                'balance'   => number_format($row->lookable->balanceInvoicePaidTotal(),2,',','.'),
                 'note'      => $row->lookable->note,
                 'total_used'=> number_format($row->total,2,',','.'),
             ];

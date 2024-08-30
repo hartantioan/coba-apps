@@ -256,19 +256,19 @@
                                         <tr>
                                             <th class="center">Proses</th>
                                             <th class="center">Keterangan</th>
-                                           
+                                            <th class="center">Production Order</th>
                                             <th class="center">Waktu</th>
                                             <th class="center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody id="body-unit">
                                         <tr id="empty-unit">
-                                            <td colspan="4" class="center">Silahkan tambahkan shift</td>
+                                            <td colspan="5" class="center">Silahkan tambahkan shift</td>
                                         </tr>
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <th colspan="4" class="center">
+                                            <th colspan="5" class="center">
                                                 <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addShift();" href="javascript:void(0);">
                                                     <i class="material-icons left">add</i> Tambah
                                                 </a>
@@ -683,7 +683,7 @@
                 M.updateTextFields();
                 $('#body-unit').empty().append(`
                     <tr>
-                        <td class="center-align" colspan="4">Data tidak ditemukan</td>
+                        <td class="center-align" colspan="5">Data tidak ditemukan</td>
                     </t>
                 `);
             }
@@ -941,6 +941,7 @@
                     <option value="` + response.shift_id + `">` + response.shift_name + `</option>
                 `);
                 if(response.details.length > 0){
+                    $('#body-unit').empty();
                     $('.row_item').each(function(){
                         $(this).remove();
                     });
@@ -963,6 +964,12 @@
                                 </td>
                                 <td class="shift-inputs">
                                     <div class="input-field">
+                                        <select class="select2 browser-default" id="arr_pdo` + count + `" name="arr_pdo[]">
+                                        </select>
+                                    </div>
+                                </td>
+                                <td class="shift-inputs">
+                                    <div class="input-field">
                                         <input name="arr_working_hour[]" onfocus="emptyThis(this);" type="text" id="time`+count+`" value="` + val.working_hour + `">
                                     </div>
                                 </td>
@@ -974,6 +981,11 @@
                             </tr>
                             
                         `);
+
+                        $('#arr_pdo'+count).append(`
+                            <option value="` + val.production_order_id + `">` + val.production_order_name + `</option>
+                        `);
+                        select2ServerSide('#arr_pdo'+count, '{{ url("admin/select2/production_order") }}');
                         $('input[id$="time' + count + '"]').inputmask(
                                 "hh:mm", {
                                 placeholder: "HH:MM", 
@@ -981,8 +993,8 @@
                                 showMaskOnHover: false,
                                 //hourFormat: 12
                             }
-                        );
-                        $('#arr_process'+count).val(response.type).formSelect();
+                        );console.log(val.type);
+                        $('#arr_process'+count).val(val.type).formSelect();
                     });
                 }
                 if(response.document){
@@ -1363,6 +1375,12 @@
                 </td>
                 <td class="shift-inputs">
                     <div class="input-field">
+                        <select class="select2 browser-default" id="arr_pdo` + count + `" name="arr_pdo[]">
+                        </select>
+                    </div>
+                </td>
+                <td class="shift-inputs">
+                    <div class="input-field">
                         <input name="arr_working_hour[]" onfocus="emptyThis(this);" type="text" id="time`+count+`">
                     </div>
                 </td>
@@ -1373,6 +1391,7 @@
                 </td>
             </tr>
         `);
+        select2ServerSide('#arr_pdo'+count, '{{ url("admin/select2/production_order") }}');
         
         $('input[id$="time' + count + '"]').inputmask(
                 "hh:mm", {

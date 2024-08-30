@@ -222,6 +222,7 @@ class ProductionWorkingHourController extends Controller
                 'machine_id'                => 'required',
                 'note'                      => 'required',
                 'arr_process'               => 'required|array',
+                'arr_pdo'                   => 'required',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -234,6 +235,7 @@ class ProductionWorkingHourController extends Controller
                 'machine_id.required'               => 'Mesin tidak boleh kosong.',
                 'note.required'                     => 'Keterangan harus dalam bentuk array.',
                 'arr_process.required'              => 'Waktu harus di isi.',
+                'arr_pdo.required'                  => 'Production Order Harus dipilih.',
             ]);
 
             if($validation->fails()) {
@@ -335,6 +337,7 @@ class ProductionWorkingHourController extends Controller
                         foreach($request->arr_process as $key => $row){
                             ProductionWorkingHourDetail::create([
                                 'production_working_hour_id'=> $query->id,
+                                'production_order_id'       => $request->arr_pdo[$key],
                                 'type'                      => $row,
                                 'note'                      => $request->arr_note[$key],
                                 'working_hour'              => $request->arr_working_hour[$key],
@@ -381,10 +384,11 @@ class ProductionWorkingHourController extends Controller
         foreach($po->productionWorkingHourDetail as $row){
             $detail_time[] = [
                 'production_working_hour_id' => $po->id,
-                'type'                       => $row->type(),
+                'type'                       => $row->type,
                 'note'                       => $row->note,
                 'working_hour'               => $row->working_hour,
-               
+                'production_order_name'      => $row->productionOrder->code,
+                'production_order_id'        => $row->production_order_id,
             ];
         }
 

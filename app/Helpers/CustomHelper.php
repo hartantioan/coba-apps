@@ -6804,7 +6804,7 @@ class CustomHelper {
 			$trimmed_number = rtrim((string)$arr[1], '0');
 			$trimmed_length = strlen($trimmed_number);
 			if($trimmed_length > 3){
-				$value = number_format(floatval($arr[0].'.'.$arr[1]),10,',','.');
+				$value = number_format(floatval($arr[0].'.'.$arr[1]),11,',','.');
 			}else{
 				$value = number_format(floatval($arr[0].'.'.$arr[1]),$trimmed_length,',','.');
 			}

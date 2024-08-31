@@ -431,10 +431,12 @@ class ResetCogsHelper
             })->where('item_id',$item_id)->get();
 
             foreach($landedcost as $row){
+                $rowfc = $row->nominal;
                 if($row->lookable_type == 'landed_cost_details'){
-                $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2) - round($row->lookable->nominal * $row->lookable->landedCost->currency_rate,2);
+                    $rowfc = round($row->nominal - $row->lookable->nominal,2);
+                    $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2) - round($row->lookable->nominal * $row->lookable->landedCost->currency_rate,2);
                 }else{
-                $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2);
+                    $rowtotal = round($row->nominal * $row->landedCost->currency_rate,2);
                 }
                 if($qtyBefore > 0){
                 $total = $rowtotal;
@@ -461,8 +463,8 @@ class ResetCogsHelper
                 ]);
                 foreach($row->journalDetail as $rowjournal){
                     $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
+                        'nominal_fc'  => $rowfc,
+                        'nominal'     => $total,
                     ]);
                 }
                 $qtyBefore = $qty_final;

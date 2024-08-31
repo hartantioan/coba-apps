@@ -2590,7 +2590,7 @@ class CustomHelper {
 							'coa_id'		=> $rowdetail->landedCostFee->coa_id,
 							'account_id'	=> $rowdetail->landedCostFee->coa->bp_journal ? $lc->account_id : NULL,
 							'type'			=> '2',
-							'nominal'		=> round($rowdetail->total * $lc->currency_rate,2),
+							'nominal'		=> $rowdetail->total,
 							'nominal_fc'	=> $lc->currency->type == '1' ? $rowdetail->total * $lc->currency_rate : $rowdetail->total,
 							'note'			=> $rowdetail->landedCostFee->name,
 							'lookable_type'	=> $table_name,

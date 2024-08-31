@@ -391,11 +391,13 @@ class ProductionScheduleController extends Controller
                     
                     if($request->arr_id){
                         foreach($request->arr_id as $key => $row){
-                            ProductionScheduleTarget::create([
-                                'production_schedule_id'            => $query->id,
-                                'marketing_order_plan_detail_id'    => $row,
-                                'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            ]);
+                            if($row){
+                                ProductionScheduleTarget::create([
+                                    'production_schedule_id'            => $query->id,
+                                    'marketing_order_plan_detail_id'    => $row,
+                                    'qty'                               => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                ]);
+                            }
                         }
                     }
 

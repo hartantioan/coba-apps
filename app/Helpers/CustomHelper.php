@@ -6997,6 +6997,9 @@ class CustomHelper {
 		}else{
 			$datanew = $data;
 		}
-		return $newrow;
+		if($newrow){
+			$datanew[] = $newrow;
+		}
+		return $datanew;
 	}
 }

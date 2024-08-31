@@ -23,6 +23,7 @@ class DeliveryCostStandard extends Model
         'price',
         'start_date',
         'end_date',
+        'place_id',
         'note',
         'status'
     ];
@@ -33,6 +34,10 @@ class DeliveryCostStandard extends Model
 
     public function city(){
         return $this->belongsTo('App\Models\Region','city_id','id')->withTrashed();
+    }
+
+    public function place(){
+        return $this->belongsTo('App\Models\Place','place_id','id')->withTrashed();
     }
 
     public function district(){

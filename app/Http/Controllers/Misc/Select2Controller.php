@@ -3534,7 +3534,6 @@ class Select2Controller extends Controller {
                     ];
                 }
             }
-            info($details);
             if($hasBom){
                 $response[] = [
                     'id'   			=> $d->id,

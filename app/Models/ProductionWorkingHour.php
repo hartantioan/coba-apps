@@ -46,7 +46,7 @@ class ProductionWorkingHour extends Model
 
     public function machine()
     {
-        return $this->belongsTo('App\Models\Machine', 'machine_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\MachineWorkingHour', 'machine_id', 'id')->withTrashed();
     }
 
     public function shift()

@@ -6962,12 +6962,33 @@ class CustomHelper {
 				$item_id = $row['item_id'];
 			}
 		}
+		$newrow = NULL;
 		if($item_id){
+			$countQty = 0;
 			foreach($data as $row){
 				$newarr = [];
 				foreach($row['list_bom'] as $key => $rowbom){
 					if($rowbom['item_id'] !== $item_id){
 						$newarr[] = $rowbom;
+					}else{
+						$countQty += str_replace(',','.',str_replace('.','',$row['qty'])) * str_replace(',','.',str_replace('.','',$rowbom['qty']));
+						$arrnewbom[0] = $rowbom;
+						$newrow = [
+							'mopd_id' 			=> '',
+							'item_id' 			=> $item_id,
+							'item_code' 		=> explode(' - ',$rowbom['item_name'])[0],
+							'item_name' 		=> explode(' - ',$rowbom['item_name'])[1],
+							'qty' 				=> CustomHelper::formatConditionalQty($countQty),
+							'uom' 				=> $rowbom['unit'],
+							'request_date' 		=> $row['request_date'],
+							'note' 				=> '-',
+							'note2' 			=> '-',
+							'priority' 			=> NULL,
+							'has_bom' 			=> '1',
+							'place_id' 			=> '1',
+							'list_warehouse'	=> $rowbom['list_warehouse'],
+							'list_bom'			=> $arrnewbom,
+						];
 					}
 				}
 				$row['list_bom'] = $newarr;
@@ -6976,6 +6997,6 @@ class CustomHelper {
 		}else{
 			$datanew = $data;
 		}
-		return $datanew;
+		return $newrow;
 	}
 }

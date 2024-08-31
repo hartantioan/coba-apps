@@ -1294,45 +1294,47 @@
                         `);
                         
                         $.each(mop.details, function(i, val) {
-                            var count = makeid(10);
+                            if(val.mopd_id){
+                                var count = makeid(10);
 
-                            let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
+                                let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
 
-                            $('#total-row-target').before(`
-                                <tr class="row_item" data-id="` + mop.id + `">
-                                    <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
-                                    <td class="center-align">
-                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.mopd_id + `" href="javascript:void(0);">
-                                            <i class="material-icons">delete</i>
-                                        </a>
-                                    </td>
-                                    <td>
-                                        ` + mop.code + `
-                                    </td>
-                                    <td>
-                                        ` + val.item_code + ` - ` + val.item_name + `
-                                        ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
-                                    </td>
-                                    <td class="right-align">
-                                        <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
-                                    </td>
-                                    <td class="right-align">
-                                        0,000
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.uom + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.note + `
-                                    </td>
-                                    <td class="">
-                                        ` + val.note2 + `
-                                    </td>
-                                    <td class="center-align">
-                                        ` + val.request_date + `
-                                    </td>
-                                </tr>
-                            `);
+                                $('#total-row-target').before(`
+                                    <tr class="row_item" data-id="` + mop.id + `">
+                                        <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">
+                                        <td class="center-align">
+                                            <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" data-id="` + val.mopd_id + `" href="javascript:void(0);">
+                                                <i class="material-icons">delete</i>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            ` + mop.code + `
+                                        </td>
+                                        <td>
+                                            ` + val.item_code + ` - ` + val.item_name + `
+                                            ` + ( val.has_bom ? '' : '<br><span style="color:red;font-weight:800;">Belum memiliki BOM.</span>' ) + `<br>
+                                        </td>
+                                        <td class="right-align">
+                                            <input name="arr_qty[]" onfocus="emptyThis(this);" id="arr_qty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);" required style="width:100%;text-align:right;" readonly>
+                                        </td>
+                                        <td class="right-align">
+                                            0,000
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.uom + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note + `
+                                        </td>
+                                        <td class="">
+                                            ` + val.note2 + `
+                                        </td>
+                                        <td class="center-align">
+                                            ` + val.request_date + `
+                                        </td>
+                                    </tr>
+                                `);
+                            }
                             
                             let datanormal = `<table class="bordered"><thead><tr>
                                         <th class="center" style="min-width:150px !important;">Item</th>

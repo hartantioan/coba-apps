@@ -2488,6 +2488,8 @@ class CustomHelper {
 
 				$totalitem = 0;
 				$totalcost = 0;
+				$totalfcitem = 0;
+				$totalfccost = 0;
 
 				foreach($lc->landedCostDetail as $rowdetail){
 					$rowfc = $rowdetail->nominal;
@@ -2499,6 +2501,7 @@ class CustomHelper {
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
 					}
 					$totalitem += $rowtotal;
+					$totalfcitem += $rowfc;
 
 					$itemdata = ItemCogs::where('place_id',$rowdetail->place_id)->where('item_id',$rowdetail->item_id)->orderByDesc('date')->orderByDesc('id')->first();
 					if($itemdata){
@@ -2580,6 +2583,7 @@ class CustomHelper {
 								'detailable_type'=> $rowfee->getTable(),
 								'detailable_id'	=> $rowfee->id,
 							]);
+							$totalfccost += $rowfc;
 						}
 					}
 				}else{
@@ -2598,10 +2602,12 @@ class CustomHelper {
 							'detailable_type'=> $rowdetail->getTable(),
 							'detailable_id'	=> $rowdetail->id,
 						]);
+						$totalfccost += $rowdetail->total;
 					}
 				}
 
 				$balance = $totalitem - $totalcost;
+				$balancefc = $totalfcitem - $totalfccost;
 				if($balance < 0 || $balance > 0){
 					$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$lc->company_id)->first();
 					JournalDetail::create([
@@ -2610,7 +2616,7 @@ class CustomHelper {
 						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 						'type'			=> $balance < 0 ? '1' : '2',
 						'nominal'		=> abs($balance),
-						'nominal_fc'	=> 0,
+						'nominal_fc'	=> $balancefc,
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 					]);

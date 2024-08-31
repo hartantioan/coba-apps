@@ -316,12 +316,9 @@
                         </div>
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="top_internal" name="top_internal" type="number" min="0" step="1" value="0">
-                            <label class="active" for="top_internal">TOP Internal Dalam Jawa</label>
+                            <label class="active" for="top_internal">TOP Internal</label>
                         </div>
-                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
-                            <input id="top_internal_out_java" name="top_internal_out_java" type="number" min="0" step="1" value="0">
-                            <label class="active" for="top_internal_out_java">TOP Internal Luar Jawa</label>
-                        </div>
+                       
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="province_id" name="province_id" onchange="getCity();"></select>
                             <label class="active" for="province_id">{{ __('translations.province') }} PIC</label>

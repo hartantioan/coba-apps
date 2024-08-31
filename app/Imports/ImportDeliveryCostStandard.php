@@ -58,6 +58,8 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                 $district_id = Region::where('code',$district)->first()->id;
                 $categoryTransportation = explode('#', $row['transportasi'])[0];
                 $transportation_id = Transportation::where('code',$categoryTransportation)->first()->id;
+                
+                $plant = explode('#', $row['plant'])[0];
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal_start'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');
                 $dateTime2 = DateTime::createFromFormat('U', ($row['tanggal_selesai'] - 25569) * 86400);
@@ -80,13 +82,14 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                         $check->code = $row['code'];
                         $check->user_id = session('bo_id');
                         $check->city_id = $city_id;
+                        $check->place_id   = $plant;
                         $check->district_id = $district_id;
                         $check->transportation_id = $transportation_id;
                         $check->price = $price;
                         $check->start_date = $dateFormatted1;
                         $check->end_date = $dateFormatted2;
                         $check->note = $note;
-                        $check->status = 1;
+                        $check->status = $row['status'] ?? 1;
 
                         $check->save();
                     }else{
@@ -94,13 +97,14 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                             'code' => $row['code'],
                             'user_id' => session('bo_id'),
                             'city_id' => $city_id,
+                            'place_id' => $plant,
                             'district_id' => $district_id,
                             'transportation_id' => $transportation_id,
                             'price' => $price,
                             'start_date' => $dateFormatted1,
                             'end_date' => $dateFormatted2,
                             'note' => $note,
-                            'status'=> 1
+                            'status'=> $row['status'] ?? 1,
                         ]);
                     }
                     

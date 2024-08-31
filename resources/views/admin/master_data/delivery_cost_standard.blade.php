@@ -101,6 +101,7 @@
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.user') }}</th>
+                                                        <th>Plant</th>
                                                         <th>Transportasi</th>
                                                         <th>Kota</th>
                                                         <th>Kecamatan</th>
@@ -147,6 +148,14 @@
                                
                             </select>
                             <label class="active" for="transportation_id">Tipe Transportasi</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select id="place_id" name="place_id">
+                                @foreach($place as $row)
+                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                @endforeach
+                            </select>
+                            <label for="plant_id" class="">{{ __('translations.plant') }}</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col m3 s12">
@@ -642,6 +651,7 @@
                 
                 $('#temp').val(id);
                 $('#code').val(response.code);
+                $('#place_id').val(response.place_id).formSelect();
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);
                 $('#note').val(response.note);

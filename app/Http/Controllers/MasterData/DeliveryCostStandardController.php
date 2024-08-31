@@ -8,6 +8,7 @@ use App\Exports\ExportTemplateDeliveryCostStandard;
 use App\Http\Controllers\Controller;
 use App\Imports\ImportDeliveryCostStandard;
 use App\Models\DeliveryCostStandard;
+use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -20,6 +21,7 @@ class DeliveryCostStandardController extends Controller
     {
         $data = [
             'title'     => 'Standard Harga Pengiriman',
+            'place'     => Place::where('status','1')->get(),
             'content'   => 'admin.master_data.delivery_cost_standard',
         ];
 
@@ -140,6 +142,7 @@ class DeliveryCostStandardController extends Controller
             'transportation_id'              => 'required',
             'city_id'                        => 'required',
             'district_id'                    => 'required',
+            'place_id'                       => 'required',
             'price'                          => 'required',
             'note'                           => 'required',
             'start_date'                     => 'required',
@@ -148,6 +151,7 @@ class DeliveryCostStandardController extends Controller
             'transportation_id.required'                       => 'Transportasi Tidak boleh kosong',
             'city_id.required'                          => 'Kota tidak boleh kosong.',
             'district_id.required'                         => 'District tidak boleh kosong.',
+            'place_id.required'                         => 'Plant tidak boleh kosong.',
             'price.required'                          => 'Harga tidak boleh kosong.',
             'note.required'                     => 'note tidak boleh kosong.',
 			'end_date.required'                            => 'Tanggal akhir tidak boleh kosong.',
@@ -171,7 +175,7 @@ class DeliveryCostStandardController extends Controller
                     $query->district_id = $request->district_id;
                     
                     $query->transportation_id = $request->transportation_id;
-
+                    $query->place_id        = $request->place_id;
                     $query->start_date      = $request->start_date;
                     $query->end_date        = $request->end_date;
                     $query->price           = str_replace(',','.',str_replace('.','',$request->price));
@@ -193,6 +197,7 @@ class DeliveryCostStandardController extends Controller
                         'user_id'			        => session('bo_id'),
                         'city_id'	                => $request->city_id,
                         'district_id'               => $request->district_id,
+                        'place_id'                  => $request->place_id,
                         'note'                      => $request->note,
                         'payment_type'              => $request->payment_type,
                         'price'                     => str_replace(',','.',str_replace('.','',$request->price)),

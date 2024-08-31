@@ -1294,11 +1294,9 @@
                         `);
                         
                         $.each(mop.details, function(i, val) {
+                            var count = makeid(10);
+                            let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
                             if(val.mopd_id){
-                                var count = makeid(10);
-
-                                let qtyTarget = parseFloat(val.qty.replaceAll(".", "").replaceAll(",","."));
-
                                 $('#total-row-target').before(`
                                     <tr class="row_item" data-id="` + mop.id + `">
                                         <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.mopd_id + `">

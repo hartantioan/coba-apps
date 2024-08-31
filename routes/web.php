@@ -79,6 +79,7 @@ use App\Http\Controllers\MasterData\ResidenceController;
 use App\Http\Controllers\MasterData\WarehouseController;
 use App\Http\Controllers\MasterData\LineController;
 use App\Http\Controllers\MasterData\MachineController;
+use App\Http\Controllers\MasterData\MachineWorkingHourController;
 use App\Http\Controllers\MasterData\BomController;
 use App\Http\Controllers\MasterData\MenuUserController;
 use App\Http\Controllers\MasterData\ShiftController;
@@ -805,6 +806,16 @@ Route::prefix('admin')->group(function () {
                         Route::get('export',[LineController::class, 'export']);
                         Route::post('create',[LineController::class, 'create'])->middleware('operation.access:line,update');
                         Route::post('destroy', [LineController::class, 'destroy'])->middleware('operation.access:line,delete');
+                    });
+
+                    Route::prefix('machine_working_hour')->middleware('operation.access:machine,view')->group(function () {
+                        Route::get('/',[MachineWorkingHourController::class, 'index']);
+                        Route::get('datatable',[MachineWorkingHourController::class, 'datatable']);
+                        Route::post('show', [MachineWorkingHourController::class, 'show']);
+                        Route::post('print',[MachineWorkingHourController::class, 'print']);
+                        Route::get('export',[MachineWorkingHourController::class, 'export']);
+                        Route::post('create',[MachineWorkingHourController::class, 'create'])->middleware('operation.access:machine,update');
+                        Route::post('destroy', [MachineWorkingHourController::class, 'destroy'])->middleware('operation.access:machine,delete');
                     });
 
                     Route::prefix('machine')->middleware('operation.access:machine,view')->group(function () {

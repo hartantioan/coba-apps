@@ -99,11 +99,7 @@ class DownPaymentController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
-                        AND (
-                            CASE 
-                                WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
-                            END
-                        )
+                        AND ar.post_date >= '2024-06-01'
                     LIMIT 1
                 ),0) AS latest_currency,
                 IFNULL((

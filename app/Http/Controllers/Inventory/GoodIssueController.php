@@ -491,6 +491,7 @@ class GoodIssueController extends Controller
                             }
                         }else{
                             $passed = false;
+                            $arrItemNotPassed[] = $item_stock->item->name;
                         }
 
                     }

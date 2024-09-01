@@ -89,6 +89,31 @@ class DownPaymentController extends Controller
                             END
                         )
                 ),0) AS adjust_nominal,
+                IFNULL((SELECT
+                    ar.currency_rate
+                    FROM adjust_rate_details ard
+                    JOIN adjust_rates ar
+                        ON ar.id = ard.adjust_rate_id
+                    WHERE 
+                        ar.post_date <= :date3
+                        AND ar.status IN ('2','3')
+                        AND ard.lookable_type = 'purchase_down_payments'
+                        AND ard.lookable_id = pdp.id
+                ),0) AS latest_currency,
+                IFNULL((
+                    SELECT
+                        SUM(jd.nominal)
+                        FROM journal_details jd
+                        JOIN journals j
+                            ON j.id = jd.journal_id
+                        JOIN coas c
+                            ON jd.coa_id = c.id
+                        WHERE c.code = '100.01.07.01.01'
+                        AND jd.note = CONCAT('REVERSE*',pdp.code)
+                        AND j.post_date <= :date4
+                        AND j.status IN ('2','3')
+                        AND jd.deleted_at IS NULL
+                ),0) AS total_journal,
                 IFNULL((
                     SELECT
                         SUM(jd.nominal)
@@ -136,8 +161,9 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
-            $currency_rate = $row->currency_rate;
-            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal;
+            $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
+            /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
+            $balance_rp = $balance * $currency_rate;
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,

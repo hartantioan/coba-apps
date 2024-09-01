@@ -52,7 +52,7 @@ class DownPaymentController extends Controller
                 *,
                 pdp.type as typepdp,
                 IFNULL((SELECT 
-                    SUM(ROUND(nominal,2)) 
+                    SUM(nominal) 
                     FROM purchase_invoice_dps pid 
                     JOIN purchase_invoices pi
                         ON pid.purchase_invoice_id = pi.id
@@ -63,7 +63,7 @@ class DownPaymentController extends Controller
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
-                        SUM(ROUND(pmd.grandtotal,2))
+                        SUM(pmd.grandtotal)
                         FROM purchase_memo_details pmd
                         JOIN purchase_memos pm
                             ON pm.id = pmd.purchase_memo_id
@@ -104,7 +104,7 @@ class DownPaymentController extends Controller
                 ),0) AS latest_currency,
                 IFNULL((
                     SELECT
-                        SUM(ROUND(jd.nominal,2))
+                        SUM(jd.nominal)
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id
@@ -118,7 +118,7 @@ class DownPaymentController extends Controller
                 ),0) AS total_journal,
                 IFNULL((
                     SELECT
-                        SUM(ROUND(jd.nominal,2))
+                        SUM(jd.nominal)
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id
@@ -165,8 +165,8 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $total_received_after_adjust = round((round($row->grandtotal * $row->currency_rate,2)) + $row->adjust_nominal,2);
-            $total_invoice_after_adjust = round(round(($row->total_used + $row->total_memo),3) * $currency_rate,2);
+            $total_received_after_adjust = ($row->grandtotal * $row->currency_rate) + $row->adjust_nominal;
+            $total_invoice_after_adjust = ($row->total_used + $row->total_memo) * $currency_rate;
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->currency_rate;

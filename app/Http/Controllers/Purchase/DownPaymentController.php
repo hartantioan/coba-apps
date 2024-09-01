@@ -99,7 +99,7 @@ class DownPaymentController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
-                    ORDER BY id DESC
+                    ORDER BY ar.id DESC
                     LIMIT 1
                 ),0) AS latest_currency,
                 IFNULL((

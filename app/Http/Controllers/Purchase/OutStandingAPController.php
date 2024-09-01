@@ -137,7 +137,7 @@ class OutStandingAPController extends Controller
                             AND cd.lookable_type = 'purchase_invoices'
                             AND cd.lookable_id = pi.id
                             AND cd.deleted_at IS NULL
-                    ),'0') AS status_cancel,
+                    ),0) AS status_cancel,
                     u.name AS account_name,
                     u.employee_no AS account_code,
                     pi.code,

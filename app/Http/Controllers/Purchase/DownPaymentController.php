@@ -85,6 +85,7 @@ class DownPaymentController extends Controller
                         AND (
                             CASE 
                                 WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
+                                WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                             END
                         )
                 ),0) AS adjust_nominal,
@@ -98,7 +99,7 @@ class DownPaymentController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
-                        AND ar.post_date >= '2024-06-01'
+                    ORDER BY id DESC
                     LIMIT 1
                 ),0) AS latest_currency,
                 IFNULL((
@@ -163,10 +164,12 @@ class DownPaymentController extends Controller
         $totalbalance = 0;
 
         foreach($data as $row){
+            $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal,2);
+            $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $row->currency_rate,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
-            $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal;
-            /* $balance_rp = $balance * $currency_rate; */
+            $currency_rate = $row->currency_rate;
+            /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
@@ -180,10 +183,10 @@ class DownPaymentController extends Controller
                     'total'         => number_format($row->total * $currency_rate,2,',','.'),
                     'used'          => number_format($row->total_used * $currency_rate,2,',','.'),
                     'memo'          => number_format($row->total_memo * $currency_rate,2,',','.'),
-                    'balance'       => number_format($balance_rp,2,',','.'),
+                    'balance'       => number_format($balance_after_adjust,2,',','.'),
                     'balance_fc'    => number_format($balance,2,',','.'),
                 ];
-                $totalbalance += round($balance_rp,2);
+                $totalbalance += round($balance_after_adjust,2);
             }
         }
 

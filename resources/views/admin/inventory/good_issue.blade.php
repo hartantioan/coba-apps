@@ -256,11 +256,11 @@
                                         <h5>Detail Produk</h5>
                                         Coa debit mengikuti coa pada masing-masing grup item.
                                         <div>
-                                            <table class="bordered" style="min-width:3000px;" id="table-detail">
+                                            <table class="bordered" style="min-width:3500px;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">{{ __('translations.item') }}</th>
-                                                        <th class="center">Stok</th>
+                                                        <th class="center" width="300px">Stok</th>
                                                         <th class="center">{{ __('translations.qty') }}</th>
                                                         <th class="center">{{ __('translations.unit') }}</th>
                                                         <th class="center" width="300px">No.Serial</th>

@@ -4372,7 +4372,7 @@ class CustomHelper {
 				}
 			}
 
-			if($adjustGrpo > 0){
+			if($adjustGrpo > 0 && $pi->currency->type == '2'){
 				$balanceselisih = $adjustGrpo - round($pi->grandtotal * $pi->currency_rate,2);
 				if($balanceselisih < 0 || $balanceselisih > 0){
 					JournalDetail::create([

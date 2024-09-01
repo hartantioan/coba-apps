@@ -462,7 +462,7 @@ class GoodIssueController extends Controller
                     }
                     $rowprice = NULL;
                     $item_stock = ItemStock::find(intval($row));
-                    $rowprice = $item_stock->priceNow();
+                    $rowprice = $item_stock->priceDate($request->post_date);
                     $grandtotal += round($rowprice * $cumulative_qty[$key],2);
                     if($item_stock){
 

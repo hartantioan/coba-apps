@@ -52,7 +52,7 @@ class DownPaymentController extends Controller
                 *,
                 pdp.type as typepdp,
                 IFNULL((SELECT 
-                    SUM(nominal) 
+                    SUM(ROUND(nominal,2)) 
                     FROM purchase_invoice_dps pid 
                     JOIN purchase_invoices pi
                         ON pid.purchase_invoice_id = pi.id
@@ -63,7 +63,7 @@ class DownPaymentController extends Controller
                 ),0) AS total_used,
                 IFNULL((
                     SELECT
-                        SUM(pmd.grandtotal)
+                        SUM(ROUND(pmd.grandtotal,2))
                         FROM purchase_memo_details pmd
                         JOIN purchase_memos pm
                             ON pm.id = pmd.purchase_memo_id
@@ -104,7 +104,7 @@ class DownPaymentController extends Controller
                 ),0) AS latest_currency,
                 IFNULL((
                     SELECT
-                        SUM(jd.nominal)
+                        SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id
@@ -118,7 +118,7 @@ class DownPaymentController extends Controller
                 ),0) AS total_journal,
                 IFNULL((
                     SELECT
-                        SUM(jd.nominal)
+                        SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id

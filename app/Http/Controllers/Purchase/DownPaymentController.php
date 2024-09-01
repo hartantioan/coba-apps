@@ -85,7 +85,6 @@ class DownPaymentController extends Controller
                         AND (
                             CASE 
                                 WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
-                                WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                             END
                         )
                 ),0) AS adjust_nominal,
@@ -166,7 +165,7 @@ class DownPaymentController extends Controller
         foreach($data as $row){
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $balance_rp = round($balance * $currency_rate,2) /* + $row->adjust_nominal */ - $row->total_journal;
+            $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal;
             /* $balance_rp = $balance * $currency_rate; */
             if($balance > 0){
                 $results[] = [

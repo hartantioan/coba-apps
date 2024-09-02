@@ -680,6 +680,8 @@
             activeSelect2.classList.remove('tab-active');
         }
     });
+
+    var arrPallet = [];
     
     $(function() {
 
@@ -867,6 +869,7 @@
                 }
                 $('#qty-unit,#sell-unit').text('-');
                 $('#total-received').text('0,000');
+                arrPallet = [];
             }
         });
         
@@ -898,9 +901,33 @@
             }
         });
 
+        $('#pallet_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/pallet") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        arr_pallet: arrPallet,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
-        select2ServerSide('#pallet_id', '{{ url("admin/select2/pallet") }}');
         select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
@@ -1283,6 +1310,7 @@
 
     function getItemProductionOrder(data){
         data = data || '';
+        arrPallet = [];
         if($('.data-used').length > 0){
             $('.data-used').trigger('click');
         }
@@ -1296,12 +1324,14 @@
         `);
         if($('#production_order_detail_id').val()){
             let datakuy = data !== '' ? data : $('#production_order_detail_id').select2('data')[0];
-            console.log(data);
             $('#item_name').val(datakuy.item_name);
             $('#conversion').val(datakuy.conversion);
             $('#qty-unit').text(datakuy.uom_unit);
             $('#sell-unit').text(datakuy.sell_unit);
             $('#note').val('NO. ' + datakuy.prod_no + ' (' + datakuy.item_name + ')');
+            $.each($('#production_order_detail_id').select2('data')[0].pallet_child, function(i, val) {
+                arrPallet.push(val);
+            });
         }else{
             $('#item_name').val('');
             $('#qty-unit,#sell-unit').text('-');

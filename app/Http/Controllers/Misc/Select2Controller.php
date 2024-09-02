@@ -1765,6 +1765,11 @@ class Select2Controller extends Controller {
                     $query->where('code', 'like', "%$search%")
                     ->orWhere('name', 'like', "%$search%");
                 })
+                ->where(function($query)use($request){
+                    if($request->arr_pallet){
+                        $query->whereIn('id',$request->arr_pallet);
+                    }
+                })
                 ->where('status','1')->get();
 
         foreach($data as $d) {
@@ -4713,14 +4718,15 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             if($d->productionScheduleDetail->item->sellUnit()){
                 $response[] = [
-                    'id'        => $d->id,
-                    'text' 	    => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
-                    'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
-                    'prod_no'   => $d->productionOrder->code,
-                    'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
-                    'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
-                    'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
-                    'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
+                    'id'                => $d->id,
+                    'text' 	            => $d->productionOrder->code.' Tgl.Post '.date('d/m/Y',strtotime($d->productionOrder->post_date)).' - Plant : '.$d->productionScheduleDetail->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+                    'item_name'         => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
+                    'prod_no'           => $d->productionOrder->code,
+                    'qty'               => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
+                    'uom_unit'          => $d->productionScheduleDetail->item->uomUnit->code, 
+                    'sell_unit'         => $d->productionScheduleDetail->item->sellUnit(),
+                    'conversion'        => CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
+                    'pallet_child'      => $d->productionScheduleDetail->item->getChildrenPalletArray(),
                 ];
             }
         }

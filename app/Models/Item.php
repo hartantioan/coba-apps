@@ -297,6 +297,16 @@ class Item extends Model
         return $pricenow;
     }
 
+    public function getChildrenPalletArray(){
+        $arr = [];
+        foreach($this->fgGroup as $row){
+            if($row->item->pallet()->exists()){
+                $arr[] = $row->item->pallet_id;
+            }
+        }
+        return $arr;
+    }
+
     public function priceNowProduction($place_id,$date){
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();

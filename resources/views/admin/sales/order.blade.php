@@ -970,6 +970,7 @@
     }
     function getTopCustomer(){
         $('#phone').val('');
+        $('#payment_type').val('2').formSelect().trigger('change');
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
@@ -999,7 +1000,6 @@
             $('#billing_address').empty().append(`
                 <option value="">--Pilih customer ya--</option>
             `);
-            $('#payment_type').val('2').formSelect();
         }
     }
 

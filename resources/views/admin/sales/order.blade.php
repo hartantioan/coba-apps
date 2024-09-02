@@ -999,6 +999,7 @@
             $('#billing_address').empty().append(`
                 <option value="">--Pilih customer ya--</option>
             `);
+            $('#payment_type').val('2').formSelect();
         }
     }
 

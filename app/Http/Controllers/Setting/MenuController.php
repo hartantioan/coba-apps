@@ -86,20 +86,20 @@ class MenuController extends Controller
             $temp = $row->item_id;
         } */
 
-        $item = Item::find(5030);
+        /* $item = Item::find(5030);
         $startdate = '2024-08-16';
 
         foreach($item as $row){
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
-        }
+        } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
     }
 
     function addToArr(&$arr, $data){

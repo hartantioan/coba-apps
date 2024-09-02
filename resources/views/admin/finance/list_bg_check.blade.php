@@ -9,6 +9,10 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+    
+    .modal {
+        top:0px !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -117,7 +121,7 @@
     </div>
 </div>
 
-<div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 80% !important;">
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
             <div class="col s12">
@@ -127,10 +131,18 @@
                         <div id="validation_alert" ></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m5">
+                        <div class="input-field col s12 m4">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="code" name="code" type="text" placeholder="Kode">
+                            <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">{{ __('translations.code') }}</label>
+                        </div>
+                        <div class="input-field col s12 m1">
+                            <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
+                                <option value="">--Pilih--</option>
+                                @foreach ($place as $rowplace)
+                                    <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                @endforeach
+                            </select>
                         </div>
                         <div class="input-field col s12 m4">
                             <select class="browser-default" id="account_id" name="account_id"></select>
@@ -294,6 +306,7 @@
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();     
         });
+        window.table.search('{{ $code }}').draw();
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -413,6 +426,44 @@
 
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
+
+    function getCode(val){
+        if(val){
+            if($('#temp').val()){
+                let newcode = $('#code').val().replaceAt(7,val);
+                $('#code').val(newcode);
+            }else{
+                if($('#code').val().length > 7){
+                    $('#code').val($('#code').val().slice(0, 7));
+                }
+                $.ajax({
+                    url: '{{ Request::url() }}/get_code',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        val: $('#code').val() + val,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        $('#code').val(response);
+                    },
+                    error: function() {
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        }
+    }
     
     function getSubdistrict(){
         if($('#city_id').val()){

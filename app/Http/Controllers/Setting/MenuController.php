@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Setting;
 
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Helpers\ResetCogsHelper;
 use App\Models\ApprovalTemplateMenu;
 use App\Models\Journal;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -85,20 +86,20 @@ class MenuController extends Controller
             $temp = $row->item_id;
         } */
 
-        /* $item = Item::find(4661);
-        $startdate = '2024-08-01';
+        $item = Item::find(5030);
+        $startdate = '2024-08-16';
 
         foreach($item as $row){
-            ResetCogsNew::dispatch($startdate,1,1,$row->id,NULL,NULL,NULL);
-        } */
+            ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
+        }
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
     }
 
     function addToArr(&$arr, $data){

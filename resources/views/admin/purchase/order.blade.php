@@ -3098,7 +3098,7 @@
         var id_biggest_total = '';
         $('.arr_subtotal').each(function(index){
             let rownominal = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), rowtax = 0, rowwtax = 0, rowbobot = 0, rowdiscount = 0, rowgrandtotal = 0;
-            rowdiscount = Math.round(( parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")) /subtotal* discount) * 100) / 100;
+            rowdiscount = subtotal > 0 ? Math.round(( parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")) /subtotal* discount) * 100) / 100 : 0;
             
             rownominal -= rowdiscount;
 
@@ -3135,6 +3135,8 @@
             );
 
             rowgrandtotal = (rownominal + rowtax - rowwtax).toFixed(2);
+
+            console.log(rowgrandtotal);
 
             $('input[name^="arr_nominal_grandtotal"]').eq(index).val(
                 (rowgrandtotal >= 0 ? '' : '-') + formatRupiahIni(rowgrandtotal.toString().replace('.',','))

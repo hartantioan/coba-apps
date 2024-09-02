@@ -284,7 +284,7 @@
                                         <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
                                             <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
                                             @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                             @endforeach
                                         </select>
                                         <label class="active" for="tax_id">PPN</label>

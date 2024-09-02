@@ -304,6 +304,7 @@ class Item extends Model
                 $arr[] = $row->item->pallet_id;
             }
         }
+        $arr = array_unique($arr);
         return $arr;
     }
 

@@ -3023,7 +3023,7 @@ class Select2Controller extends Controller {
                 'tax'           => CustomHelper::formatConditionalQty($d->tax),
                 'grandtotal'    => CustomHelper::formatConditionalQty($d->grandtotal),
                 'percent_dp'    => CustomHelper::formatConditionalQty($d->percent_dp),
-                'total_dp'      => CustomHelper::formatConditionalQty(round(($d->percent_dp / 100) * $d->grandtotal,2)),
+                'total_dp'      => CustomHelper::formatConditionalQty(round(($d->percent_dp / 100) * $d->total,2)),
                 'payment_type'  => $d->payment_type,
             ];
         }

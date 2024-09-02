@@ -88,10 +88,9 @@
                                                         <th>User</th>
                                                         <th>Customer</th>
                                                         <th>Company</th>
-                                                       
+                                                        <th>Post Date</th>
                                                         <th>Valid Date</th>
                                                         <th>Pay Date</th>
-                                                        <th>Post Date</th>
                                                         <th>Bank Source Name</th>
                                                         <th>Bank Source No</th>
                                                         <th>Document Number</th>

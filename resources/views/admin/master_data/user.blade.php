@@ -290,14 +290,7 @@
                             </select>
                             <label for="gender">Jenis Kelamin</label>
                         </div>
-                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
-                            <input id="pic_finance" name="pic_finance" type="text" placeholder="PIC FIN">
-                            <label class="active" for="pic_finance">PIC Finance</label>
-                        </div>
-                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
-                            <input id="no_pic_finance" name="no_pic_finance" type="text" placeholder="No PIC FIN">
-                            <label class="active" for="no_pic_finance">No PIC Finance</label>
-                        </div>
+                        
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="pic" name="pic" type="text" placeholder="PIC">
                             <label class="active" for="pic">PIC</label>
@@ -309,6 +302,14 @@
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="pic_no" name="pic_no" type="text" placeholder="Kontak PIC">
                             <label class="active" for="pic_no">Kontak PIC</label>
+                        </div>
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
+                            <input id="pic_finance" name="pic_finance" type="text" placeholder="PIC FIN">
+                            <label class="active" for="pic_finance">PIC Finance</label>
+                        </div>
+                        <div class="input-field col s12 m3 other_inputs" style="display:none;">
+                            <input id="no_pic_finance" name="no_pic_finance" type="text" placeholder="No PIC FIN">
+                            <label class="active" for="no_pic_finance">No PIC Finance</label>
                         </div>
                         <div class="input-field col s12 m3 other_inputs" style="display:none;">
                             <input id="office_no" name="office_no" type="text" placeholder="Kontak Kantor">

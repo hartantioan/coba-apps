@@ -33,9 +33,9 @@
         <script>
             $(function() {
                 cekNotif('{{ URL::to('/') }}');
-                setInterval(function () {
+                /* setInterval(function () {
                     cekNotif('{{ URL::to('/') }}');
-                },25000);
+                },25000); */
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
                 var sessionLifetime = {{  config('session.lifetime') }};

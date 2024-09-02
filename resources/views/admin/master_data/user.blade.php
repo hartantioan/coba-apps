@@ -1140,7 +1140,7 @@
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#type').val('2');
-                $('#province_id,#city_id,#country_id').empty();
+                $('#province_id,#city_id,#country_id,#brand_id,#district_id').empty();
                 M.updateTextFields();
                 $('.row_bank').remove();
                 $('.row_info').remove();

@@ -511,6 +511,7 @@
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
+                { name: 'start_date', className: 'center-align' },
                 { name: 'end_date', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'province', searchable: false, orderable: false, className: 'center-align' },

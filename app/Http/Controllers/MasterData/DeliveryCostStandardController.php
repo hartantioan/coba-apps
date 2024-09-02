@@ -104,6 +104,7 @@ class DeliveryCostStandardController extends Controller
                     $nomor,
                     $val->code,
                     $val->user->name,
+                    $val->place->name ?? '-',
                     $val->transportation->name ?? '-',
                     $val->city->name,
                     $val->district->name,

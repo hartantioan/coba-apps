@@ -975,6 +975,12 @@ class CustomHelper {
 				'currency_id'	=> $currency_id,
 				'currency_rate'	=> $currency_rate,
 			]);
+
+			if($gr->total <= 0){
+				$gr->update([
+					'status'	=> '3'
+				]);
+			}
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
 			

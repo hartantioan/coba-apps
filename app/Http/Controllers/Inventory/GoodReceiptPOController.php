@@ -572,7 +572,7 @@ class GoodReceiptPOController extends Controller
 
                     $rowprice = 0;
 
-                    $bobot = $pod->subtotal / $subtotal;
+                    $bobot = $subtotal > 0 ? $pod->subtotal / $subtotal : 0;
                     $rowprice = $pod->price;
 
                     if($pod->total){

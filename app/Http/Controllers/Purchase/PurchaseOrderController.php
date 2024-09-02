@@ -711,7 +711,7 @@ class PurchaseOrderController extends Controller
                         $total += floatval(str_replace(',','.',str_replace('.','',$row)));
                     }
                     if($total == 0){
-                        $passedZero = false;
+                        //$passedZero = false;
                     }
 
                     if(!$passedZero){

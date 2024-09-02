@@ -655,10 +655,12 @@ class UserController extends Controller
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
 
-                    $query->top_internal_out_java = $request->top_internal_out_java ? $request->top_internal_out_java : NULL;
+     
                     $query->brand_id             = $request->brand_id ? $request->brand_id : NULL;
                     $query->sales_payment_type    = $request->sales_payment_type;
 
+                    $query->pic_finance    = $request->pic_finance;
+                    $query->no_pic_finance    = $request->no_pic_finance;
 
 
                     $query->status          = $request->status ? $request->status : '2';
@@ -720,9 +722,12 @@ class UserController extends Controller
 
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,
-                        'top_internal_out_java' => $request->top_internal_out_java ? $request->top_internal_out_java : NULL,
+                       
                         'brand_id'              => $request->brand_id ? $request->brand_id : NULL,
                         'sales_payment_type'    => $request->sales_payment_type,
+
+                        'pic_finance'    => $request->pic_finance,
+                        'no_pic_finance'    => $request->no_pic_finance,
 
                         'status'                => $request->status ? $request->status : '2',
                         'gender'                => $request->gender ? $request->gender : NULL,

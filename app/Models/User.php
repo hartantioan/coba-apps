@@ -80,6 +80,9 @@ class User extends Authenticatable
 
         'brand_id',
         'sales_payment_type',
+
+        'pic_finance',
+        'no_pic_finance',
     ];
 
     protected $hidden = [

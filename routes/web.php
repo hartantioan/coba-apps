@@ -15,6 +15,7 @@ use App\Http\Controllers\Accounting\AdjustRateController;
 use App\Http\Controllers\Production\BomCalculatorController;
 use App\Http\Controllers\Finance\PaymentRequestDateReportController;
 use App\Http\Controllers\Finance\FinanceReportController;
+use App\Http\Controllers\Finance\ListBgCheckController;
 use App\Http\Controllers\HR\LeaveRequestController;
 use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\HR\RevisionAttendanceHRDController;
@@ -2697,6 +2698,16 @@ Route::prefix('admin')->group(function () {
                     Route::get('approval/{id}',[PurchaseDownPaymentController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('destroy', [PurchaseDownPaymentController::class, 'destroy'])->middleware('operation.access:purchase_down_payment,delete');
                     Route::get('export_from_page',[PurchaseDownPaymentController::class, 'exportFromTransactionPage']);
+                });
+
+                Route::prefix('list_bg_check')->middleware('operation.access:list_bg_check,view')->group(function () {
+                    Route::get('/',[ListBgCheckController::class, 'index']);
+                    Route::get('datatable',[ListBgCheckController::class, 'datatable']);
+                    Route::post('show', [ListBgCheckController::class, 'show']);
+                    Route::post('print',[ListBgCheckController::class, 'print']);
+                    Route::get('export',[ListBgCheckController::class, 'export']);
+                    Route::post('create',[ListBgCheckController::class, 'create'])->middleware('operation.access:list_bg_check,update');
+                    Route::post('destroy', [ListBgCheckController::class, 'destroy'])->middleware('operation.access:list_bg_check,delete');
                 });
 
                 Route::prefix('purchase_invoice')->middleware(['operation.access:purchase_invoice,view','lockacc'])->group(function () {

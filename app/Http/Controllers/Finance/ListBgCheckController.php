@@ -1,0 +1,280 @@
+<?php
+
+namespace App\Http\Controllers\Finance;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\ListBgCheck;
+use App\Models\Company;
+
+class ListBgCheckController extends Controller
+{
+    public function index()
+    {
+        $data = [
+            'title'     => 'List BG Check',
+            'content'   => 'admin.finance.list_bg_check',
+            'company'       => Company::where('status','1')->get(),
+        ];
+
+        return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function datatable(Request $request){
+        $column = [
+            'code',
+            'user_id',
+            'account_id',
+            'company_id',
+            'post_date',
+            'valid_until_date',
+            'pay_date',
+            'bank_source_name',
+            'bank_source_no',
+            'document_no',
+            'document',
+            'note',
+            'nominal',
+            'grandtotal',
+            'status',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = ListBgCheck::count();
+        
+        $query_data = ListBgCheck::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('bank_source_name', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('bank_source_no', 'like', "%$search%")
+                            ->orWhere('document', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request) {
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ;
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request) {
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ;
+                            });;
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+            })
+            ->offset($start)
+            ->limit($length)
+            ->orderBy($order, $dir)
+            ->get();
+
+        $total_filtered = ListBgCheck::where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where(function($query) use ($search, $request) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('bank_source_name', 'like', "%$search%")
+                            ->orWhere('document_no', 'like', "%$search%")
+                            ->orWhere('bank_source_no', 'like', "%$search%")
+                            ->orWhere('document', 'like', "%$search%")
+                            ->orWhere('note', 'like', "%$search%")
+                            ->orWhereHas('user',function($query) use ($search, $request) {
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ;
+                            })
+                            ->orWhereHas('account',function($query) use ($search, $request) {
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%")
+                                    ;
+                            });;
+                    });
+                }
+
+                if($request->status){
+                    $query->where('status', $request->status);
+                }
+            })
+            ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+				
+                $response['data'][] = [
+                    $nomor,
+                    $val->code,
+                    $val->user->name,
+                    $val->account->name,
+                    $val->company->name,
+                    date('d/m/Y',strtotime($val->post_date)),
+                    date('d/m/Y',strtotime($val->valid_until_date)),
+                    date('d/m/Y',strtotime($val->pay_date))??'-',
+                    $val->bank_source_name,
+                    $val->bank_source_no,
+                    $val->document_no,
+                    $val->document,
+                    $val->note,
+                    $val->nominal,
+                    $val->grandtotal,
+                    $val->status(),
+                    '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
+					'
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
+    }
+
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+            'code' 				=> $request->temp ? ['required', Rule::unique('machines', 'code')->ignore($request->temp)] : 'required|unique:machines,code',
+            
+            'note'              => 'required',
+        ], [
+            'code.required' 	    => 'Kode tidak boleh kosong.',
+            'code.unique'           => 'Kode telah terpakai.',
+           
+            'note.required'         => 'Nama tidak boleh kosong.',
+        ]);
+
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+			if($request->temp){
+                DB::beginTransaction();
+                try {
+                    $query = ListBgCheck::find($request->temp);
+                    $query->code            = $request->code;
+                    $query->user_id         = session('bo_id'); 
+                    $query->account_id      = $request->account_id; 
+                    $query->company_id      = $request->company_id; 
+                    $query->post_date       = $request->post_date; 
+                    $query->valid_until_date = $request->valid_until_date; 
+                    $query->pay_date        = $request->pay_date; 
+                    $query->bank_source_name = $request->bank_source_name; 
+                    $query->bank_source_no  = $request->bank_source_no; 
+                    $query->document_no     = $request->document_no; 
+                    $query->document        = $request->document; 
+                    $query->note            = $request->note; 
+                    $query->nominal         = str_replace(',','.',str_replace('.','',$request->nominal)); 
+                    // $query->grandtotal      = str_replace(',','.',str_replace('.','',$request->grandtotal?? null)); 
+                    $query->status          = $request->status ? $request->status : '1';
+
+                    $query->save();
+                    DB::commit();
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
+			}else{
+                DB::beginTransaction();
+                    info($request);
+                    $query = ListBgCheck::create([
+                        'code'              => $request->code,
+                        'user_id'           => session('bo_id'),
+                        'account_id'        => $request->account_id,
+                        'company_id'        => $request->company_id,
+                        'post_date'         => $request->post_date,
+                        'valid_until_date'  => $request->valid_until_date,
+                        'pay_date'          => $request->pay_date,
+                        'bank_source_name'  => $request->bank_source_name,
+                        'bank_source_no'    => $request->bank_source_no,
+                        'document_no'       => $request->document_no,
+                        'document'          => $request->document,
+                        'note'              => $request->note,
+                        'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
+                        // 'grandtotal'        => str_replace(',','.',str_replace('.','',$request->grandtotal?? null)),
+                        'status'            => $request->status ? $request->status : '1',
+                    ]);
+                    
+                    DB::commit();
+                
+			}
+			
+			if($query) {
+
+                activity()
+                    ->performedOn(new ListBgCheck())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit list bg check.');
+
+				$response = [
+					'status'  => 200,
+					'message' => 'Data successfully saved.'
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+		
+		return response()->json($response);
+    }
+
+    public function show(Request $request){
+        $list = ListBgCheck::find($request->id);
+        $list['nominal'] = number_format($list->nominal,2,',','.');	
+        $list['account_name'] = $list->account->name;
+        $list['grandtotal'] = number_format($list->grandtotal,2,',','.');				
+		return response()->json($list);
+    }
+
+    public function destroy(Request $request){
+        $query = ListBgCheck::find($request->id);
+		
+        if($query->delete()) {
+            activity()
+                ->performedOn(new ListBgCheck())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Delete the list bg check data');
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data deleted successfully.'
+            ];
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }  
+}

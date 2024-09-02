@@ -2560,6 +2560,7 @@
                     $('#limit_credit').val(response.limit_credit);
                     $('#top').val(response.top);
                     $('#top_internal').val(response.top_internal);
+                    $('#sales_payment_type').val(response.sales_payment_type).formSelect();
                 }
 
                 $('.row_bank').remove();

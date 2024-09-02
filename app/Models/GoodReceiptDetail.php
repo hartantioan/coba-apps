@@ -227,6 +227,7 @@ class GoodReceiptDetail extends Model
     public function updateTaxGrandtotal(){
         $total = $this->total;
         $tax = 0;
+        $wtax = 0;
         $grandtotal = 0;
 
         if($this->purchaseOrderDetail->is_tax == '1' && $this->purchaseOrderDetail->is_include_tax == '1'){

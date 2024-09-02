@@ -224,7 +224,8 @@ class GoodReceiptDetail extends Model
         return $total;
     }
 
-    public function updateTaxGrandtotal($total){
+    public function updateTaxGrandtotal(){
+        $total = $this->total;
         $tax = 0;
         $grandtotal = 0;
 

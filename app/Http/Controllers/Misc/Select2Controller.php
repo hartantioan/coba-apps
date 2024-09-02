@@ -1160,6 +1160,7 @@ class Select2Controller extends Controller {
                 'count_limit_credit'    => number_format($d->count_limit_credit,2,',','.'),
                 'billing_address'       => $d->getBillingAddress(),
                 'phone'                 => $d->phone,
+                'sales_payment_type'    => $d->sales_payment_type,
             ];
         }
 

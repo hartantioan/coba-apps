@@ -973,6 +973,9 @@
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
+            if($('#account_id').select2('data')[0].sales_payment_type){
+                $('#payment_type').val($('#account_id').select2('data')[0].sales_payment_type).formSelect();
+            }
             $('#limit').text($('#account_id').select2('data')[0].deposit);
             var result = new Date($('#post_date').val());
             result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));

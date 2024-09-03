@@ -75,6 +75,7 @@
                                         <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
+                                                <option value="">Semua</option>
                                                 <option value="1">Menunggu</option>
                                                 <option value="2">Dalam Proses</option>
                                                 <option value="3">Selesai</option>
@@ -203,70 +204,17 @@
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
-                        <div class="col m4 s12 step6">
+                        <div class="col m3 s12 step6">
                             <label class="">Bukti Upload</label>
                             <br>
                             <input type="file" name="file" id="fileInput" style="display: none;">
                             <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                 Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                 <br>
-                                
                             </div>
                             <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                Clear
                             </a>
-                        </div>
-                        <div class="input-field col m6 s12 step25">
-                            <table width="100%" class="bordered">
-                                <thead>
-                                    {{-- <tr>
-                                        <td width="33%"></td>
-                                        <td width="33%" class="center-align">Mata Uang Asli</td>
-                                        <td width="33%" class="center-align">Mata Uang Konversi</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Subtotal Sblm Diskon</td>
-                                        <td class="right-align"><span id="subtotal">0,00</span></td>
-                                        <td class="right-align"><span id="subtotal-convert">0,00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Diskon</td>
-                                        <td class="right-align">
-                                            <input class="browser-default" onfocus="emptyThis(this);" id="discount" name="discount" type="text" value="0" onkeyup="formatRupiahNominal(this);countAll();" style="text-align:right;width:100%;">
-                                        </td>
-                                        <td class="right-align"><span id="discount-convert">0,00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Subtotal Setelah Diskon</td>
-                                        <td class="right-align"><span id="total">0,00</span></td>
-                                        <td class="right-align"><span id="total-convert">0,00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>PPN</td>
-                                        <td class="right-align"><span id="tax">0,00</span></td>
-                                        <td class="right-align"><span id="tax-convert">0,00</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>PPh</td>
-                                        <td class="right-align">
-                                            <input class="browser-default" onfocus="emptyThis(this);" id="wtax" name="wtax" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countGrandtotal(this.value);" style="text-align:right;width:100%;">
-                                            <td class="right-align"><span id="wtax-convert">0,00</span></td>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Pembulatan</td>
-                                        <td class="right-align">
-                                            <input class="browser-default" id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiahNominal(this);countAll();" style="text-align:right;width:100%;">
-                                            <td class="right-align"><span id="rounding-convert">0,00</span></td>
-                                        </td>
-                                    </tr> --}}
-                                    <tr>
-                                        <td>Grandtotal</td>
-                                        <td class="right-align"><span id="grandtotal">0,00</span></td>
-                                        <td class="right-align"><span id="grandtotal-convert">0,00</span></td>
-                                    </tr>
-                                </thead>
-                            </table>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -723,7 +671,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+                $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#temp').val(id);
                 $('#account_id').append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>

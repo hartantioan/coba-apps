@@ -229,9 +229,12 @@ class ListBgCheckController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                    info($request);
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ListBgCheck::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+
                     $query = ListBgCheck::create([
-                        'code'              => $request->code,
+                        'code'              => $newCode,
                         'user_id'           => session('bo_id'),
                         'account_id'        => $request->account_id,
                         'company_id'        => $request->company_id,

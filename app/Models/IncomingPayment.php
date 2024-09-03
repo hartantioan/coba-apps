@@ -28,8 +28,10 @@ class IncomingPayment extends Model
         'percent_wtax',
         'total',
         'wtax',
+        'rounding',
         'grandtotal',
         'coa_id',
+        'list_bg_check_id',
         'document',
         'note',
         'status',
@@ -43,6 +45,11 @@ class IncomingPayment extends Model
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
+    }
+
+    public function listBgCheck()
+    {
+        return $this->belongsTo('App\Models\ListBgCheck', 'list_bg_check_id', 'id')->withTrashed();
     }
 
     public function used(){

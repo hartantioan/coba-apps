@@ -483,6 +483,15 @@
     function save(){
 			
         var formData = new FormData($('#form_data')[0]);
+
+        var path = window.location.pathname;
+            path = path.replace(/^\/|\/$/g, '');
+
+            
+            var segments = path.split('/');
+            var lastSegment = segments[segments.length - 1];
+        
+            formData.append('lastsegment',lastSegment);
         
         $.ajax({
             url: '{{ Request::url() }}/create',

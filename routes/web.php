@@ -429,6 +429,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('production_issue', [Select2Controller::class, 'productionIssue']);
                 Route::get('group_customer', [Select2Controller::class, 'groupCustomer']);
                 Route::get('bom_calculator', [Select2Controller::class, 'bomCalculator']);
+                Route::get('list_bg_check', [Select2Controller::class, 'listBgCheck']);
             });
 
             Route::prefix('dashboard')->group(function () {

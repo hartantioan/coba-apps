@@ -367,6 +367,14 @@ class IncomingPaymentController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
+                            ->orWhereHas('listBgCheck',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('bank_source_name', 'like', "%$search%")
+                                    ->orWhere('document_no', 'like', "%$search%")
+                                    ->orWhere('bank_source_no', 'like', "%$search%")
+                                    ->orWhere('document', 'like', "%$search%")
+                                    ->orWhere('note', 'like', "%$search%");
+                            })
                             ->orWhereHas('incomingPaymentDetail',function($query) use($search, $request){
                                 $query->where('note','like',"%$search%");
                             });
@@ -434,6 +442,14 @@ class IncomingPaymentController extends Controller
                             ->orWhereHas('account',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('listBgCheck',function($query) use($search, $request){
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('bank_source_name', 'like', "%$search%")
+                                    ->orWhere('document_no', 'like', "%$search%")
+                                    ->orWhere('bank_source_no', 'like', "%$search%")
+                                    ->orWhere('document', 'like', "%$search%")
+                                    ->orWhere('note', 'like', "%$search%");
                             })
                             ->orWhereHas('incomingPaymentDetail',function($query) use($search, $request){
                                 $query->where('note','like',"%$search%");
@@ -509,11 +525,14 @@ class IncomingPaymentController extends Controller
                     $val->account_id ? $val->account->name : '-',
                     $val->company->name,
                     $val->coa->name,
+                    $val->listBgCheck()->exists() ? $val->listBgCheck->code.' - '.$val->listBgCheck->document_no : '-',
                     date('d/m/Y',strtotime($val->post_date)),
                     $val->currency->code,
                     number_format($val->currency_rate,2,',','.'),
+                    number_format($val->total,2,',','.'),
+                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
-                      $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     $val->status(),
                     (
@@ -573,7 +592,6 @@ class IncomingPaymentController extends Controller
             'grandtotal'            => 'required',
             'arr_coa'               => 'required|array',
             'arr_total'             => 'required|array',
-            'arr_rounding'          => 'required|array',
             'arr_subtotal'          => 'required|array',
 		], [
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -588,8 +606,6 @@ class IncomingPaymentController extends Controller
             'arr_coa.array'                     => 'Coa harus array.',
             'arr_total.required'                => 'Total tidak boleh kosong.',
             'arr_total.array'                   => 'Total harus array.',
-            'arr_rounding.required'             => 'Pembulatan tidak boleh kosong.',
-            'arr_rounding.array'                => 'Pembulatan harus array.',
             'arr_subtotal.required'             => 'Subtotal tidak boleh kosong.',
             'arr_subtotal.array'                => 'Subtotal harus array.',
 		]);
@@ -668,11 +684,13 @@ class IncomingPaymentController extends Controller
                         $query->company_id = $request->company_id;
                         $query->account_id = $request->account_id ? $request->account_id : NULL;
                         $query->coa_id = $request->coa_id;
+                        $query->list_bg_check_id = $request->list_bg_check_id ?? NULL;
                         $query->post_date = $request->post_date;
                         $query->currency_id = $request->currency_id;
                         $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                         $query->total = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->wtax = 0;
+                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->document = $document;
                         $query->note = $request->note;
@@ -705,11 +723,13 @@ class IncomingPaymentController extends Controller
                         'company_id'                => $request->company_id,
                         'account_id'                => $request->account_id ? $request->account_id : NULL,
                         'coa_id'                    => $request->coa_id,
+                        'list_bg_check_id'          => $request->list_bg_check_id ?? NULL,
                         'post_date'                 => $request->post_date,
                         'currency_id'               => $request->currency_id,
                         'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'wtax'                      => 0,
+                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'document'                  => $request->file('document') ? $request->file('document')->store('public/incoming_payments') : NULL,
                         'note'                      => $request->note,
@@ -727,7 +747,6 @@ class IncomingPaymentController extends Controller
                 try {
                     foreach($request->arr_coa as $key => $row){
                         $total = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                        $rounding = str_replace(',','.',str_replace('.','',$request->arr_rounding[$key]));
                         $subtotal = str_replace(',','.',str_replace('.','',$request->arr_subtotal[$key]));
                         IncomingPaymentDetail::create([
                             'incoming_payment_id'   => $query->id,
@@ -735,7 +754,7 @@ class IncomingPaymentController extends Controller
                             'lookable_id'           => $request->arr_type[$key] == 'coas' ? $request->arr_coa[$key] : $request->arr_id[$key],
                             'cost_distribution_id'  => $request->arr_cost_distribution[$key] ? $request->arr_cost_distribution[$key] : NULL,
                             'total'                 => $total,
-                            'rounding'              => $rounding,
+                            'rounding'              => 0,
                             'subtotal'              => $subtotal,
                             'note'                  => $request->arr_note[$key],
                         ]);
@@ -791,9 +810,9 @@ class IncomingPaymentController extends Controller
                                 <th class="center-align">Referensi</th>
                                 <th class="center-align">Tipe</th>
                                 <th class="center-align">Dist.Biaya</th>
-                                <th class="center-align">Total</th>
+                                <th class="center-align">Total Tagihan</th>
                                 <th class="center-align">Pembulatan</th>
-                                <th class="center-align">Subtotal</th>
+                                <th class="center-align">Total Diterima</th>
                                 <th class="center-align">Keterangan</th>
                             </tr>
                         </thead><tbody>';
@@ -906,14 +925,17 @@ class IncomingPaymentController extends Controller
         $ip = IncomingPayment::where('code',CustomHelper::decrypt($request->id))->first();
         $ip['code_place_id'] = substr($ip->code,7,2);
         $ip['grandtotal'] = number_format($ip->grandtotal,2,',','.');
+        $ip['total'] = number_format($ip->total,2,',','.');
+        $ip['rounding'] = number_format($ip->rounding,2,',','.');
         $ip['account_name'] = $ip->account_id ? $ip->account->name : '';
         $ip['coa_name'] = $ip->coa->code.' - '.$ip->coa->name;
         $ip['currency_rate'] = number_format($ip->currency_rate,2,',','.');
+        $ip['list_bg_check_name'] = $ip->listBgCheck()->exists() ? $ip->listBgCheck->document_no.' Rp '.CustomHelper::formatConditionalQty($ip->listBgCheck->nominal).' - '.$ip->listBgCheck->bank_source_name.' - '.$ip->listBgCheck->bank_source_no : '';
         $coareceivable = Coa::where('code','100.01.03.03.02')->where('company_id',$ip->company_id)->first()->id;
 
         $arr = [];
 
-        foreach($ip->incomingPaymentDetail as $row){
+        foreach($ip->incomingPaymentDetail()->orderBy('id')->get() as $row){
             $arr[] = [
                 'type'                  => $row->lookable_type,
                 'coa_id'                => $row->lookable_type == 'coas' ? $row->lookable_id : $coareceivable,
@@ -952,8 +974,16 @@ class IncomingPaymentController extends Controller
                     'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
                 ];
             }else{
+                $tempStatus = $query->status;
 
-                if(in_array($query->status,['2','3'])){
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                if(in_array($tempStatus,['2','3'])){
                     foreach($query->incomingPaymentDetail as $row){
                         if($row->lookable_type == 'outgoing_payments'){
                             CustomHelper::addCountLimitCredit($query->account_id,$row->total);
@@ -965,15 +995,20 @@ class IncomingPaymentController extends Controller
                                 'status'    => '2'
                             ]);
                         }
+                        if($row->lookable_type == 'marketing_order_invoices'){
+                            if($row->lookable->balancePaymentIncoming() <= 0){
+                                $row->lookable->update([
+                                    'status'	=> '2'
+                                ]);
+                            }
+                        }
+                    }
+                    if($query->listBgCheck()->exists()){
+                        $query->listBgCheck->update([
+                            'status'    => '2',
+                        ]);
                     }
                 }
-
-                $query->update([
-                    'status'    => '5',
-                    'void_id'   => session('bo_id'),
-                    'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
-                ]);
     
                 activity()
                     ->performedOn(new IncomingPayment())

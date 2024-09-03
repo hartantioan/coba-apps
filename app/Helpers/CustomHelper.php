@@ -1378,35 +1378,50 @@ class CustomHelper {
 								'coa_id'		=> $coapiutangusaha->id,
 								'account_id'	=> $coapiutangusaha->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
 								'type'			=> '2',
-								'nominal'		=> floatval($row->total * $ip->currency_rate),
-								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->total * $ip->currency_rate) : floatval($row->total),
+								'nominal'		=> floatval($row->subtotal * $ip->currency_rate),
+								'nominal_fc'	=> $ip->currency->type == '1' ? floatval($row->subtotal * $ip->currency_rate) : floatval($row->subtotal),
 								'note'			=> $row->note,
 								'lookable_type'	=> $table_name,
 								'lookable_id'	=> $table_id,
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
+							if($row->lookable_type == 'marketing_order_invoices'){
+								if($row->lookable->balancePaymentIncoming() <= 0){
+									$row->lookable->update([
+										'status'	=> '3'
+									]);
+								}
+							}
 						}
-						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->total * $ip->currency_rate));
+						CustomHelper::removeCountLimitCredit($row->lookable->account_id,floatval($row->subtotal * $ip->currency_rate));
 						if(self::checkArrayRaw($arrNote,$row->lookable->code) < 0){
 							$arrNote[] = $row->lookable->code;
 						}
 					}else{
 						
 					}
+				}
 
-					if($row->rounding > 0 || $row->rounding < 0){
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coarounding->id,
-							'account_id'	=> $coarounding->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
-							'type'			=> $row->rounding > 0 ? '2' : '1',
-							'nominal'		=> floatval(abs($row->rounding * $ip->currency_rate)),
-							'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($row->rounding * $ip->currency_rate)) : floatval(abs($row->rounding)),
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-						]);
-					}
+				if($ip->rounding > 0 || $ip->rounding < 0){
+					JournalDetail::create([
+						'journal_id'	=> $query->id,
+						'coa_id'		=> $coarounding->id,
+						'account_id'	=> $coarounding->bp_journal ? ($ip->account_id ? $ip->account_id : NULL) : NULL,
+						'type'			=> $ip->rounding > 0 ? '2' : '1',
+						'nominal'		=> floatval(abs($ip->rounding * $ip->currency_rate)),
+						'nominal_fc'	=> $ip->currency->type == '1' ? floatval(abs($ip->rounding * $ip->currency_rate)) : floatval(abs($ip->rounding)),
+						'lookable_type'	=> $table_name,
+						'lookable_id'	=> $table_id,
+					]);
+				}
+
+				if($ip->listBgCheck()->exists()){
+					$ip->listBgCheck->update([
+						'status'		=> '3',
+						'pay_date'		=> $ip->post_date,
+						'grandtotal'	=> $ip->grandtotal,
+					]);
 				}
 			}
 

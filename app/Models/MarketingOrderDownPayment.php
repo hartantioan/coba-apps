@@ -314,7 +314,7 @@ class MarketingOrderDownPayment extends Model
         $total = 0;
 
         foreach($this->incomingPaymentDetail as $row){
-            $total += $row->total;
+            $total += $row->subtotal;
         }
 
         return $total;
@@ -326,7 +326,7 @@ class MarketingOrderDownPayment extends Model
         foreach($this->incomingPaymentDetail()->whereHas('incomingPayment',function($query)use($date){
             $query->whereDate('post_date','<=',$date);
         })->get() as $row){
-            $total += $row->total;
+            $total += $row->subtotal;
         }
 
         return $total;

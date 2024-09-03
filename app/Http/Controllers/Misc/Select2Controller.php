@@ -92,6 +92,7 @@ use App\Models\ItemPricelist;
 use App\Models\CustomerDiscount;
 use App\Models\DeliveryCostStandard;
 use App\Models\Group;
+use App\Models\ListBgCheck;
 use App\Models\StandardCustomerPrice;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -5001,6 +5002,40 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->name.' | '.$d->note,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function listBgCheck(Request $request)
+    {
+        $response   = [];
+        $search     = $request->search;
+       
+        $data = ListBgCheck::where(function($query) use($search,$request){
+            $query->where(function($query) use ($search, $request) {
+                if ($search) {
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('bank_source_name', 'like', "%$search%")
+                        ->orWhere('bank_source_no', 'like', "%$search%")
+                        ->orWhere('document_no', 'like', "%$search%")
+                        ->orWhere('note', 'like', "%$search%")
+                        ->orWhere('nominal', 'like', "%$search%")
+                        ->orWhereHas('account',function($query)use($search){
+                            $query->where('employee_no','like',"%$search%")
+                                ->orWhere('name','like',"%$search%");
+                        });
+                }
+            });
+        })
+        ->where('status','2')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->document_no.' Rp '.CustomHelper::formatConditionalQty($d->nominal).' - '.$d->bank_source_name.' - '.$d->bank_source_no,
             ];
         }
 

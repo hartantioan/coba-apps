@@ -168,8 +168,11 @@
                                                         <th rowspan="2" class="center-align">{{ __('translations.bussiness_partner') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.company') }}</th>
                                                         <th rowspan="2" class="center-align">Kas/Bank</th>
+                                                        <th rowspan="2" class="center-align">BG/Check</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
+                                                        <th rowspan="2" class="center-align">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2" class="center-align">{{ __('translations.rounding') }}</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2" class="center-align">Dokumen</th>
                                                         <th rowspan="2" class="center-align">{{ __('translations.note') }}</th>
@@ -239,6 +242,10 @@
                                     <select class="browser-default" id="coa_id" name="coa_id"></select>
                                     <label class="active" for="coa_id">Kas / Bank</label>
                                 </div>
+                                <div class="input-field col m3 s12">
+                                    <select class="browser-default" id="list_bg_check_id" name="list_bg_check_id"></select>
+                                    <label class="active" for="list_bg_check_id">List BG/Check (OPSIONAL)</label>
+                                </div>
                                 <div class="input-field col m3 s12 step6">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
                                     <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
@@ -296,15 +303,14 @@
                                     <p class="mt-2 mb-2">
                                         <h6>Detail AR Invoice / AR Down Payment / AR Memo / BS.Karyawan / Coa</h6>
                                         <div style="overflow:scroll;width:100% !important;">
-                                            <table class="bordered" style="min-width:2000px !important;" id="table-detail">
+                                            <table class="bordered" style="min-width:1600px !important;" id="table-detail">
                                                 <thead>
                                                     <tr>
                                                         <th class="center">Referensi</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">Tgl.Jatuh Tempo</th>
-                                                        <th class="center">{{ __('translations.subtotal') }}</th>
-                                                        <th class="center">Pembulatan</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
+                                                        <th class="center">Dibayar</th>
                                                         <th class="center">Dist.Biaya</th>
                                                         <th class="center" width="500">{{ __('translations.note') }}</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
@@ -312,7 +318,7 @@
                                                 </thead>
                                                 <tbody id="body-detail">
                                                     <tr id="last-row-detail">
-                                                        <td colspan="9">
+                                                        <td colspan="8">
                                                             <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem()" href="javascript:void(0);">
                                                                 <i class="material-icons left">add</i> Tambah Baris
                                                             </a>
@@ -343,7 +349,19 @@
                                             <tr>
                                                 <td>Total</td>
                                                 <td class="right-align">
-                                                    <input class="browser-default" id="grandtotal" name="grandtotal" onfocus="emptyThis(this);" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;" readonly>
+                                                    <input id="total" name="total" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;border-bottom:none;" readonly>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Pembulatan</td>
+                                                <td class="right-align">
+                                                    <input id="rounding" name="rounding" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>Grandtotal</td>
+                                                <td class="right-align">
+                                                    <input id="grandtotal" name="grandtotal" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -879,6 +897,7 @@
                     return null;
                 };
                 countAll();
+                $('#list_bg_check_id').empty();
             }
         });
 
@@ -1021,6 +1040,7 @@
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/employee_customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
+        select2ServerSide('#list_bg_check_id', '{{ url("admin/select2/list_bg_check") }}');
 
         $('#body-detail').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
@@ -1111,13 +1131,10 @@
                     -
                 </td>
                 <td class="center">
-                    <input id="arr_total_item` + count + `" name="arr_total_item[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
+                    <input id="arr_total_item` + count + `" name="arr_total_item[]" data-limit="0" type="text" value="0,00" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" readonly>
                 </td>
                 <td class="center">
-                    <input id="arr_rounding_item` + count + `" name="arr_rounding_item[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;">
-                </td>
-                <td class="center">
-                    <input id="arr_subtotal_item` + count + `" name="arr_subtotal_item[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                    <input id="arr_subtotal_item` + count + `" name="arr_subtotal_item[]" data-limit="0" type="text" value="0,00" onkeyup="formatRupiah(this);countAllManual();" style="text-align:right;">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>
@@ -1313,7 +1330,7 @@
                                         </div>
                                     `);
                                     let readonly = 'readonly';
-                                    let array = ['marketing_order_memos'];
+                                    let array = ['marketing_order_memos','marketing_order_invoices'];
                                     if(array.includes(val.type)){
                                         readonly = '';
                                     }
@@ -1332,13 +1349,10 @@
                                                 -
                                             </td>
                                             <td class="center">
-                                                <input id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" data-limit="` + val.balance + `" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                                <input id="arr_total` + count + `" name="arr_total[]" data-limit="0" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none;" readonly>
                                             </td>
                                             <td class="center">
-                                                <input id="arr_rounding` + count + `" name="arr_rounding[]" class="browser-default" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
-                                            </td>
-                                            <td class="center">
-                                                <input id="arr_subtotal` + count + `" name="arr_subtotal[]" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                                <input id="arr_subtotal` + count + `" name="arr_subtotal[]" data-limit="` + val.balance + `" type="text" value="` + val.balance + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="text-align:right;" ` + readonly + `>
                                             </td>
                                             <td class="center">
                                                 -
@@ -1395,20 +1409,30 @@
         }
     }
 
+    function countAllManual(){
+        if($('input[name^="arr_subtotal_item[]"]').length > 0){
+            $('input[name^="arr_subtotal_item[]"]').each(function(index){
+                $('input[name^="arr_total_item[]"]').eq(index).val($(this).val());
+            });
+        }
+        countAll();
+    }
+
     function countAll(){
-        var total = 0, grandtotal = 0;
+        var total = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
         
-        if($('input[name^="arr_total"]').length > 0){
-            $('input[name^="arr_total"]').each(function(index){
-                let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) + parseFloat($('input[name^="arr_rounding"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+        if($('input[name^="arr_subtotal"]').length > 0){
+            $('input[name^="arr_subtotal"]').each(function(index){
+                let rowtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                 total += rowtotal;
-                $('input[name^="arr_subtotal"]').eq(index).val(
-                    (rowtotal >= 0 ? '' : '-') + formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',','))
-                );
             });
         }
 
-        grandtotal = total;
+        $('#total').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        );
+
+        grandtotal = total + rounding;
 
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
@@ -1433,13 +1457,13 @@
     }
 
     function countRow(id){
-        var total = parseFloat($('#arr_total' + id).val().replaceAll(".", "").replaceAll(",",".")), 
-            limit = parseFloat($('#arr_total' + id).data('limit').toString().replaceAll(".", "").replaceAll(",","."));
+        var total = parseFloat($('#arr_subtotal' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+            limit = parseFloat($('#arr_subtotal' + id).data('limit').toString().replaceAll(".", "").replaceAll(",","."));
 
         if(limit > 0){
             if(total > limit){
                 total = limit;
-                $('#arr_total' + id).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
+                $('#arr_subtotal' + id).val(formatRupiahIni(total.toFixed(2).toString().replace('.',',')));
             }
         }
     }
@@ -1523,9 +1547,12 @@
                 { name: 'account_id', className: 'center-align' },
                 { name: 'company_id', className: 'center-align' },
                 { name: 'coa_id', className: 'center-align' },
+                { name: 'list_bg_check_id', className: 'center-align' },
                 { name: 'post_date', className: 'center-align' },
                 { name: 'currency_id', className: 'center-align' },
                 { name: 'currency_rate', className: 'center-align' },
+                { name: 'total', className: 'right-align' },
+                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'note', className: '' },
@@ -1610,7 +1637,6 @@
                 formData.delete("arr_cost_distribution[]");
                 formData.delete("arr_coa[]");
                 formData.delete("arr_total[]");
-                formData.delete("arr_rounding[]");
                 formData.delete("arr_subtotal[]");
                 formData.delete("arr_note[]");
                 formData.delete("arr_type[]");
@@ -1624,13 +1650,12 @@
                         formData.append('arr_id[]',$('input[name^="arr_id[]"]').eq(index).val());
                         formData.append('arr_cost_distribution[]','');
                         formData.append('arr_total[]',$('input[name^="arr_total[]"]').eq(index).val());
-                        formData.append('arr_rounding[]',$('input[name^="arr_rounding[]"]').eq(index).val());
                         formData.append('arr_subtotal[]',$('input[name^="arr_subtotal[]"]').eq(index).val());
                         formData.append('arr_type[]',$('input[name^="arr_type[]"]').eq(index).val());
                         formData.append('arr_note[]',(
                             $('input[name^="arr_note[]"]').eq(index).val() ? $('input[name^="arr_note[]"]').eq(index).val() : ''
                         ));
-                        if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_rounding[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
+                        if(!$(this).val() || !$('input[name^="arr_total[]"]').eq(index).val() || !$('input[name^="arr_subtotal[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1644,13 +1669,12 @@
                             $('select[name^="arr_cost_distribution[]"]').eq(index).val() ? $('select[name^="arr_cost_distribution[]"]').eq(index).val() : ''
                         ));
                         formData.append('arr_total[]',$('input[name^="arr_total_item[]"]').eq(index).val());
-                        formData.append('arr_rounding[]',$('input[name^="arr_rounding_item[]"]').eq(index).val());
                         formData.append('arr_subtotal[]',$('input[name^="arr_subtotal_item[]"]').eq(index).val());
                         formData.append('arr_type[]',$('input[name^="arr_type_item[]"]').eq(index).val());
                         formData.append('arr_note[]',(
                             $('input[name^="arr_note_item[]"]').eq(index).val() ? $('input[name^="arr_note_item[]"]').eq(index).val() : ''
                         ));
-                        if(!$(this).val() || !$('input[name^="arr_total_item[]"]').eq(index).val() || !$('input[name^="arr_rounding_item[]"]').eq(index).val() || !$('input[name^="arr_subtotal_item[]"]').eq(index).val()){
+                        if(!$(this).val() || !$('input[name^="arr_total_item[]"]').eq(index).val() || !$('input[name^="arr_subtotal_item[]"]').eq(index).val()){
                             passed = false;
                         }
                     });
@@ -1802,14 +1826,22 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#note').val(response.note);
+                $('#total').val(response.total);
+                $('#rounding').val(response.rounding);
                 $('#grandtotal').val(response.grandtotal);
+
+                if(response.list_bg_check_name){
+                    $('#list_bg_check_id').empty().append(`
+                        <option value="` + response.list_bg_check_id + `">` + response.list_bg_check_name + `</option>
+                    `);
+                }
                 
                 if(response.details.length > 0){
                     $('.row_detail').remove();
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
                         let readonly = 'readonly';
-                        let array = ['marketing_order_memos','coas'];
+                        let array = ['marketing_order_memos','coas','marketing_order_invoices'];
                         if(array.includes(val.type)){
                             readonly = '';
                         }
@@ -1833,13 +1865,10 @@
                                     -
                                 </td>
                                 <td class="center">
-                                    <input id="` + (val.type == 'coas' ? 'arr_total_item' + count : 'arr_total' + count) + `" name="` + (val.type == 'coas' ? 'arr_total_item[]' : 'arr_total[]') + `" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countRow('` + count + `');countAll();" style="width:150px;text-align:right;" ` + readonly + `>
+                                    <input id="` + (val.type == 'coas' ? 'arr_total_item' + count : 'arr_total' + count) + `" name="` + (val.type == 'coas' ? 'arr_total_item[]' : 'arr_total[]') + `" data-limit="0" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);" style="text-align:right;border-bottom:none !important;" readonly>
                                 </td>
                                 <td class="center">
-                                    <input id="` + (val.type == 'coas' ? 'arr_rounding_item' + count : 'arr_rounding' + count) + `" name="` + (val.type == 'coas' ? 'arr_rounding_item[]' : 'arr_rounding[]') + `" class="browser-default" type="text" value="` + val.rounding + `" onkeyup="formatRupiah(this);countAll();" style="width:150px;text-align:right;" ` + readonly + `>
-                                </td>
-                                <td class="center">
-                                    <input id="` + (val.type == 'coas' ? 'arr_subtotal_item' + count : 'arr_subtotal' + count) + `" name="` + (val.type == 'coas' ? 'arr_subtotal_item[]' : 'arr_subtotal[]') + `" onfocus="emptyThis(this);" data-limit="0" class="browser-default" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);" style="width:150px;text-align:right;" readonly>
+                                    <input id="` + (val.type == 'coas' ? 'arr_subtotal_item' + count : 'arr_subtotal' + count) + `" name="` + (val.type == 'coas' ? 'arr_subtotal_item[]' : 'arr_subtotal[]') + `" data-limit="` + (val.type == 'marketing_order_invoices' ? val.total : '0') + `" type="text" value="` + val.subtotal + `" onkeyup="formatRupiah(this);` + (val.type !== 'coas' ? `countRow('` + count + `');` : ``) + `` + (val.type == 'coas' ? `countAllManual();` : `countAll();`) + `" style="text-align:right;" ` + readonly + `>
                                 </td>
                                 <td class="center">
                                     ` + (val.type == 'coas' ? `<select class="browser-default" id="arr_cost_distribution` + count + `" name="arr_cost_distribution[]" onchange="applyCoa('` + count + `');"></select>` : `-`) + `

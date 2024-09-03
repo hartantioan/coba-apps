@@ -98,7 +98,7 @@ class ListBgCheckController extends Controller
                                 $query->where('employee_no', 'like', "%$search%")
                                     ->orWhere('name', 'like', "%$search%")
                                     ;
-                            });;
+                            });
                     });
                 }
 
@@ -129,7 +129,7 @@ class ListBgCheckController extends Controller
                                 $query->where('employee_no', 'like', "%$search%")
                                     ->orWhere('name', 'like', "%$search%")
                                     ;
-                            });;
+                            });
                     });
                 }
 
@@ -152,14 +152,14 @@ class ListBgCheckController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->valid_until_date)),
-                    date('d/m/Y',strtotime($val->pay_date))??'-',
+                    $val->pay_date ? date('d/m/Y',strtotime($val->pay_date)) : '-',
                     $val->bank_source_name,
                     $val->bank_source_no,
                     $val->document_no,
                     $val->document,
                     $val->note,
-                    $val->nominal,
-                    $val->grandtotal,
+                    CustomHelper::formatConditionalQty($val->nominal),
+                    CustomHelper::formatConditionalQty($val->grandtotal),
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
@@ -256,6 +256,9 @@ class ListBgCheckController extends Controller
 			}
 			
 			if($query) {
+
+                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan List BG/Check No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
                     ->performedOn(new ListBgCheck())

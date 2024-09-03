@@ -5037,6 +5037,11 @@ class Select2Controller extends Controller {
                 }
             });
         })
+        ->where(function($query) use ($search, $request) {
+            if($request->account_id){
+                $query->where('account_id',$request->account_id);
+            }
+        })
         ->where('status','2')
         ->get();
        

@@ -1044,7 +1044,31 @@
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/employee_customer") }}');
         select2ServerSide('#coa_id', '{{ url("admin/select2/coa_cash_bank") }}');
-        select2ServerSide('#list_bg_check_id', '{{ url("admin/select2/list_bg_check") }}');
+
+        $('#list_bg_check_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/list_bg_check") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#body-detail').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();

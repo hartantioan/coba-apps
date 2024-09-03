@@ -253,7 +253,7 @@
                                 <div class="col m12 s12 l12"></div>
                                 
             
-                                <div class="input-field col m4 s12 stepcurrency">
+                                <div class="input-field col m2 s12 stepcurrency">
                                     <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
                                         @foreach ($currency as $row)
                                             <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
@@ -262,8 +262,12 @@
                                     <label class="" for="currency_id">{{ __('translations.currency') }}</label>
                                 </div>
                                 <div class="input-field col m2 s12 stepconversion">
-                                    <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                    <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)" style="text-align:right;">
                                     <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
+                                </div>
+                                <div class="input-field col m2 s12">
+                                    <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    <label class="active" for="nominal">Uang Diterima (OPSIONAL)</label>
                                 </div>
                                 <div class="col m4 s12 stepfile">
                                     <label class="">Bukti Upload</label>
@@ -1419,7 +1423,7 @@
     }
 
     function countAll(){
-        var total = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
+        var total = 0, grandtotal = 0, rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",",".")), nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",","."));
         
         if($('input[name^="arr_subtotal"]').length > 0){
             $('input[name^="arr_subtotal"]').each(function(index){
@@ -1431,6 +1435,13 @@
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
+
+        if(nominal > 0){
+            rounding = nominal - total;
+            $('#rounding').val(
+                (rounding >= 0 ? '' : '-') + formatRupiahIni(rounding.toFixed(2).toString().replace('.',','))
+            );
+        }
 
         grandtotal = total + rounding;
 
@@ -1828,7 +1839,7 @@
                 $('#note').val(response.note);
                 $('#total').val(response.total);
                 $('#rounding').val(response.rounding);
-                $('#grandtotal').val(response.grandtotal);
+                $('#grandtotal,#nominal').val(response.grandtotal);
 
                 if(response.list_bg_check_name){
                     $('#list_bg_check_id').empty().append(`
@@ -1908,7 +1919,7 @@
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
-                countAll();
+                /* countAll(); */
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

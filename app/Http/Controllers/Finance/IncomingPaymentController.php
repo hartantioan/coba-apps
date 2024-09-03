@@ -1006,6 +1006,8 @@ class IncomingPaymentController extends Controller
                     if($query->listBgCheck()->exists()){
                         $query->listBgCheck->update([
                             'status'    => '2',
+                            'grandtotal'=> 0,
+                            'pay_date'  => NULL,
                         ]);
                     }
                 }

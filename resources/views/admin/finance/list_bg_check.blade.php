@@ -91,13 +91,13 @@
                                                         <th>Code</th>
                                                         <th>User</th>
                                                         <th>Customer</th>
-                                                        <th>Company</th>
-                                                        <th>Post Date</th>
-                                                        <th>Valid Date</th>
-                                                        <th>Pay Date</th>
+                                                        <th>Perusahaan</th>
+                                                        <th>Tgl.Post</th>
+                                                        <th>Tgl.Jatuh Tempo</th>
+                                                        <th>Tgl.Cair</th>
                                                         <th>Bank Source Name</th>
                                                         <th>Bank Source No</th>
-                                                        <th>Document Number</th>
+                                                        <th>Nomor BG/Check</th>
                                                         <th>Document</th>
                                                         <th>Note</th>
                                                         <th>Nominal</th>
@@ -131,7 +131,7 @@
                         <div id="validation_alert" ></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m4">
+                        <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
                             <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                             <label class="active" for="code">{{ __('translations.code') }}</label>
@@ -148,7 +148,7 @@
                             <select class="browser-default" id="account_id" name="account_id"></select>
                             <label class="active" for="account_id">Customer</label>
                         </div>
-                        <div class="input-field col s12 m3 employee_inputs" id="company_select">
+                        <div class="input-field col s12 m4 " id="company_select">
                             <select id="company_id" name="company_id">
                                 @foreach($company as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -157,13 +157,13 @@
                             <label for="company_id">{{ __('translations.company') }}</label>
                         </div>
                         <div class="input-field col s12"></div>
-                        <div class="input-field col s12 m3 employee_inputs">
+                        <div class="input-field col s12 m3 ">
                             <input id="post_date" name="post_date" type="date">
                             <label class="active" for="post_date">Tgl. Post</label>
                         </div>
-                        <div class="input-field col s12 m3 employee_inputs">
+                        <div class="input-field col s12 m3 ">
                             <input id="valid_until_date" name="valid_until_date" type="date">
-                            <label class="active" for="valid_until_date">Valid Date</label>
+                            <label class="active" for="valid_until_date">Tgl. Jatuh Tempo</label>
                         </div>
                         <div class="input-field col s12 m3 " >
                             <input id="bank_source_name" name="bank_source_name" type="text" placeholder="Kontak Kantor">

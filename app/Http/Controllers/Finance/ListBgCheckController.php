@@ -186,7 +186,7 @@ class ListBgCheckController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('machines', 'code')->ignore($request->temp)] : 'required|unique:machines,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('list_bg_checks', 'code')->ignore($request->temp)] : 'required|unique:list_bg_checks,code',
             
             'note'              => 'required',
         ], [

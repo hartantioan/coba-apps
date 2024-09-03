@@ -157,7 +157,7 @@ class ListBgCheckController extends Controller
                     $val->bank_source_name,
                     $val->bank_source_no,
                     $val->document_no,
-                    $val->document,
+                    $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     CustomHelper::formatConditionalQty($val->nominal),
                     CustomHelper::formatConditionalQty($val->grandtotal),

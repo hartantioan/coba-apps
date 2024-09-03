@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ListBgCheck extends Model
 {
@@ -32,6 +33,23 @@ class ListBgCheck extends Model
         'grandtotal',
         'status',
     ];
+
+    public function attachment() 
+    {
+        if($this->document !== NULL && Storage::exists($this->document)) {
+            $document = asset(Storage::url($this->document));
+        } else {
+            $document = asset('website/empty.png');
+        }
+
+        return $document;
+    }
+
+    public function deleteFile(){
+		if(Storage::exists($this->document)) {
+            Storage::delete($this->document);
+        }
+	}
 
     public static function generateCode($prefix)
     {

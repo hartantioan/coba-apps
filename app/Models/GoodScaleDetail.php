@@ -34,6 +34,6 @@ class GoodScaleDetail extends Model
 
     public function goodScale()
     {
-        return $this->belongsTo('App\Models\GoodScale', 'good_scale_id', 'id')->withTrashed();
+        return $this->belongsTo('App\Models\GoodScale', 'good_scale_id', 'id');
     }
 }

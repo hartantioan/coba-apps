@@ -261,11 +261,11 @@
                                         <label class="active" for="driver_hp">HP/WA Supir</label>
                                     </div>
                                     <div class="input-field col m3 s12 step9">
-                                        <input id="vehicle_name" name="vehicle_name" type="text" placeholder="Nama Kendaraan">
+                                        <input id="vehicle_name" name="vehicle_name" type="text" placeholder="Nama Kendaraan" readonly>
                                         <label class="active" for="vehicle_name">Nama Kendaraan</label>
                                     </div>
                                     <div class="input-field col m3 s12 step10">
-                                        <input id="vehicle_no" name="vehicle_no" type="text" placeholder="Nopol Kendaraan">
+                                        <input id="vehicle_no" name="vehicle_no" type="text" placeholder="Nopol Kendaraan" readonly>
                                         <label class="active" for="vehicle_no">Nopol Kendaraan</label>
                                     </div>
                                     <div class="input-field col m9 s12">
@@ -988,6 +988,9 @@ document.addEventListener('focusin', function (event) {
                                 <option value="">--Data supir tidak ditemukan--</option>
                             `);
                         }
+
+                        $('#vehicle_name').val(response.vehicle_name);
+                        $('#vehicle_no').val(response.vehicle_no);
 
                         if(response.details.length > 0){
                             $('#body-item').empty();

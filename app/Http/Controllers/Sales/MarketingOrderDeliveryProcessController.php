@@ -344,8 +344,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ];
                 }
 
+                info($data->goodScaleDetail->goodScale->id);
+
                 $data['details'] = $details;
                 $data['drivers'] = $drivers;
+                $data['vehicle_no'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->vehicle_no : '';
+                $data['vehicle_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada MOD No. '.$data->code.' sudah dikirimkan. Data tidak bisa ditambahkan.';

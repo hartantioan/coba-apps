@@ -3069,6 +3069,8 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code,
+                'vehicle_no'    => $d->goodScaleDetail()->exists() ? $d->goodScaleDetail->goodScale->vehicle_no : '',
+                'vehicle_name'  => $d->transportation()->exists() ? $d->transportation->name : '',
             ];
         }
 

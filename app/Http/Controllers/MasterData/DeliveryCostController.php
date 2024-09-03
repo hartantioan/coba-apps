@@ -55,6 +55,7 @@ class DeliveryCostController extends Controller
         $query_data = DeliveryCost::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where('name','like',"%$search%")
+                    ->orWhere('code','like',"%$search%")
                     ->orWhereHas('account',function($query) use ($search) {
                         $query->where('employee_no', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%");
@@ -107,6 +108,7 @@ class DeliveryCostController extends Controller
         $total_filtered = DeliveryCost::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where('name','like',"%$search%")
+                    ->orWhere('code','like',"%$search%")
                     ->orWhereHas('account',function($query) use ($search) {
                         $query->where('employee_no', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%");

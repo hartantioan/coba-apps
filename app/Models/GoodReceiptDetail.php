@@ -223,4 +223,31 @@ class GoodReceiptDetail extends Model
 
         return $total;
     }
+
+    public function updateTaxGrandtotal(){
+        $total = $this->total;
+        $tax = 0;
+        $wtax = 0;
+        $grandtotal = 0;
+
+        if($this->purchaseOrderDetail->is_tax == '1' && $this->purchaseOrderDetail->is_include_tax == '1'){
+            $total = round($total / (1 + ($this->purchaseOrderDetail->percent_tax / 100)),2);
+        }
+
+        if($this->purchaseOrderDetail->is_tax == '1'){
+            $tax = round($total * ($this->purchaseOrderDetail->percent_tax / 100),2);
+        }
+
+        if($this->purchaseOrderDetail->is_wtax == '1'){
+            $wtax = round($total * ($this->purchaseOrderDetail->percent_wtax / 100),2);
+        }
+
+        $grandtotal = $total + $tax - $wtax;
+
+        $this->update([
+            'tax'       => $tax,
+            'wtax'      => $wtax,
+            'grandtotal'=> $grandtotal
+        ]);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Helpers\CustomHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,18 +11,46 @@ use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\ListBgCheck;
 use App\Models\Company;
+use App\Models\Menu;
+use App\Models\MenuUser;
+use App\Models\Place;
+use App\Models\User;
 
 class ListBgCheckController extends Controller
 {
-    public function index()
+    protected $dataplaces, $dataplacecode, $url, $menu;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->url = request()->segment(3);
+        $this->menu = Menu::where('url', $this->url)->first();
+    }
+
+    public function index(Request $request)
     {
+        $menu = $this->menu;
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
+
         $data = [
-            'title'     => 'List BG Check',
-            'content'   => 'admin.finance.list_bg_check',
+            'title'         => 'List BG Check',
+            'content'       => 'admin.finance.list_bg_check',
             'company'       => Company::where('status','1')->get(),
+            'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
+            'newcode'       => $menu->document_code.date('y'),
+            'modedata'      => $menuUser->mode ? $menuUser->mode : '',
+            'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+    }
+
+    public function getCode(Request $request){
+        $code = ListBgCheck::generateCode($request->val);
+        				
+		return response()->json($code);
     }
 
     public function datatable(Request $request){
@@ -157,7 +186,7 @@ class ListBgCheckController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'code' 				=> $request->temp ? ['required', Rule::unique('machines', 'code')->ignore($request->temp)] : 'required|unique:machines,code',
+            'code' 				=> $request->temp ? ['required', Rule::unique('list_bg_checks', 'code')->ignore($request->temp)] : 'required|unique:list_bg_checks,code',
             
             'note'              => 'required',
         ], [
@@ -200,9 +229,12 @@ class ListBgCheckController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                    info($request);
+                    $lastSegment = $request->lastsegment;
+                    $menu = Menu::where('url', $lastSegment)->first();
+                    $newCode=ListBgCheck::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+
                     $query = ListBgCheck::create([
-                        'code'              => $request->code,
+                        'code'              => $newCode,
                         'user_id'           => session('bo_id'),
                         'account_id'        => $request->account_id,
                         'company_id'        => $request->company_id,

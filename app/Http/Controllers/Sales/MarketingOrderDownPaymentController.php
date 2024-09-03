@@ -101,7 +101,6 @@ class MarketingOrderDownPaymentController extends Controller
             'percent_tax',
             'is_include_tax',
             'subtotal',
-            'discount',
             'total',
             'tax',
             'grandtotal'
@@ -264,7 +263,6 @@ class MarketingOrderDownPaymentController extends Controller
                     number_format($val->discount,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     (
@@ -326,7 +324,6 @@ class MarketingOrderDownPaymentController extends Controller
             'subtotal'                  => 'required',
             'total'                     => 'required',
             'tax'                       => 'required',
-            'rounding'                  => 'required',
             'grandtotal'                => 'required',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
@@ -339,7 +336,6 @@ class MarketingOrderDownPaymentController extends Controller
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
             'total.required'                    => 'Total tidak boleh kosong.',
             'tax.required'                      => 'PPN tidak boleh kosong.',
-            'rounding.required'                 => 'Pembulatan tidak boleh kosong.',
             'grandtotal.required'               => 'Grandtotal tidak boleh kosong.'
 		]);
 
@@ -440,7 +436,7 @@ class MarketingOrderDownPaymentController extends Controller
                         $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
                         $query->total = str_replace(',','.',str_replace('.','',$request->total));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
-                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
+                        $query->rounding = 0;
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
                         $query->status = '1';
 
@@ -488,7 +484,7 @@ class MarketingOrderDownPaymentController extends Controller
                         'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
                         'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
                         'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
-                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
+                        'rounding'                  => 0,
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
                         'status'                    => '1'
                     ]);

@@ -186,7 +186,6 @@
                                                         <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
-                                                        <th rowspan="2">{{ __('translations.rounding') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
@@ -298,12 +297,16 @@
                                         <label class="active" for="is_include_tax">Termasuk PPN</label>
                                     </div>
                                     <div class="input-field col m3 s12 step13">
-                                        <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
+                                        <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
                                         <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
                                     </div>
                                     <div class="input-field col m3 s12 step14">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step10">
+                                        <input id="nominal" name="nominal" type="text" value="1" onkeyup="formatRupiah(this);countFromHeader();">
+                                        <label class="active" for="nominal">Nominal Uang Masuk (Grandtotal)</label>
                                     </div>
                                     <div class="col m12 s12 l12"></div>
                                     <div class="col m6 s12 step8">
@@ -339,7 +342,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Sales Order Detail</legend>
+                                    <legend>3. Sales Order Detail (OPSIONAL)</legend>
                                     <div class="input-field col m3 s12 step16">
                                         <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
                                         <label class="active" for="marketing_order_id">Sales Order</label>
@@ -390,9 +393,9 @@
                                 <table width="100%" class="bordered">
                                     <thead>
                                         <tr>
-                                            <td width="50%">Subtotal (Isi disini)</td>
+                                            <td width="50%">Subtotal</td>
                                             <td width="50%" class="right-align">
-                                                <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
+                                                <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
                                         <tr>
@@ -411,12 +414,6 @@
                                             <td>PPN</td>
                                             <td class="right-align">
                                                 <input id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Pembulatan</td>
-                                            <td class="right-align">
-                                                <input id="rounding" name="rounding" type="text" value="0,00" style="text-align:right;width:100%;" onkeyup="countAll();">
                                             </td>
                                         </tr>
                                         <tr>
@@ -858,6 +855,7 @@
                         </td>
                     </tr>
                 `);
+                $('#nominal').attr('readonly',false);
             }
         });
 
@@ -945,6 +943,7 @@
                         </td>
                     </tr>
                 `);
+                $('#nominal').attr('readonly',false);
             }
             $('#marketing_order_id').empty();
         });
@@ -1055,6 +1054,7 @@
                         $('#marketing_order_id').empty();
 
                         $('#type').val(datakuy.payment_type).formSelect();
+                        $('#nominal').attr('readonly',true);
                         countRow();
                     }
                 },
@@ -1427,7 +1427,59 @@
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
         );
 
-        countAll();
+        countAllFromSO();
+    }
+
+    function countFromHeader(){
+        if($('.row_item').length > 0){
+            M.toast({
+                html: 'Silahkan hapus baris SO/MO untuk perhitungan dari Nominal Masuk atau tanpa menarik SO/MO.'
+            });
+        }else{
+            $('#subtotal').val($('#nominal').val());
+            countAll();
+        }
+    }
+
+    function countAllFromSO(){
+
+        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, totalold = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
+
+        total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
+
+        if(percent_tax > 0){
+            if($('#is_include_tax').val() == '1'){
+                grandtotal = total;
+                total = Math.floor(total);
+                tax = Math.floor(total * (percent_tax / 100));
+                total = grandtotal - tax;
+            }else{
+                tax = Math.floor(total * (percent_tax / 100));
+                grandtotal = total + tax;
+            }
+        }
+
+        $('#total').val(
+            (total >= 0 ? '' : '-') + formatRupiahIni(total.toString().replace('.',','))
+        );
+
+        $('#tax').val(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#grandtotal').val(
+            (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
+        );
+
+        if(tax > 0){
+            $('#textTax').show();
+            if(!$('#tax_no').val()){
+                getTaxSeries();
+            }
+        }else{
+            $('#textTax').hide();
+            $('#tax_no').val('');
+        }
     }
 
     function countAll(){
@@ -1436,16 +1488,18 @@
 
         total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
 
-        rounding = parseFloat($('#rounding').val().replaceAll(".", "").replaceAll(",","."));
-
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
-                total = Math.round((total / (1 + (percent_tax / 100))) * 100) / 100;
+                total = Math.floor((total / (1 + (percent_tax / 100))));
             }
             tax = Math.floor(total * (percent_tax / 100));
         }
 
-        grandtotal = total + tax + rounding;
+        if(tax > 0 && $('#is_include_tax').val() == '1'){
+            total = subtotal - tax;
+        }
+
+        grandtotal = total + tax;
 
         $('#total').val(
             (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
@@ -1618,7 +1672,6 @@
                 { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
-                { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

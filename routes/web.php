@@ -2704,6 +2704,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('/',[ListBgCheckController::class, 'index']);
                     Route::get('datatable',[ListBgCheckController::class, 'datatable']);
                     Route::post('show', [ListBgCheckController::class, 'show']);
+                    Route::post('get_code', [ListBgCheckController::class, 'getCode']);
                     Route::post('print',[ListBgCheckController::class, 'print']);
                     Route::get('export',[ListBgCheckController::class, 'export']);
                     Route::post('create',[ListBgCheckController::class, 'create'])->middleware('operation.access:list_bg_check,update');

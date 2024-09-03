@@ -4,7 +4,17 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
-
+    #dropZone {
+        border: 2px dashed #ccc;
+       
+       
+    }
+    #imagePreview {
+        max-width: 20em;
+        max-height: 20em;
+        min-height: 5em;
+        margin: 2px auto;
+    }
     .modal-content .select2.tab-active {
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
@@ -173,10 +183,24 @@
                             <input id="bank_source_no" name="bank_source_no" type="text" placeholder="Kontak Kantor">
                             <label class="active" for="bank_source_no">Rek Bank</label>
                         </div>
-                        <div class="input-field col s12 m3 " >
-                            <input id="document" name="document" type="text" placeholder="Kontak Kantor">
-                            <label class="active" for="document">Dokumen</label>
+                        <div class="col m4 s12 step6">
+                            <label class="">Bukti Upload</label>
+                            <br>
+                            <input type="file" name="file" id="fileInput" style="display: none;">
+                            <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                <br>
+                                
+                            </div>
+                            <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                               Clear
+                            </a>
                         </div>
+                        <div class="col m4 s12">
+                            <div id="fileName"></div>
+                            <img src="" alt="Preview" id="imagePreview" style="display: none;">
+                        </div>
+                        <div class="col s12"></div>
                         <div class="input-field col s12 m3 " >
                             <input id="document_no" name="document_no" type="text" placeholder="Kontak Kantor">
                             <label class="active" for="document_no">No Dokumen</label>
@@ -276,6 +300,132 @@
 
 <!-- END: Page Main-->
 <script>
+    const dropZone = document.getElementById('dropZone');
+    const uploadLink = document.getElementById('uploadLink');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const clearButton = document.getElementById('clearButton');
+    const fileNameDiv = document.getElementById('fileName');
+    dropZone.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        handleFile(e.target.files[0]);
+    });
+
+    function dragOverHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#f0f0f0';
+    }
+
+    function dropHandler(event) {
+        event.preventDefault();
+        dropZone.style.backgroundColor = '#fff';
+
+        handleFile(event.dataTransfer.files[0]);
+    }
+
+    function handleFile(file) {
+        if (file) {
+        const reader = new FileReader();
+        const fileType = file.type.split('/')[0]; 
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('File size exceeds the maximum limit of 10 MB.');
+            return;
+        }
+
+        reader.onload = () => {
+           
+            fileNameDiv.textContent = 'File uploaded: ' + file.name;
+
+            if (fileType === 'image') {
+                
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'inline-block';
+                clearButton.style.display = 'inline-block'; 
+            } else {
+               
+                imagePreview.style.display = 'none';
+               
+            }
+        };
+
+        reader.readAsDataURL(file);
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+
+       
+        fileInput.files = dataTransfer.files;
+         
+        }
+    }
+    
+    clearButton.addEventListener('click', () => {
+        imagePreview.src = ''; 
+        imagePreview.style.display = 'none';
+        fileInput.value = ''; 
+        fileNameDiv.textContent = '';
+    });
+
+    document.addEventListener('paste', (event) => {
+        const items = event.clipboardData.items;
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const file = items[i].getAsFile();
+                    handleFile(file);
+                    break;
+                }
+            }
+        }
+    });
+
+    function displayFile(fileLink) {
+        const fileType = getFileType(fileLink);
+       
+        fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
+
+        if (fileType === 'image') {
+        
+            imagePreview.src = fileLink;
+            imagePreview.style.display = 'inline-block';
+          
+        } else {
+         
+            imagePreview.style.display = 'none';
+           
+            
+            const fileExtension = getFileExtension(fileLink);
+            if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
+               
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileLink;
+                downloadLink.download = getFileName(fileLink);
+                downloadLink.textContent = 'Download ' + fileExtension.toUpperCase();
+                fileNameDiv.appendChild(downloadLink);
+            }
+        }
+    }
+
+    function getFileType(fileLink) {
+        const fileExtension = getFileExtension(fileLink);
+        if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+            return 'image';
+        } else {
+            return 'other';
+        }
+    }
+
+    function getFileExtension(fileLink) {
+        return fileLink.split('.').pop().toLowerCase();
+    }
+
+    function getFileName(fileLink) {
+        return fileLink.split('/').pop();
+    }
+
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -711,6 +861,47 @@
                     title: 'Ups!',
                     text: 'Check your internet connection.',
                     icon: 'error'
+                });
+            }
+        });
+    }
+
+    function voidStatus(id){
+        var msg = '';
+        swal({
+            title: "Alasan mengapa anda menutup!",
+            text: "Anda tidak bisa mengembalikan data yang telah ditutup.",
+            buttons: true,
+            content: "input",
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/void_status',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: { id : id, msg : message },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        M.toast({
+                            html: response.message
+                        });
+                        loadDataTable();
+                    },
+                    error: function() {
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });

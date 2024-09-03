@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
 use App\Models\ListBgCheck;
 use App\Models\Company;
 use App\Models\Menu;
@@ -163,6 +164,7 @@ class ListBgCheckController extends Controller
                     $val->status(),
                     '
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(' . $val->id . ')"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat red accent-2 white-text btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -206,6 +208,18 @@ class ListBgCheckController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = ListBgCheck::find($request->temp);
+
+                    if($request->has('file')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('file')->store('public/list_bg_check');
+                    } else {
+                        $document = $query->document;
+                    }
+
                     $query->code            = $request->code;
                     $query->user_id         = session('bo_id'); 
                     $query->account_id      = $request->account_id; 
@@ -216,7 +230,7 @@ class ListBgCheckController extends Controller
                     $query->bank_source_name = $request->bank_source_name; 
                     $query->bank_source_no  = $request->bank_source_no; 
                     $query->document_no     = $request->document_no; 
-                    $query->document        = $request->document; 
+                    $query->document        = $document; 
                     $query->note            = $request->note; 
                     $query->nominal         = str_replace(',','.',str_replace('.','',$request->nominal)); 
                     // $query->grandtotal      = str_replace(',','.',str_replace('.','',$request->grandtotal?? null)); 
@@ -244,7 +258,7 @@ class ListBgCheckController extends Controller
                         'bank_source_name'  => $request->bank_source_name,
                         'bank_source_no'    => $request->bank_source_no,
                         'document_no'       => $request->document_no,
-                        'document'          => $request->document,
+                        'document'          => $request->file('file') ? $request->file('file')->store('public/list_bg_check') : NULL,
                         'note'              => $request->note,
                         'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
                         // 'grandtotal'        => str_replace(',','.',str_replace('.','',$request->grandtotal?? null)),
@@ -288,6 +302,64 @@ class ListBgCheckController extends Controller
         $list['grandtotal'] = number_format($list->grandtotal,2,',','.');				
 		return response()->json($list);
     }
+
+    public function voidStatus(Request $request){
+        $query = ListBgCheck::where('code',CustomHelper::decrypt($request->id))->first();
+        
+        if($query) {
+
+            /* if(!CustomHelper::checkLockAcc($query->post_date)){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                ]);
+            } */
+
+            if(in_array($query->status,['4','5'])){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah ditutup anda tidak bisa menutup lagi.'
+                ];
+            }elseif($query->hasChildDocument()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data telah digunakan pada Purchase Order.'
+                ];
+            }else{
+                $query->update([
+                    'status'    => '5',
+                    'void_id'   => session('bo_id'),
+                    'void_note' => $request->msg,
+                    'void_date' => date('Y-m-d H:i:s')
+                ]);
+
+                $query->updateRootDocumentStatusProcess();
+    
+                activity()
+                    ->performedOn(new ListBgCheck())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Void the list bg check data');
+    
+                CustomHelper::sendNotification('list_bg_check',$query->id,'list bg check No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::removeApproval('list_bg_check',$query->id);
+
+                $response = [
+                    'status'  => 200,
+                    'message' => 'Data closed successfully.'
+                ];
+            }
+        } else {
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+
 
     public function destroy(Request $request){
         $query = ListBgCheck::find($request->id);

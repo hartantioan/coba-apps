@@ -111,7 +111,9 @@ class handleDC implements OnEachRow, WithHeadingRow
                         ->log('Add / edit from excel Delivery cost data.');
                
             }else{
-                return null;
+                DB::rollback();
+                $sheet='Header';
+                throw new RowImportException('baris kode kosong', $row->getIndex(),$this->error,$sheet);
             } 
             DB::commit();
         }catch (\Exception $e) {

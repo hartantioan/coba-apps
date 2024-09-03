@@ -2507,6 +2507,11 @@
                         <option value="` + response.province_id + `">` + response.province_name + `</option>
                     `);
                 }
+                if(response.brand_id){
+                    $('#brand_id').append(`
+                        <option value="` + response.brand_id + `">` + response.brand_name + `</option>
+                    `);
+                }
                 if(!response.manager_id && response.type == 1){
                     $('#manager_select').append(`
                         <select class="select2 browser-default" id="manager_id" name="manager_id">

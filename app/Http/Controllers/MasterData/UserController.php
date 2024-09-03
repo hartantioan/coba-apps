@@ -1385,7 +1385,7 @@ class UserController extends Controller
         $user['limit_credit'] = number_format($user->limit_credit, 0, ',', '.');
         $user['cities'] = $user->province()->exists() ? $user->province->getCity() : '';
         $user['has_document'] = $user->hasDocument() ? '1' : '';
-
+        $user['brand_name'] = $user->brand()->exists() ? $user->brand->code.' - '.$user->brand->name : '';
         $banks = [];
 		
 		foreach($user->userBank as $row){

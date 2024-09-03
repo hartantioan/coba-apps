@@ -569,6 +569,10 @@ class User extends Authenticatable
         return $this->belongsTo('App\Models\Country','country_id','id')->withTrashed();
     }
 
+    public function brand(){
+        return $this->belongsTo('App\Models\Brand','brand_id','id')->withTrashed();
+    }
+
     public function company(){
         return $this->belongsTo('App\Models\Company','company_id','id')->withTrashed();
     }

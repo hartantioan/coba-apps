@@ -297,7 +297,7 @@ class ListBgCheckController extends Controller
 
     public function show(Request $request){
         $list = ListBgCheck::find($request->id);
-        $modp['code_place_id'] = substr($list->code,7,2);
+        $list['code_place_id'] = substr($list->code,7,2);
         $list['nominal'] = number_format($list->nominal,2,',','.');	
         $list['account_name'] = $list->account->name;
         $list['grandtotal'] = number_format($list->grandtotal,2,',','.');				

@@ -344,8 +344,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ];
                 }
 
-                info($data->goodScaleDetail->goodScale->id);
-
                 $data['details'] = $details;
                 $data['drivers'] = $drivers;
                 $data['vehicle_no'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->vehicle_no : '';

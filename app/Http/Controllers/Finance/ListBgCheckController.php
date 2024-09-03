@@ -234,7 +234,7 @@ class ListBgCheckController extends Controller
                     $query->note            = $request->note; 
                     $query->nominal         = str_replace(',','.',str_replace('.','',$request->nominal)); 
                     // $query->grandtotal      = str_replace(',','.',str_replace('.','',$request->grandtotal?? null)); 
-                    $query->status          = $request->status ? $request->status : '1';
+                    $query->status          = '1';
 
                     $query->save();
                     DB::commit();
@@ -262,7 +262,7 @@ class ListBgCheckController extends Controller
                         'note'              => $request->note,
                         'nominal'           => str_replace(',','.',str_replace('.','',$request->nominal)),
                         // 'grandtotal'        => str_replace(',','.',str_replace('.','',$request->grandtotal?? null)),
-                        'status'            => $request->status ? $request->status : '1',
+                        'status'            => '1',
                     ]);
                     
                     DB::commit();

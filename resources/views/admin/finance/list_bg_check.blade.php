@@ -75,9 +75,12 @@
                                         <label for="filter_status" style="font-size:1.2rem;">{{ __('translations.filter_status') }} :</label>
                                         <div class="input-field inline" style="margin-top: 0;margin-bottom: 0;">
                                             <select class="form-control" id="filter_status" onchange="loadDataTable()">
-                                                <option value="">{{ __('translations.all') }}</option>
-                                                <option value="1">{{ __('translations.active') }}</option>
-                                                <option value="2">{{ __('translations.non_active') }}</option>
+                                                <option value="1">Menunggu</option>
+                                                <option value="2">Dalam Proses</option>
+                                                <option value="3">Selesai</option>
+                                                <option value="4">Ditolak</option>
+                                                <option value="5">Ditutup</option>
+                                                <option value="6">Direvisi</option>
                                             </select>
                                         </div>
                                     </div>
@@ -183,19 +186,6 @@
                             <input id="bank_source_no" name="bank_source_no" type="text" placeholder="Kontak Kantor">
                             <label class="active" for="bank_source_no">Rek Bank</label>
                         </div>
-                        <div class="col m4 s12 step6">
-                            <label class="">Bukti Upload</label>
-                            <br>
-                            <input type="file" name="file" id="fileInput" style="display: none;">
-                            <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
-                                Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
-                                <br>
-                                
-                            </div>
-                            <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
-                               Clear
-                            </a>
-                        </div>
                         <div class="col m4 s12">
                             <div id="fileName"></div>
                             <img src="" alt="Preview" id="imagePreview" style="display: none;">
@@ -213,8 +203,18 @@
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
-                        <div class="input-field col m3 s12 step24">
-                            
+                        <div class="col m4 s12 step6">
+                            <label class="">Bukti Upload</label>
+                            <br>
+                            <input type="file" name="file" id="fileInput" style="display: none;">
+                            <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
+                                Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
+                                <br>
+                                
+                            </div>
+                            <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
+                               Clear
+                            </a>
                         </div>
                         <div class="input-field col m6 s12 step25">
                             <table width="100%" class="bordered">
@@ -267,17 +267,6 @@
                                     </tr>
                                 </thead>
                             </table>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <div class="switch mb-1">
-                                <label for="order">{{ __('translations.status') }}</label>
-                                <label>
-                                    {{ __('translations.non_active') }}
-                                    <input checked type="checkbox" id="status" name="status" value="1">
-                                    <span class="lever"></span>
-                                   {{ __('translations.active') }}
-                                </label>
-                            </div>
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -749,11 +738,6 @@
                 $('#bank_source_name').val(response.bank_source_name);
                 $('#bank_source_no').val(response.bank_source_no);
                 $('#valid_until_date').val(response.valid_until_date);
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
-                }
 
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();

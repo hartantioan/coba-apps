@@ -865,6 +865,8 @@
                     </tr>
                 `);
                 $('#nominal').attr('readonly',false);
+                $('#is_include_tax').attr('readonly',false);
+                $('#is_include_tax option').attr('disabled', false);
             }
         });
 
@@ -1017,6 +1019,9 @@
 
                         let datakuy = $('#marketing_order_id').select2('data')[0];
 
+                        $('#is_include_tax').val('0');
+                        $('#is_include_tax option:not(:selected)').attr('disabled', true);
+
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + datakuy.code + `
@@ -1024,41 +1029,34 @@
                             </div>
                         `);
 
-                        var count = makeid(10);
-                        $('#body-item').append(`
-                            <tr class="row_item" data-id="` + $('#marketing_order_id').val() + `">
-                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + $('#marketing_order_id').val() + `">
-                                <td class="center-align">
-                                    ` + datakuy.code + `
-                                </td>
-                                <td class="center-align">
-                                    ` + datakuy.post_date + `
-                                </td>
-                                <td>
-                                    ` + datakuy.note + `
-                                </td>
-                                <td class="right-align row-total">
-                                    ` + datakuy.total + `
-                                </td>
-                                <td class="right-align row-tax">
-                                    ` + datakuy.tax + `
-                                </td>
-                                <td class="right-align row-grandtotal">
-                                    ` + datakuy.grandtotal + `
-                                </td>
-                                <td class="right-align row-percent">
-                                    ` + datakuy.percent_dp + `
-                                </td>
-                                <td class="right-align row-downpayment">
-                                    ` + datakuy.total_dp + `
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                        $.each(datakuy.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + $('#marketing_order_id').val() + `">
+                                    <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + $('#marketing_order_id').val() + `">
+                                    <td class="center-align">
+                                        ` + datakuy.code + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + datakuy.post_date + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td>
+                                        ` + datakuy.note + `
+                                    </td>
+                                    <td class="right-align row-total">
+                                        ` + val.total + `
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                        });
 
                         $('#marketing_order_id').empty();
 
@@ -1428,7 +1426,7 @@
     function countRow(){
         let total = 0;
 
-        $('.row-downpayment').each(function(){
+        $('.row-total').each(function(){
             total += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
         });
 
@@ -1439,37 +1437,31 @@
         countAllFromSO();
     }
 
-    function countFromHeader(){
-        if($('.row_item').length > 0){
-            M.toast({
-                html: 'Silahkan hapus baris SO/MO untuk perhitungan dari Nominal Masuk atau tanpa menarik SO/MO.'
-            });
-        }else{
-            $('#subtotal').val($('#nominal').val());
-            countAll();
-        }
-    }
-
     function countAllFromSO(){
 
-        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, totalold = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
+        let nominal = 0, subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
 
-        total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
+        $('.row-total').each(function(){
+            nominal += parseFloat($(this).text().replaceAll(".", "").replaceAll(",","."));
+        });
+
+        subtotal = nominal;
 
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
-                grandtotal = total;
-                total = Math.floor(total);
-                tax = Math.floor(total * (percent_tax / 100));
-                total = grandtotal - tax;
-            }else{
-                tax = Math.floor(total * (percent_tax / 100));
-                grandtotal = total + tax;
+                subtotal = Math.floor((subtotal / (1 + (percent_tax / 100))));
             }
+            tax = Math.floor(subtotal * (percent_tax / 100));
         }
 
-        $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toString().replace('.',','))
+        if(tax > 0 && $('#is_include_tax').val() == '1'){
+            subtotal = nominal - tax;
+        }
+
+        grandtotal = subtotal + tax;
+
+        $('#subtotal').val(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );
 
         $('#tax').val(
@@ -1491,27 +1483,38 @@
         }
     }
 
+    function countFromHeader(){
+        if($('.row_item').length > 0){
+            M.toast({
+                html: 'Silahkan hapus baris SO/MO untuk perhitungan dari Nominal Masuk atau tanpa menarik SO/MO.'
+            });
+        }else{
+            $('#subtotal').val($('#nominal').val());
+            countAll();
+        }
+    }
+
     function countAll(){
 
-        let subtotal = parseFloat($('#subtotal').val().replaceAll(".", "").replaceAll(",",".")), discount = 0, total = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
+        let nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
 
-        total = subtotal - parseFloat($('#discount').val().replaceAll(".", "").replaceAll(",","."));
+        subtotal = nominal;
 
         if(percent_tax > 0){
             if($('#is_include_tax').val() == '1'){
-                total = Math.floor((total / (1 + (percent_tax / 100))));
+                subtotal = Math.floor((subtotal / (1 + (percent_tax / 100))));
             }
-            tax = Math.floor(total * (percent_tax / 100));
+            tax = Math.floor(subtotal * (percent_tax / 100));
         }
 
         if(tax > 0 && $('#is_include_tax').val() == '1'){
-            total = subtotal - tax;
+            subtotal = nominal - tax;
         }
 
-        grandtotal = total + tax;
+        grandtotal = subtotal + tax;
 
-        $('#total').val(
-            (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
+        $('#subtotal').val(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
         );
 
         $('#tax').val(
@@ -1890,7 +1893,8 @@
                 $('#currency_id').val(response.currency_id).formSelect();
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
-                $('#tax_no').val(response.tax_no);            
+                $('#tax_no').val(response.tax_no);
+                $('#is_include_tax').val(response.is_include_tax);
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
                 if(response.is_include_tax == '1'){
@@ -1906,45 +1910,47 @@
                     if($('#last-row-item').length > 0){
                         $('#last-row-item').remove();
                     }
+                    $('#is_include_tax').val('0');
+                    $('#is_include_tax option:not(:selected)').attr('disabled', true);
+                    $('#nominal').attr('readonly',true);
                     $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-item').append(`
-                            <tr class="row_item" data-id="` + val.id + `">
-                                <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.id + `">
-                                <td class="center-align">
-                                    ` + val.code + `
-                                </td>
-                                <td class="center-align">
-                                    ` + val.post_date + `
-                                </td>
-                                <td>
-                                    ` + val.note + `
-                                </td>
-                                <td class="right-align row-total">
-                                    ` + val.total + `
-                                </td>
-                                <td class="right-align row-tax">
-                                    ` + val.tax + `
-                                </td
-                                <td class="right-align row-grandtotal">
-                                    ` + val.grandtotal + `
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                        $.each(val.details, function(i, valdetail) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + val.id + `">
+                                    <input type="hidden" name="arr_id[]" id="arr_id` + count + `" value="` + val.id + `">
+                                    <td class="center-align">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + val.post_date + `
+                                    </td>
+                                    <td class="center-align">
+                                        ` + valdetail.item_name + `
+                                    </td>
+                                    <td>
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="right-align row-total">
+                                        ` + valdetail.total + `
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                        });
                     });
+                }else{
+                    $('#nominal').val(response.subtotal);
                 }
                 
                 $('#note').val(response.note);
                 $('#grandtotal').val(response.grandtotal);
-                $('#total').val(response.total);
                 $('#tax').val(response.tax);
-                $('#subtotal').val(response.subtotal);
-                $('#discount').val(response.discount);                
+                $('#subtotal').val(response.total);
                 $('.modal-content').scrollTop(0);
                 $('#subtotal').focus();
                 M.updateTextFields();

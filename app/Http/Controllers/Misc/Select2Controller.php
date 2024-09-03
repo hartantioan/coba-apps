@@ -3008,6 +3008,13 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
+            $details = [];
+            foreach($d->marketingOrderDetail as $row){
+                $details[] = [
+                    'item_name'     => $row->item->code.' - '.$row->item->name,
+                    'total'         => CustomHelper::formatConditionalQty($row->total),
+                ];
+            }
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' '.$d->account->name,
@@ -3026,6 +3033,7 @@ class Select2Controller extends Controller {
                 'percent_dp'    => CustomHelper::formatConditionalQty($d->percent_dp),
                 'total_dp'      => CustomHelper::formatConditionalQty(round(($d->percent_dp / 100) * $d->total,2)),
                 'payment_type'  => $d->payment_type,
+                'details'       => $details,
             ];
         }
 

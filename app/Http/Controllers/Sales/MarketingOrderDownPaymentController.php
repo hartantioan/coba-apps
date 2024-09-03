@@ -322,9 +322,9 @@ class MarketingOrderDownPaymentController extends Controller
             'currency_id'               => 'required',
             'currency_rate'             => 'required',
             'subtotal'                  => 'required',
-            'total'                     => 'required',
             'tax'                       => 'required',
             'grandtotal'                => 'required',
+            'note'                      => $request->arr_id ? '' : 'required',
 		], [
             'code.required' 	                => 'Kode tidak boleh kosong.',
             'code_place_id.required'            => 'Plant Tidak boleh kosong',
@@ -334,9 +334,9 @@ class MarketingOrderDownPaymentController extends Controller
             'post_date.required'                => 'Tgl post tidak boleh kosong.',
             'currency_id.required'              => 'Mata uang tidak boleh kosong.',
             'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
-            'total.required'                    => 'Total tidak boleh kosong.',
             'tax.required'                      => 'PPN tidak boleh kosong.',
-            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.'
+            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
+            'note.required'                     => 'Keterangan tidak boleh kosong.'
 		]);
 
         if($validation->fails()) {
@@ -433,8 +433,8 @@ class MarketingOrderDownPaymentController extends Controller
                         $query->due_date = $request->post_date;
                         $query->note = $request->note;
                         $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
-                        $query->discount = str_replace(',','.',str_replace('.','',$request->discount));
-                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
+                        $query->discount = 0;
+                        $query->total = str_replace(',','.',str_replace('.','',$request->subtotal));
                         $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
                         $query->rounding = 0;
                         $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
@@ -481,8 +481,8 @@ class MarketingOrderDownPaymentController extends Controller
                         'due_date'                  => $request->post_date,
                         'note'                      => $request->note,
                         'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
-                        'discount'                  => str_replace(',','.',str_replace('.','',$request->discount)),
-                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
+                        'discount'                  => 0,
+                        'total'                     => str_replace(',','.',str_replace('.','',$request->subtotal)),
                         'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
                         'rounding'                  => 0,
                         'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
@@ -498,7 +498,8 @@ class MarketingOrderDownPaymentController extends Controller
 			if($query) {
 
                 if($request->arr_id){
-                    foreach($request->arr_id as $key => $row){
+                    $arr = array_unique($request->arr_id);
+                    foreach($arr as $key => $row){
                         MarketingOrderDownPaymentDetail::create([
                             'marketing_order_down_payment_id'   => $query->id,
                             'marketing_order_id'                => intval($row),
@@ -871,6 +872,13 @@ class MarketingOrderDownPaymentController extends Controller
         $arr = [];
 
         foreach($modp->marketingOrderDownPaymentDetail as $row){
+            $details = [];
+            foreach($row->marketingOrder->marketingOrderDetail as $rowdetail){
+                $details[] = [
+                    'item_name'     => $rowdetail->item->code.' - '.$rowdetail->item->name,
+                    'total'         => CustomHelper::formatConditionalQty($rowdetail->total),
+                ];
+            }
             $arr[] = [
                 'id'   			=> $row->marketingOrder->id,
                 'type'          => $row->marketingOrder->getTable(),
@@ -880,15 +888,11 @@ class MarketingOrderDownPaymentController extends Controller
                 'total'         => CustomHelper::formatConditionalQty($row->marketingOrder->total),
                 'tax'           => CustomHelper::formatConditionalQty($row->marketingOrder->tax),
                 'grandtotal'    => CustomHelper::formatConditionalQty($row->marketingOrder->grandtotal),
+                'details'       => $details,
             ];
         }
 
         $modp['details'] = $arr;
-
-        if($modp->tax_no){
-            $newprefix = '011.'.explode('.',$modp->tax_no)[1].'.'.explode('.',$modp->tax_no)[2];
-            $modp['tax_no'] = $newprefix;
-        }
 
 		return response()->json($modp);
     }
@@ -1050,11 +1054,19 @@ class MarketingOrderDownPaymentController extends Controller
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
             }else{
+                $newtaxno = '';
+                if($query->tax_no){
+                    $array = explode('.',$query->tax_no);
+                    $newarray = array_slice($array, 1);
+                    $newtaxno = '011.'.implode('.',$newarray);
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
+                    'void_date' => date('Y-m-d H:i:s'),
+                    'tax_no'    => $newtaxno ?? NULL,
                 ]);
 
                 activity()

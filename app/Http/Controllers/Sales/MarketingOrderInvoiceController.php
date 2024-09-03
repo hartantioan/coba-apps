@@ -1225,11 +1225,19 @@ class MarketingOrderInvoiceController extends Controller
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
                 }
 
+                $newtaxno = '';
+                if($query->tax_no){
+                    $array = explode('.',$query->tax_no);
+                    $newarray = array_slice($array, 1);
+                    $newtaxno = '011.'.implode('.',$newarray);
+                }
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
+                    'void_date' => date('Y-m-d H:i:s'),
+                    'tax_no'    => $newtaxno ?? NULL,
                 ]);
     
                 activity()

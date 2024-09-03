@@ -279,37 +279,16 @@
                                         <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
                                         <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step11">
-                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
-                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                            @foreach ($tax as $row)
-                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                            @endforeach
-                                        </select>
-                                        <label class="active" for="tax_id">PPN</label>
-                                    </div>
-                                    <div class="col m12 s12 l12"></div>
-                                    <div class="input-field col m3 s12 step12">
-                                        <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
-                                            <option value="0">--Tidak--</option>
-                                            <option value="1">--Ya--</option>
-                                        </select>
-                                        <label class="active" for="is_include_tax">Termasuk PPN</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step13">
-                                        <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
-                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
-                                    </div>
                                     <div class="input-field col m3 s12 step14">
                                         <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
+                                    <div class="col m12 s12 l12"></div>
                                     <div class="input-field col m3 s12 step10">
-                                        <input id="nominal" name="nominal" type="text" value="1" onkeyup="formatRupiah(this);countFromHeader();">
+                                        <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);countFromHeader();">
                                         <label class="active" for="nominal">Nominal Uang Masuk (Grandtotal)</label>
                                     </div>
-                                    <div class="col m12 s12 l12"></div>
-                                    <div class="col m6 s12 step8">
+                                    <div class="col m5 s12 step8">
                                         <label class="">Bukti Upload</label>
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
@@ -332,7 +311,40 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. SO Terpakai</legend>
+                                    <legend>2. Pajak</legend>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
+                                            <option value="010">010</option>
+                                        </select>
+                                        <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                            <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                            @foreach ($tax as $row)
+                                                <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="tax_id">PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step12">
+                                        <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
+                                            <option value="0">--Tidak--</option>
+                                            <option value="1">--Ya--</option>
+                                        </select>
+                                        <label class="active" for="is_include_tax">Termasuk PPN</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step13">
+                                        <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>3. SO Terpakai</legend>
                                     <div class="col m3 s12 step15">
                                         <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
                                     </div>
@@ -342,7 +354,7 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
-                                    <legend>3. Sales Order Detail (OPSIONAL)</legend>
+                                    <legend>4. Sales Order Detail (OPSIONAL)</legend>
                                     <div class="input-field col m3 s12 step16">
                                         <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
                                         <label class="active" for="marketing_order_id">Sales Order</label>
@@ -359,18 +371,15 @@
                                                     <tr>
                                                         <th class="center">No. Sales Order</th>
                                                         <th class="center">Tgl.Post</th>
+                                                        <th class="center">Item</th>
                                                         <th class="center">{{ __('translations.note') }}</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
-                                                        <th class="center">{{ __('translations.tax') }}</th>
-                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
-                                                        <th class="center">Prosentase DP</th>
-                                                        <th class="center">Total Down Payment</th>
                                                         <th class="center">{{ __('translations.delete') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
-                                                        <td colspan="9">
+                                                        <td colspan="6">
                                                             Silahkan pilih Sales Order...
                                                         </td>
                                                     </tr>
@@ -398,7 +407,7 @@
                                                 <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        {{-- <tr>
                                             <td>Discount (Isi disini)</td>
                                             <td class="right-align">
                                                 <input id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
@@ -409,7 +418,7 @@
                                             <td class="right-align">
                                                 <input id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
-                                        </tr>
+                                        </tr> --}}
                                         <tr>
                                             <td>PPN</td>
                                             <td class="right-align">
@@ -850,7 +859,7 @@
                 }
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="9">
+                        <td colspan="6">
                             Silahkan pilih Sales Order...
                         </td>
                     </tr>
@@ -938,7 +947,7 @@
             if($('.row_item').length == 0){
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
-                        <td colspan="9">
+                        <td colspan="6">
                             Silahkan pilih Sales Order...
                         </td>
                     </tr>
@@ -1093,7 +1102,7 @@
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
                         <tr id="last-row-item">
-                            <td colspan="9">
+                            <td colspan="6">
                                 Silahkan pilih Sales Order...
                             </td>
                         </tr>
@@ -1533,6 +1542,7 @@
                 data: {
                     company_id: $('#company_id').val(),
                     date: $('#post_date').val(),
+                    prefix_tax: $('#prefix_tax').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

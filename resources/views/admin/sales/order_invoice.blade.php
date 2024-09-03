@@ -161,7 +161,7 @@
                                                         <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">{{ __('translations.customer') }}</th>
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
-                                                        <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
+                                                        <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.type') }}</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Seri Pajak</th>
@@ -178,7 +178,6 @@
                                                     <tr>
                                                         <th>Post</th>
                                                         <th>Tenggat</th>
-                                                        <th>Dokumen</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -253,14 +252,6 @@
                                         <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
                                         <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step8">
-                                        <input id="document_date" name="document_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. dokumen">
-                                        <label class="active" for="document_date">Tgl. Dokumen</label>
-                                    </div>
-                                    <div class="input-field col m3 s12 step9">
-                                        <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
-                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
-                                    </div>
                                     {{-- <div class="input-field col m1 s12 step10">
                                         <button class="btn waves-effect waves-light green" onclick="getTaxSeries();"><i class="material-icons">autorenew</i></button>
                                     </div> --}}
@@ -287,7 +278,22 @@
                             </div>
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Dokumen Terpakai</legend>
+                                    <legend>2. Pajak</legend>
+                                    <div class="input-field col m3 s12 step11">
+                                        <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
+                                            <option value="010">010</option>
+                                        </select>
+                                        <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step9">
+                                        <input id="tax_no" name="tax_no" type="text" readonly placeholder="Auto generate : pajak > 0">
+                                        <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>3. Dokumen Terpakai</legend>
                                     <div class="col m3 s12 step11">
                                         <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
                                     </div>
@@ -295,7 +301,7 @@
                             </div>
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>3. Surat Jalan</legend>
+                                    <legend>4. Surat Jalan</legend>
                                     <div class="row">
                                         <div class="input-field col m5 step12">
                                             <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id"></select>
@@ -341,7 +347,7 @@
                             </div>
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>4. AR Down Payment</legend>
+                                    <legend>5. AR Down Payment</legend>
                                     <div class="row">
                                         <div class="input-field col m5 step14">
                                             <select class="browser-default" id="marketing_order_down_payment_id" name="marketing_order_down_payment_id"></select>
@@ -1479,6 +1485,7 @@
                 data: {
                     company_id: $('#company_id').val(),
                     date: $('#post_date').val(),
+                    prefix_tax: $('#prefix_tax').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1723,7 +1730,6 @@
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'due_date', className: '' },
-                { name: 'document_date', className: '' },
                 { name: 'type', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'tax_no', className: '' },
@@ -1965,7 +1971,6 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
-                $('#document_date').val(response.document_date);
                 $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
                 $('#subtotal').val(response.subtotal);
@@ -2374,11 +2379,6 @@
                     title : 'Tgl. Jatuh Tempo',
                     element : document.querySelector('.step7'),
                     intro : 'Tanggal tenggat adalah batas tanggal berlaku untuk invoice yang dibuat.' 
-                },
-                {
-                    title : 'Tgl. Dokumen',
-                    element : document.querySelector('.step8'),
-                    intro : 'Tanggal dokumen adalah tanggal yang muncul di dokumen ketika dicetak.' 
                 },
                 {
                     title : 'Nomor Seri PPN',

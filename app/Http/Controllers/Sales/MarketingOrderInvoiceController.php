@@ -81,7 +81,7 @@ class MarketingOrderInvoiceController extends Controller
     }
 
     public function getTaxSeries(Request $request){
-		return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date));
+		return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date,$request->prefix_tax));
     }
 
     public function datatable(Request $request){
@@ -93,7 +93,6 @@ class MarketingOrderInvoiceController extends Controller
             'company_id',
             'post_date',
             'due_date',
-            'document_date',
             'type',
             'document',
             'note',
@@ -245,7 +244,6 @@ class MarketingOrderInvoiceController extends Controller
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->due_date)),
-                    date('d/m/Y',strtotime($val->document_date)),
                     $val->type(),
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->tax_no,
@@ -340,7 +338,6 @@ class MarketingOrderInvoiceController extends Controller
             'account_id'	                => 'required',
             'post_date'		                => 'required',
             'due_date'                      => 'required',
-            'document_date'                 => 'required',
             'type'		                    => 'required',
             'arr_lookable_id'		        => 'required|array',
             'arr_total'                     => 'required|array',
@@ -355,7 +352,6 @@ class MarketingOrderInvoiceController extends Controller
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
             'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
             'due_date.required' 			        => 'Tanggal tenggat tidak boleh kosong.',
-            'document_date.required' 			    => 'Tanggal dokumen tidak boleh kosong.',
             'type.required'                         => 'Tipe pembayaran tidak boleh kosong.',
             'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
             'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
@@ -438,7 +434,6 @@ class MarketingOrderInvoiceController extends Controller
                         $query->marketing_order_delivery_process_id = $request->marketing_order_delivery_process_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
-                        $query->document_date = $request->document_date;
                         $query->status = '1';
                         $query->type = $request->type;
                         $query->tax_id = $request->tempTaxId ?? NULL;
@@ -482,7 +477,6 @@ class MarketingOrderInvoiceController extends Controller
                         'marketing_order_delivery_process_id' => $request->marketing_order_delivery_process_id,
                         'post_date'                     => $request->post_date,
                         'due_date'                      => $request->due_date,
-                        'document_date'                 => $request->document_date,
                         'status'                        => '1',
                         'type'                          => $request->type,
                         'tax_id'                        => $request->tempTaxId ?? NULL,

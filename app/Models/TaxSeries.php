@@ -23,6 +23,7 @@ class TaxSeries extends Model
         'djp_letter_no',
         'pkp_letter_no',
         'year',
+        'branch_code',
         'document',
         'start_date',
         'end_date',
@@ -73,29 +74,29 @@ class TaxSeries extends Model
         }
 	}
 
-    public static function getListCurrentTaxSeries($company_id,$year){
-        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,5,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
-        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,5,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
+    public static function getListCurrentTaxSeries($company_id,$year,$prefix){
+        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
+        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
         $newList = array_merge($dataInvoice,$dataDp);
         rsort($newList);
         return $newList;
     } 
 
-    public static function getTaxCode($company_id,$date){
+    public static function getTaxCode($company_id,$date,$prefix){
         $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->first();
 
         if($data){
             $year = date('y',strtotime($date));
-            $list = TaxSeries::getListCurrentTaxSeries($company_id,$year);
+            $list = TaxSeries::getListCurrentTaxSeries($company_id,$year,$prefix);
             $no = '';
             if(count($list) > 0){
                 $lastData = $list[0];
                 $currentno = intval(explode('.',$lastData)[count(explode('.',$lastData)) - 1]) + 1;
-                $startno = intval(explode('.',$data->start_no)[count(explode('.',$data->start_no)) - 1]);
-                $endno = intval(explode('.',$data->end_no)[count(explode('.',$data->end_no)) - 1]);
+                $startno = intval($data->start_no);
+                $endno = intval($data->end_no);
                 if($currentno >= $startno && $currentno <= $endno){
                     $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
-                    $no = explode('.',$data->start_no)[0].'.'.explode('.',$data->start_no)[1].'.'.$newcurrent;
+                    $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
                     $response = [
                         'status'    => 200,
                         'no'        => $no,
@@ -107,7 +108,7 @@ class TaxSeries extends Model
                     ];
                 }
             }else{
-                $no = $data->start_no;
+                $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$data->start_no;
                 $response = [
                     'status'    => 200,
                     'no'        => $no,

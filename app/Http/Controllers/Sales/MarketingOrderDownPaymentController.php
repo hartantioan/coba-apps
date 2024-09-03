@@ -81,7 +81,7 @@ class MarketingOrderDownPaymentController extends Controller
     }
 
     public function getTaxSeries(Request $request){
-        return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date));
+        return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date,$request->prefix_tax));
     }
 
     public function datatable(Request $request){

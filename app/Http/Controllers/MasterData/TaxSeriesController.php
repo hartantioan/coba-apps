@@ -38,6 +38,7 @@ class TaxSeriesController extends Controller
             'npwp',
             'djp_letter_no',
             'pkp_letter_no',
+            'branch_code',
             'year',
             'start_date',
             'end_date',
@@ -97,6 +98,7 @@ class TaxSeriesController extends Controller
                     $val->npwp,
                     $val->djp_letter_no,
                     $val->pkp_letter_no,
+                    $val->branch_code,
                     $val->year,
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
@@ -139,6 +141,7 @@ class TaxSeriesController extends Controller
             'start_no'          => 'required',
             'end_no'            => 'required',
             'year'              => 'required',
+            'branch_code'       => 'required',
         ], [
             'npwp.required'             => 'NPWP tidak boleh kosong.',
             'company_id.required'       => 'Perusahaan beli tidak boleh kosong.',
@@ -149,6 +152,7 @@ class TaxSeriesController extends Controller
             'start_no.required'         => 'Nomor awal tidak boleh kosong.',
             'end_no.required'           => 'Nomor akhir tidak boleh kosong.',
             'year.required'             => 'Tahun berlaku seri pajak tidak boleh kosong.',
+            'branch_code.required'      => 'Kode branch tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -203,6 +207,7 @@ class TaxSeriesController extends Controller
                     $query->start_no        = $request->start_no;
                     $query->end_no          = $request->end_no;
                     $query->year            = $request->year;
+                    $query->branch_code     = $request->branch_code;
                     $query->note            = $request->note;
                     $query->document        = $document;
                     $query->status          = $request->status ? $request->status : '2';
@@ -220,6 +225,7 @@ class TaxSeriesController extends Controller
                         'start_no'          => $request->start_no,
                         'end_no'            => $request->end_no,
                         'year'              => $request->year,
+                        'branch_code'       => $request->branch_code,
                         'note'              => $request->note,
                         'document'          => $request->file('document') ? $request->file('document')->store('public/tax_series') : NULL,
                         'status'            => $request->status ? $request->status : '2'

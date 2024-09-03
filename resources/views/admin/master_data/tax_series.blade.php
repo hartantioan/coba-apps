@@ -18,6 +18,10 @@
         outline: 2px solid green !important; /* Adjust the color and style as needed */
         border-radius: 5px !important;
     }
+
+    .select-wrapper, .select2-container {
+        height:3.6rem !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -83,7 +87,8 @@
                                                         <th>NPWP</th>
                                                         <th>No.Surat DJP</th>
                                                         <th>No.Surat PKP</th>
-                                                        <th>Tahun</th>
+                                                        <th>Kode Branch</th>
+                                                        <th>Kode Tahun</th>
                                                         <th>Tgl.Mulai Berlaku</th>
                                                         <th>Tgl.Akhir Berlaku</th>
                                                         <th>No.Awal</th>
@@ -119,54 +124,56 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input type="hidden" id="temp" name="temp">
                             <select class="form-control" id="company_id" name="company_id">
                                 @foreach ($company as $row)
-                                    <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                    <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                 @endforeach
                             </select>
                             <label class="" for="company_id">{{ __('translations.company') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input id="npwp" name="npwp" type="text">
+                        <div class="input-field col s12 m4">
+                            <input id="npwp" name="npwp" type="text" placeholder="-">
                             <label class="active" for="npwp">NPWP</label>
                         </div>
-                        <div class="col m12 s12 l12"></div>
-                        <div class="input-field col s12 m6">
-                            <input id="djp_letter_no" name="djp_letter_no" type="text">
+                        <div class="input-field col s12 m4">
+                            <input id="djp_letter_no" name="djp_letter_no" type="text" placeholder="-">
                             <label class="active" for="djp_letter_no">No.Surat Pemberitahuan DJP</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input id="pkp_letter_no" name="pkp_letter_no" type="text">
+                        <div class="input-field col s12 m4">
+                            <input id="pkp_letter_no" name="pkp_letter_no" type="text" placeholder="-">
                             <label class="active" for="pkp_letter_no">No.Surat Permohonan PKP</label>
                         </div>
                         
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input id="start_date" name="start_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="start_date">Tgl.Mulai Berlaku</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        <div class="input-field col s12 m4">
                             <input id="end_date" name="end_date" type="date" max="{{ date('9999'.'-12-31') }}">
                             <label class="active" for="end_date">Tgl.Berakhir Berlaku</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input id="start_no" name="start_no" type="text">
+                        <div class="input-field col s12 m3">
+                            <input id="branch_code" name="branch_code" type="text" placeholder="Ex. 01">
+                            <label class="active" for="branch_code">Kode Cabang</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <input id="year" name="year" type="text" placeholder="Ex. 24">
+                            <label class="active" for="year">Kode Tahun</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <input id="start_no" name="start_no" type="text" placeholder="Ex. XXXXXXXX">
                             <label class="active" for="start_no">Nomor Awal</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input id="end_no" name="end_no" type="text">
+                        <div class="input-field col s12 m3">
+                            <input id="end_no" name="end_no" type="text" placeholder="Ex. XXXXXXXX">
                             <label class="active" for="end_no">Nomor Akhir</label>
                         </div>
-                        <div class="input-field col s12 m6">
-                            <input id="year" name="year" type="text">
-                            <label class="active" for="year">Tahun berlaku</label>
-                        </div>
-                        <div class="input-field col s12 m6">
-                            <textarea class="materialize-textarea" id="note" name="note"></textarea>
+                        <div class="input-field col s12 m4">
+                            <textarea class="materialize-textarea" id="note" name="note" placeholder="-"></textarea>
                             <label class="active" for="note">Catatan</label>
                         </div>
-                        <div class="col m12 s12 l12"></div>
                         <div class="col m6 s12 ">
                             <label class="">Bukti Upload</label>
                             <br>
@@ -197,7 +204,6 @@
                             </div>
                         </div>
                         <div class="col s12 mt-3">
-                            <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
                         </div>
                     </div>
                 </form>
@@ -205,7 +211,8 @@
         </div>
     </div>
     <div class="modal-footer">
-        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
     </div>
 </div>
 
@@ -433,6 +440,7 @@
                 { name: 'npwp', className: '' },
                 { name: 'djp_no', className: '' },
                 { name: 'pkp_no', className: '' },
+                { name: 'branch_code', className: '' },
                 { name: 'year', className: '' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'end_date', className: 'center-align' },
@@ -573,6 +581,7 @@
                 $('#start_no').val(response.start_no);
                 $('#end_no').val(response.end_no);
                 $('#year').val(response.year);
+                $('#branch_code').val(response.branch_code);
                 $('#note').val(response.note);
                 if(response.status == '1'){
                     $('#status').prop( "checked", true);

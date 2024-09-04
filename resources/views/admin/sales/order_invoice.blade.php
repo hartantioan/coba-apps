@@ -862,7 +862,7 @@
                 $('#form_data')[0].reset();
                 $('#temp,#tempTaxId').val('');
                 $('#tempTaxPercent').val('0,00');
-                $('#account_id').empty();
+                $('#account_id,#marketing_order_delivery_process_id,#marketing_order_down_payment_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
@@ -1033,10 +1033,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
 
                     if(response.status == 500){
                         swal({
@@ -1050,6 +1050,16 @@
                         }
 
                         let datakuy = $('#marketing_order_delivery_process_id').select2('data')[0];
+
+                        if(datakuy.payment_type){
+                            $('#type').val(datakuy.payment_type).formSelect();
+                        }
+
+                        if(!$('#account_id').val()){
+                            $('#account_id').empty().append(`
+                                <option value="` + datakuy.account_id + `">` + datakuy.account_name + `</option>
+                            `);
+                        }
 
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
@@ -1122,7 +1132,7 @@
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',
@@ -1147,10 +1157,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 beforeSend: function() {
-                    loadingOpen('.modal-content');
+                    loadingOpen('#modal1');
                 },
                 success: function(response) {
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
 
                     if(response.status == 500){
                         swal({
@@ -1222,7 +1232,7 @@
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);
-                    loadingClose('.modal-content');
+                    loadingClose('#modal1');
                     swal({
                         title: 'Ups!',
                         text: 'Check your internet connection.',

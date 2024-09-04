@@ -50,6 +50,14 @@ class MarketingOrderDeliveryProcess extends Model
         'done_note',
     ];
 
+    public function getTypePayment(){
+        $type = '';
+        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            $type = $row->marketingOrderDetail->marketingOrder->payment_type;
+        }
+        return $type;
+    }
+
     public function getPoCustomer(){
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){

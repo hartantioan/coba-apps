@@ -3213,6 +3213,9 @@ class Select2Controller extends Controller {
                     'due_date'          => $d->return_date,
                     'days_due'          => $d->marketingOrderDelivery->customer->top,
                     'list_area'         => Area::where('status','1')->get(), 
+                    'account_name'      => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
+                    'payment_type'      => $d->getTypePayment(),
+                    'account_id'        => $d->marketingOrderDelivery->customer_id,
                 ];
             }
         }

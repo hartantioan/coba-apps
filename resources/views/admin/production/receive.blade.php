@@ -1925,16 +1925,18 @@
                         formData.append('arr_count_detail[]',count);
                         formData.append('arr_batch_no[]',$(this).val());
                     });
-                    if($('.qty-batch-' + $(element).data('id')).length > 0){
-                        $('.qty-batch-' + $(element).data('id')).each(function(d){
-                            formData.append('arr_qty_batch[]',$(this).val());
-                            rowtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-                        });
-                        if(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) !== rowtotal){
+                    if($('input[name^="arr_issue_batch_usage_qty[]"]').length == 0){
+                        if($('.qty-batch-' + $(element).data('id')).length > 0){
+                            $('.qty-batch-' + $(element).data('id')).each(function(d){
+                                formData.append('arr_qty_batch[]',$(this).val());
+                                rowtotal += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+                            });
+                            if(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) !== rowtotal){
+                                passedQty = false;
+                            }
+                        }else{
                             passedQty = false;
                         }
-                    }else{
-                        passedQty = false;
                     }
                     if(!$('select[name^="arr_warehouse[]"]').eq(index).val()){
                         passedInput = false;

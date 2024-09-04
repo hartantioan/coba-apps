@@ -71,6 +71,14 @@ class HardwareItem extends Model
         return $this->hasOne('App\Models\Asset');
     }
 
+    public function hasAsset(){
+        $x = "non-Asset";
+        if($this->asset()->exists()){
+            $x="Asset";
+        }
+        return $x;
+    }
+
 
     public function receptionHardwareItemsUsage(){
         return $this->hasMany('App\Models\ReceptionHardwareItemsUsage','hardware_item_id','id')->whereIn('status',['1','2','3']);
@@ -79,6 +87,17 @@ class HardwareItem extends Model
     public function receptionHardwareItemsUsageALL(){
         return $this->hasMany('App\Models\ReceptionHardwareItemsUsage','hardware_item_id','id');
     }
+
+    public function latestReceptionHardwareItemUsage()
+    {
+        $latestUsage = $this->hasMany('App\Models\ReceptionHardwareItemsUsage', 'hardware_item_id', 'id')
+                    ->whereIn('status', ['1', '2', '3'])
+                    ->latest('created_at')
+                    ->first(); 
+        
+        return $latestUsage->code ?? '-'; 
+    }
+
 
     public static function generateCode()
     {

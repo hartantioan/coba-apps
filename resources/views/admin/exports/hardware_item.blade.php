@@ -6,6 +6,8 @@
             <th>Nama Inventaris</th>
             <th>Group</th>
             <th>Detail</th>
+            <th>Tipe</th>
+            <th>Kode Serah Terima</th>
             <th>Status</th>
         </tr>
     </thead>
@@ -20,6 +22,8 @@
                 <td>{{ $row->item }}</td>
                 <td>{{ $row->hardwareItemGroup->name }}</td>
                 <td>{{ $row->detail1 }}</td>
+                <td>{{ $row->hasAsset() }}</td>
+                <td>{{ $row->latestReceptionHardwareItemUsage() }}</td>
                 <td>{{ $row->statusRaw() }}</td>
 
             </tr>

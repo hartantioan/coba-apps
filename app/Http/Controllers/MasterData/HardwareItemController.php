@@ -118,7 +118,8 @@ class HardwareItemController extends Controller
                     $val->item,
                     $val->hardwareItemGroup->name,
                     $val->detail1,
-                  
+                    $val->hasAsset(),
+                    $val->latestReceptionHardwareItemUsage(),
                     $val->status(),
                     '
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue lighten-3 white-text btn-small" data-popup="tooltip" title="Barcode" onclick="printBarcode(' . $val->id . ')"><i class="material-icons dp48">reorder

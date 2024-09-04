@@ -117,8 +117,9 @@
                                                         <th>{{ __('translations.item') }}</th>
                                                         <th>Group</th>
                                                     
-                                                        <th>Detail 1</th>
-                                                        
+                                                        <th>Detail</th>
+                                                        <th>Tipe</th>
+                                                        <th>Kode Serah Terima</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -645,7 +646,7 @@
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": true,
+            "responsive": false,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -678,8 +679,9 @@
                 { name: 'code', className: 'center-align' },
                 { name: 'item_id', className: 'center-align' },
                 { name: 'hardware_item_group_id', className: 'center-align' },
-              
                 { name: 'info', className: 'center-align' },
+                { name: 'info', className: 'center-align' },
+                { name: 'code-ref', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],

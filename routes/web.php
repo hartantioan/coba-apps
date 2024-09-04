@@ -2484,6 +2484,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderDeliveryProcessController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderDeliveryProcessController::class, 'show']);
                     Route::post('get_code', [MarketingOrderDeliveryProcessController::class, 'getCode']);
+                    Route::post('get_stock_by_barcode', [MarketingOrderDeliveryProcessController::class, 'getStockByBarcode']);
                     Route::post('print',[MarketingOrderDeliveryProcessController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderDeliveryProcessController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderDeliveryProcessController::class, 'viewStructureTree']);

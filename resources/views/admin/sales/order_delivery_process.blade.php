@@ -1036,7 +1036,7 @@ document.addEventListener('focusin', function (event) {
                                                             <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                         </div>
                                                         <th class="center" colspan="3">
-                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `');">
+                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `',` + val.modd_id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');">
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -1110,6 +1110,82 @@ document.addEventListener('focusin', function (event) {
             `);
             $('#post_date').val('{{ date("Y-m-d") }}');
         }
+    }
+
+    function getStockByBarcode(id,modd,place,item,conversion){
+        if($('#text-barcode-' + id).val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_stock_by_barcode',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    code: $('#text-barcode-' + id).val(),
+                    place: place,
+                    item: item,
+                    conversion: conversion,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#model1');
+                },
+                success: function(response) {
+                    loadingClose('#model1');
+                    if(response.status == 200){
+                        if($('#last-row-item-' + id).length > 0){
+                            $('#last-row-item-' + id).remove();
+                        }
+                        let count = makeid(10);
+                        $('#body-item-' + id).append(`
+                            <tr class="row_item_detail_` + id + `">
+                                <input type="hidden" name="arr_modd_id[]" value="` + modd + `">
+                                <input type="hidden" name="arr_item_stock_id[]" value="` + response.id + `">
+                                <td>
+                                    ` + response.place + `
+                                </td>
+                                <td>
+                                    ` + response.warehouse + `
+                                </td>
+                                <td>
+                                    ` + response.area + `
+                                </td>
+                                <td>
+                                    ` + response.shading + `
+                                </td>
+                                <td>
+                                    ` + response.batch + `
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + response.qty + `" class="rowQtyDetail` + id + `">
+                                </td>
+                                <td class="center-align">
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + id + `');">
+                                        <i class="material-icons">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        `);
+                    }else{
+                        M.toast({
+                            html: response.message
+                        });
+                    }
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#model1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+        $('#text-barcode-' + id).val('');
     }
 
     function getStock(id,modd){
@@ -1210,7 +1286,7 @@ document.addEventListener('focusin', function (event) {
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                    $.ajax({
+                $.ajax({
                     url: '{{ Request::url() }}/print_by_range',
                     type: 'POST',
                     dataType: 'JSON',

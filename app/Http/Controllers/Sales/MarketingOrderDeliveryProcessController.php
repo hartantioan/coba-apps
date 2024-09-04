@@ -78,11 +78,54 @@ class MarketingOrderDeliveryProcessController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-   public function getCode(Request $request){
+    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderDeliveryProcess::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getStockByBarcode(Request $request){
+        if($request->code){
+            $data = ItemStock::whereHas('productionBatch',function($query)use($request){
+                $query->where('code',$request->code);
+            })
+            ->where('place_id',$request->place)
+            ->where('item_id',$request->item)
+            ->first();
+            
+            if($data){
+                $qtyStock = $data->qty / $request->conversion;
+                $qtyNeeded = 1;
+                if($qtyStock < $qtyNeeded){
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Stock saat ini tidak mencukupi.'
+                    ];
+                }else{
+                    $response = [
+                        'status'        => 200,
+                        'place'         => $data->place->code,
+                        'warehouse'     => $data->warehouse->name,
+                        'area'          => $data->area->code,
+                        'shading'       => $data->itemShading->code,
+                        'batch'         => $data->productionBatch->code,
+                        'qty'           => $qtyNeeded,
+                    ];
+                }
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data stock tidak ditemukan.'
+                ];
+            }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Kode tidak boleh kosong.'
+            ];
+        }        				
+		return response()->json($response);
     }
 
     public function datatable(Request $request){

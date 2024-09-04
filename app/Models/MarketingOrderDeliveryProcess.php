@@ -416,7 +416,7 @@ class MarketingOrderDeliveryProcess extends Model
                 }
 
                 if($passedDp){
-                    $arrayTax = TaxSeries::getTaxCode($this->company_id,$this->post_date);
+                    $arrayTax = TaxSeries::getTaxCode($this->company_id,$this->post_date,'010');
                     if($arrayTax['status'] == 200){
                         $tax_no = $arrayTax['no'];
                     }

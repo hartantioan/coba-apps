@@ -228,6 +228,12 @@
                                         <select class="browser-default" id="account_id" name="account_id" onchange="addDueDate();"></select>
                                         <label class="active" for="account_id">{{ __('translations.customer') }}</label>
                                     </div>
+                                    <div class="row">
+                                        <div class="input-field col m6 s12">
+                                            <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id" onchange="getMarketingOrderDelivery();" ></select>
+                                            <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
+                                        </div>
+                                    </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)
@@ -243,7 +249,6 @@
                                         </select>
                                         <label class="" for="type">{{ __('translations.type') }}</label>
                                     </div>
-                                    <div class="col m12 s12 l12"></div>
                                     <div class="input-field col m3 s12 step6">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
@@ -255,6 +260,7 @@
                                     {{-- <div class="input-field col m1 s12 step10">
                                         <button class="btn waves-effect waves-light green" onclick="getTaxSeries();"><i class="material-icons">autorenew</i></button>
                                     </div> --}}
+                                    <div class="col m12 s12 l12"></div>
                                     <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
@@ -302,17 +308,6 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;overflow:auto;">
                                     <legend>4. Surat Jalan</legend>
-                                    <div class="row">
-                                        <div class="input-field col m5 step12">
-                                            <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id"></select>
-                                            <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
-                                        </div>
-                                        <div class="col m4 step13">
-                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1 mt-5" onclick="getMarketingOrderDelivery();" href="javascript:void(0);">
-                                                <i class="material-icons left">add</i> Surat Jalan
-                                            </a>
-                                        </div>
-                                    </div> 
                                     <div class="col m12 s12" style="width:2500px !important;" id="table-item">
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" id="table-detail">
@@ -1068,7 +1063,9 @@
                             </div>
                         `);
 
-                        $('#due_date').val(datakuy.due_date);
+                        /* $('#due_date').val(datakuy.due_date); */
+
+                        addDueDateByValue(datakuy.top_internal);
 
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
@@ -1182,7 +1179,7 @@
                             </div>
                         `);
 
-                        $('#due_date').val(datakuy.due_date);
+                        /* $('#due_date').val(datakuy.due_date); */
 
                         var count = makeid(10);
 
@@ -1247,6 +1244,16 @@
         if($('#account_id').val()){
             var result = new Date($('#post_date').val());
             result.setDate(result.getDate() + parseInt($('#account_id').select2('data')[0].top_customer));
+            $('#due_date').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date').val(null);
+        }
+    }
+
+    function addDueDateByValue(val){
+        if($('#account_id').val()){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt(val));
             $('#due_date').val(result.toISOString().split('T')[0]);
         }else{
             $('#due_date').val(null);

@@ -3219,6 +3219,7 @@ class Select2Controller extends Controller {
                     'account_name'      => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
                     'payment_type'      => $d->getTypePayment(),
                     'account_id'        => $d->marketingOrderDelivery->customer_id,
+                    'top_internal'      => $d->marketingOrderDelivery->top_internal,
                 ];
             }
         }

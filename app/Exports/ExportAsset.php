@@ -34,6 +34,7 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
         'SALDO BUKU',
         'METODE',
         'KETERANGAN',
+        'KODE INVENTARIS',
         'STATUS',
     ];
 
@@ -77,6 +78,7 @@ class ExportAsset implements FromCollection, WithTitle, WithHeadings, WithCustom
                 'balance'       => number_format($row->book_balance,2,',','.'),
                 'method'        => $row->method(),
                 'note'          => $row->note,
+                'inventory_code'          => $row->hardwareItem->code ?? '-',
                 'status'        => $row->statusRaw(),
             ];
         }

@@ -100,10 +100,19 @@ class MarketingOrderDeliveryProcessDetail extends Model
 
     public function getPriceHpp(){
         $pricenow = 0;
-        $cogs = ItemCogs::where('item_id',$this->itemStock->item_id)->where('place_id',$this->itemStock->place_id)->where('warehouse_id',$this->itemStock->warehouse_id)->where('item_shading_id',$this->itemStock->item_shading_id)->where('production_batch_id',$this->itemStock->production_batch_id)->where('date','<=',$this->marketingOrderDeliveryProcess->post_date)->orderByDesc('date')->orderByDesc('id')->first();
-        if($cogs){
-            $pricenow = $cogs->qty_final > 0 ? round($cogs->total_final / $cogs->qty_final,6) : 0;
+        $cogs = ItemCogs::where('item_id',$this->itemStock->item_id)->where('place_id',$this->itemStock->place_id)->where('warehouse_id',$this->itemStock->warehouse_id)->where('item_shading_id',$this->itemStock->item_shading_id)->where('production_batch_id',$this->itemStock->production_batch_id)->where('date','<=',$this->marketingOrderDeliveryProcess->post_date)->orderBy('date')->orderBy('id')->get();
+        $total = 0;
+        $qty = 0;
+        foreach($cogs as $row){
+            if($row->type == 'IN'){
+                $qty += $row->qty_in;
+                $total += $row->total_in;
+            }elseif($row->type == 'OUT'){
+                $qty -= $row->qty_out;
+                $total -= $row->total_out;
+            }
         }
+        $pricenow = $qty > 0 ? $total / $qty : 0;
         return $pricenow;
     }
 

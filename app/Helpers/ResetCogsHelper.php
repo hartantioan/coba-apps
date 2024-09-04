@@ -956,9 +956,9 @@ class ResetCogsHelper
             })->get();
 
             foreach($marketingorderdelivery as $row){
-                $price = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
+                $total = $row->total;
                 $qty = $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
-                $total = round($qty * $price,2);
+                $price = $total / $qty;
                 $total_final = $totalBefore - $total;
                 $qty_final = $qtyBefore - $qty;
                 ItemCogs::create([

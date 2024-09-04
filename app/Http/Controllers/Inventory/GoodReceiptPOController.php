@@ -728,6 +728,7 @@ class GoodReceiptPOController extends Controller
                         'wtax'                  => $wtaxall,
                         'grandtotal'            => $grandtotalall,
                         'type'                  => $request->type,
+                        'status_lc'             => '1',
                     ]);
 
                     DB::commit();
@@ -1596,33 +1597,75 @@ class GoodReceiptPOController extends Controller
     }
 
     public function updateMultipleLc(Request $request){
-        $query_done = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
+  
+        if($request->arr_id && count($request->arr_id) > 0){
+            foreach($request->arr_id as $key =>$row){
+                $query_done = GoodReceipt::where('code',$row)->first();
+                if($query_done){
 
-        if($query_done){
-
-            if(in_array($query_done->status,['2','3'])){
-                $query_done->update([
-                    'is_multiple_lc'    => $query_done->is_multiple_lc ? NULL : '1',
-                ]);
-    
-                activity()
-                        ->performedOn(new GoodReceipt())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query_done)
-                        ->log('Change multiple landed cost status the Good Receipt data');
-    
-                $response = [
-                    'status'  => 200,
-                    'message' => 'Data berhasil diupdate.'
-                ];
-            }else{
-                $response = [
-                    'status'  => 500,
-                    'message' => 'Data tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
-                ];
+                    if(in_array($query_done->status,['2','3'])){
+                        $currentStatusLc = $query_done->status_lc;
+                        $newStatusLc = ($currentStatusLc == '1') ? '2' : '1';
+                        $query_done->update([
+                            'is_multiple_lc'    => $query_done->is_multiple_lc ? NULL : '1',
+                            'status_lc'         => $newStatusLc,
+                        ]);
+            
+                        activity()
+                                ->performedOn(new GoodReceipt())
+                                ->causedBy(session('bo_id'))
+                                ->withProperties($query_done)
+                                ->log('Change multiple landed cost status the Good Receipt data');
+            
+                        $response = [
+                            'status'  => 200,
+                            'message' => 'Data berhasil diupdate.'
+                        ];
+                    }else{
+                        $response = [
+                            'status'  => 500,
+                            'message' => 'Data'.$query_done->code .'tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
+                        ];
+                        
+                        return response()->json($response);
+                    }
+        
+                }
             }
+        }else{
+            $query_done = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
 
-            return response()->json($response);
+            if($query_done){
+
+                if(in_array($query_done->status,['2','3'])){
+                    $currentStatusLc = $query_done->status_lc;
+                    $newStatusLc = ($currentStatusLc == '1') ? '2' : '1';
+                    $query_done->update([
+                        'is_multiple_lc'    => $query_done->is_multiple_lc ? NULL : '1',
+                        'status_lc'         => $newStatusLc,
+                    ]);
+        
+                    activity()
+                            ->performedOn(new GoodReceipt())
+                            ->causedBy(session('bo_id'))
+                            ->withProperties($query_done)
+                            ->log('Change multiple landed cost status the Good Receipt data');
+        
+                    $response = [
+                        'status'  => 200,
+                        'message' => 'Data berhasil diupdate.'
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
+                    ];
+                }
+
+                
+            }
         }
+        return response()->json($response);
+        
     }
 }

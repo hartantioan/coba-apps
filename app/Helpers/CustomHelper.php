@@ -2520,6 +2520,9 @@ class CustomHelper {
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2) - round($rowdetail->lookable->nominal * $rowdetail->lookable->landedCost->currency_rate,2);
 					}else{
 						$rowtotal = round($rowdetail->nominal * $lc->currency_rate,2);
+						$rowdetail->lookable->goodReceipt->update([
+							'status_lc' => '2'
+						]);
 					}
 					$totalitem += $rowtotal;
 					$totalfcitem += $rowfc;

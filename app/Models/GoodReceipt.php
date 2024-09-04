@@ -44,6 +44,7 @@ class GoodReceipt extends Model
         'done_id',
         'done_date',
         'done_note',
+        'status_lc',
     ];
 
     public function deleteUser()
@@ -456,5 +457,15 @@ class GoodReceipt extends Model
             $arr[] = $row->purchaseOrderDetail->requester;
         }
         return implode(', ',$arr);
+    }
+
+    public function statusLC(){
+        $status = match ($this->status) {
+            '1' => 'Buka',
+            '2' => 'Tutup',
+            default => 'Invalid',
+        };
+
+        return $status;
     }
 }

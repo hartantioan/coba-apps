@@ -529,6 +529,12 @@
     </a>
 </div>
 
+<div style="bottom: 50px; right: 142px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-blue-grey-blue-grey gradient-shadow modal-trigger" onclick="changemulti();">
+        <i class="material-icons">blur_linear</i>
+    </a>
+</div>
+
 <div style="bottom: 50px; right: 80px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-amber-amber gradient-shadow modal-trigger tooltipped"  data-position="top" data-tooltip="Range Printing" href="#modal5">
         <i class="material-icons">view_comfy</i>
@@ -2185,6 +2191,62 @@
                     title: 'Ups!',
                     text: 'Check your internet connection.',
                     icon: 'error'
+                });
+            }
+        });
+    }
+
+    function changemulti(){
+        var arr_id_temp=[];
+        $.map(window.table.rows('.selected').nodes(), function (item) {
+            var poin = $(item).find('td:nth-child(1)').text().trim();
+            arr_id_temp.push(poin);
+            
+        });
+        var msg = '';
+        swal({
+            title: "Apakah anda yakin membuka multi LC?",
+            text: "Data yang sudah terupdate bisa dikembalikan dengan menekan tombol ini.",
+            buttons: true,
+        })
+        .then(message => {
+            if (message != "" && message != null) {
+                $.ajax({
+                    url: '{{ Request::url() }}/update_multiple_lc',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        arr_id: arr_id_temp,
+                        msg : message
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#main');
+                    },
+                    success: function(response) {
+                        loadingClose('#main');
+                        if(response.status == 200) {
+                            loadDataTable();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#main');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });

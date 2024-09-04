@@ -71,7 +71,7 @@ class GoodScale extends Model
         $has = false;
         foreach($this->goodScaleDetail as $row){
             if($row->lookable_type == 'marketing_order_deliveries'){
-                if($row->lookable->type_delivery == '2'){
+                if($row->lookable->type_delivery == '2' && $row->total > 0){
                     $has = true;
                 }
             }

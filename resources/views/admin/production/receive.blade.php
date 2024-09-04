@@ -1954,9 +1954,9 @@
                     $('input[name^="arr_issue_batch_usage_qty[]"]').each(function(index){
                         totalBatchIssue += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                     });
-                    if(totalBatchIssue !== totalQtyReceive){
+                    /* if(totalBatchIssue !== totalQtyReceive){
                         passedQty = false;
-                    }
+                    } */
                 }
 
                 if(!passedQty){

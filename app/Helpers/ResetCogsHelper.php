@@ -947,8 +947,12 @@ class ResetCogsHelper
                     ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
                     $query->where('status','2');
                 });
-            })->whereHas('itemStock',function($query)use($item_id){
-                $query->where('item_id',$item_id);
+            })->whereHas('itemStock',function($query)use($item_id,$place_id,$area_id,$item_shading_id,$production_batch_id){
+                $query->where('item_id',$item_id)
+                    ->where('place_id',$place_id)
+                    ->where('area_id',$area_id)
+                    ->where('item_shading_id',$item_shading_id)
+                    ->where('production_batch_id',$production_batch_id);
             })->get();
 
             foreach($marketingorderdelivery as $row){

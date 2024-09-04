@@ -24,6 +24,12 @@ class ImportDeliveryCostStandard implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new ModelsDeliveryCostStandard())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel customer discount data.');
+
         return [
             0 => new deliveryCostStandard(),
         ];
@@ -108,12 +114,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
                         ]);
                     }
                     
-                    activity()
-                        ->performedOn(new ModelsDeliveryCostStandard())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel customer discount data.');
-               
+                   
                 }else{
                     $sheet='Header';
                     throw new RowImportException('ada yang salah', $row->getIndex(),$this->error,$sheet);

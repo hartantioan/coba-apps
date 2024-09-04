@@ -16,6 +16,11 @@ class ImportPattern implements OnEachRow, WithHeadingRow, WithValidation, WithBa
 {
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new Pattern())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('From excel pattern to database.');
         return [
             0 => $this,
         ];
@@ -38,11 +43,7 @@ class ImportPattern implements OnEachRow, WithHeadingRow, WithValidation, WithBa
                 'name'      => $row['name'],
                 'status'    => '1',
             ]);
-            activity()
-                ->performedOn(new Pattern())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('From excel pattern to database.');
+            
         }
     }
 

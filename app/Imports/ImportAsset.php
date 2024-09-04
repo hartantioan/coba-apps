@@ -18,6 +18,11 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
 {
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new Asset())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('From excel asset to database.');
         return [
             0 => $this,
         ];
@@ -43,11 +48,7 @@ class ImportAsset implements OnEachRow, WithHeadingRow, WithValidation, WithBatc
             'hardware_item_id' => $inventaris->id ?? null ,
             'status' => '1',
         ]);
-        activity()
-            ->performedOn(new Asset())
-            ->causedBy(session('bo_id'))
-            ->withProperties($query)
-            ->log('From excel asset to database.');
+        
     }
 
     public function rules(): array

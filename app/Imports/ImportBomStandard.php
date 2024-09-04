@@ -24,6 +24,11 @@ class ImportBomStandard implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new BomStandard())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel bom standard data.');
         return [
             0 => new handleBomSheet(),
             1 => new handleDetailSheet(),
@@ -50,11 +55,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                         'status'    => '1',
                     ]);
 
-                    activity()
-                        ->performedOn(new BomStandard())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel bom standard data.');
+                    
                 }else{
                     $check->bomStandardDetail()->delete();
 

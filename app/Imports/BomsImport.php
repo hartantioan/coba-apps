@@ -28,6 +28,11 @@ class BomsImport implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new Bom())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('Add / edit from excel bom data.');
         return [
             0 => new handleBomSheet(),
             1 => new handleAlternativeSheet(),
@@ -76,11 +81,7 @@ class handleBomSheet implements OnEachRow, WithHeadingRow
                         'status' => '1',
                     ]);
 
-                    activity()
-                        ->performedOn(new Bom())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel bom data.');
+                    
                 }else{
                     $check->bomDetail()->delete();
                     $check->bomAlternative()->delete();

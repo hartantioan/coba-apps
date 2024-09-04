@@ -34,6 +34,11 @@ class ImportUser implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new User())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('Add / edit from excel bom data.');
         return [
             0 => new handleUser($this->temp),
             1 => new handleUsebankSheet($this->temp),
@@ -148,11 +153,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'no' => $row['no']
                     ];
 
-                    activity()
-                        ->performedOn(new User())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel bom data.');
+                    
                 }else{
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);

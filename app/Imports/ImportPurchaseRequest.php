@@ -28,6 +28,12 @@ class ImportPurchaseRequest implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new PurchaseRequest())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('Add / edit from excel pr data.');
+
         return [
             0 => new handlePR($this->temp),
             1 => new handlePRdetail($this->temp),
@@ -87,12 +93,7 @@ class handlePR implements OnEachRow, WithHeadingRow
                     CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Purchase Request No. '.$query->code,$query->note,session('bo_id'));
     
               
-                    activity()
-                        ->performedOn(new PurchaseRequest())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel pr data.');
-               
+                   
             }else{
                 return null;
             } 

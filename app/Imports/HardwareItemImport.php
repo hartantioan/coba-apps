@@ -21,6 +21,11 @@ class HardwareItemImport implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new HardwareItem())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel HardwareItem data.');
         return [
             0 => new handleHardwareSheet(),
         ];
@@ -68,11 +73,7 @@ class handleHardwareSheet implements OnEachRow, WithHeadingRow
                         throw new RowImportException('Ada yang tidak Lengkap', $row->getIndex(),$this->error,$sheet);
                     }
 
-                    activity()
-                        ->performedOn(new HardwareItem())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel HardwareItem data.');
+                    
                 }
             }else{
                 DB::rollback();

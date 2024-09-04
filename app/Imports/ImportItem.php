@@ -33,6 +33,12 @@ class ImportItem implements WithMultipleSheets
 {
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new Item())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel item data.');
+        
         return [
             0 => new handleItemSheet(),
             1 => new handleConversionSheet(),
@@ -103,12 +109,7 @@ class handleItemSheet implements OnEachRow, WithHeadingRow
                         ]);
                     }
         
-                    activity()
-                        ->performedOn(new Item())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel item data.');
-                        
+                     
                 }else{
 
                     if(!$check->hasChildDocument()){

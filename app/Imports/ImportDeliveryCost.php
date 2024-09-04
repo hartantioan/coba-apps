@@ -25,6 +25,12 @@ class ImportDeliveryCost implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new DeliveryCost())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel Delivery cost data.');
+               
         return [
             0 => new handleDC(),
         ];
@@ -104,12 +110,7 @@ class handleDC implements OnEachRow, WithHeadingRow
                         'status'=> 1
                     ]);
                 
-                    activity()
-                        ->performedOn(new DeliveryCost())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel Delivery cost data.');
-               
+                    
             }else{
                 DB::rollback();
                 $sheet='Header';

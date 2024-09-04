@@ -26,6 +26,8 @@
             <th>Satuan Produksi</th>
             <th>Total Real</th>
             <th>No Batch</th>
+            <th>Group</th>
+            <th>Shift</th>
             <th>Line</th>
             <th>Gudang</th>
             <th>Based On</th>
@@ -64,6 +66,8 @@
                     <td>{{ $row_detail->item->uomUnit->code}}</td>
                     <td>{{ $row_detail->total}}</td>
                     <td>{{ $row_detail->getProductionBatchCodesAttribute()}}</td>
+                    <td>{{ $row->group }}</td>
+                    <td>{{ $row->shift->name }}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ $row_detail->warehouse->name}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>

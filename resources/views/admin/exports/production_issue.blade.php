@@ -30,6 +30,8 @@
             <th>Total Planned</th>
             <th>Total Real</th>
             <th>Batch</th>
+            <th>Group</th>
+            <th>Shift</th>
             <th>{{ __('translations.line') }}</th>
             <th>Gudang</th>
             <th>Based On</th>
@@ -71,6 +73,8 @@
                     <td>{{ number_format($row_detail->total_planned ,3,',','.') }}</td>
                     <td>{{ number_format($row_detail->total ,3,',','.') }}</td>
                     <td>{{ ($row_detail->productionBatchUsage()->exists() ? $row_detail->listBatch() : '-') }}</td>
+                    <td>{{ $row->group }}</td>
+                    <td>{{ $row->shift->name }}</td>
                     <td>{{ ($row->line()->exists() ? $row->line->code : '-') }}</td>
                     <td>{{ ($row_detail->warehouse()->exists() ? $row_detail->warehouse->name : '-') }}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionOrder->code }}</td>

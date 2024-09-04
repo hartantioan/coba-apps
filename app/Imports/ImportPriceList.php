@@ -20,6 +20,11 @@ class ImportPriceList implements WithMultipleSheets
 
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new ItemPricelist())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('From excel item price list to database.');
         return [
             0 => new handleItemPriceList(),
            
@@ -69,11 +74,7 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
                 }
                 
-                activity()
-                    ->performedOn(new ItemPricelist())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('From excel item price list to database.');
+                
             }else{
                 return null;
             } 

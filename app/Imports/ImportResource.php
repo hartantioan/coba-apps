@@ -20,6 +20,11 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
 {
     public function sheets(): array
     {
+        activity()
+        ->performedOn(new Resource())
+        ->causedBy(session('bo_id'))
+        ->withProperties(null)
+        ->log('From excel resource to database.');
         return [
             0 => $this,
         ];
@@ -43,11 +48,7 @@ class ImportResource implements OnEachRow, WithHeadingRow, WithValidation, WithB
             'cost'              => $row['cost'],
             'status'            => '1',
         ]);
-        activity()
-            ->performedOn(new Resource())
-            ->causedBy(session('bo_id'))
-            ->withProperties($query)
-            ->log('From excel resource to database.');
+        
     }
 
     public function rules(): array

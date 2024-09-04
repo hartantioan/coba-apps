@@ -20,6 +20,8 @@
             <th>Kode Item</th>
             <th>Nama Item</th>
             <th>No. Batch/Pallet</th>
+            <th>Group</th>
+            <th>Shift</th>
             <th>Shading</th>
             <th>Qty Diterima</th>
             <th>{{ __('translations.unit') }}</th>
@@ -59,6 +61,8 @@
                     <td>{{ $row_detail->item->code }}</td>
                     <td>{{ $row_detail->item->name }}</td>
                     <td>{{ $row_detail->pallet_no}}</td>
+                    <td>{{ $row->group }}</td>
+                    <td>{{ $row->shift->name }}</td>
                     <td>{{ $row_detail->shading}}</td>
                     <td>{{ $row_detail->qty_sell}}</td>
                     <td>{{ $row_detail->itemUnit->unit->code}}</td>

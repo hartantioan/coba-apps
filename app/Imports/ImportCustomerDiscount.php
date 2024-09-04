@@ -25,6 +25,13 @@ class ImportCustomerDiscount implements WithMultipleSheets
 
     public function sheets(): array
     {
+
+        activity()
+        ->performedOn(new CustomerDiscount())
+        ->causedBy(session('bo_id'))
+        ->withProperties('')
+        ->log('Add / edit from excel customer discount data.');
+
         return [
             0 => new handleCustomerDiscount(),
         ];
@@ -81,12 +88,7 @@ class handleCustomerDiscount implements OnEachRow, WithHeadingRow
                         'status'=> 1
                     ]);
                 
-                    activity()
-                        ->performedOn(new CustomerDiscount())
-                        ->causedBy(session('bo_id'))
-                        ->withProperties($query)
-                        ->log('Add / edit from excel customer discount data.');
-               
+                   
             }else{
                 return null;
             } 

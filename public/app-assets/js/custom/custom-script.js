@@ -360,7 +360,7 @@ Date.prototype.yyyymmdd = function(showtime) {
 }
 
 function loadCurrency(){
-	if($('#currency_id').length > 0){
+	if($('#currency_id').length > 0 && $('#post_date').length > 0){
 		let code = $('#currency_id').find(':selected').data('code'), date = $('#post_date').val();
 		var yesterday = new Date(date);
 		/* yesterday.setDate(yesterday.getDate() -2); */

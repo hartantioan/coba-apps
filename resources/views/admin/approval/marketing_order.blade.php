@@ -235,6 +235,12 @@
                     {{ date('d/m/Y',strtotime($data->delivery_date)) }}
                 </div>
                 <div class="col s4">
+                    Jadwal Kirim
+                </div>
+                <div class="col s8">
+                    {{ $data->deliverySchedule() }}
+                </div>
+                <div class="col s4">
                     {{ __('translations.billing_address') }}
                 </div>
                 <div class="col s8">

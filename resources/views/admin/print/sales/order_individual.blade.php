@@ -237,6 +237,15 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td width="40%">
+                                            Jadwal Kirim
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td width="60%">
+                                            {{ $data->deliverySchedule() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>
                                             Broker
                                         </td>

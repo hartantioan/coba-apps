@@ -91,7 +91,7 @@ class HardwareItem extends Model
     public function latestReceptionHardwareItemUsage()
     {
         $latestUsage = $this->hasMany('App\Models\ReceptionHardwareItemsUsage', 'hardware_item_id', 'id')
-                    ->whereIn('status', ['1', '2', '3'])
+                    ->whereIn('status', ['1'])
                     ->latest('created_at')
                     ->first(); 
         

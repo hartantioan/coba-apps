@@ -317,8 +317,8 @@ class ProductionReceiveController extends Controller
     }
 
     public function create(Request $request){
-        /* DB::beginTransaction();
-        try { */
+        DB::beginTransaction();
+        try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
@@ -705,10 +705,11 @@ class ProductionReceiveController extends Controller
                 }
             }
         
-            /* DB::commit();
+            DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        } */
+            info($e->getMessage());
+        }
 
 		return response()->json($response);
     }

@@ -211,6 +211,7 @@
                                                         <th>Pengirim</th>
                                                         <th>Tipe Transport</th>
                                                         <th>Tgl.Kirim</th>
+                                                        <th>Jadwal Pengiriman</th>
                                                         <th>Tipe Pembayaran</th>
                                                         <th>TOP.Internal</th>
                                                         <th>TOP.Customer</th>
@@ -390,6 +391,14 @@
                                     <div class="input-field col m3 s12">
                                         <input id="phone" name="phone" type="text" placeholder="No.Kontak Customer">
                                         <label class="active" for="phone">No.Kontak Customer</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="delivery_schedule" name="delivery_schedule">
+                                            <option value="1">Segera</option>
+                                            <option value="2">Terjadwal</option>
+                                            <option value="3">Belum Terjadwal</option>
+                                        </select>
+                                        <label class="" for="delivery_schedule">Jadwal Pengiriman</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -1722,10 +1731,10 @@
                 { name: 'sender_id', className: '' },
                 { name: 'transportation_id', className: '' },
                 { name: 'delivery_date', className: '' },
+                { name: 'delivery_schedule', className: '' },
                 { name: 'payment_type', className: '' },
                 { name: 'top_internal', className: '' },
                 { name: 'top_customer', className: '' },
-               
                 { name: 'billing_address', className: '' },
                 { name: 'outlet_id', className: '' },
                 { name: 'destination_address', className: '' },
@@ -2009,6 +2018,7 @@
                 `);
                 $('#limit').text(response.deposit);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#delivery_schedule').val(response.delivery_schedule).formSelect();
                 $('#type').val(response.type).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#valid_date').val(response.valid_date);
@@ -2666,6 +2676,7 @@
                         `);
                         $('#limit').text(response.deposit);
                         $('#company_id').val(response.company_id).formSelect();
+                        $('#delivery_schedule').val(response.delivery_schedule).formSelect();
                         $('#type').val(response.type).formSelect();
                         $('#post_date').val(response.post_date);
                         $('#valid_date').val(response.valid_date);

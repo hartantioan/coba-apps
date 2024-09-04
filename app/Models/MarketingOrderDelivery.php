@@ -31,6 +31,7 @@ class MarketingOrderDelivery extends Model
         'transportation_id',
         'cost_delivery_type',
         'type_delivery',
+        'top_internal',
         'note_internal',
         'note_external',
         'status',

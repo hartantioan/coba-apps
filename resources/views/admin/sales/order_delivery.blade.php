@@ -245,7 +245,7 @@
                                     <div class="col m6 s12">
                                         <div class="card-alert card green" id="alert-phase1">
                                             <div class="card-content white-text">
-                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman dan Prosentase DP adalah sama.</p>
+                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman, Prosentase DP, dan TOP Internal adalah sama.</p>
                                             </div>
                                         </div>
                                         <div class="card-alert card green hide" id="alert-phase2">
@@ -293,6 +293,7 @@
                                         <input type="hidden" id="tempPayment" name="tempPayment">
                                         <input type="hidden" id="tempDownPayment" name="tempDownPayment">
                                         <input type="hidden" id="tempTypeDelivery" name="tempTypeDelivery">
+                                        <input type="hidden" id="tempTopInternal" name="tempTopInternal">
                                     </div>
                                 </fieldset>
                             </div>
@@ -597,7 +598,7 @@ document.addEventListener('focusin', function (event) {
                 tempAccount = null;
                 paymentType = null;
                 $('#district-info,#city-info,#transportation-info').text('-');
-                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment,#tempTypeDelivery').val('');
+                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment,#tempTypeDelivery,#tempTopInternal').val('');
                 $('.second-inputs').css('pointer-events','auto');
                 $('.first-inputs').css('pointer-events','auto');
                 $('#alert-phase1').removeClass('hide');
@@ -691,6 +692,7 @@ document.addEventListener('focusin', function (event) {
                         payment_type: $('#tempPayment').val(),
                         down_payment: $('#tempDownPayment').val(),
                         type_delivery: $('#tempTypeDelivery').val(),
+                        top_internal: $('#tempTopInternal').val(),
                     };
                 },
                 processResults: function(data) {
@@ -797,6 +799,7 @@ document.addEventListener('focusin', function (event) {
                         $('#tempPayment').val(response.payment_type);
                         $('#tempDownPayment').val(response.percent_dp);
                         $('#tempTypeDelivery').val(response.type_delivery);
+                        $('#tempTopInternal').val(response.top_internal);
                         $('#district-info').text(response.district_name);
                         $('#city-info').text(response.city_name);
                         $('#transportation-info').text(response.transportation_name);
@@ -1631,6 +1634,9 @@ document.addEventListener('focusin', function (event) {
                     $('#tempDistrict').val(response.district_id);
                     $('#tempCity').val(response.city_id);
                     $('#tempTransport').val(response.transportation_id);
+                    if(response.top_internal){
+                        $('#tempTopInternal').val(response.top_internal);
+                    }
                     $('#district-info').text(response.district_name);
                     $('#city-info').text(response.city_name);
                     $('#transportation-info').text(response.transportation_name);

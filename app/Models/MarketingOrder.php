@@ -32,6 +32,7 @@ class MarketingOrder extends Model
         'sender_id',
         'transportation_id',
         'delivery_date',
+        'delivery_schedule',
         'outlet_id',
         'payment_type',
         'top_internal',
@@ -148,6 +149,17 @@ class MarketingOrder extends Model
         };
 
         return $type;
+    }
+
+    public function deliverySchedule(){
+        $delivery_schedule = match ($this->delivery_schedule) {
+            '1' => 'Segera',
+            '2' => 'Terjadwal',
+            '3' => 'Belum Terjadwal',
+            default => 'Invalid',
+        };
+
+        return $delivery_schedule;
     }
 
     public function isGuarantee(){

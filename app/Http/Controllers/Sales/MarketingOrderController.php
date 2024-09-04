@@ -106,10 +106,10 @@ class MarketingOrderController extends Controller
             'sender_id',
             'transportation_id',
             'delivery_date',
+            'delivery_schedule',
             'payment_type',
             'top_internal',
             'top_customer',
-           
             'billing_address',
             'outlet_id',
             'destination_address',
@@ -319,6 +319,7 @@ class MarketingOrderController extends Controller
                     $val->sender->name,
                     $val->transportation->name,
                     date('d/m/Y',strtotime($val->delivery_date)),
+                    $val->deliverySchedule(),
                     $val->paymentType(),
                     $val->top_internal,
                     $val->top_customer,
@@ -403,6 +404,7 @@ class MarketingOrderController extends Controller
                 'type_delivery'             => 'required',
                 'sender_id'                 => 'required',
                 'delivery_date'             => 'required',
+                'delivery_schedule'         => 'required',
                 'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
                 
                 'billing_address'           => 'required',
@@ -455,6 +457,7 @@ class MarketingOrderController extends Controller
                 'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
                 'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
                 'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
+                'delivery_schedule.required'        => 'Jadwal kirim tidak boleh kosong.',
                 'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
             
                 'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
@@ -613,6 +616,7 @@ class MarketingOrderController extends Controller
                         $query->type_delivery = $request->type_delivery;
                         $query->sender_id = $request->sender_id;
                         $query->delivery_date = $request->delivery_date;
+                        $query->delivery_schedule = $request->delivery_schedule;
                         $query->payment_type = $request->payment_type;
                         $query->top_internal = $request->top_internal;
                         $query->top_customer = $request->top_customer;
@@ -672,6 +676,7 @@ class MarketingOrderController extends Controller
                         'type_delivery'             => $request->type_delivery,
                         'sender_id'                 => $request->sender_id,
                         'delivery_date'             => $request->delivery_date,
+                        'delivery_schedule'         => $request->delivery_schedule,
                         'payment_type'              => $request->payment_type,
                         'top_internal'              => $request->top_internal,
                         'top_customer'              => $request->top_customer,

@@ -67,6 +67,18 @@ class GoodScale extends Model
         'done_note',
     ];
 
+    public function hasFrancoMod(){
+        $has = false;
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable_type == 'marketing_order_deliveries'){
+                if($row->lookable->type_delivery == '2'){
+                    $has = true;
+                }
+            }
+        }
+        return $has;
+    }
+
     public function itemUnit()
     {
         return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();

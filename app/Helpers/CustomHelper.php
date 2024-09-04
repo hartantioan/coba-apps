@@ -1008,7 +1008,7 @@ class CustomHelper {
 			$gs = GoodScale::find($table_id);
 
 			if($gs){
-				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0){
+				if($gs->type == '2' && $gs->goodScaleDetail()->exists() && $gs->qty_final > 0 && $gs->hasFrancoMod()){
 					$place = Place::where('code',substr($gs->code,7,2))->where('status','1')->first();
 
 					$query = Journal::create([

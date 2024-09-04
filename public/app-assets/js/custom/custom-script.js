@@ -360,33 +360,35 @@ Date.prototype.yyyymmdd = function(showtime) {
 }
 
 function loadCurrency(){
-	let code = $('#currency_id').find(':selected').data('code'), date = $('#post_date').val();
-	var yesterday = new Date(date);
-	/* yesterday.setDate(yesterday.getDate() -2); */
-	let dateString = yesterday.yyyymmdd();
-	$.ajax({
-		url: window.location.origin+'/admin/currency_get',
-		type: 'GET',
-		beforeSend: function() {
-			loadingOpen('#currency_rate');
-		},
-		data: {
-			code:code,
-			date:dateString
-		},
-		success: function(response) {
-			loadingClose('#currency_rate');
-			
-			$('#currency_rate').val(formatRupiahIni(parseFloat(response['currency_rate']).toFixed(2).toString().replace('.',','))).trigger('keyup');
-		},
-		error: function() {
-			swal({
-				title: 'Ups!',
-				text: 'Check your internet connection.',
-				icon: 'error'
-			});
-		}
-	});
+	if($('#currency_id').length > 0){
+		let code = $('#currency_id').find(':selected').data('code'), date = $('#post_date').val();
+		var yesterday = new Date(date);
+		/* yesterday.setDate(yesterday.getDate() -2); */
+		let dateString = yesterday.yyyymmdd();
+		$.ajax({
+			url: window.location.origin+'/admin/currency_get',
+			type: 'GET',
+			beforeSend: function() {
+				loadingOpen('#currency_rate');
+			},
+			data: {
+				code:code,
+				date:dateString
+			},
+			success: function(response) {
+				loadingClose('#currency_rate');
+				
+				$('#currency_rate').val(formatRupiahIni(parseFloat(response['currency_rate']).toFixed(2).toString().replace('.',','))).trigger('keyup');
+			},
+			error: function() {
+				swal({
+					title: 'Ups!',
+					text: 'Check your internet connection.',
+					icon: 'error'
+				});
+			}
+		});
+	}
 }
 
 function getRandomColor() {

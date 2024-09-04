@@ -940,6 +940,13 @@ document.addEventListener('focusin', function (event) {
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/supplier_vendor") }}');
         select2ServerSide('#marketing_order_delivery_id,#filter_marketing_order_delivery', '{{ url("admin/select2/marketing_order_delivery") }}');
+        $("#form_data").on("keypress", function (event) { 
+            var keyPressed = event.keyCode || event.which; 
+            if (keyPressed === 13) { 
+                event.preventDefault(); 
+                return false; 
+            } 
+        }); 
     });
 
     function getMarketingOrderDelivery(){
@@ -1136,43 +1143,49 @@ document.addEventListener('focusin', function (event) {
                         if($('#last-row-item-' + id).length > 0){
                             $('#last-row-item-' + id).remove();
                         }
-                        let count = makeid(10);
-                        $('#body-item-' + id).append(`
-                            <tr class="row_item_detail_` + id + `">
-                                <input type="hidden" name="arr_modd_id[]" value="` + modd + `">
-                                <input type="hidden" name="arr_item_stock_id[]" value="` + response.id + `">
-                                <td>
-                                    ` + response.place + `
-                                </td>
-                                <td>
-                                    ` + response.warehouse + `
-                                </td>
-                                <td>
-                                    ` + response.area + `
-                                </td>
-                                <td>
-                                    ` + response.shading + `
-                                </td>
-                                <td>
-                                    ` + response.batch + `
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + response.qty + `" class="rowQtyDetail` + id + `">
-                                </td>
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + id + `');">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
+                        if($('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').length > 0){
+                            let qty = parseFloat($('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').parent().find('input[name^="arr_qty[]"]').val().replaceAll(".", "").replaceAll(",",".")) + parseFloat(response.qty);
+                            $('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').parent().find('input[name^="arr_qty[]"]').val(
+                                qty
+                            );
+                        }else{
+                            let count = makeid(10);
+                            $('#body-item-' + id).append(`
+                                <tr class="row_item_detail_` + id + `">
+                                    <input type="hidden" name="arr_modd_id[]" value="` + modd + `">
+                                    <input type="hidden" name="arr_item_stock_id[]" value="` + response.id + `">
+                                    <td>
+                                        ` + response.place + `
+                                    </td>
+                                    <td>
+                                        ` + response.warehouse + `
+                                    </td>
+                                    <td>
+                                        ` + response.area + `
+                                    </td>
+                                    <td>
+                                        ` + response.shading + `
+                                    </td>
+                                    <td>
+                                        ` + response.batch + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + response.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + response.qty_max + `" class="rowQtyDetail` + id + `">
+                                    </td>
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + id + `');">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        $('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').parent().find('input[name^="arr_qty[]"]').trigger('keyup');
                     }else{
                         M.toast({
                             html: response.message
                         });
                     }
-                    $('.modal-content').scrollTop(0);
-                    M.updateTextFields();
                 },
                 error: function() {
                     $('.modal-content').scrollTop(0);

@@ -95,7 +95,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             ->first();
             
             if($data){
-                $qtyStock = $data->qty / $request->conversion;
+                $qtyStock = round($data->qty / $request->conversion,3);
                 $qtyNeeded = 1;
                 if($qtyStock < $qtyNeeded){
                     $response = [
@@ -111,6 +111,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'shading'       => $data->itemShading->code,
                         'batch'         => $data->productionBatch->code,
                         'qty'           => $qtyNeeded,
+                        'qty_max'       => CustomHelper::formatConditionalQty($qtyStock),
+                        'id'            => $data->id,
                     ];
                 }
             }else{

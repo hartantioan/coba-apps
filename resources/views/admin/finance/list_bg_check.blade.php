@@ -179,11 +179,11 @@
                         </div>
                         <div class="input-field col s12"></div>
                         <div class="input-field col s12 m3 ">
-                            <input id="post_date" name="post_date" type="date">
+                            <input id="post_date" name="post_date" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="post_date">Tgl. Post</label>
                         </div>
                         <div class="input-field col s12 m3 ">
-                            <input id="valid_until_date" name="valid_until_date" type="date">
+                            <input id="valid_until_date" name="valid_until_date" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="valid_until_date">Tgl. Jatuh Tempo</label>
                         </div>
                         <div class="input-field col s12 m3">
@@ -195,7 +195,7 @@
                             <label class="active" for="document_no">No Dokumen</label>
                         </div>
                         <div class="input-field col s12 m3">
-                            <input id="nominal" name="nominal" type="text" value="0" placeholder="Limit Kredit" onkeyup="formatRupiah(this)">
+                            <input id="nominal" name="nominal" type="text" value="0" placeholder="Nominal BG/Check" onkeyup="formatRupiah(this)" onfocus="emptyThis(this);">
                             <label class="active" for="nominal">Nominal</label>
                         </div>
                         <div class="input-field col m3 s12 step23">

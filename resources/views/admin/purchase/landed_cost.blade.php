@@ -1633,9 +1633,13 @@
                                 $('.data-used').trigger('click');
                             }
 
-                            $('.row_item').each(function(){
-                                $(this).remove();
-                            });
+                            $('.last_row_item').remove();
+
+                            if(!$('#temp').val()){
+                                $('.row_item').each(function(){
+                                    $(this).remove();
+                                });
+                            }
 
                             $('#last-row-item').remove();
                             var totalall = 0, totalproporsional = 0, passed = true, errormessage = [];
@@ -1758,8 +1762,8 @@
                                 });
 
                                 $('#body-item').append(`
-                                    <tr class="row_item">
-                                        <td class="right-align" colspan="9">
+                                    <tr class="last_row_item">
+                                        <td class="right-align" colspan="10">
                                             TOTAL
                                         </td>
                                         <td class="right-align">
@@ -2536,8 +2540,8 @@
                         });
 
                         $('#body-item').append(`
-                            <tr class="row_item">
-                                <td class="right-align" colspan="9">
+                            <tr class="last_row_item">
+                                <td class="right-align" colspan="10">
                                     TOTAL
                                 </td>
                                 <td class="right-align">

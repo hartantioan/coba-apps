@@ -25,6 +25,7 @@ class ListBgCheck extends Model
         'valid_until_date',
         'pay_date',
         'coa_id',
+        'type',
         'document_no',
         'document',
         'note',
@@ -122,5 +123,15 @@ class ListBgCheck extends Model
         };
 
         return $status;
+    }
+
+    public function type(){
+        $type = match ($this->type) {
+            '1' => 'BG',
+            '2' => 'Check',
+            default => 'Invalid',
+        };
+
+        return $type;
     }
 }

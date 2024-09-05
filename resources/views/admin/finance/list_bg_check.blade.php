@@ -118,6 +118,7 @@
                                                         <th>Tgl.Jatuh Tempo</th>
                                                         <th>Tgl.Cair</th>
                                                         <th>Bank Tujuan</th>
+                                                        <th>Tipe</th>
                                                         <th>Nomor BG/Check</th>
                                                         <th>Document</th>
                                                         <th>Note</th>
@@ -169,7 +170,7 @@
                             <select class="browser-default" id="account_id" name="account_id"></select>
                             <label class="active" for="account_id">Customer</label>
                         </div>
-                        <div class="input-field col s12 m4 " id="company_select">
+                        <div class="input-field col s12 m4 ">
                             <select id="company_id" name="company_id">
                                 @foreach($company as $row)
                                     <option value="{{ $row->id }}">{{ $row->name }}</option>
@@ -189,6 +190,13 @@
                         <div class="input-field col s12 m3">
                             <select class="browser-default" id="coa_id" name="coa_id"></select>
                             <label class="active" for="coa_id">Bank Tujuan</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <select id="type" name="type">
+                                <option value="1">BG</option>
+                                <option value="2">Check</option>
+                            </select>
+                            <label for="type">Tipe</label>
                         </div>
                         <div class="input-field col s12 m3 " >
                             <input id="document_no" name="document_no" type="text" placeholder="No BG/Check">
@@ -476,6 +484,7 @@
                 { name: 'due_date', className: 'center-align' },
                 { name: 'pay_date', className: 'center-align' },
                 { name: 'coa_id', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'document_no', className: 'center-align' },
                 { name: 'attachment', className: 'center-align' },
                 { name: 'note', className: '' },
@@ -691,6 +700,7 @@
                 `);
                 $('#code').val(response.code);
                 $('#company_id').val(response.company_id).formSelect();
+                $('#type').val(response.type).formSelect();
                 $('#document_no').val(response.document_no);
                 $('#document').val(response.document);
                 $('#nominal').val(response.nominal);

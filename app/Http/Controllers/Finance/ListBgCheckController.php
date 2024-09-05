@@ -65,6 +65,7 @@ class ListBgCheckController extends Controller
             'valid_until_date',
             'pay_date',
             'coa_id',
+            'type',
             'document_no',
             'document',
             'note',
@@ -154,6 +155,7 @@ class ListBgCheckController extends Controller
                     date('d/m/Y',strtotime($val->valid_until_date)),
                     $val->pay_date ? date('d/m/Y',strtotime($val->pay_date)) : '-',
                     $val->coa->code.' - '.$val->coa->name,
+                    $val->type(),
                     $val->document_no,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
@@ -225,7 +227,8 @@ class ListBgCheckController extends Controller
                     $query->post_date       = $request->post_date; 
                     $query->valid_until_date = $request->valid_until_date; 
                     $query->pay_date        = $request->pay_date; 
-                    $query->coa_id          = $request->coa_id; 
+                    $query->coa_id          = $request->coa_id;
+                    $query->type            = $request->type;
                     $query->document_no     = $request->document_no; 
                     $query->document        = $document; 
                     $query->note            = $request->note; 
@@ -253,6 +256,7 @@ class ListBgCheckController extends Controller
                         'valid_until_date'  => $request->valid_until_date,
                         'pay_date'          => $request->pay_date,
                         'coa_id'            => $request->coa_id,
+                        'type'              => $request->type,
                         'document_no'       => $request->document_no,
                         'document'          => $request->file('file') ? $request->file('file')->store('public/list_bg_check') : NULL,
                         'note'              => $request->note,

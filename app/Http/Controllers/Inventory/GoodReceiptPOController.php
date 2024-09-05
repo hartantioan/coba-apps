@@ -729,6 +729,7 @@ class GoodReceiptPOController extends Controller
                         'grandtotal'            => $grandtotalall,
                         'type'                  => $request->type,
                         'status_lc'             => '1',
+                        'is_multiple_lc'        => '1',
                     ]);
 
                     DB::commit();

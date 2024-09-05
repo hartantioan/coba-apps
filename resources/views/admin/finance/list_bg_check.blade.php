@@ -419,7 +419,7 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                $('#province_id').empty();
+                $('#coa_id,#account_id').empty();
                 $('#city_id').empty();
                 M.updateTextFields();
                 $('#city_id').empty();
@@ -709,7 +709,9 @@
                 $('#bank_source_name').val(response.bank_source_name);
                 $('#bank_source_no').val(response.bank_source_no);
                 $('#valid_until_date').val(response.valid_until_date);
-
+                $('#coa_id').append(`
+                    <option value="` + response.coa_id + `">` + response.coa_name + `</option>
+                `);
                 $('.modal-content').scrollTop(0);
                 $('#name').focus();
                 M.updateTextFields();

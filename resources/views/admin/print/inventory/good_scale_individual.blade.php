@@ -174,7 +174,7 @@
                 <tr>
                     <td width="66%" class="left-align" style="padding-top:15px;">
                         <span class="invoice-number mr-1">Tiket Timbangan # {{ $data->code }}</span>
-                        <br><span>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
+                        <br><span>Diajukan:{{ date('d/m/Y',strtotime($data->post_date)) }} | Tipe : {{ $data->type() }}</span>
                         <h4 class="indigo-text"></h4>
                     </td>
                     <td width="34%" class="right-align">
@@ -208,7 +208,7 @@
                                                 Supplier
                                             </td>
                                             <td width="50%">
-                                                {{ $data->account->name }}
+                                                {{ $data->account()->exists() ? $data->account->name : '-' }}
                                             </td>
                                         </tr>
                                     @endif

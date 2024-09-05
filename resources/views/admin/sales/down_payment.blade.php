@@ -280,7 +280,7 @@
                                         <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step14">
-                                        <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                        <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3">UANG MUKA PORCELAIN</textarea>
                                         <label class="active" for="note">{{ __('translations.note') }}</label>
                                     </div>
                                     <div class="col m12 s12 l12"></div>

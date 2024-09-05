@@ -254,6 +254,7 @@
                                 <select class="form-control" id="type" name="type" onchange="changeMode(this.value);">
                                     <option value="1">Timbang Barang Masuk (Pembelian)</option>
                                     <option value="2">Timbang Barang Keluar (Penjualan)</option>
+                                    <option value="3">Timbang Barang Manual</option>
                                 </select>
                                 <label class="ac" for="type">Tipe Timbang</label>
                             </div>
@@ -261,7 +262,7 @@
                                 <select class="browser-default" id="item_id" name="item_id" onchange="getRowUnit();"></select>
                                 <label class="active" for="item_id">{{ __('translations.item') }}</label>
                             </div>
-                            <div class="input-field col m3 s12" id="div-account">
+                            <div class="input-field col m3 s12 manual-inputs" id="div-account">
                                 <input type="hidden" id="temp" name="temp">
                                 <select class="browser-default" id="account_id" name="account_id"></select>
                                 <label class="active" for="account_id">Supplier/Ekspedisi</label>
@@ -331,11 +332,11 @@
                                 <input id="delivery_no" name="delivery_no" type="text" placeholder="No. Pengiriman">
                                 <label class="active" for="delivery_no">Nomor Pengiriman / SJ</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 manual-inputs">
                                 <input id="vehicle_no" name="vehicle_no" type="text" placeholder="No. Kendaraan">
                                 <label class="active" for="vehicle_no">Nomor Kendaraan</label>
                             </div>
-                            <div class="input-field col m3 s12">
+                            <div class="input-field col m3 s12 manual-inputs">
                                 <input id="driver" name="driver" type="text" placeholder="Nama Supir">
                                 <label class="active" for="driver">Nama Supir</label>
                             </div>
@@ -357,7 +358,7 @@
                                 <div id="fileName"></div>
                                 <img src="" alt="Preview" id="imagePreview" style="display: none;">
                             </div>
-                            <div class="col m6 s12 hide">
+                            <div class="col m6 s12 hide manual-inputs">
                                 <table class="bordered" style="border: 1px solid;" id="table-detail-mod">
                                     <thead>
                                         <tr>
@@ -1261,13 +1262,21 @@
         `);
         if(val == '1'){
             $('.hide-inputs').removeClass('hide');
+            $('.manual-inputs').removeClass('hide');
             $('#is_quality_check').prop( "checked", true);
             $('#table-detail-mod').parent().addClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
         }else if(val == '2'){
             $('#is_quality_check').prop( "checked", false);
             $('.hide-inputs').addClass('hide');
+            $('.manual-inputs').removeClass('hide');
             $('#table-detail-mod').parent().removeClass('hide');
+            select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
+        }else if(val == '3'){
+            $('#is_quality_check').prop( "checked", false);
+            $('.hide-inputs').addClass('hide');
+            $('.manual-inputs').addClass('hide');
+            $('#table-detail-mod').parent().addClass('hide');
             select2ServerSide('#account_id', '{{ url("admin/select2/vendor") }}');
         }
     }

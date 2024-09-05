@@ -356,41 +356,80 @@ class GoodScaleController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
-            'company_id'                => 'required',
-            'vehicle_no'                => 'required',
-            'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
-            'driver'                    => 'required',
-            'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
-            'place_id'                  => 'required',
-			'post_date'		            => 'required',
-            /* 'item_id'                   => 'required',
-            'warehouse_id'              => 'required',
-            'purchase_order_detail_id'  => 'required', */
-            'qty_po'                    => 'required',
-            'qty_in'                    => 'required',
-            'qty_out'                   => 'required',
-            /* 'item_unit_id'              => 'required', */
-		], [
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
-            'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
-            'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
-            'purchase_order_detail_id.required' => 'Data PO tidak boleh kosong.',
-            'driver.required'                   => 'Nama supir tidak boleh kosong.',
-            'place_id.required'                 => 'Plant tidak boleh kosong.',
-			'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
-            /* 'item_id.required'                  => 'Item tidak boleh kosong.',
-            'warehouse_id.required'             => 'Gudang tidak boleh kosong.',
-            'purchase_order_detail_id.required' => 'PO tidak boleh kosong.', */
-            'qty_po.required'                   => 'Qty PO tidak boleh kosong.',
-            'qty_in.required'                   => 'Qty timbang masuk tidak boleh kosong.',
-            'qty_out.required'                  => 'Qty timbang keluar tidak boleh kosong.',
-            /* 'item_unit_id.required'             => 'Satuan item tidak boleh kosong.', */
-		]);
+        if($request->type == '3'){
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                'company_id'                => 'required',
+               
+                // 'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
+               
+                // 'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
+                'place_id'                  => 'required',
+                'post_date'		            => 'required',
+                /* 'item_id'                   => 'required',
+                'warehouse_id'              => 'required',
+                'purchase_order_detail_id'  => 'required', */
+                'qty_po'                    => 'required',
+                'qty_in'                    => 'required',
+                'qty_out'                   => 'required',
+                /* 'item_unit_id'              => 'required', */
+            ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+                // 'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
+                // 'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
+                // 'purchase_order_detail_id.required' => 'Data PO tidak boleh kosong.',
+                // 'driver.required'                   => 'Nama supir tidak boleh kosong.',
+                'place_id.required'                 => 'Plant tidak boleh kosong.',
+                'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
+                /* 'item_id.required'                  => 'Item tidak boleh kosong.',
+                'warehouse_id.required'             => 'Gudang tidak boleh kosong.',
+                'purchase_order_detail_id.required' => 'PO tidak boleh kosong.', */
+                'qty_po.required'                   => 'Qty PO tidak boleh kosong.',
+                'qty_in.required'                   => 'Qty timbang masuk tidak boleh kosong.',
+                'qty_out.required'                  => 'Qty timbang keluar tidak boleh kosong.',
+                /* 'item_unit_id.required'             => 'Satuan item tidak boleh kosong.', */
+            ]);
+        }else{
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                'company_id'                => 'required',
+                'vehicle_no'                => 'required',
+                'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
+                'driver'                    => 'required',
+                'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
+                'place_id'                  => 'required',
+                'post_date'		            => 'required',
+                /* 'item_id'                   => 'required',
+                'warehouse_id'              => 'required',
+                'purchase_order_detail_id'  => 'required', */
+                'qty_po'                    => 'required',
+                'qty_in'                    => 'required',
+                'qty_out'                   => 'required',
+                /* 'item_unit_id'              => 'required', */
+            ], [
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+                'vehicle_no.required'               => 'Nomor kendaraan tidak boleh kosong.',
+                'account_id.required'               => 'Supplier/Ekspedisi tidak boleh kosong.',
+                'purchase_order_detail_id.required' => 'Data PO tidak boleh kosong.',
+                'driver.required'                   => 'Nama supir tidak boleh kosong.',
+                'place_id.required'                 => 'Plant tidak boleh kosong.',
+                'post_date.required' 				=> 'Tanggal posting tidak boleh kosong.',
+                /* 'item_id.required'                  => 'Item tidak boleh kosong.',
+                'warehouse_id.required'             => 'Gudang tidak boleh kosong.',
+                'purchase_order_detail_id.required' => 'PO tidak boleh kosong.', */
+                'qty_po.required'                   => 'Qty PO tidak boleh kosong.',
+                'qty_in.required'                   => 'Qty timbang masuk tidak boleh kosong.',
+                'qty_out.required'                  => 'Qty timbang keluar tidak boleh kosong.',
+                /* 'item_unit_id.required'             => 'Satuan item tidak boleh kosong.', */
+            ]);
+        }
+        
 
         if($validation->fails()) {
             $response = [
@@ -486,7 +525,11 @@ class GoodScaleController extends Controller
                         if(Storage::exists($query->image_in)){
                             Storage::delete($query->image_in);
                         }
-                        
+                        if($request->type == '3'){
+                            $account_id = null;
+                        }else{
+                            $account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
+                        }
                         $query->code = $request->code;
                         $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
@@ -545,10 +588,15 @@ class GoodScaleController extends Controller
                     }else{
                         $document = null;
                     }
+                    if($request->type == '3'){
+                        $account_id = null;
+                    }else{
+                        $account_id = $request->account_id ?? $pod->purchaseOrder->account_id;
+                    }
                     $query = GoodScale::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id ?? $pod->purchaseOrder->account_id,
+                        'account_id'                => $account_id,
                         'company_id'                => $request->company_id,
                         'place_id'                  => $request->place_id,
                         'warehouse_id'              => $request->warehouse_id ?? NULL,
@@ -708,7 +756,10 @@ class GoodScaleController extends Controller
 
     public function update(Request $request){
         $data = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
-        $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+        if($data->account()->exists()){
+            $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+        }
+       
         $data['image_in'] = $data->imageIn();
         $data['item_name'] = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '';
         $data['purchase_code'] = $data->purchaseOrderDetail()->exists() ? $data->purchaseOrderDetail->purchaseOrder->code : $data->referencePO();
@@ -732,10 +783,17 @@ class GoodScaleController extends Controller
                 'message' => 'Data Timbangan telah ditarik menjadi GRPO, anda tidak bisa merubah data.'
             ]);
         }else{
-            $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
-            $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code;
+            if($data->account()->exists()){
+                $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
+            }elseif($data->purchaseOrderDetail()->exists()){
+                $data['purchase_code'] = $data->purchaseOrderDetail->purchaseOrder->code;
+            }elseif($data->warehouse()->exists()){
+                $data['warehouse_name'] = $data->warehouse->name;
+            }
+         
+          
             $data['place_code'] = $data->place->code;
-            $data['warehouse_name'] = $data->warehouse->name;
+          
             $response = [
                 'status'    => 200,  
                 'data'      => $data

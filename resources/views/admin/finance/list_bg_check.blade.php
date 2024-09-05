@@ -23,6 +23,14 @@
     .modal {
         top:0px !important;
     }
+
+    .select-wrapper {
+        height: 3.6rem !important;
+    }
+
+    .select2-container {
+        height: 3.6rem !important;
+    }
 </style>
 <div id="main">
     <div class="row">
@@ -109,8 +117,7 @@
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Jatuh Tempo</th>
                                                         <th>Tgl.Cair</th>
-                                                        <th>Bank Source Name</th>
-                                                        <th>Bank Source No</th>
+                                                        <th>Bank Tujuan</th>
                                                         <th>Nomor BG/Check</th>
                                                         <th>Document</th>
                                                         <th>Note</th>
@@ -179,19 +186,10 @@
                             <input id="valid_until_date" name="valid_until_date" type="date">
                             <label class="active" for="valid_until_date">Tgl. Jatuh Tempo</label>
                         </div>
-                        <div class="input-field col s12 m3 " >
-                            <input id="bank_source_name" name="bank_source_name" type="text" placeholder="Kontak Kantor">
-                            <label class="active" for="bank_source_name">Nama Bank</label>
+                        <div class="input-field col s12 m3">
+                            <select class="browser-default" id="coa_id" name="coa_id"></select>
+                            <label class="active" for="coa_id">Bank Tujuan</label>
                         </div>
-                        <div class="input-field col s12 m3 " >
-                            <input id="bank_source_no" name="bank_source_no" type="text" placeholder="Kontak Kantor">
-                            <label class="active" for="bank_source_no">Rek Bank</label>
-                        </div>
-                        <div class="col m4 s12">
-                            <div id="fileName"></div>
-                            <img src="" alt="Preview" id="imagePreview" style="display: none;">
-                        </div>
-                        <div class="col s12"></div>
                         <div class="input-field col s12 m3 " >
                             <input id="document_no" name="document_no" type="text" placeholder="Kontak Kantor">
                             <label class="active" for="document_no">No Dokumen</label>
@@ -204,7 +202,8 @@
                             <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
                             <label class="active" for="note">{{ __('translations.note') }}</label>
                         </div>
-                        <div class="col m3 s12 step6">
+                        <div class="input-field col s12"></div>
+                        <div class="col m6 s12 step6">
                             <label class="">Bukti Upload</label>
                             <br>
                             <input type="file" name="file" id="fileInput" style="display: none;">
@@ -215,6 +214,10 @@
                             <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                Clear
                             </a>
+                        </div>
+                        <div class="col m4 s12">
+                            <div id="fileName"></div>
+                            <img src="" alt="Preview" id="imagePreview" style="display: none;">
                         </div>
                         <div class="col s12 mt-3">
                             <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
@@ -423,7 +426,7 @@
             width: '100%',
         });
         select2ServerSide('#account_id', '{{ url("admin/select2/customer") }}');
-
+        select2ServerSide('#coa_id', '{{ url("admin/select2/coa_bank") }}');
     });
 
     function loadDataTable() {
@@ -465,21 +468,19 @@
             },
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
-                { name: 'name', className: 'center-align' },
-                { name: 'order', className: 'center-align' },
                 { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'order', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'order', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'order', className: 'center-align' },
-                { name: 'code', className: 'center-align' },
-                { name: 'name', className: 'center-align' },
-                { name: 'order', className: 'center-align' },
-                
+                { name: 'user', className: 'center-align' },
+                { name: 'customer', className: 'center-align' },
+                { name: 'company', className: 'center-align' },
+                { name: 'post_date', className: 'center-align' },
+                { name: 'due_date', className: 'center-align' },
+                { name: 'pay_date', className: 'center-align' },
+                { name: 'coa_id', className: 'center-align' },
+                { name: 'document_no', className: 'center-align' },
+                { name: 'attachment', className: 'center-align' },
+                { name: 'note', className: '' },
+                { name: 'nominal', className: 'right-align' },
+                { name: 'grandtotal', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
@@ -572,78 +573,90 @@
     }
 
     function save(){
-			
-        var formData = new FormData($('#form_data')[0]);
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
 
-        var path = window.location.pathname;
-            path = path.replace(/^\/|\/$/g, '');
+                var path = window.location.pathname;
+                    path = path.replace(/^\/|\/$/g, '');
 
-            
-            var segments = path.split('/');
-            var lastSegment = segments[segments.length - 1];
-        
-            formData.append('lastsegment',lastSegment);
-        
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
                     
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+                    var segments = path.split('/');
+                    var lastSegment = segments[segments.length - 1];
+                
+                    formData.append('lastsegment',lastSegment);
+                
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });

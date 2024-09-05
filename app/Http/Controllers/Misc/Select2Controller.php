@@ -667,6 +667,32 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function coaBank(Request $request)
+    {
+        $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
+        $response = [];
+        $search   = $request->search;
+        $data = Coa::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                    ->orWhere('name', 'like', "%$search%")
+                    ->orWhere('prefix', 'like', "%$search%");
+                 })->where('level',5)
+                ->where('status','1')
+                ->whereNotNull('is_cash_account')
+                ->where('name','like',"%bank%")
+                ->whereIn('company_id',$arrCompany)
+                ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function rawCoa(Request $request)
     {
         $response = [];
@@ -5034,14 +5060,16 @@ class Select2Controller extends Controller {
             $query->where(function($query) use ($search, $request) {
                 if ($search) {
                     $query->where('code', 'like', "%$search%")
-                        ->orWhere('bank_source_name', 'like', "%$search%")
-                        ->orWhere('bank_source_no', 'like', "%$search%")
                         ->orWhere('document_no', 'like', "%$search%")
                         ->orWhere('note', 'like', "%$search%")
                         ->orWhere('nominal', 'like', "%$search%")
                         ->orWhereHas('account',function($query)use($search){
                             $query->where('employee_no','like',"%$search%")
                                 ->orWhere('name','like',"%$search%");
+                        })
+                        ->orWhereHas('coa',function($query) use ($search, $request) {
+                            $query->where('code', 'like', "%$search%")
+                                ->orWhere('name', 'like', "%$search%");
                         });
                 }
             });
@@ -5057,7 +5085,7 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
-                'text' 			    => $d->document_no.' Rp '.CustomHelper::formatConditionalQty($d->nominal).' - '.$d->bank_source_name.' - '.$d->bank_source_no,
+                'text' 			    => $d->document_no.' Rp '.CustomHelper::formatConditionalQty($d->nominal).' - '.$d->coa->name.' - '.$d->note,
             ];
         }
 

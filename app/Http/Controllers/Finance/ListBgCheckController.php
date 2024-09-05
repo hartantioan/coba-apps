@@ -56,6 +56,7 @@ class ListBgCheckController extends Controller
 
     public function datatable(Request $request){
         $column = [
+            'id',
             'code',
             'user_id',
             'account_id',
@@ -63,14 +64,12 @@ class ListBgCheckController extends Controller
             'post_date',
             'valid_until_date',
             'pay_date',
-            'bank_source_name',
-            'bank_source_no',
+            'coa_id',
             'document_no',
             'document',
             'note',
             'nominal',
             'grandtotal',
-            'status',
         ];
 
         $start  = $request->start;
@@ -85,20 +84,20 @@ class ListBgCheckController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('bank_source_name', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('bank_source_no', 'like', "%$search%")
                             ->orWhere('document', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request) {
                                 $query->where('employee_no', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ;
+                                    ->orWhere('name', 'like', "%$search%");
                             })
                             ->orWhereHas('account',function($query) use ($search, $request) {
                                 $query->where('employee_no', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ;
+                                    ->orWhere('name', 'like', "%$search%");
+                            })
+                            ->orWhereHas('coa',function($query) use ($search, $request) {
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
                             });
                     });
                 }
@@ -116,20 +115,20 @@ class ListBgCheckController extends Controller
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
-                            ->orWhere('bank_source_name', 'like', "%$search%")
                             ->orWhere('document_no', 'like', "%$search%")
-                            ->orWhere('bank_source_no', 'like', "%$search%")
                             ->orWhere('document', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request) {
                                 $query->where('employee_no', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ;
+                                    ->orWhere('name', 'like', "%$search%");
                             })
                             ->orWhereHas('account',function($query) use ($search, $request) {
                                 $query->where('employee_no', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ;
+                                    ->orWhere('name', 'like', "%$search%");
+                            })
+                            ->orWhereHas('coa',function($query) use ($search, $request) {
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
                             });
                     });
                 }
@@ -154,8 +153,7 @@ class ListBgCheckController extends Controller
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->valid_until_date)),
                     $val->pay_date ? date('d/m/Y',strtotime($val->pay_date)) : '-',
-                    $val->bank_source_name,
-                    $val->bank_source_no,
+                    $val->coa->code.' - '.$val->coa->name,
                     $val->document_no,
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
@@ -189,12 +187,12 @@ class ListBgCheckController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('list_bg_checks', 'code')->ignore($request->temp)] : 'required|unique:list_bg_checks,code',
-            
+            'coa_id'            => 'required',
             'note'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
-           
+            'coa_id.required'       => 'Coa tidak boleh kosong.',
             'note.required'         => 'Nama tidak boleh kosong.',
         ]);
 
@@ -227,8 +225,7 @@ class ListBgCheckController extends Controller
                     $query->post_date       = $request->post_date; 
                     $query->valid_until_date = $request->valid_until_date; 
                     $query->pay_date        = $request->pay_date; 
-                    $query->bank_source_name = $request->bank_source_name; 
-                    $query->bank_source_no  = $request->bank_source_no; 
+                    $query->coa_id          = $request->coa_id; 
                     $query->document_no     = $request->document_no; 
                     $query->document        = $document; 
                     $query->note            = $request->note; 
@@ -255,8 +252,7 @@ class ListBgCheckController extends Controller
                         'post_date'         => $request->post_date,
                         'valid_until_date'  => $request->valid_until_date,
                         'pay_date'          => $request->pay_date,
-                        'bank_source_name'  => $request->bank_source_name,
-                        'bank_source_no'    => $request->bank_source_no,
+                        'coa_id'            => $request->coa_id,
                         'document_no'       => $request->document_no,
                         'document'          => $request->file('file') ? $request->file('file')->store('public/list_bg_check') : NULL,
                         'note'              => $request->note,
@@ -301,6 +297,7 @@ class ListBgCheckController extends Controller
         $list['nominal'] = number_format($list->nominal,2,',','.');	
         $list['account_name'] = $list->account->name;
         $list['grandtotal'] = number_format($list->grandtotal,2,',','.');				
+        $list['coa_name'] = $list->coa->code.' - '.$list->coa->name;
 		return response()->json($list);
     }
 

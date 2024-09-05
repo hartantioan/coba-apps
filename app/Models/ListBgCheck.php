@@ -24,8 +24,7 @@ class ListBgCheck extends Model
         'post_date',
         'valid_until_date',
         'pay_date',
-        'bank_source_name',
-        'bank_source_no',
+        'coa_id',
         'document_no',
         'document',
         'note',
@@ -75,6 +74,11 @@ class ListBgCheck extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function coa()
+    {
+        return $this->belongsTo('App\Models\Coa', 'coa_id', 'id')->withTrashed();
     }
 
     public function incomingPayment()

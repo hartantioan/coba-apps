@@ -285,7 +285,7 @@
                                     </div>
                                     <div class="col m12 s12 l12"></div>
                                     <div class="input-field col m3 s12 step10">
-                                        <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);countFromHeader();">
+                                        <input id="nominal" name="nominal" type="text" value="0,00" onfocus="emptyThis(this);" onkeyup="formatRupiah(this);countFromHeader();">
                                         <label class="active" for="nominal">Nominal Uang Masuk (Grandtotal)</label>
                                     </div>
                                     <div class="col m5 s12 step8">

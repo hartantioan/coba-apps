@@ -266,7 +266,7 @@
                                     <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                 </div>
                                 <div class="input-field col m2 s12">
-                                    <input id="nominal" name="nominal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
+                                    <input id="nominal" name="nominal" type="text" onfocus="emptyThis(this);" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;">
                                     <label class="active" for="nominal">Uang Diterima (OPSIONAL)</label>
                                 </div>
                                 <div class="col m4 s12 stepfile">

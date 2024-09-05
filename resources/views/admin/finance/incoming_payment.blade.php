@@ -248,7 +248,7 @@
                                 </div>
                                 <div class="input-field col m3 s12 step6">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
-                                    <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
+                                    <label class="active" for="post_date">Tgl.Cair/Masuk Uang</label>
                                 </div>
                                 <div class="col m12 s12 l12"></div>
                                 

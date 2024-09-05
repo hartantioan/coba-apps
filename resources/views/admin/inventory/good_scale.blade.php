@@ -1527,7 +1527,7 @@
                 success: function(response) {
                     if($('#modal1').hasClass('open')){
                         if(!$('#temp').val()){
-                            if($('#type').val() == '1'){
+                            if($('#type').val() == '1'|| $('#type').val() == '3'){
                                 $('#qty_in').val(response);
                             }else{
                                 /* $('#qty_out').val(response); */
@@ -1537,7 +1537,7 @@
                         }
                     }
                     if($('#modal6').hasClass('open')){
-                        if($('#tempType').val() == '1'){
+                        if($('#tempType').val() == '1'|| $('#tempType').val() == '3' ){
                             $('#qtyOutUpdate').val(response);
                         }else{
                             /* $('#qtyInUpdate').text(response); */

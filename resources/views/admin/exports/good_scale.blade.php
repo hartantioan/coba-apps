@@ -59,8 +59,8 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
        
-                <td>{{ $row->delivery_no }}</td>
-                <td>{{ $row->vehicle_no }}</td>
+                <td>{{ $row->delivery_no ?? '-' }}</td>
+                <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>
                 <td>{{ $row->note }}</td>
                 <td>{{ $row->time_scale_in }}</td>
@@ -69,11 +69,17 @@
                 <td>{{ $row->statusQcRaw() }}</td>
                 <td>{{ $row->note_qc }}</td>
                 <td>{{ $row->time_scale_out }}</td>
-                <td>{{ $row->item->code }}</td>
-                <td>{{ $row->item->name }}</td>
-                <td>{{ $row->item->uomUnit->code }}</td>
+                <td>{{ $row->item ? $row->item->code : '-' }}</td>
+                <td>{{ $row->item ? $row->item->name : '-'}}</td>
+                <td>{{ $row->item ? $row->item->uomUnit->code : '-'}}</td>
                 <td>{{ $row->place->code }}</td>
-                <td>{{ $row->warehouse->name }}</td>
+                <td>
+                    @if($row->warehouse)
+                        {{ $row->warehouse->name }}
+                    @else
+                        No warehouse available
+                    @endif
+                </td>
                 <td>{{ $row->qty_in }}</td>
                 <td>{{ $row->qty_out }}</td>
                 <td>{{ $row->qty_balance }}</td>

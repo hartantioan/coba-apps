@@ -240,7 +240,7 @@
                                         <select class="select2 browser-default" id="user_data_id" name="user_data_id">
                                             <option value="">--Pilih customer ya--</option>
                                         </select>
-                                        <label class="active" for="user_data_id">Alamat Tagih & NPWP (Otomatis dari SO)</label>
+                                        <label class="active" for="user_data_id">Alamat Tagih & NPWP (Otomatis dari SO paling akhir)</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="company_id" name="company_id">

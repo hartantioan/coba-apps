@@ -623,7 +623,7 @@ class MarketingOrderController extends Controller
                         $query->transportation_id = $request->transportation_id;
                         $query->outlet_id = $request->outlet_id;
                         $query->user_data_id = $request->billing_address;
-                        $query->billing_address = $userData->title.' '.$userData->content;
+                        $query->billing_address = $userData->title.' '.$userData->npwp.' '.$userData->address;
                         $query->destination_address = $request->destination_address;
                         $query->province_id = $request->province_id;
                         $query->city_id = $request->city_id;
@@ -683,7 +683,7 @@ class MarketingOrderController extends Controller
                         'transportation_id'         => $request->transportation_id,
                         'outlet_id'                 => $request->outlet_id,
                         'user_data_id'              => $request->billing_address,
-                        'billing_address'           => $userData->title.' '.$userData->content,
+                        'billing_address'           => $userData->title.' '.$userData->npwp.' '.$userData->address,
                         'destination_address'       => $request->destination_address,
                         'province_id'               => $request->province_id,
                         'city_id'                   => $request->city_id,

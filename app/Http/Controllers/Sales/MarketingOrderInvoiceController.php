@@ -90,6 +90,7 @@ class MarketingOrderInvoiceController extends Controller
             'code',
             'user_id',
             'account_id',
+            'user_data_id',
             'company_id',
             'post_date',
             'due_date',
@@ -242,6 +243,7 @@ class MarketingOrderInvoiceController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->account->name,
+                    $val->userData->title.' - '.$val->userData->npwp.' - '.$val->userData->address,
                     $val->company->name,
                     date('d/m/Y',strtotime($val->post_date)),
                     date('d/m/Y',strtotime($val->due_date)),
@@ -337,6 +339,7 @@ class MarketingOrderInvoiceController extends Controller
              */'code_place_id'                 => 'required',
             'company_id'			        => 'required',
             'marketing_order_delivery_process_id' => 'required',
+            'user_data_id'                  => 'required',
             'account_id'	                => 'required',
             'post_date'		                => 'required',
             'due_date'                      => 'required',
@@ -349,6 +352,7 @@ class MarketingOrderInvoiceController extends Controller
             'code.min'                              => 'Kode harus minimal 18 karakter.',
             'code.unique'                           => 'Kode telah dipakai.', */
             'marketing_order_delivery_process_id.required' => 'Surat jalan harus dipilih.',
+            'user_data_id.required'                 => 'Alamat penagihan tidak boleh kosong.',
             'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
             'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
             'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
@@ -432,6 +436,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->account_id = $request->account_id;
+                        $query->user_data_id = $request->user_data_id;
                         $query->company_id = $request->company_id;
                         $query->marketing_order_delivery_process_id = $request->marketing_order_delivery_process_id;
                         $query->post_date = $request->post_date;
@@ -475,6 +480,7 @@ class MarketingOrderInvoiceController extends Controller
                         'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
                         'account_id'                    => $request->account_id,
+                        'user_data_id'                  => $request->user_data_id,
                         'company_id'                    => $request->company_id,
                         'marketing_order_delivery_process_id' => $request->marketing_order_delivery_process_id,
                         'post_date'                     => $request->post_date,
@@ -1102,6 +1108,7 @@ class MarketingOrderInvoiceController extends Controller
         $po['downpayment'] = number_format($po->downpayment,2,',','.');
         $po['modp_code'] = $po->marketingOrderDeliveryProcess()->exists() ? $po->marketingOrderDeliveryProcess->code.' - Ven : '.$po->marketingOrderDeliveryProcess->account->name. ' - Cust. '.$po->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name : '';
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
+        $po['user_datas'] = $po->account->getBillingAddress();
 
         if($po->tax_no){
             $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];

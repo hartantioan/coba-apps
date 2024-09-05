@@ -160,6 +160,7 @@
                                                         <th rowspan="2">{{ __('translations.code') }}</th>
                                                         <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">{{ __('translations.customer') }}</th>
+                                                        <th rowspan="2">Alamat Penagihan & NPWP</th>
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
                                                         <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.type') }}</th>
@@ -226,7 +227,7 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
-                                        <select class="browser-default" id="account_id" name="account_id" onchange="addDueDate();"></select>
+                                        <select class="browser-default" id="account_id" name="account_id" onchange="addDueDate();getDataCustomer();"></select>
                                         <label class="active" for="account_id">{{ __('translations.customer') }}</label>
                                     </div>
                                     <div class="row">
@@ -234,6 +235,12 @@
                                             <select class="browser-default" id="marketing_order_delivery_process_id" name="marketing_order_delivery_process_id" onchange="getMarketingOrderDelivery();" ></select>
                                             <label class="active" for="marketing_order_delivery_process_id">Surat Jalan</label>
                                         </div>
+                                    </div>
+                                    <div class="input-field col m6 s12">
+                                        <select class="select2 browser-default" id="user_data_id" name="user_data_id">
+                                            <option value="">--Pilih customer ya--</option>
+                                        </select>
+                                        <label class="active" for="user_data_id">Alamat Tagih & NPWP (Otomatis dari SO)</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
                                         <select class="form-control" id="company_id" name="company_id">
@@ -871,6 +878,9 @@
                 };
                 countAll();
                 $('#textTax').hide();
+                $("#user_data_id").empty().append(`
+                    <option value="">--Pilih customer ya--</option>
+                `);
             }
         });
 
@@ -1015,6 +1025,27 @@
         });
     });
 
+    function getDataCustomer(){
+        $('#user_data_id').empty();
+        if($('#account_id').val()){
+            if($('#account_id').select2('data')[0].billing_address.length > 0){
+                $.each($('#account_id').select2('data')[0].billing_address, function(i, val) {
+                    $('#user_data_id').append(`
+                        <option value="` + val.id + `">` + val.npwp + ` ` + val.address + `</option>
+                    `);
+                });
+            }else{
+                $('#user_data_id').append(`
+                    <option value="">--Data tidak ditemukan--</option>
+                `); 
+            }
+        }else{
+            $('#user_data_id').append(`
+                <option value="">--Pilih customer ya--</option>
+            `);
+        }
+    }
+
     function getMarketingOrderDelivery(){
         if($('.data-used').length > 0){
             $('.data-used').trigger('click');
@@ -1067,7 +1098,7 @@
                             </div>
                         `);
 
-                        /* $('#due_date').val(datakuy.due_date); */
+                        $('#user_data_id').val(datakuy.user_data_id).trigger('change');
 
                         addDueDateByValue(datakuy.top_customer);
                         addDueDateByValueInternal(datakuy.top_internal);
@@ -1759,6 +1790,7 @@
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'account_id', className: '' },
+                { name: 'user_data_id', className: '' },
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'due_date', className: '' },
@@ -2018,6 +2050,21 @@
                     $('#marketing_order_delivery_process_id').append(`
                         <option value="` + response.marketing_order_delivery_process_id + `">` + response.modp_code + `</option>
                     `);
+                }
+
+                $('#user_data_id').empty();
+                if(response.user_datas.length > 0){
+                    $.each(response.user_datas, function(i, val) {
+                        $('#user_data_id').append(`
+                            <option value="` + val.id + `">` + val.npwp + ` ` + val.address + `</option>
+                        `);
+                    });
+
+                    $('#user_data_id').val(response.user_data_id).trigger('change');
+                }else{
+                    $('#user_data_id').append(`
+                        <option value="">--Data tidak ditemukan--</option>
+                    `); 
                 }
 
                 if(response.details.length > 0){

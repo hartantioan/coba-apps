@@ -3247,6 +3247,7 @@ class Select2Controller extends Controller {
                     'account_id'        => $d->marketingOrderDelivery->customer_id,
                     'top_internal'      => $d->marketingOrderDelivery->top_internal,
                     'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
+                    'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
                 ];
             }
         }

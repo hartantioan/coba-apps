@@ -47,6 +47,14 @@ class MarketingOrderDelivery extends Model
         'done_note',
     ];
 
+    public function getMaxBillingAddress(){
+        $data = 0;
+        foreach($this->marketingOrderDeliveryDetail()->orderBy('id')->get() as $row){
+            $data = $row->marketingOrderDetail->marketingOrder->user_data_id;
+        }
+        return $data;
+    }
+
     public function getMaxTop(){
         $top = 0;
         foreach($this->marketingOrderDeliveryDetail as $row){

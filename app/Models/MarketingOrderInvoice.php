@@ -19,6 +19,7 @@ class MarketingOrderInvoice extends Model
         'code',
         'user_id',
         'account_id',
+        'user_data_id',
         'company_id',
         'marketing_order_delivery_process_id',
         'post_date',
@@ -63,6 +64,11 @@ class MarketingOrderInvoice extends Model
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
+    }
+
+    public function userData()
+    {
+        return $this->belongsTo('App\Models\UserData', 'user_data_id', 'id')->withTrashed();
     }
 
     public function voidUser()

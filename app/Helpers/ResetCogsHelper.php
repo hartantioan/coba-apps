@@ -956,7 +956,7 @@ class ResetCogsHelper
             })->get();
 
             foreach($marketingorderdelivery as $row){
-                $total = $row->total;
+                $total = $row->getHpp();
                 $qty = $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
                 $price = $total / $qty;
                 $total_final = $totalBefore - $total;

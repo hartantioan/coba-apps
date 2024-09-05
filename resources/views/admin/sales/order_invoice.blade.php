@@ -161,7 +161,7 @@
                                                         <th rowspan="2">{{ __('translations.user') }}</th>
                                                         <th rowspan="2">{{ __('translations.customer') }}</th>
                                                         <th rowspan="2">{{ __('translations.company') }}</th>
-                                                        <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
+                                                        <th colspan="3" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.type') }}</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">Seri Pajak</th>
@@ -177,7 +177,8 @@
                                                     </tr>
                                                     <tr>
                                                         <th>Post</th>
-                                                        <th>Tenggat</th>
+                                                        <th>Jatuh Tempo</th>
+                                                        <th>Jatuh Tempo Internal</th>
                                                     </tr>
                                                 </thead>
                                             </table>
@@ -242,13 +243,6 @@
                                         </select>
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
-                                        <select class="form-control" id="type" name="type">
-                                            <option value="1">DP</option>
-                                            <option value="2">Credit</option>
-                                        </select>
-                                        <label class="" for="type">{{ __('translations.type') }}</label>
-                                    </div>
                                     <div class="input-field col m3 s12 step6">
                                         <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                         <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
@@ -257,10 +251,20 @@
                                         <input id="due_date" name="due_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
                                         <label class="active" for="due_date">Tgl. Jatuh Tempo</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="due_date_internal" name="due_date_internal" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Jatuh Tempo">
+                                        <label class="active" for="due_date_internal">Tgl. Jatuh Tempo (Internal)</label>
+                                    </div>
                                     {{-- <div class="input-field col m1 s12 step10">
                                         <button class="btn waves-effect waves-light green" onclick="getTaxSeries();"><i class="material-icons">autorenew</i></button>
                                     </div> --}}
-                                    <div class="col m12 s12 l12"></div>
+                                    <div class="input-field col m3 s12 step5">
+                                        <select class="form-control" id="type" name="type">
+                                            <option value="1">DP</option>
+                                            <option value="2">Credit</option>
+                                        </select>
+                                        <label class="" for="type">{{ __('translations.type') }}</label>
+                                    </div>
                                     <div class="col m4 s12 step10">
                                         <label class="">Bukti Upload</label>
                                         <br>
@@ -1065,7 +1069,8 @@
 
                         /* $('#due_date').val(datakuy.due_date); */
 
-                        addDueDateByValue(datakuy.top_internal);
+                        addDueDateByValue(datakuy.top_customer);
+                        addDueDateByValueInternal(datakuy.top_internal);
 
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
@@ -1257,6 +1262,16 @@
             $('#due_date').val(result.toISOString().split('T')[0]);
         }else{
             $('#due_date').val(null);
+        }
+    }
+
+    function addDueDateByValueInternal(val){
+        if($('#account_id').val()){
+            var result = new Date($('#post_date').val());
+            result.setDate(result.getDate() + parseInt(val));
+            $('#due_date_internal').val(result.toISOString().split('T')[0]);
+        }else{
+            $('#due_date_internal').val(null);
         }
     }
 
@@ -1747,6 +1762,7 @@
                 { name: 'company_id', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'due_date', className: '' },
+                { name: 'due_date_internal', className: '' },
                 { name: 'type', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: '' },
                 { name: 'tax_no', className: '' },
@@ -1988,6 +2004,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#post_date').val(response.post_date);
                 $('#due_date').val(response.due_date);
+                $('#due_date_internal').val(response.due_date_internal);
                 $('#tax_no').val(response.tax_no);
                 $('#note').val(response.note);
                 $('#subtotal').val(response.subtotal);

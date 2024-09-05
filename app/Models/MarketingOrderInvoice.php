@@ -23,7 +23,7 @@ class MarketingOrderInvoice extends Model
         'marketing_order_delivery_process_id',
         'post_date',
         'due_date',
-        'document_date',
+        'due_date_internal',
         'status',
         'type',
         'document',

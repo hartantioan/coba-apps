@@ -47,6 +47,16 @@ class MarketingOrderDelivery extends Model
         'done_note',
     ];
 
+    public function getMaxTop(){
+        $top = 0;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderDetail->marketingOrder->top_customer > $top){
+                $top = $row->marketingOrderDetail->marketingOrder->top_customer;
+            }
+        }
+        return $top;
+    }
+
     public function deliveryType(){
         $type = match ($this->type_delivery) {
             '1' => 'Loco',

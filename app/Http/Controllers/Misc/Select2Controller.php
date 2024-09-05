@@ -3246,6 +3246,7 @@ class Select2Controller extends Controller {
                     'payment_type'      => $d->getTypePayment(),
                     'account_id'        => $d->marketingOrderDelivery->customer_id,
                     'top_internal'      => $d->marketingOrderDelivery->top_internal,
+                    'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
                 ];
             }
         }

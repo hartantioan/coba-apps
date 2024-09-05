@@ -279,6 +279,7 @@ class GoodScale extends Model
         $type = match ($this->type) {
           '1' => 'Timbang Barang Masuk (Pembelian)',
           '2' => 'Timbang Barang Keluar (Penjualan)',
+          '3' => 'Timbang Barang Manual',
           default => 'Invalid',
         };
 

@@ -2766,6 +2766,7 @@ class Select2Controller extends Controller {
                 ->whereDoesntHave('goodReceiptDetail')
                 ->whereIn('status',['2','3'])
                 ->where('qty_final','>',0)
+                ->where('type','1')
                 ->where('purchase_order_detail_id',$request->pod)
                 ->get();
 

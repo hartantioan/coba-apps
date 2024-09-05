@@ -219,8 +219,8 @@ class GoodReceipt extends Model
 
     public function isMultipleLC(){
         $multiple = match ($this->is_multiple_lc) {
-            '1' => 'Ya',
-            default => 'Tidak',
+            '1' => 'Dibuka',
+            default => 'Ditutup',
         };
   
         return $multiple;

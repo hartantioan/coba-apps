@@ -129,7 +129,7 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.date') }}</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">No.Surat Jalan</th>
-                                                        <th rowspan="2">Multiple LC?</th>
+                                                        <th rowspan="2">Status LC</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>

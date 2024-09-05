@@ -191,7 +191,7 @@
                             <label class="active" for="coa_id">Bank Tujuan</label>
                         </div>
                         <div class="input-field col s12 m3 " >
-                            <input id="document_no" name="document_no" type="text" placeholder="Kontak Kantor">
+                            <input id="document_no" name="document_no" type="text" placeholder="No BG/Check">
                             <label class="active" for="document_no">No Dokumen</label>
                         </div>
                         <div class="input-field col s12 m3">

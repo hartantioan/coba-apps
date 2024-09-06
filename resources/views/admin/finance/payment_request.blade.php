@@ -1898,7 +1898,7 @@
                             $('#empty-detail').remove();
                             if(response.details.length > 0){
                                 $.each(response.details, function(i, val) {
-                                    $('.row_detail[data-account!="' + val.account_code + '"]').remove();
+                                    /* $('.row_detail[data-account!="' + val.account_code + '"]').remove(); */
                                     var count = makeid(10);
                                     $('#list-used-data').append(`
                                         <div class="chip purple darken-4 gradient-shadow white-text">

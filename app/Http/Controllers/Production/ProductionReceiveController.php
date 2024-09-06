@@ -519,7 +519,7 @@ class ProductionReceiveController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','2','5','6'])){
+                    if(in_array($query->status,['1','6'])){
                         if($request->has('file')) {
                             if($query->document){
                                 if(Storage::exists($query->document)){

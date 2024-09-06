@@ -289,7 +289,7 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
+                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
                                     </td>
                                     
                                 </tr>

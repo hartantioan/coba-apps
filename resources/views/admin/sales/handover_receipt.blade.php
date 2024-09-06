@@ -257,11 +257,6 @@
                                                     <tr>
                                                         <th class="center">No.Kwitansi</th>
                                                         <th class="center">{{ __('translations.customer') }}</th>
-                                                        <th class="center">{{ __('translations.address') }}</th>
-                                                        <th class="center">{{ __('translations.urban_village') }}</th>
-                                                        <th class="center">{{ __('translations.subdistrict') }}</th>
-                                                        <th class="center">Kab./Kota</th>
-                                                        <th class="center">{{ __('translations.province') }}</th>
                                                         <th class="center">Tgl.Post</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
                                                     </tr>
@@ -670,11 +665,6 @@
                     "columns": [
                         {"data": "receipt"},
                         {"data": "customer"},
-                        {"data": "address"},
-                        {"data": "subdistrict"},
-                        {"data": "district"},
-                        {"data": "city"},
-                        {"data": "province"},
                         {"data": "post_date", className: 'center-align'},
                         {"data": "grandtotal", className: 'right-align'},
                     ],
@@ -826,11 +816,6 @@
                             'id': val.enc_code,
                             'receipt': val.code,
                             'customer': val.customer_name,
-                            'address': val.address,
-                            'subdistrict': val.subdistrict,
-                            'district': val.district,
-                            'city': val.city,
-                            'province': val.province,
                             'post_date': val.post_date,
                             'grandtotal': val.grandtotal,
                             'selected': ''
@@ -1472,11 +1457,6 @@
                                 'id': val.enc_code,
                                 'receipt': val.code,
                                 'customer': val.customer_name,
-                                'address': val.address,
-                                'subdistrict': val.subdistrict,
-                                'district': val.district,
-                                'city': val.city,
-                                'province': val.province,
                                 'post_date': val.post_date,
                                 'grandtotal': val.grandtotal,
                                 'selected': '1'

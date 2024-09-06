@@ -97,11 +97,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                 'enc_code'          => CustomHelper::encrypt($row->code),
                 'post_date'         => date('d/m/Y',strtotime($row->post_date)),
                 'customer_name'     => $row->account->name,
-                'address'           => $row->account->address,
-                'subdistrict'       => $row->account->subdistrict->name,
-                'district'          => $row->account->district->name,
-                'city'              => $row->account->city->name,
-                'province'          => $row->account->province->name,
                 'grandtotal'        => number_format($row->grandtotal,2,',','.'),
             ];
         }
@@ -461,11 +456,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                 'enc_code'          => CustomHelper::encrypt($row->marketingOrderReceipt->code),
                 'post_date'         => date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)),
                 'customer_name'     => $row->marketingOrderReceipt->account->name,
-                'address'           => $row->marketingOrderReceipt->account->address,
-                'subdistrict'       => $row->marketingOrderReceipt->account->subdistrict->name,
-                'district'          => $row->marketingOrderReceipt->account->district->name,
-                'city'              => $row->marketingOrderReceipt->account->city->name,
-                'province'          => $row->marketingOrderReceipt->account->province->name,
                 'grandtotal'        => number_format($row->marketingOrderReceipt->grandtotal,2,',','.'),
             ];
         }
@@ -495,7 +485,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                                 <th class="center-align">No.</th>
                                 <th class="center-align">No.Kwitansi</th>
                                 <th class="center-align">Customer</th>
-                                <th class="center-align">Alamat</th>
                                 <th class="center-align">Tgl</th>
                                 <th class="center-align">Tagihan</th>
                                 <th class="center-align">Status</th>
@@ -510,7 +499,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="">'.$row->marketingOrderReceipt->code.'</td>
                 <td class="">'.$row->marketingOrderReceipt->account->name.'</td>
-                <td class="">'.$row->marketingOrderReceipt->account->address.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)).'</td>
                 <td class="right-align">'.number_format($row->marketingOrderReceipt->grandtotal,2,',','.').'</td>
                 <td class="center-align">'.$row->status().'</td>

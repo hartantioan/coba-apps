@@ -190,7 +190,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td align="right" colspan="3"><b>Total</b></td>
+                                <td align="right" colspan="5"><b>Total</b></td>
                                 <td align="right"><b>{{ number_format($data->grandtotal,2,',','.') }}</b></td>
                                 <td>-</td>
                             </tr>

@@ -30,6 +30,14 @@ class MarketingOrderHandoverReceiptDetail extends Model
     {
         return $this->belongsTo('App\Models\MarketingOrderReceipt', 'marketing_order_receipt_id', 'id')->withTrashed();
     }
+    
+    public function getListInvoice(){
+        $arr = [];
+        foreach($this->marketingOrderReceipt->marketingOrderReceiptDetail as $row){
+            $arr[] = $row->lookable->code;
+        }
+        return implode(', ',$arr);
+    }
 
     public function status(){
         $status = match ($this->status) {

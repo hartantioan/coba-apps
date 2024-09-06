@@ -147,13 +147,16 @@
                         <tbody>
                             @foreach($data->marketingOrderHandoverReceiptDetail as $key => $row)
                                 <tr>
-                                    <td align="center">{{ ($key + 1)  }}</td>
+                                    <td align="center" rowspan="2">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->marketingOrderReceipt->code }}</td>
                                     <td>{{ $row->marketingOrderReceipt->account->name }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->marketingOrderReceipt->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->marketingOrderReceipt->grandtotal,2,',','.') }}</td>
                                     <td align="center">{{ $row->status() }}</td>
                                     <td>{{ $row->note }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6">Daftar Invoice {{ $row->getListInvoice() }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

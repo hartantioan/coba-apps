@@ -2088,7 +2088,7 @@
                                 });
                                 
                             }else{
-                                $('#body-detail').empty().append(`
+                                /* $('#body-detail').empty().append(`
                                     <tr id="empty-detail">
                                         <td colspan="12">
                                             Pilih partner bisnis untuk memulai...
@@ -2096,7 +2096,7 @@
                                     </tr>
                                 `);
 
-                                $('#grandtotal,#admin').val('0,00');
+                                $('#grandtotal,#admin').val('0,00'); */
                             }
 
                             $('#body-detail-payment').empty();

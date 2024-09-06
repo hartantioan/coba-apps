@@ -89,6 +89,8 @@ class OutgoingPaymentController extends Controller
             'currency_rate',
             'admin',
             'grandtotal',
+            'payment',
+            'balance',
             'document',
             'note',
         ];
@@ -267,6 +269,8 @@ class OutgoingPaymentController extends Controller
                     number_format($val->currency_rate,2,',','.'),
                     number_format($val->admin,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
+                    number_format($val->payment,2,',','.'),
+                    number_format($val->balance,2,',','.'),
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->note,
                     $val->status(),

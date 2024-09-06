@@ -159,6 +159,8 @@
                                                         <th colspan="2" class="center-align">{{ __('translations.currency') }}</th>
                                                         <th rowspan="2">Admin</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
+                                                        <th rowspan="2">Potongan Piutang</th>
+                                                        <th rowspan="2">Nominal Bayar</th>
                                                         <th rowspan="2">Dokumen</th>
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
@@ -785,6 +787,8 @@
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'admin', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
+                { name: 'payment', className: 'right-align' },
+                { name: 'balance', className: 'right-align' },
                 { name: 'document', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
               { name: 'status', searchable: false, orderable: false, className: 'center-align' },

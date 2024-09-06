@@ -131,9 +131,6 @@
                 </td>
                 <td align="center" width="33%" style="padding-top:10px;">
                     <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
-                    <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
-                        {{ $data->code }}
-                    </span>
                 </td>
             </table>
         </header>

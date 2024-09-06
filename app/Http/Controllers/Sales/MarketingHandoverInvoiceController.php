@@ -78,7 +78,7 @@ class MarketingHandoverInvoiceController extends Controller
         $data = MarketingOrderInvoice::whereIn('status',['2','3'])
                 ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
                 ->whereDoesntHave('marketingOrderHandoverInvoiceDetail')
-                ->where('balance','>=',0)->get();
+                ->where('grandtotal','>=',0)->get();
 
         $arr = [];
         foreach($data as $row){
@@ -421,13 +421,12 @@ class MarketingHandoverInvoiceController extends Controller
                 'enc_code'          => CustomHelper::encrypt($row->lookable->code),
                 'post_date'         => date('d/m/Y',strtotime($row->lookable->post_date)),
                 'customer_name'     => $row->lookable->account->name,
+                'subtotal'          => number_format($row->lookable->subtotal,2,',','.'),
+                'downpayment'       => number_format($row->lookable->downpayment,2,',','.'),
                 'total'             => number_format($row->lookable->total,2,',','.'),
                 'tax'               => number_format($row->lookable->tax,2,',','.'),
-                'total_after_tax'   => number_format($row->lookable->total_after_tax,2,',','.'),
-                'rounding'          => number_format($row->lookable->rounding,2,',','.'),
                 'grandtotal'        => number_format($row->lookable->grandtotal,2,',','.'),
-                'downpayment'       => number_format($row->lookable->downpayment,2,',','.'),
-                'balance'           => number_format($row->lookable->balance,2,',','.'),
+                'balance'           => number_format($row->lookable->grandtotal,2,',','.'),
                 'paid'              => number_format($row->totalPay(),2,',','.'),
                 'memo'              => number_format($row->totalMemo(),2,',','.'),
                 'final'             => number_format($row->balancePaymentIncoming(),2,',','.'),
@@ -454,19 +453,18 @@ class MarketingHandoverInvoiceController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"> <div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11">Daftar AR Invoice</th>
+                                <th class="center-align" colspan="13">Daftar AR Invoice</th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
                                 <th class="center-align">No.AR Invoice</th>
                                 <th class="center-align">Customer</th>
                                 <th class="center-align">Tgl.Post</th>
+                                <th class="center-align">Subtotal</th>
+                                <th class="center-align">Downpayment</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">Tax</th>
-                                <th class="center-align">Total Stlh Pajak</th>
-                                <th class="center-align">Pembulatan</th>
                                 <th class="center-align">Grandtotal</th>
-                                <th class="center-align">Downpayment</th>
                                 <th class="center-align">Tagihan</th>
                                 <th class="center-align">Terbayar</th>
                                 <th class="center-align">Memo</th>
@@ -475,22 +473,20 @@ class MarketingHandoverInvoiceController extends Controller
                         </thead><tbody>';
         $totals=0;
         $totaltax=0;
-        $totalaftertax=0;
-        $totalrounding=0;
-        $totalgrandtotal=0;
+        $total=0;
         $totaldownpayment=0;
+        $totalgrandtotal=0;
         $totalbalance=0;
         $totalpay=0;
         $totalmemo=0;
         $totalbalancepayment=0;
         foreach($data->marketingOrderHandoverInvoiceDetail as $key => $row){
-            $totals+=$row->lookable->total;
-            $totaltax+=$row->lookable->tax;
-            $totalaftertax+=$row->lookable->total_after_tax;
-            $totalrounding+=$row->lookable->rounding;
-            $totalgrandtotal+=$row->lookable->grandtotal;
+            $totals+=$row->lookable->subtotal;
             $totaldownpayment+=$row->lookable->downpayment;
-            $totalbalance+=$row->lookable->balance;
+            $total+=$row->lookable->total;
+            $totaltax+=$row->lookable->tax;
+            $totalgrandtotal+=$row->lookable->grandtotal;
+            $totalbalance+=$row->lookable->grandtotal;
             $totalpay+=$row->lookable->totalPay();
             $totalmemo+=$row->lookable->totalMemo();
             $totalbalancepayment+=$row->lookable->balancePaymentIncoming();
@@ -499,26 +495,24 @@ class MarketingHandoverInvoiceController extends Controller
                 <td class="">'.$row->lookable->code.'</td>
                 <td class="">'.$row->lookable->account->name.'</td>
                 <td class="center-align">'.date('d/m/Y',strtotime($row->lookable->post_date)).'</td>
+                <td class="right-align">'.number_format($row->lookable->subtotal,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->downpayment,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->lookable->total_after_tax,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->lookable->rounding,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->grandtotal,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->lookable->downpayment,2,',','.').'</td>
-                <td class="right-align">'.number_format($row->lookable->balance,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->lookable->grandtotal,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->totalPay(),2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->totalMemo(),2,',','.').'</td>
                 <td class="right-align">'.number_format($row->lookable->balancePaymentIncoming(),2,',','.').'</td>
             </tr>';
         }
         $string .= '<tr>
-                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
+                <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="4"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaltax, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalaftertax, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalrounding, 2, ',', '.') . '</td>
-                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaldownpayment, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totaltax, 2, ',', '.') . '</td>
+                <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalbalance, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalpay, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalmemo, 2, ',', '.') . '</td>

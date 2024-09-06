@@ -237,12 +237,11 @@
                                                         <th class="center">No.AR Invoice</th>
                                                         <th class="center">{{ __('translations.customer') }}</th>
                                                         <th class="center">Tgl.Post</th>
+                                                        <th class="center">Subtotal</th>
+                                                        <th class="center">Downpayment</th>
                                                         <th class="center">{{ __('translations.total') }}</th>
                                                         <th class="center">Tax</th>
-                                                        <th class="center">Total Stlh Pajak</th>
-                                                        <th class="center">Pembulatan</th>
                                                         <th class="center">{{ __('translations.grandtotal') }}</th>
-                                                        <th class="center">Downpayment</th>
                                                         <th class="center">Tagihan</th>
                                                         <th class="center">Dibayar</th>
                                                         <th class="center">Memo</th>
@@ -729,13 +728,12 @@
                                 <td>` + val.code + `</td>
                                 <td>` + val.customer_name + `</td>
                                 <td>` + val.post_date + `</td>
+                                <td class="right-align">` + val.subtotal + `</td>
+                                <td class="right-align">` + val.downpayment + `</td>
                                 <td class="right-align">` + val.total + `</td>
                                 <td class="right-align">` + val.tax + `</td>
-                                <td class="right-align">` + val.total_after_tax + `</td>
-                                <td class="right-align">` + val.rounding + `</td>
                                 <td class="right-align">` + val.grandtotal + `</td>
-                                <td class="right-align">` + val.downpayment + `</td>
-                                <td class="right-align">` + val.balance + `</td>
+                                <td class="right-align">` + val.grandtotal + `</td>
                                 <td class="right-align">` + val.paid + `</td>
                                 <td class="right-align">` + val.memo + `</td>
                                 <td class="right-align">` + val.final + `</td>
@@ -1298,10 +1296,10 @@
                         beforeSend: function() {
                             $('#validation_alert').hide();
                             $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal1');
                         },
                         success: function(response) {
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             $('input').css('border', 'none');
                             $('input').css('border-bottom', '0.5px solid black');
                             if(response.status == 200) {
@@ -1345,7 +1343,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',

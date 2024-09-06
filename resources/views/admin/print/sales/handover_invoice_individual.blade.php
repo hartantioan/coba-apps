@@ -224,7 +224,7 @@
                                     <td class="">{{ $row->lookable->code }}</td>
                                     <td class="">{{ $row->lookable->account->name }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
-                                    <td align="right">{{ number_format($row->lookable->balance,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>

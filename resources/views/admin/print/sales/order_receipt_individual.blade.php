@@ -218,7 +218,7 @@
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
+                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
                                         </td>
                                     </tr>
                                 </table>
@@ -336,7 +336,7 @@
                                         </td>
                                         <td>:</td>
                                         <td>
-                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }}
+                                            {{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
                                         </td>
                                     </tr>
                                 </table>

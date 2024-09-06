@@ -149,36 +149,19 @@
     <body>
         <header>
             <table border="0" width="100%">
-                <tr>
-                    <td width="83%" class="left-align">
-                        <tr>
-                            <td align="center">
-                                <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
-                                    {{ $data->code }}
-                                </span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="margin-top: -2px;">
-                                <small style="font-size:10px">Diproses:</small>
-                                <span style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <h5 style="margin-top: -2px">{{ $title }}</h5>
-                            </td>
-                        </tr>
-                    </td>
-                    <td width="33%" class="right-align">
-                    </td>
-                    
-                    <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:100px;right:75px;" height="10%" />
-                    </td>
-                </tr>
-                
+                <td align="center" width="33%">
+                    <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;font-size:15px !important;">
+                    <b>{{ $title }}</b>
+                    <div>{{ $data->code }}</div>
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;">
+                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
+                    <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
+                        {{ $data->code }}
+                    </span>
+                </td>
             </table>
         </header>
         <main>

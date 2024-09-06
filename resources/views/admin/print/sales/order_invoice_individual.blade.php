@@ -185,7 +185,9 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="80%">
-                                            {!! $data->account->name.' <br> ('.$data->account->phone.' / '.$data->account->office_no.')' !!}
+                                            {{ $data->userData->title }}
+                                            <br>
+                                            {{ $data->userData->address }}
                                         </td>
                                     </tr>
                                 </table>

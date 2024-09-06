@@ -50,12 +50,12 @@
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
-                    font-size:15px !important;
+                    font-size:13px !important;
                 }
         
                 table > thead > tr > th {
                     
-                    font-size:13px !important;
+                    font-size:11px !important;
                     font-weight: 800 !important;
                 }
 
@@ -67,11 +67,11 @@
         
             @media print {
                 .invoice-print-area {
-                    font-size:13px !important;
+                    font-size:11px !important;
                 }
         
                 table > thead > tr > th {
-                    font-size:15px !important;
+                    font-size:13px !important;
                     font-weight: 800 !important;
                 }
         
@@ -106,7 +106,7 @@
                 }
         
                 .invoice-info {
-                    font-size:12px !important;
+                    font-size:10px !important;
                 }
         
                 .modal {
@@ -246,10 +246,13 @@
                             <tr>
                                 <td width="70%" style="border:1px solid black;padding:10px;">
                                     Mohon ditransfer ke :<br>
-                                    <b>{!! $data->company->banks() !!}</b><br>
+                                    <b>
+                                        <h5>BANK MANDIRI KCP DARMO PERMAI 14100 798 77999</h5>
+                                        atas nama {{ $data->company->name }}
+                                    </b>
                                 </td>
                                 <td width="30%" align="center">
-                                    {{ $data->company->city->name.', '.date('d-M-Y',strtotime($data->post_date)) }}
+                                    {{ $data->company->city->name.', '.CustomHelper::tgl_indo($data->post_date) }}
                                     <br><br><br><br>
                                     __________________________
                                     <br>
@@ -361,7 +364,10 @@
                             <tr>
                                 <td width="70%" style="border:1px solid black;padding:10px;">
                                     Mohon ditransfer ke :<br>
-                                    <b>{!! $data->company->banks() !!}</b><br>
+                                    <b>
+                                        <h5>BANK MANDIRI KCP DARMO PERMAI 14100 798 77999</h5>
+                                        atas nama {{ $data->company->name }}
+                                    </b>
                                 </td>
                                 <td width="30%" align="center">
                                     {{ $data->company->city->name.', '.date('d-M-Y',strtotime($data->post_date)) }}

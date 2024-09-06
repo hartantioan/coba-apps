@@ -1404,12 +1404,11 @@
                                 <td>` + val.code + `</td>
                                 <td>` + val.customer_name + `</td>
                                 <td>` + val.post_date + `</td>
+                                <td class="right-align">` + val.subtotal + `</td>
+                                <td class="right-align">` + val.downpayment + `</td>
                                 <td class="right-align">` + val.total + `</td>
                                 <td class="right-align">` + val.tax + `</td>
-                                <td class="right-align">` + val.total_after_tax + `</td>
-                                <td class="right-align">` + val.rounding + `</td>
                                 <td class="right-align">` + val.grandtotal + `</td>
-                                <td class="right-align">` + val.downpayment + `</td>
                                 <td class="right-align">` + val.balance + `</td>
                                 <td class="right-align">` + val.paid + `</td>
                                 <td class="right-align">` + val.memo + `</td>

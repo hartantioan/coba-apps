@@ -179,7 +179,7 @@
                                     <td align="center">{{ ($key + 1)  }}</td>
                                     <td>{{ $row->lookable->code }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
-                                    <td align="right">{{ number_format($row->lookable->balance,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
                                     <td>{{ $row->lookable->listDeliveryProcess() }}</td>
                                 </tr>
                             @endforeach

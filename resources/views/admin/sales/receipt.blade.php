@@ -253,12 +253,11 @@
                                                         <th class="center">No.AR Invoice</th>
                                                         <th class="center">{{ __('translations.customer') }}</th>
                                                         <th class="center">Tgl.Post</th>
-                                                        <th class="center">{{ __('translations.total') }}</th>
-                                                        <th class="center">Tax</th>
-                                                        <th class="center">Total Stlh Pajak</th>
-                                                        <th class="center">Pembulatan</th>
-                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
+                                                        <th class="center">{{ __('translations.subtotal') }}</th>
                                                         <th class="center">Downpayment</th>
+                                                        <th class="center">Total</th>
+                                                        <th class="center">Tax</th>
+                                                        <th class="center">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center">Tagihan</th>
                                                         <th class="center">Dibayar</th>
                                                         <th class="center">Memo</th>
@@ -670,12 +669,11 @@
                         {"data": "invoice"},
                         {"data": "customer"},
                         {"data": "post_date"},
+                        {"data": "subtotal", className:"right-align"},
+                        {"data": "downpayment", className:"right-align"},
                         {"data": "total", className:"right-align"},
                         {"data": "tax", className:"right-align"},
-                        {"data": "total_after_tax", className:"right-align"},
-                        {"data": "rounding", className:"right-align"},
                         {"data": "grandtotal", className:"right-align"},
-                        {"data": "downpayment", className:"right-align"},
                         {"data": "balance", className:"right-align"},
                         {"data": "paid", className:"right-align"},
                         {"data": "memo", className:"right-align"},
@@ -832,12 +830,11 @@
                             'invoice': val.code,
                             'customer': val.customer_name,
                             'post_date': val.post_date,
+                            'subtotal': val.subtotal,
+                            'downpayment': val.downpayment,
                             'total': val.total,
                             'tax': val.tax,
-                            'total_after_tax': val.total_after_tax,
-                            'rounding': val.rounding,
                             'grandtotal': val.grandtotal,
-                            'downpayment': val.downpayment,
                             'balance': val.balance,
                             'paid': val.paid,
                             'memo': val.memo,
@@ -1365,12 +1362,12 @@
                         beforeSend: function() {
                             $('#validation_alert').hide();
                             $('#validation_alert').html('');
-                            loadingOpen('.modal-content');
+                            loadingOpen('#modal1');
                         },
                         success: function(response) {
                             $('input').css('border', 'none');
                             $('input').css('border-bottom', '0.5px solid black');
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             if(response.status == 200) {
                                 success();
                                 M.toast({
@@ -1412,7 +1409,7 @@
                         },
                         error: function() {
                             $('.modal-content').scrollTop(0);
-                            loadingClose('.modal-content');
+                            loadingClose('#modal1');
                             swal({
                                 title: 'Ups!',
                                 text: 'Check your internet connection.',

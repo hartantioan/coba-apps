@@ -427,9 +427,9 @@ class MarketingHandoverInvoiceController extends Controller
                 'tax'               => number_format($row->lookable->tax,2,',','.'),
                 'grandtotal'        => number_format($row->lookable->grandtotal,2,',','.'),
                 'balance'           => number_format($row->lookable->grandtotal,2,',','.'),
-                'paid'              => number_format($row->totalPay(),2,',','.'),
-                'memo'              => number_format($row->totalMemo(),2,',','.'),
-                'final'             => number_format($row->balancePaymentIncoming(),2,',','.'),
+                'paid'              => number_format($row->lookable->totalPay(),2,',','.'),
+                'memo'              => number_format($row->lookable->totalMemo(),2,',','.'),
+                'final'             => number_format($row->lookable->balancePaymentIncoming(),2,',','.'),
                 'type'              => $row->lookable_type,
             ];
         }

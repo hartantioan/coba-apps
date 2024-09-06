@@ -149,11 +149,11 @@
         <header>
             <table border="0" width="100%">
                 <tr>
-                    <td width="83%" class="left-align">
+                    <td width="60%" class="left-align">
                         <tr>
                             <td align="center">
                                 <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-bottom:0px">
-                                    {{ $data->code }}
+                                    KWITANSI {{ $data->code }}
                                 </span>
                             </td>
                         </tr>
@@ -169,12 +169,9 @@
                             </td>
                         </tr>
                     </td>
-                    <td width="33%" class="right-align">
-                    </td>
-                    
-                    <td width="34%" class="right-align">
-                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
-                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:100px;right:75px;" height="10%" />
+                    <td width="40%" class="right-align">
+                        <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; right:25px;width:20%">
+                        <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="position: absolute; top:50px;width:200px;right:0px;" height="20%" />
                     </td>
                 </tr>
                 
@@ -184,29 +181,14 @@
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
-                    <table border="0" width="60%" style="margin-left: auto;margin-right: auto;font-size:12px;font-weight:800;">
+                    <table border="0" width="80%" style="margin-left: auto;margin-right: auto;font-size:12px;font-weight:800;">
                         <tr>
-                            <td width="19%">{{ __('translations.customer') }}</td>
+                            <td width="25%">Telah terima dari</td>
                             <td width="1%">:</td>
-                            <td width="80%">{{ $data->account->name }}</td>
+                            <td width="74%">{{ $data->account->name }}</td>
                         </tr>
                         <tr>
-                            <td>{{ __('translations.address') }}</td>
-                            <td>:</td>
-                            <td>{{ $data->account->address }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ __('translations.phone_number') }}</td>
-                            <td>:</td>
-                            <td>{{ $data->account->phone.' / '.$data->account->office_no }}</td>
-                        </tr>
-                        <tr>
-                            <td>Tipe Bayar</td>
-                            <td>:</td>
-                            <td>{{ $data->type() }}</td>
-                        </tr>
-                        <tr>
-                            <td>Total</td>
+                            <td>Total Nominal</td>
                             <td>:</td>
                             <td>{{ number_format($data->grandtotal,2,',','.') }}</td>
                         </tr>
@@ -215,68 +197,43 @@
                             <td>:</td>
                             <td><i>{{ CustomHelper::terbilangWithKoma($data->grandtotal).' '.ucwords(strtolower($data->currency->document_text)) }}</i></td>
                         </tr>
-                        @if($data->type !== '1')
-                        <tr>
-                            <td>Rekening</td>
-                            <td>:</td>
-                            <td>{!! $data->company->banks() !!}</td>
-                        </tr>
-                        @endif
                         <tr>
                             <td>Catatan</td>
                             <td>:</td>
                             <td>{{ $data->note }}</td>
                         </tr>
                     </table>
-                    
-                    <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row">
 
-                        <div class="row">
-                            <div class="col">
+                    <table border="0" width="80%" style="font-size:12px;margin-top:15px;">
+                        <tr>
+                            <td>
+                                NB : Bukan merupakan bukti penerimaan, pembayaran dianggap sah jika : 
+                                <ol>
+                                    <li>Cek/Giro telah dicairkan di rekening</li>
+                                    <li>Transfer dana telah diterima di rekening</li>
+                                </ol>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <table border="0" width="100%" style="font-size:12px;margin-top:15px;">
+                        <tr>
+                            <td width="40%" style="border:1px solid black;padding:5px;">
+                                Mohon ditransfer ke :
+                                <h5>BANK MANDIRI KCP DARMO PERMAI 14100 798 77999</h5>
+                                atas nama {{ $data->company->name }}
+                            </td>
+                            <td width="10%" style="padding-left:10px;">
+
+                            </td>
+                            <td width="50%" style="padding-left:10px;">
                                 {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                            </div>
-                            <div class="col">
-                                
-                            </div>
-                        </div>
-                        <table class="mt-3" width="100%" border="0">
-                            <tr>
-                                <td>
-                                    Dibuat oleh,
-                                    @if($data->user->signature)
-                                        <div>{!! $data->user->signature() !!}</div>
-                                    @endif
-                                    <div class="{{ $data->user->signature ? '' : 'mt-5' }}">{{ $data->user->name }}</div>
-                                    <div class="mt-1">{{ $data->user->position()->exists() ? $data->user->position->Level->name.' - '.$data->user->position->division->name : '-' }}</div>
-                                </td>
-                                <td width="">
-                                    Supir,
-                                    <div style="margin-top:50px;">{{ $data->driver_name }}</div>
-                                </td>
-                                <td width="">
-                                    Customer,
-                                    <div style="margin-top:50px;">...............</div>
-                                </td>
-                                @if($data->approval())
-                                    @foreach ($data->approval() as $detail)
-                                        @foreach ($detail->approvalMatrix()->where('status','2')->get() as $row)
-                                            <td>
-                                                {{ $row->approvalTemplateStage->approvalStage->approval->document_text }}
-                                                @if($row->user->signature)
-                                                    <div>{!! $row->user->signature() !!}</div>
-                                                @endif
-                                                <div class="{{ $row->user->signature ? '' : 'mt-5' }}">{{ $row->user->name }}</div>
-                                                @if ($row->user->position()->exists())
-                                        <div class="mt-1">{{ $row->user->position->Level->name.' - '.$row->user->position->division->name }}</div>
-                                    @endif
-                                            </td>
-                                        @endforeach
-                                    @endforeach
-                                @endif
-                            </tr>
-                        </table>  
-                    </div>
+                                <div style="margin-top:50px;">
+                                    Tanda Tangan dan Nama Terang
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
             </div>
         </main>

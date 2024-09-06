@@ -106,7 +106,7 @@ class MenuController extends Controller
         foreach($purchase as $row){
             foreach($row->purchaseOrderDetail as $rowpod){
                 foreach($rowpod->goodReceiptDetail as $rowgrd){
-                    echo $row->code.' - '.$rowgrd->goodReceipt->code.' - '.number_format($rowgrd->total * $row->currency_rate,2,',','.').'<br>';
+                    echo $row->code.' - '.$rowgrd->goodReceipt->code.' - '.number_format($rowgrd->total * $row->currency_rate,2,',','.').' - Nominal menjadi invoice '.number_format($rowgrd->totalInvoice(),2,',','.').'<br>';
                     $total += round($rowgrd->total * $row->currency_rate,2);
                 }
             }

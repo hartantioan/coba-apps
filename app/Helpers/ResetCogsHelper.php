@@ -100,12 +100,6 @@ class ResetCogsHelper
                 'date'				        => $dateloop,
                 'type'				        => 'IN'
                 ]);
-                foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $row->total,
-                    'nominal'     => $total,
-                ]);
-                }
                 $qtyBefore = $qty_final;
                 $totalBefore = $total_final;
             }
@@ -148,12 +142,6 @@ class ResetCogsHelper
                         'area_id'                   => $row ->area_id ?? NULL,
                         'item_shading_id'           => $row->item_shading_id ?? NULL,
                         'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
-                    ]);
-                }
-                foreach($row->journalDetail as $rowjournal){
-                    $rowjournal->update([
-                        'nominal_fc'  => $total,
-                        'nominal'     => $total,
                     ]);
                 }
                 $qtyBefore = $qty_final;

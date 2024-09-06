@@ -111,7 +111,7 @@ class MenuController extends Controller
                 }
             }
         }
-        echo number_format($total,2,',','.');
+        echo '<h1>'.number_format($total,2,',','.').'<h1>';
     }
 
     function addToArr(&$arr, $data){

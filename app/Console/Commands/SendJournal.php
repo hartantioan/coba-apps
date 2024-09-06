@@ -8,6 +8,7 @@ use App\Models\ItemCogs;
 use App\Models\Journal;
 use App\Models\JournalDetail;
 use App\Models\LandedCost;
+use App\Models\ProductionIssue;
 use Illuminate\Console\Command;
 
 class SendJournal extends Command
@@ -31,7 +32,7 @@ class SendJournal extends Command
      */
     public function handle()
     {
-        $lc = LandedCost::find(345);
+        /* $lc = LandedCost::find(345);
 			
         if($lc){
             $arrNote = [];
@@ -190,6 +191,63 @@ class SendJournal extends Command
                     'lookable_type'	=> $lc->getTable(),
                     'lookable_id'	=> $lc->id,
                 ]);
+            }
+        } */
+
+        $data = ProductionIssue::whereIn('code',['ISFP-24P1-00000032','ISFP-24P1-00000031','ISFP-24P1-00000030','ISFP-24P1-00000025','ISFP-24P1-00000024','ISFP-24P1-00000020','ISFP-24P1-00000019','ISFP-24P1-00000018','ISFP-24P1-00000015','ISFP-24P1-00000014','ISFP-24P1-00000013','ISFP-24P1-00000010','ISFP-24P1-00000009','ISFP-24P1-00000008','ISFP-24P1-00000002','ISFP-24P1-00000001'])->get();
+
+        foreach($data as $rowkambing){
+            foreach($rowkambing->productionIssueDetail()->where('lookable_type','items')->get() as $rowdetail){
+                $itemcogs2 = ItemCogs::where('date','>=',$rowkambing->post_date)->where('company_id',$rowkambing->company_id)->where('place_id',$rowkambing->place_id)->where('item_id',$rowdetail->lookable_id)->orderBy('date')->orderBy('id')->get();
+                $old_data2 = ItemCogs::where('date','<',$rowkambing->post_date)->where('company_id',$rowkambing->company_id)->where('place_id',$rowkambing->place_id)->where('item_id',$rowdetail->lookable_id)->orderByDesc('date')->orderByDesc('id')->first();
+        
+                $total_final = 0;
+                $qty_final = 0;
+                $price_final = 0;
+                foreach($itemcogs2 as $key2 => $row){
+                    if($key2 == 0){
+                        if($old_data2){
+                            if($row->type == 'IN'){
+                                $total_final = $old_data2->total_final + $row->total_in;
+                                $qty_final = $old_data2->qty_final + $row->qty_in;
+                            }elseif($row->type == 'OUT'){
+                                $total_final = $old_data2->total_final - $row->total_out;
+                                $qty_final = $old_data2->qty_final - $row->qty_out;
+                            }
+            
+                            $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        }else{
+                            if($row->type == 'IN'){
+                                $total_final = $row->total_in;
+                                $qty_final = $row->qty_in;
+                            }elseif($row->type == 'OUT'){
+                                $total_final = 0 - $row->total_out;
+                                $qty_final = 0 - $row->qty_out;
+                            }
+                
+                            $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        }
+                        $row->update([
+                            'price_final'	=> $price_final,
+                            'qty_final'		=> $qty_final,
+                            'total_final'	=> $total_final,
+                        ]);
+                    }else{
+                        if($row->type == 'IN'){
+                            $total_final += $row->total_in;
+                            $qty_final += $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final -= $row->total_out;
+                            $qty_final -= $row->qty_out;
+                        }
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        $row->update([
+                            'price_final'	=> $price_final,
+                            'qty_final'		=> $qty_final,
+                            'total_final'	=> $total_final,
+                        ]);
+                    }
+                }
             }
         }
     }

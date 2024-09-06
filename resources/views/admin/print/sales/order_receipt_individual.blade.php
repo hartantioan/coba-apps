@@ -253,7 +253,7 @@
                                 </td>
                                 <td width="30%" align="center">
                                     {{ $data->company->city->name.', '.CustomHelper::tgl_indo($data->post_date) }}
-                                    <br><br><br><br>
+                                    <br><br><br><br><br><br>
                                     __________________________
                                     <br>
                                     Tanda Tangan dan Nama Terang
@@ -370,8 +370,8 @@
                                     </b>
                                 </td>
                                 <td width="30%" align="center">
-                                    {{ $data->company->city->name.', '.date('d-M-Y',strtotime($data->post_date)) }}
-                                    <br><br><br><br>
+                                    {{ $data->company->city->name.', '.CustomHelper::tgl_indo($data->post_date) }}
+                                    <br><br><br><br><br><br>
                                     __________________________
                                     <br>
                                     Tanda Tangan dan Nama Terang

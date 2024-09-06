@@ -6596,7 +6596,7 @@ class CustomHelper {
 	public static function terbilang($angka) {
 		$angka = strval($angka);
 		
-		$baca = array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
+		$baca = array("nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
 	  
 		$terbilang="";
 		 if ($angka < 12){

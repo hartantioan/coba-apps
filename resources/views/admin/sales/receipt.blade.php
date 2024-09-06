@@ -1525,13 +1525,13 @@
                     url: '{{ Request::url() }}/print_individual/' + code,
                     type:'GET',
                     beforeSend: function() {
-                        loadingOpen('.modal-content');
+                        loadingOpen('#main');
                     },
                     complete: function() {
                         
                     },
                     success: function(data){
-                        loadingClose('.modal-content');
+                        loadingClose('#main');
                         printService.submit({
                             'type': 'INVOICE',
                             'url': data
@@ -1718,13 +1718,13 @@
             url: '{{ Request::url() }}/print_individual/' + code,
             type:'GET',
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             complete: function() {
                 
             },
             success: function(data){
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 window.open(data, '_blank');
             }
         });

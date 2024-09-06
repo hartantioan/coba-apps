@@ -256,7 +256,7 @@
                         </div>
                         <div class="input-field col s12 m6">
                             <input type="hidden" id="temp" name="temp">
-                            <input id="item" name="item" type="text" placeholder="Nama Item">
+                            <input id="item" name="item" type="text" placeholder="Nama Item"  style="text-transform:uppercase">
                             <label class="active" for="item">{{ __('translations.item') }}</label>
                         </div>
                         <div class="input-field col s12 m6">
@@ -265,7 +265,7 @@
                         </div>
                         
                         <div class="input-field col s12 m6">
-                            <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan">
+                            <input id="detail1_edit" name="detail1_edit" type="text" placeholder="Keterangan"  style="text-transform:uppercase">
                             <label class="active" for="detail1_edit">Detail </label>
                         </div>
 

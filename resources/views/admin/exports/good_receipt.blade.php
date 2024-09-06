@@ -32,6 +32,7 @@
             <th>Qty Konversi</th>
             <th>{{ __('translations.unit') }}</th>
             <th>Kurs</th>
+            <th>Status LC</th>
             <th>{{ __('translations.total') }}</th>
             <th>{{ __('translations.line') }}</th>
             <th>{{ __('translations.engine') }}</th>
@@ -80,6 +81,7 @@
                 <td align="center">{{ $rowdetail->qty * $rowdetail->qty_conversion }}</td>
                 <td align="center">{{ $rowdetail->item->uomUnit->code }}</td>
                 <td align="center">{{ $nominal ? $rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate : '' }}</td>
+                <td align="center">{{ $row->statusLC() ?? '' }}</td>
                 <td align="center">{{ $nominal ? round($rowdetail->purchaseOrderDetail->purchaseOrder->currency_rate * $rowdetail->total,2) : '' }}</td>
                 <td align="center">{{ $rowdetail->line->name ?? ''  }}</td>
                 <td align="center">{{ $rowdetail->machine->name ?? ''  }}</td>

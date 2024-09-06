@@ -518,47 +518,53 @@ class ResetCogsHelper
                 $query->where('item_id',$item_id);
             })->get();
 
+            $tempgiprice = 0;
             foreach($goodissue as $row){
                 $price = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
+                if($tempgiprice > 0){
+                    $price = $tempgiprice;
+                }else{
+                    $tempgiprice = $price;
+                }
                 $total = round($row->qty * $price,2);
                 $qty = $row->qty;
                 $total_final = $totalBefore - $total;
                 $qty_final = $qtyBefore - $qty;
                 ItemCogs::create([
-                'lookable_type'		    => $row->goodIssue->getTable(),
-                'lookable_id'		      => $row->goodIssue->id,
-                'detailable_type'	    => $row->getTable(),
-                'detailable_id'		    => $row->id,
-                'company_id'		      => $row->goodIssue->company_id,
-                'place_id'			      => $row->itemStock->place_id,
-                'warehouse_id'		    => $row->itemStock->warehouse_id,
-                'item_id'			        => $row->itemStock->item_id,
-                'qty_out'			        => $qty,
-                'price_out'			      => $price,
-                'total_out'			      => $total,
-                'qty_final'			      => $qty_final,
-                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
-                'total_final'		      => $total_final,
-                'date'				        => $dateloop,
-                'type'				        => 'OUT',
-                'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
-                'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
-                'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
+                    'lookable_type'		    => $row->goodIssue->getTable(),
+                    'lookable_id'		      => $row->goodIssue->id,
+                    'detailable_type'	    => $row->getTable(),
+                    'detailable_id'		    => $row->id,
+                    'company_id'		      => $row->goodIssue->company_id,
+                    'place_id'			      => $row->itemStock->place_id,
+                    'warehouse_id'		    => $row->itemStock->warehouse_id,
+                    'item_id'			        => $row->itemStock->item_id,
+                    'qty_out'			        => $qty,
+                    'price_out'			      => $price,
+                    'total_out'			      => $total,
+                    'qty_final'			      => $qty_final,
+                    'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+                    'total_final'		      => $total_final,
+                    'date'				        => $dateloop,
+                    'type'				        => 'OUT',
+                    'area_id'             => $row->itemStock->area()->exists() ? $row->itemStock->area_id : NULL,
+                    'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
+                    'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
                 ]);
                 foreach($row->journalDetail as $rowjournal){
-                $rowjournal->update([
-                    'nominal_fc'  => $total,
-                    'nominal'     => $total,
-                ]);
+                    $rowjournal->update([
+                        'nominal_fc'  => $total,
+                        'nominal'     => $total,
+                    ]);
                 }
                 $row->update([
-                'price' => $price,
-                'total' => $total
+                    'price' => $price,
+                    'total' => $total
                 ]);
                 if($row->goodReturnIssueDetail()->exists()){
                     foreach($row->goodReturnIssueDetail as $rowretur){
                         $rowretur->update([
-                        'total'   => round($price * $rowretur->qty,2),
+                            'total'   => round($price * $rowretur->qty,2),
                         ]);
                     }
                 }

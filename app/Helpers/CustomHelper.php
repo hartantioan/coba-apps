@@ -2353,10 +2353,6 @@ class CustomHelper {
 					$row->itemStock->item_shading_id ? $row->itemStock->item_shading_id : NULL,
 					$row->itemStock->production_batch_id ? $row->itemStock->production_batch_id : NULL,
 				);
-
-				$row->update([
-					'total'	=> $total,
-				]);
 			}
 
 			if($gr){
@@ -6915,13 +6911,13 @@ class CustomHelper {
 	}
 
 	public static function accumulateCogs($date,$company_id,$place_id,$item_id){
-		/* $item = Item::find($item_id);
+		$item = Item::find($item_id);
         $bomPowder = $item->bomPlace($place_id) ? $item->bomPlace($place_id)->first() : NULL;
         $bomGroup = '';
         if($bomPowder){
             $bomGroup = $bomPowder->group; 
         }
-		if($bomGroup == '2' || $bomGroup == '3'){ */
+		if($bomGroup == '2' || $bomGroup == '3'){
             $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
             $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
     
@@ -6972,7 +6968,7 @@ class CustomHelper {
                     ]);
                 }
             }
-        /* } */
+        }
 	}
 
 	public static function splitBomArray($data){

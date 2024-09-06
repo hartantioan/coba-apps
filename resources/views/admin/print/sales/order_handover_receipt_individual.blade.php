@@ -119,19 +119,29 @@
         </style>
     </head>
     <body>
-        <div style="position:absolute;top:0px !important;">
-            <img src="{{ $image }}" height="30px">
-            <br>Collector : {{ $data->account->name }}
-        </div>
-        <h5 align="center">
-            {{ $title }}
-            <br>{{ $data->code }}
-            <br>{{ date('d/m/Y',strtotime($data->post_date)) }}
-        </h5>
+        <header>
+            <table border="0" width="100%">
+                <td align="center" width="33%">
+                    <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;font-size:15px !important;">
+                    <b>{{ $title }}</b>
+                    <div>{{ $data->code }}</div>
+                    <br>{{ date('d/m/Y',strtotime($data->post_date)) }}
+                </td>
+                <td align="center" width="33%" style="padding-top:10px;">
+                    <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="margin-left:35px;top:5px;width:150px;" height="30px" />
+                    <span class="invoice-number mr-1" style="font-size:15px;font-weight:800;margin-left:40px;top:50px;">
+                        {{ $data->code }}
+                    </span>
+                </td>
+            </table>
+        </header>
         <main>
             <div class="card break-row">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->
+                    Collector : {{ $data->account->name }}
                     <table border="1" width="100%" style="border-collapse: collapse;">
                         <thead>
                             <tr>

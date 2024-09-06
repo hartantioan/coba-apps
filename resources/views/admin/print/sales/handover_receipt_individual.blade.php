@@ -170,6 +170,8 @@
                                 <th>No.Invoice</th>
                                 <th>{{ __('translations.date') }}</th>
                                 <th>{{ __('translations.grandtotal') }}</th>
+                                <th>Dibayar</th>
+                                <th>Sisa</th>
                                 <th>Surat Jalan</th>
                             </tr>
                         </thead>
@@ -180,7 +182,9 @@
                                     <td>{{ $row->lookable->code }}</td>
                                     <td align="center">{{ date('d/m/Y',strtotime($row->lookable->post_date)) }}</td>
                                     <td align="right">{{ number_format($row->lookable->grandtotal,2,',','.') }}</td>
-                                    <td>{{ $row->lookable->listDeliveryProcess() }}</td>
+                                    <td align="right">{{ number_format($row->lookable->totalPay(),2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->balancePaymentIncoming(),2,',','.') }}</td>
+                                    <td>{{ $row->lookable->marketingOrderDeliveryProcess->code.' - '.date('d/m/Y',strtotime($row->lookable->marketingOrderDeliveryProcess->post_date)) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

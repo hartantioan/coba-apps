@@ -114,17 +114,6 @@ class MarketingOrderInvoice extends Model
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details');
     }
 
-    public function listDeliveryProcess(){
-        $arr = [];
-        foreach($this->marketingOrderInvoiceDeliveryProcessDetail as $row){
-            if(!in_array($row->lookable->marketingOrderDeliveryProcess->code,$arr)){
-                $arr[] = $row->lookable->marketingOrderDeliveryProcess->code;
-            }
-        }
-
-        return implode(', ',$arr);
-    }
-
     public function marketingOrderInvoiceDownPayment()
     {
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_down_payments');

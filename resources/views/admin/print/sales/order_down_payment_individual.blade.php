@@ -228,7 +228,7 @@
                             </td>
                             <td width="50%" style="padding-left:10px;">
                                 {!! ucwords(strtolower($data->company->city->name)).', '.CustomHelper::tgl_indo($data->post_date) !!}
-                                <div style="margin-top:50px;">
+                                <div style="margin-top:100px;">
                                     Tanda Tangan dan Nama Terang
                                 </div>
                             </td>

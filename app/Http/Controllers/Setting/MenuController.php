@@ -104,10 +104,10 @@ class MenuController extends Controller
 
         $data = ProductionIssue::whereIn('code',['ISFP-24P1-00000032','ISFP-24P1-00000031','ISFP-24P1-00000030','ISFP-24P1-00000025','ISFP-24P1-00000024','ISFP-24P1-00000020','ISFP-24P1-00000019','ISFP-24P1-00000018','ISFP-24P1-00000015','ISFP-24P1-00000014','ISFP-24P1-00000013','ISFP-24P1-00000010','ISFP-24P1-00000009','ISFP-24P1-00000008','ISFP-24P1-00000002','ISFP-24P1-00000001'])->get();
 
-        foreach($data as $row){
-            foreach($row->productionIssueDetail()->where('lookable_type','items')->get() as $rowdetail){
-                $itemcogs2 = ItemCogs::where('date','>=',$row->post_date)->where('company_id',$row->company_id)->where('place_id',$row->place_id)->where('item_id',$rowdetail->lookable_id)->orderBy('date')->orderBy('id')->get();
-                $old_data2 = ItemCogs::where('date','<',$row->post_date)->where('company_id',$row->company_id)->where('place_id',$row->place_id)->where('item_id',$rowdetail->lookable_id)->orderByDesc('date')->orderByDesc('id')->first();
+        foreach($data as $rowkambing){
+            foreach($rowkambing->productionIssueDetail()->where('lookable_type','items')->get() as $rowdetail){
+                $itemcogs2 = ItemCogs::where('date','>=',$rowkambing->post_date)->where('company_id',$rowkambing->company_id)->where('place_id',$rowkambing->place_id)->where('item_id',$rowdetail->lookable_id)->orderBy('date')->orderBy('id')->get();
+                $old_data2 = ItemCogs::where('date','<',$rowkambing->post_date)->where('company_id',$rowkambing->company_id)->where('place_id',$rowkambing->place_id)->where('item_id',$rowdetail->lookable_id)->orderByDesc('date')->orderByDesc('id')->first();
         
                 $total_final = 0;
                 $qty_final = 0;

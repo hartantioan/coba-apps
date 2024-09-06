@@ -602,9 +602,6 @@ class MarketingOrderHandoverReceiptController extends Controller
         if($pr){
             $pdf = PrintHelper::print($pr,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
             $content = $pdf->download()->getOriginalContent();
 
             $merger = new Merger();
@@ -641,9 +638,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -718,9 +712,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                         if($query){
                             $pdf = PrintHelper::print($query,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                         }
@@ -771,9 +762,6 @@ class MarketingOrderHandoverReceiptController extends Controller
                         if($query){
                             $pdf = PrintHelper::print($query,'Tanda Terima Kwitansi','a4','portrait','admin.print.sales.order_handover_receipt_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            

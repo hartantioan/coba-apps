@@ -609,7 +609,6 @@ class MarketingHandoverInvoiceController extends Controller
             
             $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
             $content = $pdf->download()->getOriginalContent();
             
@@ -643,9 +642,6 @@ class MarketingHandoverInvoiceController extends Controller
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                    $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                    $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
@@ -720,9 +716,6 @@ class MarketingHandoverInvoiceController extends Controller
                         if($query){
                             $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            
@@ -774,9 +767,6 @@ class MarketingHandoverInvoiceController extends Controller
                         if($query){
                             $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-                            $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
                            

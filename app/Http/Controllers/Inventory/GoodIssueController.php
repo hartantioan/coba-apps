@@ -1275,18 +1275,24 @@ class GoodIssueController extends Controller
     }
 
     public function export(Request $request){
+        $menu = Menu::where('url','good_receipt_po')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportGoodIssue($post_date,$end_date,$mode), 'good_issue_'.uniqid().'.xlsx');
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportGoodIssue($post_date,$end_date,$mode,$nominal), 'good_issue_'.uniqid().'.xlsx');
     }
     public function exportFromTransactionPage(Request $request){
+        $menu = Menu::where('url','good_receipt_po')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $search = $request->search? $request->search : '';
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $status = $request->status ? $request->status : '';
 		$modedata = $request->modedata ? $request->modedata : '';
-		return Excel::download(new ExportGoodIssueTransactionPage($search,$post_date,$end_date,$status,$modedata), 'good_issue'.uniqid().'.xlsx');
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportGoodIssueTransactionPage($search,$post_date,$end_date,$status,$modedata,$nominal), 'good_issue'.uniqid().'.xlsx');
     }
 
     public function viewJournal(Request $request,$id){

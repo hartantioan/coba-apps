@@ -10,14 +10,15 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportGoodIssueTransactionPage implements FromView,ShouldAutoSize
 {
-    protected $search,$start_date, $end_date, $status, $modedata;
-    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata)
+    protected $search,$start_date, $end_date, $status, $modedata, $nominal;
+    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata, string $nominal)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status   = $status ? $status : '';
         $this->modedata = $modedata ? $modedata : '';
+        $this->nominal = $nominal ? $nominal : '';
     }
     public function view(): View
     {
@@ -55,7 +56,8 @@ class ExportGoodIssueTransactionPage implements FromView,ShouldAutoSize
                     $query->whereIn('status', $array);
                 }
             })
-            ->get()
+            ->get(),
+            'nominal'   => $this->nominal,
         ]);
     }
 }

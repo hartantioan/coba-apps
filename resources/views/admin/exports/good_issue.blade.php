@@ -74,7 +74,7 @@
                 <td>{{ $rowdetail->project()->exists() ? $rowdetail->project->name : '-' }}</td>
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ $rowdetail->qty_return }}</td>
-                <td>{{ $rowdetail->total }}</td>
+                <td>{{ $nominal ? $rowdetail->total : '-' }}</td>
                 <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>                
             </tr>
             @php

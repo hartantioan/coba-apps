@@ -103,15 +103,17 @@ class MenuController extends Controller
 
         $purchase = PurchaseOrder::whereIn('code',['PORD-24P1-00001412','PORD-24P1-00001411','PORD-24P1-00001409','PORD-24P1-00001408','PORD-24P1-00001407','PORD-24P1-00001573','PORD-24P1-00001579','PORD-24P1-00001596','PORD-24P1-00001602','PORD-24P1-00001627'])->whereIn('status',['2','3'])->get();
         $total = 0;
+        $totalpo = 0;
         foreach($purchase as $row){
             foreach($row->purchaseOrderDetail as $rowpod){
                 foreach($rowpod->goodReceiptDetail as $rowgrd){
-                    echo $row->code.' - '.$rowgrd->goodReceipt->code.' - '.number_format($rowgrd->total * $row->currency_rate,2,',','.').'<br>';
+                    echo $row->code.' - '.$rowgrd->goodReceipt->code.' - '.number_format($rowgrd->total * $row->currency_rate,2,',','.').' - '.number_format($rowgrd->qty * $rowpod->price * $row->currency_rate,2,',','.').'<br>';
                     $total += round($rowgrd->total * $row->currency_rate,2);
+                    $totalpo += round($rowgrd->qty * $rowpod->price * $row->currency_rate,2);
                 }
             }
         }
-        echo '<h1>'.number_format($total,2,',','.').'<h1>';
+        echo '<h1>'.number_format($total,2,',','.').' - '.number_format($totalpo,2,',','.').'<h1>';
     }
 
     function addToArr(&$arr, $data){

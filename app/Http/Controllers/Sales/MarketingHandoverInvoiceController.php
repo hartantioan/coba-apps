@@ -607,7 +607,7 @@ class MarketingHandoverInvoiceController extends Controller
                 
         if($pr){
             
-            $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
@@ -641,7 +641,7 @@ class MarketingHandoverInvoiceController extends Controller
                 $pr = MarketingOrderHandoverInvoice::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual');
+                    $pdf = PrintHelper::print($pr,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -718,7 +718,7 @@ class MarketingHandoverInvoiceController extends Controller
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
                         $query = MarketingOrderHandoverInvoice::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual');
+                            $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -772,7 +772,7 @@ class MarketingHandoverInvoiceController extends Controller
                     foreach($merged as $code){
                         $query = MarketingOrderHandoverInvoice::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a5','landscape','admin.print.sales.handover_invoice_individual');
+                            $pdf = PrintHelper::print($query,'Tanda Terima Invoice','a4','portrait','admin.print.sales.handover_invoice_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 340, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));

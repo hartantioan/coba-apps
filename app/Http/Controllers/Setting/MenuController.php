@@ -41,6 +41,7 @@ use App\Models\MaterialRequestDetail;
 use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
+use App\Models\ProductionIssue;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
@@ -93,13 +94,70 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $data = ProductionIssue::whereIn('code',['ISFP-24P1-00000032','ISFP-24P1-00000031','ISFP-24P1-00000030','ISFP-24P1-00000025','ISFP-24P1-00000024','ISFP-24P1-00000020','ISFP-24P1-00000019','ISFP-24P1-00000018','ISFP-24P1-00000015','ISFP-24P1-00000014','ISFP-24P1-00000013','ISFP-24P1-00000010','ISFP-24P1-00000009','ISFP-24P1-00000008','ISFP-24P1-00000002','ISFP-24P1-00000001'])->get();
+
+        foreach($data as $row){
+            foreach($row->productionIssueDetail()->where('lookable_type','items')->get() as $rowdetail){
+                $itemcogs2 = ItemCogs::where('date','>=',$row->post_date)->where('company_id',$row->company_id)->where('place_id',1)->where('item_id',$rowdetail->lookable_id)->orderBy('date')->orderBy('id')->get();
+                $old_data2 = ItemCogs::where('date','<',$row->post_date)->where('company_id',$row->company_id)->where('place_id',1)->where('item_id',$rowdetail->lookable_id)->orderByDesc('date')->orderByDesc('id')->first();
+        
+                $total_final = 0;
+                $qty_final = 0;
+                $price_final = 0;
+                foreach($itemcogs2 as $key2 => $row){
+                    if($key2 == 0){
+                        if($old_data2){
+                            if($row->type == 'IN'){
+                                $total_final = $old_data2->total_final + $row->total_in;
+                                $qty_final = $old_data2->qty_final + $row->qty_in;
+                            }elseif($row->type == 'OUT'){
+                                $total_final = $old_data2->total_final - $row->total_out;
+                                $qty_final = $old_data2->qty_final - $row->qty_out;
+                            }
+            
+                            $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        }else{
+                            if($row->type == 'IN'){
+                                $total_final = $row->total_in;
+                                $qty_final = $row->qty_in;
+                            }elseif($row->type == 'OUT'){
+                                $total_final = 0 - $row->total_out;
+                                $qty_final = 0 - $row->qty_out;
+                            }
+                
+                            $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        }
+                        $row->update([
+                            'price_final'	=> $price_final,
+                            'qty_final'		=> $qty_final,
+                            'total_final'	=> $total_final,
+                        ]);
+                    }else{
+                        if($row->type == 'IN'){
+                            $total_final += $row->total_in;
+                            $qty_final += $row->qty_in;
+                        }elseif($row->type == 'OUT'){
+                            $total_final -= $row->total_out;
+                            $qty_final -= $row->qty_out;
+                        }
+                        $price_final = $qty_final > 0 ? $total_final / $qty_final : 0;
+                        $row->update([
+                            'price_final'	=> $price_final,
+                            'qty_final'		=> $qty_final,
+                            'total_final'	=> $total_final,
+                        ]);
+                    }
+                }
+            }
+        }
 
         /* $purchase = PurchaseOrder::whereIn('code',['PORD-24P1-00001412','PORD-24P1-00001411','PORD-24P1-00001409','PORD-24P1-00001408','PORD-24P1-00001407','PORD-24P1-00001573','PORD-24P1-00001579','PORD-24P1-00001596','PORD-24P1-00001602','PORD-24P1-00001627'])->whereIn('status',['2','3'])->get();
         $total = 0;

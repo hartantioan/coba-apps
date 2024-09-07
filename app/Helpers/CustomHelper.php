@@ -1446,58 +1446,174 @@ class CustomHelper {
 					'note'			=> $pr->note,
 					'status'		=> '3'
 				]);
-	
-				foreach($pr->paymentRequestDetail as $row){
-					if($row->cost_distribution_id){
-						$total = $row->nominal;
-						$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
-						$accumulation = 0;
-						foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
-							if($key == $lastIndex){
-								$nominal = $total - $accumulation;
-							}else{
-								$nominal = round(($rowcost->percentage / 100) * $total);
-								$accumulation += $nominal;
+
+				foreach($pr->paymentRequestCost as $row){
+					if($row->nominal_debit_fc > 0 || $row->nominal_debit_fc < 0){
+						if($row->cost_distribution_id){
+							$total = $row->nominal_debit_fc;
+							$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'                        => $row->coa_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : $row->place_id,
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : $row->line_id,
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : $row->machine_id,
+									'account_id'                    => $row->coa->bp_journal ? $pr->account_id : NULL,
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : $row->division_id,
+									'project_id'					=> $row->project_id ? $row->project_id : NULL,
+									'type'                          => '1',
+									'nominal'                       => floatval($nominal),
+									'nominal_fc'					=> floatval($nominal),
+									'note'							=> $row->note,
+									'note2'							=> $row->note2,
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $row->getTable(),
+									'detailable_id'					=> $row->id,
+								]);
 							}
+						}else{
 							JournalDetail::create([
-								'journal_id'                    => $query->id,
-								'cost_distribution_detail_id'   => $rowcost->id,
-								'coa_id'                        => $row->coa_id,
-								'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
-								'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
-								'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
-								'account_id'                    => $row->coa->bp_journal ? $pr->account_id : NULL,
-								'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
-								'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
-								'project_id'					=> $row->project_id ? $row->project_id : NULL,
-								'type'                          => '1',
-								'nominal'                       => floatval($nominal * $pr->currency_rate),
-								'nominal_fc'					=> $pr->currency->type == '1' ? floatval($nominal * $pr->currency_rate) : floatval($nominal),
-								'lookable_type'					=> $table_name,
-								'lookable_id'					=> $table_id,
-								'detailable_type'				=> $row->getTable(),
-								'detailable_id'					=> $row->id,
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->coa_id,
+								'account_id'	=> $row->coa->bp_journal ? $pr->account_id : NULL,
+								'line_id'		=> $row->line_id ? $row->line_id : NULL,
+								'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+								'place_id'		=> $row->place_id ? $row->place_id : NULL,
+								'department_id'	=> $row->department_id ? $row->department_id : NULL,
+								'project_id'	=> $row->project_id ? $row->project_id : NULL,
+								'type'			=> '1',
+								'nominal'		=> floatval($row->nominal_debit_fc * $pr->currency_rate),
+								'nominal_fc'	=> floatval($row->nominal_debit_fc),
+								'note'			=> $row->note,
+								'note2'			=> $row->note2,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
 							]);
 						}
-					}else{
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $row->coa_id,
-							'account_id'	=> $pr->account_id,
-							'line_id'		=> $row->line_id ? $row->line_id : NULL,
-							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
-							'place_id'		=> $row->place_id ? $row->place_id : NULL,
-							'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
-							'department_id'	=> $row->department_id ? $row->department_id : NULL,
-							'project_id'	=> $row->project_id ? $row->project_id : NULL,
-							'type'			=> '1',
-							'nominal'		=> floatval($row->nominal * $pr->currency_rate),
-							'nominal_fc'	=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
-							'lookable_type'	=> $table_name,
-							'lookable_id'	=> $table_id,
-							'detailable_type'=> $row->getTable(),
-							'detailable_id'	=> $row->id,
-						]);
+					}
+	
+					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
+						if($row->cost_distribution_id){
+							$total = $row->nominal_credit_fc;
+							$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'                        => $row->coa_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : $row->place_id,
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : $row->line_id,
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : $row->machine_id,
+									'account_id'                    => $row->coa->bp_journal ? $pr->account_id : NULL,
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : $row->division_id,
+									'project_id'					=> $row->project_id ? $row->project_id : NULL,
+									'type'                          => '2',
+									'nominal'                       => $nominal,
+									'nominal_fc'					=> $nominal,
+									'note'							=> $row->note,
+									'note2'							=> $row->note2,
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $row->getTable(),
+									'detailable_id'					=> $row->id,
+								]);
+							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->coa_id,
+								'account_id'	=> $row->coa->bp_journal ? $pr->account_id : NULL,
+								'line_id'		=> $row->line_id ? $row->line_id : NULL,
+								'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+								'place_id'		=> $row->place_id ? $row->place_id : NULL,
+								'department_id'	=> $row->department_id ? $row->department_id : NULL,
+								'project_id'	=> $row->project_id ? $row->project_id : NULL,
+								'type'			=> '2',
+								'nominal'		=> floatval($row->nominal_credit_fc),
+								'nominal_fc'	=> floatval($row->nominal_credit_fc),
+								'note'			=> $row->note,
+								'note2'			=> $row->note2,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+						}
+					}
+				}
+	
+				foreach($pr->paymentRequestDetail as $row){
+					if($row->lookable_type !== 'fund_requests'){
+						if($row->cost_distribution_id){
+							$total = $row->nominal;
+							$lastIndex = count($row->costDistribution->costDistributionDetail) - 1;
+							$accumulation = 0;
+							foreach($row->costDistribution->costDistributionDetail as $key => $rowcost){
+								if($key == $lastIndex){
+									$nominal = $total - $accumulation;
+								}else{
+									$nominal = round(($rowcost->percentage / 100) * $total);
+									$accumulation += $nominal;
+								}
+								JournalDetail::create([
+									'journal_id'                    => $query->id,
+									'cost_distribution_detail_id'   => $rowcost->id,
+									'coa_id'                        => $row->coa_id,
+									'place_id'                      => $rowcost->place_id ? $rowcost->place_id : NULL,
+									'line_id'                       => $rowcost->line_id ? $rowcost->line_id : NULL,
+									'machine_id'                    => $rowcost->machine_id ? $rowcost->machine_id : NULL,
+									'account_id'                    => $row->coa->bp_journal ? $pr->account_id : NULL,
+									'department_id'                 => $rowcost->department_id ? $rowcost->department_id : NULL,
+									'warehouse_id'                  => $rowcost->warehouse_id ? $rowcost->warehouse_id : NULL,
+									'project_id'					=> $row->project_id ? $row->project_id : NULL,
+									'type'                          => '1',
+									'nominal'                       => floatval($nominal * $pr->currency_rate),
+									'nominal_fc'					=> $pr->currency->type == '1' ? floatval($nominal * $pr->currency_rate) : floatval($nominal),
+									'lookable_type'					=> $table_name,
+									'lookable_id'					=> $table_id,
+									'detailable_type'				=> $row->getTable(),
+									'detailable_id'					=> $row->id,
+								]);
+							}
+						}else{
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->coa_id,
+								'account_id'	=> $row->coa->bp_journal ? $pr->account_id : NULL,
+								'line_id'		=> $row->line_id ? $row->line_id : NULL,
+								'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
+								'place_id'		=> $row->place_id ? $row->place_id : NULL,
+								'warehouse_id'	=> $row->warehouse_id ? $row->warehouse_id : NULL,
+								'department_id'	=> $row->department_id ? $row->department_id : NULL,
+								'project_id'	=> $row->project_id ? $row->project_id : NULL,
+								'type'			=> '1',
+								'nominal'		=> floatval($row->nominal * $pr->currency_rate),
+								'nominal_fc'	=> $pr->currency->type == '1' ? floatval($row->nominal * $pr->currency_rate) : floatval($row->nominal),
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+						}
 					}
 				}
 

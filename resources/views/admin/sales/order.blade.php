@@ -2171,33 +2171,7 @@
                         $('#arr_item' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_name + `</option>
                         `);
-                        $('#arr_item' + count).select2({
-                            placeholder: '-- Kosong --',
-                            minimumInputLength: 1,
-                            allowClear: true,
-                            cache: true,
-                            width: 'resolve',
-                            dropdownParent: $('body').parent(),
-                            ajax: {
-                                url: '{{ url("admin/select2/sales_item") }}',
-                                type: 'GET',
-                                dataType: 'JSON',
-                                data: function(params) {
-                                    return {
-                                        search: params.term,
-                                        account_id: $('#account_id').val(),
-                                        date: $('#post_date').val(),
-                                        city: $('#city_id').val(),
-                                        payment_type: $('#payment_type').val(),
-                                    };
-                                },
-                                processResults: function(data) {
-                                    return {
-                                        results: data.items
-                                    }
-                                }
-                            }
-                        });
+                        select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
                         $.each(val.sell_units, function(i, value) {
                             $('#arr_unit' + count).append(`
                                 <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
@@ -2829,33 +2803,7 @@
                                 $('#arr_item' + count).append(`
                                     <option value="` + val.item_id + `">` + val.item_name + `</option>
                                 `);
-                                $('#arr_item' + count).select2({
-                                    placeholder: '-- Kosong --',
-                                    minimumInputLength: 1,
-                                    allowClear: true,
-                                    cache: true,
-                                    width: 'resolve',
-                                    dropdownParent: $('body').parent(),
-                                    ajax: {
-                                        url: '{{ url("admin/select2/sales_item") }}',
-                                        type: 'GET',
-                                        dataType: 'JSON',
-                                        data: function(params) {
-                                            return {
-                                                search: params.term,
-                                                account_id: $('#account_id').val(),
-                                                date: $('#post_date').val(),
-                                                city: $('#city_id').val(),
-                                                payment_type: $('#payment_type').val(),
-                                            };
-                                        },
-                                        processResults: function(data) {
-                                            return {
-                                                results: data.items
-                                            }
-                                        }
-                                    }
-                                });
+                                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
                                 $.each(val.sell_units, function(i, value) {
                                     $('#arr_unit' + count).append(`
                                         <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>

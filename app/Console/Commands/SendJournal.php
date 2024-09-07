@@ -956,7 +956,7 @@ class SendJournal extends Command
             $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->first();
             if($itemstock){
                 $itemstock->update([
-                    'qty'   => $qty_final,
+                    'qty'   => $qtyBefore,
                 ]);
             }
         }

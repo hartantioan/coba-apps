@@ -962,8 +962,8 @@ class Select2Controller extends Controller {
                 'disc1'             => /* $cek_discount->disc1 ??  */0,
                 'disc2'             => /* $cek_discount->disc2 ??  */0,
                 'disc3'             => /* $cek_discount->disc3 ??  */0,
-                'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
-                'stock_com'         => CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)),
+                'stock_now'         => /* CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)) */0,
+                'stock_com'         => /* CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)) */0,
             ];
         }
 

@@ -1337,78 +1337,79 @@
     }
     
     function getRowUnit(nil){
-        var price_f_pricelist  = parseFloat($("#arr_item" + nil).select2('data')[0].price), price_delivery = parseFloat($("#arr_item" + nil).select2('data')[0].price_delivery), price_bp = parseFloat($("#arr_item" + nil).select2('data')[0].price_bp);
-        var disc_1  = parseFloat($("#arr_item" + nil).select2('data')[0].disc1);
-        var disc_2  = parseFloat($("#arr_item" + nil).select2('data')[0].disc2);
-        var disc_3  = parseFloat($("#arr_item" + nil).select2('data')[0].disc3);
-        /* $('#tempPrice' + nil).empty(); */
-        /* $("#arr_warehouse" + nil).empty(); */
         if($("#arr_item" + nil).val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_sales_item_information',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    item_id: $("#arr_item" + nil).val(),
+                    account_id: $('#account_id').val(),
+                    date: $('#post_date').val(),
+                    city: $('#city_id').val(),
+                    district: $('#district_id').val(),
+                    payment_type: $('#payment_type').val(),
+                    transportation_id: $('#transportation_id').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    var price_f_pricelist  = parseFloat(response.price), price_delivery = parseFloat(response.price_delivery), price_bp = parseFloat(response.price_bp);
+                    var disc_1  = parseFloat(response.disc1);
+                    var disc_2  = parseFloat(response.disc2);
+                    var disc_3  = parseFloat(response.disc3);
 
-            $('#arr_uom_unit' + nil).empty().append($("#arr_item" + nil).select2('data')[0].uom);
-            $('#arr_qty_now' + nil).empty().append($("#arr_item" + nil).select2('data')[0].stock_now);
-            $('#arr_qty_temporary' + nil).empty().append($("#arr_item" + nil).select2('data')[0].stock_com);
+                    $('#arr_uom_unit' + nil).empty().append(response.uom);
+                    $('#arr_qty_now' + nil).empty().append(response.stock_now);
+                    $('#arr_qty_temporary' + nil).empty().append(response.stock_com);
 
-            $('#arr_unit' + nil).empty();
+                    $('#arr_unit' + nil).empty();
 
-            $('#rowDisc1' + nil).val(disc_1);
-            $('#rowDisc2' + nil).val(disc_2);
-            $('#rowDisc3' + nil).val(disc_3);
-            
-            $.each($("#arr_item" + nil).select2('data')[0].sell_units, function(i, value) {
-                $('#arr_unit' + nil).append(`
-                    <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
-                `);
-            });
-
-            /* if($("#arr_item" + nil).select2('data')[0].list_warehouse.length > 0){
-                $.each($("#arr_item" + nil).select2('data')[0].list_warehouse, function(i, value) {
-                    $('#arr_warehouse' + nil).append(`
-                        <option value="` + value.id + `">` + value.name + `</option>
-                    `);
-                });
-            }else{
-                $("#arr_warehouse" + nil).append(`
-                    <option value="">--Gudang tidak diatur di master data Grup Item--</option>
-                `);
-            } */
-
-            /* if($("#arr_item" + nil).select2('data')[0].old_prices.length > 0){
-                $.each($("#arr_item" + nil).select2('data')[0].old_prices, function(i, value) {
-                    if($('#account_id').val()){
-                        if(value.customer_id == $('#account_id').val()){
-                            $('#tempPrice' + nil).append(`
-                                <option value="` + value.price + `">` + value.sales_code + ` Supplier ` + value.customer_name + ` Tgl ` + value.post_date + `</option>
-                            `);
-                        }
-                    }else{
-                        $('#tempPrice' + nil).append(`
-                            <option value="` + value.price + `">` + value.sales_code + ` Supplier ` + value.customer_name + ` Tgl ` + value.post_date + `</option>
+                    $('#rowDisc1' + nil).val(disc_1);
+                    $('#rowDisc2' + nil).val(disc_2);
+                    $('#rowDisc3' + nil).val(disc_3);
+                    
+                    $.each(response.sell_units, function(i, value) {
+                        $('#arr_unit' + nil).append(`
+                            <option value="` + value.id + `" data-conversion="` + value.conversion + `">` + value.code + `</option>
                         `);
+                    });
+                    
+                    if(response.price){
+                        if($('#account_id').val() ){
+                            $("#rowPriceList" + nil).val(
+                                (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
+                            );
+                            $("#rowPriceDelivery" + nil).val(
+                                (parseFloat(price_delivery) >= 0 ? '' : '-') + formatRupiahIni(price_delivery.toFixed(2).toString().replace('.',','))
+                            );
+                            $("#rowPriceTypeBp" + nil).val(
+                                (parseFloat(price_bp) >= 0 ? '' : '-') + formatRupiahIni(price_bp.toFixed(2).toString().replace('.',','))
+                            );
+                            let final = parseFloat(price_f_pricelist) + parseFloat(price_delivery) + parseFloat(price_bp);
+                            $("#rowPrice" + nil).val(
+                                (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
+                            );
+                            $("#arr_final_price" + nil).val(
+                                (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
+                            );
+                        }
                     }
-                });
-            } */
-            
-            if($("#arr_item" + nil).select2('data')[0].price){
-                if($('#account_id').val() ){
-                    $("#rowPriceList" + nil).val(
-                        (parseFloat(price_f_pricelist) >= 0 ? '' : '-') + formatRupiahIni(price_f_pricelist.toFixed(2).toString().replace('.',','))
-                    );
-                    $("#rowPriceDelivery" + nil).val(
-                        (parseFloat(price_delivery) >= 0 ? '' : '-') + formatRupiahIni(price_delivery.toFixed(2).toString().replace('.',','))
-                    );
-                    $("#rowPriceTypeBp" + nil).val(
-                        (parseFloat(price_bp) >= 0 ? '' : '-') + formatRupiahIni(price_bp.toFixed(2).toString().replace('.',','))
-                    );
-                    let final = parseFloat(price_f_pricelist) + parseFloat(price_delivery) + parseFloat(price_bp);
-                    $("#rowPrice" + nil).val(
-                        (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
-                    );
-                    $("#arr_final_price" + nil).val(
-                        (final >= 0 ? '' : '-') + formatRupiahIni(final.toFixed(2).toString().replace('.',','))
-                    );
+                },
+                error: function() {
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
                 }
-            }
+            });
         }else{
             $('#arr_uom_unit' + nil).empty().append(`-`);
             $('#arr_qty_now' + nil).empty().append(`-`);
@@ -1416,9 +1417,6 @@
             $('#arr_unit' + nil).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
-            /* $("#arr_warehouse" + nil).append(`
-                <option value="">--Silahkan pilih item--</option>
-            `); */
             $("#rowPrice" + nil).val('0,00');
             $("#rowPriceDelivery" + nil).val('0,00');
             $("#rowPriceTypeBp" + nil).val('0,00');
@@ -1516,37 +1514,7 @@
                         </td>
                     </tr>
                 `);
-                
-               
-                $('#arr_item' + count).select2({
-                    placeholder: '-- Kosong --',
-                    minimumInputLength: 1,
-                    allowClear: true,
-                    cache: true,
-                    width: 'resolve',
-                    dropdownParent: $('body').parent(),
-                    ajax: {
-                        url: '{{ url("admin/select2/sales_item") }}',
-                        type: 'GET',
-                        dataType: 'JSON',
-                        data: function(params) {
-                            return {
-                                search: params.term,
-                                account_id: $('#account_id').val(),
-                                date: $('#post_date').val(),
-                                city: $('#city_id').val(),
-                                district: $('#district_id').val(),
-                                payment_type: $('#payment_type').val(),
-                                transportation_id: $('#transportation_id').val(),
-                            };
-                        },
-                        processResults: function(data) {
-                            return {
-                                results: data.items
-                            }
-                        }
-                    }
-                });
+                select2ServerSide('#arr_item' + count, '{{ url("admin/select2/sales_item") }}');
             }else{
                 swal({
                     title: '!',

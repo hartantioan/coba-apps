@@ -2426,6 +2426,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderController::class, 'show']);
                     Route::post('get_code', [MarketingOrderController::class, 'getCode']);
+                    Route::post('get_sales_item_information', [MarketingOrderController::class, 'getSalesItemInformation']);
                     Route::post('print',[MarketingOrderController::class, 'print']);
                     Route::post('done',[MarketingOrderController::class, 'done'])->middleware('operation.access:sales_order,update');
                     Route::post('print_by_range',[MarketingOrderController::class, 'printByRange']);

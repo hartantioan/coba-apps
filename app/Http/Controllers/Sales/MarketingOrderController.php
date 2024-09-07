@@ -33,12 +33,17 @@ use Illuminate\Http\Request;
 use App\Models\Currency;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\Area;
+use App\Models\CustomerDiscount;
+use App\Models\DeliveryCostStandard;
 use App\Models\Item;
+use App\Models\ItemPricelist;
 use App\Models\ItemUnit;
 use App\Models\User;
 use App\Models\Tax;
 use App\Models\Menu;
 use App\Models\MenuUser;
+use App\Models\StandardCustomerPrice;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -84,11 +89,68 @@ class MarketingOrderController extends Controller
         return view('admin.layouts.index', ['data' => $data]);
     }
 
-   public function getCode(Request $request){
+    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrder::generateCode($request->val);
         				
 		return response()->json($code);
+    }
+
+    public function getSalesItemInformation(Request $request){
+        $item = Item::find($request->item_id);
+        $account_id   = $request->account_id;
+        $date   = $request->date;
+        $city   = $request->city;
+        $district = $request->district;
+        $payment_type   = $request->payment_type;
+        $user = User::find($account_id);
+        $transportation = Transportation::find($request->transportation_id);
+        $cek_price = ItemPricelist::where('group_id',$user->group_id)
+            ->where('item_id',$item->id)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->where('status','1')
+            ->first() ?? 0;
+            
+            $cek_delivery = DeliveryCostStandard::where('transportation_id',$transportation->id)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->where('city_id',$city)
+            ->where('district_id',$district)
+            ->where('status','1')
+            ->first() ?? 0;
+
+            $cek_type = StandardCustomerPrice::where('group_id',$user->group_id)
+            ->whereDate('start_date', '<=', $date)
+            ->whereDate('end_date', '>=', $date)
+            ->where('status','1')
+            ->first() ?? 0;
+
+            $cek_discount = CustomerDiscount::where('account_id',$user->id)
+            ->where('brand_id',$item->brand_id)
+            ->where('city_id',$city)
+            ->where('payment_type',$payment_type)
+            ->where('status','1')
+            ->first() ?? 0;
+
+        
+        $response = [
+            'old_prices'        => $item->oldSalePrices($this->dataplaces),
+            'list_warehouse'    => $item->warehouseList(),
+            'list_outletprice'  => $item->listOutletPrice(),
+            'price'             => $cek_price->price ?? 0,
+            'price_delivery'    => $cek_delivery->price ?? 0,
+            'price_bp'          => $cek_type->price ?? 0,
+            'disc1'             => $cek_discount->disc1 ?? 0,
+            'disc2'             => $cek_discount->disc2 ?? 0,
+            'disc3'             => $cek_discount->disc3 ?? 0,
+            'stock_now'         => CustomHelper::formatConditionalQty($item->getStockArrayPlace($this->dataplaces)),
+            'stock_com'         => CustomHelper::formatConditionalQty($item->getQtySalesNotSent($this->dataplaces)),
+            'sell_units'        => $item->arrSellUnits(),
+            'list_area'         => Area::where('status','1')->get(),
+        ];
+        
+		return response()->json($response);
     }
 
     public function datatable(Request $request){

@@ -6640,12 +6640,23 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				$date = $row->date;
-				
-				/* ResetCogsNew::dispatch($row->date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
+				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
+			}
+
+			foreach($data as $row){
+				$company_id = $row->company_id;
+				$item_id = $row->item_id;
+				$place_id = $row->place_id;
+				$warehouse_id = $row->warehouse_id;
+				$area_id = $row->area_id ? $row->area_id : NULL;
+				$item_shading_id = $row->item_shading_id ? $row->item_shading_id : NULL;
+				$production_batch_id = $row->production_batch_id ? $row->production_batch_id : NULL;
+				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
+				$type = $row->qty_in ? 'IN' : 'OUT';
+				$date = $row->date;
 				$row->delete();
 				ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
 				self::accumulateCogs($date,$company_id,$place_id,$item_id);
-				self::resetStock($place_id,$warehouse_id,$area_id,$item_id,$item_shading_id,$production_batch_id,$qty,$type);
 			}
 		}
 	}

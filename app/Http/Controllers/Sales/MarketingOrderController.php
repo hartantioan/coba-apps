@@ -108,6 +108,7 @@ class MarketingOrderController extends Controller
             'delivery_date',
             'delivery_schedule',
             'payment_type',
+            'dp_type',
             'top_internal',
             'top_customer',
             'billing_address',
@@ -321,6 +322,7 @@ class MarketingOrderController extends Controller
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->deliverySchedule(),
                     $val->paymentType(),
+                    $val->dpType(),
                     $val->top_internal,
                     $val->top_customer,
                     $val->billing_address,
@@ -414,6 +416,7 @@ class MarketingOrderController extends Controller
                 'district_id'               => 'required',
                 'phone'                     => 'required',
                 'payment_type'              => 'required',
+                'dp_type'                   => $request->payment_type == '1' ? 'required' : '',
                 'top_internal'              => 'required',
                 'top_customer'              => 'required',
             
@@ -467,6 +470,7 @@ class MarketingOrderController extends Controller
                 'district_id.required'              => 'Kecamatan tujuan tidak boleh kosong.',
                 'phone.required'                    => 'Telepon customer tidak boleh kosong.',
                 'payment_type.required'             => 'Tipe pembayaran tidak boleh kosong.',
+                'dp_type.required'                  => 'Tipe DP tidak boleh kosong untuk tipe pembayaran DP.',
                 'top_internal.required'             => 'TOP internal tidak boleh kosong.',
                 'top_customer.required'             => 'TOP customer tidak boleh kosong',
                 
@@ -618,6 +622,7 @@ class MarketingOrderController extends Controller
                         $query->delivery_date = $request->delivery_date;
                         $query->delivery_schedule = $request->delivery_schedule;
                         $query->payment_type = $request->payment_type;
+                        $query->dp_type = $request->payment_type == '1' ? $request->dp_type : NULL;
                         $query->top_internal = $request->top_internal;
                         $query->top_customer = $request->top_customer;
                         $query->transportation_id = $request->transportation_id;
@@ -678,6 +683,7 @@ class MarketingOrderController extends Controller
                         'delivery_date'             => $request->delivery_date,
                         'delivery_schedule'         => $request->delivery_schedule,
                         'payment_type'              => $request->payment_type,
+                        'dp_type'                   => $request->payment_type == '1' ? $request->dp_type : NULL,
                         'top_internal'              => $request->top_internal,
                         'top_customer'              => $request->top_customer,
                         'transportation_id'         => $request->transportation_id,

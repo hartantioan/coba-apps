@@ -35,6 +35,7 @@ class MarketingOrder extends Model
         'delivery_schedule',
         'outlet_id',
         'payment_type',
+        'dp_type',
         'top_internal',
         'top_customer',
         'is_guarantee',
@@ -149,6 +150,16 @@ class MarketingOrder extends Model
         };
 
         return $type;
+    }
+
+    public function dpType(){
+        $dp_type = match ($this->dp_type) {
+            '1' => 'Proporsional',
+            '2' => 'FIFO',
+            default => '-',
+        };
+
+        return $dp_type;
     }
 
     public function deliverySchedule(){

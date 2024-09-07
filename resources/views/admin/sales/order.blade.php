@@ -213,6 +213,7 @@
                                                         <th>Tgl.Kirim</th>
                                                         <th>Jadwal Pengiriman</th>
                                                         <th>Tipe Pembayaran</th>
+                                                        <th>Tipe DP</th>
                                                         <th>TOP.Internal</th>
                                                         <th>TOP.Customer</th>
                                                         <th>Alamat Penagihan</th>
@@ -406,12 +407,20 @@
                                 <fieldset>
                                     <legend>3. Pembayaran</legend>
                                     <div class="input-field col m3 s12 step21">
-                                        <select class="form-control" id="payment_type" name="payment_type" onchange="resetTerm()">
+                                        <select class="browser-default" id="payment_type" name="payment_type" onchange="resetTerm()">
                                             <option value="2">Credit</option>
                                             <option value="1">DP</option>
                                         </select>
-                                        <label class="" for="payment_type">Tipe Pembayaran</label>
-                                    </div>                   
+                                        <label class="active" for="payment_type">Tipe Pembayaran</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="dp_type" name="dp_type" disabled>
+                                            <option value="">--Kosong--</option>
+                                            <option value="1">Proporsional</option>
+                                            <option value="2">FIFO</option>
+                                        </select>
+                                        <label class="active" for="dp_type">Tipe DP</label>
+                                    </div>                
                                     <div class="input-field col m3 s12 step22">
                                         <input id="top_internal" name="top_internal" type="number" value="0" min="0" step="1">
                                         <label class="active" for="top_internal">TOP Internal (hari)</label>
@@ -797,7 +806,6 @@
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
-                M.updateTextFields();
                 window.onbeforeunload = function() {
                     if($('.data-used').length > 0){
                         $('.data-used').trigger('click');
@@ -807,6 +815,7 @@
                 if(!$('#temp').val()){
                     loadCurrency();
                 }
+                M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -841,6 +850,7 @@
                     return null;
                 };
                 city = [];
+                resetTerm();
             }
         });
 
@@ -955,9 +965,11 @@
     }
 
     function resetTerm(){
+        $('#dp_type').val('');
         if($('#payment_type').val() == '1'){
             $('#top_internal').val('0');
             $('#top_customer').val('0');
+            $('#dp_type').attr('disabled',false);
         }else{
             if($('#account_id').val()){
                 $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
@@ -966,6 +978,7 @@
                 $('#top_internal').val('0');
                 $('#top_customer').val('0');
             }
+            $('#dp_type').attr('disabled',true);
         }
     }
     function clearDetail(){
@@ -979,12 +992,12 @@
     }
     function getTopCustomer(){
         $('#phone').val('');
-        $('#payment_type').val('2').formSelect().trigger('change');
+        $('#payment_type').val('2').trigger('change');
         if($('#account_id').val()){
             $('#top_internal').val($('#account_id').select2('data')[0].top_internal);
             $('#top_customer').val($('#account_id').select2('data')[0].top_customer);
             if($('#account_id').select2('data')[0].sales_payment_type){
-                $('#payment_type').val($('#account_id').select2('data')[0].sales_payment_type).formSelect();
+                $('#payment_type').val($('#account_id').select2('data')[0].sales_payment_type);
             }
             $('#limit').text($('#account_id').select2('data')[0].deposit);
             var result = new Date($('#post_date').val());
@@ -1733,6 +1746,7 @@
                 { name: 'delivery_date', className: '' },
                 { name: 'delivery_schedule', className: '' },
                 { name: 'payment_type', className: '' },
+                { name: 'dp_type', className: '' },
                 { name: 'top_internal', className: '' },
                 { name: 'top_customer', className: '' },
                 { name: 'billing_address', className: '' },
@@ -2008,6 +2022,7 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                resetTerm();
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
@@ -2071,7 +2086,8 @@
                         `);
                     });
                 }
-                $('#payment_type').val(response.payment_type).formSelect();
+                $('#payment_type').val(response.payment_type).trigger('change');
+                $('#dp_type').val(response.dp_type);
                 $('#top_internal').val(response.top_internal);
                 $('#top_customer').val(response.top_customer);
                 $('#is_guarantee').val(response.is_guarantee).formSelect();
@@ -2670,6 +2686,7 @@
                     success: function(response) {
                         loadingClose('#main');
                         $('#modal1').modal('open');
+                        resetTerm();
                         $('#account_id').empty();
                         $('#account_id').append(`
                             <option value="` + response.account_id + `">` + response.account_name + `</option>
@@ -2727,7 +2744,8 @@
                                 `);
                             });
                         }
-                        $('#payment_type').val(response.payment_type).formSelect();
+                        $('#payment_type').val(response.payment_type).trigger('change');
+                        $('#dp_type').val(response.dp_type);
                         $('#top_internal').val(response.top_internal);
                         $('#top_customer').val(response.top_customer);
                         $('#is_guarantee').val(response.is_guarantee).formSelect();

@@ -291,7 +291,7 @@ class ProductionReceiveController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
-						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="showEdit(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
@@ -314,6 +314,76 @@ class ProductionReceiveController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function saveEdit(Request $request){
+        $validation = Validator::make($request->all(), [
+            'shift_id'                  => 'required',
+            'group'                     => 'required'
+        ], [
+           
+            'shift_id'                          => 'Shift tidak boleh kosong.',
+            'group'                             => 'Grup tidak boleh kosong.',
+           
+        ]);
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+
+         
+            
+            
+            if($request->temp_edit){
+                $query = ProductionReceive::where('code',CustomHelper::decrypt($request->temp))->first();
+
+                $approved = false;
+                $revised = false;
+
+                if(in_array($query->status,['1','2','6'])){
+                    
+
+                    $query->user_id = session('bo_id');
+                    $query->shift_id = $request->shift_id;
+                    $query->group = $request->group;
+                 
+                    $query->note = $request->note;
+                    $query->status = '1';
+
+                    $query->save();
+                    
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Status Production Issue sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+            }
+            
+            if($query) {
+
+                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive No. '.$query->code);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Receive Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
+
+                activity()
+                    ->performedOn(new ProductionReceive())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit receive production.');
+
+                $response = [
+                    'status'    => 200,
+                    'message'   => 'Data successfully saved.',
+                ];
+            } else {
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Data failed to save.'
+                ];
+            }
+        }
     }
 
     public function create(Request $request){

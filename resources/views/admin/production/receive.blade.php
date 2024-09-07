@@ -385,6 +385,53 @@
     </div>
 </div>
 
+<div id="modal_edit" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content" style="overflow:auto !important;">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <form class="row" id="form_data_edit" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <div class="input-field col m3 s12">
+                                        <div id="code_edit"  style="font-size: 2em"></div>
+                                    </div>
+    
+                                    <div class="input-field col m3 s12">
+                                        
+                                        <input type="hidden" id="temp_edit" name="temp_edit">
+                                        <select class="browser-default" id="shift_id_edit" name="shift_id_edit"></select>
+                                        <label class="active" for="shift_id_edit">Shift</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="group_edit" name="group_edit" type="text" placeholder="Grup">
+                                        <label class="active" for="group_edit">Grup</label>
+                                    </div>
+                                  
+                                    <div class="input-field col m3 s12">
+                                        <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                        <label class="active" for="note_edit">{{ __('translations.note') }}</label>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <b id="title-modal" style="position:absolute;left:15px;top:15px;">-</b>
+        <button class="btn waves-effect waves-light mr-1 submit step10" onclick="saveEdit();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">Tutup</a>
+    </div>
+</div>
+
 <div id="modal2" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -682,7 +729,31 @@
         loadDataTable();
 
         window.table.search('{{ $code }}').draw();
-
+        $('#modal_edit').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+                $('#post_date').attr('min','{{ $minDate }}');
+                $('#post_date').attr('max','{{ $maxDate }}');
+                applyStartEndDate();
+            },
+            onOpenEnd: function(modal, trigger) {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                M.updateTextFields();
+                window.onbeforeunload = function() {
+                    return 'You will lose all changes made since your last save';
+                };
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#form_data_edit')[0].reset();
+                $('#shift_id_edit').empty();
+                $('#group_edit').val('');
+                $('#code_edit').empty();
+                $('#temp_edit').val('');
+                M.updateTextFields();
+         
+            }
+        });
         $('#modal_pdo').modal({
             onOpenStart: function(modal,trigger) {
                 $('.collapsible').collapsible({
@@ -940,6 +1011,121 @@
                     });
                 }
                 $('#modal_pdo').modal('close');
+            }
+        });
+    }
+
+    function saveEdit(){
+        var formData = new FormData($('#form_data_edit')[0]);
+        $.ajax({
+            url: '{{ Request::url() }}/save_edit',
+            type: 'POST',
+            dataType: 'JSON',
+            data: formData,
+            contentType: false,
+            processData: false,
+            cache: true,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                $('#validation_alert').hide();
+                $('#validation_alert').html('');
+                loadingOpen('#modal_edit');
+            },
+            success: function(response) {
+                loadingClose('#modal_edit');
+                $('input').css('border', 'none');
+                $('input').css('border-bottom', '0.5px solid black');
+                if(response.status == 200) {
+                    loadDataTable();
+                    $('#modal_edit').modal('close');
+                    M.toast({
+                        html: response.message
+                    });
+                } else if(response.status == 422) {
+                    $('#validation_alert').show();
+                    $('.modal-content').scrollTop(0);
+                    $.each(response.error, function(field, errorMessage) {
+                        $('#' + field).addClass('error-input');
+                        $('#' + field).css('border', '1px solid red');
+                        
+                    });
+                    swal({
+                        title: 'Ups! Validation',
+                        text: 'Check your form.',
+                        icon: 'warning'
+                    });
+
+                    $.each(response.error, function(i, val) {
+                        $.each(val, function(i, val) {
+                            $('#validation_alert').append(`
+                                <div class="card-alert card red">
+                                    <div class="card-content white-text">
+                                        <p>` + val + `</p>
+                                    </div>
+                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">×</span>
+                                    </button>
+                                </div>
+                            `);
+                        });
+                    });
+                } else {
+                    M.toast({
+                        html: response.message
+                    });
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#modal1');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function showEdit(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                $('#modal_edit').modal('open');
+                $('#temp_edit').val(id);
+     
+                $('#code_edit').append(response.code);
+                $('#shift_id_edit').empty().append(`
+                    <option value="` + response.shift_id + `">` + response.shift_name + `</option>
+                `);
+                $('#group_edit').val(response.group);
+                $('#note_edit').val(response.note);
+
+                M.updateTextFields();
+                $('.modal-content').scrollTop(0);
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
             }
         });
     }

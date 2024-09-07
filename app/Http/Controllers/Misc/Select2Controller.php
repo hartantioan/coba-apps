@@ -917,9 +917,9 @@ class Select2Controller extends Controller {
                 })
                 ->whereDoesntHave('fgGroup')->get();
         $user = User::find($account_id);
-        $transportation = Transportation::find($request->transportation_id);
+        /* $transportation = Transportation::find($request->transportation_id); */
         foreach($data as $d) {
-            $cek_price = ItemPricelist::where('group_id',$user->group_id)
+            /* $cek_price = ItemPricelist::where('group_id',$user->group_id)
             ->where('item_id',$d->id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
@@ -945,7 +945,7 @@ class Select2Controller extends Controller {
             ->where('city_id',$city)
             ->where('payment_type',$payment_type)
             ->where('status','1')
-            ->first() ?? 0;
+            ->first() ?? 0; */
             
             $response[] = [
                 'id'   			    => $d->id,
@@ -958,12 +958,12 @@ class Select2Controller extends Controller {
                 'list_outletprice'  => $d->listOutletPrice(),
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
-                'price'             => $cek_price->price ?? 0,
-                'price_delivery'    => $cek_delivery->price ?? 0,
-                'price_bp'          => $cek_type->price ?? 0,
-                'disc1'             => $cek_discount->disc1 ?? 0,
-                'disc2'             => $cek_discount->disc2 ?? 0,
-                'disc3'             => $cek_discount->disc3 ?? 0,
+                'price'             => 0,
+                'price_delivery'    => 0,
+                'price_bp'          => 0,
+                'disc1'             => 0,
+                'disc2'             => 0,
+                'disc3'             => 0,
                 'stock_now'         => CustomHelper::formatConditionalQty($d->getStockArrayPlace($this->dataplaces)),
                 'stock_com'         => CustomHelper::formatConditionalQty($d->getQtySalesNotSent($this->dataplaces)),
             ];

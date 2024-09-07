@@ -262,7 +262,6 @@ class ProductionIssueController extends Controller
                     $query->group = $request->group;
                  
                     $query->note = $request->note;
-                    $query->status = '1';
 
                     $query->save();
                     
@@ -276,7 +275,7 @@ class ProductionIssueController extends Controller
             
             if($query) {
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                /* CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code); */
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
 
                 activity()

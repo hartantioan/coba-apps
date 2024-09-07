@@ -350,7 +350,6 @@ class ProductionReceiveController extends Controller
                     $query->group = $request->group;
                  
                     $query->note = $request->note;
-                    $query->status = '1';
 
                     $query->save();
                     
@@ -364,7 +363,7 @@ class ProductionReceiveController extends Controller
             
             if($query) {
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive No. '.$query->code);
+                /* CustomHelper::sendApproval($query->getTable(),$query->id,'Production Receive No. '.$query->code); */
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Receive Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code,session('bo_id'));
 
                 activity()

@@ -437,6 +437,23 @@
     </div>
 </div>
 
+<div id="modal3" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12" id="show_structure">
+                <div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;">
+
+                </div>
+                <div id="visualisation">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div id="modal4" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -474,6 +491,21 @@
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
+            }
+        });
+
+        $('#modal3').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#myDiagramDiv').remove();
+                $('#show_structure').append(
+                    `<div id="myDiagramDiv" style="border: 1px solid black; width: 100%; height: 600px; position: relative; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); cursor: auto;"></div>
+                    `
+                );
             }
         });
 
@@ -1492,6 +1524,163 @@
                             icon: 'error'
                         });
                     }
+                });
+            }
+        });
+    }
+
+    function makeTreeOrg(data,link){
+        var $ = go.GraphObject.make;
+
+        myDiagram =
+        $(go.Diagram, "myDiagramDiv",
+        {
+            initialContentAlignment: go.Spot.Center,
+            "undoManager.isEnabled": true,
+            layout: $(go.TreeLayout,
+            { 
+                angle: 180,
+                path: go.TreeLayout.PathSource,  
+                setsPortSpot: false, 
+                setsChildPortSpot: false,  
+                arrangement: go.TreeLayout.ArrangementHorizontal
+            })
+        });
+        $("PanelExpanderButton", "METHODS",
+            { row: 2, column: 1, alignment: go.Spot.TopRight },
+            {
+                visible: true,
+                click: function(e, obj) {
+                    var node = obj.part.parent;
+                    var diagram = node.diagram;
+                    var data = node.data;
+                    diagram.startTransaction("Collapse/Expand Methods");
+                    diagram.model.setDataProperty(data, "isTreeExpanded", !data.isTreeExpanded);
+                    diagram.commitTransaction("Collapse/Expand Methods");
+                }
+            },
+            new go.Binding("visible", "methods", function(arr) { return arr.length > 0; })
+        );
+        myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
+            var part = e.subject.part;
+            if (part instanceof go.Link) {
+                
+                
+            } else if (part instanceof go.Node) {
+                window.open(part.data.url);
+                if (part.isTreeExpanded) {
+                    part.collapseTree();
+                } else {
+                    part.expandTree();
+                }
+              
+            }
+        });
+        myDiagram.nodeTemplate =
+        $(go.Node, "Auto",
+            {
+            locationSpot: go.Spot.Center,
+            fromSpot: go.Spot.AllSides,
+            toSpot: go.Spot.AllSides,
+            portId: "",  
+
+            },
+            { isTreeExpanded: false },  
+            $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
+            new go.Binding("fill", "color")),
+            $(go.Panel, "Table",
+            { defaultRowSeparatorStroke: "black" },
+            $(go.TextBlock,
+                {
+                row: 0, columnSpan: 2, margin: 3, alignment: go.Spot.Center,
+                font: "bold 12pt sans-serif",
+                isMultiline: false, editable: true
+                },
+                new go.Binding("text", "name").makeTwoWay()
+            ),
+            $(go.TextBlock, "Properties",
+                { row: 1, font: "italic 10pt sans-serif" },
+                new go.Binding("visible", "visible", function(v) { return !v; }).ofObject("PROPERTIES")
+            ),
+            $(go.Panel, "Vertical", { name: "PROPERTIES" },
+                new go.Binding("itemArray", "properties"),
+                {
+                row: 1, margin: 3, stretch: go.GraphObject.Fill,
+                defaultAlignment: go.Spot.Left,
+                }
+            ),
+            
+            $(go.Panel, "Auto",
+                { portId: "r" },
+                { margin: 6 },
+                $(go.Shape, "Circle", { fill: "transparent", stroke: null, desiredSize: new go.Size(8, 8) })
+            ),
+            ),
+
+            $("TreeExpanderButton",
+            { alignment: go.Spot.Right, alignmentFocus: go.Spot.Right, width: 14, height: 14 }
+            )
+        );
+        myDiagram.model.root = data[0].key;
+   
+
+        myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
+        setTimeout(function() {
+
+            var rootKey = data[0].key; 
+            var rootNode = myDiagram.findNodeForKey(rootKey);
+            if (rootNode !== null) {
+                rootNode.collapseTree();
+            }
+        }, 100); 
+        });
+
+        myDiagram.layout = $(go.TreeLayout);
+
+        myDiagram.addDiagramListener("InitialLayoutCompleted", e => {
+           e.diagram.findTreeRoots().each(r => r.expandTree(3));
+            e.diagram.nodes.each(node => {
+                node.findTreeChildrenNodes().each(child => child.expandTree(10));
+            });
+        });
+
+        myDiagram.model = $(go.GraphLinksModel,
+        {
+            copiesArrays: true,
+            copiesArrayObjects: true,
+            nodeDataArray: data,
+            linkDataArray: link
+        });
+            
+            
+    }
+
+    function viewStructureTree(id){
+        $.ajax({
+            url: '{{ Request::url() }}/viewstructuretree',
+            type: 'GET',
+            dataType: 'JSON',
+            data: { 
+                id : id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+            
+                makeTreeOrg(response.message,response.link);
+                
+                $('#modal3').modal('open');
+            },
+            error: function() {
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
                 });
             }
         });

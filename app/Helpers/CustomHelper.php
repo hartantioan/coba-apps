@@ -1483,7 +1483,7 @@ class CustomHelper {
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
-							'account_id'	=> $row->coa->bp_journal ? $pr->account_id : NULL,
+							'account_id'	=> $pr->account_id,
 							'line_id'		=> $row->line_id ? $row->line_id : NULL,
 							'machine_id'	=> $row->machine_id ? $row->machine_id : NULL,
 							'place_id'		=> $row->place_id ? $row->place_id : NULL,

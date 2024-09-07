@@ -2258,6 +2258,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[ProductionIssueController::class, 'datatable']);
                     Route::get('row_detail',[ProductionIssueController::class, 'rowDetail']);
                     Route::post('show', [ProductionIssueController::class, 'show']);
+                    Route::post('save_edit',[ProductionIssueController::class, 'saveEdit'])->middleware('operation.access:production_issue,update');
                     Route::post('get_code', [ProductionIssueController::class, 'getCode']);
                     Route::post('get_account_data', [ProductionIssueController::class, 'getAccountData']);
                     Route::post('print',[ProductionIssueController::class, 'print']);
@@ -2280,6 +2281,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable',[ProductionReceiveController::class, 'datatable']);
                     Route::get('row_detail',[ProductionReceiveController::class, 'rowDetail']);
                     Route::post('show', [ProductionReceiveController::class, 'show']);
+                    Route::post('save_edit',[ProductionReceiveController::class, 'saveEdit'])->middleware('operation.access:production_issue,update');
                     Route::post('get_code', [ProductionReceiveController::class, 'getCode']);
                     Route::post('get_batch_code', [ProductionReceiveController::class, 'getBatchCode']);
                     Route::post('get_account_data', [ProductionReceiveController::class, 'getAccountData']);

@@ -894,7 +894,8 @@ class PaymentRequestController extends Controller
     }
 
     public function create(Request $request){
-        
+        DB::beginTransaction();
+        try {
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
@@ -988,264 +989,243 @@ class PaymentRequestController extends Controller
             }
             
 			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = PaymentRequest::where('code',CustomHelper::decrypt($request->temp))->first();
+                
+                $query = PaymentRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    /* $approved = false;
-                    $revised = false;
+                /* $approved = false;
+                $revised = false;
 
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
+                if($query->approval()){
+                    foreach ($query->approval() as $detail){
+                        foreach($detail->approvalMatrix as $row){
+                            if($row->approved){
+                                $approved = true;
+                            }
 
-                                if($row->revised){
-                                    $revised = true;
-                                }
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
+                }
 
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Payment Request telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    } */
+                if($approved && !$revised){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Payment Request telah diapprove, anda tidak bisa melakukan perubahan.'
+                    ]);
+                } */
 
-                    if($query->hasChildDocument()){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Payment Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
-                        ]);
+                if($query->hasChildDocument()){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Payment Request telah dipakai pada dokumen lain, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+
+                // if(!CustomHelper::checkLockAcc($request->post_date)){
+                //     return response()->json([
+                //         'status'  => 500,
+                //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                //     ]);
+                // }
+
+                if(in_array($query->status,['1','2','3','6'])){
+
+                    if($request->has('document')) {
+                        if($query->document){
+                            if(Storage::exists($query->document)){
+                                Storage::delete($query->document);
+                            }
+                        }
+                        $document = $request->file('document')->store('public/payment_requests');
+                    } else {
+                        $document = $query->document;
                     }
 
-                    // if(!CustomHelper::checkLockAcc($request->post_date)){
-                    //     return response()->json([
-                    //         'status'  => 500,
-                    //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                    //     ]);
-                    // }
+                    $query->code = $request->code;
+                    $query->user_id = session('bo_id');
+                    $query->account_id = $request->account_id;
+                    $query->company_id = $request->company_id;
+                    $query->coa_source_id = $request->coa_source_id ? $request->coa_source_id : NULL;
+                    $query->payment_type = $request->payment_type;
+                    $query->payment_no = $request->payment_no ? $request->payment_no : NULL;
+                    $query->post_date = $request->post_date;
+                    $query->pay_date = $request->pay_date ? $request->pay_date : NULL;
+                    $query->currency_id = $request->currency_id;
+                    $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                    $query->cost_distribution_id = $request->cost_distribution_id ? $request->cost_distribution_id : NULL;
+                    $query->total = str_replace(',','.',str_replace('.','',$request->total));
+                    $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
+                    $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
+                    $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                    $query->payment = str_replace(',','.',str_replace('.','',$request->payment));
+                    $query->balance = str_replace(',','.',str_replace('.','',$request->balance));
+                    $query->document = $document;
+                    $query->account_bank = $request->account_bank;
+                    $query->account_no = $request->account_no;
+                    $query->account_name = $request->account_name;
+                    $query->note = $request->note;
+                    $query->status = '1';
+                    $query->is_reimburse = $request->is_reimburse;
 
-                    if(in_array($query->status,['1','2','3','6'])){
+                    $query->save();
 
-                        if($request->has('document')) {
-                            if($query->document){
-                                if(Storage::exists($query->document)){
-                                    Storage::delete($query->document);
-                                }
-                            }
-                            $document = $request->file('document')->store('public/payment_requests');
-                        } else {
-                            $document = $query->document;
-                        }
-
-                        $query->code = $request->code;
-                        $query->user_id = session('bo_id');
-                        $query->account_id = $request->account_id;
-                        $query->company_id = $request->company_id;
-                        $query->coa_source_id = $request->coa_source_id ? $request->coa_source_id : NULL;
-                        $query->payment_type = $request->payment_type;
-                        $query->payment_no = $request->payment_no ? $request->payment_no : NULL;
-                        $query->post_date = $request->post_date;
-                        $query->pay_date = $request->pay_date ? $request->pay_date : NULL;
-                        $query->currency_id = $request->currency_id;
-                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
-                        $query->cost_distribution_id = $request->cost_distribution_id ? $request->cost_distribution_id : NULL;
-                        $query->total = str_replace(',','.',str_replace('.','',$request->total));
-                        $query->rounding = str_replace(',','.',str_replace('.','',$request->rounding));
-                        $query->admin = str_replace(',','.',str_replace('.','',$request->admin));
-                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-                        $query->payment = str_replace(',','.',str_replace('.','',$request->payment));
-                        $query->balance = str_replace(',','.',str_replace('.','',$request->balance));
-                        $query->document = $document;
-                        $query->account_bank = $request->account_bank;
-                        $query->account_no = $request->account_no;
-                        $query->account_name = $request->account_name;
-                        $query->note = $request->note;
-                        $query->status = '1';
-                        $query->is_reimburse = $request->is_reimburse;
-
-                        $query->save();
-
-                        foreach($query->paymentRequestDetail as $row){
-                            if($row->lookable_type == 'purchase_down_payments'){
-                                foreach($row->lookable->purchaseDownPaymentDetail as $rowapdp){
-                                    if($rowapdp->fundRequestDetail()->exists()){
-                                        if($rowapdp->fundRequestDetail->fundRequest->status == '7'){
-                                            CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'2');
-                                        }
-                                    }
-                                }
-                            }elseif($row->lookable_type == 'purchase_invoices'){
-                                foreach($row->lookable->purchaseInvoiceDetail as $rowapin){
-                                    if($rowapin->fundRequestDetail()->exists()){
-                                        if($rowapin->fundRequestDetail->fundRequest->status == '7'){
-                                            CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'2');
-                                        }
+                    foreach($query->paymentRequestDetail as $row){
+                        if($row->lookable_type == 'purchase_down_payments'){
+                            foreach($row->lookable->purchaseDownPaymentDetail as $rowapdp){
+                                if($rowapdp->fundRequestDetail()->exists()){
+                                    if($rowapdp->fundRequestDetail->fundRequest->status == '7'){
+                                        CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'2');
                                     }
                                 }
                             }
-                            if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
-                                if($row->lookable->status == '7'){
-                                    CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                        }elseif($row->lookable_type == 'purchase_invoices'){
+                            foreach($row->lookable->purchaseInvoiceDetail as $rowapin){
+                                if($rowapin->fundRequestDetail()->exists()){
+                                    if($rowapin->fundRequestDetail->fundRequest->status == '7'){
+                                        CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'2');
+                                    }
                                 }
                             }
-                            $row->delete();
                         }
-                        
-                        $query->paymentRequestCross()->delete();
-                        $query->paymentRequestCost()->delete();
-
-                        DB::commit();
-                    }else{
-                        return response()->json([
-                            'status'  => 500,
-					        'message' => 'Status Payment Request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
-                        ]);
+                        if(in_array($row->lookable_type,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                            if($row->lookable->status == '7'){
+                                CustomHelper::updateStatus($row->lookable_type,$row->lookable_id,'2');
+                            }
+                        }
+                        $row->delete();
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
+                    
+                    $query->paymentRequestCross()->delete();
+                    $query->paymentRequestCost()->delete();
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Status Payment Request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                    ]);
                 }
 			}else{
-                DB::beginTransaction();
-                try {
-                    $lastSegment = $request->lastsegment;
-                    $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=PaymentRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
-                    $query = PaymentRequest::create([
-                        'code'			            => $newCode,
-                        'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
-                        'company_id'                => $request->company_id,
-                        'coa_source_id'             => $request->coa_source_id,
-                        'payment_type'              => $request->payment_type,
-                        'payment_no'                => $request->payment_no,
-                        'post_date'                 => $request->post_date,
-                        'pay_date'                  => $request->pay_date,
-                        'currency_id'               => $request->currency_id,
-                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
-                        'cost_distribution_id'      => $request->cost_distribution_id ? $request->cost_distribution_id : NULL,
-                        'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
-                        'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
-                        'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
-                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
-                        'payment'                   => str_replace(',','.',str_replace('.','',$request->payment)),
-                        'balance'                   => str_replace(',','.',str_replace('.','',$request->balance)),
-                        'document'                  => $request->file('document') ? $request->file('document')->store('public/payment_requests') : NULL,
-                        'account_bank'              => $request->account_bank,
-                        'account_no'                => $request->account_no,
-                        'account_name'              => $request->account_name,
-                        'note'                      => $request->note,
-                        'status'                    => '1',
-                        'is_reimburse'              => $request->is_reimburse,
-                    ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=PaymentRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                
+                $query = PaymentRequest::create([
+                    'code'			            => $newCode,
+                    'user_id'		            => session('bo_id'),
+                    'account_id'                => $request->account_id,
+                    'company_id'                => $request->company_id,
+                    'coa_source_id'             => $request->coa_source_id,
+                    'payment_type'              => $request->payment_type,
+                    'payment_no'                => $request->payment_no,
+                    'post_date'                 => $request->post_date,
+                    'pay_date'                  => $request->pay_date,
+                    'currency_id'               => $request->currency_id,
+                    'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                    'cost_distribution_id'      => $request->cost_distribution_id ? $request->cost_distribution_id : NULL,
+                    'total'                     => str_replace(',','.',str_replace('.','',$request->total)),
+                    'rounding'                  => str_replace(',','.',str_replace('.','',$request->rounding)),
+                    'admin'                     => str_replace(',','.',str_replace('.','',$request->admin)),
+                    'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                    'payment'                   => str_replace(',','.',str_replace('.','',$request->payment)),
+                    'balance'                   => str_replace(',','.',str_replace('.','',$request->balance)),
+                    'document'                  => $request->file('document') ? $request->file('document')->store('public/payment_requests') : NULL,
+                    'account_bank'              => $request->account_bank,
+                    'account_no'                => $request->account_no,
+                    'account_name'              => $request->account_name,
+                    'note'                      => $request->note,
+                    'status'                    => '1',
+                    'is_reimburse'              => $request->is_reimburse,
+                ]);
 			}
 			
 			if($query) {
-                /* DB::beginTransaction();
-                try { */
+                if($request->arr_coa_cost){
+                    foreach($request->arr_coa_cost as $key => $row){
+                        PaymentRequestCost::create([
+                            'payment_request_id'            => $query->id,
+                            'cost_distribution_id'          => $request->arr_cost_distribution_cost[$key] ? intval($request->arr_cost_distribution_cost[$key]) : NULL,
+                            'coa_id'                        => intval($row),
+                            'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
+                            'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
+                            'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
+                            'department_id'                 => $request->arr_division[$key] ? $request->arr_division[$key] : NULL,
+                            'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
+                            'nominal_debit'                 => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
+                            'nominal_credit'                => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
+                            'nominal_debit_fc'              => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
+                            'nominal_credit_fc'             => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
+                            'note'                          => $request->arr_note_cost[$key],
+                            'note2'                         => $request->arr_note_cost2[$key],
+                        ]);
+                    }
+                }
+                
+                if($request->arr_type){
+                    foreach($request->arr_type as $key => $row){
+                        $code = CustomHelper::decrypt($request->arr_code[$key]);
 
-                    if($request->arr_coa_cost){
-                        foreach($request->arr_coa_cost as $key => $row){
-                            PaymentRequestCost::create([
-                                'payment_request_id'            => $query->id,
-                                'cost_distribution_id'          => $request->arr_cost_distribution_cost[$key] ? intval($request->arr_cost_distribution_cost[$key]) : NULL,
-                                'coa_id'                        => intval($row),
-                                'place_id'                      => $request->arr_place[$key] ? $request->arr_place[$key] : NULL,
-                                'line_id'                       => $request->arr_line[$key] ? $request->arr_line[$key] : NULL,
-                                'machine_id'                    => $request->arr_machine[$key] ? $request->arr_machine[$key] : NULL,
-                                'department_id'                 => $request->arr_division[$key] ? $request->arr_division[$key] : NULL,
-                                'project_id'                    => $request->arr_project[$key] ? $request->arr_project[$key] : NULL,
-                                'nominal_debit'                 => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit[$key])),
-                                'nominal_credit'                => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit[$key])),
-                                'nominal_debit_fc'              => str_replace(',','.',str_replace('.','',$request->arr_nominal_debit_fc[$key])),
-                                'nominal_credit_fc'             => str_replace(',','.',str_replace('.','',$request->arr_nominal_credit_fc[$key])),
-                                'note'                          => $request->arr_note_cost[$key],
-                                'note2'                         => $request->arr_note_cost2[$key],
-                            ]);
+                        if($row == 'fund_requests'){
+                            $idDetail = FundRequest::find($request->arr_id[$key])->id;
+                        }elseif($row == 'purchase_down_payments'){
+                            $apdp = PurchaseDownPayment::find($request->arr_id[$key]);
+                            $idDetail = $apdp->id;
+                            foreach($apdp->purchaseDownPaymentDetail as $rowapdp){
+                                if($rowapdp->fundRequestDetail()->exists()){
+                                    CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'7');
+                                }
+                            }
+                        }elseif($row == 'purchase_invoices'){
+                            $apin = PurchaseInvoice::find($request->arr_id[$key]);
+                            $idDetail = $apin->id;
+                            foreach($apin->purchaseInvoiceDetail as $rowapin){
+                                if($rowapin->fundRequestDetail()->exists()){
+                                    CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'7');
+                                }
+                            }
+                        }elseif($row == 'marketing_order_memos'){
+                            $idDetail = MarketingOrderMemo::find($request->arr_id[$key])->id;
+                        }
+                        
+                        $prd = PaymentRequestDetail::create([
+                            'payment_request_id'            => $query->id,
+                            'lookable_type'                 => $row,
+                            'lookable_id'                   => $idDetail,
+                            'coa_id'                        => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
+                            'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
+                            'note'                          => $request->arr_note[$key],
+                        ]);
+
+                        if(in_array($row,['purchase_invoices','purchase_down_payments','fund_requests'])){
+                            CustomHelper::updateStatus($row,$request->arr_id[$key],'7');
                         }
                     }
+                }
+
+                if($request->arr_cd_payment){
+                    foreach($request->arr_cd_payment as $key => $row){
+                        $prc = PaymentRequestCross::create([
+                            'payment_request_id'            => $query->id,
+                            'lookable_type'                 => 'outgoing_payments',
+                            'lookable_id'                   => intval($row),
+                            'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_payment[$key])),
+                        ]);
+                        if($prc->lookable_type == 'outgoing_payments'){
+                            $op = $prc->lookable;
+                            if($op->balancePaymentCross() <= 0){
+                                foreach($op->paymentRequest->paymentRequestDetail as $rowdetail){
+                                    if($rowdetail->lookable_type == 'fund_requests'){
+                                        $rowdetail->lookable->update([
+                                            'balance_status'	=> '1'
+                                        ]);
+                                    }
+                                }
+                            }
+                            CustomHelper::removeCountLimitCredit($op->account_id,$prc->nominal);
+                        }
+                    }
+                }
                     
-                    if($request->arr_type){
-                        foreach($request->arr_type as $key => $row){
-                            $code = CustomHelper::decrypt($request->arr_code[$key]);
-
-                            if($row == 'fund_requests'){
-                                $idDetail = FundRequest::find($request->arr_id[$key])->id;
-                            }elseif($row == 'purchase_down_payments'){
-                                $apdp = PurchaseDownPayment::find($request->arr_id[$key]);
-                                $idDetail = $apdp->id;
-                                foreach($apdp->purchaseDownPaymentDetail as $rowapdp){
-                                    if($rowapdp->fundRequestDetail()->exists()){
-                                        CustomHelper::updateStatus($rowapdp->fundRequestDetail->fundRequest->getTable(),$rowapdp->fundRequestDetail->fund_request_id,'7');
-                                    }
-                                }
-                            }elseif($row == 'purchase_invoices'){
-                                $apin = PurchaseInvoice::find($request->arr_id[$key]);
-                                $idDetail = $apin->id;
-                                foreach($apin->purchaseInvoiceDetail as $rowapin){
-                                    if($rowapin->fundRequestDetail()->exists()){
-                                        CustomHelper::updateStatus($rowapin->fundRequestDetail->fundRequest->getTable(),$rowapin->fundRequestDetail->fund_request_id,'7');
-                                    }
-                                }
-                            }elseif($row == 'marketing_order_memos'){
-                                $idDetail = MarketingOrderMemo::find($request->arr_id[$key])->id;
-                            }
-                            
-                            $prd = PaymentRequestDetail::create([
-                                'payment_request_id'            => $query->id,
-                                'lookable_type'                 => $row,
-                                'lookable_id'                   => $idDetail,
-                                'coa_id'                        => $request->arr_coa[$key] ? $request->arr_coa[$key] : NULL,
-                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_pay[$key])),
-                                'note'                          => $request->arr_note[$key],
-                            ]);
-
-                            if(in_array($row,['purchase_invoices','purchase_down_payments','fund_requests'])){
-                                CustomHelper::updateStatus($row,$request->arr_id[$key],'7');
-                            }
-                        }
-                    }
-
-                    if($request->arr_cd_payment){
-                        foreach($request->arr_cd_payment as $key => $row){
-                            $prc = PaymentRequestCross::create([
-                                'payment_request_id'            => $query->id,
-                                'lookable_type'                 => 'outgoing_payments',
-                                'lookable_id'                   => intval($row),
-                                'nominal'                       => str_replace(',','.',str_replace('.','',$request->arr_payment[$key])),
-                            ]);
-                            if($prc->lookable_type == 'outgoing_payments'){
-                                $op = $prc->lookable;
-                                if($op->balancePaymentCross() <= 0){
-                                    foreach($op->paymentRequest->paymentRequestDetail as $rowdetail){
-                                        if($rowdetail->lookable_type == 'fund_requests'){
-                                            $rowdetail->lookable->update([
-                                                'balance_status'	=> '1'
-                                            ]);
-                                        }
-                                    }
-                                }
-                                CustomHelper::removeCountLimitCredit($op->account_id,$prc->nominal);
-                            }
-                        }
-                    }
-
-                    /* DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                } */
-
                 CustomHelper::sendApproval('payment_requests',$query->id,$query->note);
                 CustomHelper::sendNotification('payment_requests',$query->id,'Payment Request No. '.$query->code,$query->note,session('bo_id'));
 
@@ -1267,6 +1247,10 @@ class PaymentRequestController extends Controller
 			}
 		}
 		
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 		return response()->json($response);
     }
 

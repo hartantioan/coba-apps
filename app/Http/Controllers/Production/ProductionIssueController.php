@@ -230,12 +230,12 @@ class ProductionIssueController extends Controller
 
     public function saveEdit(Request $request){
         $validation = Validator::make($request->all(), [
-            'shift_id'                  => 'required',
-            'group'                     => 'required'
+            'shift_id_edit'                  => 'required',
+            'group_edit'                     => 'required'
         ], [
            
-            'shift_id'                          => 'Shift tidak boleh kosong.',
-            'group'                             => 'Grup tidak boleh kosong.',
+            'shift_id_edit'                          => 'Shift tidak boleh kosong.',
+            'group_edit'                             => 'Grup tidak boleh kosong.',
            
         ]);
         if($validation->fails()) {
@@ -245,32 +245,24 @@ class ProductionIssueController extends Controller
             ];
         } else {
 
-         
-            
-            
-            if($request->temp_edit){
-                $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp))->first();
 
+            if($request->temp_edit){
+          
+                $query = ProductionIssue::where('code',CustomHelper::decrypt($request->temp_edit))->first();
+             
                 $approved = false;
                 $revised = false;
 
-                if(in_array($query->status,['1','2','6'])){
-                    
+                
 
                     $query->user_id = session('bo_id');
-                    $query->shift_id = $request->shift_id;
-                    $query->group = $request->group;
+                    $query->shift_id = $request->shift_id_edit;
+                    $query->group = $request->group_edit;
                  
-                    $query->note = $request->note;
+                    $query->note = $request->note_edit;
 
                     $query->save();
-                    
-                }else{
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Status Production Issue sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
-                    ]);
-                }
+
             }
             
             if($query) {
@@ -295,6 +287,7 @@ class ProductionIssueController extends Controller
                 ];
             }
         }
+        return response()->json($response);
     }
 
     public function create(Request $request){

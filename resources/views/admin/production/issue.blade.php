@@ -363,13 +363,52 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m2 s12 step1">
+                                        <input type="hidden" id="temp_edit" name="temp_edit">
+                                        <input id="code_edit" name="code" type="text" value="{{ $newcode }}" readonly>
+                                        <label class="active" for="code_edit">No. Dokumen </label>
+                                    </div>
+                                    <div class="input-field col m1 s12 step2">
+                                        <select class="form-control" id="code_place_id_edit" name="code_place_id" onchange="getCode(this.value);" readonly>
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="code_place_id_edit">Tempat Kode </label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <select class="form-control" id="company_id_edit" name="company_id" readonly>
+                                            @foreach ($company as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="company_id_edit">{{ __('translations.company') }} </label>
+                                    </div>
                                     <div class="input-field col m3 s12">
-                                        <div id="code_edit"  style="font-size: 2em"></div>
+                                        <select class="form-control" id="place_id_edit" name="place_id" readonly>
+                                            @foreach ($place as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="place_id_edit">{{ __('translations.plant') }} </label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id_edit" name="line_id">
+                                            @foreach ($line as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id_edit">{{ __('translations.line') }} </label>
+                                    </div>
+                                    <div class="input-field col m2 s12">
+                                        <select class="browser-default" id="production_order_detail_id_edit" name="production_order_detail_id" onclick="redefinition()" onchange="getProductionOrder();" readonly></select>
+                                        <label class="active" for="production_order_detail_id_edit">Daftar Order Produksi </label>
                                     </div>
     
                                     <div class="input-field col m3 s12">
                                         
-                                        <input type="hidden" id="temp_edit" name="temp_edit">
                                         <select class="browser-default" id="shift_id_edit" name="shift_id_edit"></select>
                                         <label class="active" for="shift_id_edit">Shift</label>
                                     </div>
@@ -377,6 +416,20 @@
                                         <input id="group_edit" name="group_edit" type="text" placeholder="Grup">
                                         <label class="active" for="group_edit">Grup</label>
                                     </div>
+
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="post_date_edit" name="post_date" min="{{ $minDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();" readonly>
+                                        <label class="active" for="post_date_edit">Tgl. Post </label>
+                                    </div>
+                                    <div class="col m12 s12 "></div>
+                                    {{-- <div class="input-field col m3 s12 step4">
+                                        <input id="start_process_time_edit" name="start_process_time" type="datetime-local" placeholder="Tgl. Mulai Produksi">
+                                        <label class="active" for="start_process_time_edit">Tgl. Mulai Produksi </label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="end_process_time_edit" name="end_process_time" type="datetime-local" placeholder="Tgl. Selesai Produksi">
+                                        <label class="active" for="end_process_time_edit">Tgl. Selesai Produksi </label>
+                                    </div> --}}
                                   
                                     <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
@@ -384,6 +437,76 @@
                                     </div>
                                 </fieldset>
                             </div>
+                        </div>
+                        <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>2. Target Produksi</legend>
+                                    <div class="col m12">
+                                        <div class="row">
+                                            <div class="col m4 s12">
+                                                Line : <b id="output-line_edit">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Target Item SFG/FG : <b id="output-fg_edit">-</b>
+                                            </div>
+                                            <div class="col m4 s12">
+                                                Qty : <b id="output-qty_edit">-</b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 step9">
+                            <fieldset style="min-width: 100%;">
+                                <legend>3. Detail Item Issue</legend>
+                                <div class="col m12 s12">
+                                    <div class="card-alert card gradient-45deg-purple-amber">
+                                        <div class="card-content white-text">
+                                            <p>Info : Item/Resource akan diambil otomatis dari BOM item Production Order. Anda tetap bisa menambahkan manual item/resource malalui tombol yang disediakan.</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-alert card gradient-45deg-deep-orange-orange">
+                                        <div class="card-content white-text">
+                                            <p>Info : Nominal item adalah 0. Karena harga didapatkan dari rata-rata cogs item terbaru ketika disimpan.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col s12" style="overflow:auto;min-width:100%;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="border: 1px solid;width:1500px !important;" id="table-detail-item-issue_edit">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">{{ __('translations.no') }}.</th>
+                                                        <th class="center">Item/Resource</th>
+                                                        <th class="center">Qty Planned</th>
+                                                        <th class="center" width="150px">Persen (%)</th>
+                                                        <th class="center">Qty Real</th>
+                                                        <th class="center">Satuan Produksi</th>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center">{{ __('translations.delete') }}</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item-issue_edit">
+                                                    <tr id="last-row-item-issue_edit">
+                                                        
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="9">
+                                                            
+                                                        </th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
                     </div>
                 </form>
@@ -882,6 +1005,22 @@
                 $('#group_edit').val('');
                 $('#code_edit').empty();
                 $('#temp_edit').val('');
+
+
+                $('#body-item-issue_edit').empty().append(`
+                    <tr id="last-row-item-issue">
+                        <td class="center-align" colspan="9">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
+                $('#body-item-receive_edit').empty().append(`
+                    <tr id="last-row-item-receive">
+                        <td colspan="11">
+                            Silahkan tambahkan Order Produksi untuk memulai...
+                        </td>
+                    </tr>
+                `);
                 M.updateTextFields();
          
             }
@@ -890,7 +1029,7 @@
         select2ServerSide('#production_order_detail_id', '{{ url("admin/select2/production_order_detail") }}');
 
         select2ServerSide('#shift_id', '{{ url("admin/select2/shift_production") }}');
-
+        select2ServerSide('#shift_id_edit', '{{ url("admin/select2/shift_production") }}');
         $('#body-item-issue').on('click', '.delete-data-item-issue', function() {
             let id = $(this).data('id');
             $('.row_item_batch[data-code="' + id + '"]').remove();
@@ -2339,6 +2478,172 @@
                 `);
                 $('#group_edit').val(response.group);
                 $('#note_edit').val(response.note);
+
+                $('#code_place_id_edit').val(response.code_place_id).formSelect();
+                $('#code_edit').val(response.code);
+                $('#post_date_edit').val(response.post_date);
+                $('#place_id_edit').val(response.place_id).formSelect();
+                $('#line_id_edit').val(response.line_id).formSelect();
+                
+                $('#company_id_edit').val(response.company_id).formSelect();
+                $('#start_process_time_edit').val(response.start_process_time);
+                $('#end_process_time_edit').val(response.end_process_time);
+                $('#note_edit').val(response.note);
+                $('#production_order_detail_id_edit').empty().append(`
+                    <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
+                `);
+
+                $('#output-line_edit').empty().text(response.line_code);
+                $('#output-fg_edit').empty().text(response.target_item);
+                $('#output-qty_edit').empty().text(response.target_qty);
+
+                $('#title-modal_edit').text(response.bom_group);
+
+                $('.row_item_issue_edit').remove();
+                $('#last-row-item-issue_edit').remove();
+
+                let no_issue = $('.row_item_issue_edit').length + 1;
+
+                $.each(response.detail_issue, function(i, val) {
+                    var count = makeid(10);
+                    let warehouse = `<select class="browser-default" id="arr_warehouse_edit` + count + `" name="arr_warehouse[]">`;
+                    if (val.list_warehouse.length > 0) {
+                        $.each(val.list_warehouse, function(i, valkuy) {
+                            warehouse += `<option value="` + valkuy.id + `" ` + (valkuy.id == val.warehouse_id ? 'selected' : '') + `>` + valkuy.name + `</option>`;
+                        });
+                    } else {
+                        warehouse += `<option value="0" data-qty="0,000">--Maaf, item ini tidak memiliki stock--</option>`;
+                    }
+                    warehouse += `</select>`;
+                    $('#body-item-issue_edit').append(`
+                        <tr class="row_item_issue_edit" data-id="` + val.id + `">
+                            <input type="hidden" name="arr_lookable_type[]" value="` + val.lookable_type + `" readonly>
+                            <input type="hidden" name="arr_lookable_id[]" value="` + val.lookable_id + `" data-id="` + count + `" readonly>
+                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `" readonly>
+                            <input type="hidden" name="arr_bom_id[]" value="` + (val.bom_id ? val.bom_id : '0' ) + `" readonly>
+                            <input type="hidden" name="arr_bom_detail_id[]" value="` + (val.bom_detail_id ? val.bom_detail_id : '0' ) + `" readonly>
+                            <input type="hidden" name="arr_qty_bom[]" value="` + (val.bom_id ? val.qty_bom : '0,000') + `" readonly>
+                            <input type="hidden" name="arr_nominal_bom[]" value="` + (val.bom_id ? val.nominal_bom : '0,00') + `" readonly>
+                            <input type="hidden" name="arr_total_bom[]" value="` + (val.bom_id ? val.total_bom : '0,00') + `" readonly>
+                            <td class="center-align" ` + (val.has_batch ? `rowspan="2"` : ``) + ` readonly>
+                                ` + no_issue + `
+                            </td>
+                            <td>
+                                ` + val.lookable_code + ` - ` + val.lookable_name + `
+                            </td>
+                            <td class="right-align" id="rowPlanned_edit` + count + `">
+                                ` + val.qty_planned + `
+                            </td>
+                            <td class="center">
+                                <input name="arr_percentage[]" class="browser-default" type="text" value="0" onkeyup="formatRupiahNoMinus(this);" style="text-align:right;width:100%;" id="rowPercent_edit`+ count +`" readonly>
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty[]" onfocus="emptyThis(this);" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);convertQtyToPercent()" style="text-align:right;width:100%;" id="rowQty_edit`+ count +`" data-id="` + count + `" required data-id="` + count + `"  readonly>
+                            </td>
+                            <td class="center" id="arr_unit_edit` + count + `"  readonly>
+                                ` + val.lookable_unit + `
+                            </td>
+                            <td class="center">
+                                <select class="browser-default" id="arr_place_edit` + count + `" name="arr_place[]"  readonly>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td class="center" id="arr_stock_edit` + count + `">
+                                ` + warehouse + `
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item-issue" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                        ` +
+                        (val.has_batch ? `<tr class="row_item_batch_edit gradient-45deg-yellow-green" data-id="` + $('#production_order_detail_id_edit').val() + `" data-code="` + count + `">
+                            <td colspan="2" class="right-align">
+                                Ambil dari Batch : 
+                            </td>
+                            <td colspan="6">
+                                <div class="row">
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="arr_batch_edit` + count + `" name="arr_batch[]" data-id="` + count + `"  readonly></select>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');" id="btn-show_edit"><i class="material-icons right">add_circle_outline</i></a>
+                                        <label class="active">&nbsp;</label>
+                                    </div>
+                                    <div class="col m12 s12">
+                                        <table class="bordered" style="width:500px !important;">
+                                            <thead>
+                                                <tr>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Dipakai</th>
+                                                    <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.delete') }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="table-batch_edit` + count + `"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>` : ``)
+                    );
+                    $('#rowQty_edit' + count).trigger('keyup');
+                    if (val.has_batch) {
+                        let arr_batch_id = [];
+
+                        $.each(val.list_batch, function(i, value) {
+                            arr_batch_id.push(value.production_batch_id);
+                        });
+
+                        $('#arr_batch_edit' + count).select2({
+                            placeholder: '-- Kosong --',
+                            minimumInputLength: 1,
+                            allowClear: true,
+                            cache: true,
+                            width: 'resolve',
+                            dropdownParent: $('body').parent(),
+                            ajax: {
+                                url: '{{ url("admin/select2/production_batch") }}',
+                                type: 'GET',
+                                dataType: 'JSON',
+                                data: function(params) {
+                                    return {
+                                        search: params.term,
+                                        item_id: val.lookable_id,
+                                        arr_batch_id: arr_batch_id,
+                                    };
+                                },
+                                processResults: function(data) {
+                                    return {
+                                        results: data.items
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    $.each(val.list_batch, function(i, value) {
+                        let countdetail = makeid(10);
+                        $('#table-batch_edit' + count).append(`
+                            <tr>
+                                <input type="hidden" name="arr_batch_id[]" id="arr_batch_id_edit` + countdetail + `" value="` + value.production_batch_id + `">
+                                <td>` + value.production_batch_code + `</td>
+                                <td>
+                                    <input name="arr_qty_batch[]" class="qty-batch-edit-` + count + `" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkQtyBatch('` + countdetail + `')" data-qty="` + value.max_qty + `" data-id="` + countdetail + `" class="" id="rowBatch_edit`+ countdetail +`" style="text-align:right;"  readonly>    
+                                </td>
+                                <td>
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatch(this,'` + count + `');">
+                                        <i class="material-icons">delete</i>
+                                    </a> 
+                                </td>
+                            </tr>
+                        `);
+                    });
+                    $('#arr_place_edit' + count).val(val.place_id);
+                    no_issue++;
+                });
+
 
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);

@@ -398,27 +398,191 @@
                         <div class="row">
                             <div class="col s12">
                                 <fieldset>
-                                    <div class="input-field col m3 s12">
-                                        <div id="code_edit"  style="font-size: 2em"></div>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m2 s12 step1">
+                                        <input type="hidden" id="temp_id_edit" name="temp_id_edit">
+                                        <input type="hidden" id="tempGroup_id_edit" name="tempGroup_id_edit">
+                                        <input id="doc_code_edit" name="doc_code_edit" type="text" value="{{ $newcode }}" readonly>
+                                        <label class="active" for="doc_code_edit">No. Dokumen</label>
                                     </div>
-    
+                                    <div class="input-field col m1 s12 step2">
+                                        <select class="form-control" id="code_place_id_edit" name="code_place_id_edit" onchange="getCode(this.value);" readonly>
+                                            <option value="">--Pilih--</option>
+                                            @foreach ($place as $rowplace)
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="active" for="code_place_id_edit">Tempat Kode</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step3">
+                                        <select class="form-control" id="company_id_edit" name="company_id_edit" readonly>
+                                            @foreach ($company as $row)
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="company_id_edit">{{ __('translations.company') }}</label>
+                                    </div>
                                     <div class="input-field col m3 s12">
-                                        
-                                        <input type="hidden" id="temp_edit" name="temp_edit">
-                                        <select class="browser-default" id="shift_id_edit" name="shift_id_edit"></select>
+                                        <select class="form-control" id="plant_id_edit" name="plant_id_edit" readonly>
+                                            @foreach ($place as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="plant_id_edit">{{ __('translations.plant') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="form-control" id="line_id_edit" name="line_id_edit" readonly>
+                                            @foreach ($line as $row)
+                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label class="" for="line_id_edit">{{ __('translations.line') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <select class="browser-default" id="shift_id_edit" name="shift_id_edit" onchange="unlockProductionOrder();"></select>
                                         <label class="active" for="shift_id_edit">Shift</label>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <input id="group_edit" name="group_edit" type="text" placeholder="Grup">
+                                        <input id="group_edit" name="group_edit" type="text" placeholder="Grup" onkeyup="unlockProductionOrder();">
                                         <label class="active" for="group_edit">Grup</label>
                                     </div>
-                                  
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="post_date_edit" name="post_date_edit" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="applyStartEndDate();" readonly>
+                                        <label class="active" for="post_date_edit">Tgl. Post</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="start_process_time_edit" name="start_process_time_edit" type="datetime-local" placeholder="Tgl. Mulai Produksi" readonly>
+                                        <label class="active" for="start_process_time_edit">Tgl. Mulai Produksi</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step4">
+                                        <input id="end_process_time_edit" name="end_process_time_edit" type="datetime-local" placeholder="Tgl. Selesai Produksi" readonly>
+                                        <label class="active" for="end_process_time_edit">Tgl. Selesai Produksi</label>
+                                    </div>
+                               
                                     <div class="input-field col m3 s12">
                                         <textarea class="materialize-textarea" id="note_edit" name="note_edit" placeholder="Catatan / Keterangan" rows="3"></textarea>
                                         <label class="active" for="note_edit">{{ __('translations.note') }}</label>
                                     </div>
                                 </fieldset>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3" id="sticky" style="z-index:99 !important;border-radius:30px !important;">
+                        <div class="col s12">
+                            <fieldset>
+                                <legend>2. Order Produksi</legend>
+                                <div class="input-field col m4 s12 step6 disable-class">
+                                    <select class="browser-default" id="production_order_detail_id_edit" name="production_order_detail_id_edit" onchange="getProductionOrder();" tabindex="-1"></select>
+                                    <label class="active" for="production_order_detail_id_edit">Daftar Order Produksi (Pilih Shift & Grup)</label>
+                                </div>
+                                <div class="input-field col m1 s12 center-align">
+                                    <a href="javascript:void(0);" class="btn-floating mb-1 btn-flat waves-effect waves-light pink accent-2 white-text" onclick="getAccountData('1');" id="btn-show_edit"><i class="material-icons right">receipt</i></a>
+                                    <label class="active">&nbsp;</label>
+                                </div>
+                                <div class="col m12">
+                                    <div class="row">
+                                        <div class="col m4 s12">
+                                            Line : <b id="output-line_edit">-</b>
+                                        </div>
+                                        <div class="col m4 s12">
+                                            Target Item SFG/FG : <b id="output-fg_edit">-</b>
+                                        </div>
+                                        <div class="col m4 s12">
+                                            Qty : <b id="output-qty_edit">-</b>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <fieldset>
+                                <legend>3. Detail Issue Production Order</legend>
+                                <div class="col m12 s12">
+                                    <div class="col s12" style="overflow:auto;min-width:100%;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item_edit">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">{{ __('translations.no') }}.</th>
+                                                        <th class="center">No. Production Issue</th>
+                                                        <th class="center">Daftar Batch Terpakai</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-issue_edit">
+                                                    <tr id="last-row-issue_edit">
+                                                        <td class="center-align" colspan="4">
+                                                            Silahkan tambah dengan tombol dibawah
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                                                    <td colspan="4" class="center-align">
+                                                        <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addIssue();"><i class="material-icons right">add_circle_outline</i> Tambah Issue</a>
+                                                    </td>
+                                                </tfoot>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 step9">
+                            <fieldset style="min-width: 100%;">
+                                <legend>4. Detail Item Receive</legend>
+                                <div class="col m12 s12">
+                                    <div class="card-alert card gradient-45deg-purple-amber">
+                                        <div class="card-content white-text">
+                                            <p>Info : Kode Batch yang muncul adalah nomor sementara, untuk kode Batch bisa berubah ketika Production Receive disimpan.</p>
+                                        </div>
+                                    </div>
+                                    <div class="card-alert card gradient-45deg-purple-amber">
+                                        <div class="card-content white-text">
+                                            <p>Info : Production Receive tipe item FG, tidak akan menjurnal dan membuat stok.</p>
+                                        </div>
+                                    </div>
+                                    <div class="col s12" style="overflow:auto;min-width:100%;">
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered" style="border: 1px solid;min-width:2000px !important;" id="table-detail-item">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="center">{{ __('translations.no') }}.</th>
+                                                        <th class="center">{{ __('translations.item') }}</th>
+                                                        <th class="center" width="150px">Qty Planned</th>
+                                                        <th class="center" width="150px">Qty Receive (OK)</th>
+                                                        <th class="center" width="150px">Qty Reject (Jika ada)</th>
+                                                        <th class="center" width="300px">Satuan Produksi</th>
+                                                        <th class="center">Plant</th>
+                                                        <th class="center">Gudang</th>
+                                                        <th class="center" width="400px">Batch (*Nomor Sementara)</th>
+                                                        <th class="center">Hapus</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-item_edit">
+                                                    <tr id="last-row-item">
+                                                        <td class="center-align" colspan="10">
+                                                            Silahkan tambahkan Order Produksi untuk memulai...
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                {{-- <tfoot>
+                                                    <tr>
+                                                        <th colspan="10">
+                                                            <a class="waves-effect waves-light red btn-small mb-1 mr-1" onclick="addLine()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Reject
+                                                            </a>
+                                                        </th>
+                                                    </tr>
+                                                </tfoot> --}}
+                                            </table>
+                                        </p>
+                                    </div>
+                                </div>
+                            </fieldset>
                         </div>
                     </div>
                 </form>
@@ -749,7 +913,7 @@
                 $('#shift_id_edit').empty();
                 $('#group_edit').val('');
                 $('#code_edit').empty();
-                $('#temp_edit').val('');
+                $('#temp_id_edit').val('');
                 M.updateTextFields();
          
             }
@@ -1106,7 +1270,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal_edit').modal('open');
-                $('#temp_edit').val(id);
+                $('#temp_id_edit').val(id);
      
                 $('#code_edit').append(response.code);
                 $('#shift_id_edit').empty().append(`
@@ -1114,6 +1278,202 @@
                 `);
                 $('#group_edit').val(response.group);
                 $('#note_edit').val(response.note);
+
+                $('#temp_id_edit').val(id);
+                $('#tempGroup_id_edit').val(response.group_bom);
+                $('#code_place_id_edit').val(response.code_place_id).formSelect();
+                $('#doc_code_edit').val(response.code);
+                $('#post_date_edit').val(response.post_date);
+                $('#plant_id_edit').val(response.place_id).formSelect();
+                $('#line_id_edit').val(response.line_id).formSelect();
+
+                $('#company_id_edit').val(response.company_id).formSelect();
+                $('#start_process_time_edit').val(response.start_process_time);
+                $('#end_process_time_edit').val(response.end_process_time);
+                $('#note_edit').val(response.note);
+                $('#production_order_detail_id_edit').empty().append(`
+                    <option value="` + response.production_order_detail_id + `">` + response.production_order_detail_code + `</option>
+                `);
+
+                let no = $('.row_item').length + 1;
+
+                $.each(response.details, function(i, val) {
+                    var count = makeid(10);
+
+                    let batchhtml = `-`;
+
+                    if(val.group_bom == '3'){
+                        batchhtml = `<div class="row">
+                            <div class="col m12 s12">
+                                <table class="bordered" style="width:500px !important;">
+                                    <thead>
+                                        <tr>
+                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No.Batch</th>
+                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Qty Diterima</th>
+                                            <th style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-batch_edit` + count + `"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="center-align">
+                                                <a href="javascript:void(0);" class="btn-flat waves-effect waves-light green accent-2 white-text" onclick="addBatch('` + count + `');"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
+                                            </td>    
+                                        </tr>    
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>`;
+                    }
+
+                    $('#body-item_edit').append(`
+                        <tr class="row_item" data-id="` + val.id + `">
+                            <input type="hidden" name="arr_production_order_detail_id[]" value="` + val.id + `">
+                            <input type="hidden" name="arr_bom_id[]" value="` + val.bom_id + `" readonly>
+                            <input type="hidden" name="arr_qty_bom[]" value="` + val.qty_planned + `" readonly>
+                            <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `" readonly>
+                            <input type="hidden" name="arr_is_powder[]" value="` + val.is_powder + `" readonly>
+                            <td class="center-align">
+                                ` + no + `
+                            </td>
+                            <td>
+                                ` + val.item_name + `
+                            </td>
+                            <td class="right-align">
+                                ` + val.qty_planned + `
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty[]" readonly type="text" value="` + val.qty + `" style="text-align:right;width:100%;" id="rowQty`+ count +`" data-id="` + count + `" data-max="` + val.qty_planned + `" readonly >
+                            </td>
+                            <td class="center">
+                                <input name="arr_qty_reject[]" readonly type="text" value="` + val.qty_reject + `" style="text-align:right;width:100%;" id="rowQtyReject`+ count +`" readonly>
+                            </td>
+                            <td class="center" id="arr_unit` + count + `">
+                                ` + val.unit + `
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" readonly>
+                                    @foreach ($place as $rowplace)
+                                        <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                    @endforeach
+                                </select>
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]" readonly>
+                                    <option value="">--Silahkan pilih item--</option>
+                                </select>
+                            </td>
+                            <td class="center-align">
+                                ` + batchhtml + `
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `"  readonly>
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+
+                    if(val.group_bom == '3'){
+                        $.each(val.list_batch, function(i, detail) {
+                            let detailcode = makeid(10);
+                            $('#table-batch_edit' + count).append(`<tr>
+                                <td>
+                                    <input name="arr_batch_no[]" id="arr_batch_no` + detailcode + `" type="text" value="` + detail.batch_no + `" readonly class="no-batch-` + count + `" readonly>
+                                </td>
+                                <td>
+                                    <input name="arr_qty_batch[]" class="qty-batch-` + count + `" type="text" value="` + detail.qty + `" readonly style="text-align:right;" readonly>    
+                                </td>
+                                <td>
+                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" onclick="removeBatch(this);" readonly>
+                                        <i class="material-icons">delete</i>
+                                    </a> 
+                                </td>
+                            </tr>`);
+                        });
+                    }
+
+                    if(val.list_warehouse.length > 0){
+                        $('#arr_warehouse' + count).empty();
+                        $.each(val.list_warehouse, function(i, val) {
+                            $('#arr_warehouse' + count).append(`
+                                <option value="` + val.id + `">` + val.name + `</option>
+                            `);
+                        });
+                    }
+
+                    $('#arr_warehouse' + count).val(val.warehouse_id);
+                    $('#arr_place' + count).val(val.place_id);
+                    no++;
+                });
+
+                $('#body-issue_edit').empty();
+
+                $.each(response.issues, function(i, val) {
+                    let count = makeid(10);
+                    $('#body-issue_edit').append(`
+                        <tr class="row_issue">
+                            <td class="center-align">
+                                ` + (i + 1) + `
+                            </td>
+                            <td>
+                                <select class="browser-default" id="arr_production_issue_id` + count + `" name="arr_production_issue_id[]" onchange="resetIssue();getBatchIssue('` + count + `');" readonly>
+                                    <option value="` + val.production_issue_id + `">` + val.production_issue_name + `</option>    
+                                </select>
+                            </td>
+                            <td id="batch-used` + count + `">
+                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
+                                    <thead>
+                                        <tr>
+                                            <th class="center">Batch</th>
+                                            <th class="center">Qty Terpakai</th>
+                                            <th class="center">Hapus</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-issue-batch` + count + `">
+                                        <tr id="last-row-issue-batch` + count + `">
+                                            <td class="center-align" colspan="3">
+                                                Hanya untuk issue yang memiliki batch dan WIP 2.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-issue" href="javascript:void(0);" data-id="` + count + `">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
+                        </tr>
+                    `);
+                   
+
+                    if(val.details.length > 0){
+                        $('#body-issue-batch_edit' + count).empty();
+                        $.each(val.details, function(i, value) {
+                            let countdata = makeid(10);
+                            $('#body-issue-batch_edit' + count).append(`
+                                <tr class="row_batch_usage` + count + `">
+                                    <input type="hidden" value="` + value.production_batch_usage_id + `" name="arr_issue_batch_usage_id[]">
+                                    <input type="hidden" value="` + value.production_issue_id + `" name="arr_issue_batch_production_issue_id[]">
+                                    <td>
+                                        ` + value.batch_no + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_issue_batch_usage_qty[]" id="arr_issue_batch_usage_qty` + countdata + `" type="text" value="` + value.qty + `" readonly style="text-align:right;" data-max="` + value.qty_max + `"  readonly>
+                                    </td>
+                                    <td>
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeBatchIssue(this,'` + count + `');">
+                                            <i class="material-icons">delete</i>
+                                        </a> 
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                });
+
+                resetIssue();
 
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);

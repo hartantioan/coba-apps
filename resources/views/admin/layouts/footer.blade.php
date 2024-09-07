@@ -26,7 +26,7 @@
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
     <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js?v=146') }}"></script>
-    <script disable-devtool-auto src='{{ url('app-assets/js/custom/disabledevtools.js') }}' disable-menu='false'></script>
+    {{-- <script disable-devtool-auto src='{{ url('app-assets/js/custom/disabledevtools.js') }}' disable-menu='false'></script> --}}
     
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>
     @if(session('bo_id'))

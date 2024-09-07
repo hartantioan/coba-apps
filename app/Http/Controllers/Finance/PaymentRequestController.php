@@ -1032,6 +1032,10 @@ class PaymentRequestController extends Controller
 
                 if(in_array($query->status,['1','2','3','6'])){
 
+                    if(in_array($query->status,['2','3'])){
+                       CustomHelper::removeJournal($query->getTable(),$query->id); 
+                    }
+
                     if($request->has('document')) {
                         if($query->document){
                             if(Storage::exists($query->document)){

@@ -912,9 +912,7 @@ class Select2Controller extends Controller {
                         ->orWhere('name', 'like', "%$search%");
                 })
                 ->where('status','1')
-                ->where(function($query) use($search){
-                    $query->whereNotNull('is_sales_item');
-                })
+                ->whereNotNull('is_sales_item')
                 ->whereDoesntHave('fgGroup')->get();
         $user = User::find($account_id);
         /* $transportation = Transportation::find($request->transportation_id); */
@@ -953,9 +951,9 @@ class Select2Controller extends Controller {
                 'code'              => $d->code,
                 'name'              => $d->name,
                 'uom'               => $d->uomUnit->code,
-                'old_prices'        => $d->oldSalePrices($this->dataplaces),
-                'list_warehouse'    => $d->warehouseList(),
-                'list_outletprice'  => $d->listOutletPrice(),
+                'old_prices'        => /* $d->oldSalePrices($this->dataplaces) */[],
+                'list_warehouse'    => /* $d->warehouseList() */[],
+                'list_outletprice'  => /* $d->listOutletPrice() */[],
                 'list_area'         => Area::where('status','1')->get(),
                 'sell_units'        => $d->arrSellUnits(),
                 'price'             => /* $cek_price->price ??  */0,

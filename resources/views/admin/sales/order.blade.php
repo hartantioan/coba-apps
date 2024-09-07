@@ -1342,7 +1342,7 @@
         var disc_2  = parseFloat($("#arr_item" + nil).select2('data')[0].disc2);
         var disc_3  = parseFloat($("#arr_item" + nil).select2('data')[0].disc3);
         /* $('#tempPrice' + nil).empty(); */
-        $("#arr_warehouse" + nil).empty();
+        /* $("#arr_warehouse" + nil).empty(); */
         if($("#arr_item" + nil).val()){
 
             $('#arr_uom_unit' + nil).empty().append($("#arr_item" + nil).select2('data')[0].uom);
@@ -1361,7 +1361,7 @@
                 `);
             });
 
-            if($("#arr_item" + nil).select2('data')[0].list_warehouse.length > 0){
+            /* if($("#arr_item" + nil).select2('data')[0].list_warehouse.length > 0){
                 $.each($("#arr_item" + nil).select2('data')[0].list_warehouse, function(i, value) {
                     $('#arr_warehouse' + nil).append(`
                         <option value="` + value.id + `">` + value.name + `</option>
@@ -1371,7 +1371,7 @@
                 $("#arr_warehouse" + nil).append(`
                     <option value="">--Gudang tidak diatur di master data Grup Item--</option>
                 `);
-            }
+            } */
 
             /* if($("#arr_item" + nil).select2('data')[0].old_prices.length > 0){
                 $.each($("#arr_item" + nil).select2('data')[0].old_prices, function(i, value) {
@@ -1416,9 +1416,9 @@
             $('#arr_unit' + nil).empty().append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
-            $("#arr_warehouse" + nil).append(`
+            /* $("#arr_warehouse" + nil).append(`
                 <option value="">--Silahkan pilih item--</option>
-            `);
+            `); */
             $("#rowPrice" + nil).val('0,00');
             $("#rowPriceDelivery" + nil).val('0,00');
             $("#rowPriceTypeBp" + nil).val('0,00');

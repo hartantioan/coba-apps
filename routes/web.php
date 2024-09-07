@@ -70,6 +70,7 @@ use App\Http\Controllers\MasterData\ItemController;
 use App\Http\Controllers\MasterData\ItemGroupController;
 use App\Http\Controllers\MasterData\UserController;
 use App\Http\Controllers\MasterData\GroupController;
+use App\Http\Controllers\MasterData\GroupOutletController;
 use App\Http\Controllers\MasterData\CompanyController;
 use App\Http\Controllers\MasterData\PlaceController;
 use App\Http\Controllers\MasterData\DepartmentController;
@@ -586,6 +587,14 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [GroupController::class, 'destroy'])->middleware('operation.access:group,delete');
                     });
 
+                    Route::prefix('outlet_group')->middleware('operation.access:group,view')->group(function () {
+                        Route::get('/',[GroupOutletController::class, 'index']);
+                        Route::get('datatable',[GroupOutletController::class, 'datatable']);
+                        Route::post('show', [GroupOutletController::class, 'show']);
+                        Route::post('create',[GroupOutletController::class, 'create'])->middleware('operation.access:group,update');
+                        Route::post('destroy', [GroupOutletController::class, 'destroy'])->middleware('operation.access:group,delete');
+                    });
+
                     Route::prefix('position')->middleware('operation.access:position,view')->group(function () {
                         Route::get('/',[PositionController::class, 'index']);
                         Route::get('datatable',[PositionController::class, 'datatable']);
@@ -598,6 +607,8 @@ Route::prefix('admin')->group(function () {
 
                     Route::prefix('outlet')->middleware('operation.access:outlet,view')->group(function () {
                         Route::get('/',[OutletController::class, 'index']);
+                        Route::post('import',[OutletController::class, 'import'])->middleware('operation.access:outlet,update');
+                        Route::get('get_import_excel',[OutletController::class, 'getImportExcel']);
                         Route::get('datatable',[OutletController::class, 'datatable']);
                         Route::post('show', [OutletController::class, 'show']);
                         Route::post('create',[OutletController::class, 'create'])->middleware('operation.access:outlet,update');

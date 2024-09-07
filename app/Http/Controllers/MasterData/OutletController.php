@@ -1,12 +1,17 @@
 <?php
 
 namespace App\Http\Controllers\MasterData;
+
+use App\Exceptions\RowImportException;
+use App\Exports\ExportTemplateOutlet;
 use App\Http\Controllers\Controller;
+use App\Imports\ImportOutlet;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Outlet;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OutletController extends Controller
 {
@@ -127,7 +132,7 @@ class OutletController extends Controller
                     $val->province->name,
                     $val->city->name,
                     $val->district->name,
-                    $val->subdistrict->name,
+                    $val->subdistrict->name ?? '-',
                     '<a href="'.$val->link_gmap.'" target="_blank"><i class="material-icons dp48" style="font-size: 40px;">location_on</i></a>',
                     $val->status(),
                     '
@@ -280,5 +285,27 @@ class OutletController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateOutlet(), 'format_master_outlet_'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new ImportOutlet, $request->file('file'));
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
     }
 }

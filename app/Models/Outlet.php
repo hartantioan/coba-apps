@@ -19,6 +19,8 @@ class Outlet extends Model
         'code',
         'name',
         'type',
+        'outlet_group_id',
+        'group_bp_id',
         'address',
         'phone',
         'province_id',
@@ -35,6 +37,14 @@ class Outlet extends Model
 
     public function province(){
         return $this->belongsTo('App\Models\Region','province_id','id')->withTrashed();
+    }
+
+    public function outletGroup(){
+        return $this->belongsTo('App\Models\GroupOutlet','outlet_group_id','id')->withTrashed();
+    }
+
+    public function groupBP(){
+        return $this->belongsTo('App\Models\Group','group_bp_id','id')->withTrashed();
     }
 
     public function city(){

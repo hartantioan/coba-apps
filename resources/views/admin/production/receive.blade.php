@@ -2083,6 +2083,10 @@
         }
     }
 
+    function checkQtyBatch(code,id){
+        
+    }
+
     function addBatch(code){
         if($('#shift_id').val() && $('#group').val()){
             $.ajax({

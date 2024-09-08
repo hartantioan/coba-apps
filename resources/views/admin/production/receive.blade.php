@@ -2513,7 +2513,7 @@
                     return false;
                 }
 
-                if(!passedInput){
+                /* if(!passedInput){
                     swal({
                         title: 'Ups! Maaf.',
                         text: 'Qty hasil produksi tidak boleh kosong atau 0. Gudang tidak boleh kosong.',
@@ -2598,7 +2598,7 @@
                             });
                         }
                     });
-                }
+                } */
             }
         });
     }

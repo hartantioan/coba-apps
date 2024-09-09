@@ -392,21 +392,45 @@ class Coa extends Model
         $totalDebit = 0;
         $totalCredit = 0;
 
-        $dataDebit = $this->journalDebit()->whereHas('journal',function($query)use($date){
-            $query->whereDate('post_date','<',$date);
-        })->get();
+        $dataBalanceBeforeDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $this->id,
+                'date'      => $date,
+            ));
 
-        $dataCredit = $this->journalCredit()->whereHas('journal',function($query)use($date){
-            $query->whereDate('post_date','<',$date);
-        })->get();
+        $totalDebit = $dataBalanceBeforeDebit[0]->total;
 
-        foreach($dataDebit as $row){
-            $totalDebit += round($row->nominal,2);
-        }
-
-        foreach($dataCredit as $row){
-            $totalCredit += round($row->nominal,2);
-        }
+        $dataBalanceBeforeCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '2'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $this->id,
+                'date'      => $date,
+            ));
+            
+        $totalCredit = $dataBalanceBeforeCredit[0]->total;
 
         return $totalDebit - $totalCredit;
     }

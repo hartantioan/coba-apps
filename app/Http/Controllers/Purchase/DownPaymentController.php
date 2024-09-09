@@ -165,8 +165,8 @@ class DownPaymentController extends Controller
 
         foreach($data as $row){
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
-            $total_received_after_adjust = round($row->grandtotal * $currency_rate,2);
-            $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
+            $total_received_after_adjust = round(round($row->grandtotal * $currency_rate,3),2);
+            $total_invoice_after_adjust = round(round($row->total_used + $row->total_memo,3) * $currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->latest_currency;

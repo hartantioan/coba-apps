@@ -31,32 +31,35 @@
             <td class="right-align">{{$row['balance']}}</td>
             <td colspan="9"></td>
         </tr>
-        @if (isset($row['coa_code']) && is_array($row['coa_code']))
-            @foreach ($row['coa_code'] as $key=>$row_sec)
+            @php
+                $balance = floatval(str_replace(',','.',str_replace('.','',$row['balance'])));
+            @endphp
+            @foreach ($row['details'] as $key => $rowdetail)
+                @php
+                    $balance = $rowdetail->type == '1' ? $balance + round($rowdetail->nominal,2) : $balance - round($rowdetail->nominal,2);
+                @endphp
             <tr>
-                <td>{{$row_sec}}</td>
-                <td>{{$row['coa_name'][$key]}}</td>
-                <td>{{$row['j_postdate'][$key]}}</td>
-                <td>{{$row['j_code'][$key]}}</td>
-                <td>{{$row['j_lookable'][$key]}}</td>
-                <td>{{$row['j_detail3'][$key]}}</td>
-                <td>{{$row['j_detail4'][$key]}}</td>
-                <td>{{$row['j_detail1'][$key]}}</td>
-                <td>{{$row['j_detail2'][$key]}}</td>
-                <td>{{$row['j_balance'][$key]}}</td>
-                <td>{{$row['j_note'][$key]}}</td>
-                <td>{{$row['j_note1'][$key]}}</td>
-                <td>{{$row['j_note2'][$key]}}</td>
-                <td>{{$row['j_place'][$key]}}</td>
-                <td>{{$row['j_warehouse'][$key]}}</td>
-                <td>{{$row['j_line'][$key]}}</td>
-                <td>{{$row['j_machine'][$key]}}</td>
-                <td>{{$row['j_department'][$key]}}</td>
-                <td>{{$row['j_project'][$key]}}</td>
+                <td>{{$rowdetail->coa->code}}</td>
+                <td>{{$rowdetail->coa->name}}</td>
+                <td>{{$rowdetail->journal->post_date}}</td>
+                <td>{{$rowdetail->journal->code}}</td>
+                <td>{{$rowdetail->journal->lookable_id ? $rowdetail->journal->lookable->code : '-'}}</td>
+                <td>{{$rowdetail->type == '1' && $rowdetail->nominal_fc != 0 ? number_format($rowdetail->nominal_fc,2,',','.') : '0'}}</td>
+                <td>{{$rowdetail->type == '2' && $rowdetail->nominal_fc != 0 ? number_format($rowdetail->nominal_fc,2,',','.') : '0'}}</td>
+                <td>{{$rowdetail->type == '1' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0'}}</td>
+                <td>{{$rowdetail->type == '2' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0'}}</td>
+                <td>{{number_format($balance,2,',','.')}}</td>
+                <td>{{$rowdetail->journal->note}}</td>
+                <td>{{$rowdetail->note}}</td>
+                <td>{{$rowdetail->note2}}</td>
+                <td>{{$rowdetail->place()->exists() ? $rowdetail->place->code : '-'}}</td>
+                <td>{{$rowdetail->warehouse()->Exists() ? $rowdetail->warehouse->name : '-'}}</td>
+                <td>{{$rowdetail->line()->exists() ? $rowdetail->line->code : '-'}}</td>
+                <td>{{$rowdetail->machine()->exists() ? $rowdetail->machine->code : '-'}}</td>
+                <td>{{$rowdetail->department()->exists() ? $rowdetail->department->name : '-'}}</td>
+                <td>{{$rowdetail->project()->exists() ? $rowdetail->project->code : '-'}}</td>
             </tr>
             @endforeach
-        @endif
-        
         @endforeach
     </tbody>
 </table>

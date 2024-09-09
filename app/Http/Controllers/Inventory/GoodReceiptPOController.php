@@ -153,6 +153,11 @@ class GoodReceiptPOController extends Controller
                     $query->where('user_id',session('bo_id'));
                     
                 }
+
+                if($request->codes){
+                    $arrCode = explode(',',$request->codes);
+                    $query->whereIn('code',$arrCode);
+                }
             })
             ->whereHas('goodReceiptDetail',function($query){
                 $query->whereIn('warehouse_id',$this->datawarehouses);
@@ -213,6 +218,11 @@ class GoodReceiptPOController extends Controller
                     }*/
                     $query->where('user_id',session('bo_id'));
                     
+                }
+
+                if($request->codes){
+                    $arrCode = explode(',',$request->codes);
+                    $query->whereIn('code',$arrCode);
                 }
             })
             ->whereHas('goodReceiptDetail',function($query){
@@ -1600,7 +1610,7 @@ class GoodReceiptPOController extends Controller
     public function updateMultipleLc(Request $request){
   
         if($request->arr_id && count($request->arr_id) > 0){
-            foreach($request->arr_id as $key =>$row){
+            foreach($request->arr_id as $key => $row){
                 $query_done = GoodReceipt::where('code',$row)->first();
                 if($query_done){
 
@@ -1622,6 +1632,8 @@ class GoodReceiptPOController extends Controller
                             'status'  => 200,
                             'message' => 'Data berhasil diupdate.'
                         ];
+
+                        info('kambing');
                     }else{
                         $response = [
                             'status'  => 500,
@@ -1637,7 +1649,6 @@ class GoodReceiptPOController extends Controller
             $query_done = GoodReceipt::where('code',CustomHelper::decrypt($request->id))->first();
 
             if($query_done){
-
                 if(in_array($query_done->status,['2','3'])){
                     $currentStatusLc = $query_done->status_lc;
                     $newStatusLc = ($currentStatusLc == '1') ? '2' : '1';
@@ -1662,11 +1673,8 @@ class GoodReceiptPOController extends Controller
                         'message' => 'Data tidak bisa diselesaikan karena status bukan PROSES / SELESAI.'
                     ];
                 }
-
-                
             }
         }
         return response()->json($response);
-        
     }
 }

@@ -69,7 +69,7 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <div class="row">
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status" onchange="loadDataTable()" multiple>
@@ -82,16 +82,22 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="start_date" style="font-size:1rem;">{{ __('translations.start_date') }} : </label>
                                                 <div class="input-field col s12">
                                                 <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                            <div class="col m4 s6 ">
+                                            <div class="col m4 s12 ">
                                                 <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                            <div class="col m8 s12 ">
+                                                <label for="filter_code" style="font-size:1rem;">Dari multi kode (dipisahkan tanda koma) :</label>
+                                                <div class="input-field col s12">
+                                                    <input type="text" placeholder="contoh : GRPO-24P1-00000001,GRPO-24P1-00000003,GRPO-24P1-00000003" id="filter_code" name="filter_code" onkeyup="loadDataTable()">
                                                 </div>
                                             </div>
                                         </div>
@@ -1348,6 +1354,7 @@
                     'status' : $('#filter_status').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    codes : $('#filter_code').val(),
                     'modedata' : '{{ $modedata }}',
                 },
                 beforeSend: function() {
@@ -2199,7 +2206,7 @@
     function changemulti(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
-            var poin = $(item).find('td:nth-child(1)').text().trim();
+            var poin = $(item).find('td:nth-child(2)').text().trim();
             arr_id_temp.push(poin);
             
         });

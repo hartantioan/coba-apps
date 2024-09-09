@@ -169,7 +169,7 @@ class DownPaymentController extends Controller
             $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $row->currency_rate,2);
             $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
-            $currency_rate = $row->currency_rate;
+            $currency_rate = $row->latest_currency;
             /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
             if($balance > 0){
                 $results[] = [

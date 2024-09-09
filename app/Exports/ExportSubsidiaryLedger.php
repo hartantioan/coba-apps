@@ -41,7 +41,9 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                             $query->where('lookable_type','!=','closing_journals')
                                 ->orWhereNull('lookable_type');
                         }
-                    })->orderBy('post_date');
+                    })
+                    ->whereIn('status',['2','3'])
+                    ->orderBy('post_date');
             })->get();
             $balance = $row->getBalanceFromDate($date_start);
             $data_tempura = [

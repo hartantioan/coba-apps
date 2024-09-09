@@ -1,25 +1,25 @@
 <table class="bordered" id="table-result" style="min-width:2500px !important;zoom:0.6;">
     <thead class="sidebar-sticky" >
         <tr>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kode Coa</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="500px">Nama Coa</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="100px">{{ __('translations.date') }}</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">No.JE</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="200px">Dok.Ref.</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit FC</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit FC</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Debit Rp</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Kredit Rp</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Total Rp</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 1</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 2</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Keterangan 3</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.plant') }}</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.warehouse') }}</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.line') }}</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">{{ __('translations.engine') }}</th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Divisi </th>
-            <th class="center-align" style="background-color:white; border: 2px solid #000;" width="150px">Proyek</th>
+            <th class="center-align">Kode Coa</th>
+            <th class="center-align">Nama Coa</th>
+            <th class="center-align">{{ __('translations.date') }}</th>
+            <th class="center-align">No.JE</th>
+            <th class="center-align">Dok.Ref.</th>
+            <th class="center-align">Debit FC</th>
+            <th class="center-align">Kredit FC</th>
+            <th class="center-align">Debit Rp</th>
+            <th class="center-align">Kredit Rp</th>
+            <th class="center-align">Total Rp</th>
+            <th class="center-align">Keterangan 1</th>
+            <th class="center-align">Keterangan 2</th>
+            <th class="center-align">Keterangan 3</th>
+            <th class="center-align">{{ __('translations.plant') }}</th>
+            <th class="center-align">{{ __('translations.warehouse') }}</th>
+            <th class="center-align">{{ __('translations.line') }}</th>
+            <th class="center-align">{{ __('translations.engine') }}</th>
+            <th class="center-align">Divisi </th>
+            <th class="center-align">Proyek</th>
         </tr>
     </thead>
     <tbody>

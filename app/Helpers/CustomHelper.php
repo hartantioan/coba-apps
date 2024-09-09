@@ -4651,9 +4651,9 @@ class CustomHelper {
 
 		}elseif($table_name == 'marketing_order_down_payments'){
 
-			/* $modp = MarketingOrderDownPayment::find($table_id);
+			$modp = MarketingOrderDownPayment::find($table_id);
 
-			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$modp->company_id)->first();
+			/* $coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$modp->company_id)->first();
 			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$modp->company_id)->first();
 
 			$query = Journal::create([
@@ -4702,9 +4702,9 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 				]);
-			}
+			} */
 
-			CustomHelper::addCountLimitCredit($modp->account_id,$modp->grandtotal * $modp->currency_rate); */
+			CustomHelper::addCountLimitCredit($modp->account_id,$modp->grandtotal * $modp->currency_rate);
 
 		}elseif($table_name == 'purchase_down_payments'){
 			$pdp = PurchaseDownPayment::find($table_id);

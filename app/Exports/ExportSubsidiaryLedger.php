@@ -34,7 +34,7 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
         $date_end = $this->dateend;
         $array_filter = [];
         foreach($coas as $key => $row){
-            /* $rowdata = JournalDetail::where('coa_id',$row->id)->whereHas('journal',function($query)use($date_start,$date_end){
+            $rowdata = JournalDetail::where('coa_id',$row->id)->whereHas('journal',function($query)use($date_start,$date_end){
                 $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
                     ->where(function($query){
                         if($this->closing_journal){
@@ -42,19 +42,7 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
                                 ->orWhereNull('lookable_type');
                         }
                     })->orderBy('post_date');
-            })->get(); */
-            $rowdata = JournalDetail::where('coa_id',$row->id)
-                ->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
-                ->where(function($query){
-                    if($this->closing_journal){
-                        $query->where('journals.lookable_type','!=','closing_journals')
-                            ->orWhereNull('journals.lookable_type');
-                    }
-                })
-                ->whereIn('journals.status',['2','3'])
-                ->join('journals', 'journals.id', '=', 'journal_details.journal_id')
-                ->orderBy('journals.post_date')
-                ->get();
+            })->get();
             $balance = $row->getBalanceFromDate($date_start);
             $data_tempura = [
                 'code'      => $row->code,

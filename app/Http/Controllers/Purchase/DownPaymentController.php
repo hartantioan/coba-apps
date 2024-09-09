@@ -82,12 +82,6 @@ class DownPaymentController extends Controller
                         AND ar.status IN ('2','3')
                         AND ard.lookable_type = 'purchase_down_payments'
                         AND ard.lookable_id = pdp.id
-                        AND (
-                            CASE 
-                                WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
-                                WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
-                            END
-                        )
                 ),0) AS adjust_nominal,
                 IFNULL((SELECT
                     ar.currency_rate

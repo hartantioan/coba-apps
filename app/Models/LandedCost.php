@@ -375,11 +375,17 @@ class LandedCost extends Model
         $code = [];
         foreach($this->landedCostDetail as $row){
             if($row->goodReceiptDetail()){
-                $code[] = $row->lookable->goodReceipt->code;
+                if(!in_array($row->lookable->goodReceipt->code,$code)){
+                    $code[] = $row->lookable->goodReceipt->code;
+                }
             }elseif($row->inventoryTransferOutDetail()){
-                $code[] = $row->lookable->inventoryTransferOut->code;
+                if(!in_array($row->lookable->inventoryTransferOut->code,$code)){
+                    $code[] = $row->lookable->inventoryTransferOut->code;
+                }
             }elseif($row->landedCostDetail()){
-                $code[] = $row->lookable->landedCost->code;
+                if(!in_array($row->lookable->landedCost->code,$code)){
+                    $code[] = $row->lookable->landedCost->code;
+                }
             }
         }
         return implode(', ',$code);

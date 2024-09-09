@@ -1912,7 +1912,7 @@ class TreeHelper {
                                 'properties'=>$properties,
                                 "key" => $row_cbd->closeBill->code,
                                 "name" => $row_cbd->closeBill->code,
-                                'url'=>request()->root()."/admin/finance/fund_request?code=".CustomHelper::encrypt($row_cbd->closeBill->code), 
+                                'url'=>request()->root()."/admin/finance/close_bill?code=".CustomHelper::encrypt($row_cbd->closeBill->code), 
                             ];
                         
                             $data_go_chart[]=$data_cb_tempura;

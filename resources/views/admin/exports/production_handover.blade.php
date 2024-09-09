@@ -21,8 +21,6 @@
             <th>Kode Item</th>
             <th>Nama Item</th>
             <th>No Batch Palet/Curah</th>
-            <th>Group</th>
-            <th>Shift</th>
             <th>Shading</th>
             <th>Qty Diterima</th>
             <th>Satuan</th>
@@ -61,8 +59,6 @@
                     <td>{{ $row_detail->item->code }}</td>
                     <td>{{ $row_detail->item->name }}</td>
                     <td>{{ $row_detail->productionFgReceiveDetail->pallet_no}}</td>
-                    <td>{{ $row->group }}</td>
-                    <td>{{ $row->shift->name }}</td>
                     <td>{{ $row_detail->shading}}</td> 
                     <td>{{ $row_detail->qty}}</td>                
                     <td>{{ $row_detail->productionFgReceiveDetail->itemUnit->unit->code}}</td>

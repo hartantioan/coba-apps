@@ -4333,6 +4333,7 @@ class CustomHelper {
 						'nominal'		=> $row->lookable->total * $currency_rate,
 						'nominal_fc'	=> $type == '1' || $type == '' ? $row->lookable->total * $currency_rate : $row->lookable->total,
 						'note'			=> $row->lookable->landedCostFee->name,
+						'note2'			=> $row->lookable->landedCost->code,
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 						'detailable_type'=> $row->getTable(),

@@ -464,10 +464,6 @@ class AdjustRateController extends Controller
                 if($query) {
                     $new_currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
                     foreach($request->arr_nominal_fc as $key => $row){
-                        $latest_currency_rate = str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key]));
-                        $nominal_rp = str_replace(',','.',str_replace('.','',$row)) * $latest_currency_rate;
-                        $nominal_new = str_replace(',','.',str_replace('.','',$row)) * $new_currency_rate;
-                        $balance = $nominal_new - $nominal_rp;
                         AdjustRateDetail::create([
                             'adjust_rate_id'        => $query->id,
                             'lookable_type'         => $request->arr_lookable_type[$key],
@@ -475,9 +471,9 @@ class AdjustRateController extends Controller
                             'coa_id'                => $request->arr_coa_id[$key],
                             'nominal_fc'            => str_replace(',','.',str_replace('.','',$row)),
                             'nominal_rate'          => str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key])),
-                            'nominal_rp'            => $nominal_rp,
-                            'nominal_new'           => $nominal_new,
-                            'nominal'               => $balance,
+                            'nominal_rp'            => str_replace(',','.',str_replace('.','',$request->arr_nominal_rp[$key])),
+                            'nominal_new'           => str_replace(',','.',str_replace('.','',$request->arr_nominal_new[$key])),
+                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_balance[$key])),,
                             'type'                  => $request->arr_type[$key],
                         ]);
                     }

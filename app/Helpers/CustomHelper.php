@@ -3600,6 +3600,7 @@ class CustomHelper {
 						$rowdetail->fundRequest->update([
 							'balance_status'	=> '1',
 						]);
+						CustomHelper::removeCountLimitCredit($rowdetail->fundRequest->account_id,$rowdetail->nominal * $cb->currency_rate);
 					}
 					$row->personalCloseBill->update([
 						'status'	=> '3'

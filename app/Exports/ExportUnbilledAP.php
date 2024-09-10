@@ -182,11 +182,11 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
                     'note'          => $row->note,
+                    'kurs'          => $currency_rate > 1 ? round($balance_after_adjust / $balance,2) : $currency_rate,
+                    'real'          => number_format($balance,2,',','.'),
                     'total_received'=> number_format($total_received_after_adjust,2,',','.'),
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
                     'total_balance' => number_format($balance_after_adjust,2,',','.'),
-                    'kurs'          => $currency_rate > 1 ? round($balance_after_adjust / $balance,2) : $currency_rate,
-                    'real'          => number_format($balance,2,',','.'),
                 ];
 
                 $totalUnbilled += round($balance_after_adjust,2);

@@ -135,38 +135,29 @@
             }
             
             .invoice-product-details{
-                border:1px solid black;
+                /* border:1px solid black; */
                 min-height: auto;
             }
 
-            @page { margin: 4em 2em 4em 2em; }
-            header { position: fixed; top: -50px; left: 0px; right: 0px; height: 100px; margin-bottom: 10em }
+            @page { margin: 4em 2em 4em 1em; }
+            header { position: fixed; top: -30px; left: 0px; right: 0px; height: 100px; margin-bottom: 10em }
                 
         
            
         </style>
     </head>
-    <body>
+    <body style="margin-top: 20px">
         <header>
             <table border="0" width="100%">
                 <tr>
                     <td width="33%">
-                        <img src="{{ $image }}" width="50%" style="width:60%;">
+                        
                     </td>
                     <td width="33%" align="center">
-                        <h5 style="margin-top:0px;">INVOICE</h5>
-                        <h5 style="margin-top:-15px;">{{ $data->code }}</h5>
+                        <h5 style="margin-top:35px;">{{ $data->code }}</h5>
                     </td>
                     <td width="33%">
-                        {{-- <img src="data:image/png;base64,{{DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:60%;right:75px;height:25px;"/><br>
-                        {{ $data->code }} --}}
-                        <h6 style="margin-top:0px;">{{ $data->company->name }}</h6>
-                        <div style="margin-top:-25px;font-size:8px;">
-                            {{ $data->company->npwp_address }}
-                        </div>
-                        <div style="font-size:8px;">
-                            {{ $data->company->npwp_no }}
-                        </div>
+                        
                     </td>
                 </tr>
             </table>
@@ -181,9 +172,9 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="20%">
-                                            Kepada Yth
+                                           
                                         </td>
-                                        <td width="1%">:</td>
+                                        
                                         <td width="80%">
                                             {{ $data->userData->title }}
                                             <br>
@@ -195,19 +186,19 @@
                             <td width="40%" class="left-align">
                                 <table border="0" width="100%">
                                     <tr>
-                                        <td width="30%">
-                                            Tanggal
+                                        <td width="50%">
+                                           
                                         </td>
-                                        <td width="1%">:</td>
-                                        <td width="70%">
+                                        
+                                        <td width="50%">
                                             {{ date('d/m/Y',strtotime($data->post_date)) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            Jatuh Tempo
+                                            
                                         </td>
-                                        <td width="1%">:</td>
+                                        
                                         <td>
                                             {{ date('d/m/Y',strtotime($data->due_date)) }}
                                         </td>
@@ -223,18 +214,18 @@
                                 <table border="0" width="100%">
                                     <tr>
                                         <td width="20%">
-                                            No. MOD
+                                            
                                         </td>
-                                        <td width="1%">:</td>
+                                        
                                         <td width="80%">
                                             {{ $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="20%">
-                                            No. DO
+                                            
                                         </td>
-                                        <td width="1%">:</td>
+                                        
                                         <td width="80%">
                                             {{ $data->marketingOrderDeliveryProcess->code }}
                                         </td>
@@ -247,49 +238,42 @@
                         </tr>
                     </table>
                     
-                    <div class="invoice-product-details mt-2" style="overflow:auto;">
+                    <div class="invoice-product-details mt-2" style="padding-top:40px;padding-left:10px;padding-right:47px">
                         <table style="border-collapse:collapse;border:none;" width="100%">
                             <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Nama Barang</th>
-                                    <th>Palet</th>
-                                    <th>{{ __('translations.qty') }}</th>
-                                    <th>UoM</th>
-                                    <th>Harga</th>
-                                    <th>Disc 1 (%)</th>
-                                    <th>Disc 2 (%)</th>
-                                    <th>Disc (Rp)</th>
-                                    <th>{{ __('translations.subtotal') }}</th>
-                                </tr>
+                                
                             </thead>
                             <tbody>
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
                                 <tr>
-                                    <td align="center">{{ ($key + 1) }}</td>
-                                    <td align="">{{ $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
-                                    <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
-                                    <td align="center">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,2,',','.') }}</td>
-                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    <td style="width:5% !important">{{ ($key + 1) }}</td>
+                                    <td style="width:40% !important;padding-left:5px">{{ $row->lookable->itemStock->item->code.' - '.$row->lookable->itemStock->item->name }}</td>
+                                    <td style="width:10% !important;padding-left:20px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                    <td style="width:5% !important"align="right">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
+                                    <td style="width:10% !important" align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price,2,',','.') }}</td>
+                                    <td style="width:10% !important;padding-left:7px" align="center">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
+                                    <td style="width:5% !important;padding-left:7px" align="">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
+                                    <td style="width:5% !important" align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->discount_3,2,',','.') }}</td>
+
+                                    <td style="width:20% !important" align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                    
                                 </tr>
+                                
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
                     
                     <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row">
+                    <div class="invoice-subtotal break-row" style="position: fixed;bottom: 73px; left: 0px; right: 45px;">
                         <div class="row">
                         <div class="column1">
                             <table style="width:100%">
                                 <tr class="break-row">
+                                    <td style="width: 20%"></td>
                                     <td>
-                                        Terbilang : <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
+                                        <i>{{ CustomHelper::terbilangWithKoma($data->grandtotal) }} Rupiah
                                     </td>
                                     
                                 </tr>
@@ -298,23 +282,23 @@
                         <div class="column2">
                             <table style="border:none;" width="74%">
                                 <tr class="break-row">
-                                    <td align="right">Subtotal</td>
+                                    <td align="right"></td>
                                     <td align="right" align="right">{{ number_format($data->subtotal,2,',','.') }}</td>
                                 </tr>
-                                <tr class="break-row">
-                                    <td align="right">Downpayment</td>
+                                <tr style="margin-top: -10px !important">
+                                    <td align="right"></td>
                                     <td align="right" align="right">{{ number_format($data->downpayment,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
-                                    <td align="right">Total</td>
+                                    <td align="right"></td>
                                     <td align="right" align="right">{{ number_format($data->total,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
-                                    <td align="right">PPN</td>
+                                    <td align="right"></td>
                                     <td align="right" align="right">{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
-                                    <td align="right">Grandtotal</td>
+                                    <td align="right"></td>
                                     <td align="right" align="right">{{ number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>
                             </table>

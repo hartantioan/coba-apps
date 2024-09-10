@@ -1198,6 +1198,7 @@
                 </td>
             </tr>
         `);
+        let url = type == 'normal' ? '{{ url("admin/select2/item_parent_fg") }}' : '{{ url("admin/select2/item_has_bom") }}';
         $('#arr_item_detail_id' + count).select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -1206,7 +1207,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/item_has_bom") }}',
+                url: url,
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {
@@ -2203,9 +2204,6 @@
                                 </tr>
                             `);
                         }else{
-                          
-                            
-                            
                             $('#body-item-detail-' + val.type).append(`
                                 <tr class="row_detail_item" data-id="` + count + `">
                                     <td class="center-align">
@@ -2329,6 +2327,7 @@
                         $('#arr_item_detail_id' + count).append(`
                             <option value="` + val.item_id + `">` + val.item_code + `</option> 
                         `);
+                        let url = val.type == 'normal' ? '{{ url("admin/select2/item_parent_fg") }}' : '{{ url("admin/select2/item_has_bom") }}';
                         $('#arr_item_detail_id' + count).select2({
                             placeholder: '-- Kosong --',
                             minimumInputLength: 1,
@@ -2337,7 +2336,7 @@
                             width: 'resolve',
                             dropdownParent: $('body').parent(),
                             ajax: {
-                                url: '{{ url("admin/select2/item_has_bom") }}',
+                                url: url,
                                 type: 'GET',
                                 dataType: 'JSON',
                                 data: function(params) {

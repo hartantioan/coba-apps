@@ -2754,7 +2754,7 @@ class CustomHelper {
 						'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
 						'type'			=> $balance < 0 ? '1' : '2',
 						'nominal'		=> abs($balance),
-						'nominal_fc'	=> $balancefc,
+						'nominal_fc'	=> abs($balancefc),
 						'lookable_type'	=> $table_name,
 						'lookable_id'	=> $table_id,
 					]);

@@ -842,7 +842,7 @@ class MarketingOrderController extends Controller
         $po = MarketingOrder::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account->name;
-        $po['sender_name'] = $po->sender->name;
+        $po['sender_name'] = $po->sender()->exists() ? $po->sender->name : '';
         $po['sales_name'] = $po->sales->name.' - '.$po->sales->phone.' Pos. '.($po->sales->position()->exists() ? $po->sales->position->name : '-').' Dep. '.($po->sales->position()->exists() ? $po->sales->position->division->department->name : '-');
         $po['province_name'] = $po->province->name;
         $po['cities'] = $po->province->getCity();

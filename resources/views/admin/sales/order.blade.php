@@ -2007,7 +2007,9 @@
                 $('#valid_date').val(response.valid_date);
                 $('#document_no').val(response.document_no);
                 $('#type_delivery').val(response.type_delivery).formSelect();
-                $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
+                if(response.sender_name){
+                    $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
+                }
                 $('#delivery_date').val(response.delivery_date);
                 $('#transportation_id').empty().append(`
                     <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
@@ -2641,7 +2643,9 @@
                         $('#valid_date').val(response.valid_date);
                         $('#document_no').val(response.document_no);
                         $('#type_delivery').val(response.type_delivery).formSelect();
-                        $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
+                        if(response.sender_name){
+                            $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
+                        }
                         $('#delivery_date').val(response.delivery_date);
                         $('#transportation_id').empty().append(`
                             <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>

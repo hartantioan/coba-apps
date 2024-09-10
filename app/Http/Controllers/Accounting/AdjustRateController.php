@@ -473,7 +473,7 @@ class AdjustRateController extends Controller
                             'nominal_rate'          => str_replace(',','.',str_replace('.','',$request->arr_latest_rate[$key])),
                             'nominal_rp'            => str_replace(',','.',str_replace('.','',$request->arr_nominal_rp[$key])),
                             'nominal_new'           => str_replace(',','.',str_replace('.','',$request->arr_nominal_new[$key])),
-                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_balance[$key])),,
+                            'nominal'               => str_replace(',','.',str_replace('.','',$request->arr_balance[$key])),
                             'type'                  => $request->arr_type[$key],
                         ]);
                     }

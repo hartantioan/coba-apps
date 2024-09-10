@@ -109,6 +109,14 @@ class GoodScaleController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('purchaseOrderDetail',function($query) use($search, $request){
+                                $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                            })->orWhereHas('item',function($query) use($search, $request){
+                                $query->where('code','like',"%$search%")
+                                    ->orWhere('name','like',"%$search%");
                             });
                     });
                 }
@@ -147,6 +155,14 @@ class GoodScaleController extends Controller
                             ->orWhereHas('user',function($query) use($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('purchaseOrderDetail',function($query) use($search, $request){
+                                $query->whereHas('purchaseOrder',function($query) use($search, $request){
+                                    $query->where('code', 'like', "%$search%");
+                                });
+                            })->orWhereHas('item',function($query) use($search, $request){
+                                $query->where('code','like',"%$search%")
+                                    ->orWhere('name','like',"%$search%");
                             });
                     });
                 }

@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Models\Coa;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -73,20 +74,45 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             $balance_debit = 0;
             $balance_credit = 0;
 
-            $datadebitbefore  = $row->journalDebit()->whereHas('journal',function($query){
-                $query->whereDate('post_date','<',$this->start_date);
-            })->get();
-            $datacreditbefore  = $row->journalCredit()->whereHas('journal',function($query){
-                $query->whereDate('post_date','<',$this->start_date);
-            })->get();
+            $datadebitbefore  = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $this->start_date,
+            ));
 
-            foreach($datadebitbefore as $rowbefore){
-                $balance_debit += round($rowbefore->nominal,2);
-            }
+            $datacreditbefore  = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '2'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $row->id,
+                'date'      => $this->start_date,
+            ));
 
-            foreach($datacreditbefore as $rowbefore){
-                $balance_credit += round($rowbefore->nominal,2);
-            }
+            $balance_debit = $datacreditbefore[0]->total;
+
+            $balance_credit = $datacreditbefore[0]->total;
 
             $balance = $balance_debit - $balance_credit;
 

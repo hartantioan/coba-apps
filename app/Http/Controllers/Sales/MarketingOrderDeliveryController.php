@@ -303,7 +303,7 @@ class MarketingOrderDeliveryController extends Controller
 
     public function getMarketingOrder(Request $request){
         $data = MarketingOrder::find($request->id);
-        $data['sender_name'] = $data->sender->name;
+        $data['sender_name'] = $data->sender()->exists() ? $data->sender->name : '';
         if($data->used()->exists()){
             $data['status'] = '500';
             $data['message'] = 'Marketing Order No. '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
@@ -434,42 +434,22 @@ class MarketingOrderDeliveryController extends Controller
             $totalCredit = 0;
             $totalDp = 0;
 
-            foreach($arrmo as $rowmo){
-                $cekmo = MarketingOrder::find($rowmo);
-
-                if($request->arr_qty){
-                    foreach($request->arr_qty as $key => $row){
-                        $datamodi = MarketingOrderDetail::find($request->arr_modi[$key]);
-                        if($datamodi->marketing_order_id == $cekmo->id){
-                            $rowtotal = $datamodi->realPriceAfterGlobalDiscount() * str_replace(',','.',str_replace('.','',$row));
-                            $rowtax = 0;
-                            if($datamodi->tax_id > 0){
-                                if($datamodi->is_include_tax == '1'){
-                                    $rowtotal = $rowtotal * (1 + ($datamodi->percent_tax / 100));
-                                }
-                                $rowtax += $rowtotal * ($datamodi->percent_tax / 100);
-                            }
-    
-                            $total += $rowtotal;
-                            $tax += $rowtax;   
-                        }      
+            if($request->arr_modi){
+                foreach($request->arr_modi as $key => $row){
+                    $mod = MarketingOrderDetail::find($row);
+                    if($mod){
+                        $totalDp = round((($mod->marketingOrder->percent_dp / 100) * $mod->grandtotal),2);
+                        $totalCredit = round((((100 - $mod->marketingOrder->percent_dp) / 100) * $mod->grandtotal),2);
                     }
-
-                    $grandtotal = $total + $tax;
-
-                    $percent_credit = 100 - $cekmo->percent_dp;
-
-                    $totalCredit += ($percent_credit / 100) * $grandtotal;
-                    $totalDp += ($cekmo->percent_dp / 100) * $grandtotal;
                 }
             }
 
-            $balanceLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit;
-            $balanceLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp;
+            $balanceLimitCredit = $totalCredit > 0 ? $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit : 0;
+            $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
             $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
             $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
             
-            if($balanceLimitCredit < 0){
+            /* if($balanceLimitCredit < 0){
                 $passedCreditLimit = false;
             }
 
@@ -477,14 +457,12 @@ class MarketingOrderDeliveryController extends Controller
                 $passedCreditLimit = false;
             }
 
-            
-
-            // if(!$passedCreditLimit){
-            //     return response()->json([
-            //         'status'  => 500,
-            //         'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
-            //     ]);
-            // }
+            if(!$passedCreditLimit){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
+                ]);
+            } */
             
 			if($request->temp){
                 DB::beginTransaction();

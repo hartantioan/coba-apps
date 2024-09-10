@@ -5,12 +5,12 @@ namespace App\Exports;
 use App\Models\JournalDetail;
 use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Illuminate\Support\Facades\DB;
 
-class ExportUnbilledAP implements FromView , WithEvents
+class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -23,7 +23,22 @@ class ExportUnbilledAP implements FromView , WithEvents
         $this->date = $date ? $date : '';
 		
     }
-    public function view(): View
+
+    private $headings = [
+        'NO',
+        'NO.GRPO',
+        'SUPPLIER/VENDOR',
+        'TGL.POST',
+        'NO.SURAT JALAN',
+        'KETERANGAN',
+        'KURS',
+        'TOTAL SISA FC',
+        'TOTAL DITERIMA',
+        'TOTAL INVOICE',
+        'TOTAL SISA RP',
+    ];
+
+    public function collection()
     {
         $array_filter = [];
         $date = $this->date;
@@ -138,6 +153,9 @@ class ExportUnbilledAP implements FromView , WithEvents
 
         $totalUnbilled = 0;
 
+        $arr = [];
+        $no = 1;
+
         foreach($results as $key => $row){
             $invoices = explode(',',$row->data_reconcile);
             $total_reconcile = 0;
@@ -157,9 +175,9 @@ class ExportUnbilledAP implements FromView , WithEvents
             $total_invoice_after_adjust = ($row->total_invoice - $total_reconcile + $row->total_return) * $currency_rate;
             $balance_after_adjust = $total_received_after_adjust - $total_invoice_after_adjust;
             if(round($balance,2) > 0){
-                $array_filter[] = [
-                    'no'            => ($key + 1),
-                    'code'          => $row->code,
+                $arr[] = [
+                    'no'            => $no,
+                    'no_grpo'       => $row->code,
                     'vendor'        => $row->account_name,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'delivery_no'   => $row->delivery_no,
@@ -167,29 +185,44 @@ class ExportUnbilledAP implements FromView , WithEvents
                     'total_received'=> number_format($total_received_after_adjust,2,',','.'),
                     'total_invoice' => number_format($total_invoice_after_adjust,2,',','.'),
                     'total_balance' => number_format($balance_after_adjust,2,',','.'),
-                    'kurs'          => $balance > 0 || $balance < 0 ? number_format($balance_after_adjust / $balance,2,',','.') : 0,
+                    'kurs'          => $currency_rate > 1 ? round($balance_after_adjust / $balance,2) : $currency_rate,
                     'real'          => number_format($balance,2,',','.'),
                 ];
+
                 $totalUnbilled += round($balance_after_adjust,2);
+                $no++;
             }
         }
-
-        return view('admin.exports.unbilled_ap', [
-            'data'      => $array_filter,
-            'total'     => number_format($totalUnbilled,2,',','.')
-        ]);
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function(AfterSheet $event) {
-                // Auto-fit columns A to Z
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                $event->sheet->autoSize();
-                $event->sheet->freezePane("A1");
-            }
+        $arr[] = [
+            'no'            => '',
+            'no_grpo'       => '',
+            'vendor'        => '',
+            'post_date'     => '',
+            'delivery_no'   => '',
+            'note'          => '',
+            'total_received'=> '',
+            'total_invoice' => '',
+            'total_balance' => '',
+            'kurs'          => '',
+            'real'          => number_format($totalUnbilled,2,',','.'),
         ];
+        return collect($arr);
     }
+
+    public function title(): string
+    {
+        return 'Laporan Hutang Usaha Belum Ditagihkan.';
+    }
+
+    public function startCell(): string
+    {
+        return 'A1';
+    }
+	/**
+	 * @return array
+	 */
+	public function headings() : array
+	{
+		return $this->headings;
+	}
 }

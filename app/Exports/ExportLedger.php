@@ -110,7 +110,7 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
                 'date'      => $this->start_date,
             ));
 
-            $balance_debit = $datacreditbefore[0]->total;
+            $balance_debit = $datadebitbefore[0]->total;
 
             $balance_credit = $datacreditbefore[0]->total;
 

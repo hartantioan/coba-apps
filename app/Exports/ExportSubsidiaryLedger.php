@@ -57,18 +57,15 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
         $date_end = $this->dateend;
         $arr = [];
         foreach($coas as $key => $row){
-            $rowdata = JournalDetail::where('coa_id',$row->id)
-                ->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
-                ->where(function($query){
-                    if($this->closing_journal){
-                        $query->where('journals.lookable_type','!=','closing_journals')
-                            ->orWhereNull('journals.lookable_type');
-                    }
-                })
-                ->whereIn('journals.status',['2','3'])
-                ->join('journals', 'journals.id', '=', 'journal_details.journal_id')
-                ->orderBy('journals.post_date')
-                ->get();
+            $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
+                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
+                    ->where(function($query){
+                        if($this->closing_journal){
+                            $query->where('lookable_type','!=','closing_journals')
+                                ->orWhereNull('lookable_type');
+                        }
+                    });
+            })->where('nominal','!=',0)->get();
             $balance = $row->getBalanceFromDate($date_start);
             $arr[] = [
                 'code'      => $row->code,
@@ -92,6 +89,10 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                 'project'   => '',
             ];
             foreach($rowdata as $rowdetail){
+                $additional_ref = '';
+                if($rowdetail->journal->lookable_type == 'outgoing_payments'){
+                    $additional_ref = ($rowdetail->note ? ' - ' : '').$rowdetail->journal->lookable->paymentRequest->code;
+                }
                 $balance = $rowdetail->type == '1' ? $balance + round($rowdetail->nominal,2) : $balance - round($rowdetail->nominal,2);
                 $arr[] = [
                     'code'      => $row->code,
@@ -105,7 +106,7 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                     'credit_rp' => $rowdetail->type == '2' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0',
                     'balance'   => number_format($balance, 2, ',', '.'),
                     'note1'     => $rowdetail->journal->note,
-                    'note2'     => $rowdetail->note,
+                    'note2'     => $rowdetail->note.$additional_ref,
                     'note3'     => $rowdetail->note2,
                     'place'     => $rowdetail->place()->exists() ? $rowdetail->place->code : '-',
                     'warehouse' => $rowdetail->warehouse()->Exists() ? $rowdetail->warehouse->name : '-',

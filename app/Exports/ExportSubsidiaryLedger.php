@@ -5,11 +5,12 @@ namespace App\Exports;
 use App\Models\Coa;
 use App\Models\ItemStock;
 use App\Models\JournalDetail;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Illuminate\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Illuminate\Support\Facades\DB;
-class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
+class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings, WithCustomStartCell
 {
     /**
     * @return \Illuminate\Support\Collection
@@ -24,39 +25,114 @@ class ExportSubsidiaryLedger implements  FromView,ShouldAutoSize
         $this->coaend = $coaend ? $coaend : '';
         $this->closing_journal = $closing_journal ? $closing_journal : '';
     }
-    public function view(): View
+
+    private $headings = [
+        'KODE COA',
+        'NAMA COA',
+        'TGL.POST',
+        'NO.JE',
+        'DOK.REF.',
+        'DEBIT FC',
+        'KREDIT FC',
+        'DEBIT RP',
+        'KREDIT RP',
+        'TOTAL RP',
+        'KETERANGAN 1',
+        'KETERANGAN 2',
+        'KETERANGAN 3',
+        'PLANT',
+        'GUDANG',
+        'LINE',
+        'MESIN',
+        'DIVISI',
+        'PROYEK',
+    ];
+
+    public function collection()
     {
-        $html=[];
         $coa_start=$this->coastart;
         $coa_end=$this->coaend;
         $coas = Coa::where('status','1')->where('level','5')->whereRaw("code BETWEEN '$coa_start' AND '$coa_end'")->orderBy('code')->get();
         $date_start = $this->datestart;
         $date_end = $this->dateend;
-        $array_filter = [];
+        $arr = [];
         foreach($coas as $key => $row){
-            $rowdata = JournalDetail::where('coa_id',$row->id)->whereHas('journal',function($query)use($date_start,$date_end){
-                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
-                        }
-                    })
-                    ->whereIn('status',['2','3'])
-                    ->orderBy('post_date');
-            })->get();
+            $rowdata = JournalDetail::where('coa_id',$row->id)
+                ->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
+                ->where(function($query){
+                    if($this->closing_journal){
+                        $query->where('journals.lookable_type','!=','closing_journals')
+                            ->orWhereNull('journals.lookable_type');
+                    }
+                })
+                ->whereIn('journals.status',['2','3'])
+                ->join('journals', 'journals.id', '=', 'journal_details.journal_id')
+                ->orderBy('journals.post_date')
+                ->get();
             $balance = $row->getBalanceFromDate($date_start);
-            $data_tempura = [
+            $arr[] = [
                 'code'      => $row->code,
                 'name'      => $row->name,
-                'balance'   => ($balance != 0 ? number_format($balance, 2, ',', '.') : '-'),
-                'details'   => $rowdata,
+                'post_date' => '',
+                'je_no'     => '',
+                'ref_doc'   => '',
+                'debit_fc'  => '',
+                'credit_fc' => '',
+                'debit_rp'  => '',
+                'credit_rp' => '',
+                'balance'   => ($balance != 0 ? number_format($balance, 2, ',', '.') : 0),
+                'note1'     => '',
+                'note2'     => '',
+                'note3'     => '',
+                'place'     => '',
+                'warehouse' => '',
+                'line'      => '',
+                'machine'   => '',
+                'division'  => '',
+                'project'   => '',
             ];
-            $array_filter[]=$data_tempura;
+            foreach($rowdata as $rowdetail){
+                $balance = $rowdetail->type == '1' ? $balance + round($rowdetail->nominal,2) : $balance - round($rowdetail->nominal,2);
+                $arr[] = [
+                    'code'      => $row->code,
+                    'name'      => $row->name,
+                    'post_date' => $rowdetail->journal->post_date,
+                    'je_no'     => $rowdetail->journal->code,
+                    'ref_doc'   => $rowdetail->journal->lookable_id ? $rowdetail->journal->lookable->code : '-',
+                    'debit_fc'  => $rowdetail->type == '1' && $rowdetail->nominal_fc != 0 ? number_format($rowdetail->nominal_fc,2,',','.') : '0',
+                    'credit_fc' => $rowdetail->type == '2' && $rowdetail->nominal_fc != 0 ? number_format($rowdetail->nominal_fc,2,',','.') : '0',
+                    'debit_rp'  => $rowdetail->type == '1' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0',
+                    'credit_rp' => $rowdetail->type == '2' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0',
+                    'balance'   => number_format($balance, 2, ',', '.'),
+                    'note1'     => $rowdetail->journal->note,
+                    'note2'     => $rowdetail->note,
+                    'note3'     => $rowdetail->note2,
+                    'place'     => $rowdetail->place()->exists() ? $rowdetail->place->code : '-',
+                    'warehouse' => $rowdetail->warehouse()->Exists() ? $rowdetail->warehouse->name : '-',
+                    'line'      => $rowdetail->line()->exists() ? $rowdetail->line->code : '-',
+                    'machine'   => $rowdetail->machine()->exists() ? $rowdetail->machine->code : '-',
+                    'division'  => $rowdetail->department()->exists() ? $rowdetail->department->name : '-',
+                    'project'   => $rowdetail->project()->exists() ? $rowdetail->project->code : '-',
+                ];
+            }
         }
-        
-        return view('admin.exports.subsidiary_ledger', [
-            'data' => $array_filter,
-        ]);
+        return collect($arr);
     }
+
+    public function title(): string
+    {
+        return 'Laporan Subsidiary Ledger';
+    }
+
+    public function startCell(): string
+    {
+        return 'A1';
+    }
+	/**
+	 * @return array
+	 */
+	public function headings() : array
+	{
+		return $this->headings;
+	}
 }

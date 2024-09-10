@@ -203,7 +203,7 @@ class ExportUnbilledAP implements FromCollection, WithTitle, WithHeadings, WithC
             'total_received'=> '',
             'total_invoice' => '',
             'total_balance' => '',
-            'kurs'          => '',
+            'kurs'          => 'TOTAL',
             'real'          => number_format($totalUnbilled,2,',','.'),
         ];
         return collect($arr);

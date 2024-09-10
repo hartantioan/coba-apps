@@ -1425,7 +1425,7 @@
                                 $('#arr_item_detail_id' + row).append(`
                                     <option value="` + arrDataNormal[z].item_id + `">` + arrDataNormal[z].item_name + `</option> 
                                 `);
-                                select2ServerSide('#arr_item_detail_id' + row, '{{ url("admin/select2/item_has_bom") }}');
+                                select2ServerSide('#arr_item_detail_id' + row, '{{ url("admin/select2/item_parent_fg") }}');
                                 $('#arr_unit' + row).text(arrDataNormal[z].unit);
                                 $('#arr_warehouse' + row).empty();
                                 $.each(arrDataNormal[z].list_warehouse, function(j, warehouserow) {

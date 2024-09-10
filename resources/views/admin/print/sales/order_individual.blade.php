@@ -247,11 +247,11 @@
                                     </tr>
                                     <tr>
                                         <td>
-                                            Broker
+                                            Ekspedisi
                                         </td>
                                         <td width="1%">:</td>
                                         <td>
-                                            {{ $data->sender->name }}
+                                            {{ $data->sender()->exists() ? $data->sender->name : '-' }}
                                         </td>
                                     </tr>
                                 </table>

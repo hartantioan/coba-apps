@@ -788,9 +788,11 @@ document.addEventListener('focusin', function (event) {
                             $('#body-item').empty();
                         }
                         $('#delivery_date').val(response.delivery_date);
-                        $('#account_id').empty().append(`
-                            <option value="` + response.sender_id + `">` + response.sender_name + `</option>
-                        `);
+                        if(response.sender_name){
+                            $('#account_id').empty().append(`
+                                <option value="` + response.sender_id + `">` + response.sender_name + `</option>
+                            `);
+                        }
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
                         $('#tempDistrict').val(response.district_id);

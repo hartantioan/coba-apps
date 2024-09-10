@@ -220,7 +220,7 @@
                     {{ __('translations.broker') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->sender->name }}
+                    {{ $data->sender()->exists() ? $data->sender->name : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.transport_type') }}

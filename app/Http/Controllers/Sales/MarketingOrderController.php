@@ -379,7 +379,7 @@ class MarketingOrderController extends Controller
                       $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->document_no,
                     $val->deliveryType(),
-                    $val->sender->name,
+                    $val->sender()->exists() ? $val->sender->name : '-',
                     $val->transportation->name,
                     date('d/m/Y',strtotime($val->delivery_date)),
                     $val->deliverySchedule(),
@@ -466,7 +466,7 @@ class MarketingOrderController extends Controller
                 'post_date'		            => 'required',
                 'valid_date'		        => 'required',
                 'type_delivery'             => 'required',
-                'sender_id'                 => 'required',
+                /* 'sender_id'                 => 'required', */
                 'delivery_date'             => 'required',
                 'delivery_schedule'         => 'required',
                 'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
@@ -520,7 +520,7 @@ class MarketingOrderController extends Controller
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
                 'valid_date.required' 			    => 'Tanggal valid SO tidak boleh kosong.',
                 'type_delivery.required'		    => 'Tipe pengiriman tidak boleh kosong.',
-                'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.',
+                /* 'sender_id.required'                => 'Pihak pengirim tidak boleh kosong.', */
                 'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
                 'delivery_schedule.required'        => 'Jadwal kirim tidak boleh kosong.',
                 'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
@@ -680,7 +680,7 @@ class MarketingOrderController extends Controller
                         $query->document = $document;
                         $query->project_id = $request->project_id;
                         $query->type_delivery = $request->type_delivery;
-                        $query->sender_id = $request->sender_id;
+                        $query->sender_id = $request->sender_id ?? NULL;
                         $query->delivery_date = $request->delivery_date;
                         $query->delivery_schedule = $request->delivery_schedule;
                         $query->payment_type = $request->payment_type;
@@ -741,7 +741,7 @@ class MarketingOrderController extends Controller
                         'document_no'               => $request->document_no,
                         'document'                  => $request->file('document_so') ? $request->file('document_so')->store('public/marketing_orders') : NULL,
                         'type_delivery'             => $request->type_delivery,
-                        'sender_id'                 => $request->sender_id,
+                        'sender_id'                 => $request->sender_id ?? NULL,
                         'delivery_date'             => $request->delivery_date,
                         'delivery_schedule'         => $request->delivery_schedule,
                         'payment_type'              => $request->payment_type,

@@ -18,6 +18,7 @@ class ProductionReceiveIssue extends Model
     protected $fillable = [
         'production_receive_id',
         'production_issue_id',
+        'is_auto',
     ];
 
     public function productionReceive()

@@ -227,7 +227,7 @@ class TreeHelper {
                                     'properties'=> $properties,
                                     'key'=>$landed_cost_detail->landedCost->code,
                                     'name'=>$landed_cost_detail->landedCost->code,
-                                    'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($landed_cost_detail->landedCost->code),    
+                                    'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($landed_cost_detail->landedCost->code),    
                                 ];
 
                                 $data_go_chart[]=$data_lc;
@@ -723,7 +723,7 @@ class TreeHelper {
                                 'properties'=>$properties ,
                                 "key" => $row->lookable->landedCost->code,
                                 "name" => $row->lookable->landedCost->code,
-                                'url'=>request()->root()."/admin/inventory/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
+                                'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($row->lookable->landedCost->code),
                             ];
 
                             $data_go_chart[]=$data_lc;

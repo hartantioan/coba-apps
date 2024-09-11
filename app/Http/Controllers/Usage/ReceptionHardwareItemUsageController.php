@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Usage;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exceptions\RowImportException;
 use App\Http\Controllers\Controller;
 use App\Models\HardwareItem;
 use App\Helpers\CustomHelper;
 use App\Models\ReceptionHardwareItemsUsage;
 use App\Exports\ExportReceptionHardwareUsage;
+use App\Exports\ExportTemplateReceptionHardwareItemUsage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,6 +16,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Helpers\PrintHelper;
+use App\Imports\ImportReceptionHardwareItemUsage as ImportsImportReceptionHardwareItemUsage;
+
 class ReceptionHardwareItemUsageController extends Controller
 {
     public function index(Request $request)
@@ -620,5 +624,27 @@ class ReceptionHardwareItemUsageController extends Controller
             abort(404);
         }
 
+    }
+
+    public function getImportExcel(){
+        return Excel::download(new ExportTemplateReceptionHardwareItemUsage(), 'format_template_serah_terima_'.uniqid().'.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            Excel::import(new ImportsImportReceptionHardwareItemUsage, $request->file('file'));
+            return response()->json(['status' => 200, 'message' => 'Import successful']);
+        } catch (RowImportException $e) {
+            return response()->json([
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+                'row' => $e->getRowNumber(),
+                'column' => $e->getColumn(),
+                'sheet' => $e->getSheet(),
+            ], 400);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Import failed', 'error' => $e->getMessage()], 400);
+        }
     }
 }

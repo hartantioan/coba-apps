@@ -1498,6 +1498,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[ReceptionHardwareItemUsageController::class, 'print']);
                     Route::post('print_return',[ReceptionHardwareItemUsageController::class, 'printReturn']);
                     Route::post('save_user',[ReceptionHardwareItemUsageController::class, 'saveUser']);
+                    Route::post('import',[ReceptionHardwareItemUsageController::class, 'import'])->middleware('operation.access:reception_hardware_items_usages,update');
+                    Route::get('get_import_excel',[ReceptionHardwareItemUsageController::class, 'getImportExcel']);
                     Route::post('get_pic',[ReceptionHardwareItemUsageController::class, 'getPIC']);
                     Route::get('approval/{id}',[ReceptionHardwareItemUsageController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ReceptionHardwareItemUsageController::class, 'voidStatus'])->middleware('operation.access:reception_hardware_items_usages,void');

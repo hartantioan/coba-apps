@@ -1240,7 +1240,7 @@ class ProductionHandoverController extends Controller
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2'])
         ->get();
-        
+        $response= null;
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
@@ -1254,9 +1254,11 @@ class ProductionHandoverController extends Controller
                 'status'        => $d->status(),
             ];
         }
-       
+        
+        if($response){
+            $account['details'] = $response;
+        }
 
-        $account['details'] = $response;
 
         return response()->json($account);
     }

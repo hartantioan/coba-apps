@@ -1183,6 +1183,8 @@
                 if (data.items[0] && data.items[0].id) {
                     let newOption = new Option(data.items[0].text, data.items[0].id, true, true);
                     $('#production_fg_receive_id').append(newOption);
+                    $('#note').val('NO. ' + data.items[0].prod_no + ' (' + data.items[0].item_name + ')');
+                  
                 }
             }
         });

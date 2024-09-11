@@ -1055,11 +1055,28 @@ class ProductionReceiveController extends Controller
                 }
             }
             if($query->productionReceiveIssue()->exists()){
+                $cekauto = $query->productionReceiveIssue()->whereNotNull('is_auto','1')->count();
+                if($cekauto > 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf receive telah memiliki issue, silahkan void issue terlebih dahulu.'
+                    ]);
+                }
+            }
+
+            /* $countbackflush = $query->productionOrderDetail->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
+                $query->whereNotNull('is_default');
+            })->where('issue_method','2')->count();
+    
+            $countbomstandard = $query->productionOrderDetail->productionScheduleDetail->bom->whereHas('bomStandard')->count();
+
+            if($countbackflush > 0 || $countbomstandard > 0){
                 return response()->json([
                     'status'  => 500,
-                    'message' => 'Mohon maaf receive telah memiliki issue, silahkan void issue terlebih dahulu.'
+                    'message' => 'Mohon maaf receive telah memiliki issue otomatis, silahkan void issue otomatis terlebih dahulu.'
                 ]);
-            }
+            } */
+
             if(in_array($query->status,['4','5'])){
                 $response = [
                     'status'  => 500,

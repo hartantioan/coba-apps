@@ -1753,8 +1753,8 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.$d->name,
-                'code'          => $d->code,
+                'text' 			=> $d->prefix_code.' - '.$d->name,
+                'code'          => $d->prefix_code,
                 'name'          => $d->name,
             ];
         }

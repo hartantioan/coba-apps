@@ -121,7 +121,7 @@ class ProductionFgReceiveController extends Controller
 
                         $result = [];
                         $yearmonth = date('ym',strtotime($date));
-                        $prefix = $pallet->code.'/'.$line->code.'-'.$shift->production_code.$group.'/'.$yearmonth;
+                        $prefix = $pallet->prefix_code.'/'.$line->code.'-'.$shift->production_code.$group.'/'.$yearmonth;
                         $latestCode = ProductionBatch::getLatestCodeFg($yearmonth);
                         $oldprefix = 0;
                         if($request->listno){

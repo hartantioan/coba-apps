@@ -370,7 +370,6 @@ class IncomingPaymentController extends Controller
                             ->orWhereHas('listBgCheck',function($query) use($search, $request){
                                 $query->where('code', 'like', "%$search%")
                                     ->orWhere('document_no', 'like', "%$search%")
-                                    ->orWhere('bank_source_no', 'like', "%$search%")
                                     ->orWhere('document', 'like', "%$search%")
                                     ->orWhere('note', 'like', "%$search%");
                             })
@@ -445,7 +444,6 @@ class IncomingPaymentController extends Controller
                             ->orWhereHas('listBgCheck',function($query) use($search, $request){
                                 $query->where('code', 'like', "%$search%")
                                     ->orWhere('document_no', 'like', "%$search%")
-                                    ->orWhere('bank_source_no', 'like', "%$search%")
                                     ->orWhere('document', 'like', "%$search%")
                                     ->orWhere('note', 'like', "%$search%");
                             })

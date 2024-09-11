@@ -1055,7 +1055,7 @@ class ProductionReceiveController extends Controller
                 }
             }
             if($query->productionReceiveIssue()->exists()){
-                $cekauto = $query->productionReceiveIssue()->whereNotNull('is_auto','1')->count();
+                $cekauto = $query->productionReceiveIssue()->whereNotNull('is_auto')->count();
                 if($cekauto > 0){
                     return response()->json([
                         'status'  => 500,

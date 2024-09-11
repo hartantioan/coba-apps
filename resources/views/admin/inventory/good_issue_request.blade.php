@@ -1457,6 +1457,9 @@
                                         <td id="arr_stock` + count + `" class="center-align">
                                             -
                                         </td>
+                                        <td id="arr_outstanding` + count + `" class="center-align">
+                                            ` + val.qty_outstanding + `
+                                        </td>
                                         <td>
                                             <input name="arr_qty[]" id="rowQty` + count + `" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinusNoMinus(this);countRow('` + count + `')">
                                         </td>

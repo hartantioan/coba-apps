@@ -316,7 +316,8 @@ class ProductionReceive extends Model
         foreach($this->productionReceiveIssue as $key => $row){
             if($row->productionReceiveIssueDetail()->exists()){
                 foreach($row->productionReceiveIssueDetail as $rowdetail){
-                    $totalIssue += round($rowdetail->qty * ($rowdetail->productionBatchUsage->qty / $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id)),2);
+                    $rowtotal = $rowdetail->productionBatchUsage->productionBatch->totalById($rowdetail->production_batch_usage_id);
+                    $totalIssue += round($rowdetail->qty * ($rowtotal / $rowdetail->productionBatchUsage->qty),2);
                 }
             }else{
                 $rowissue = $row->productionIssue->total();
@@ -330,7 +331,7 @@ class ProductionReceive extends Model
                 $rowbatch->update([
                     'total' => $totalbatch,
                 ]);
-                ResetCogsHelper::gas($this->post_date,$this->company_id,$this->place_id,$row->item_id,NULL,NULL,$rowbatch->id);
+                ResetCogsHelper::gas($this->post_date,$this->company_id,$this->place_id,$row->item_id,$rowbatch->area_id,$rowbatch->item_shading_id,$rowbatch->id);
             }
             $row->update([
                 'total' => $rowtotal,
@@ -543,6 +544,7 @@ class ProductionReceive extends Model
                 ProductionReceiveIssue::create([
                     'production_receive_id' => $this->id,
                     'production_issue_id'   => $query->id,
+                    'is_auto'               => '1',
                 ]);
 
                 CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);

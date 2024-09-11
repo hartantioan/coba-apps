@@ -1800,6 +1800,17 @@
 
     function addItem(){
         var count = makeid(10);
+        let countItem = $('.row_item').length;
+
+        if(countItem > 49){
+            swal({
+                title: 'Ups!',
+                text: 'Satu GIR tidak boleh memiliki baris item lebih dari 50.',
+                icon: 'error'
+            });
+            return false;
+        }
+
         $('#last-row-item').before(`
             <tr class="row_item">
                 <td>

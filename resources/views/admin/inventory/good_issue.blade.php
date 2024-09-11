@@ -1006,7 +1006,24 @@
                             icon: 'warning'
                         });
                     }else{
+                        let countItem = $('.row_item').length;
 
+                        if(datakuy.details.length+countItem > 49){
+                            swal({
+                                title: 'Ups!',
+                                text: 'Satu GI tidak boleh memiliki baris item lebih dari 50.',
+                                icon: 'error'
+                            });
+                            return false;
+                        }
+                        if(countItem > 49){
+                            swal({
+                                title: 'Ups!',
+                                text: 'Satu GI tidak boleh memiliki baris item lebih dari 50.',
+                                icon: 'error'
+                            });
+                            return false;
+                        }
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + datakuy.code + `
@@ -1015,7 +1032,7 @@
                         `);
 
                         $('.row_item[data-id=""]').remove();
-
+                        
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
                             $('#last-row-item').before(`
@@ -1211,6 +1228,16 @@
 
     function addItem(){
         var count = makeid(10);
+        let countItem = $('.row_item').length;
+
+        if(countItem > 49){
+            swal({
+                title: 'Ups!',
+                text: 'Satu GI tidak boleh memiliki baris item lebih dari 50.',
+                icon: 'error'
+            });
+            return false;
+        }
         $('#last-row-item').before(`
             <tr class="row_item" data-id="">
                 <input type="hidden" name="arr_lookable_type[]" value="">

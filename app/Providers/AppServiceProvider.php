@@ -118,6 +118,8 @@ class AppServiceProvider extends ServiceProvider
             'marketing_order_delivery_process_details'=> 'App\Models\MarketingOrderDeliveryProcessDetail',
             'production_working_hours'              => 'App\Models\ProductionWorkingHour',
             'list_bg_checks'                        => 'App\Models\ListBgCheck',
+            'production_repacks'                    => 'App\Models\ProductionRepack',
+            'production_repack_details'             => 'App\Models\ProductionRepackDetail',
         ]);
     }
 }

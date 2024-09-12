@@ -216,6 +216,7 @@ use App\Http\Controllers\Production\ProductionIssueController;
 use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 use App\Http\Controllers\Production\ProductionRecapitulationController;
+use App\Http\Controllers\Production\ProductionRepackController;
 use App\Models\ItemPricelist;
 
 /*
@@ -2407,6 +2408,25 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionWorkingHourController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionWorkingHourController::class, 'voidStatus'])->middleware('operation.access:production_working_hour,void');
                     Route::post('destroy', [ProductionWorkingHourController::class, 'destroy'])->middleware('operation.access:production_working_hour,delete');
+                });
+
+                Route::prefix('production_repack')->middleware(['operation.access:production_repack,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionRepackController::class, 'index']);
+                    Route::get('datatable',[ProductionRepackController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionRepackController::class, 'rowDetail']);
+                    Route::post('show', [ProductionRepackController::class, 'show']);
+                    Route::post('get_code', [ProductionRepackController::class, 'getCode']);
+                    Route::post('print',[ProductionRepackController::class, 'print']);
+                    Route::post('done',[ProductionRepackController::class, 'done'])->middleware('operation.access:production_repack,update');
+                    Route::post('print_by_range',[ProductionRepackController::class, 'printByRange']);
+                    Route::get('export',[ProductionRepackController::class, 'export']);
+                    Route::get('export_from_page',[ProductionRepackController::class, 'exportFromTransactionPage']);
+                    Route::get('viewstructuretree',[ProductionRepackController::class, 'viewStructureTree']);
+                    Route::post('create',[ProductionRepackController::class, 'create'])->middleware('operation.access:production_repack,update');
+                    Route::get('approval/{id}',[ProductionRepackController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionRepackController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionRepackController::class, 'voidStatus'])->middleware('operation.access:production_repack,void');
+                    Route::post('destroy', [ProductionRepackController::class, 'destroy'])->middleware('operation.access:production_repack,delete');
                 });
 
                 Route::prefix('production_report')->middleware('direct.access')->group(function () {

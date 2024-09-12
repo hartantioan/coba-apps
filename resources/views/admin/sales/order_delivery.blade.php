@@ -605,6 +605,13 @@ document.addEventListener('focusin', function (event) {
                 $('.first-inputs').css('pointer-events','auto');
                 $('#alert-phase1').removeClass('hide');
                 $('#alert-phase2').addClass('hide');
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="11">
+                            Silahkan pilih Sales Order...
+                        </td>
+                    </tr>
+                `);
             }
         });
 

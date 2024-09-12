@@ -68,8 +68,8 @@ class MarketingOrderDelivery extends Model
 
     public function deliveryType(){
         $type = match ($this->type_delivery) {
-            '1' => 'Loco',
-            '2' => 'Franco',
+            '1' => 'LOCO',
+            '2' => 'FRANCO',
           default => 'Invalid',
         };
 

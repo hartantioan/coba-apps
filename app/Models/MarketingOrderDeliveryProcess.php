@@ -62,8 +62,15 @@ class MarketingOrderDeliveryProcess extends Model
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,$arr)){
+                if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no){
+                    
                 $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
+                }
             }
+        }
+
+        if(count($arr) == 0){
+            $arr[]='-';
         }
         return implode(', ',$arr);
     }
@@ -77,6 +84,9 @@ class MarketingOrderDeliveryProcess extends Model
                 }
             }
         }
+        if(count($arr) == 0){
+            $arr[]='-';
+        }
         return implode(', ',$arr);
     }
 
@@ -88,6 +98,9 @@ class MarketingOrderDeliveryProcess extends Model
                     $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->project->name;
                 }
             }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
         }
         return implode(', ',$arr);
     }
@@ -126,6 +139,9 @@ class MarketingOrderDeliveryProcess extends Model
             if(!in_array($row->itemStock->warehouse->name,$arr)){
                 $arr[] = $row->itemStock->warehouse->name;
             }
+        }
+        if(count($arr) == 0){
+            $arr[]='-';
         }
         return implode(', ',$arr);
     }

@@ -1530,12 +1530,12 @@
                             if($('#type').val() == '1'){
                                 $('#qty_in').val(response);
                             }else{
-                                /* $('#qty_out').val(response); */
-                                if($('#type').val() == '3'){
+                                $('#qty_out').val(response);
+                                /* if($('#type').val() == '3'){
                                     $('#qty_out').val(response);
                                 }else{
                                     $('#qty_out').val('10.000,000');
-                                }
+                                } */
                             }
                             /* countBalance(); */
                         }
@@ -1544,12 +1544,12 @@
                         if($('#tempType').val() == '1'){
                             $('#qtyOutUpdate').val(response);
                         }else{
-                            /* $('#qtyInUpdate').text(response); */
-                            if($('#tempType').val() == '3'){
+                            $('#qtyInUpdate').text(response);
+                            /* if($('#tempType').val() == '3'){
                                 $('#qtyInUpdate').text(response);
                             }else{
                                 $('#qtyInUpdate').text('25.000,000');
-                            }
+                            } */
                         }
                         countBalance();
                     }

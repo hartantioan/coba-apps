@@ -1187,8 +1187,16 @@
     function resetMod(){
         arrMod = [];
         $('select[name^="arr_marketing_order_delivery_id[]"]').each(function(index){
+            let element = $(this);
             if($(this).val()){
                 arrMod.push($(this).val());
+                if(element.select2('data')[0].account_id){
+                    if(element.select2('data')[0].account_id !== element.val()){
+                        $('#account_id').empty().append(`
+                            <option value="` + element.select2('data')[0].account_id + `">` + element.select2('data')[0].account_name + `</option>
+                        `);
+                    }
+                }
             }
         });
     }

@@ -3098,7 +3098,9 @@ class Select2Controller extends Controller {
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code.' - '.date('d/m/Y',strtotime($d->post_date)),
+                'text' 			=> $d->code.' - '.date('d/m/Y',strtotime($d->post_date)).' - Ekspedisi : '.($d->account()->exists() ? $d->account->name : 'Belum diatur.'),
+                'account_id'    => $d->account_id,
+                'account_name'  => $d->account->name,
             ];
         }
 
@@ -5043,6 +5045,67 @@ class Select2Controller extends Controller {
             $response[] = [
                 'id'   			    => $d->id,
                 'text' 			    => $d->document_no.' Rp '.CustomHelper::formatConditionalQty($d->nominal).' - '.$d->coa->name.' - '.$d->note,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function itemFgFromPacking(Request $request)
+    {
+        $response = [];
+        $search     = $request->search;
+       
+        $data = Item::where(function($query) use($search,$request){
+            $query->where(function($query) use ($search, $request) {
+                if($search) {
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                }
+            });
+            if($request->item_source){
+                $itemref = Item::find($request->item_source);
+                if($itemref){
+                    $query->whereIn('id',$itemref->arrayItemWithSameParent());
+                }
+            }
+        })
+        ->where('status','1')
+        ->get();
+       
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function salesItemPalletOnly(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })
+                ->where('status','1')
+                ->whereNotNull('is_sales_item')
+                ->whereDoesntHave('fgGroup')
+                ->whereHas('pallet',function($query){
+                    $query->where('box_conversion','>',1);
+                })
+                ->get();
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
             ];
         }
 

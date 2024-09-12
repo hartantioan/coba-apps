@@ -475,7 +475,7 @@ class Coa extends Model
                     AND jd.deleted_at IS NULL
                     AND j.deleted_at IS NULL
                     AND j.post_date < :date
-                    AND jd.type = '1'
+                    AND jd.type = '2'
                     AND j.status IN ('2','3')
             ", array(
                 'coa_id'    => $this->id,

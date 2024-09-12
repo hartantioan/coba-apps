@@ -2347,7 +2347,7 @@
             var finalpricedisc1 = price - (price * (disc1 / 100));
             var finalpricedisc2 = finalpricedisc1 - (finalpricedisc1 * (disc2 / 100));
             var finalpricedisc3 = finalpricedisc2 - disc3;
-            var rowtotal = (finalpricedisc3 * qty).toFixed(2);
+            var rowtotal = (finalpricedisc3.toFixed(2) * qty).toFixed(2);
             var rowtax = 0;
 
             if($('#arr_tax' + id).val() !== '0'){

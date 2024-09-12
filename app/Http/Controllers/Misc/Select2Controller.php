@@ -2899,6 +2899,9 @@ class Select2Controller extends Controller {
             if($request->top_internal){
                 $query->where('top_internal',floatval($request->top_internal));
             }
+            if($request->so_type){
+                $query->where('type',floatval($request->so_type));
+            }
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

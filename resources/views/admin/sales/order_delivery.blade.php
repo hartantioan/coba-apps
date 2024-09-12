@@ -164,6 +164,7 @@
                                                         <th>Tipe Transport</th>
                                                         <th>Metode Hitung Ongkir</th>
                                                         <th>Tipe Pengiriman</th>
+                                                        <th>Tipe SO</th>
                                                         <th>Tgl.Post</th>
                                                         <th>Tgl.Kirim</th>
                                                         <th>Catatan Internal</th>
@@ -245,7 +246,7 @@
                                     <div class="col m6 s12">
                                         <div class="card-alert card green" id="alert-phase1">
                                             <div class="card-content white-text">
-                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman, Prosentase DP, dan TOP Internal adalah sama.</p>
+                                                <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman, Prosentase DP, Tipe SO, dan TOP Internal adalah SAMA.</p>
                                             </div>
                                         </div>
                                         <div class="card-alert card green hide" id="alert-phase2">
@@ -1365,6 +1366,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'transportation_id', className: '' },
                 { name: 'cost_delivery_type', className: '' },
                 { name: 'type_delivery', className: '' },
+                { name: 'so_type', className: '' },
                 { name: 'post_date', className: '' },
                 { name: 'delivery_date', className: '' },
                 { name: 'note_internal', className: '' },

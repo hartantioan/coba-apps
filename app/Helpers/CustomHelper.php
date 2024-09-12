@@ -3770,6 +3770,7 @@ class CustomHelper {
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 				]);
+				CustomHelper::removeDeposit($moi->account_id,$moi->downpayment);
 			}
 
 			if($moi->tax > 0){

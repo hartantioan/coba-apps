@@ -985,7 +985,7 @@ class IncomingPaymentController extends Controller
                             CustomHelper::addCountLimitCredit($query->account_id,$row->total);
                         }
                         if($row->lookable_type == 'marketing_order_down_payments'){
-                            CustomHelper::removeDeposit($row->lookable->account_id,$row->total * $query->currency_rate);
+                            CustomHelper::removeDeposit($row->lookable->account_id,$row->lookable->total * $query->currency_rate);
                             CustomHelper::addCountLimitCredit($row->lookable->account_id,$row->total * $query->currency_rate);
                             $row->lookable->update([
                                 'status'    => '2'

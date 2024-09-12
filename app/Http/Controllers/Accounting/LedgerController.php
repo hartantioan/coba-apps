@@ -97,20 +97,9 @@ class LedgerController extends Controller
                 } else {
                     $periode = "";
                 }
-                $datadebitbefore  = $val->journalDebit()->whereHas('journal',function($query)use($request){
-                    $query->whereDate('post_date','<',$request->start_date);
-                })->get();
-                $datacreditbefore  = $val->journalCredit()->whereHas('journal',function($query)use($request){
-                    $query->whereDate('post_date','<',$request->start_date);
-                })->get();
-
-                foreach($datadebitbefore as $row){
-                    $balance_debit += round($row->nominal,2);
-                }
-
-                foreach($datacreditbefore as $row){
-                    $balance_credit += round($row->nominal,2);
-                }
+                
+                $balance_debit = $val->getBalanceFromDateDebit($request->start_date);
+                $balance_credit = $val->getBalanceFromDateCredit($request->start_date);
 
                 $balance = $balance_debit - $balance_credit;
                 $total_debit = 0;

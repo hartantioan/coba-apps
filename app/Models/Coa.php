@@ -434,4 +434,56 @@ class Coa extends Model
 
         return $totalDebit - $totalCredit;
     }
+
+    public function getBalanceFromDateDebit($date){
+        $totalDebit = 0;
+
+        $dataBalanceBeforeDebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $this->id,
+                'date'      => $date,
+            ));
+
+        $totalDebit = $dataBalanceBeforeDebit[0]->total;
+
+        return $totalDebit;
+    }
+
+    public function getBalanceFromDateCredit($date){
+        $totalCredit = 0;
+
+        $dataBalanceBeforeCredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND j.post_date < :date
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+            ", array(
+                'coa_id'    => $this->id,
+                'date'      => $date,
+            ));
+
+        $totalCredit = $dataBalanceBeforeCredit[0]->total;
+
+        return $totalCredit;
+    }
 }

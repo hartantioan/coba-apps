@@ -1228,8 +1228,8 @@ class MarketingOrderInvoiceController extends Controller
                 ];
             }else{
                 if(in_array($query->status,['2','3'])){
-                    foreach($query->marketingOrderInvoiceDownPayment as $row){
-                        CustomHelper::addDeposit($row->lookable->account_id,$row->grandtotal * $row->lookable->currency_rate);
+                    if($query->downpayment > 0){
+                        CustomHelper::addDeposit($query->account_id,$query->downpayment);
                     }
                     CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
                 }

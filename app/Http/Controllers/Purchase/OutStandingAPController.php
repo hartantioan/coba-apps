@@ -359,7 +359,7 @@ class OutStandingAPController extends Controller
 
         if($results || $results2){
             foreach($results as $row){
-                $total_received_after_adjust = round(($row->balance * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nomina2,2);
+                $total_received_after_adjust = round(($row->balance * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nominal2,2);
                 $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [
@@ -378,7 +378,7 @@ class OutStandingAPController extends Controller
             }
 
             foreach($results2 as $row){
-                $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nomina2,2);
+                $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nominal2,2);
                 $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2) + ($row->total_journal_debit + $row->total_journal_credit);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [

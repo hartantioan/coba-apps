@@ -148,6 +148,7 @@ class MarketingOrderController extends Controller
             'stock_com'         => CustomHelper::formatConditionalQty($item->getQtySalesNotSent($this->dataplaces)),
             'sell_units'        => $item->arrSellUnits(),
             'list_area'         => Area::where('status','1')->get(),
+            'uom'               => $item->uomUnit->code,
         ];
         
 		return response()->json($response);

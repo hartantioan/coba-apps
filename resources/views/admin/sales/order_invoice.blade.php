@@ -881,6 +881,20 @@
                 $("#user_data_id").empty().append(`
                     <option value="">--Pilih customer ya--</option>
                 `);
+                $('#body-item').empty().append(`
+                    <tr id="last-row-item">
+                        <td colspan="13">
+                            Silahkan tambahkan Surat Jalan...
+                        </td>
+                    </tr>
+                `);
+                $('#body-dp').empty().append(`
+                    <tr id="last-row-dp">
+                        <td colspan="10">
+                            Silahkan tambahkan AR Down Payment...
+                        </td>
+                    </tr>
+                `);
             }
         });
 

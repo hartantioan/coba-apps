@@ -124,7 +124,7 @@ class OutStandingAPController extends Controller
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
                             AND ard.type IS NOT NULL
-                            AND ar.post_date < '2024-07-01'
+                            AND ar.post_date < '2024-06-01'
                     ),0) AS adjust_nominal,
                     IFNULL((SELECT
                         SUM(ROUND(jd.nominal,2))
@@ -139,7 +139,7 @@ class OutStandingAPController extends Controller
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
-                            AND ar.post_date >= '2024-07-01'
+                            AND ar.post_date >= '2024-06-01'
                             AND ard.type = '2'
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'
@@ -263,7 +263,7 @@ class OutStandingAPController extends Controller
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
                             AND ard.type IS NOT NULL
-                            AND ar.post_date < '2024-07-01'
+                            AND ar.post_date < '2024-06-01'
                     ),0) AS adjust_nominal,
                     IFNULL((SELECT
                         SUM(ROUND(jd.nominal,2))
@@ -278,7 +278,7 @@ class OutStandingAPController extends Controller
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
-                            AND ar.post_date >= '2024-07-01'
+                            AND ar.post_date >= '2024-06-01'
                             AND ard.type = '2'
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'

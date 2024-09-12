@@ -965,7 +965,7 @@ class MarketingOrderController extends Controller
             $totalqtyuom+=$row->qty_uom;
             $totaldiskon1+=$row->percent_discount_1;
             $totaldiskon2+=$row->percent_discount_2;
-            $totaldiskon3+=$row->discount3;
+            $totaldiskon3+=$row->discount_3;
             $totalpriceafterdiscount+=$row->price_after_discount;
             $totals+=$row->total;
             $string .= '<tr>

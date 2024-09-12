@@ -142,6 +142,7 @@ class OutStandingAPController extends Controller
                             AND ar.post_date >= '2024-07-01'
                             AND ard.type = '2'
                             AND jd.deleted_at IS NULL
+                            AND jd.type = '2'
                     ),0) AS adjust_nominal2,
                     IFNULL((SELECT
                         '1'
@@ -280,6 +281,7 @@ class OutStandingAPController extends Controller
                             AND ar.post_date >= '2024-07-01'
                             AND ard.type = '2'
                             AND jd.deleted_at IS NULL
+                            AND jd.type = '2'
                     ),0) AS adjust_nominal2,
                     IFNULL((SELECT
                         '1'

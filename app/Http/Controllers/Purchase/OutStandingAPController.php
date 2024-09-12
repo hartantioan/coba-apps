@@ -113,7 +113,7 @@ class OutStandingAPController extends Controller
                             AND jd.deleted_at IS NULL
                     ),0) AS total_journal,
                     IFNULL((SELECT
-                        SUM(ROUND(ard.nominal,2))
+                        SUM(ard.nominal)
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
@@ -236,7 +236,7 @@ class OutStandingAPController extends Controller
                             AND prd.deleted_at IS NULL
                     ),0) AS total_reconcile,
                     IFNULL((SELECT
-                        SUM(ROUND(ard.nominal,2))
+                        SUM(ard.nominal)
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
@@ -330,7 +330,7 @@ class OutStandingAPController extends Controller
         if($results || $results2){
             foreach($results as $row){
                 $total_received_after_adjust = round(($row->balance * $row->currency_rate) + $row->adjust_nominal,2);
-                $total_invoice_after_adjust = round(round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,4),2);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [
                     'code'      => $row->code,
@@ -349,7 +349,7 @@ class OutStandingAPController extends Controller
 
             foreach($results2 as $row){
                 $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal,2);
-                $total_invoice_after_adjust = round(round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,4),2) + ($row->total_journal_debit + $row->total_journal_credit);
+                $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2) + ($row->total_journal_debit + $row->total_journal_credit);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [
                     'code'      => $row->code,

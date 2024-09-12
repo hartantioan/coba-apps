@@ -427,10 +427,8 @@ class User extends Authenticatable
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                    $query->whereDoesntHave('marketingOrderDeliveryProcess');
-                })->get() as $rowmod){
-                    $totalMod += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderDeliveryProcessDetail')->get() as $rowmod){
+                    $totalMod += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }
         }
@@ -442,10 +440,8 @@ class User extends Authenticatable
         $totalMod = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                    $query->whereDoesntHave('marketingOrderDeliveryProcess');
-                })->get() as $rowmod){
-                    $totalMod += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereDoesntHave('marketingOrderDeliveryProcessDetail')->get() as $rowmod){
+                    $totalMod += round(($rowmod->getGrandtotal() * ($row->percent_dp/100)),2);
                 }
             }
         }
@@ -457,9 +453,7 @@ class User extends Authenticatable
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                    $query->whereHas('marketingOrderDeliveryProcess');
-                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail')->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
                     $totalDo += $rowmod->getGrandtotal();
                 }
             }
@@ -472,10 +466,8 @@ class User extends Authenticatable
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
-                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
-                })->get() as $rowmod){
-                    $totalDo += ($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100));
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail')->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }
         }
@@ -487,10 +479,8 @@ class User extends Authenticatable
         $totalDo = 0;
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
-                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
-                })->get() as $rowmod){
-                    $totalDo += ($rowmod->getGrandtotal() * ($row->percent_dp/100));
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail')->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $totalDo += round(($rowmod->getGrandtotal() * ($row->percent_dp/100)),2);
                 }
             }
         }

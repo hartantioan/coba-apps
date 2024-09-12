@@ -19,18 +19,18 @@
 
             td {
                 font-weight: 700;
-                font-size:22px;
+                font-size:20px;
             }
 
-            @page { margin: 0.5em 0.75em 0.5em 0.75em; }
+            @page { margin: 0.30em 0.75em 0.25em 0.75em; }
         </style>
     </head>
     <body>
         <table border="0" width="100%" class="tbl-info">
             <tr>
                 <td align="center">
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="50px" />
-                    <div>{{ $data->code }}</div>
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($data->code, 'C128')}}" alt="barcode" style="width:100%;" height="55px" />
+                    <div style="margin-top:5px;">{{ $data->code }}</div>
                 </td>
             </tr>
         </table>

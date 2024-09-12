@@ -52,6 +52,7 @@ class OutStandingAPController extends Controller
                 rs.balance,
                 rs.currency_rate,
                 rs.adjust_nominal,
+                rs.adjust_nominal2,
                 rs.total_payment,
                 rs.total_memo,
                 rs.total_reconcile,
@@ -122,18 +123,31 @@ class OutStandingAPController extends Controller
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
-                            AND (
-                                CASE 
-                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
-                                    WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
-                                END
-                            )
+                            AND ard.type IS NOT NULL
+                            AND ar.post_date < '2024-07-01'
                     ),0) AS adjust_nominal,
+                    IFNULL((SELECT
+                        SUM(ROUND(jd.nominal,2))
+                        FROM adjust_rate_details ard
+                        JOIN adjust_rates ar
+                            ON ar.id = ard.adjust_rate_id
+                        JOIN journal_details jd
+                            ON jd.detailable_type = 'adjust_rate_details'
+                            AND jd.detailable_id = ard.id
+                        WHERE 
+                            ar.post_date <= :date6
+                            AND ar.status IN ('2','3')
+                            AND ard.lookable_type = 'purchase_invoices'
+                            AND ard.lookable_id = pi.id
+                            AND ar.post_date >= '2024-07-01'
+                            AND ard.type = '2'
+                            AND jd.deleted_at IS NULL
+                    ),0) AS adjust_nominal2,
                     IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date6
+                            cd.post_date <= :date7
                             AND cd.lookable_type = 'purchase_invoices'
                             AND cd.lookable_id = pi.id
                             AND cd.deleted_at IS NULL
@@ -153,7 +167,7 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date <= :date7
+                        pi.post_date <= :date8
                         AND pi.balance > 0
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
@@ -169,6 +183,7 @@ class OutStandingAPController extends Controller
             'date5' => $date,
             'date6' => $date,
             'date7' => $date,
+            'date8' => $date,
         ));
 
         $results2 = DB::select("
@@ -189,6 +204,7 @@ class OutStandingAPController extends Controller
                 rs.grandtotal,
                 rs.currency_rate,
                 rs.adjust_nominal,
+                rs.adjust_nominal2,
                 rs.total_payment,
                 rs.total_memo,
                 rs.total_reconcile,
@@ -243,20 +259,33 @@ class OutStandingAPController extends Controller
                         WHERE 
                             ar.post_date <= :date4
                             AND ar.status IN ('2','3')
-                            AND ard.lookable_type = 'purchase_down_payments'
+                            AND ard.lookable_type = 'purchase_invoices'
                             AND ard.lookable_id = pi.id
-                            AND (
-                                CASE 
-                                    WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
-                                    WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
-                                END
-                            )
+                            AND ard.type IS NOT NULL
+                            AND ar.post_date < '2024-07-01'
                     ),0) AS adjust_nominal,
+                    IFNULL((SELECT
+                        SUM(ROUND(jd.nominal,2))
+                        FROM adjust_rate_details ard
+                        JOIN adjust_rates ar
+                            ON ar.id = ard.adjust_rate_id
+                        JOIN journal_details jd
+                            ON jd.detailable_type = 'adjust_rate_details'
+                            AND jd.detailable_id = ard.id
+                        WHERE 
+                            ar.post_date <= :date5
+                            AND ar.status IN ('2','3')
+                            AND ard.lookable_type = 'purchase_invoices'
+                            AND ard.lookable_id = pi.id
+                            AND ar.post_date >= '2024-07-01'
+                            AND ard.type = '2'
+                            AND jd.deleted_at IS NULL
+                    ),0) AS adjust_nominal2,
                     IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
                         WHERE 
-                            cd.post_date <= :date5
+                            cd.post_date <= :date6
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pi.id
                             AND cd.deleted_at IS NULL
@@ -271,7 +300,7 @@ class OutStandingAPController extends Controller
                                 ON jd.coa_id = c.id
                             WHERE c.code = '200.01.03.01.01'
                             AND jd.note = CONCAT('REVERSE*',pi.code)
-                            AND j.post_date <= :date6
+                            AND j.post_date <= :date7
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND jd.type = '1'
@@ -286,7 +315,7 @@ class OutStandingAPController extends Controller
                                 ON jd.coa_id = c.id
                             WHERE c.code = '200.01.03.01.01'
                             AND jd.note = CONCAT('REVERSE*',pi.code)
-                            AND j.post_date <= :date7
+                            AND j.post_date <= :date8
                             AND j.status IN ('2','3')
                             AND jd.deleted_at IS NULL
                             AND jd.type = '2'
@@ -306,7 +335,7 @@ class OutStandingAPController extends Controller
                     LEFT JOIN users u
                         ON u.id = pi.account_id
                     WHERE 
-                        pi.post_date <= :date8
+                        pi.post_date <= :date9
                         AND pi.grandtotal > 0
                         AND pi.status IN ('2','3','7','8')
                         AND pi.deleted_at IS NULL
@@ -323,13 +352,14 @@ class OutStandingAPController extends Controller
             'date6' => $date,
             'date7' => $date,
             'date8' => $date,
+            'date9' => $date,
         ));
 
         $totalAll = 0;
 
         if($results || $results2){
             foreach($results as $row){
-                $total_received_after_adjust = round(($row->balance * $row->currency_rate) + $row->adjust_nominal,2);
+                $total_received_after_adjust = round(($row->balance * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nomina2,2);
                 $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [
@@ -348,7 +378,7 @@ class OutStandingAPController extends Controller
             }
 
             foreach($results2 as $row){
-                $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal,2);
+                $total_received_after_adjust = round(($row->grandtotal * $row->currency_rate) + $row->adjust_nominal + $row->adjust_nomina2,2);
                 $total_invoice_after_adjust = round(($row->total_payment + $row->total_memo + $row->total_reconcile) * $row->currency_rate,2) + ($row->total_journal_debit + $row->total_journal_credit);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
                 $data_tempura = [

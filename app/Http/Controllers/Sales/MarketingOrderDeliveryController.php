@@ -551,6 +551,7 @@ class MarketingOrderDeliveryController extends Controller
                         'transportation_id'         => $request->tempTransport,
                         'cost_delivery_type'        => $request->cost_delivery_type,
                         'type_delivery'             => $request->tempTypeDelivery,
+                        'so_type'                   => $request->tempSoType,
                         'top_internal'              => $request->tempTopInternal,
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,

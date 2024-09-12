@@ -31,6 +31,7 @@ class MarketingOrderDelivery extends Model
         'transportation_id',
         'cost_delivery_type',
         'type_delivery',
+        'so_type',
         'top_internal',
         'note_internal',
         'note_external',
@@ -73,6 +74,18 @@ class MarketingOrderDelivery extends Model
         };
 
         return $type;
+    }
+
+    public function soType(){
+        $so_type = match ($this->so_type) {
+            '1' => 'Proyek',
+            '2' => 'Retail',
+            '3' => 'Khusus',
+            '4' => 'Sampel',
+          default => 'Invalid',
+        };
+
+        return $so_type;
     }
 
     public function costDeliveryType(){

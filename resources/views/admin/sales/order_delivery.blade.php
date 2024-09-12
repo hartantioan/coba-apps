@@ -294,6 +294,7 @@
                                         <input type="hidden" id="tempDownPayment" name="tempDownPayment">
                                         <input type="hidden" id="tempTypeDelivery" name="tempTypeDelivery">
                                         <input type="hidden" id="tempTopInternal" name="tempTopInternal">
+                                        <input type="hidden" id="tempSoType" name="tempSoType">
                                     </div>
                                 </fieldset>
                             </div>
@@ -598,7 +599,7 @@ document.addEventListener('focusin', function (event) {
                 tempAccount = null;
                 paymentType = null;
                 $('#district-info,#city-info,#transportation-info').text('-');
-                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment,#tempTypeDelivery,#tempTopInternal').val('');
+                $('#tempDistrict,#tempCity,#tempTransport,#tempPayment,#tempDownPayment,#tempTypeDelivery,#tempTopInternal,#tempSoType').val('');
                 $('.second-inputs').css('pointer-events','auto');
                 $('.first-inputs').css('pointer-events','auto');
                 $('#alert-phase1').removeClass('hide');
@@ -693,6 +694,7 @@ document.addEventListener('focusin', function (event) {
                         down_payment: $('#tempDownPayment').val(),
                         type_delivery: $('#tempTypeDelivery').val(),
                         top_internal: $('#tempTopInternal').val(),
+                        so_type: $('#tempSoType').val(),
                     };
                 },
                 processResults: function(data) {
@@ -802,6 +804,7 @@ document.addEventListener('focusin', function (event) {
                         $('#tempDownPayment').val(response.percent_dp);
                         $('#tempTypeDelivery').val(response.type_delivery);
                         $('#tempTopInternal').val(response.top_internal);
+                        $('#tempSoType').val(response.type);
                         $('#district-info').text(response.district_name);
                         $('#city-info').text(response.city_name);
                         $('#transportation-info').text(response.transportation_name);
@@ -1639,6 +1642,7 @@ document.addEventListener('focusin', function (event) {
                     if(response.top_internal){
                         $('#tempTopInternal').val(response.top_internal);
                     }
+                    $('#tempSoType').val(response.so_type);
                     $('#district-info').text(response.district_name);
                     $('#city-info').text(response.city_name);
                     $('#transportation-info').text(response.transportation_name);

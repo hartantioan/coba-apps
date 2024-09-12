@@ -527,7 +527,7 @@ class MarketingOrderInvoiceController extends Controller
                     }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
                         $rowdata = MarketingOrderDownPayment::find($row);
                         $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
-                        $rowtax = $rowdata->taxId()->exists() ? floor($rowtotal * ($rowdata->taxId->percentage / 100)) : 0;
+                        $rowtax = $rowdata->taxId()->exists() ? round($rowdata->tax * ($rowtotal / $rowdata->total),2) : 0;
                         $rowgrandtotal = $rowtotal + $rowtax;
                         MarketingOrderInvoiceDetail::create([
                             'marketing_order_invoice_id'    => $query->id,

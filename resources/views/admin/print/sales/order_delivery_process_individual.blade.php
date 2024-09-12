@@ -176,6 +176,13 @@
             </table>
         </header>
         <main style="margin-top:25px;">
+            @if ($data->marketingOrderDelivery->so_type == '4')
+                <div style="position:absolute;top:30%;left:35%;width:150px;height:50px;padding:15px 15px 15px 15px;font-size:12px;text-align:center;border:1px solid black;border-radius:15px;opacity: 0.5;">
+                    SAMPLE
+                    <hr>
+                    TIDAK UNTUK DIJUAL
+                </div>
+            @endif
             <div class="card">
                 <div class="card-content invoice-print-area">
                     <!-- header section -->

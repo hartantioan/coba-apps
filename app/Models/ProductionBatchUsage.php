@@ -36,7 +36,11 @@ class ProductionBatchUsage extends Model
     }
 
     public function productionReceiveIssueDetail(){
-        return $this->hasMany('App\Models\ProductionReceiveIssueDetail','production_batch_usage_id','id');
+        return $this->hasMany('App\Models\ProductionReceiveIssueDetail','production_batch_usage_id','id')->whereHas('productionReceiveIssue',function($query){
+            $query->whereHas('productionReceive',function($query){
+                $query->whereIn('status',['2','3']);
+            });
+        });
     }
 
     public function balanceQty(){

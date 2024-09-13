@@ -191,7 +191,7 @@ class ResetCogsNew implements ShouldQueue
         })->where('item_reject_id',$item_id)->where('qty_reject','>',0)->get();
 
         foreach($productionreceivereject as $row){
-            $qty_final = $totalBefore + $row->qty_reject;
+            $qty_final = $qtyBefore + $row->qty_reject;
             $total_final = $totalBefore + 0;
             ItemCogs::create([
                 'lookable_type'		        => $row->productionReceive->getTable(),

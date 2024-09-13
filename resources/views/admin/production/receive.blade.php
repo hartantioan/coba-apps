@@ -2467,8 +2467,8 @@
 
                 $('input[name^="arr_qty[]"]').each(function(index){
                     let count = makeid(10), rowtotal = 0, element = this;
-                    totalQtyReceive += parseFloat($(element).val().replaceAll(".", "").replaceAll(",","."));
-                    totalQtyReceive += parseFloat($('input[name^="arr_qty_reject[]"]').eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                    totalQtyReceive += Math.round(parseFloat($(element).val().replaceAll(".", "").replaceAll(",",".")) * 1000) / 1000;
+                    totalQtyReceive += Math.round(parseFloat($('input[name^="arr_qty_reject[]"]').eq(index).val().replaceAll(".", "").replaceAll(",",".")) * 1000) / 1000;
                     if($(element).val() == '' || $(element).val() == '0'){
                         passedInput = false;
                     }

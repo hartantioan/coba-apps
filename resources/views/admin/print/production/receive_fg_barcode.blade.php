@@ -60,13 +60,13 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="70%" align="center" style="padding-top:10px;">
+                            <td width="70%" align="center">
                                 <table border="0">
                                     <tr>
                                         <td>{{ $row->item->code }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ $row->item->name }}</td>
+                                        <td style="padding-top:2px;">{{ $row->item->name }}</td>
                                     </tr>
                                     <tr>
                                         <td>{{ 'SHADE : '.$row->shading }}</td>

@@ -864,9 +864,9 @@
                         </td>
                     </tr>
                 `);
-                $('#nominal').attr('readonly',false);
+                /* $('#nominal').attr('readonly',false);
                 $('#is_include_tax').attr('readonly',false);
-                $('#is_include_tax option').attr('disabled', false);
+                $('#is_include_tax option').attr('disabled', false); */
             }
         });
 
@@ -1061,7 +1061,7 @@
                         $('#marketing_order_id').empty();
 
                         $('#type').val(datakuy.payment_type).formSelect();
-                        $('#nominal').attr('readonly',true);
+                        /* $('#nominal').attr('readonly',true); */
                         countRow();
                     }
                 },
@@ -1484,14 +1484,14 @@
     }
 
     function countFromHeader(){
-        if($('.row_item').length > 0){
+        /* if($('.row_item').length > 0){
             M.toast({
                 html: 'Silahkan hapus baris SO/MO untuk perhitungan dari Nominal Masuk atau tanpa menarik SO/MO.'
             });
-        }else{
+        }else{ */
             $('#subtotal').val($('#nominal').val());
             countAll();
-        }
+        /* } */
     }
 
     function countAll(){
@@ -1897,12 +1897,6 @@
                 $('#is_include_tax').val(response.is_include_tax);
                 $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
-                if(response.is_include_tax == '1'){
-                    $('#is_include_tax').prop( "checked", true);
-                }else{
-                    $('#is_include_tax').prop( "checked", false);
-                }
-
                 if(response.details.length > 0){
                     if($('.data-used').length > 0){
                         $('.data-used').trigger('click');
@@ -1912,7 +1906,7 @@
                     }
                     $('#is_include_tax').val('0');
                     $('#is_include_tax option:not(:selected)').attr('disabled', true);
-                    $('#nominal').attr('readonly',true);
+                    /* $('#nominal').attr('readonly',true); */
                     $.each(response.details, function(i, val) {
                         $.each(val.details, function(i, valdetail) {
                             var count = makeid(10);

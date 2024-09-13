@@ -183,7 +183,6 @@
                                                         <th rowspan="2">{{ __('translations.note') }}</th>
                                                         <th colspan="4" class="center-align">Pajak</th>
                                                         <th rowspan="2">{{ __('translations.subtotal') }}</th>
-                                                        <th rowspan="2">Diskon</th>
                                                         <th rowspan="2">{{ __('translations.total') }}</th>
                                                         <th rowspan="2">{{ __('translations.tax') }}</th>
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
@@ -1682,7 +1681,6 @@
                 { name: 'is_include_tax', className: 'center-align' },
                 { name: 'tax_no', className: 'center-align' },
                 { name: 'subtotal', className: 'right-align' },
-                { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },

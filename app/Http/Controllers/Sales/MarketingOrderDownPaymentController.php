@@ -260,7 +260,6 @@ class MarketingOrderDownPaymentController extends Controller
                     $val->isIncludeTax(),
                     $val->tax_no,
                     number_format($val->subtotal,2,',','.'),
-                    number_format($val->discount,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),

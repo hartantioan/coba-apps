@@ -2439,6 +2439,7 @@
                 formData.delete("arr_batch_no[]");
                 formData.delete("arr_qty_batch[]");
                 formData.delete("arr_production_issue_id[]");
+                let totalBatchIssue = 0;
 
                 let passedInput = true, passedQty = true, passedProductionIssue = true, totalQtyReceive = 0;
 
@@ -2498,7 +2499,6 @@
                 });
 
                 if($('input[name^="arr_issue_batch_usage_qty[]"]').length > 0){
-                    let totalBatchIssue = 0;
                     $('input[name^="arr_issue_batch_usage_qty[]"]').each(function(index){
                         totalBatchIssue += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                     });

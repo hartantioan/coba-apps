@@ -2507,6 +2507,9 @@
                     }
                 }
 
+                console.log(totalBatchIssue);
+                console.log(totalQtyReceive);
+
                 if(!passedQty){
                     swal({
                         title: 'Ups! Maaf.',
@@ -2516,9 +2519,6 @@
 
                     return false;
                 }
-
-                console.log(totalBatchIssue);
-                console.log(totalQtyReceive);
 
                 if(!passedInput){
                     swal({

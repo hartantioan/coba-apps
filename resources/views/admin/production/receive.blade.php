@@ -2507,6 +2507,9 @@
                     }
                 }
 
+                console.log(totalBatchIssue);
+                console.log(totalQtyReceive);
+
                 if(!passedQty){
                     swal({
                         title: 'Ups! Maaf.',

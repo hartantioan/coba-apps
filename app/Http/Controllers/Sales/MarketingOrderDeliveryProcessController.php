@@ -1297,6 +1297,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            
             if($request->status_tracking == '5'){
                 return response()->json([
                     'status'  => 500,
@@ -1304,6 +1305,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ]);
             }
             $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
+
+            if($data->weight_netto <= 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
+                ]);
+            }
+
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status',$request->status_tracking)->first();
             if($cek){
                 $cek->update([
@@ -1315,14 +1324,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'marketing_order_delivery_process_id'   => $data->id,
                     'status'                                => $request->status_tracking,
                 ]);
-            }
-
-            if($data->weight_netto <= 0){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
-                ]);
-            }
+            }            
 
             if($request->status_tracking == '2'){
                 $data->createJournalSentDocument();

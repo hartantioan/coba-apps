@@ -250,7 +250,7 @@
                     {{ __('translations.outlet') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->outlet->name }}
+                    {{ $data->outlet()->exists() ? $data->outlet->name : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.destination_address') }}

@@ -60,7 +60,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="70%" align="center">
+                            <td width="70%" align="center" style="padding-top:10px;">
                                 <table border="0">
                                     <tr>
                                         <td>{{ $row->item->code }}</td>

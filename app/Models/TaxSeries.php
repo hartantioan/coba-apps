@@ -96,7 +96,7 @@ class TaxSeries extends Model
             $no = '';
             if(count($list) > 0){
                 $lastData = $list[0];
-                $currentno = intval(explode('.',$lastData)[count(explode('.',$lastData)) - 1]) + 1;
+                $currentno = intval($lastData) + 1;
                 $startno = intval($data->start_no);
                 $endno = intval($data->end_no);
                 if($currentno >= $startno && $currentno <= $endno){

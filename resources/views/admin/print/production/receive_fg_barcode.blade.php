@@ -72,7 +72,7 @@
                                         <td>{{ 'SHADE : '.$row->shading }}</td>
                                     </tr>
                                     <tr>
-                                        <td>{{ 'PALET : '.$row->pallet->name }}</td>
+                                        <td>{{ 'PALET : '.$row->pallet->prefix_code }}</td>
                                     </tr>
                                 </table>
                             </td>

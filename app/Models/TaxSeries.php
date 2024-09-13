@@ -75,12 +75,16 @@ class TaxSeries extends Model
 	}
 
     public static function getListCurrentTaxSeries($company_id,$year,$prefix){
-        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
-        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->pluck('tax_no')->toArray();
-        $newList = array_merge($dataInvoice,$dataDp);
-        $newList = array_unique($newList);
-        rsort($newList);
-        return $newList;
+        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->get();
+        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->get();
+        $arr = [];
+        foreach($dataInvoice as $row){
+            if(!in_array($row->tax_no,$arr)){
+                $arr[] = substr($row->tax_no,10,8);
+            }
+        }
+        rsort($arr);
+        return $arr;
     } 
 
     public static function getTaxCode($company_id,$date,$prefix){
@@ -96,9 +100,8 @@ class TaxSeries extends Model
                 $startno = intval($data->start_no);
                 $endno = intval($data->end_no);
                 if($currentno >= $startno && $currentno <= $endno){
-                    $newcurrent = $currentno/* str_pad($currentno, 8, 0, STR_PAD_LEFT) */;
+                    $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
-                    info($lastData);
                     $response = [
                         'status'    => 200,
                         'no'        => $no,

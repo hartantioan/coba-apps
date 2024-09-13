@@ -300,7 +300,7 @@
                                         </td>
                                         <td width="1%">:</td>
                                         <td width="60%">
-                                            {{ $data->outlet->name }}
+                                            {{ $data->outlet()->exits() ? $data->outlet->name : '' }}
                                         </td>
                                     </tr>
                                     <tr>

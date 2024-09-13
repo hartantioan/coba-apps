@@ -71,6 +71,9 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                 }elseif(!$note && $this->error ==null){
                     $this->error = "Belum ada keterangan.";
                 }
+                if($user->position()->exists()){
+                    $divisi = $user->position->division->name;
+                }
 
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');

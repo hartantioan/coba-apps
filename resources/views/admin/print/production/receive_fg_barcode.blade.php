@@ -78,7 +78,7 @@
                             </td>
                         </tr>
                     </table>
-                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:5px;" height="75px" />
+                    <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($row->pallet_no, 'C128')}}" alt="barcode" style="width:100%;margin-top:5px;" height="90px" />
                 </td>
             </tr>
             @endforeach

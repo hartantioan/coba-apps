@@ -98,6 +98,7 @@ class TaxSeries extends Model
                 if($currentno >= $startno && $currentno <= $endno){
                     $newcurrent = $currentno/* str_pad($currentno, 8, 0, STR_PAD_LEFT) */;
                     $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
+                    info($lastData);
                     $response = [
                         'status'    => 200,
                         'no'        => $no,

@@ -1957,11 +1957,11 @@
     }
 
     function checkMaxBatchQty(id){
-        /* let qtyMax = parseFloat($('#arr_issue_batch_usage_qty' + id).data('max').replaceAll(".", "").replaceAll(",","."));
+        let qtyMax = parseFloat($('#arr_issue_batch_usage_qty' + id).data('max').replaceAll(".", "").replaceAll(",","."));
         let qty = parseFloat($('#arr_issue_batch_usage_qty' + id).val().replaceAll(".", "").replaceAll(",","."));
         if(qty > qtyMax){
             $('#arr_issue_batch_usage_qty' + id).val(formatRupiahIni(qtyMax.toFixed(3).toString().replace('.',',')));
-        } */
+        }
     }
 
     function getBatchIssue(id){

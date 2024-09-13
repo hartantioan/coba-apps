@@ -2503,7 +2503,7 @@
                     $('input[name^="arr_issue_batch_usage_qty[]"]').each(function(index){
                         totalBatchIssue += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                     });
-                    if(totalBatchIssue !== totalQtyReceive){
+                    if((Math.round(totalBatchIssue* 1000) / 1000) !== (Math.round(totalQtyReceive * 1000) / 1000)){
                         passedQty = false;
                     }
                 }

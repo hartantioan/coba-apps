@@ -35,13 +35,13 @@
                         <h3>{{ $row->pallet_no }}</h3>
                     </div> --}}
                     <div style="margin-top:-25px;">
-                        <h3>{{ $row->pallet_no }}</h3>
+                        <h2>{{ $row->pallet_no }}</h2>
                     </div>
-                    <div align="center" style="font-size:9px;margin-top:-10px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
+                    <div align="center" style="font-size:7px;margin-top:-10px;">Print By : {{ session('bo_name').' '.date('d/m/Y H:i:s') }}</div>
                     <table border="0" width="100%">
                         <tr>
                             <td width="30%" align="center">
-                                <div>{{ date('d/m/Y',strtotime($data->post_date)) }}</div>
+                                <div style="font-size:10px;">{{ date('d/m/Y',strtotime($data->post_date)) }}</div>
                                 <table border="0">
                                     <tr>
                                         <td>LINE</td>
@@ -51,7 +51,7 @@
                                     <tr>
                                         <td>SHIFT</td>
                                         <td>:</td>
-                                        <td>{{ $data->shift->code }}</td>
+                                        <td>{{ $data->shift->production_code }}</td>
                                     </tr>
                                     <tr>
                                         <td>GROUP</td>

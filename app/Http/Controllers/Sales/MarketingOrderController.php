@@ -191,7 +191,6 @@ class MarketingOrderController extends Controller
             'total',
             'tax',
             'grandtotal',
-            'rounding',
             'balance'
         ];
 
@@ -406,7 +405,6 @@ class MarketingOrderController extends Controller
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
                     number_format($val->total_after_tax,2,',','.'),
-                    number_format($val->rounding,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     (

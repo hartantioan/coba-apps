@@ -234,7 +234,6 @@
                                                         <th>{{ __('translations.total') }}</th>
                                                         <th>{{ __('translations.tax') }}</th>
                                                         <th>Total Stlh PPN</th>
-                                                        <th>Rounding</th>
                                                         <th>{{ __('translations.grandtotal') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -1735,7 +1734,6 @@
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'rounding', className: 'right-align' },
                 { name: 'balance', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },

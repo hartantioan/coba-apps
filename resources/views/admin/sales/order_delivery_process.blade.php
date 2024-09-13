@@ -1043,7 +1043,7 @@ document.addEventListener('focusin', function (event) {
                                                             <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.modd_id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                         </div>
                                                         <th class="center" colspan="3">
-                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `',` + val.modd_id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');">
+                                                            <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `',` + val.modd_id + `,` + val.place_id + `,` + val.item_id + `,'` + val.conversion + `');">
                                                         </th>
                                                     </tr>
                                                     <tr>
@@ -2247,7 +2247,7 @@ document.addEventListener('focusin', function (event) {
                                                     <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
                                                 </div>
                                                 <th class="center" colspan="3">
-                                                    <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onkeypress="getStockByBarcode('` + count + `');">
+                                                    <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `');">
                                                 </th>
                                             </tr>
                                             <tr>

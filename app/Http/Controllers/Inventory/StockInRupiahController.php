@@ -188,7 +188,7 @@ class StockInRupiahController extends Controller
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
                 'area' => $row->area->code ?? '-',
-                'shading' => $row->shading->code ?? '-',
+                'shading' => $row->itemShading->code ?? '-',
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'final'=>number_format($priceNow,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
@@ -232,7 +232,7 @@ class StockInRupiahController extends Controller
                     'satuan'       => $row->item->uomUnit->code,
                     'area' => $row->area->code ?? '-',
                     'production_batch' => '-',
-                    'shading' => $row->shading->code ?? '-',
+                    'shading' => $row->itemShading->code ?? '-',
                     'kode'         => $row->item->code,
                     'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
                 ];

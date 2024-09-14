@@ -59,7 +59,7 @@ class ExportStockInQty implements FromView,ShouldAutoSize
                     'item' => $row->item->name,
                     'area'         => $row->area->code ?? '-',
                     'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                    'shading'      => $row->shading->code ?? '-',
+                    'shading'      => $row->itemShading->code ?? '-',
                     'final'=> $row->qty,
                     'satuan'=>$row->item->uomUnit->code,
                     'perlu' =>1,

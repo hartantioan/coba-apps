@@ -761,37 +761,20 @@ class ProductionFgReceiveController extends Controller
 
         $detail_batch = [];
 
-        foreach($po->productionBatchUsage as $row){
-            $detail_batch[] = [
-                'production_batch_id'   => $row->production_batch_id,
-                'production_batch_info' => $row->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($row->productionBatch->qty_real).' '.$row->productionBatch->item->uomUnit->code.' - Item : '.$row->productionBatch->lookable->item->code.' - '.$row->productionBatch->lookable->item->name,
-                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'qty_max'               => CustomHelper::formatConditionalQty($row->productionBatch->qty + $row->qty),
-                'unit'                  => $row->productionBatch->item->uomUnit->code,
-            ];
-        }
-
-        foreach($po->productionFgReceiveDetail()->orderBy('id')->get() as $key => $row){
-            $detail_receive[] = [
-                'item_id'               => $row->item_id,
-                'item_code'             => $row->item->code,
-                'item_name'             => $row->item->name,
-                'unit'                  => $row->item->uomUnit->code,
-                'item_unit_id'          => $row->item_unit_id,
-                'sell_unit'             => $row->itemUnit->unit->code,
-                'code'                  => $row->pallet_no,
-                'pallet_id'             => $row->pallet_id,
-                'pallet_code'           => $row->pallet->code,
-                'grade_id'              => $row->grade_id,
-                'grade_code'            => $row->grade->code,
-                'shading'               => $row->shading,
-                'qty_sell'              => CustomHelper::formatConditionalQty($row->qty_sell),
-                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
-                'conversion'            => CustomHelper::formatConditionalQty($row->conversion),
-                'place'                 => $row->productionFgReceive->place->code,
-                'shift'                 => $row->productionFgReceive->shift->code,
-                'group'                 => $row->productionFgReceive->group,
-            ];
+        foreach($po->productionIssue()->whereHas('productionIssueDetail',function($query){
+            $query->whereHas('productionBatchUsage');
+        })->get() as $row){
+            foreach($row->productionIssueDetail()->where('lookable_type','items')->orderBy('id')->get() as $key => $rowdetail){
+                foreach($rowdetail->productionBatchUsage as $rowbatch){
+                    $detail_batch[] = [
+                        'production_batch_id'   => $rowbatch->production_batch_id,
+                        'production_batch_info' => $rowbatch->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty_real).' '.$rowbatch->productionBatch->item->uomUnit->code.' - Item : '.$rowbatch->productionBatch->lookable->item->code.' - '.$rowbatch->productionBatch->lookable->item->name,
+                        'qty'                   => CustomHelper::formatConditionalQty($rowbatch->qty),
+                        'qty_max'               => CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty + $rowbatch->qty),
+                        'unit'                  => $rowbatch->productionBatch->item->uomUnit->code,
+                    ];
+                }
+            }
         }
 
         $po['code_place_id']                    = substr($po->code,7,2);

@@ -361,51 +361,8 @@ class ProductionFgReceive extends Model
         }
 
         $query = null;
-        
-        $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
-        
-        $query = ProductionIssue::create([
-            'code'			            => $newCode,
-            'user_id'		            => session('bo_id'),
-            'company_id'                => $this->company_id,
-            'production_order_detail_id'=> $this->production_order_detail_id,
-            'production_fg_receive_id'  => $this->id,
-            'place_id'                  => $this->place_id,
-            'shift_id'                  => $this->shift_id,
-            'group'                     => $this->group,
-            'line_id'                   => $this->line_id,
-            'post_date'                 => $this->post_date,
-            'note'                      => 'PRODUCTION RECEIVE FG NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
-            'status'                    => '1',
-        ]);
 
-        /* foreach($this->productionBatchUsage as $row){
-            $total = $row->productionBatch->totalById($row->id);
-            $price = $total / $row->qty;
-            $itemStock = ItemStock::where('item_id',$row->productionBatch->item_id)->where('place_id',$row->productionBatch->place_id)->where('warehouse_id',$row->productionBatch->warehouse_id)->where('production_batch_id',$row->productionBatch->id)->first();
-            $querydetail = ProductionIssueDetail::create([
-                'production_issue_id'           => $query->id,
-                'production_order_detail_id'    => $this->production_order_detail_id,
-                'lookable_type'                 => 'items',
-                'lookable_id'                   => $row->productionBatch->item_id,
-                'bom_id'                        => NULL,
-                'bom_detail_id'                 => NULL,
-                'qty'                           => $row->qty,
-                'nominal'                       => $price,
-                'total'                         => $total,
-                'qty_bom'                       => 0,
-                'nominal_bom'                   => 0,
-                'total_bom'                     => 0,
-                'qty_planned'                   => $row->qty,
-                'nominal_planned'               => $price,
-                'total_planned'                 => $total,
-                'from_item_stock_id'            => $itemStock->id,
-                'place_id'                      => $itemStock->place_id,
-                'warehouse_id'                  => $itemStock->warehouse_id,
-                'is_wip'                        => '1',
-            ]);
-        } */
-
+        $adaSupporting = false;
         foreach($this->productionFgReceiveDetail as $key => $row){
             
             $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
@@ -413,46 +370,43 @@ class ProductionFgReceive extends Model
             })->whereNotNull('is_default')->first();
 
             if($bomAlternative){
-                foreach($bomAlternative->bomDetail as $rowbom){
-                    $nominal = 0;
-                    $total = 0;
-                    $itemstock = NULL;
-                    if($rowbom->lookable_type == 'items'){
-                        $item = Item::find($rowbom->lookable_id);
-                        if($item){
-                            $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
-                            $nominal = $price;
-                            $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
-                        }
-                    }elseif($rowbom->lookable_type == 'resources'){
-                        $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
-                        $nominal = $rowbom->nominal;
-                    }
-                    $querydetail = ProductionIssueDetail::create([
-                        'production_issue_id'           => $query->id,
-                        'production_order_detail_id'    => $this->production_order_detail_id,
-                        'lookable_type'                 => $rowbom->lookable_type,
-                        'lookable_id'                   => $rowbom->lookable_id,
-                        'bom_id'                        => $rowbom->bom_id,
-                        'bom_detail_id'                 => $rowbom->id,
-                        'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
-                        'nominal'                       => $nominal,
-                        'total'                         => $total,
-                        'qty_bom'                       => 0,
-                        'nominal_bom'                   => 0,
-                        'total_bom'                     => 0,
-                        'qty_planned'                   => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
-                        'nominal_planned'               => $nominal,
-                        'total_planned'                 => $total,
-                        'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
-                        'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
-                        'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
-                    ]);
+                if($bomAlternative->bomDetail()->exists()){
+                    $adaSupporting = true;
                 }
-
                 if($bomAlternative->bom->bomStandard()->exists()){
-                    foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                    if($bomAlternative->bom->bomStandard->bomStandardDetail()->exists()){
+                        $adaSupporting = true;
+                    }
+                }
+            }
+        }
+        
+        if($adaSupporting){
+            $newCode=ProductionIssue::generateCode($menu->document_code.date('y').substr($this->code,7,2));
+        
+            $query = ProductionIssue::create([
+                'code'			            => $newCode,
+                'user_id'		            => session('bo_id'),
+                'company_id'                => $this->company_id,
+                'production_order_detail_id'=> $this->production_order_detail_id,
+                'production_fg_receive_id'  => $this->id,
+                'place_id'                  => $this->place_id,
+                'shift_id'                  => $this->shift_id,
+                'group'                     => $this->group,
+                'line_id'                   => $this->line_id,
+                'post_date'                 => $this->post_date,
+                'note'                      => 'PRODUCTION RECEIVE FG NO. '.$this->code.' ( '.$this->productionOrderDetail->productionScheduleDetail->item->code.' - '.$this->productionOrderDetail->productionScheduleDetail->item->name.' )',
+                'status'                    => '1',
+            ]);
+
+            foreach($this->productionFgReceiveDetail as $key => $row){
+                
+                $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                    $query->where('item_id',$row->item_id)->orderByDesc('created_at');
+                })->whereNotNull('is_default')->first();
+
+                if($bomAlternative){
+                    foreach($bomAlternative->bomDetail as $rowbom){
                         $nominal = 0;
                         $total = 0;
                         $itemstock = NULL;
@@ -460,12 +414,12 @@ class ProductionFgReceive extends Model
                             $item = Item::find($rowbom->lookable_id);
                             if($item){
                                 $price = $item->priceNowProduction($this->place_id,$this->post_date);
-                                $total = round(round($rowbom->qty * $row->qty,3) * $price,2);
+                                $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
                                 $nominal = $price;
                                 $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                             }
                         }elseif($rowbom->lookable_type == 'resources'){
-                            $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
+                            $total = round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
                             $nominal = $rowbom->nominal;
                         }
                         $querydetail = ProductionIssueDetail::create([
@@ -473,35 +427,75 @@ class ProductionFgReceive extends Model
                             'production_order_detail_id'    => $this->production_order_detail_id,
                             'lookable_type'                 => $rowbom->lookable_type,
                             'lookable_id'                   => $rowbom->lookable_id,
-                            'bom_id'                        => $bomAlternative->bom_id,
-                            'qty'                           => round($rowbom->qty * $row->qty,3),
+                            'bom_id'                        => $rowbom->bom_id,
+                            'bom_detail_id'                 => $rowbom->id,
+                            'qty'                           => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
                             'nominal'                       => $nominal,
                             'total'                         => $total,
-                            'qty_bom'                       => round($rowbom->qty * $row->qty,3),
-                            'nominal_bom'                   => $rowbom->nominal,
-                            'total_bom'                     => $total,
-                            'qty_planned'                   => round($rowbom->qty * $row->qty,3),
-                            'nominal_planned'               => $rowbom->nominal,
+                            'qty_bom'                       => 0,
+                            'nominal_bom'                   => 0,
+                            'total_bom'                     => 0,
+                            'qty_planned'                   => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                            'nominal_planned'               => $nominal,
                             'total_planned'                 => $total,
-                            'from_item_stock_id'            => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->id : NULL) : NULL,
-                            'place_id'                      => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->place_id : NULL) : $this->place_id,
-                            'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : NULL) : NULL,
-                            'cost_distribution_id'          => $rowbom->cost_distribution_id ?? NULL,
+                            'from_item_stock_id'            => $itemstock ? $itemstock->id : NULL,
+                            'place_id'                      => $itemstock ? $itemstock->place_id : NULL,
+                            'warehouse_id'                  => $itemstock ? $itemstock->warehouse_id : NULL,
                         ]);
+                    }
+
+                    if($bomAlternative->bom->bomStandard()->exists()){
+                        foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
+                            $nominal = 0;
+                            $total = 0;
+                            $itemstock = NULL;
+                            if($rowbom->lookable_type == 'items'){
+                                $item = Item::find($rowbom->lookable_id);
+                                if($item){
+                                    $price = $item->priceNowProduction($this->place_id,$this->post_date);
+                                    $total = round(round($rowbom->qty * $row->qty,3) * $price,2);
+                                    $nominal = $price;
+                                    $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
+                                }
+                            }elseif($rowbom->lookable_type == 'resources'){
+                                $total = round(round($rowbom->qty * $row->qty,3) * $rowbom->nominal,2);
+                                $nominal = $rowbom->nominal;
+                            }
+                            $querydetail = ProductionIssueDetail::create([
+                                'production_issue_id'           => $query->id,
+                                'production_order_detail_id'    => $this->production_order_detail_id,
+                                'lookable_type'                 => $rowbom->lookable_type,
+                                'lookable_id'                   => $rowbom->lookable_id,
+                                'bom_id'                        => $bomAlternative->bom_id,
+                                'qty'                           => round($rowbom->qty * $row->qty,3),
+                                'nominal'                       => $nominal,
+                                'total'                         => $total,
+                                'qty_bom'                       => round($rowbom->qty * $row->qty,3),
+                                'nominal_bom'                   => $rowbom->nominal,
+                                'total_bom'                     => $total,
+                                'qty_planned'                   => round($rowbom->qty * $row->qty,3),
+                                'nominal_planned'               => $rowbom->nominal,
+                                'total_planned'                 => $total,
+                                'from_item_stock_id'            => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->id : NULL) : NULL,
+                                'place_id'                      => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->place_id : NULL) : $this->place_id,
+                                'warehouse_id'                  => $rowbom->lookable_type == 'items' ? ($itemstock ? $itemstock->warehouse_id : NULL) : NULL,
+                                'cost_distribution_id'          => $rowbom->cost_distribution_id ?? NULL,
+                            ]);
+                        }
                     }
                 }
             }
-        }
 
-        if($query){
-            CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
-            CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
+            if($query){
+                CustomHelper::sendApproval($query->getTable(),$query->id,'Production Issue No. '.$query->code);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Issue No. '.$query->code,'Pengajuan Production Issue No. '.$query->code.' dari Production Receive FG No. '.$this->code,session('bo_id'));
 
-            activity()
-                ->performedOn(new ProductionIssue())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Add / edit issue production.');
+                activity()
+                    ->performedOn(new ProductionIssue())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit issue production.');
+            }
         }
     }
     

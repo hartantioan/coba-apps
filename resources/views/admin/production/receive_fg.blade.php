@@ -323,7 +323,7 @@
                                         <label class="active" for="shading">Shading</label>
                                     </div>
                                     <div class="col m3 s12">
-                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate No.Palet</a>
+                                        <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Generate Number</a>
                                     </div>
                                 </fieldset>
                             </div>

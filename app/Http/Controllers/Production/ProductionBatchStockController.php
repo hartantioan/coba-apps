@@ -104,7 +104,7 @@ class ProductionBatchStockController extends Controller
         
             
             $all_total += round($row->total_final,2);
-            
+            info($row->item_shading_id);
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -114,7 +114,7 @@ class ProductionBatchStockController extends Controller
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
                 'area' => $row->area->code ?? '-',
-                'shading' => $row->shading->code ?? '-',
+                'shading' => $row->itemShading->code ?? '-',
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'final'=>number_format($priceNow,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),

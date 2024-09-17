@@ -104,7 +104,7 @@ class ProductionBatchStockController extends Controller
         
             
             $all_total += round($row->total_final,2);
-            info($row->item_shading_id);
+            
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,

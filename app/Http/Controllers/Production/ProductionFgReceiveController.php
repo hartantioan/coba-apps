@@ -762,7 +762,7 @@ class ProductionFgReceiveController extends Controller
         $detail_batch = [];
 
         foreach($po->productionIssue()->whereHas('productionIssueDetail',function($query){
-            $query->whereHas('productionBatchUsage');
+            /* $query->whereHas('productionBatchUsage'); */
         })->get() as $row){
             foreach($row->productionIssueDetail()->where('lookable_type','items')->orderBy('id')->get() as $key => $rowdetail){
                 foreach($rowdetail->productionBatchUsage()->withTrashed()->get() as $rowbatch){

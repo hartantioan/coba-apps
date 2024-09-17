@@ -70,6 +70,10 @@ class ProductionFgReceive extends Model
     }
 
     public function productionIssue(){
+        return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3']);
+    }
+
+    public function productionIssueWithVoid(){
         return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3','5']);
     }
 

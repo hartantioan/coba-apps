@@ -253,10 +253,10 @@
                             <div class="col s12">
                                 <fieldset style="min-width: 100%;">
                                     <legend>2. Pilih Batch</legend>
-                                    <div class="col m8 s12">
+                                    <div class="col m12 s12">
                                         <div class="col m12 s12" style="overflow:auto;min-width:100%;">
                                             <p class="mt-2 mb-2">
-                                                <table class="bordered" style="border: 1px solid;width:800px !important;" id="table-detail-item">
+                                                <table class="bordered" style="border: 1px solid;" id="table-detail-item">
                                                     <thead>
                                                         <tr>
                                                             <th class="center">{{ __('translations.no') }}.</th>
@@ -282,7 +282,7 @@
                                             </p>
                                         </div>
                                     </div>
-                                    <div class="col m4 s12">
+                                    <div class="col m12 s12">
                                         <h6>Data Terpakai : <i id="list-used-data"></i></h6>
                                     </div>
                                 </fieldset>

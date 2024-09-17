@@ -110,6 +110,7 @@
                                                         <th>Tanggal Akhir</th>
                                                         <th>Keterangan</th>
                                                         <th>Provinsi</th>
+                                                        <th>Tipe</th>
                                                         <th>Status</th>
                                                         <th>{{ __('translations.action') }}</th>
                                                     </tr>
@@ -156,6 +157,14 @@
                                 @endforeach
                             </select>
                             <label for="plant_id" class="">{{ __('translations.plant') }}</label>
+                        </div>
+                        <div class="input-field col s12 m6">
+                            <select id="type_id" name="type_id">
+                                @foreach($type as $row)
+                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                @endforeach
+                            </select>
+                            <label for="type_id" class="">Tipe:</label>
                         </div>
                         <div class="col s12"></div>
                         <div class="input-field col m3 s12">
@@ -512,6 +521,7 @@
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
+                { name: 'type', className: 'center-align' },
                 { name: 'end_date', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'note', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'province', searchable: false, orderable: false, className: 'center-align' },
@@ -655,6 +665,7 @@
                 $('#place_id').val(response.place_id).formSelect();
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);
+                $('#type_id').val(response.type_id).formSelect();
                 $('#note').val(response.note);
 
                 if(response.transportation_id){

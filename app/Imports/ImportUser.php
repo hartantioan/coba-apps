@@ -94,6 +94,8 @@ class handleUser implements OnEachRow, WithHeadingRow
 
                 $brand = Brand::where('code', explode('#', $row['brand'])[1] ?? null)->first()->id ?? null;
 
+                $area_marketing = str_replace(',', '.', explode('#', $row['area_pemasaran'])[0]);
+
                 $provinceArea = str_replace(',', '.', explode('#', $row['provinsi_pemasaran'])[0]);
                 $province_area_id = Region::where('code',$provinceArea)->first()->id;
                 
@@ -107,6 +109,12 @@ class handleUser implements OnEachRow, WithHeadingRow
                     $this->error = "Provinsi.";
                 }elseif(!$country_id && $this->error ==null){
                     $this->error = "Negara.";
+                }
+
+                if($type == '2'){
+                    if(!$area_marketing && $this->error ==null){
+                        $this->error = "Area Pemasaran harus di isi untuk tipe pelanggan dan broker.";
+                    }
                 }
 
                 if (!$this->error) {
@@ -142,6 +150,7 @@ class handleUser implements OnEachRow, WithHeadingRow
                         'children'          => $row['jumlah_anak'],
                         'country_id'        => $country_id,
                         'nib'               => $row['nib'],
+                        'sale_area_id'      => $area_marketing,
                         'sppkp'             => $row['sppkp'],
                         'sales_payment_type'=> $payment_type,
                         'brand_id'          => $brand ?? null,

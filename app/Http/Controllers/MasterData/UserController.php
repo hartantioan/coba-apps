@@ -666,6 +666,8 @@ class UserController extends Controller
                     $query->status          = $request->status ? $request->status : '2';
                     $query->gender          = $request->gender;
 
+                    $query->sale_area_id    = $request->sale_area_id;
+
                     $query->type_body       = $request->type_body;
                     $query->nib             = $request->nib;
                     $query->sppkp            = $request->sppkp;
@@ -719,6 +721,8 @@ class UserController extends Controller
                         'type_body'             => $request->type_body,
                         'sppkp'                  => $request->sppkp,
                         'nib'                   => $request->nib,
+
+                        'sale_area_id'          => $request->sale_area_id,
 
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,

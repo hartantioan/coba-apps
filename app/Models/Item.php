@@ -146,6 +146,14 @@ class Item extends Model
         return $unit;
     }
 
+    public function itemUnitDefault(){
+        /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
+        $itemUnit = $this->itemUnit()->whereNotNull('is_default')->first();
+
+        
+        return $itemUnit;
+    }
+
     public function itemUnitSellId(){
         /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
         $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();

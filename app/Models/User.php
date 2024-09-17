@@ -81,6 +81,7 @@ class User extends Authenticatable
         'brand_id',
         'sales_payment_type',
 
+        'sale_area_id',
         'pic_finance',
         'no_pic_finance',
     ];

@@ -353,6 +353,20 @@
                             <label for="group_id">Group BP</label>
                         </div>
                         <div class="input-field col s12 m3 customer_inputs">
+                            <select id="sale_area_id" name="sale_area_id">
+                                <option value="">PILIH UNTUK PROVINSI</option>
+                                <option value="1">SUMATERA</option>
+                                <option value="2">DKI JAKARTA JABAR</option>
+                                <option value="3">BALI NUSRA</option>
+                                <option value="4">JAWA TENGAH</option>
+                                <option value="5">JAWA TIMUR</option>
+                                <option value="6">KALIMANTAN</option>
+                                <option value="7">SULAWESI</option>
+                                <option value="8">MALUKU PAPUA</option>
+                            </select>
+                            <label for="sale_area_id">Area Pemasaran</label>
+                        </div>
+                        <div class="input-field col s12 m3 customer_inputs">
                             <select class="select2 browser-default" id="province_area_id" name="province_area_id">
                                 <option value="">--{{ __('translations.select') }}--</option>
                             </select>

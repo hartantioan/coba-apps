@@ -77,7 +77,7 @@ class ProductionBatch extends Model
 
     public function qtyById($id){
         $qty = $this->qty_real;
-        $dataused = $this->productionBatchUsage()->where('id','<',$id)->get();
+        $dataused = $this->productionBatchUsage()->where('id','<=',$id)->get();
         foreach($dataused as $row){
             $qty -= $row->qty;
         }

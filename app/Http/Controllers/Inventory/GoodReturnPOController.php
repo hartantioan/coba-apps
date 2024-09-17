@@ -49,6 +49,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Exports\ExportGoodReturnPO;
 use App\Exports\ExportGoodReturnPOTransactionPage;
+use App\Models\ItemCogs;
 use App\Models\ItemSerial;
 use App\Models\Menu;
 use App\Models\MenuUser;
@@ -389,6 +390,8 @@ class GoodReturnPOController extends Controller
             $tax = 0;
 
             $arrTotal = [];
+            $passedStock = true;
+            $passedGrpoDate = true;
             foreach($request->arr_good_receipt_detail as $key => $row){
 
                 $grd = GoodReceiptDetail::find(intval($row));
@@ -421,10 +424,38 @@ class GoodReturnPOController extends Controller
                     $grandtotalall += $grandtotal;
 
                     $arrTotal[] = $total;
+
+                    $lateststock = ItemCogs::where('place_id',$grd->place_id)->where('warehouse_id',$grd->warehouse_id)->where('item_id',$grd->item_id)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+
+                    if($lateststock){
+                        if($lateststock->qty_final < floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key])))){
+                            $passedStock = false;
+                        }
+                    }else{
+                        $passedStock = false;
+                    }
+
+                    if($grd->goodReceipt->post_date > $request->post_date){
+                        $passedGrpoDate = false;
+                    }
                 }
             }
 
-			if($request->temp){
+            if(!$passedStock){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Item return pada tanggal terpilih tidak memiliki stok.'
+                ]);
+            }
+
+            if(!$passedGrpoDate){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Item return tanggal retur tidak boleh kurang dari tanggal GRPO.'
+                ]);
+            }
+
+			/* if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = GoodReturnPO::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -583,7 +614,7 @@ class GoodReturnPOController extends Controller
 					'status'  => 500,
 					'message' => 'Data failed to save.'
 				];
-			}
+			} */
 		}
 		
 		return response()->json($response);

@@ -783,7 +783,7 @@ class ProductionFgReceiveController extends Controller
             })->get() as $row){
                 foreach($row->productionIssueDetail()->where('lookable_type','items')->orderBy('id')->get() as $key => $rowdetail){
                     foreach($rowdetail->productionBatchUsage()->get() as $rowbatch){
-                        $qtyBeforeTransaction = $rowbatch->productionBatch->qtyById($rowbatch->id);
+                        $qtyBeforeTransaction = $rowbatch->productionBatch->qtyById($rowbatch->id) + $rowbatch->qty;
                         $qtyGas = $qtyBeforeTransaction <= 0 ? $rowbatch->qty : $qtyBeforeTransaction;
                         $detail_batch[] = [
                             'production_batch_id'   => $rowbatch->production_batch_id,

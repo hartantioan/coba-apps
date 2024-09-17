@@ -783,9 +783,11 @@ class ProductionFgReceiveController extends Controller
             })->get() as $row){
                 foreach($row->productionIssueDetail()->where('lookable_type','items')->orderBy('id')->get() as $key => $rowdetail){
                     foreach($rowdetail->productionBatchUsage()->get() as $rowbatch){
+                        $qtyBeforeTransaction = $rowbatch->productionBatch->qtyById($rowbatch->id);
+                        $qtyGas = $qtyBeforeTransaction <= 0 ? $rowbatch->qty : $qtyBeforeTransaction;
                         $detail_batch[] = [
                             'production_batch_id'   => $rowbatch->production_batch_id,
-                            'production_batch_info' => $rowbatch->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($rowbatch->productionBatch->qtyById($rowbatch->id)).' '.$rowbatch->productionBatch->item->uomUnit->code.' - Item : '.$rowbatch->productionBatch->lookable->item->code.' - '.$rowbatch->productionBatch->lookable->item->name,
+                            'production_batch_info' => $rowbatch->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($qtyGas).' '.$rowbatch->productionBatch->item->uomUnit->code.' - Item : '.$rowbatch->productionBatch->lookable->item->code.' - '.$rowbatch->productionBatch->lookable->item->name,
                             'qty'                   => CustomHelper::formatConditionalQty($rowbatch->qty),
                             'qty_max'               => CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty + $rowbatch->qty),
                             'unit'                  => $rowbatch->productionBatch->item->uomUnit->code,

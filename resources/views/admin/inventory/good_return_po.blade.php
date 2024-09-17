@@ -783,9 +783,31 @@
             }
         });
 
-        select2ServerSide('#good_receipt_id', '{{ url("admin/select2/good_receipt_return") }}');
         select2ServerSide('#account_id', '{{ url("admin/select2/supplier") }}');
-
+        $('#good_receipt_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/good_receipt_return") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        account_id: $('#account_id').val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
         $('#body-item').on('click', '.delete-data-item', function() {
             $(this).closest('tr').remove();
             

@@ -75,6 +75,15 @@ class ProductionBatch extends Model
         return $date;
     }
 
+    public function qtyById($id){
+        $qty = $this->qty_real;
+        $dataused = $this->productionBatchUsage()->where('id','<=',$id)->get();
+        foreach($dataused as $row){
+            $qty -= $row->qty;
+        }
+        return $qty;
+    }
+
     public function totalById($id){
         $total = $this->total;
         $qty = $this->qty_real;

@@ -635,10 +635,26 @@ class PurchaseRequestController extends Controller
         } else {
 
             $passedQty = true;
+            $passedRequestDate = true;
+            $smallestRequestDate = date('Y-m-d');
             foreach($request->arr_qty as $key => $row){
                 if(str_replace(',','.',str_replace('.','',$row)) <= 0){
                     $passedQty = false;
                 }
+                if($request->arr_required_date[$key] < $smallestRequestDate){
+                    $smallestRequestDate = $request->arr_required_date[$key];
+                }
+            }
+
+            if($request->post_date > $smallestRequestDate){
+                $passedRequestDate = false;
+            }
+
+            if(!$passedRequestDate){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Terdapat tanggal dipakai yang kurang dari tanggal post. Silahkan hubungi pembuat IR jika dokumen ini menarik IR.'
+                ]);
             }
 
             if(!$passedQty){

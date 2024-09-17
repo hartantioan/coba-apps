@@ -130,7 +130,7 @@ class ResetCogsNew implements ShouldQueue
             'warehouse_id'		    => $row->warehouse_id,
             'item_id'			        => $row->item_id,
             'qty_in'			        => $qty,
-            'price_in'			      => round($total / $qty,6),
+            'price_in'			      => $total / $qty,
             'total_in'			      => $total,
             'qty_final'			      => $qty_final,
             'price_final'		      => $total_final / $qty_final,
@@ -170,7 +170,7 @@ class ResetCogsNew implements ShouldQueue
                     'warehouse_id'		    => $row->warehouse_id,
                     'item_id'			        => $row->item_id,
                     'qty_in'			        => $qty,
-                    'price_in'			      => round($total / $qty,6),
+                    'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
                     'price_final'		      => $total_final / $qty_final,
@@ -271,7 +271,7 @@ class ResetCogsNew implements ShouldQueue
                             'item_id'			        => $row->item_id,
                             'production_batch_id'       => $rowbatch->id,
                             'qty_in'			        => $qty,
-                            'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
+                            'price_in'			        => $qty > 0 ? $total / $qty : 0,
                             'total_in'			        => $total,
                             'qty_final'			        => $qty_final,
                             'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
@@ -307,7 +307,7 @@ class ResetCogsNew implements ShouldQueue
                                 'item_id'			        => $row->item_id,
                                 'production_batch_id'       => $rowbatch->id,
                                 'qty_in'			        => $qty,
-                                'price_in'			        => $qty > 0 ? round($total / $qty,6) : 0,
+                                'price_in'			        => $qty > 0 ? $total / $qty : 0,
                                 'total_in'			        => $total,
                                 'qty_final'			        => $qty_final,
                                 'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
@@ -341,7 +341,7 @@ class ResetCogsNew implements ShouldQueue
                     'warehouse_id'		    => $row->warehouse_id,
                     'item_id'			        => $row->item_id,
                     'qty_in'			        => $qty,
-                    'price_in'			      => round($total / $qty,6),
+                    'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
                     'price_final'		      => $total_final / $qty_final,
@@ -391,7 +391,7 @@ class ResetCogsNew implements ShouldQueue
                 'warehouse_id'		    => $row->productionOrderDetail->productionScheduleDetail->item->warehouse(),
                 'item_id'			        => $row->productionOrderDetail->productionScheduleDetail->item_id,
                 'qty_in'			        => $qty,
-                'price_in'			      => round($total / $qty,6),
+                'price_in'			      => $total / $qty,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
                 'price_final'		      => $total_final / $qty_final,
@@ -433,7 +433,7 @@ class ResetCogsNew implements ShouldQueue
                     'item_shading_id'	        => $row->item_shading_id,
                     'production_batch_id'       => $row->productionBatch->id,
                     'qty_in'			        => $qty,
-                    'price_in'			        => round($total / $qty,6),
+                    'price_in'			        => $total / $qty,
                     'total_in'			        => $total,
                     'qty_final'			        => $qty_final,
                     'price_final'		        => $total_final / $qty_final,
@@ -609,7 +609,7 @@ class ResetCogsNew implements ShouldQueue
         foreach($goodreturnissue as $row){
             $total = $row->total;
             $qty = $row->qty;
-            $price = round($total / $qty,6);
+            $price = $total / $qty;
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
             ItemCogs::create([
@@ -699,7 +699,7 @@ class ResetCogsNew implements ShouldQueue
         foreach($goodtransferin as $row){
             $total = $row->total;
             $qty = $row->qty;
-            $price = round($total / $qty,6);
+            $price = $total / $qty;
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
             ItemCogs::create([
@@ -804,7 +804,7 @@ class ResetCogsNew implements ShouldQueue
                                 'price_out'			        => $rowprice,
                                 'total_out'			        => $rowtotal,
                                 'qty_final'			        => $qtyBefore,
-                                'price_final'		        => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0,
+                                'price_final'		        => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
                                 'total_final'		        => $totalBefore,
                                 'date'				        => $dateloop,
                                 'type'				        => 'OUT',
@@ -820,7 +820,7 @@ class ResetCogsNew implements ShouldQueue
                     }
                 }
             }else{
-                $rowprice = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
+                $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
                 $rowtotal = round($rowprice * $row->qty,2);
                 $total += $rowtotal;
                 $totalBefore -= $rowtotal;

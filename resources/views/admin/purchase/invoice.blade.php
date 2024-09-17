@@ -641,6 +641,7 @@
                                             <tr>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">GR/LC/PO/FR No.</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Detail Item</th>
+                                                <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No PO</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
                                                 <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Ter-Invoice</th>
@@ -682,9 +683,11 @@
                                         <thead>
                                             <tr>
                                                 <th class="center">Purchase DP No.</th>
+                                                <th class="center">NO PREQ.</th>
                                                 <th class="center">Tgl.Post</th>
                                                 <th class="center">{{ __('translations.nominal') }}</th>
                                                 <th class="center">Sisa</th>
+                                                <th class="center">Keterangan</th>
                                             </tr>
                                         </thead>
                                         <tbody id="body-detail-dp-multi"></tbody>
@@ -2587,6 +2590,9 @@
                                         <td>
                                             ` + val.list_item + `
                                         </td>
+                                        <td>
+                                            ` + val.purchase_order + `
+                                        </td>
                                         <td class="center">
                                             ` + val.post_date + `
                                         </td>
@@ -2617,6 +2623,9 @@
                                         <td>
                                             ` + val.rawcode + `
                                         </td>
+                                        <td>
+                                            ` + val.pyr_code + `
+                                        </td>
                                         <td class="center">
                                             ` + val.post_date + `
                                         </td>
@@ -2625,6 +2634,9 @@
                                         </td>
                                         <td class="right-align">
                                             ` + val.balance + `
+                                        </td>
+                                        <td class="center">
+                                            ` + val.note + `
                                         </td>
                                     </tr>
                                 `);

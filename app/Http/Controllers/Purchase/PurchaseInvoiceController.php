@@ -321,6 +321,8 @@ class PurchaseInvoiceController extends Controller
                     'type'          => 'purchase_down_payments',
                     'id'            => $row->id,
                     'rawcode'       => $row->code,
+                    'pyr_code'      => $row->listPaymentRequest(),
+                    'note'          => $row->note,
                     'code'          => CustomHelper::encrypt($row->code),
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                     'total'         => number_format($row->total,2,',','.'),
@@ -378,6 +380,7 @@ class PurchaseInvoiceController extends Controller
                     'id'            => $row->id,
                     'code'          => $row->code.' - No. SJ : '.$row->delivery_no,
                     'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'purchase_order'=> $row->getPurchaseCode(),
                     'grandtotal'    => number_format($row->total,2,',','.'),
                     'invoice'       => number_format($invoice,2,',','.'),
                     'balance'       => $row->currencyReference()->symbol.' '.number_format($row->total - $invoice,2,',','.'),
@@ -422,6 +425,7 @@ class PurchaseInvoiceController extends Controller
                 if($datadp->balanceInvoice() > 0){
                     $downpayments[] = [
                         'rawcode'       => $datadp->code,
+                        'rawcode'       => $datadp->note,
                         'pyr_code'      => $datadp->listPaymentRequest(),
                         'code'          => CustomHelper::encrypt($datadp->code),
                         'post_date'     => date('d/m/Y',strtotime($datadp->post_date)),

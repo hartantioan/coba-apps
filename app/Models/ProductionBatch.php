@@ -84,6 +84,15 @@ class ProductionBatch extends Model
         return $qty;
     }
 
+    public function qtyByIdWithVoid($id){
+        $qty = $this->qty_real;
+        $dataused = $this->productionBatchUsage()->withTrashed()->where('id','<=',$id)->get();
+        foreach($dataused as $row){
+            $qty -= $row->qty;
+        }
+        return $qty;
+    }
+
     public function totalById($id){
         $total = $this->total;
         $qty = $this->qty_real;

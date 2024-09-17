@@ -397,7 +397,7 @@ class GoodReturnPOController extends Controller
 
                     $rowprice = 0;
 
-                    $rowprice = round($grd->total / $grd->qty,2);
+                    $rowprice = $grd->total / $grd->qty;
 
                     $total = round($rowprice * floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))),2);
 

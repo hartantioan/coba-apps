@@ -366,8 +366,6 @@
                             <table style="width:100%">
                                 <tr class="break-row">
                                     <td>
-                                        Rekening :<br>
-                                        {!! $data->company->banks() !!}
                                         <div class="mt-3">
                                             Catatan Internal : {{ $data->note_internal }}
                                         </div>

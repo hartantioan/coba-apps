@@ -765,7 +765,7 @@ class ProductionFgReceiveController extends Controller
             $query->whereHas('productionBatchUsage');
         })->get() as $row){
             foreach($row->productionIssueDetail()->where('lookable_type','items')->orderBy('id')->get() as $key => $rowdetail){
-                foreach($rowdetail->productionBatchUsage as $rowbatch){
+                foreach($rowdetail->productionBatchUsage()->withTrashed()->get() as $rowbatch){
                     $detail_batch[] = [
                         'production_batch_id'   => $rowbatch->production_batch_id,
                         'production_batch_info' => $rowbatch->productionBatch->code.' - Qty : '.CustomHelper::formatConditionalQty($rowbatch->productionBatch->qty_real).' '.$rowbatch->productionBatch->item->uomUnit->code.' - Item : '.$rowbatch->productionBatch->lookable->item->code.' - '.$rowbatch->productionBatch->lookable->item->name,

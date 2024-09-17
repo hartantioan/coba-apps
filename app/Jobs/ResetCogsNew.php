@@ -546,7 +546,7 @@ class ResetCogsNew implements ShouldQueue
 
         $tempgiprice = 0;
         foreach($goodissue as $row){
-            $price = $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0;
+            $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
             if($tempgiprice > 0){
                 $price = $tempgiprice;
             }else{

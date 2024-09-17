@@ -8,6 +8,7 @@
             <th>IR Status</th>
             <th>PR Code</th>
             <th>PR Date</th>
+            <th>PR Tgl.Pakai</th>
             <th>PR Qty</th>
             <th>PR Status</th>
             <th>PO Code</th>
@@ -95,6 +96,7 @@
             {{-- <th>IR Done Date</th> --}}
             <th>PR Code</th>
             <th>PR Date</th>
+            <th>PR Tgl.Pakai</th>
             <th>PR Qty</th>
             <th>PR Status</th>
             <th>PR Updated By</th>
@@ -155,6 +157,7 @@
                              
                                     <td>{{ $pr['pr_code'] }}</td>
                                     <td>{{ $pr['pr_date'] }}</td>
+                                    <td>{{ $pr['pr_use_date'] }}</td>
                                     <td>{{ $pr['pr_qty'] }}</td>
                                     <td>{{ $pr['status'] }}</td>
                                     <td>{{ $pr['done_user'] }}</td>

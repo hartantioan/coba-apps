@@ -79,6 +79,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                         $pr=[
                             'pr_code'      => $row_pr_detail->purchaseRequest->code,
                             'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
+                            'pr_use_date'  => $row_pr_detail->required_date,
                             'pr_qty'       => $row_pr_detail->qty,
                             'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                             'done_user'    => ($row_pr_detail->purchaseRequest->status == 3 && is_null($row_pr_detail->purchaseRequest->done_id)) ? 'sistem' : (($row_pr_detail->purchaseRequest->status == 3 && !is_null($row_pr_detail->purchaseRequest->done_id)) ? $row_pr_detail->purchaseRequest->doneUser->name : ''),
@@ -199,6 +200,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                             $pr=[
                                 'pr_code'      => $row_pr_detail->purchaseRequest->code,
                                 'pr_date'      => $row_pr_detail->purchaseRequest->post_date,
+                                'pr_use_date'  => $row_pr_detail->required_date,
                                 'pr_qty'       => $row_pr_detail->qty,
                                 'status'       => $row_pr_detail->purchaseRequest->statusRaw(),
                                 'done_user'    => '',
@@ -248,6 +250,7 @@ class ExportPurchaseProgressReport implements FromView,ShouldAutoSize,WithTitle
                     $pr=[
                         'pr_code'      => '',
                         'pr_date'      => '',
+                        'pr_use_date'  => '',
                         'pr_qty'       => '',
                         'status'       => '',
                         'done_user'    => '',

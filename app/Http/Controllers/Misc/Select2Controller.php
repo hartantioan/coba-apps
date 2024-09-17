@@ -1519,7 +1519,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = GoodReceipt::where(function($query) use($search){
+        $data = GoodReceipt::where(function($query) use($search,$request){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note', 'like', "%$search%")
@@ -1535,6 +1535,9 @@ class Select2Controller extends Controller {
                                     ->orWhere('employee_no','like',"%$search%");
                             });
                     });
+                    if($request->account_id){
+                        $query->where('account_id',$request->account_id);
+                    }
                 })
                 ->whereHas('goodReceiptDetail',function($query) use($search){
                     $query->whereDoesntHave('purchaseInvoiceDetail');

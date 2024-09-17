@@ -777,6 +777,29 @@ class ProductionFgReceiveController extends Controller
             }
         }
 
+        foreach($po->productionFgReceiveDetail()->orderBy('id')->get() as $key => $row){
+            $detail_receive[] = [
+                'item_id'               => $row->item_id,
+                'item_code'             => $row->item->code,
+                'item_name'             => $row->item->name,
+                'unit'                  => $row->item->uomUnit->code,
+                'item_unit_id'          => $row->item_unit_id,
+                'sell_unit'             => $row->itemUnit->unit->code,
+                'code'                  => $row->pallet_no,
+                'pallet_id'             => $row->pallet_id,
+                'pallet_code'           => $row->pallet->code,
+                'grade_id'              => $row->grade_id,
+                'grade_code'            => $row->grade->code,
+                'shading'               => $row->shading,
+                'qty_sell'              => CustomHelper::formatConditionalQty($row->qty_sell),
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'conversion'            => CustomHelper::formatConditionalQty($row->conversion),
+                'place'                 => $row->productionFgReceive->place->code,
+                'shift'                 => $row->productionFgReceive->shift->code,
+                'group'                 => $row->productionFgReceive->group,
+            ];
+        }
+
         $po['code_place_id']                    = substr($po->code,7,2);
         $po['item_parent_name']                 = $po->item->code.' - '.$po->item->name;
         $po['unit']                             = $po->item->uomUnit->code;

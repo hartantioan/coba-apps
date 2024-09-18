@@ -940,8 +940,9 @@ class ResetCogsNew implements ShouldQueue
 
         foreach($productionhandoverout as $row){
             $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
-            $price = $row->total / $qty;
-            $total_final = $totalBefore - $row->total;
+            $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+            $total = round($price * $qty,2);
+            $total_final = $totalBefore - $total;
             $qty_final = $qtyBefore - $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->productionHandover->getTable(),
@@ -954,7 +955,7 @@ class ResetCogsNew implements ShouldQueue
                 'item_id'			    => $row->productionHandover->productionFgReceive->item_id,
                 'qty_out'			    => $qty,
                 'price_out'			    => $price,
-                'total_out'			    => $row->total,
+                'total_out'			    => $total,
                 'qty_final'			    => $qty_final,
                 'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		    => $total_final,
@@ -963,10 +964,13 @@ class ResetCogsNew implements ShouldQueue
             ]);
             foreach($row->journalDetail as $rowjournal){
                 $rowjournal->update([
-                    'nominal_fc'  => $row->total,
-                    'nominal'     => $row->total,
+                    'nominal_fc'  => $total,
+                    'nominal'     => $total,
                 ]);
             }
+            $row->update([
+                'total' => $total
+            ]);
             $totalBefore = $total_final;
             $qtyBefore = $qty_final;
             self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);

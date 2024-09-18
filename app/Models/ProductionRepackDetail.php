@@ -68,7 +68,7 @@ class ProductionRepackDetail extends Model
     }
 
     public function productionBatch(){
-        return $this->hasOne('App\Models\ProductionBatch','production_batch_id','id');
+        return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id')->withTrashed();
     }
 
     public function area(){

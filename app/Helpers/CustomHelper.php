@@ -7183,7 +7183,7 @@ class CustomHelper {
                             $qty_final = $old_data2->qty_final - $row->qty_out;
                         }
         
-                        $price_final = $qty_final > 0 ? round(floatval($total_final) / floatval($qty_final),5) : 0;
+                        $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     }else{
                         if($row->type == 'IN'){
                             $total_final = $row->total_in;
@@ -7193,10 +7193,10 @@ class CustomHelper {
                             $qty_final = 0 - $row->qty_out;
                         }
             
-                        $price_final = $qty_final > 0 ? round(floatval($total_final) / floatval($qty_final),5) : 0;
+                        $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     }
                     $row->update([
-                        'price_final'	=> round($price_final,5),
+                        'price_final'	=> $price_final,
                         'qty_final'		=> round($qty_final,3),
                         'total_final'	=> round($total_final,2),
                     ]);
@@ -7208,9 +7208,9 @@ class CustomHelper {
                         $total_final -= $row->total_out;
                         $qty_final -= $row->qty_out;
                     }
-                    $price_final = $qty_final > 0 ? round(floatval($total_final) / floatval($qty_final),5) : 0;
+                    $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     $row->update([
-                        'price_final'	=> round($price_final,5),
+                        'price_final'	=> $price_final,
                         'qty_final'		=> round($qty_final,3),
                         'total_final'	=> round($total_final,2),
                     ]);

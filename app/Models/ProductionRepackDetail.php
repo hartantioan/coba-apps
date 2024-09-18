@@ -40,7 +40,7 @@ class ProductionRepackDetail extends Model
     }
     
     public function itemStock(){
-        return $this->belongsTo('App\Models\ItemStock','item_stock_id','id')->withTrashed();
+        return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
     }
 
     public function itemUnitSource(){
@@ -68,7 +68,7 @@ class ProductionRepackDetail extends Model
     }
 
     public function productionBatch(){
-        return $this->belongsTo('App\Models\ProductionBatch','production_batch_id','id')->withTrashed();
+        return $this->hasOne('App\Models\ProductionBatch','production_batch_id','id');
     }
 
     public function area(){

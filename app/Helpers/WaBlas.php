@@ -1,10 +1,14 @@
 <?php
+namespace App\Helpers;
+
+use mysqli;
+
 //wablas API class
 //https://pati.wablas.com/documentation
 //server whatsapp disesuaikan pada saat pesan
 //token ada pada tombol setting
 //untuk menjalankan pertama kali harus generate qrcode dan scan pada menu device di wablac
-class wablas{
+class WaBlas{
 
     private $token;
  

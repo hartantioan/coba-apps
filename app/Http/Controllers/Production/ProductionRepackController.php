@@ -18,6 +18,7 @@ use App\Models\Area;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Helpers\WaBlas;
 use App\Models\Item;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
@@ -28,6 +29,7 @@ use App\Models\ProductionRepackDetail;
 use App\Models\UsedData;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductionRepackController extends Controller
 {

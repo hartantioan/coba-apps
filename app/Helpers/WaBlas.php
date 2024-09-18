@@ -41,9 +41,9 @@ class wablas{
     }
 
     function simple_wa($phone, $message){
-        $resutl = file_get_content("https://pati.wablas.com/api/send-message?token=".$this->token."&phone=".$phone."&message=".$message);
+      /*  $resutl = file_get_content("https://pati.wablas.com/api/send-message?token=".$this->token."&phone=".$phone."&message=".$message);
         echo "<pre>";
-        print_r($result);
+        print_r($result);*/
     }
 
     function send_group($groupId, $phone, $message){

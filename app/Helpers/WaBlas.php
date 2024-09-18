@@ -9,15 +9,7 @@ use mysqli;
 //token ada pada tombol setting
 //untuk menjalankan pertama kali harus generate qrcode dan scan pada menu device di wablac
 class WaBlas{
-
-    private $token;
- 
-    public function __construct() {
-       
-        $this->token = env('WABLAS_KEY');
-    }
-
-    function kirim_wa($phone,$message)
+    public static function kirim_wa($phone,$message)
     {
 
         $curl = curl_init();
@@ -28,7 +20,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -44,13 +36,13 @@ class WaBlas{
        
     }
 
-    function simple_wa($phone, $message){
-      /*  $resutl = file_get_content("https://pati.wablas.com/api/send-message?token=".$this->token."&phone=".$phone."&message=".$message);
+    public static function simple_wa($phone, $message){
+      /*  $resutl = file_get_content("https://pati.wablas.com/api/send-message?token=".env('WABLAS_KEY')."&phone=".$phone."&message=".$message);
         echo "<pre>";
         print_r($result);*/
     }
 
-    function send_group($groupId, $phone, $message){
+    public static function send_group($groupId, $phone, $message){
         $curl = curl_init();
         $data = [
             'groupId' => $groupId,
@@ -60,7 +52,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization:".$this->token,
+                "Authorization:".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -76,7 +68,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_image($phone, $caption, $urlImage){
+    public static function send_image($phone, $caption, $urlImage){
         $curl = curl_init();
         $data = [
             'phone' => $phone,
@@ -86,7 +78,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -102,7 +94,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_image_lokal($phone, $caption){
+    public static function send_image_lokal($phone, $caption){
 
         $filename = $_FILES['upload_file']['tmp_name'];
         $handle = fopen($filename, "r");
@@ -126,7 +118,7 @@ class WaBlas{
         */
 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [ "Authorization:".$this->token ] );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [ "Authorization:".env('WABLAS_KEY') ] );
         curl_setopt($curl, CURLOPT_URL, "https://pati.wablas.com/api/send-image-from-local");
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -140,7 +132,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_image_group(){
+    public static function send_image_group(){
         $curl = curl_init();
         $data = [
             'groupId' => '154xxxxx',
@@ -151,7 +143,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -167,7 +159,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_image_from_image($groupId, $phone, $caption){
+    public static function send_image_from_image($groupId, $phone, $caption){
         $filename = $_FILES['upload_file']['tmp_name'];
         $handle = fopen($filename, "r");
         $file = fread($handle, filesize($filename));
@@ -191,7 +183,7 @@ class WaBlas{
         */
 
         $curl = curl_init();
-        curl_setopt($curl, CURLOPT_HTTPHEADER, [ "Authorization: ".$this->token ] );
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [ "Authorization: ".env('WABLAS_KEY') ] );
         curl_setopt($curl, CURLOPT_URL, "https://pati.wablas.com/api/send-image-from-local");
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -205,7 +197,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_document($phone, $caption, $url){
+    public static function send_document($phone, $caption, $url){
         $curl = curl_init();
         $data = [
             'phone' => $phone,
@@ -215,7 +207,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_URL, "https://pati.wablas.com/api/send-document");
@@ -231,7 +223,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_document_group($groupId, $phone, $caption, $url){
+    public static function send_document_group($groupId, $phone, $caption, $url){
         $curl = curl_init();
         $data = [
             'groupId' => $groupId,
@@ -242,7 +234,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_URL, "https://pati.wablas.com/api/send-document-group");
@@ -258,7 +250,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function send_video($phone, $caption, $urlVideo){
+    public static function send_video($phone, $caption, $urlVideo){
         $curl = curl_init();
         $data = [
             'phone' => $phone,
@@ -268,7 +260,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_URL, "https://pati.wablas.com/api/send-video");
@@ -284,7 +276,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function schedule($phone, $message, $date, $time){
+    public static function schedule($phone, $message, $date, $time){
         $curl = curl_init();
         $data = [
             'phone' => $phone,
@@ -295,7 +287,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -311,11 +303,11 @@ class WaBlas{
         print_r($result);
     }
 
-    function report($fromDate, $toDate ){
+    public static function report($fromDate, $toDate ){
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -329,7 +321,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function receive(){
+    public static function receive(){
         /**
          * all data POST sent from https://pati.wablas.com
          * you must create URL what can receive POST data
@@ -369,7 +361,7 @@ class WaBlas{
 
     }
 
-    function autoReply(){
+    public static function autoReply(){
         extract($_POST);
         /**
          * for auto reply or bot 
@@ -384,13 +376,13 @@ class WaBlas{
         }
     }
 
-    function extract(){
+    public static function extract(){
         $result = extract($_POST);
         echo "<pre>";
         print_r($result);
     }
 
-    function send_sms($phone, $message){
+    public static function send_sms($phone, $message){
         $curl = curl_init();
         $token = "";
         $data = [
@@ -400,7 +392,7 @@ class WaBlas{
 
         curl_setopt($curl, CURLOPT_HTTPHEADER,
             array(
-                "Authorization: ".$this->token,
+                "Authorization: ".env('WABLAS_KEY'),
             )
         );
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "POST");
@@ -416,7 +408,7 @@ class WaBlas{
         print_r($result);
     }
 
-    function forward_sms(){
+    public static function forward_sms(){
         /**
          * all data POST sent from https://pati.wablas.com
          * you must create URL what can receive POST data
@@ -431,7 +423,7 @@ class WaBlas{
         print_r($data);
     }
 
-    function finger_print(){
+    public static function finger_print(){
         /**
          * all data POST sent from https://pati.wablas.com
          * you must create URL what can receive POST data

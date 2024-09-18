@@ -26,6 +26,7 @@ use App\Exports\ExportCoa;
 use Illuminate\Database\Eloquent\Builder;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Helpers\WaBlas;
 use App\Models\ApprovalSource;
 use App\Models\GoodIssueRequestDetail;
 use App\Models\ProductionScheduleDetail;
@@ -496,6 +497,9 @@ class ApprovalController extends Controller
                                                 $row->update([
                                                     'status'    => '1'
                                                 ]);
+                                                if($row->user->phone == '085729547103'){
+                                                    WaBlas::kirim_wa('085729547103','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                }
                                             }
                                         }else{
                                             
@@ -697,6 +701,9 @@ class ApprovalController extends Controller
                                                 $rowdetail->update([
                                                     'status'    => '1'
                                                 ]);
+                                                if($rowdetail->user->phone == '085729547103'){
+                                                    WaBlas::kirim_wa('085729547103','Dokumen '.$rowdetail->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                }
                                             }
                                         }
                                     }else{

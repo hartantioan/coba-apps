@@ -7197,8 +7197,8 @@ class CustomHelper {
                     }
                     $row->update([
                         'price_final'	=> $price_final,
-                        'qty_final'		=> $qty_final,
-                        'total_final'	=> $total_final,
+                        'qty_final'		=> round($qty_final,3),
+                        'total_final'	=> round($total_final,2),
                     ]);
                 }else{
                     if($row->type == 'IN'){
@@ -7211,8 +7211,8 @@ class CustomHelper {
                     $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     $row->update([
                         'price_final'	=> $price_final,
-                        'qty_final'		=> $qty_final,
-                        'total_final'	=> $total_final,
+                        'qty_final'		=> round($qty_final,3),
+                        'total_final'	=> round($total_final,2),
                     ]);
                 }
             }

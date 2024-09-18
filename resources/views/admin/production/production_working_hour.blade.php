@@ -176,7 +176,7 @@
                                     <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                         <option value="">--Pilih--</option>
                                         @foreach ($place as $rowplace)
-                                            <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                            <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                         @endforeach
                                     </select>
                                 </div>

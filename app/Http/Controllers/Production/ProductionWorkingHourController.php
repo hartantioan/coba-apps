@@ -245,6 +245,8 @@ class ProductionWorkingHourController extends Controller
                 ];
             } else {
 
+                $place = Place::where('code',$request->code_place_id)->first();
+
                 if($request->temp){
                     $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->temp))->first();
 
@@ -287,7 +289,7 @@ class ProductionWorkingHourController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->place_id = $request->code_place_id;
+                        $query->place_id = $place->id;
                         $query->shift_id = $request->shift_id;
                         $query->group = $request->group;
                         $query->line_id = $request->line_id;
@@ -318,7 +320,7 @@ class ProductionWorkingHourController extends Controller
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'place_id'                  => $request->code_place_id,
+                        'place_id'                  => $place->id,
                         'area_id'                   => $request->area_id,
                         'shift_id'                  => $request->shift_id,
                         'group'                     => $request->group,

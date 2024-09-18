@@ -356,7 +356,7 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'                => $detail->id,
-                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
+                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '').' - '.CustomHelper::formatConditionalQty($detail->qty),
                 'name'              => $detail->place->code.' Gudang: '.$detail->warehouse->name.($detail->area()->exists() ? ' Area: '.$detail->area->name : ''),
                 'warehouse_id'      => $detail->warehouse_id,
                 'place_id'          => $detail->place_id,
@@ -366,6 +366,7 @@ class Item extends Model
                 'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
                 'qty'               => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
                 'qty_raw'           => CustomHelper::formatConditionalQty($detail->qty),
+                'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
             ];
         }
         
@@ -487,6 +488,26 @@ class Item extends Model
         return $arr;
     }
 
+    public function arrayItemWithSameParent(){
+        $arr = [];
+        $data = FgGroup::where('item_id',$this->id)->get();
+        foreach($data as $row){
+            $arr[] = $row->parent_id;
+        }
+        $arr = array_unique($arr);
+        $result = [];
+        $data2 = FgGroup::whereIn('parent_id',$arr)->where('item_id','!=',$this->id)->whereHas('item',function($query){
+            $query->whereHas('pallet',function($query){
+                $query->where('box_conversion','<=',1);
+            });
+        })->get();
+        foreach($data2 as $row){
+            $result[] = $row->item_id;
+        }
+        $result = array_unique($result);
+        return $result;
+    }
+
     public function parentFg()
     {
         return $this->hasOne('App\Models\FgGroup','item_id','id');
@@ -589,6 +610,10 @@ class Item extends Model
         return $this->hasMany('App\Models\GoodIssueRequestDetail','item_id','id')->whereHas('goodIssueRequest',function($query){
             $query->whereIn('status',['1','2','3']);
         });
+    }
+
+    public function itemRejectBom(){
+        return $this->hasMany('App\Models\Bom','item_reject_id','id')->where('status','1');
     }
 
     public function bomPlace($place_id)

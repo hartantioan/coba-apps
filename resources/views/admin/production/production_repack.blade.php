@@ -150,7 +150,7 @@
 </div>
 
 <div id="modal1" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;max-width:100%;min-width:90%;">
-    <div class="modal-content">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
                 <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
@@ -172,7 +172,7 @@
                                         <select class="form-control" id="code_place_id" name="code_place_id" onchange="getCode(this.value);">
                                             <option value="">--Pilih--</option>
                                             @foreach ($place as $rowplace)
-                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                <option value="{{ $rowplace->code }}">{{ $rowplace->code }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -212,7 +212,7 @@
                             <fieldset style="min-width: 100%;">
                                 <legend>2. Detail Item</legend>
                                 <div class="col s12" style="overflow:auto;min-width:100%;">
-                                    <table class="bordered" style="border: 1px solid;min-width:1800px !important;">
+                                    <table class="bordered" style="border: 1px solid;min-width:2700px !important;">
                                         <thead>
                                             <tr>
                                                 <th class="center" rowspan="2">Hapus</th>
@@ -235,12 +235,12 @@
                                         </thead>
                                         <tbody id="body-item">
                                             <tr id="empty-item">
-                                                <td colspan="13" class="center">Silahkan tambahkan baris item / scan dari barcode</td>
+                                                <td colspan="13">Silahkan tambahkan baris item / scan dari barcode</td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
                                             <tr>
-                                                <th colspan="13" class="center">
+                                                <th colspan="13">
                                                     <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addItem();" href="javascript:void(0);">
                                                         <i class="material-icons left">add</i> Tambah
                                                     </a>
@@ -663,6 +663,21 @@
                 };
             }
         });
+
+        $('#body-item').on('click', '.delete-data-item', function() {
+            $(this).closest('tr').remove();
+            if($('.row_item').length == 0){
+                $('#body-item').append(`
+                    <tr id="empty-item">
+                        <td colspan="13">Silahkan tambahkan baris item / scan dari barcode</td>
+                    </tr>
+                `);
+            }
+        });
+
+        String.prototype.replaceAt = function(index, replacement) {
+            return this.substring(0, index) + replacement + this.substring(index + replacement.length);
+        };
     });
 
     function makeTreeOrg(data,link){
@@ -1321,118 +1336,405 @@
             $('#empty-item').remove();
         }
         let count = makeid(10);
-        $('#body-unit').append(`
+        $('#body-item').append(`
             <tr class="row_item">
-                <td class="center-align shift-inputs">
+                <td class="center-align">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                         <i class="material-icons">delete</i>
                     </a>
                 </td>
                 <td>
-                    <select class="browser-default item-array" id="arr_item_source` + count + `" name="arr_item_source[]" onchange="getRowUnit('` + count + `')"></select>
+                    <select class="browser-default" id="arr_item_source` + count + `" name="arr_item_source[]" onchange="getItemSourceData('` + count + `');"></select>
                 </td>
-                <td class="center" id="stock` + count + `">
-                    -
+                <td class="center">
+                    <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;">
+                        <option>--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td>
                     <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty`+ count +`">
                 </td>
-                <td class="center" id="unit` + count + `">
+                <td class="center" id="unit_source` + count + `">
                     -
                 </td>
                 <td>
-                    <input name="arr_qty_conversion[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty_conversion`+ count +`">
+                    <input name="arr_qty_conversion_source[]" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty_conversion_source`+ count +`" readonly>
                 </td>
-                <td class="center" id="unit-conversion` + count + `">
-                    -
+                <td class="center">
+                    <select class="browser-default" id="arr_unit_conversion` + count + `" name="arr_unit_conversion[]" style="width:100%;">
+                        <option>--Silahkan pilih item--</option>
+                    </select>
                 </td>
                 <td class="center" id="source-batch` + count + `">
                     -
                 </td>
                 <td>
-                    <select class="browser-default" id="arr_item_source` + count + `" name="arr_item_source[]" onchange="getRowUnit('` + count + `')"></select>
+                    <select class="browser-default" id="arr_item_target` + count + `" name="arr_item_target[]" onchange="getItemTargetData('` + count + `');"></select>
+                </td>
+                <td>
+                    <input name="arr_qty_conversion_target[]" type="text" value="0,000" onkeyup="formatRupiah(this);" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty_conversion_target`+ count +`" readonly>
+                </td>
+                <td class="center">
+                    <select class="browser-default" id="arr_unit_target_conversion` + count + `" name="arr_unit_target_conversion[]" style="width:100%;" onchange="countRow('` + count + `')">
+                        <option>--Silahkan pilih item target--</option>
+                    </select>
+                </td>
+                <td class="center">
+                    <input name="arr_batch_no[]" type="text" placeholder="Akan membuat baru." id="arr_batch_no` + count + `" readonly style="border-bottom:none;">
                 </td>
             </tr>
         `);
+        select2ServerSide('#arr_item_source' + count, '{{ url("admin/select2/sales_item_pallet_only") }}');
+        $('#arr_item_target' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/item_fg_from_packing") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        item_source: $('#arr_item_source' + count).val(),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+    }
+
+    function setStock(id){
+        if($('#arr_item_stock' + id).val()){
+            let qtyInput = parseFloat($('#arr_qty' + id).val().replaceAll(".", "").replaceAll(",","."));
+            let qtyStock = parseFloat($('#arr_item_stock' + id).find(':selected').data('stock').toString().replaceAll(".", "").replaceAll(",","."));
+            if(qtyInput > qtyStock){
+                $('#arr_qty' + id).val($('#arr_item_stock' + id).find(':selected').data('stock'));
+            }
+            console.log(qtyInput);
+            console.log(qtyStock);
+            $('#source-batch' + id).text($('#arr_item_stock' + id).find(':selected').data('batch'));
+        }else{
+            $('#arr_item_stock' + id).val('0,000');
+            $('#source-batch' + id).text('-');
+        }
+        countRow(id);
+    }
+
+    function countRow(id){
+        let qty = parseFloat($('#arr_qty' + id).val().replaceAll(".", "").replaceAll(",",".")), batch = '';
+        if($('#arr_unit_conversion' + id).val()){
+            let qtyConversion = qty > 0 ? qty / parseFloat($('#arr_unit_conversion' + id).find(':selected').data('conversion')) : 0;
+            $('#arr_qty_conversion_source' + id).val(
+                formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))
+            );
+        }
+        if($('#arr_unit_target_conversion' + id).val()){
+            let qtyConversion = qty > 0 ? qty / parseFloat($('#arr_unit_target_conversion' + id).find(':selected').data('conversion')) : 0;
+            $('#arr_qty_conversion_target' + id).val(
+                formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))
+            );
+        }
+        if($('#arr_item_stock' + id).val()){
+            batch = $('#arr_item_stock' + id).find(':selected').data('batch');
+            let targetUnit = '';
+            if($('#arr_unit_target_conversion' + id).val()){
+                targetUnit = $("#arr_unit_target_conversion" + id + " option:selected").text().substring(0, 1);
+            }
+            let array = batch.split('/');
+            let newbatch = targetUnit + array[0] + '/' + array[1];
+            $('#arr_batch_no' + id).val(newbatch);
+        }
+    }
+
+    function getItemSourceData(id){
+        $('#arr_item_stock' + id).empty().append(`
+            <option value="">--Silahkan pilih item--</option>
+        `);
+        $('#arr_unit_conversion' + id).empty().append(`
+            <option>--Silahkan pilih item--</option>
+        `);
+        $('#unit_source' + id).text('');
+        if($('#arr_item_source' + id).val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_item_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#arr_item_source' + id).val(),
+                    type: 'source',
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    if(response.list_stock.length > 0){
+                        $.each(response.list_stock, function(i, val) {
+                            $('#arr_item_stock' + id).append(`
+                                <option value="` + val.id + `" data-stock="` + val.qty_raw + `" data-batch="` + val.batch + `">` + val.warehouse + `</option>
+                            `);
+                        });
+                    }else{
+                        $('#arr_item_stock' + id).empty().append(`
+                            <option value="">--Stock tidak ditemukan--</option>
+                        `);
+                    }
+                    $('#unit_source' + id).text(response.uom_unit_code);
+                    if(response.sell_units.length > 0){
+                        $('#arr_unit_conversion' + id).empty();
+                        $.each(response.sell_units, function(i, val) {
+                            $('#arr_unit_conversion' + id).append(`
+                                <option value="` + val.id + `" data-conversion="` + val.conversion + `">` + val.code + `</option>
+                            `);
+                        });
+                    }else{
+                        $('#arr_unit_conversion' + id).empty().append(`
+                            <option value="">--Satuan jual tidak ditemukan--</option>
+                        `);
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
+    }
+
+    function getItemTargetData(id){
+        $('#arr_unit_target_conversion' + id).empty().append(`
+            <option>--Silahkan pilih item target--</option>
+        `);
+        if($('#arr_item_target' + id).val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_item_data',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    id: $('#arr_item_target' + id).val(),
+                    type: 'target',
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('#modal1');
+                },
+                success: function(response) {
+                    loadingClose('#modal1');
+                    if(response.sell_units.length > 0){
+                        $('#arr_unit_target_conversion' + id).empty();
+                        $.each(response.sell_units, function(i, val) {
+                            $('#arr_unit_target_conversion' + id).append(`
+                                <option value="` + val.id + `" data-conversion="` + val.conversion + `">` + val.code + `</option>
+                            `);
+                        });
+                        countRow(id);
+                    }else{
+                        $('#arr_unit_target_conversion' + id).empty().append(`
+                            <option value="">--Satuan jual tidak ditemukan--</option>
+                        `);
+                    }
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('#modal1');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 
     function save(){
-        var formData = new FormData($('#form_data')[0]);
-        var path = window.location.pathname;
-        path = path.replace(/^\/|\/$/g, '');
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
 
-        
-        var segments = path.split('/');
-        var lastSegment = segments[segments.length - 1];
-    
-        formData.append('lastsegment',lastSegment);
-                    
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
-                loadingClose('.modal-content');
-                if(response.status == 200) {
-                    success();
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    $.each(response.error, function(field, errorMessage) {
-                        $('#' + field).addClass('error-input');
-                        $('#' + field).css('border', '1px solid red');
-                        
-                    });
+                let passed = true, passedQtyRound = true;
+
+                $('*[name^="arr_item_source[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_item_stock[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_qty[]"]').each(function(index){
+                    if(!$(this).val() || $(this).val() == '0,000' || $(this).val() == '0,00' || $(this).val() == '0,0' || $(this).val() == '0'){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_qty_conversion_source[]"]').each(function(index){
+                    if(!$(this).val() || $(this).val() == '0,000' || $(this).val() == '0,00' || $(this).val() == '0,0' || $(this).val() == '0'){
+                        passed = false;
+                    }else{
+                        let arraydecimal = $(this).val().split(',');
+                        if(parseInt(arraydecimal[1]) > 0){
+                            passedQtyRound = false;
+                        }
+                    }
+                });
+
+                $('*[name^="arr_unit_conversion[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_item_target[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_qty_conversion_target[]"]').each(function(index){
+                    if(!$(this).val() || $(this).val() == '0,000' || $(this).val() == '0,00' || $(this).val() == '0,0' || $(this).val() == '0'){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_unit_target_conversion[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('*[name^="arr_batch_no[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                if(!passed){
                     swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
+                        title: 'Ups! Ada yang kurang!',
+                        text: 'Item sumber, stok asal, qty, item tujuan / target, dan batch tujuan tidak boleh kosong.',
                         icon: 'warning'
                     });
-
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
-                        });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
+                    return false;
                 }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+
+                if(!passedQtyRound){
+                    swal({
+                        title: 'Ups! Ada yang kurang!',
+                        text: 'Total qty item konversi keluar tidak bulat.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
+                var formData = new FormData($('#form_data')[0]);
+                var path = window.location.pathname;
+                path = path.replace(/^\/|\/$/g, '');
+
+                
+                var segments = path.split('/');
+                var lastSegment = segments[segments.length - 1];
+            
+                formData.append('lastsegment',lastSegment);
+                            
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
+                            success();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
+                                
+                            });
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
+
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
                 });
             }
         });

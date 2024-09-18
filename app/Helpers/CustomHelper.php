@@ -78,6 +78,7 @@ use App\Models\ProductionHandover;
 use App\Models\ProductionIssue;
 use App\Models\ProductionRecalculate;
 use App\Models\ProductionReceive;
+use App\Models\ProductionRepack;
 use App\Models\ProductionSchedule;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseRequest;
@@ -5661,7 +5662,120 @@ class CustomHelper {
 					'status'	=> '3'
 				]);
 			}
+
+		}elseif($table_name == 'production_repacks'){
 			
+			$pr = ProductionRepack::find($table_id);
+			
+			$query = Journal::create([
+				'user_id'		=> session('bo_id'),
+				'company_id'	=> $pr->company_id,
+				'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($data->post_date)).'00'),
+				'lookable_type'	=> $table_name,
+				'lookable_id'	=> $table_id,
+				'post_date'		=> $data->post_date,
+				'note'			=> $data->note ?? '',
+				'status'		=> '3',
+				'currency_rate'	=> 1,
+				'currency_id'	=> 1,
+			]);
+
+			foreach($pr->productionRepackDetail as $row){
+				#jurnal barang masuk
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->itemTarget->itemGroup->coa_id,
+					'place_id'		=> $row->place_id,
+					'item_id'		=> $row->item_target_id,
+					'warehouse_id'	=> $row->warehouse_id,
+					'type'			=> '1',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> 0,
+					'note'			=> $pr->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
+				]);
+
+				self::sendCogs($table_name,
+					$pr->id,
+					$pr->company_id,
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_target_id,
+					$row->qty,
+					$row->total,
+					'IN',
+					$pr->post_date,
+					$row->area_id,
+					$row->item_shading_id,
+					$row->production_batch_id,
+					$row->getTable(),
+					$row->id,
+				);
+
+				self::sendStock(
+					$row->place_id,
+					$row->warehouse_id,
+					$row->item_target_id,
+					$row->qty,
+					'IN',
+					$row->area_id,
+					$row->item_shading_id,
+					$row->production_batch_id,
+				);
+				
+				#jurnal barang keluar
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+					'place_id'		=> $row->itemStock->place_id,
+					'item_id'		=> $row->itemStock->item_id,
+					'warehouse_id'	=> $row->itemStock->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> 0,
+					'note'			=> $pr->code,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
+				]);
+
+				self::sendCogs($table_name,
+					$pr->id,
+					$pr->company_id,
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->itemStock->item_id,
+					$row->qty,
+					$row->total,
+					'OUT',
+					$pr->post_date,
+					$row->itemStock->area_id,
+					$row->itemStock->item_shading_id,
+					$row->itemStock->production_batch_id,
+					$row->getTable(),
+					$row->id,
+				);
+
+				self::sendStock(
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->itemStock->item_id,
+					$row->qty,
+					'OUT',
+					$row->itemStock->area_id,
+					$row->itemStock->item_shading_id,
+					$row->itemStock->production_batch_id,
+				);
+			}
+
+			$pr->update([
+				'status'	=> '3'
+			]);
+
 		}elseif($table_name == 'adjust_rates'){
 			$ar = AdjustRate::find($table_id);
 

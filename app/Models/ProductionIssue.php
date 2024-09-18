@@ -304,4 +304,21 @@ class ProductionIssue extends Model
         }
         return implode(', ',$arr);
     }
+
+    public function reJournalAndRecalculateReceive(){
+        if($this->journal()->exists()){
+            foreach($this->journal->journalDetail as $row){
+                $row->delete();
+            }
+            $this->journal->delete();
+        }
+        
+        CustomHelper::sendJournal($this->getTable(),$this->id);
+
+        if($this->productionReceiveIssue()->exists()){
+            foreach($this->productionReceiveIssue as $row){
+                $row->productionReceive->recalculateAndResetCogs();
+            }
+        }
+    }
 }

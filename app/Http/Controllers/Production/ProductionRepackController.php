@@ -18,6 +18,11 @@ use App\Models\Area;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
+use App\Models\Item;
+use App\Models\ItemShading;
+use App\Models\ItemStock;
+use App\Models\ProductionBatch;
+use App\Models\ProductionBatchUsage;
 use App\Models\ProductionRepack;
 use App\Models\ProductionRepackDetail;
 use App\Models\UsedData;
@@ -182,35 +187,65 @@ class ProductionRepackController extends Controller
         return response()->json($response);
     }
 
+    public function getItemData(Request $request){
+        $type = $request->type;
+        $item = $request->id;
+        if($type == 'source'){
+            $data = Item::find($item);
+            $data['list_stock'] = $data->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses);
+            $data['uom_unit_code'] = $data->uomUnit->code;
+            $data['sell_units'] = $data->arrSellUnits();
+        }else{
+            $data = Item::find($item);
+            $data['list_stock'] = $data->currentStockMoreThanZero($this->dataplaces,$this->datawarehouses);
+            $data['uom_unit'] = $data->uomUnit->code;
+            $data['sell_units'] = $data->arrSellUnits();
+        }
+        return response()->json($data);
+    }
+
     public function create(Request $request){
-        /* DB::beginTransaction();
-        try { */
+        DB::beginTransaction();
+        try {
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
                 'company_id'			    => 'required',
-                'shift_id'                  => 'required',
-                'group'                     => 'required',
-                'line_id'                   => 'required',
                 'post_date'		            => 'required',
-                'area_id'                   => 'required',
-                'machine_id'                => 'required',
                 'note'                      => 'required',
-                'arr_process'               => 'required|array',
-                'arr_pdo'                   => 'required',
+                'arr_item_source'           => 'required|array',
+                'arr_item_stock'            => 'required|array',
+                'arr_qty'                   => 'required|array',
+                'arr_qty_conversion_source' => 'required|array',
+                'arr_unit_conversion'       => 'required|array',
+                'arr_item_target'           => 'required|array',
+                'arr_qty_conversion_target' => 'required|array',
+                'arr_unit_target_conversion'=> 'required|array',
+                'arr_batch_no'              => 'required|array',
             ], [
                 'code_place_id.required'            => 'Plant Tidak boleh kosong',
                 'code.required' 	                => 'Kode tidak boleh kosong.',
                 'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-                'shift_id'                          => 'Shift tidak boleh kosong.',
-                'group'                             => 'Group tidak boleh kosong.',
-                'line_id'                           => 'Line tidak boleh kosong.',
                 'post_date.required' 			    => 'Tanggal posting tidak boleh kosong.',
-                'area_id.required'                  => 'Area tidak boleh kosong.',
-                'machine_id.required'               => 'Mesin tidak boleh kosong.',
                 'note.required'                     => 'Keterangan harus dalam bentuk array.',
-                'arr_process.required'              => 'Waktu harus di isi.',
-                'arr_pdo.required'                  => 'Production Order Harus dipilih.',
+                'arr_item_source.required'          => 'Item sumber tidak boleh kosong.',
+                'arr_item_source.array'             => 'Item sumber harus array.',
+                'arr_item_stock.required'           => 'Stok asal tidak boleh kosong.',
+                'arr_item_stock.array'              => 'Stok asal harus array.',
+                'arr_qty.required'                  => 'Qty tidak boleh kosong.',
+                'arr_qty.array'                     => 'Qty harus array.',
+                'arr_qty_conversion_source.required'=> 'Qty konversi boleh kosong.',
+                'arr_qty_conversion_source.array'   => 'Qty konversi harus array.',
+                'arr_unit_conversion.required'      => 'Satuan konversi boleh kosong.',
+                'arr_unit_conversion.array'         => 'Satuan konversi harus array.',
+                'arr_item_target.required'          => 'Item target boleh kosong.',
+                'arr_item_target.array'             => 'Item target harus array.',
+                'arr_qty_conversion_target.required'=> 'Qty konversi target boleh kosong.',
+                'arr_qty_conversion_target.array'   => 'Qty konversi target harus array.',
+                'arr_unit_target_conversion.required'=> 'Satuan konversi target boleh kosong.',
+                'arr_unit_target_conversion.array'   => 'Satuan konversi target harus array.',
+                'arr_batch_no.required'             => 'Nomor batch boleh kosong.',
+                'arr_batch_no.array'                => 'Nomor batch harus array.',
             ]);
 
             if($validation->fails()) {
@@ -220,8 +255,44 @@ class ProductionRepackController extends Controller
                 ];
             } else {
 
+                $arrItemStock = [];
+                $arrItemQty = [];
+                $arrErrorItem = [];
+
+                if($request->arr_item_stock){
+                    foreach($request->arr_item_stock as $key => $row){
+                        if(!in_array($row,$arrItemStock)){
+                            $arrItemStock[] = $row;
+                            $arrItemQty[] = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        }else{
+                            $index = array_search($row,$arrItemStock);
+                            $arrItemQty[$index] += str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        }
+                    }
+
+                    foreach($arrItemStock as $key => $row){
+                        $itemstock = NULL;
+                        $itemstock = ItemStock::find($row);
+                        if($itemstock){
+                            $qtyStock = $itemstock->stockByDate($request->post_date);
+                            if($qtyStock < $arrItemQty[$key]){
+                                $arrErrorItem[] = 'Item '.$itemstock->item->name.' qty stock tidak mencukupi pada tanggal terpilih. Stok : '.CustomHelper::formatConditionalQty($qtyStock).' - kebutuhan '.CustomHelper::formatConditionalQty($arrItemQty[$key]);
+                            }
+                        }else{
+                            $arrErrorItem[] = 'Data item stock tidak ditemukan.';
+                        }
+                    }
+                }
+
+                if(count($arrErrorItem) > 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, '.implode(', ',$arrErrorItem).'.',
+                    ]);
+                }
+
                 if($request->temp){
-                    $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->temp))->first();
+                    $query = ProductionRepack::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
                     $revised = false;
@@ -243,7 +314,7 @@ class ProductionRepackController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Production Issue telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Production repack telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
 
@@ -254,7 +325,7 @@ class ProductionRepackController extends Controller
                                     Storage::delete($query->document);
                                 }
                             }
-                            $document = $request->file('file')->store('public/production_working_hour');
+                            $document = $request->file('file')->store('public/production_repack');
                         } else {
                             $document = $query->document;
                         }
@@ -262,12 +333,6 @@ class ProductionRepackController extends Controller
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
                         $query->company_id = $request->company_id;
-                        $query->place_id = $request->code_place_id;
-                        $query->shift_id = $request->shift_id;
-                        $query->group = $request->group;
-                        $query->line_id = $request->line_id;
-                        $query->area_id = $request->area_id;
-                        $query->machine_id = $request->machine_id;
                         $query->post_date = $request->post_date;
                         $query->document = $document;
                         $query->note = $request->note;
@@ -275,7 +340,9 @@ class ProductionRepackController extends Controller
 
                         $query->save();
                         
-                        foreach($query->ProductionWorkingHourDetail as $row){
+                        foreach($query->productionRepackDetail as $row){
+                            $row->productionBatch()->delete();
+                            $row->productionBatchUsage()->delete();
                             $row->delete();
                         }
                     }else{
@@ -287,20 +354,14 @@ class ProductionRepackController extends Controller
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=ProductionWorkingHour::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                    $newCode=ProductionRepack::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
                     
-                    $query = ProductionWorkingHour::create([
+                    $query = ProductionRepack::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
                         'company_id'                => $request->company_id,
-                        'place_id'                  => $request->code_place_id,
-                        'area_id'                   => $request->area_id,
-                        'shift_id'                  => $request->shift_id,
-                        'group'                     => $request->group,
-                        'line_id'                   => $request->line_id,
-                        'machine_id'                => $request->machine_id,
                         'post_date'                 => $request->post_date,
-                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_working_hour') : NULL,
+                        'document'                  => $request->file('file') ? $request->file('file')->store('public/production_repack') : NULL,
                         'note'                      => $request->note,
                         'status'                    => '1',
                     ]);
@@ -308,26 +369,75 @@ class ProductionRepackController extends Controller
                 
                 if($query) {
                     
-                    if($request->arr_process){
-                        foreach($request->arr_process as $key => $row){
-                            ProductionWorkingHourDetail::create([
-                                'production_working_hour_id'=> $query->id,
-                                'production_order_id'       => $request->arr_pdo[$key],
-                                'type'                      => $row,
-                                'note'                      => $request->arr_note[$key],
-                                'working_hour'              => $request->arr_working_hour[$key],
+                    $yearno = date('ym',strtotime($request->post_date));
+                    foreach($request->arr_item_source as $key => $row){
+                        $itemStock = NULL;
+                        $itemStock = ItemStock::find($request->arr_item_stock[$key]);
+                        if($itemStock){
+                            $total = round($itemStock->priceFgNow($request->post_date) * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),2);
+                            $prd = ProductionRepackDetail::create([
+                                'production_repack_id'      => $query->id,
+                                'item_source_id'            => $row,
+                                'item_stock_id'             => $request->arr_item_stock[$key],
+                                'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                                'item_unit_source_id'       => $request->arr_unit_conversion[$key],
+                                'item_target_id'            => $request->arr_item_target[$key],
+                                'item_unit_target_id'       => $request->arr_unit_target_conversion[$key],
+                                'place_id'                  => $itemStock->place_id,
+                                'warehouse_id'              => $itemStock->warehouse_id,
+                                'total'                     => $total,
+                            ]);
+
+                            $item_shading_id = NULL;
+                            $shading = ItemShading::where('item_id',$request->arr_item_target[$key])->where('code',$itemStock->itemShading->code)->first();
+                            if(!$shading){
+                                $shading = ItemShading::create([
+                                    'item_id'   => $request->arr_item_target[$key],
+                                    'code'      => $itemStock->itemShading->code,
+                                ]);   
+                            }
+                            $item_shading_id = $shading->id;
+                            
+                            $runningno = ProductionBatch::getLatestCodeFg($yearno);
+                            $newbatch = $request->arr_batch_no[$key].'/'.$runningno;
+                            $batch = ProductionBatch::create([
+                                'code'              => $newbatch,
+                                'item_id'           => $prd->item_target_id,
+                                'place_id'          => $prd->place_id,
+                                'warehouse_id'      => $prd->warehouse_id,
+                                'area_id'           => $itemStock->area_id,
+                                'item_shading_id'   => $item_shading_id,
+                                'lookable_type'     => $prd->getTable(),
+                                'lookable_id'       => $prd->id,
+                                'qty'               => $prd->qty,
+                                'qty_real'          => $prd->qty,
+                                'total'             => $total,
+                            ]);
+
+                            $prd->update([
+                                'item_shading_id'       => $item_shading_id,
+                                'production_batch_id'   => $batch->id,
+                                'area_id'               => $itemStock->area_id,
+                                'batch_no'              => $batch->code,
+                            ]);
+
+                            ProductionBatchUsage::create([
+                                'production_batch_id'   => $itemStock->production_batch_id,
+                                'lookable_type'         => $prd->getTable(),
+                                'lookable_id'           => $prd->id,
+                                'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
                             ]);
                         }
                     }
                     
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Working Hour No. '.$query->code);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Working Hour No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
+                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Repack No. '.$query->code);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Repack No. '.$query->code,'Pengajuan Production Repack No. '.$query->code,session('bo_id'));
 
                     activity()
-                        ->performedOn(new ProductionWorkingHour())
+                        ->performedOn(new ProductionRepack())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query)
-                        ->log('Add / edit receive production working hour.');
+                        ->log('Add / edit production repack.');
 
                     $response = [
                         'status'    => 200,
@@ -341,10 +451,10 @@ class ProductionRepackController extends Controller
                 }
             }
         
-            /* DB::commit();
+            DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        } */
+        }
 
 		return response()->json($response);
     }

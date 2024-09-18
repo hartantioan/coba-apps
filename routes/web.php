@@ -433,6 +433,8 @@ Route::prefix('admin')->group(function () {
                 Route::get('group_customer', [Select2Controller::class, 'groupCustomer']);
                 Route::get('bom_calculator', [Select2Controller::class, 'bomCalculator']);
                 Route::get('list_bg_check', [Select2Controller::class, 'listBgCheck']);
+                Route::get('item_fg_from_packing', [Select2Controller::class, 'itemFgFromPacking']);
+                Route::get('sales_item_pallet_only', [Select2Controller::class, 'salesItemPalletOnly']);
             });
 
             Route::prefix('dashboard')->group(function () {
@@ -2416,6 +2418,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[ProductionRepackController::class, 'rowDetail']);
                     Route::post('show', [ProductionRepackController::class, 'show']);
                     Route::post('get_code', [ProductionRepackController::class, 'getCode']);
+                    Route::post('get_item_data', [ProductionRepackController::class, 'getItemData']);
                     Route::post('print',[ProductionRepackController::class, 'print']);
                     Route::post('done',[ProductionRepackController::class, 'done'])->middleware('operation.access:production_repack,update');
                     Route::post('print_by_range',[ProductionRepackController::class, 'printByRange']);

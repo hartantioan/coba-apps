@@ -619,7 +619,7 @@ class Item extends Model
     public function bomPlace($place_id)
     {
         $data = $this->bom()->where('place_id',intval($place_id))->orderByDesc('id')->get();
-        if($data){
+        if(count($data)>0){
             return $data;
         }else{
             return '';

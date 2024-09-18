@@ -5685,6 +5685,52 @@ class CustomHelper {
 			]);
 
 			foreach($pr->productionRepackDetail as $row){
+				#jurnal barang keluar
+				JournalDetail::create([
+					'journal_id'	=> $query->id,
+					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
+					'place_id'		=> $row->itemStock->place_id,
+					'item_id'		=> $row->item_source_id,
+					'warehouse_id'	=> $row->itemStock->warehouse_id,
+					'type'			=> '2',
+					'nominal'		=> $row->total,
+					'nominal_fc'	=> 0,
+					'note'			=> $pr->code,
+					'note2'			=> $row->itemStock->item->code.' - '.$row->itemStock->item->name,
+					'lookable_type'	=> $table_name,
+					'lookable_id'	=> $table_id,
+					'detailable_type'=> $row->getTable(),
+					'detailable_id'	=> $row->id,
+				]);
+
+				self::sendCogs($table_name,
+					$pr->id,
+					$pr->company_id,
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->item_source_id,
+					$row->qty,
+					$row->total,
+					'OUT',
+					$pr->post_date,
+					$row->itemStock->area_id,
+					$row->itemStock->item_shading_id,
+					$row->itemStock->production_batch_id,
+					$row->getTable(),
+					$row->id,
+				);
+
+				self::sendStock(
+					$row->itemStock->place_id,
+					$row->itemStock->warehouse_id,
+					$row->itemStock->item_id,
+					$row->qty,
+					'OUT',
+					$row->itemStock->area_id,
+					$row->itemStock->item_shading_id,
+					$row->itemStock->production_batch_id,
+				);
+
 				#jurnal barang masuk
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
@@ -5696,6 +5742,7 @@ class CustomHelper {
 					'nominal'		=> $row->total,
 					'nominal_fc'	=> 0,
 					'note'			=> $pr->code,
+					'note2'			=> $row->itemTarget->code.' - '.$row->itemTarget->name,
 					'lookable_type'	=> $table_name,
 					'lookable_id'	=> $table_id,
 					'detailable_type'=> $row->getTable(),
@@ -5728,51 +5775,6 @@ class CustomHelper {
 					$row->area_id,
 					$row->item_shading_id,
 					$row->production_batch_id,
-				);
-				
-				#jurnal barang keluar
-				JournalDetail::create([
-					'journal_id'	=> $query->id,
-					'coa_id'		=> $row->itemStock->item->itemGroup->coa_id,
-					'place_id'		=> $row->itemStock->place_id,
-					'item_id'		=> $row->itemStock->item_id,
-					'warehouse_id'	=> $row->itemStock->warehouse_id,
-					'type'			=> '2',
-					'nominal'		=> $row->total,
-					'nominal_fc'	=> 0,
-					'note'			=> $pr->code,
-					'lookable_type'	=> $table_name,
-					'lookable_id'	=> $table_id,
-					'detailable_type'=> $row->getTable(),
-					'detailable_id'	=> $row->id,
-				]);
-
-				self::sendCogs($table_name,
-					$pr->id,
-					$pr->company_id,
-					$row->itemStock->place_id,
-					$row->itemStock->warehouse_id,
-					$row->itemStock->item_id,
-					$row->qty,
-					$row->total,
-					'OUT',
-					$pr->post_date,
-					$row->itemStock->area_id,
-					$row->itemStock->item_shading_id,
-					$row->itemStock->production_batch_id,
-					$row->getTable(),
-					$row->id,
-				);
-
-				self::sendStock(
-					$row->itemStock->place_id,
-					$row->itemStock->warehouse_id,
-					$row->itemStock->item_id,
-					$row->qty,
-					'OUT',
-					$row->itemStock->area_id,
-					$row->itemStock->item_shading_id,
-					$row->itemStock->production_batch_id,
 				);
 			}
 

@@ -343,8 +343,8 @@ class ProductionRepackController extends Controller
                         $query->save();
                         
                         foreach($query->productionRepackDetail as $row){
-                            $row->productionBatch()->delete();
                             $row->productionBatchUsage()->delete();
+                            $row->productionBatch()->delete();
                             $row->delete();
                         }
                     }else{
@@ -607,7 +607,7 @@ class ProductionRepackController extends Controller
     }
 
     public function voidStatus(Request $request){
-        $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
         
         if($query) {
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -624,10 +624,6 @@ class ProductionRepackController extends Controller
             }else{
                 $tempStatus = $query->status;
 
-                foreach($query->productionWorkingHourDetail as $rowdetail){
-                    $rowdetail->delete();
-                }
-
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
@@ -640,13 +636,18 @@ class ProductionRepackController extends Controller
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                 }
 
+                foreach($query->productionRepackDetail as $rowdetail){
+                    $rowdetail->productionBatchUsage()->delete();
+                    $rowdetail->productionBatch()->delete();
+                }
+
                 activity()
-                    ->performedOn(new ProductionWorkingHour())
+                    ->performedOn(new ProductionRepack())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Void the Production Working Hour data');
+                    ->log('Void the Production Repack data');
     
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Production Working Hour No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
+                CustomHelper::sendNotification($query->getTable(),$query->id,'Production Repack No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $response = [
@@ -972,7 +973,7 @@ class ProductionRepackController extends Controller
         $total_debit_konversi = 0;
         $total_kredit_asli = 0;
         $total_kredit_konversi = 0;
-        $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($id))->first();
+        $query = ProductionRepack::where('code',CustomHelper::decrypt($id))->first();
         if($query->journal()->exists()){
             $response = [
                 'title'     => 'Journal',

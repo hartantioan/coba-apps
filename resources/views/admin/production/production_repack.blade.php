@@ -394,6 +394,69 @@
     </div>
 </div>
 
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content">
+        <div class="row" >
+            <div class="col m3 s12">
+                
+            </div>
+            <div class="col m6 s12">
+                <h4 id="title_data" style="text-align:center"></h4>
+                <h5 id="code_data" style="text-align:center"></h5>
+            </div>
+            <div class="col m3 s12 right-align">
+                <img src="{{ url('website/logo_web_fix.png') }}" width="40%" height="60%">
+            </div>
+        </div>
+        <div class="divider mb-1 mt-2"></div>
+        <div class="row">
+            <div class="col" id="user_jurnal">
+            </div>
+            <div class="col" id="post_date_jurnal">
+            </div>
+            <div class="col" id="note_jurnal">
+            </div>
+            <div class="col" id="ref_jurnal">
+            </div>
+            <div class="col" id="company_jurnal">
+            </div>
+        </div>
+        <div class="row mt-2">
+            <table class="bordered Highlight striped" style="zoom:0.7;">
+                <thead>
+                        <tr>
+                            <th class="center-align" rowspan="2">No</th>
+                            <th class="center-align" rowspan="2">Coa</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.bussiness_partner') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.plant') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.line') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.engine') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.division') }}</th>
+                            <th class="center-align" rowspan="2">{{ __('translations.warehouse') }}</th>
+                            <th class="center-align" rowspan="2">Proyek</th>
+                            <th class="center-align" rowspan="2">Ket.1</th>
+                            <th class="center-align" rowspan="2">Ket.2</th>
+                            <th class="center-align" colspan="2">Mata Uang Asli</th>
+                            <th class="center-align" colspan="2">Mata Uang Konversi</th>
+                        </tr>
+                        <tr>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
+                            <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
+                        </tr>
+                    
+                </thead>
+                <tbody id="body-journal-table">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -678,6 +741,24 @@
         String.prototype.replaceAt = function(index, replacement) {
             return this.substring(0, index) + replacement + this.substring(index + replacement.length);
         };
+
+        $('#modal6').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) { 
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#title_data').empty();
+                $('#code_data').empty();             
+                $('#body-journal-table').empty();
+                $('#user_jurnal').empty();
+                $('#note_jurnal').empty();
+                $('#ref_jurnal').empty();
+                $('#company_jurnal').empty();
+                $('#post_date_jurnal').empty();
+            }
+        });
     });
 
     function makeTreeOrg(data,link){
@@ -1823,6 +1904,37 @@
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date;
        
+    }
+
+    function viewJournal(id){
+        $.ajax({
+            url: '{{ Request::url() }}/view_journal/' + id,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                if(data.status == '500'){
+                    M.toast({
+                        html: data.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#title_data').append(``+data.title+``);
+                    $('#code_data').append(data.message.code);
+                    $('#body-journal-table').append(data.tbody);
+                    $('#user_jurnal').append(`Pengguna : `+data.user);
+                    $('#note_jurnal').append(`Keterangan : `+data.message.note);
+                    $('#ref_jurnal').append(`Referensi : `+data.reference);
+                    $('#company_jurnal').append(`Perusahaan : `+data.company);
+                    $('#post_date_jurnal').append(`Tanggal : `+data.message.post_date);
+                }
+            }
+        });
     }
 
 </script>

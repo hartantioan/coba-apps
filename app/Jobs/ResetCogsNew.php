@@ -477,7 +477,7 @@ class ResetCogsNew implements ShouldQueue
                 'company_id'		    => $row->productionRepack->company_id,
                 'place_id'			    => $row->place_id,
                 'warehouse_id'		    => $row->warehouse_id,
-                'item_id'			    => $row->item_id,
+                'item_id'			    => $row->item_target_id,
                 'qty_in'			    => $qty,
                 'price_in'			    => $total / $qty,
                 'total_in'			    => $total,
@@ -486,7 +486,7 @@ class ResetCogsNew implements ShouldQueue
                 'total_final'		    => $total_final,
                 'date'				    => $dateloop,
                 'type'				    => 'IN',
-                'area_id'               => $row ->area_id,
+                'area_id'               => $row->area_id,
                 'item_shading_id'       => $row->item_shading_id,
                 'production_batch_id'   => $row->production_batch_id,
             ]);
@@ -982,40 +982,54 @@ class ResetCogsNew implements ShouldQueue
         ->where(function($query)use($area_id,$item_shading_id,$production_batch_id){
             if($area_id && $item_shading_id && $production_batch_id){
                 $query->whereHas('itemStock',function($query)use($area_id,$item_shading_id,$production_batch_id){
-                    $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('id',$production_batch_id);
+                    $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
                 });
             }
         })->get();
 
-        /* foreach($productionrepack as $row){
-            $total = $row->total;
+        foreach($productionrepack as $row){
+            $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+            $total = round($price * $row->qty,2);
             $qty = $row->qty;
-            $total_final = $totalBefore + $total;
-            $qty_final = $qtyBefore + $qty;
+            $total_final = $totalBefore - $total;
+            $qty_final = $qtyBefore - $qty;
             ItemCogs::create([
                 'lookable_type'		    => $row->productionRepack->getTable(),
                 'lookable_id'		    => $row->productionRepack->id,
                 'detailable_type'	    => $row->getTable(),
                 'detailable_id'		    => $row->id,
                 'company_id'		    => $row->productionRepack->company_id,
-                'place_id'			    => $row->place_id,
-                'warehouse_id'		    => $row->warehouse_id,
-                'item_id'			    => $row->item_id,
-                'qty_in'			    => $qty,
-                'price_in'			    => $total / $qty,
-                'total_in'			    => $total,
+                'place_id'			    => $row->itemStock->place_id,
+                'warehouse_id'		    => $row->itemStock->warehouse_id,
+                'item_id'			    => $row->itemStock->item_id,
+                'qty_out'			    => $qty,
+                'price_out'			    => round($price,5),
+                'total_out'			    => $total,
                 'qty_final'			    => $qty_final,
                 'price_final'		    => round($total_final / $qty_final,5),
                 'total_final'		    => $total_final,
                 'date'				    => $dateloop,
                 'type'				    => 'OUT',
-                'area_id'               => $row ->area_id,
-                'item_shading_id'       => $row->item_shading_id,
-                'production_batch_id'   => $row->production_batch_id,
+                'area_id'               => $row->itemStock->area_id,
+                'item_shading_id'       => $row->itemStock->item_shading_id,
+                'production_batch_id'   => $row->itemStock->production_batch_id,
             ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => $total,
+                    'nominal'     => $total,
+                ]);
+            }
+            $row->update([
+                'total' => $total
+            ]);
+            $row->productionBatch->update([
+                'total' => $total
+            ]);
+            self::dispatch($dateloop,$row->productionRepack->company_id,$row->place_id,$row->item_target_id,$row->area_id,$row->item_shading_id,$row->production_batch_id);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
-        } */
+        }
 
         $marketingorderdelivery = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop)

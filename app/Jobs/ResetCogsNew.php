@@ -35,6 +35,7 @@ use App\Models\ProductionHandoverDetail;
 use App\Models\ProductionIssueDetail;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
+use App\Models\ProductionRepackDetail;
 use App\Models\PurchaseMemo;
 use Carbon\CarbonPeriod;
 use Illuminate\Bus\Queueable;
@@ -121,22 +122,22 @@ class ResetCogsNew implements ShouldQueue
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;
             ItemCogs::create([
-            'lookable_type'		    => $row->goodReceipt->getTable(),
-            'lookable_id'		      => $row->goodReceipt->id,
-            'detailable_type'	    => $row->getTable(),
-            'detailable_id'		    => $row->id,
-            'company_id'		      => $row->goodReceipt->company_id,
-            'place_id'			      => $row->place_id,
-            'warehouse_id'		    => $row->warehouse_id,
-            'item_id'			        => $row->item_id,
-            'qty_in'			        => $qty,
-            'price_in'			      => $total / $qty,
-            'total_in'			      => $total,
-            'qty_final'			      => $qty_final,
-            'price_final'		      => $total_final / $qty_final,
-            'total_final'		      => $total_final,
-            'date'				        => $dateloop,
-            'type'				        => 'IN'
+                'lookable_type'		    => $row->goodReceipt->getTable(),
+                'lookable_id'		      => $row->goodReceipt->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		      => $row->goodReceipt->company_id,
+                'place_id'			      => $row->place_id,
+                'warehouse_id'		    => $row->warehouse_id,
+                'item_id'			        => $row->item_id,
+                'qty_in'			        => $qty,
+                'price_in'			      => $total / $qty,
+                'total_in'			      => $total,
+                'qty_final'			      => $qty_final,
+                'price_final'		      => round($total_final / $qty_final,5),
+                'total_final'		      => $total_final,
+                'date'				        => $dateloop,
+                'type'				        => 'IN'
             ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
@@ -173,7 +174,7 @@ class ResetCogsNew implements ShouldQueue
                     'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
-                    'price_final'		      => $total_final / $qty_final,
+                    'price_final'		      => round($total_final / $qty_final,5),
                     'total_final'		      => $total_final,
                     'date'				        => $dateloop,
                     'type'				        => 'IN',
@@ -274,7 +275,7 @@ class ResetCogsNew implements ShouldQueue
                             'price_in'			        => $qty > 0 ? $total / $qty : 0,
                             'total_in'			        => $total,
                             'qty_final'			        => $qty_final,
-                            'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                            'price_final'		        => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                             'total_final'		        => $total_final,
                             'date'				        => $dateloop,
                             'type'				        => 'IN'
@@ -310,7 +311,7 @@ class ResetCogsNew implements ShouldQueue
                                 'price_in'			        => $qty > 0 ? $total / $qty : 0,
                                 'total_in'			        => $total,
                                 'qty_final'			        => $qty_final,
-                                'price_final'		        => $qty_final > 0 ? $total_final / $qty_final : 0,
+                                'price_final'		        => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                                 'total_final'		        => $total_final,
                                 'date'				        => $dateloop,
                                 'type'				        => 'IN'
@@ -344,7 +345,7 @@ class ResetCogsNew implements ShouldQueue
                     'price_in'			      => $total / $qty,
                     'total_in'			      => $total,
                     'qty_final'			      => $qty_final,
-                    'price_final'		      => $total_final / $qty_final,
+                    'price_final'		      => round($total_final / $qty_final,5),
                     'total_final'		      => $total_final,
                     'date'				        => $dateloop,
                     'type'				        => 'IN'
@@ -394,7 +395,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_in'			      => $total / $qty,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => $total_final / $qty_final,
+                'price_final'		      => round($total_final / $qty_final,5),
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'IN'
@@ -436,7 +437,7 @@ class ResetCogsNew implements ShouldQueue
                     'price_in'			        => $total / $qty,
                     'total_in'			        => $total,
                     'qty_final'			        => $qty_final,
-                    'price_final'		        => $total_final / $qty_final,
+                    'price_final'		        => round($total_final / $qty_final,5),
                     'total_final'		        => $total_final,
                     'date'				        => $dateloop,
                     'type'				        => 'IN',
@@ -448,6 +449,47 @@ class ResetCogsNew implements ShouldQueue
                     'nominal'     => $row->total,
                 ]);
             }
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        $productionrepack = ProductionRepackDetail::whereHas('productionRepack',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->where('item_target_id',$item_id)
+        ->where(function($query)use($area_id,$item_shading_id,$production_batch_id){
+            if($area_id && $item_shading_id && $production_batch_id){
+                $query->whereHas('productionBatch',function($query)use($area_id,$item_shading_id,$production_batch_id){
+                    $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('id',$production_batch_id);
+                });
+            }
+        })->get();
+
+        foreach($productionrepack as $row){
+            $total = $row->total;
+            $qty = $row->qty;
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->productionRepack->getTable(),
+                'lookable_id'		    => $row->productionRepack->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->productionRepack->company_id,
+                'place_id'			    => $row->place_id,
+                'warehouse_id'		    => $row->warehouse_id,
+                'item_id'			    => $row->item_id,
+                'qty_in'			    => $qty,
+                'price_in'			    => $total / $qty,
+                'total_in'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => round($total_final / $qty_final,5),
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'IN',
+                'area_id'               => $row ->area_id,
+                'item_shading_id'       => $row->item_shading_id,
+                'production_batch_id'   => $row->production_batch_id,
+            ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
         }
@@ -482,7 +524,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_in'			      => 0,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => $total_final / $qty_final,
+                'price_final'		      => round($total_final / $qty_final,5),
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'IN'
@@ -520,7 +562,7 @@ class ResetCogsNew implements ShouldQueue
             'price_in'			      => 0,
             'total_in'			      => $total,
             'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
             'total_final'		      => $total_final,
             'date'				        => $dateloop,
             'type'				        => 'IN',
@@ -569,7 +611,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_out'			      => $price,
                 'total_out'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'OUT',
@@ -625,7 +667,7 @@ class ResetCogsNew implements ShouldQueue
             'price_in'			      => $price,
             'total_in'			      => $total,
             'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
             'total_final'		      => $total_final,
             'date'				        => $dateloop,
             'type'				        => 'IN',
@@ -670,7 +712,7 @@ class ResetCogsNew implements ShouldQueue
             'price_out'			      => $price,
             'total_out'			      => $total,
             'qty_final'			      => $qty_final,
-            'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+            'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
             'total_final'		      => $total_final,
             'date'				        => $dateloop,
             'type'				        => 'OUT',
@@ -715,7 +757,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_in'			      => $price,
                 'total_in'			      => $total,
                 'qty_final'			      => $qty_final,
-                'price_final'		      => $qty_final > 0 ? $total_final / $qty_final : 0,
+                'price_final'		      => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		      => $total_final,
                 'date'				        => $dateloop,
                 'type'				        => 'IN',
@@ -771,7 +813,7 @@ class ResetCogsNew implements ShouldQueue
                             'price_out'			    => $rowprice,
                             'total_out'			    => $rowtotal,
                             'qty_final'			    => $qtyBefore,
-                            'price_final'		    => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
+                            'price_final'		    => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
                             'total_final'		    => $totalBefore,
                             'date'				    => $dateloop,
                             'type'				    => 'OUT',
@@ -804,7 +846,7 @@ class ResetCogsNew implements ShouldQueue
                                 'price_out'			        => $rowprice,
                                 'total_out'			        => $rowtotal,
                                 'qty_final'			        => $qtyBefore,
-                                'price_final'		        => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
+                                'price_final'		        => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
                                 'total_final'		        => $totalBefore,
                                 'date'				        => $dateloop,
                                 'type'				        => 'OUT',
@@ -838,7 +880,7 @@ class ResetCogsNew implements ShouldQueue
                     'price_out'			      => $rowprice,
                     'total_out'			      => $rowtotal,
                     'qty_final'			      => $qtyBefore,
-                    'price_final'		      => $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0,
+                    'price_final'		      => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
                     'total_final'		      => $totalBefore,
                     'date'				        => $dateloop,
                     'type'				        => 'OUT',
@@ -888,50 +930,6 @@ class ResetCogsNew implements ShouldQueue
             }
         }
 
-        /* $productionfgreceivebatch = ProductionFgReceive::whereHas('productionBatchUsage',function($query)use($item_id,$production_batch_id){
-            $query->whereHas('productionBatch',function($query)use($item_id,$production_batch_id){
-                $query->where('item_id',$item_id)->where(function($query)use($production_batch_id){
-                    if($production_batch_id){
-                        $query->where('id',$production_batch_id);
-                    }
-                });
-            });
-        })->whereIn('status',['2','3'])->whereDate('post_date',$dateloop)->get();
-
-        foreach($productionfgreceivebatch as $row){
-            foreach($row->productionBatchUsage as $rowbatch){
-                $rowtotal = $rowbatch->productionBatch->totalById($rowbatch->id);
-                $rowprice = $rowtotal / $rowbatch->qty;
-                $totalBefore -= $rowtotal;
-                $qtyBefore -= $rowbatch->qty;
-                ItemCogs::create([
-                    'lookable_type'		    => $row->getTable(),
-                    'lookable_id'		    => $row->id,
-                    'detailable_type'	    => $rowbatch->getTable(),
-                    'detailable_id'		    => $rowbatch->id,
-                    'company_id'		    => $row->company_id,
-                    'place_id'			    => $row->place_id,
-                    'warehouse_id'		    => $rowbatch->productionBatch->warehouse_id,
-                    'item_id'			    => $rowbatch->productionBatch->item_id,
-                    'qty_out'			    => $rowbatch->qty,
-                    'price_out'			    => $rowprice,
-                    'total_out'			    => $rowtotal,
-                    'qty_final'			    => $qtyBefore,
-                    'price_final'		    => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,6) : 0,
-                    'total_final'		    => $totalBefore,
-                    'date'				    => $dateloop,
-                    'type'				    => 'OUT',
-                    'production_batch_id'   => $rowbatch->productionBatch->id,
-                ]);
-                foreach($rowbatch->journalDetail as $rowjournal){
-                    $rowjournal->update([
-                        'nominal_fc'  => $rowtotal,
-                        'nominal'     => $rowtotal,
-                    ]);
-                }
-            }
-        } */
-
         $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->whereHas('productionFgReceiveDetail',function($query)use($item_id){
@@ -958,7 +956,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_out'			    => $price,
                 'total_out'			    => $row->total,
                 'qty_final'			    => $qty_final,
-                'price_final'		    => $qty_final > 0 ? $total_final / $qty_final : 0,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		    => $total_final,
                 'date'				    => $dateloop,
                 'type'				    => 'OUT',
@@ -973,6 +971,47 @@ class ResetCogsNew implements ShouldQueue
             $qtyBefore = $qty_final;
             self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
         }
+
+        $productionrepack = ProductionRepackDetail::whereHas('productionRepack',function($query)use($dateloop){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->where('item_source_id',$item_id)
+        ->where(function($query)use($area_id,$item_shading_id,$production_batch_id){
+            if($area_id && $item_shading_id && $production_batch_id){
+                $query->whereHas('itemStock',function($query)use($area_id,$item_shading_id,$production_batch_id){
+                    $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('id',$production_batch_id);
+                });
+            }
+        })->get();
+
+        /* foreach($productionrepack as $row){
+            $total = $row->total;
+            $qty = $row->qty;
+            $total_final = $totalBefore + $total;
+            $qty_final = $qtyBefore + $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->productionRepack->getTable(),
+                'lookable_id'		    => $row->productionRepack->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->productionRepack->company_id,
+                'place_id'			    => $row->place_id,
+                'warehouse_id'		    => $row->warehouse_id,
+                'item_id'			    => $row->item_id,
+                'qty_in'			    => $qty,
+                'price_in'			    => $total / $qty,
+                'total_in'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => round($total_final / $qty_final,5),
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'OUT',
+                'area_id'               => $row ->area_id,
+                'item_shading_id'       => $row->item_shading_id,
+                'production_batch_id'   => $row->production_batch_id,
+            ]);
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        } */
 
         $marketingorderdelivery = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop)
@@ -1006,7 +1045,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_out'			    => $price,
                 'total_out'			    => $total,
                 'qty_final'			    => $qty_final,
-                'price_final'		    => $qty_final > 0 ? $total_final / $qty_final : 0,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		    => $total_final,
                 'date'				    => $dateloop,
                 'type'				    => 'OUT',

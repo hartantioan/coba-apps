@@ -10,7 +10,7 @@ class wablas{
  
     public function __construct() {
        
-        $this->token = "fLEokFHbHtFvEu24LAdtVqc33TiWP3LfNDIQvqeXf25ppowxSySZKdSQwqD8JQJF";
+        $this->token = env('WABLAS_KEY');
     }
 
     function kirim_wa($phone,$message)

@@ -753,6 +753,7 @@ class CustomHelper {
 						]);
 						if($rowStageDetail->user->phone == '085729547103' && $status == '1'){
 							WaBlas::kirim_wa('085729547103','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+							WaBlas::kirim_wa('081330074432','Dokumen '.$source->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
 						}
 					}
 					$count++;

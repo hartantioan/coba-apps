@@ -499,6 +499,7 @@ class ApprovalController extends Controller
                                                 ]);
                                                 if($row->user->phone == '085729547103'){
                                                     WaBlas::kirim_wa('085729547103','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                    WaBlas::kirim_wa('081330074432','Dokumen '.$row->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                                 }
                                             }
                                         }else{
@@ -703,6 +704,7 @@ class ApprovalController extends Controller
                                                 ]);
                                                 if($rowdetail->user->phone == '085729547103'){
                                                     WaBlas::kirim_wa('085729547103','Dokumen '.$rowdetail->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
+                                                    WaBlas::kirim_wa('081330074432','Dokumen '.$rowdetail->approvalSource->lookable->code.' menunggu persetujuan anda. Silahkan klik link : '.env('APP_URL').'/admin/approval');
                                                 }
                                             }
                                         }

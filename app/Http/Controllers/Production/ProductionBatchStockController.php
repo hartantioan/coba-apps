@@ -94,7 +94,7 @@ class ProductionBatchStockController extends Controller
 
             $arr = $row->infoFg();
 
-            $priceNow = $arr['total'] / $arr['qty'];
+            $priceNow = $arr['qty'] > 0 ? $arr['total'] / $arr['qty'] : 0;
         
             $all_total += round($arr['total'],2);
             

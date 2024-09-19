@@ -142,24 +142,23 @@ class ProductionBatchStockController extends Controller
                 ->orderBy('date', 'desc') // Order by 'date' column in descending order
                 ->first();
 
-                $arrFirst = $query_first->infoFg();
-
-                $array_last_item[] = [
-                    'perlu'        => 1,
-                    'item_id'      => $row->item->id,
-                    'id'           => $query_first->id ?? null, 
-                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                    'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
-                    'item'         => $row->item->name,
-                    'satuan'       => $row->item->uomUnit->code,
-                    'area'         => $row->area->code ?? '-',
-                    'production_batch' => '-',
-                    'shading' => $row->shading->code ?? '-',
-                    'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
-                ];
-
-
+                if($query_first){
+                    $arrFirst = $query_first->infoFg();
+                    $array_last_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row->item->id,
+                        'id'           => $query_first->id ?? null, 
+                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
+                        'item'         => $row->item->name,
+                        'satuan'       => $row->item->uomUnit->code,
+                        'area'         => $row->area->code ?? '-',
+                        'production_batch' => '-',
+                        'shading' => $row->shading->code ?? '-',
+                        'kode'         => $row->item->code,
+                        'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
+                    ];
+                }
             }
             $previousId = $row->item_id;
             

@@ -80,41 +80,41 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            // $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$request->finish_date."' GROUP BY item_id)")
-            // ->where(function($query) use ( $request) {
-            //     $query->whereHas('item',function($query) use($request){
-            //         $query->whereIn('status',['1','2']);
-            //     });
-            //     if($request->finish_date) {
-            //         $query->whereDate('date','<=', $request->finish_date);
-            //     }
-            //     if($request->item_id) {
-            //         $query->whereHas('item',function($query) use($request){
-            //             $query->where('id',$request->item_id);
-            //         });
-            //     }
-            //     if($request->plant != 'all'){
-            //         $query->whereHas('place',function($query) use($request){
-            //             $query->where('id',$request->plant);
-            //         });
-            //     }
-            //     if($request->warehouse != 'all'){
-            //         $query->whereHas('warehouse',function($query) use($request){
-            //             $query->where('id',$request->warehouse);
-            //         });
-            //     }
+            $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$request->finish_date."' GROUP BY item_id)")
+            ->where(function($query) use ( $request) {
+                $query->whereHas('item',function($query) use($request){
+                    $query->whereIn('status',['1','2']);
+                });
+                if($request->finish_date) {
+                    $query->whereDate('date','<=', $request->finish_date);
+                }
+                if($request->item_id) {
+                    $query->whereHas('item',function($query) use($request){
+                        $query->where('id',$request->item_id);
+                    });
+                }
+                if($request->plant != 'all'){
+                    $query->whereHas('place',function($query) use($request){
+                        $query->where('id',$request->plant);
+                    });
+                }
+                if($request->warehouse != 'all'){
+                    $query->whereHas('warehouse',function($query) use($request){
+                        $query->where('id',$request->warehouse);
+                    });
+                }
     
-            //     if($request->filter_group){
+                if($request->filter_group){
                    
-            //         $query->whereHas('item',function($query) use($request){
-            //             $query->whereIn('item_group_id', $request->filter_group);
-            //         });
-            //     }
-            // })
-            // ->orderBy('date', 'desc')
-            // ->get();
+                    $query->whereHas('item',function($query) use($request){
+                        $query->whereIn('item_group_id', $request->filter_group);
+                    });
+                }
+            })
+            ->orderBy('date', 'desc')
+            ->get();
         
-            $query_data = DB::select("
+            /* $query_data = DB::select("
                 SELECT * FROM item_cogs 
                 WHERE id IN (
                     SELECT MAX(id) 
@@ -143,7 +143,7 @@ class StockInRupiahController extends Controller
             ));
             $query_data_collection = ItemCogs::hydrate($query_data);
 
-            $query_data = $query_data_collection;
+            $query_data = $query_data_collection; */
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {

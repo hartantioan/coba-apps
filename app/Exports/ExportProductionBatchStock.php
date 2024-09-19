@@ -69,16 +69,11 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
         $array_first_item = [];
         $all_total = 0;
         foreach($query_data as $row){
-            $all_total += round($row->total_final,2);
-            if($row->type=='IN'){
-                $priceNow = $row->price_in;
-                $cum_qty=$row->qty_in;
-                $cum_val=round($row->total_in,2);
-            }else{
-                $priceNow = $row->price_out;
-                $cum_qty=$row->qty_out * -1;
-                $cum_val=round($row->total_out,2) * -1;
-            }
+            $arr = $row->infoFg();
+
+            $priceNow = $arr['qty'] > 0 ? $arr['total'] / $arr['qty'] : 0;
+        
+            $all_total += round($arr['total'],2);
             
             $data_tempura = [
                 'item_id'      => $row->item->id,
@@ -93,11 +88,11 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'final'=>number_format($priceNow,2,',','.'),
                 'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
-                'qty' => $perlu == 0 ? '-' : $cum_qty,
+                'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($arr['qty']),
                 'date' =>  date('d/m/Y',strtotime($row->date)),
                 'document' => $row->lookable->code,
-                'cum_qty' => $row->qty_final,
-                'cum_val' => number_format($row->total_final,2,',','.'),
+                'cum_qty' => CustomHelper::formatConditionalQty($arr['qty']),
+                'cum_val' => number_format($arr['total'],2,',','.'),
             ];
             $array_filter[]=$data_tempura;
             if ($row->item_id !== $previousId) {
@@ -122,22 +117,23 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                 ->orderBy('id','desc')
                 ->first();
 
-                $array_last_item[] = [
-                    'perlu'        => 1,
-                    'item_id'      => $row->item->id,
-                    'id'           => $query_first->id ?? null,
-                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                    'area'         => $row->area->code ?? '-',
-                    'production_batch' => '-',
-                    'shading'      => $row->shading->code ?? '-',
-                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
-                    'item'         => $row->item->name,
-                    'satuan'       => $row->item->uomUnit->code,
-                    'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? $query_first->qty_final : 0,
-                ];
-
-
+                if($query_first){
+                    $arrFirst = $query_first->infoFg();
+                    $array_last_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row->item->id,
+                        'id'           => $query_first->id ?? null, 
+                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
+                        'item'         => $row->item->name,
+                        'satuan'       => $row->item->uomUnit->code,
+                        'area'         => $row->area->code ?? '-',
+                        'production_batch' => '-',
+                        'shading' => $row->shading->code ?? '-',
+                        'kode'         => $row->item->code,
+                        'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
+                    ];
+                }
             }
             $previousId = $row->item_id;
             

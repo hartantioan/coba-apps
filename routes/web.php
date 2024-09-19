@@ -591,12 +591,12 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [GroupController::class, 'destroy'])->middleware('operation.access:group,delete');
                     });
 
-                    Route::prefix('outlet_group')->middleware('operation.access:group,view')->group(function () {
+                    Route::prefix('outlet_group')->middleware('operation.access:outlet_group,view')->group(function () {
                         Route::get('/',[GroupOutletController::class, 'index']);
                         Route::get('datatable',[GroupOutletController::class, 'datatable']);
                         Route::post('show', [GroupOutletController::class, 'show']);
-                        Route::post('create',[GroupOutletController::class, 'create'])->middleware('operation.access:group,update');
-                        Route::post('destroy', [GroupOutletController::class, 'destroy'])->middleware('operation.access:group,delete');
+                        Route::post('create',[GroupOutletController::class, 'create'])->middleware('operation.access:outlet_group,update');
+                        Route::post('destroy', [GroupOutletController::class, 'destroy'])->middleware('operation.access:outlet_group,delete');
                     });
 
                     Route::prefix('position')->middleware('operation.access:position,view')->group(function () {

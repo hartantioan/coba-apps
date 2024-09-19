@@ -620,64 +620,65 @@ class LandedCostController extends Controller
     }
 
     public function create(Request $request){
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
-            /* 'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
-             */'company_id' 			    => 'required',
-			'account_id'                => 'required',
-            'post_date'                 => 'required',
-            'currency_id'               => 'required',
-            'currency_rate'             => 'required',
-            'total'                     => 'required',
-            'tax'                       => 'required',
-            'grandtotal'                => 'required',
-            'arr_item'                  => 'required|array',
-            'arr_price'                 => 'required|array',
-            'arr_qty'                   => 'required|array'
-		], [
-            'code_place_id.required'            => 'Plant Tidak boleh kosong',
-            'code.required' 	                => 'Kode tidak boleh kosong.',
-            /* 'code.string'                       => 'Kode harus dalam bentuk string.',
-            'code.min'                          => 'Kode harus minimal 18 karakter.',
-            'code.unique'                       => 'Kode telah dipakai', */
-            'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
-			'account_id.required'               => 'Broker / Ekspeditor tidak boleh kosong',
-            'post_date.required'                => 'Tgl post tidak boleh kosong.',
-            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
-            'total.required'                    => 'Total tagihan tidak boleh kosong.',
-            'tax.required'                      => 'Total pajak tidak boleh kosong.',
-            'grandtotal.required'               => 'Total tagihan tidak boleh kosong.',
-            'arr_item.required'                 => 'Item tidak boleh kosong.',
-            'arr_item.array'                    => 'Item harus dalam bentuk array.',
-            'arr_price.required'                => 'Harga per item tidak boleh kosong.',
-            'arr_price.array'                   => 'Harga per item harus dalam bentuk array.',
-            'arr_qty.required'                  => 'Qty item tidak boleh kosong.',
-            'arr_qty.array'                     => 'Qty item harus dalam bentuk array.',
-		]);
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                /* 'code'			            => $request->temp ? ['required', Rule::unique('landed_costs', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:landed_costs,code',
+                */'company_id' 			    => 'required',
+                'account_id'                => 'required',
+                'post_date'                 => 'required',
+                'currency_id'               => 'required',
+                'currency_rate'             => 'required',
+                'total'                     => 'required',
+                'tax'                       => 'required',
+                'grandtotal'                => 'required',
+                'arr_item'                  => 'required|array',
+                'arr_price'                 => 'required|array',
+                'arr_qty'                   => 'required|array'
+            ], [
+                'code_place_id.required'            => 'Plant Tidak boleh kosong',
+                'code.required' 	                => 'Kode tidak boleh kosong.',
+                /* 'code.string'                       => 'Kode harus dalam bentuk string.',
+                'code.min'                          => 'Kode harus minimal 18 karakter.',
+                'code.unique'                       => 'Kode telah dipakai', */
+                'company_id.required' 			    => 'Perusahaan tidak boleh kosong.',
+                'account_id.required'               => 'Broker / Ekspeditor tidak boleh kosong',
+                'post_date.required'                => 'Tgl post tidak boleh kosong.',
+                'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+                'total.required'                    => 'Total tagihan tidak boleh kosong.',
+                'tax.required'                      => 'Total pajak tidak boleh kosong.',
+                'grandtotal.required'               => 'Total tagihan tidak boleh kosong.',
+                'arr_item.required'                 => 'Item tidak boleh kosong.',
+                'arr_item.array'                    => 'Item harus dalam bentuk array.',
+                'arr_price.required'                => 'Harga per item tidak boleh kosong.',
+                'arr_price.array'                   => 'Harga per item harus dalam bentuk array.',
+                'arr_qty.required'                  => 'Qty item tidak boleh kosong.',
+                'arr_qty.array'                     => 'Qty item harus dalam bentuk array.',
+            ]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
-            
-            $total = str_replace(',','.',str_replace('.','',$request->total));
-            $tax = str_replace(',','.',str_replace('.','',$request->tax));
-            $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
-            $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
+                
+                $total = str_replace(',','.',str_replace('.','',$request->total));
+                $tax = str_replace(',','.',str_replace('.','',$request->tax));
+                $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
+                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
-            if($grandtotal <= 0){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Nominal grandtotal tidak boleh dibawah sama dengan 0.'
-                ]);
-            }
+                if($grandtotal <= 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Nominal grandtotal tidak boleh dibawah sama dengan 0.'
+                    ]);
+                }
 
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if($request->temp){
+                    
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -734,20 +735,13 @@ class LandedCostController extends Controller
                         $query->landedCostFeeDetail()->delete();
 
                         CustomHelper::removeApproval($query->getTable(),$query->id);
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status landed cost sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status landed cost sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=LandedCost::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -770,18 +764,11 @@ class LandedCostController extends Controller
                         'grandtotal'                => round($grandtotal,3),
                         'status'                    => '1'
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
                 }
-			}
-			
-			if($query) {
                 
-                if($request->arr_item){
-                    /* DB::beginTransaction();
-                    try { */
+                if($query) {
+                    
+                    if($request->arr_item){
                         foreach($request->arr_item as $key => $row){
                             $item = Item::find(intval($row));
                             $stock = $item->getStockPlace($request->arr_place[$key]);
@@ -818,32 +805,34 @@ class LandedCostController extends Controller
                                 ]);
                             }
                         }
-                        /* DB::commit();
-                    }catch(\Exception $e){
-                        DB::rollback();
-                    } */
+                            
+                    }
+
+                    CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
+                    CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
+
+                    activity()
+                        ->performedOn(new LandedCost())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit landed cost.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
-                CustomHelper::sendNotification('landed_costs',$query->id,'Pengajuan Landed Cost No. '.$query->code,$query->note,session('bo_id'));
-
-                activity()
-                    ->performedOn(new LandedCost())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit landed cost.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 		
 		return response()->json($response);
     }

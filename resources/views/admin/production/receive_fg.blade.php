@@ -274,8 +274,12 @@
                                                         </tr>
                                                     </tbody>
                                                     <tfoot>
-                                                        <td colspan="5" class="center-align">
+                                                        <td colspan="2" class="center-align">
                                                             <a href="javascript:void(0);" class="btn-flat waves-effect waves-light blue accent-2 white-text" onclick="addBatch();" id="btn-show"><i class="material-icons right">add_circle_outline</i> Tambah Batch</a>
+                                                        </td>
+                                                        <td class="right-align">TOTAL QTY : <b id="total-batch-used">0,000</b></td>
+                                                        <td colspan="2" class="center-align">
+
                                                         </td>
                                                     </tfoot>
                                                 </table>
@@ -957,6 +961,8 @@
             }
             count();
         });
+
+        $('#total-batch-used').text('0,000');
     });
 
     function setInitialValue(initialId) {
@@ -976,6 +982,16 @@
                 }
             }
         });
+    }
+
+    function countUsedBatch(){
+        let total = 0;
+        $('input[name^="arr_qty_batch[]"]').each(function(index){
+            total += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
+        });
+        $('#total-batch-used').text(
+            formatRupiahIni(total.toFixed(3).toString().replace('.',','))
+        );
     }
 
     function applyDocuments(type){
@@ -1107,6 +1123,7 @@
             totalQty += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
         });
         $('#qty').val(formatRupiahIni(totalQty.toFixed(3).toString().replace('.',',')));
+        countUsedBatch();
     }
 
     function applyQty(code){

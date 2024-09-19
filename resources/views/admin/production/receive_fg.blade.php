@@ -874,6 +874,7 @@
                 $('#qty-unit,#sell-unit').text('-');
                 $('#total-received').text('0,000');
                 arrPallet = [];
+                $('#total-batch-used').text('0,000');
             }
         });
         
@@ -961,8 +962,6 @@
             }
             count();
         });
-
-        $('#total-batch-used').text('0,000');
     });
 
     function setInitialValue(initialId) {

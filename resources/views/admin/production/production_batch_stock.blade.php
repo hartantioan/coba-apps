@@ -192,7 +192,9 @@
                         });
                         $('#table_body').append(`
                             <tr>
-                                <td class="center-align" colspan="9"></td>     
+                                <td class="center-align" colspan="7"></td>
+                                <td class="center-align">Execution time :</td>
+                                <td class="center-align">` + response.time + `</td>
                                 <td class="center-align">Total</td>
                                 <td class="right-align">`+response.alltotal+`</td>
                             </tr>

@@ -73,6 +73,10 @@ class Item extends Model
         return $this->belongsTo('App\Models\Variety', 'variety_id', 'id')->withTrashed();
     }
 
+    public function itemFgPicture(){
+        return $this->hasOne('App\Models\itemFGPicture','item_id','id');
+    }
+
     public function pattern(){
         return $this->belongsTo('App\Models\Pattern', 'pattern_id', 'id')->withTrashed();
     }

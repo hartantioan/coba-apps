@@ -34,9 +34,15 @@
     .browser-default {
         height: 2rem !important;
     }
-
     .select-wrapper, .select2-container {
-        height:3.6rem !important;
+        height:3.7rem !important;
+    }
+    .select2-selection--multiple{
+        overflow-y: scroll !important;
+        height: auto !important;
+    }
+    .select2{
+        height: fit-content !important;
     }
 </style>
 <!-- BEGIN: Page Main-->
@@ -97,6 +103,7 @@
                                                     </select>
                                                 </div>
                                             </div>
+                                            
                                             <div class="col m4 s6 ">
                                                 <label for="filter_company" style="font-size:1rem;">Perusahaan :</label>
                                                 <div class="input-field">
@@ -114,6 +121,8 @@
                                                     <select class="browser-default" id="filter_account" name="filter_account" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
+                                            <div class="col m12 s12"></div>
+                                            
                                             <div class="col m4 s6 ">
                                                 <label for="filter_currency" style="font-size:1rem;">Mata Uang :</label>
                                                 <div class="input-field">
@@ -135,6 +144,12 @@
                                                 <label for="finish_date" style="font-size:1rem;">{{ __('translations.end_date') }} :</label>
                                                 <div class="input-field col s12">
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
+                                                </div>
+                                            </div>
+                                            <div class="col m4 s6 ">
+                                                <label for="filter_bank" style="font-size:1rem;">Sumber Dana :</label>
+                                                <div class="input-field">
+                                                    <select class="browser-default" id="filter_bank" name="filter_bank" multiple="multiple" style="width:100% !important;" onchange="loadDataTable()"></select>
                                                 </div>
                                             </div>
                                         </div>  
@@ -1386,7 +1401,7 @@
         });
 
         select2ServerSide('#account_id,#filter_account', '{{ url("admin/select2/business_partner") }}');
-        
+        select2ServerSide('#filter_bank', '{{ url("admin/select2/coa_cash_bank") }}');
         $('#coa_source_id').select2({
             placeholder: '-- Kosong --',
             minimumInputLength: 1,
@@ -2388,6 +2403,7 @@
                 type: 'GET',
                 data: {
                     'status[]' : $('#filter_status').val(),
+                    'bank[]' : $('#filter_bank').val(),
                     'account_id[]' : $('#filter_account').val(),
                     company_id : $('#filter_company').val(),
                     'currency_id[]' : $('#filter_currency').val(),
@@ -3811,7 +3827,8 @@
     }
     function exportExcel(){
         var search = table.search();
-        var status = $('#filter_status').val();;
+        var status = $('#filter_status').val();
+        var bank = $('#filter_bank').val();
         var company = $('#filter_company').val();
         var account = $('#filter_account').val();
         var currency = $('#filter_currency').val();
@@ -3819,7 +3836,7 @@
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&account=" + account + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata+ "&bank=" + bank;
        
     }
 </script>

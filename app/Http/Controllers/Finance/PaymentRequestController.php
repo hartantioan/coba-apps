@@ -193,6 +193,10 @@ class PaymentRequestController extends Controller
                     $query->whereIn('status', $request->status);
                 }
 
+                if($request->bank){
+                    $query->whereIn('coa_source_id', $request->bank);
+                }
+
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
@@ -264,6 +268,10 @@ class PaymentRequestController extends Controller
 
                 if($request->status){
                     $query->whereIn('status', $request->status);
+                }
+
+                if($request->bank){
+                    $query->whereIn('coa_source_id', $request->bank);
                 }
 
                 if($request->account_id){
@@ -2497,7 +2505,8 @@ class PaymentRequestController extends Controller
     // }
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
-        $status = $request->status? $request->status : '';;
+        $status = $request->status? $request->status : '';
+        $bank = $request->bank? $request->bank : '';
         $company = $request->company ? $request->company : '';
         $type_pay = $request->type_pay ? $request->type_pay : '';
         $account = $request->account? $request->account : '';
@@ -2506,6 +2515,6 @@ class PaymentRequestController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
 		$modedata = $request->modedata? $request->modedata : '';
       
-		return Excel::download(new ExportPaymentRequestTransactionPage($search,$status,$company,$type_pay,$account,$currency,$end_date,$start_date,$modedata), 'purchase_down_payment'.uniqid().'.xlsx');
+		return Excel::download(new ExportPaymentRequestTransactionPage($search,$status,$company,$type_pay,$account,$currency,$end_date,$start_date,$modedata,$bank), 'payment_request_'.uniqid().'.xlsx');
     }
 }

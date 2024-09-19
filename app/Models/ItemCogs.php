@@ -86,4 +86,25 @@ class ItemCogs extends Model
         }
         return $requester;
     }
+
+    public function infoFg(){
+        $qty = 0;
+        $total = 0;
+        $arr = [];
+        $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('date','<=',$this->date)->orderBy('date')->orderBy('id')->get();
+        foreach($cogs as $row){
+            if($row->type == 'IN'){
+                $qty += $row->qty_in;
+                $total += $row->total_in;
+            }elseif($row->type == 'OUT'){
+                $qty -= $row->qty_out;
+                $total -= $row->total_out;
+            }
+        }
+        $arr = [
+            'qty'   => $qty,
+            'total' => $total,
+        ];
+        return $arr;
+    }
 }

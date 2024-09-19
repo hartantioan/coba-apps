@@ -77,14 +77,14 @@ class ProductionBatchController extends Controller
                     ->whereDoesntHave('itemShading');
                 }
 
-                if($request->start_date && $request->finish_date) {
+                /* if($request->start_date && $request->finish_date) {
                     $query->whereDate('created_at', '>=', $request->start_date)
                         ->whereDate('created_at', '<=', $request->finish_date);
                 } else if($request->start_date) {
                     $query->whereDate('created_at','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('created_at','<=', $request->finish_date);
-                }
+                } */
 
             })
             ->offset($start)
@@ -113,14 +113,14 @@ class ProductionBatchController extends Controller
                     ->whereDoesntHave('itemShading');
                 }
 
-                if($request->start_date && $request->finish_date) {
+                /* if($request->start_date && $request->finish_date) {
                     $query->whereDate('created_at', '>=', $request->start_date)
                         ->whereDate('created_at', '<=', $request->finish_date);
                 } else if($request->start_date) {
                     $query->whereDate('created_at','>=', $request->start_date);
                 } else if($request->finish_date) {
                     $query->whereDate('created_at','<=', $request->finish_date);
-                }
+                } */
             })
             ->count();
 

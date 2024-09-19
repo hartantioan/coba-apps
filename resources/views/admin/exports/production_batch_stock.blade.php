@@ -12,7 +12,6 @@
             <th align="center">Shading</th>
             <th align="center">Cumulative Qty.</th>
             <th align="center">Cumulative Value</th>
-            <th align="center">Cumulative Value</th>
         </tr>
     </thead>
     <tbody>

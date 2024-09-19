@@ -1503,6 +1503,12 @@
                     }
                 });
 
+                $('select[name^="arr_department"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
                 $('select[name^="arr_item[]"]').each(function(index){
                     if($('#arr_serial' + $(this).data('id')).length > 0){
                         let arr = $('#arr_serial' + $(this).data('id')).val();
@@ -1624,7 +1630,7 @@
                     }else{
                         swal({
                             title: 'Ups!',
-                            text: 'Mohon maaf, requester / stok item / qty / coa tidak boleh kosong atau diisi 0. Dan coa atau tipe pengeluaran harus dipilih salah satu.',
+                            text: 'Mohon maaf, requester / stok item / qty / coa tidak boleh kosong atau diisi 0. Dan coa atau tipe pengeluaran harus dipilih salah satu. Serta Divisi tidak boleh kosong.',
                             icon: 'warning'
                         });
                     }

@@ -12,10 +12,10 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-    protected $status, $type_buy,$type_deliv, $company, $type_pay,$account, $currency, $end_date, $start_date , $search , $modedata;
+    protected $status, $type_buy,$type_deliv, $company, $type_pay,$account, $currency, $end_date, $start_date , $search , $modedata,$bank;
 
 
-    public function __construct(string $search,string $status, string $company, string $type_pay,string $account, string $currency, string $end_date, string $start_date,  string $modedata )
+    public function __construct(string $search,string $status, string $company, string $type_pay,string $account, string $currency, string $end_date, string $start_date,  string $modedata,  string $bank )
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
@@ -26,6 +26,7 @@ class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, 
         $this->account = $account ? $account : '';
         $this->currency = $currency ? $currency : '';
         $this->modedata = $modedata ? $modedata : '';
+        $this->bank = $bank ? $bank : '';
         
     }
     private $headings = [
@@ -85,6 +86,11 @@ class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, 
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
             }
+
+            if($this->bank){
+                $groupIds = explode(',', $this->bank);
+                $query->whereIn('coa_source_id', $groupIds);
+            }
     
             if($this->start_date && $this->end_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
@@ -94,8 +100,6 @@ class ExportPaymentRequestTransactionPage implements FromCollection, WithTitle, 
             } else if($this->end_date) {
                 $query->whereDate('post_date','<=', $this->end_date);
             }
-    
-           
     
             if($this->account){
                 $groupIds = explode(',', $this->account);

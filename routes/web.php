@@ -207,6 +207,7 @@ use App\Http\Controllers\MasterData\BomStandardController;
 use App\Http\Controllers\MasterData\FgGroupController;
 use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\ItemPricelistController;
+use App\Http\Controllers\MasterData\ItemFGPictureController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionBatchStockController;
@@ -217,7 +218,7 @@ use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 use App\Http\Controllers\Production\ProductionRecapitulationController;
 use App\Http\Controllers\Production\ProductionRepackController;
-use App\Models\ItemPricelist;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -728,6 +729,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [GradeController::class, 'show']);
                         Route::post('create',[GradeController::class, 'create'])->middleware('operation.access:grade,update');
                         Route::post('destroy', [GradeController::class, 'destroy'])->middleware('operation.access:grade,delete');
+                    });
+
+                    Route::prefix('item_fg_picture')->middleware('operation.access:item_fg_picture,view')->group(function () {
+                        Route::get('/',[ItemFGPictureController::class, 'index']);
+                        Route::post('import',[ItemFGPictureController::class, 'import'])->middleware('operation.access:item_fg_picture,update');
+                        Route::get('get_import_excel',[ItemFGPictureController::class, 'getImportExcel']);
+                        Route::get('datatable',[ItemFGPictureController::class, 'datatable']);
+                        Route::get('export',[ItemFGPictureController::class, 'export']);
+                        Route::get('export_from_page',[ItemFGPictureController::class, 'exportFromTransactionPage']);
+                        Route::post('show', [ItemFGPictureController::class, 'show']);
+                        Route::post('create',[ItemFGPictureController::class, 'create'])->middleware('operation.access:item_fg_picture,update');
+                        Route::post('save_multi',[ItemFGPictureController::class, 'saveMulti'])->middleware('operation.access:item_fg_picture,update');
+                        Route::post('destroy', [ItemFGPictureController::class, 'destroy'])->middleware('operation.access:item_fg_picture,delete');
                     });
 
                     Route::prefix('brand')->middleware('operation.access:brand,view')->group(function () {
@@ -1299,7 +1313,6 @@ Route::prefix('admin')->group(function () {
                         Route::post('create',[DiscountCustomerController::class, 'create'])->middleware('operation.access:customer_discount,update');
                         Route::post('destroy', [DiscountCustomerController::class, 'destroy'])->middleware('operation.access:customer_discount,delete');
                     });
-
 
 
                     Route::prefix('item_pricelist')->middleware('operation.access:item_pricelist,view')->group(function () {

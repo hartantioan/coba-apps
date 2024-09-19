@@ -29,7 +29,7 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
    
         $perlu = 0 ;
            
-        $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$this->finish_date."' GROUP BY item_id)")
+        $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$this->finish_date."' GROUP BY item_id, production_batch_id, item_shading_id, area_id)")
         ->where(function($query) {
             $query->whereHas('item',function($query){
                 $query->whereIn('status',['1','2']);

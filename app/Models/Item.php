@@ -299,7 +299,7 @@ class Item extends Model
         $pricenow = 0;
         $cogs = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
         if($cogs){
-            $pricenow = $cogs->qty_final > 0 ? round($cogs->total_final / $cogs->qty_final,6) : 0;
+            $pricenow = $cogs->qty_final > 0 ? $cogs->total_final / $cogs->qty_final : 0;
         }else{
             if($this->bomCalculator()->exists()){
                 $pricenow = $this->bomCalculator->grandtotal;

@@ -2003,4 +2003,20 @@
         });
     }
 
+    function barcode(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_barcode/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            complete: function() {
+                
+            },
+            success: function(data){
+                loadingClose('.modal-content');
+                window.open(data, '_blank');
+            }
+        });
+    }
 </script>

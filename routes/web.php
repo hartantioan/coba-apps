@@ -2438,6 +2438,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('export',[ProductionRepackController::class, 'export']);
                     Route::get('export_from_page',[ProductionRepackController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[ProductionRepackController::class, 'viewStructureTree']);
+                    Route::get('print_barcode/{id}',[ProductionRepackController::class, 'printBarcode']);
                     Route::get('view_journal/{id}',[ProductionRepackController::class, 'viewJournal'])->middleware('operation.access:production_repack,journal');
                     Route::post('create',[ProductionRepackController::class, 'create'])->middleware('operation.access:production_repack,update');
                     Route::get('approval/{id}',[ProductionRepackController::class, 'approval'])->withoutMiddleware('direct.access');

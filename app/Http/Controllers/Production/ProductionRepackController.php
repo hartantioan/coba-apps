@@ -162,6 +162,7 @@ class ProductionRepackController extends Controller
                     $val->document ? '<a href="'.$val->attachment().'" target="_blank"><i class="material-icons">attachment</i></a>' : 'file tidak ditemukan',
                     $val->status(),
                     '
+                        <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Barcode" onclick="barcode(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">style</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
@@ -496,15 +497,15 @@ class ProductionRepackController extends Controller
 
     public function approval(Request $request,$id){
         
-        $pr = ProductionWorkingHour::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionRepack::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
             $data = [
-                'title'     => 'Production Working Hour',
+                'title'     => 'Production Repack',
                 'data'      => $pr
             ];
 
-            return view('admin.approval.production_working_hour', $data);
+            return view('admin.approval.production_repack', $data);
         }else{
             abort(404);
         }
@@ -512,26 +513,42 @@ class ProductionRepackController extends Controller
 
     public function rowDetail(Request $request)
     {
-        $data   = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $data   = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
         
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="11" style="font-size:20px !important;">Daftar Jam Kerja</th>
+                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Item</th>
                             </tr>
                             <tr>
                                 <th class="center">'.__('translations.no').'</th>
-                                <th class="center">Proses</th>
-                                <th class="center">Keterangan</th>
-                                <th class="center">Jam Kerja</th>
+                                <th class="center">Item Sumber</th>
+                                <th class="center">Ambil dari Stok</th>
+                                <th class="center">Jumlah (Stock)</th>
+                                <th class="center">Satuan (Stock)</th>
+                                <th class="center">Qty (Konversi)</th>
+                                <th class="center">Satuan (Konversi)</th>
+                                <th class="center">Batch Lama</th>
+                                <th class="center">Item Target</th>
+                                <th class="center">Qty (Konversi)</th>
+                                <th class="center">Satuan (Konversi)</th>
+                                <th class="center">Batch Baru</th>
                             </tr>
                         </thead><tbody>';
-        foreach($data->productionWorkingHourDetail()->orderBy('id')->get() as $key => $row){
+        foreach($data->productionRepackDetail()->orderBy('id')->get() as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key+1).'</td>
-                <td>'.$row->type().'</td>
-                <td>'.$row->note.'</td>
-                <td>'.$row->working_hour.'</td>
+                <td>'.$row->itemSource->name.'</td>
+                <td>'.$row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.$row->itemSource->uomUnit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitSource->conversion,3)).'</td>
+                <td class="center-align">'.$row->itemUnitSource->unit->code.'</td>
+                <td class="center-align">'.$row->itemStock->productionBatch->code.'</td>
+                <td>'.$row->itemTarget->name.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitSource->conversion,3)).'</td>
+                <td class="center-align">'.$row->itemUnitTarget->unit->code.'</td>
+                <td class="center-align">'.$row->batch_no.'</td>
             </tr>';
         }
 
@@ -597,10 +614,10 @@ class ProductionRepackController extends Controller
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         
-        $pr = ProductionWorkingHour::where('code',CustomHelper::decrypt($id))->first();
+        $pr = ProductionRepack::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Working Hour','a4','portrait','admin.print.production.production_working_hour_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'Production Working Hour','a4','portrait','admin.print.production.production_repack_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             
@@ -674,7 +691,7 @@ class ProductionRepackController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -714,18 +731,19 @@ class ProductionRepackController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->ProductionWorkingHourDetail as $row){
-               $row->delete();
+            foreach($query->productionRepackDetail as $row){
+                $row->productionBatchUsage()->delete();
+                $row->productionBatch()->delete();
+                $row->delete();
             }
-            
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
 
             activity()
-                ->performedOn(new ProductionWorkingHour())
+                ->performedOn(new ProductionRepack())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the Production Working Hour data');
+                ->log('Delete the Production Repack data');
 
             $response = [
                 'status'  => 200,
@@ -758,10 +776,10 @@ class ProductionRepackController extends Controller
             $currentDateTime = Date::now();
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
-                $pr = ProductionWorkingHour::where('code',$row)->first();
+                $pr = ProductionRepack::where('code',$row)->first();
                 
                 if($pr){
-                    $pdf = PrintHelper::print($pr,'Production Receive','a4','portrait','admin.print.production.production_working_hour_individual');
+                    $pdf = PrintHelper::print($pr,'Production Receive','a4','portrait','admin.print.production.production_repack_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
                     $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -834,9 +852,9 @@ class ProductionRepackController extends Controller
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
                         $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
-                        $query = ProductionWorkingHour::where('Code', 'LIKE', '%'.$x)->first();
+                        $query = ProductionRepack::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.production_working_hour_individual');
+                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.production_repack_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -888,9 +906,9 @@ class ProductionRepackController extends Controller
                     ];
                 }else{
                     foreach($merged as $code){
-                        $query = ProductionWorkingHour::where('Code', 'LIKE', '%'.$code)->first();
+                        $query = ProductionRepack::where('Code', 'LIKE', '%'.$code)->first();
                         if($query){
-                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.production_working_hour_individual');
+                            $pdf = PrintHelper::print($query,'Production Receive','a4','portrait','admin.print.production.production_repack_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                             $pdf->getCanvas()->page_text(495, 740, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
@@ -921,7 +939,7 @@ class ProductionRepackController extends Controller
 
 
     public function viewStructureTree(Request $request){
-        $query = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
         
         $data_go_chart=[];
         $data_link=[];
@@ -1048,7 +1066,7 @@ class ProductionRepackController extends Controller
     }
 
     public function done(Request $request){
-        $query_done = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $query_done = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
 
         if($query_done){
 
@@ -1060,10 +1078,10 @@ class ProductionRepackController extends Controller
                 ]);
     
                 activity()
-                        ->performedOn(new ProductionWorkingHour())
+                        ->performedOn(new ProductionRepack())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
-                        ->log('Done the Production Receive data');
+                        ->log('Done the Production Repack data');
     
                 $response = [
                     'status'  => 200,
@@ -1079,6 +1097,24 @@ class ProductionRepackController extends Controller
             return response()->json($response);
         }
     }
+
+    public function printBarcode(Request $request,$id){
+        
+        $pr = ProductionRepack::where('code',CustomHelper::decrypt($id))->first();
+                
+        if($pr){
+            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,264.57,188.98),'portrait','admin.print.production.repack_barcode');
+            
+            $content = $pdf->download()->getOriginalContent();
+            
+            $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
+    
+            return $document_po;
+        }else{
+            abort(404);
+        }
+    }
+
     public function exportFromTransactionPage(Request $request){
         $search= $request->search? $request->search : '';
         $status = $request->status? $request->status : '';

@@ -34,6 +34,7 @@
             <th>Qty Kembali</th>
             <th>{{ __('translations.total') }}</th>
             <th>Based On</th>
+            <th>GIRQ Creator</th>
         </tr>
     </thead>
     <tbody>
@@ -75,7 +76,8 @@
                 <td>{{ $rowdetail->requester }}</td>
                 <td>{{ $rowdetail->qty_return }}</td>
                 <td>{{ $nominal ? $rowdetail->total : '-' }}</td>
-                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>                
+                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->code : '-'}}</td>        
+                <td>{{ $rowdetail->goodIssueRequestDetail()  ? $rowdetail->lookable->goodIssueRequest->user->name : '-' }}</td>        
             </tr>
             @php
                 $no++;

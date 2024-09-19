@@ -1405,6 +1405,9 @@ class ProductionIssueController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		return Excel::download(new ExportProductionIssue($post_date,$end_date,$mode), 'production_issue'.uniqid().'.xlsx');
+        $menu = Menu::where('url','production_issue')->first();
+        $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
+        $nominal = $menuUser->show_nominal ?? '';
+		return Excel::download(new ExportProductionIssue($post_date,$end_date,$mode,$nominal), 'production_issue'.uniqid().'.xlsx');
     }
 }

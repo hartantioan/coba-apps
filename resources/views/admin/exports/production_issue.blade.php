@@ -70,8 +70,8 @@
                     <td>{{ $row_detail->qty}}</td>
                     <td>{{ $row_detail->productionOrderDetail->productionScheduleDetail->item->itemGroup->code }}</td>
                     <td>{{ $row_detail->lookable->uomUnit->code }}</td>
-                    <td>{{ number_format($row_detail->total_planned ,3,',','.') }}</td>
-                    <td>{{ number_format($row_detail->total ,3,',','.') }}</td>
+                    <td>{{ $nominal ? number_format($row_detail->total_planned ,3,',','.') : '-' }}</td>
+                    <td>{{ $nominal ? number_format($row_detail->total ,3,',','.') : '-' }}</td>
                     <td>{{ ($row_detail->productionBatchUsage()->exists() ? $row_detail->listBatch() : '-') }}</td>
                     <td>{{ $row->group }}</td>
                     <td>{{ $row->shift->name }}</td>

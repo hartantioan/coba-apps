@@ -9,12 +9,13 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportProductionIssue implements FromView, ShouldAutoSize
 {
-    protected $start_date, $end_date, $mode;
-    public function __construct(string $start_date, string $end_date, string $mode)
+    protected $start_date, $end_date, $mode, $nominal;
+    public function __construct(string $start_date, string $end_date, string $mode, string $nominal)
     {
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->mode = $mode ? $mode : '';
+        $this->nominal = $nominal ?? '';
     }
 
     public function view(): View
@@ -31,7 +32,8 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
                 ->withProperties(null)
                 ->log('Export production issue.');
             return view('admin.exports.production_issue', [
-                'data' => $data
+                'data'      => $data,
+                'nominal'   => $this->nominal,
             ]);
         }elseif($this->mode == '2'){
             $data = ProductionIssue::withTrashed()->where(function($query){
@@ -45,7 +47,8 @@ class ExportProductionIssue implements FromView, ShouldAutoSize
                 ->withProperties(null)
                 ->log('Export production issue.');
             return view('admin.exports.production_issue', [
-                'data' => $data
+                'data'      => $data,
+                'nominal'   => $this->nominal,
             ]);
         }
     }

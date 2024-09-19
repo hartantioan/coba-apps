@@ -110,36 +110,44 @@ class HomeController extends Controller
     }
 
     public function getStatusUser(Request $request) {
-
-        $user = User::where('employee_no',$request->nik)->first();
-        if($user){
-            return response()->json(['status' => 'success','status_user' => $user->statusRaw()], 200);
+        $cek = User::where('api_token',$request->bearerToken())->count();
+        if($cek > 0){
+            $user = User::where('employee_no',$request->nik)->first();
+            if($user){
+                return response()->json(['status' => 'success','status_user' => $user->statusRaw()], 200);
+            }else{
+                return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
+            }
         }else{
-            return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
+            return response()->json(['status' => 'failed'], 401);
         }
     }
 
     public function updateStatusUser(Request $request) {
-
-        $user = User::where('employee_no',$request->nik)->first();
-        if($user){
-            if(in_array($request->status,['1','2'])){
-                $user->update([
-                    'status'    => $request->status,
-                ]);
-                activity()
-                    ->performedOn(new User())
-                    ->withProperties([
-                        'nik'       => $request->nik,
+        $cek = User::where('api_token',$request->bearerToken())->count();
+        if($cek > 0){
+            $user = User::where('employee_no',$request->nik)->first();
+            if($user){
+                if(in_array($request->status,['1','2'])){
+                    $user->update([
                         'status'    => $request->status,
-                    ])
-                    ->log('Add / edit user via api update status.');
-                return response()->json(['status' => 'success'], 200);
+                    ]);
+                    activity()
+                        ->performedOn(new User())
+                        ->withProperties([
+                            'nik'       => $request->nik,
+                            'status'    => $request->status,
+                        ])
+                        ->log('Add / edit user via api update status.');
+                    return response()->json(['status' => 'success'], 200);
+                }else{
+                    return response()->json(['status' => 'accepted value status 1 (active) or 2 (inactive)'], 500);
+                }
             }else{
-                return response()->json(['status' => 'accepted value status 1 (active) or 2 (inactive)'], 500);
+                return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
             }
         }else{
-            return response()->json(['status' => 'failed', 'message' => 'user not found'], 401);
+            return response()->json(['status' => 'failed'], 401);
         }
     }
 }

@@ -462,26 +462,34 @@ class ProductionRepackController extends Controller
     }
 
     public function show(Request $request){
-        $detail_time = [];
+        $detail = [];
 
-        $po = ProductionWorkingHour::where('code',CustomHelper::decrypt($request->id))->first();
+        $po = ProductionRepack::where('code',CustomHelper::decrypt($request->id))->first();
 
-      
-
-        foreach($po->productionWorkingHourDetail as $row){
-            $detail_time[] = [
-                'production_working_hour_id' => $po->id,
-                'type'                       => $row->type,
-                'note'                       => $row->note,
-                'working_hour'               => $row->working_hour,
-                'production_order_name'      => $row->productionOrder->code,
-                'production_order_id'        => $row->production_order_id,
+        foreach($po->productionRepackDetail as $row){
+            $arr = explode('/',$row->batch_no);
+            $detail[] = [
+                'item_source_id'                => $row->item_source_id,
+                'item_source_info'              => $row->itemSource->code.' - '.$row->itemSource->name,
+                'item_unit_source'              => $row->itemSource->uomUnit->code,
+                'qty'                           => CustomHelper::formatConditionalQty($row->qty),
+                'qty_conversion_source'         => CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitSource->conversion,3)),
+                'list_stock'                    => $row->itemSource->currentStock($this->dataplaces,$this->datawarehouses),
+                'unit_source_conversion'        => $row->itemSource->arrSellUnits(),
+                'item_unit_source_id'           => $row->item_unit_source_id,
+                'source_batch'                  => $row->itemStock->productionBatch->code,
+                'item_target_id'                => $row->item_target_id,
+                'item_target_info'              => $row->itemTarget->code.' - '.$row->itemTarget->name,
+                'qty_conversion_target'         => CustomHelper::formatConditionalQty(round($row->qty / $row->itemUnitTarget->conversion,3)),
+                'unit_target_conversion'        => $row->itemTarget->arrSellUnits(),
+                'item_unit_target_id'           => $row->item_unit_target_id,
+                'batch_no'                      => $arr[0].'/'.$arr[1],
+                'item_stock_id'                 => $row->item_stock_id,
             ];
         }
 
         $po['code_place_id']                    = substr($po->code,7,2);
-        $po['details']                          = $detail_time;
-        $po['shift_name']                       = $po->shift->code.' - '.$po->shift->name;
+        $po['details']                          = $detail;
         
 		return response()->json($po);
     }

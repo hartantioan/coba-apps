@@ -343,6 +343,7 @@ class Item extends Model
                 'shading'           => $detail->itemShading()->exists() ? $detail->itemShading->code : '',
                 'qty'               => CustomHelper::formatConditionalQty($detail->qty).' '.$this->uomUnit->code,
                 'qty_raw'           => CustomHelper::formatConditionalQty($detail->qty),
+                'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
             ];
         }
         

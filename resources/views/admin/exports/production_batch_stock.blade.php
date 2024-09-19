@@ -20,17 +20,19 @@
             $x = 0;
         @endphp
         @foreach($data as $i => $row)
-            <td align="center">{{ $x + 1 }}</td>
-            <td align="center">{{$row['production_batch']}}</td>
-            <td align="center">{{$row['plant']}}</td>
-            <td align="center">{{$row['warehouse']}}</td>
-            <td align="center">{{$row['kode']}}</td>
-            <td align="center">{{$row['item']}}</td>
-            <td align="center">{{$row['satuan']}}</td>
-            <td align="center">{{$row['area']}}</td>
-            <td align="center">{{$row['shading']}}</td>
-            <td align="center">{{$row['cum_qty']}}</td>
-            <td align="center">{{$row['cum_val']}}</td>
+            <tr>
+                <td align="center">{{ $x + 1 }}</td>
+                <td align="center">{{$row['production_batch']}}</td>
+                <td align="center">{{$row['plant']}}</td>
+                <td align="center">{{$row['warehouse']}}</td>
+                <td align="center">{{$row['kode']}}</td>
+                <td align="center">{{$row['item']}}</td>
+                <td align="center">{{$row['satuan']}}</td>
+                <td align="center">{{$row['area']}}</td>
+                <td align="center">{{$row['shading']}}</td>
+                <td align="center">{{$row['cum_qty']}}</td>
+                <td align="center">{{$row['cum_val']}}</td>
+            </tr>
         @endforeach
       
         @if(count($data) == 0)

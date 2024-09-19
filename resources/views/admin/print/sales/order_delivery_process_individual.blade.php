@@ -293,7 +293,7 @@
                                         </td>
                                         
                                         <td >
-                                           <div style="min-height: 30px !important"> 
+                                           <div style="min-height:36px !important"> 
                                             {{ strtoupper($data->marketingOrderDelivery->destination_address) }}
                                             <div>
                                         </td>

@@ -38,7 +38,7 @@
             @foreach($row->goodReceiptDetail as $keydetail => $rowdetail)
             <tr align="center" style="background-color:#d9d9d9;">
                 <td>{{ $no }}</td>
-                <td>{{ $rowdetail->item->is_hide_supplier ? '-' : $row->account->name }}</td>
+                <td>{{ $row->account->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->document_date)) }}</td>
                 <td>{{ $row->delivery_no }}</td>

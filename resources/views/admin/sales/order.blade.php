@@ -477,6 +477,7 @@
                                             <table class="bordered" style="width:3500px;" id="table-detail">
                                                 <thead>
                                                     <tr>
+                                                        <th class="center">Termasuk PPN</th>
                                                         <th class="center">{{ __('translations.item') }}</th>
                                                         <th class="center">{{ __('translations.plant') }}</th>
                                                         <th class="center">Qty</th>
@@ -496,7 +497,6 @@
                                                                 <span style="padding-left: 25px;">{{ __('translations.all') }}</span>
                                                             </label>
                                                         </th>
-                                                        <th class="center">Termasuk PPN</th>
                                                         <th class="center">Disc1(%)</th>
                                                         <th class="center">Disc2(%)</th>
                                                         <th class="center">Disc3(Rp)</th>
@@ -1439,6 +1439,12 @@
                         <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
                         <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
                         <td>
+                            <label>
+                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                                <span>Ya/Tidak</span>
+                            </label>
+                        </td>
+                        <td>
                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                         </td>
                         <td class="center-align">
@@ -1480,12 +1486,6 @@
                                     <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                 @endforeach
                             </select>
-                        </td>
-                        <td>
-                            <label>
-                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
-                                <span>Ya/Tidak</span>
-                            </label>
                         </td>
                         <td class="center">
                             <input name="arr_disc1[]" class="browser-default" type="text" value="0" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
@@ -2088,6 +2088,12 @@
                                 <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                 <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
                                 <td>
+                                    <label>
+                                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                                        <span>Ya/Tidak</span>
+                                    </label>
+                                </td>
+                                <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                 </td>
                                 <td class="center-align">
@@ -2130,12 +2136,6 @@
                                             <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                         @endforeach
                                     </select>
-                                </td>
-                                <td>
-                                    <label>
-                                        <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
-                                        <span>Ya/Tidak</span>
-                                    </label>
                                 </td>
                                 <td class="center">
                                     <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">
@@ -2722,6 +2722,12 @@
                                         <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                         <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
                                         <td>
+                                            <label>
+                                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
+                                                <span>Ya/Tidak</span>
+                                            </label>
+                                        </td>
+                                        <td>
                                             <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')"></select>
                                         </td>
                                         <td class="center-align">
@@ -2764,12 +2770,6 @@
                                                     <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
                                                 @endforeach
                                             </select>
-                                        </td>
-                                        <td>
-                                            <label>
-                                                <input type="checkbox" id="arr_is_include_tax` + count + `" name="arr_is_include_tax[]" value="1" onclick="countRow('` + count + `');">
-                                                <span>Ya/Tidak</span>
-                                            </label>
                                         </td>
                                         <td class="center">
                                             <input name="arr_disc1[]" class="browser-default" type="text" value="` + val.disc1 + `" onkeyup="formatRupiah(this);countRow('` + count + `')" style="text-align:right;width:100px;" id="rowDisc1`+ count +`">

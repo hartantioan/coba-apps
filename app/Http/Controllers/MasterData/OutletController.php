@@ -126,7 +126,7 @@ class OutletController extends Controller
                     $val->user->name,
                     $val->code,
                     $val->name,
-                    $val->type(),
+                    $val->outletGroup()->exists() ? $val->outletGroup->name : '-',
                     $val->address,
                     $val->phone,
                     $val->province->name,

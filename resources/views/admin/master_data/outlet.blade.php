@@ -85,7 +85,7 @@
                                                         <th>{{ __('translations.user') }}</th>
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
-                                                        <th>{{ __('translations.type') }}</th>
+                                                        <th>Grup</th>
                                                         <th>{{ __('translations.address') }}</th>
                                                         <th>{{ __('translations.phone_number') }}</th>
                                                         <th>{{ __('translations.province') }}</th>
@@ -513,7 +513,7 @@
                 { name: 'user_id', className: '' },
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
-                { name: 'type', className: '' },
+                { name: 'outlet_group_id', className: '' },
                 { name: 'address', className: '' },
                 { name: 'phone', className: '' },
                 { name: 'province', className: '' },

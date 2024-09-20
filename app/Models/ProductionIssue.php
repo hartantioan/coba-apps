@@ -219,6 +219,10 @@ class ProductionIssue extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
+        if($this->productionReceiveIssue()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 

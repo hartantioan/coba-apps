@@ -22,7 +22,7 @@
                 font-size:20px;
             }
 
-            @page { margin: 0.50em 0.75em 0.25em 0.75em; }
+            @page { margin: 0.75em 0.75em 0.25em 0.75em; }
         </style>
     </head>
     <body>

@@ -188,7 +188,7 @@ class GoodScaleController extends Controller
                 }
 
                 if($request->type){
-                    $query->where('type', $request->type);
+                    $query->whereIn('type', $request->type);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

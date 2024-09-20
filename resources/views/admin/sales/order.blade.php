@@ -2386,9 +2386,9 @@
             let rownominal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
 
             let percent_tax = parseFloat($('select[name^="arr_tax"]').eq(index).val());
-            if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
+            /* if($('input[name^="arr_is_include_tax"]').eq(index).is(':checked')){
                 rownominal = rownominal / (1 + (percent_tax / 100));
-            }
+            } */
             tax += rownominal * (percent_tax / 100);
         });
 

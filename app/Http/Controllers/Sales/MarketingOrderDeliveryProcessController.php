@@ -887,7 +887,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $pr = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
                 
         if($pr){
-            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,188.98,75.59),'portrait','admin.print.sales.order_delivery_proces_barcode_individual');
+            $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,188.98,78.59),'portrait','admin.print.sales.order_delivery_proces_barcode_individual');
             
             $content = $pdf->download()->getOriginalContent();
             

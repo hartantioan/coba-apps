@@ -393,6 +393,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $data['details'] = $details;
                 $data['drivers'] = $drivers;
                 $data['vehicle_no'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->vehicle_no : '';
+                $data['driver_name'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->driver : '';
                 $data['vehicle_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
             }else{
                 $data['status'] = '500';

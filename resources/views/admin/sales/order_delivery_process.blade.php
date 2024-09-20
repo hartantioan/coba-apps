@@ -998,6 +998,7 @@ document.addEventListener('focusin', function (event) {
 
                         $('#vehicle_name').val(response.vehicle_name);
                         $('#vehicle_no').val(response.vehicle_no);
+                        $('#driver_name').val(response.driver_name);
 
                         if(response.details.length > 0){
                             $('#body-item').empty();

@@ -107,7 +107,6 @@
                                                 <label for="filter_type" style="font-size:1rem;">Tipe Timbang :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_type" onchange="loadDataTable()" multiple>
-                                                        <option value="">Semua</option>
                                                         <option value="1">Timbang Barang Masuk (Pembelian)</option>
                                                         <option value="2">Timbang Barang Keluar (Penjualan)</option>
                                                         <option value="3">Timbang Barang Manual</option>

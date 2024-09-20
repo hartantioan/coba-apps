@@ -42,17 +42,17 @@
                                     <tr>
                                         <td>LINE</td>
                                         <td>:</td>
-                                        <td>-</td>
+                                        <td>{{ $row->line()->exists() ? $row->line->code : '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td>SHIFT</td>
                                         <td>:</td>
-                                        <td>-</td>
+                                        <td>{{ $row->shift()->exists() ? $row->shift->production_code : '-' }}</td>
                                     </tr>
                                     <tr>
                                         <td>GROUP</td>
                                         <td>:</td>
-                                        <td>-</td>
+                                        <td>{{ $row->group }}</td>
                                     </tr>
                                 </table>
                             </td>
@@ -68,7 +68,7 @@
                                         <td>{{ 'SHADE : '.$row->productionBatch->itemShading->code }}</td>
                                     </tr>
                                     <tr>
-                                        <td>PALET : -</td>
+                                        <td>PALET : {{ $row->itemTarget->pallet->prefix_code }}</td>
                                     </tr>
                                 </table>
                             </td>

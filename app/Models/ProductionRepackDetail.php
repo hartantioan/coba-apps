@@ -27,6 +27,9 @@ class ProductionRepackDetail extends Model
         'item_shading_id',
         'production_batch_id',
         'area_id',
+        'line_id',
+        'shift_id',
+        'group',
         'batch_no',
         'total',
     ];
@@ -37,6 +40,14 @@ class ProductionRepackDetail extends Model
 
     public function itemSource(){
         return $this->belongsTo('App\Models\Item','item_source_id','id')->withTrashed();
+    }
+
+    public function line(){
+        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
+    }
+
+    public function shift(){
+        return $this->belongsTo('App\Models\Shift','shift_id','id')->withTrashed();
     }
     
     public function itemStock(){

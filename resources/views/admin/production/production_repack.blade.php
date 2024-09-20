@@ -1021,7 +1021,7 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;">
-                                        <option>--Silahkan pilih item--</option>    
+                                        <option value="">--Silahkan pilih item--</option>    
                                     </select>
                                 </td>
                                 <td>
@@ -1035,7 +1035,7 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_unit_conversion` + count + `" name="arr_unit_conversion[]" style="width:100%;">
-                                        <option>--Silahkan pilih item--</option>
+                                        <option value="">--Silahkan pilih item--</option>
                                     </select>
                                 </td>
                                 <td class="center" id="source-batch` + count + `">
@@ -1049,7 +1049,7 @@
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_unit_target_conversion` + count + `" name="arr_unit_target_conversion[]" style="width:100%;" onchange="countRow('` + count + `')">
-                                        <option>--Silahkan pilih item target--</option>
+                                        <option value="">--Silahkan pilih item target--</option>
                                     </select>
                                 </td>
                                 <td class="center">
@@ -1495,7 +1495,7 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_item_stock` + count + `" name="arr_item_stock[]" onchange="setStock('` + count + `');" style="width:100%;">
-                        <option>--Silahkan pilih item--</option>    
+                        <option value="">--Silahkan pilih item--</option>    
                     </select>
                 </td>
                 <td>
@@ -1509,7 +1509,7 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_unit_conversion` + count + `" name="arr_unit_conversion[]" style="width:100%;">
-                        <option>--Silahkan pilih item--</option>
+                        <option value="">--Silahkan pilih item--</option>
                     </select>
                 </td>
                 <td class="center" id="source-batch` + count + `">
@@ -1523,7 +1523,7 @@
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_unit_target_conversion` + count + `" name="arr_unit_target_conversion[]" style="width:100%;" onchange="countRow('` + count + `')">
-                        <option>--Silahkan pilih item target--</option>
+                        <option value="">--Silahkan pilih item target--</option>
                     </select>
                 </td>
                 <td class="center">
@@ -1565,8 +1565,6 @@
             if(qtyInput > qtyStock){
                 $('#arr_qty' + id).val($('#arr_item_stock' + id).find(':selected').data('stock'));
             }
-            console.log(qtyInput);
-            console.log(qtyStock);
             $('#source-batch' + id).text($('#arr_item_stock' + id).find(':selected').data('batch'));
         }else{
             $('#arr_item_stock' + id).val('0,000');
@@ -1592,7 +1590,7 @@
         if($('#arr_item_stock' + id).val()){
             batch = $('#arr_item_stock' + id).find(':selected').data('batch');
             let targetUnit = '';
-            if($('#arr_unit_target_conversion' + id).val()){
+            if($('#arr_unit_target_conversion' + id).val() || $('#arr_unit_target_conversion' + id).val() !== ''){
                 targetUnit = $("#arr_unit_target_conversion" + id + " option:selected").text().substring(0, 1);
             }
             let array = batch.split('/');
@@ -1606,7 +1604,7 @@
             <option value="">--Silahkan pilih item--</option>
         `);
         $('#arr_unit_conversion' + id).empty().append(`
-            <option>--Silahkan pilih item--</option>
+            <option value="">--Silahkan pilih item--</option>
         `);
         $('#unit_source' + id).text('');
         if($('#arr_item_source' + id).val()){
@@ -1666,7 +1664,7 @@
 
     function getItemTargetData(id){
         $('#arr_unit_target_conversion' + id).empty().append(`
-            <option>--Silahkan pilih item target--</option>
+            <option value="">--Silahkan pilih item target--</option>
         `);
         if($('#arr_item_target' + id).val()){
             $.ajax({

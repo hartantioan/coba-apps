@@ -26,6 +26,7 @@ use App\Models\ProductionBatch;
 use App\Models\ProductionBatchUsage;
 use App\Models\ProductionRepack;
 use App\Models\ProductionRepackDetail;
+use App\Models\Shift;
 use App\Models\UsedData;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -403,6 +404,16 @@ class ProductionRepackController extends Controller
                             
                             $runningno = ProductionBatch::getLatestCodeFg($yearno);
                             $newbatch = $request->arr_batch_no[$key].'/'.$runningno;
+
+                            $lineshiftgroup = explode('/',$request->arr_batch_no[$key])[1];
+
+                            $linecode = explode('-',$lineshiftgroup)[0];
+                            $shiftcode = substr(explode('-',$lineshiftgroup)[1],0,1);
+                            $group = substr(explode('-',$lineshiftgroup)[1],1,1);
+
+                            $line = Line::where('code',$linecode)->first();
+                            $shift = Shift::where('production_code',$shiftcode)->first();
+
                             $batch = ProductionBatch::create([
                                 'code'              => $newbatch,
                                 'item_id'           => $prd->item_target_id,
@@ -421,6 +432,9 @@ class ProductionRepackController extends Controller
                                 'item_shading_id'       => $item_shading_id,
                                 'production_batch_id'   => $batch->id,
                                 'area_id'               => $itemStock->area_id,
+                                'line_id'               => $line ? $line->id : NULL,
+                                'shift_id'              => $shift ? $shift->id : NULL,
+                                'group'                 => $group,
                                 'batch_no'              => $batch->code,
                             ]);
 

@@ -78,6 +78,7 @@ class Outlet extends Model
           '5'   => 'Toko Online',
           '6'   => 'Marketplace',
           '7'   => 'Institusi',
+          '8'   => 'Toko Offline',
           default => 'Invalid',
         };
 

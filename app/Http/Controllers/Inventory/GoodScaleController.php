@@ -136,6 +136,10 @@ class GoodScaleController extends Controller
                 if($request->status_qc){
                     $query->where('status_qc', $request->status_qc);
                 }
+
+                if($request->type){
+                    $query->where('type', $request->type);
+                }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
             ->offset($start)
@@ -181,6 +185,10 @@ class GoodScaleController extends Controller
 
                 if($request->status_qc){
                     $query->where('status_qc', $request->status_qc);
+                }
+
+                if($request->type){
+                    $query->where('type', $request->type);
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

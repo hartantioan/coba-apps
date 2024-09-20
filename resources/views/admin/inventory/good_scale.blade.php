@@ -104,6 +104,17 @@
                                                 </div>
                                             </div>
                                             <div class="col m3 s6 ">
+                                                <label for="filter_type" style="font-size:1rem;">Tipe Timbang :</label>
+                                                <div class="input-field">
+                                                    <select class="form-control" id="filter_type" onchange="loadDataTable()" multiple>
+                                                        <option value="">Semua</option>
+                                                        <option value="1">Timbang Barang Masuk (Pembelian)</option>
+                                                        <option value="2">Timbang Barang Keluar (Penjualan)</option>
+                                                        <option value="3">Timbang Barang Manual</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col m3 s6 ">
                                                 <label for="filter_status" style="font-size:1rem;">Status QC :</label>
                                                 <div class="input-field">
                                                     <select class="form-control" id="filter_status_qc" onchange="loadDataTable()">
@@ -1408,6 +1419,7 @@
                     status_qc : $('#filter_status_qc').val(),
                     start_date : $('#start_date').val(),
                     finish_date : $('#finish_date').val(),
+                    type : $('#filter_type').val(),
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

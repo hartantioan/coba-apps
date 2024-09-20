@@ -2606,7 +2606,7 @@ class Select2Controller extends Controller {
             if($d->balanceWithUnsent() > 0){
                 $response[] = [
                     'id'        => $d->id,
-                    'text' 	    => $d->place->code.' / Gudang : '.$d->warehouse->name.' / Area : '.($d->area()->exists() ? $d->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion).' '.$d->item->uomUnit->code.' / Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-'),
+                    'text' 	    => $d->place->code.' / Gudang : '.$d->warehouse->name.' / Area : '.($d->area()->exists() ? $d->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion).' '.$d->item->uomUnit->code.' / Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-').' / Batch : '.($d->productionBatch()->exists() ? $d->productionBatch->code : '-'),
                     'place'     => $d->place->code,
                     'warehouse' => $d->warehouse->name,
                     'area'      => $d->area->code,

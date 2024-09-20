@@ -86,6 +86,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>Grup</th>
+                                                        <th>Tipe</th>
                                                         <th>{{ __('translations.address') }}</th>
                                                         <th>{{ __('translations.phone_number') }}</th>
                                                         <th>{{ __('translations.province') }}</th>
@@ -524,6 +525,7 @@
                 { name: 'code', className: '' },
                 { name: 'name', className: '' },
                 { name: 'outlet_group_id', className: '' },
+                { name: 'type', className: '' },
                 { name: 'address', className: '' },
                 { name: 'phone', className: '' },
                 { name: 'province', className: '' },

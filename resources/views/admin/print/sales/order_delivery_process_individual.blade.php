@@ -338,7 +338,7 @@
                                     <td style="width:30%"></td>
                                     <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:10%" align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
-                                    <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty) }}</td>
+                                    <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
                                 </tr>
                                 
                                 @endforeach

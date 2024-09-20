@@ -80,8 +80,12 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.user') }}</th>
-                                                        <th>{{ __('translations.item') }}</th>
+                                                        <th>Tipe Item</th>
                                                         <th>Grup BP</th>
+                                                        <th>Customer</th>
+                                                        <th>Brand</th>
+                                                        <th>Tipe Pengiriman</th>
+                                                        <th>Grade</th>
                                                         <th>{{ __('translations.plant') }}</th>
                                                         <th>Tgl.Mulai Aktif</th>
                                                         <th>Tgl.Akhir Aktif</th>
@@ -117,8 +121,8 @@
                     <div class="col s12">
                         <div class="input-field col s12 m3">
                             <input type="hidden" id="temp" name="temp">
-                            <select class="browser-default" id="item_id" name="item_id"></select>
-                            <label class="active" for="item_id">{{ __('translations.item') }}</label>
+                            <select class="browser-default" id="type_id" name="type_id"></select>
+                            <label class="active" for="type_id">Tipe Item</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="group_id" name="group_id">
@@ -128,6 +132,30 @@
                                 @endforeach
                             </select>
                             <label for="group_id" class="">Group Customer</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            
+                            <select class="browser-default" id="customer_id" name="customer_id"></select>
+                            <label class="active" for="customer_id">Customer</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            
+                            <select class="browser-default" id="brand_id" name="brand_id"></select>
+                            <label class="active" for="brand_id">Brand</label>
+                        </div>
+                        <div class="input-field col s12 m12"></div>
+                        <div class="input-field col s12 m3">
+                            
+                            <select class="browser-default" id="grade_id" name="grade_id"></select>
+                            <label class="active" for="grade_id">Grade</label>
+                        </div>
+                        <div class="input-field col s12 m3">
+                            <select id="type_delivery" name="type_delivery">
+                                <option value="">Silahkan pilih Tipe</option>
+                                <option value="1">LOCO</option>
+                                <option value="2">FRANCO</option>
+                            </select>
+                            <label for="type_delivery" class="">Tipe Pengiriman</label>
                         </div>
                         <div class="input-field col s12 m3">
                             <select id="place_id" name="place_id">
@@ -142,6 +170,7 @@
                             <input id="price" name="price" type="text" onkeyup="formatRupiah(this)" value="0">
                             <label class="active" for="price">Harga satuan</label>
                         </div>
+                        <div class="input-field col s12 m12"></div>
                         <div class="input-field col s12 m3">
                             <input id="start_date" name="start_date" type="date" value="{{ date('Y-m-d') }}">
                             <label class="active" for="start_date">Tgl. Mulai Aktif</label>
@@ -363,18 +392,30 @@
                 $('#start_date').val('');
                 $('#end_date').val('');
                 M.updateTextFields();
-                $('#item_id').empty();
+                $('#type_id').empty();
+                $('#customer_id').empty();
+                $('#brand_id').empty();
+                $('#grade_id').empty();
             }
         });
 
-        select2ServerSide('#item_id', '{{ url("admin/select2/sales_item_child") }}');
+        select2ServerSide('#type_id', '{{ url("admin/select2/type") }}');
+        select2ServerSide('#customer_id', '{{ url("admin/select2/customer") }}');
+        select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
+        select2ServerSide('#grade_id', '{{ url("admin/select2/grade") }}');
     });
+
+    function successImport(){
+        loadDataTable();
+        $('#modal_import').modal('close');
+    }
+
 
     function loadDataTable() {
 		window.table = $('#datatable_serverside').DataTable({
             "scrollCollapse": true,
             "scrollY": '400px',
-            "responsive": true,
+            "responsive": false,
             "stateSave": true,
             "serverSide": true,
             "deferRender": true,
@@ -407,12 +448,16 @@
                 { name: 'user_id', className: 'center-align' },
                 { name: 'item_id', className: '' },
                 { name: 'group_id', className: 'center-align' },
+                { name: 'group_id', className: 'center-align' },
+                { name: 'group_id', className: 'center-align' },
+                { name: 'group_id', className: 'center-align' },
+                { name: 'group_id', className: 'center-align' },
+                { name: 'group_id', className: 'center-align' },
                 { name: 'place_id', className: 'center-align' },
                 { name: 'start_date', className: 'center-align' },
                 { name: 'end_date', className: 'center-align' },
                 { name: 'price', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'action', searchable: false, orderable: false, className: 'center-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
@@ -516,9 +561,20 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#item_id').empty().append(`
-                    <option value="` + response.item.id + `">` + response.item['name'] + `</option>
+                $('#type_id').empty().append(`
+                    <option value="` + response.type_id + `">` + response.type['name'] + `</option>
                 `);
+                $('#grade_id').empty().append(`
+                    <option value="` + response.grade_id + `">` + response.grade['name'] + `</option>
+                `);
+                $('#customer_id').empty().append(`
+                    <option value="` + response.customer_id + `">` + response.customer['name'] + `</option>
+                `);
+                $('#brand_id').empty().append(`
+                    <option value="` + response.brand_id + `">` + response.brand['name'] + `</option>
+                `);
+                
+                $('#type_delivery').val(response.type_delivery).formSelect();
                 $('#start_date').val(response.start_date);
                 $('#end_date').val(response.end_date);
                 $('#place_id').val(response.place_id).formSelect();

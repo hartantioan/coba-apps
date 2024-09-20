@@ -14,7 +14,7 @@ use App\Models\EmployeeSchedule;
 use App\Models\FundRequest;
 use App\Models\GoodIssue;
 use App\Models\GoodReceipt;
-use App\Models\GoodScaleDetail;
+use App\Models\GroupOutlet;
 use App\Models\Grade;
 use App\Models\HardwareItem;
 use App\Models\HardwareItemGroup;
@@ -2100,6 +2100,33 @@ class Select2Controller extends Controller {
                 'text' 			=> ($d->prefix ? $d->prefix.' ' : '').''.$d->code.' - '.$d->name,
                 'must_bp'       => $d->bp_journal ? '1' : '',
             ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function groupOutlet(Request $request)
+    {
+
+        $response = [];
+        $search   = $request->search;
+        $data = GroupOutlet::where(function($query) use($search){
+                    $query->where(function($query) use ($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%")
+                            ;
+                            
+                    });
+                })
+                ->whereIn('status',['1'])->get();
+
+        foreach($data as $d) {
+            
+            $response[] = [
+                'id'   			=> $d->id,
+                'text' 			=> $d->code.' - '.$d->name,
+            ];
+            
         }
 
         return response()->json(['items' => $response]);

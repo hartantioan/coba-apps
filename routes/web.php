@@ -436,6 +436,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('list_bg_check', [Select2Controller::class, 'listBgCheck']);
                 Route::get('item_fg_from_packing', [Select2Controller::class, 'itemFgFromPacking']);
                 Route::get('sales_item_pallet_only', [Select2Controller::class, 'salesItemPalletOnly']);
+                Route::get('group_outlet', [Select2Controller::class, 'groupOutlet']);
             });
 
             Route::prefix('dashboard')->group(function () {

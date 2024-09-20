@@ -44,11 +44,19 @@ class ItemPricelistController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'id',
+            'code',
             'user_id',
-            'item_id',
+            'type_id',
+            'group_id',
             'place_id',
+            'grade_id',
+            'customer_id',
+            'brand_id',
+            'type_delivery',
+            'start_date',
+            'end_date',
             'price',
+            'status',
         ];
 
         $start  = $request->start;
@@ -110,8 +118,12 @@ class ItemPricelistController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->user->name,
-                    $val->item->code.' - '.$val->item->name,
+                    $val->type->code ?? '-',
                     $val->group->name,
+                    $val->customer->name ?? '-',
+                    $val->brand->code ?? '-',
+                    $val->deliveryType() ?? '-',
+                    $val->grade->code ?? '-',
                     $val->place->code.' - '.$val->place->name,
                     date('d/m/Y',strtotime($val->start_date)),
                     date('d/m/Y',strtotime($val->end_date)),
@@ -142,14 +154,14 @@ class ItemPricelistController extends Controller
 
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
-            'item_id'               => 'required',
+            'type_id'               => 'required',
             'place_id'              => 'required',
             'group_id'              => 'required',
             'price'                 => 'required',
             'start_date'            => 'required',
             'end_date'              => 'required',
         ], [
-            'item_id.required'      => 'Item tidak boleh kosong.',
+            'type_id.required'      => 'Tipe Item tidak boleh kosong.',
             'place_id.required'     => 'Plant tidak boleh kosong.',
             'group_id.required'     => 'Group tidak boleh kosong.',
             'price.required'        => 'Harga tidak boleh kosong.',
@@ -168,9 +180,14 @@ class ItemPricelistController extends Controller
                 if($request->temp){
                     $query = ItemPricelist::find($request->temp);
                     $query->user_id         = session('bo_id');
-                    $query->item_id	        = $request->item_id;
+                   
                     $query->group_id        = $request->group_id;
                     $query->place_id        = $request->place_id;
+                    $query->brand_id        = $request->brand_id;
+                    $query->customer_id	    = $request->customer_id;
+                    $query->type_id         = $request->type_id;
+                    $query->grade_id        = $request->grade_id;
+                    $query->type_delivery   = $request->type_delivery;
                     $query->start_date      = $request->start_date;
                     $query->end_date        = $request->end_date;
                     $query->price           = str_replace(',','.',str_replace('.','',$request->price));
@@ -180,9 +197,16 @@ class ItemPricelistController extends Controller
                     $query = ItemPricelist::create([
                         'code'              => strtoupper(Str::random(15)),
                         'user_id'           => session('bo_id'),
-                        'item_id'			=> $request->item_id,
+                     
                         'group_id'          => $request->group_id,
                         'place_id'          => $request->place_id,
+
+                        'type_id'			=> $request->type_id,
+                        'customer_id'          => $request->customer_id,
+                        'brand_id'          => $request->brand_id,
+                        'grade_id'			=> $request->grade_id,
+                        'type_delivery'          => $request->type_delivery,
+
                         'start_date'        => $request->start_date,
                         'end_date'          => $request->end_date,
                         'price'             => str_replace(',','.',str_replace('.','',$request->price)),
@@ -221,7 +245,10 @@ class ItemPricelistController extends Controller
     public function show(Request $request){
         $bp = ItemPricelist::find($request->id);
         $bp['price'] = number_format($bp->price,2,',','.');
-        $bp['item'] = $bp->item;
+        $bp['type'] = $bp->type;
+        $bp['grade'] = $bp->grade;
+        $bp['customer'] = $bp->customer;
+        $bp['brand'] = $bp->brand;
         $bp['group']= $bp->group;
         				
 		return response()->json($bp);

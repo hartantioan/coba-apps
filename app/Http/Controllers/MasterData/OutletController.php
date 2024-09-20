@@ -39,6 +39,7 @@ class OutletController extends Controller
             'district_id',
             'subdistrict_id',
             'link_gmap',
+            'outlet_group_id',
         ];
 
         $start  = $request->start;
@@ -166,6 +167,7 @@ class OutletController extends Controller
             'address'           => 'required',
             'phone'             => 'required',
             'province_id'       => 'required',
+            'outlet_group_id'       => 'required',
             'city_id'           => 'required',
             'district_id'       => 'required',
             'subdistrict_id'    => 'required',
@@ -177,6 +179,7 @@ class OutletController extends Controller
             'address.required'          => 'Alamat tidak boleh kosong.',
             'phone.required'            => 'Telepon tidak boleh kosong.',
             'province_id.required'      => 'Provinsi tidak boleh kosong.',
+            'group_outlet_id.required'      => 'Grup Outlet tidak boleh kosong.',
             'city_id.required'          => 'Kota tidak boleh kosong.',
             'district_id.required'      => 'Kecamatan tidak boleh kosong.',
             'subdistrict_id.required'   => 'Kelurahan tidak boleh kosong.',
@@ -199,6 +202,7 @@ class OutletController extends Controller
                     $query->phone           = $request->phone;
                     $query->address         = $request->address;
                     $query->province_id     = $request->province_id;
+                    $query->outlet_group_id     = $request->group_outlet_id;
                     $query->city_id         = $request->city_id;
                     $query->district_id     = $request->district_id;
                     $query->subdistrict_id  = $request->subdistrict_id;
@@ -220,6 +224,7 @@ class OutletController extends Controller
                         'phone'             => $request->phone,
                         'address'           => $request->address,
                         'province_id'       => $request->province_id,
+                        'outlet_group_id'   => $request->group_outlet_id,
                         'city_id'           => $request->city_id,
                         'district_id'       => $request->district_id,
                         'subdistrict_id'    => $request->subdistrict_id,

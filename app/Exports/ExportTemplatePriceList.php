@@ -2,10 +2,14 @@
 
 namespace App\Exports;
 
+use App\Models\Brand;
+use App\Models\Grade;
 use App\Models\Group;
 use App\Models\Item;
 use App\Models\ItemGroup;
 use App\Models\Place;
+use App\Models\Type;
+use App\Models\User;
 use Maatwebsite\Excel\Excel;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\BeforeExport;
@@ -22,10 +26,16 @@ class ExportTemplatePriceList implements WithEvents
         $event->writer->getSheetByIndex(1); #alternative
         $event->writer->getSheetByIndex(2); #detail
         $event->writer->getSheetByIndex(3);
+        $event->writer->getSheetByIndex(4);
+        $event->writer->getSheetByIndex(5);
+        $event->writer->getSheetByIndex(6);
 
-        $Item =  Item::where('status',1)->get();
+        $Item =  Type::where('status',1)->get();
         $Group = Group::where('type',2)->where('status',1)->get();
         $Place = Place::where('status',1)->get();
+        $Customer = User::where('status',1)->whereIn('type',['2','5'])->get();
+        $Brand = Brand::where('status',1)->get();
+        $Grade = Grade::where('status',1)->get();
 
         $startRow = 2;
         foreach($Item as $row){
@@ -44,6 +54,24 @@ class ExportTemplatePriceList implements WithEvents
         foreach($Place as $row){
             $event->getWriter()->getSheetByIndex(3)->setCellValue('A'.$startRow,$row->code);
             $event->getWriter()->getSheetByIndex(3)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+        $startRow = 2;
+        foreach($Customer as $row){
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('A'.$startRow,$row->employee_no);
+            $event->getWriter()->getSheetByIndex(4)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+        $startRow = 2;
+        foreach($Brand as $row){
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(5)->setCellValue('B'.$startRow,$row->name);
+            $startRow++;
+        }
+        $startRow = 2;
+        foreach($Grade as $row){
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('A'.$startRow,$row->code);
+            $event->getWriter()->getSheetByIndex(6)->setCellValue('B'.$startRow,$row->name);
             $startRow++;
         }
        

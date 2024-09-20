@@ -212,6 +212,10 @@
                             <label class="active" for="link_gmap">Link Google Map</label>
                         </div>
                         <div class="input-field col s3">
+                            <select class="browser-default" id="group_outlet_id" name="group_outlet_id" onchange="getCity();"></select>
+                            <label class="active" for="group_outlet_id">Group Outlet</label>
+                        </div>
+                        <div class="input-field col s3">
                             <div class="switch mb-1">
                                 <label for="order">{{ __('translations.status') }}</label>
                                 <label>
@@ -400,8 +404,14 @@
         });
 
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
-
+        select2ServerSide('#group_outlet_id', '{{ url("admin/select2/group_outlet") }}');
     });
+
+    function successImport(){
+        loadDataTable();
+        $('#modal_import').modal('close');
+    }
+
 
     function getCity(){
         $('#city_id,#subdistrict_id,#district_id').empty().append(`
@@ -637,6 +647,7 @@
                     $('#status').prop( "checked", false);
                 }
                 $('#province_id').empty().append(`<option value="` + response.province_id + `">` + response.province_name + `</option>`);
+                $('#group_outlet_id').empty().append(`<option value="` + response.group_outlet_id + `">` + response.group_outlet_name + `</option>`);
                 $('#subdistrict_id,#district_id,#city_id').empty().append(`
                     <option value="">--{{ __('translations.select') }}--</option>
                 `);

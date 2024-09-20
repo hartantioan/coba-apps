@@ -16,21 +16,44 @@ class ItemPricelist extends Model
     protected $fillable = [
         'code',
         'user_id',
-        'item_id',
+        'type_id',
         'group_id',
         'place_id',
+        'grade_id',
+        'customer_id',
+        'brand_id',
+        'type_delivery',
         'start_date',
         'end_date',
         'price',
         'status',
     ];
+    public function type(){
+        return $this->belongsTo('App\Models\Type','type_id','id')->withTrashed();
+    }
 
+    public function grade(){
+        return $this->belongsTo('App\Models\Grade','grade_id','id')->withTrashed();
+    }
+
+    public function customer(){
+        return $this->belongsTo('App\Models\User','customer_id','id')->withTrashed();
+    }
+    public function brand(){
+        return $this->belongsTo('App\Models\Brand','brand_id','id')->withTrashed();
+    }
     public function user(){
         return $this->belongsTo('App\Models\User','user_id','id')->withTrashed();
     }
 
-    public function item(){
-        return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
+    public function deliveryType(){
+        $type = match ($this->type_delivery) {
+            '1' => 'LOCO',
+            '2' => 'FRANCO',
+          default => 'Invalid',
+        };
+
+        return $type;
     }
 
     public function place(){

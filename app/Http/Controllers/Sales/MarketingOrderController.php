@@ -117,8 +117,10 @@ class MarketingOrderController extends Controller
             ->whereDate('end_date', '>=', $date)
             ->where('city_id',$city)
             ->where('district_id',$district)
+            ->where('type_id',$item->type_id)
             ->where('status','1')
             ->first() ?? 0;
+          
 
             $cek_type = StandardCustomerPrice::where('group_id',$user->group_id)
             ->whereDate('start_date', '<=', $date)
@@ -150,6 +152,7 @@ class MarketingOrderController extends Controller
             'list_area'         => Area::where('status','1')->get(),
             'uom'               => $item->uomUnit->code,
         ];
+
         
 		return response()->json($response);
     }

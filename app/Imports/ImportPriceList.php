@@ -11,6 +11,10 @@ use Maatwebsite\Excel\Row;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use Illuminate\Support\Facades\DB;
 use App\Exceptions\RowImportException;
+use App\Models\Brand;
+use App\Models\Grade;
+use App\Models\Type;
+use App\Models\User;
 use DateTime;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -42,14 +46,29 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
             if (isset($row['plant']) && $row['plant']) {
                 $place_code= explode('#',$row['plant'])[0];
                 $place = Place::where('code',$place_code)->first();
-                $item_code= explode('#',$row['item'])[0];
-                $item = Item::where('code',$item_code)->first();
+                $item_code= explode('#',$row['type'])[0];
+                $item = Type::where('code',$item_code)->first();
                 $group_code = explode('#', $row['group'])[0];
                 $group = Group::where('code',$group_code)->first();
+
+                $customer_code = explode('#', $row['customer'])[0];
+                $customer = User::where('employee_no',$customer_code)->first();
+                $brand_code = explode('#', $row['brand'])[0];
+                $brand = Brand::where('code',$brand_code)->first();
+                $grade_code = explode('#', $row['grade'])[0];
+                $grade = Grade::where('code',$grade_code)->first();
+                $delivery_type = explode('#', $row['tipe_delivery'])[0];
+                
                 if(!$item && $this->error ==null){
-                    $this->error = "Item.";
+                    $this->error = "type.";
                 }elseif(!$group && $this->error ==null){
                     $this->error = "Group.";
+                }elseif(!$customer && $this->error ==null){
+                    $this->error = "Customer.";
+                }elseif(!$brand && $this->error ==null){
+                    $this->error = "BRAND.";
+                }elseif(!$grade && $this->error ==null){
+                    $this->error = "GRADE.";
                 }
                 $dateTime1 = DateTime::createFromFormat('U', ($row['startdate'] - 25569) * 86400);
                 $dateFormatted_1 = $dateTime1->format('Y/m/d');
@@ -59,11 +78,15 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                     $query = ItemPricelist::create([
                         'code'              => strtoupper(Str::random(15)),
                         'user_id'           => session('bo_id'),
-                        'item_id'           => $item->id,
+                        'type_id'           => $item->id,
                         'group_id'          => $group->id,
                         'place_id'          => $place->id,
+                        'customer_id'       => $customer->id,
+                        'brand_id'          => $brand->id,
+                        'grade_id'          => $grade->id,
                         'start_date'        => $dateFormatted_1,
                         'end_date'          => $dateFormatted_2,
+                        'type_delivery'     => $delivery_type,
                         'price'             => $row['price'],
                         'status'            => '1',
                     ]);
@@ -73,7 +96,6 @@ class handleItemPriceList implements   OnEachRow, WithHeadingRow
                     $sheet='Header';
                     throw new RowImportException("data kurang lengkap", $row->getIndex(),$this->error,$sheet);
                 }
-                
                 
             }else{
                 return null;

@@ -102,7 +102,7 @@ class StockInQtyController extends Controller
                         'item' => $row->item->name,
                         'final'=>CustomHelper::formatConditionalQty($row->qty),
                         'satuan'=>$row->item->uomUnit->code,
-                        'area'         => $row->area->code ?? '-',
+                        'area'         => $row->area->name ?? '-',
                         'shading'      => $row->itemShading->code ?? '-',
                         'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                         'perlu' =>1,

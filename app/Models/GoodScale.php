@@ -79,6 +79,18 @@ class GoodScale extends Model
         return $has;
     }
 
+    public function getSalesSuratJalan(){
+        $arr = [];
+        foreach($this->goodScaleDetail as $row){
+            if($row->lookable_type == 'marketing_order_deliveries'){
+                if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                    $arr[] = $row->lookable->marketingOrderDeliveryProcess->code;
+                }
+            }
+        }
+        return implode(', ',$arr);
+    }
+
     public function itemUnit()
     {
         return $this->belongsTo('App\Models\ItemUnit', 'item_unit_id', 'id')->withTrashed();

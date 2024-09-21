@@ -264,7 +264,7 @@
                                     <select class="browser-default" id="warehouse_to" name="warehouse_to">
                                         <option value="">--Pilih gudang--</option>
                                         @foreach ($warehouse as $rowwarehouse)
-                                            <option value="{{ $rowwarehouse->id }}" disabled>{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
+                                            <option value="{{ $rowwarehouse->id }}">{{ $rowwarehouse->code.' - '.$rowwarehouse->name }}</option>
                                         @endforeach
                                     </select>
                                     <label class="active" for="warehouse_to">{{ __('translations.warehouse') }}</label>
@@ -948,7 +948,7 @@
     }
 
     function resetWarehouseTo(){
-        $("#warehouse_to > option").each(function(){
+        /* $("#warehouse_to > option").each(function(){
             if($(this).attr('value') !== ''){
                 $(this).prop("disabled",true);
             }
@@ -956,14 +956,14 @@
         if($('#warehouse_from').val()){
             $("#warehouse_to option:contains('" + $('#warehouse_from').val() + "')").prop("disabled",false);
             $('#warehouse_to').val($('#warehouse_from').val());
-        }
+        } */
     }
 
     function resetItem(){
-        resetWarehouseTo();
+        /* resetWarehouseTo();
         $('select[name^="arr_itemkuy"]').each(function(){
             $(this).empty().trigger('change');
-        });
+        }); */
     }
 
     function addItem(){

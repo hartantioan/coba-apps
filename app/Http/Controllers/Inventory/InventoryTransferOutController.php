@@ -421,10 +421,10 @@ class InventoryTransferOutController extends Controller
             }
 
             if($passedWarehouse == false){
-                return response()->json([
+                /* return response()->json([
                     'status'  => 500,
                     'message' => 'Maaf, beberapa barang memiliki gudang tujuan yang tidak semestinya.'
-                ]);
+                ]); */
             }
 
             if($request->arr_serial){

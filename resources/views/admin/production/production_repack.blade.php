@@ -222,10 +222,10 @@
                                             <tr>
                                                 <th class="center">Item</th>
                                                 <th class="center">Ambil dari Stok</th>
-                                                <th class="center">Jumlah (Stock)</th>
-                                                <th class="center">Satuan (Stock)</th>
                                                 <th class="center">Qty (Konversi)</th>
                                                 <th class="center">Satuan (Konversi)</th>
+                                                <th class="center">Jumlah (Stock)</th>
+                                                <th class="center">Satuan (Stock)</th>
                                                 <th class="center">Batch</th>
                                                 <th class="center">Item</th>
                                                 <th class="center">Qty (Konversi)</th>
@@ -1025,18 +1025,18 @@
                                     </select>
                                 </td>
                                 <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty`+ count +`">
-                                </td>
-                                <td class="center" id="unit_source` + count + `">
-                                    ` + val.item_unit_source + `
-                                </td>
-                                <td>
-                                    <input name="arr_qty_conversion_source[]" type="text" value="` + val.qty_conversion_source + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty_conversion_source`+ count +`" readonly>
+                                    <input name="arr_qty_conversion_source[]" onfocus="emptyThis(this);" type="text" value="` + val.qty_conversion_source + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty_conversion_source`+ count +`">
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_unit_conversion` + count + `" name="arr_unit_conversion[]" style="width:100%;">
                                         <option value="">--Silahkan pilih item--</option>
                                     </select>
+                                </td>
+                                <td>
+                                    <input name="arr_qty[]" type="text" value="` + val.qty + `" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty`+ count +`" readonly>
+                                </td>
+                                <td class="center" id="unit_source` + count + `">
+                                    ` + val.item_unit_source + `
                                 </td>
                                 <td class="center" id="source-batch` + count + `">
                                     ` + val.source_batch + `
@@ -1499,18 +1499,18 @@
                     </select>
                 </td>
                 <td>
-                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty`+ count +`">
-                </td>
-                <td class="center" id="unit_source` + count + `">
-                    -
-                </td>
-                <td>
-                    <input name="arr_qty_conversion_source[]" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty_conversion_source`+ count +`" readonly>
+                    <input name="arr_qty_conversion_source[]" onfocus="emptyThis(this);" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;" id="arr_qty_conversion_source`+ count +`">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_unit_conversion` + count + `" name="arr_unit_conversion[]" style="width:100%;">
                         <option value="">--Silahkan pilih item--</option>
                     </select>
+                </td>
+                <td>
+                    <input name="arr_qty[]" type="text" value="0,000" onkeyup="formatRupiah(this);setStock('` + count + `')" style="text-align:right;width:100%;border-bottom:none;" id="arr_qty`+ count +`" readonly>
+                </td>
+                <td class="center" id="unit_source` + count + `">
+                    -
                 </td>
                 <td class="center" id="source-batch` + count + `">
                     -
@@ -1574,15 +1574,17 @@
     }
 
     function countRow(id){
-        let qty = parseFloat($('#arr_qty' + id).val().replaceAll(".", "").replaceAll(",",".")), batch = '';
+        let qty = parseFloat($('#arr_qty_conversion_source' + id).val().replaceAll(".", "").replaceAll(",",".")), batch = '';
+        let qtyJos = 0;
         if($('#arr_unit_conversion' + id).val()){
-            let qtyConversion = qty > 0 ? qty / parseFloat($('#arr_unit_conversion' + id).find(':selected').data('conversion')) : 0;
-            $('#arr_qty_conversion_source' + id).val(
+            let qtyConversion = qty > 0 ? qty * parseFloat($('#arr_unit_conversion' + id).find(':selected').data('conversion')) : 0;
+            qtyJos = qtyConversion;
+            $('#arr_qty' + id).val(
                 formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))
             );
         }
         if($('#arr_unit_target_conversion' + id).val()){
-            let qtyConversion = qty > 0 ? qty / parseFloat($('#arr_unit_target_conversion' + id).find(':selected').data('conversion')) : 0;
+            let qtyConversion = qtyJos > 0 ? qtyJos / parseFloat($('#arr_unit_target_conversion' + id).find(':selected').data('conversion')) : 0;
             $('#arr_qty_conversion_target' + id).val(
                 formatRupiahIni(qtyConversion.toFixed(3).toString().replace('.',','))
             );

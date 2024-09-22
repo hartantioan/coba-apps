@@ -2369,6 +2369,13 @@ class CustomHelper {
 					$mod->update([
 						'status'	=> '3',
 					]);
+					foreach($mod->marketingOrderDeliveryDetail as $row){
+						if(!$row->marketingOrderDetail->marketingOrder->hasBalanceMod()){
+							$row->marketingOrderDetail->marketingOrder->update([
+								'status'	=> '3'
+							]);
+						}
+					}
 				}
 			}
 		}elseif($table_name == 'good_issues'){

@@ -1028,6 +1028,14 @@ class MarketingOrderDeliveryController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                foreach($query->marketingOrderDeliveryDetail as $row){
+                    if($row->marketingOrderDetail->marketingOrder->hasBalanceMod()){
+                        $row->marketingOrderDetail->marketingOrder->update([
+                            'status'	=> '2'
+                        ]);
+                    }
+                }
     
                 activity()
                     ->performedOn(new MarketingOrderDelivery())

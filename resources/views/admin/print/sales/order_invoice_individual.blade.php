@@ -245,9 +245,15 @@
                             </thead>
                             <tbody>
                                 @foreach($data->marketingOrderInvoiceDeliveryProcessDetail as $key => $row)
+                                @php
+                                    $boxQty = '';
+                                    if($row->lookable->isPallet()){
+                                        $boxQty = ' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->itemStock->item->pallet->box_conversion).' BOX )';
+                                    }
+                                @endphp
                                 <tr>
                                     <td style="width:5% !important">{{ ($key + 1) }}</td>
-                                    <td style="width:40% !important;padding-left:5px">{{ $row->lookable->itemStock->item->name.' ( '.CustomHelper::formatConditionalQty($row->qty * $row->lookable->itemStock->item->pallet->box_conversion).' BOX )' }}</td>
+                                    <td style="width:40% !important;padding-left:5px">{{ $row->lookable->itemStock->item->name.$boxQty }}</td>
                                     <td style="width:10% !important;padding-left:20px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:5% !important"align="right">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>

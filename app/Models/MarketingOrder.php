@@ -351,9 +351,6 @@ class MarketingOrder extends Model
         foreach($this->marketingOrderDetail as $row){
             foreach($row->marketingOrderDeliveryDetail as $rowmodd){
                 $total += $rowmodd->getGrandtotal();
-                /* foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
-                    $total -= $rowreturn->getGrandtotal();
-                } */
             }
         }
         return $total;
@@ -362,17 +359,10 @@ class MarketingOrder extends Model
     public function totalModProcess(){
         $total = 0;
         foreach($this->marketingOrderDetail as $row){
-            foreach($row->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                $query->whereHas('marketingOrderDeliveryProcess',function($query){
-                    $query->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                        $query->where('status','5');
-                    });
-                });
-            })->get() as $rowmodd){
-                $total += $rowmodd->getGrandtotal();
-                /* foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
-                    $total -= $rowreturn->getGrandtotal();
-                } */
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
+                    $total += $rowmodpd->getGrandtotal();
+                }
             }
         }
         return $total;
@@ -381,11 +371,11 @@ class MarketingOrder extends Model
     public function totalReturn(){
         $total = 0;
         foreach($this->marketingOrderDetail as $row){
-            foreach($row->marketingOrderDeliveryDetail()->whereHas('marketingOrderDelivery',function($query){
-                $query->whereHas('marketingOrderDeliveryProcess');
-            })->get() as $rowmodd){
-                foreach($rowmodd->marketingOrderReturnDetail as $rowreturn){
-                    $total += $rowreturn->getGrandtotal();
+            foreach($row->marketingOrderDeliveryDetail as $rowmodd){
+                foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
+                    foreach($rowmodpd->marketingOrderReturnDetail as $rowreturn){
+                        $total += $rowreturn->getGrandtotal();
+                    }
                 }
             }
         }
@@ -397,8 +387,10 @@ class MarketingOrder extends Model
 
         foreach($this->marketingOrderDetail as $row){
             foreach($row->marketingOrderDeliveryDetail as $rowmodd){
-                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
-                    $total += $rowinvoice->getGrandtotal();
+                foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
+                    foreach($rowmodpd->marketingOrderInvoiceDetail as $rowinvoice){
+                        $total += $rowinvoice->grandtotal;
+                    }
                 }
             }
         }
@@ -411,9 +403,11 @@ class MarketingOrder extends Model
 
         foreach($this->marketingOrderDetail as $row){
             foreach($row->marketingOrderDeliveryDetail as $rowmodd){
-                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
-                    foreach($rowinvoice->marketingOrderMemoDetail as $rowmemo){
-                        $total += $rowmemo->grandtotal;
+                foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
+                    foreach($rowmodpd->marketingOrderInvoiceDetail as $rowinvoice){
+                        foreach($rowinvoice->marketingOrderMemoDetail as $rowmemo){
+                            $total += $rowmemo->grandtotal;
+                        }
                     }
                 }
             }
@@ -427,9 +421,11 @@ class MarketingOrder extends Model
 
         foreach($this->marketingOrderDetail as $row){
             foreach($row->marketingOrderDeliveryDetail as $rowmodd){
-                foreach($rowmodd->marketingOrderInvoiceDetail as $rowinvoice){
-                    $total += $rowinvoice->getDownPayment();
-                    $total += $rowinvoice->getPayment();
+                foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
+                    foreach($rowmodpd->marketingOrderInvoiceDetail as $rowinvoice){
+                        $total += $rowinvoice->getDownPayment();
+                        $total += $rowinvoice->getPayment();
+                    }
                 }
             }
         }

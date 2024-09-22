@@ -53,8 +53,8 @@ class MarketingOrderReturnDetail extends Model
 
     public function getGrandtotal(){
         $total = 0;
-        $totalDelivered = $this->marketingOrderDeliveryDetail->getGrandtotal();
-        $bobot = $this->qty / $this->marketingOrderDeliveryDetail->qty;
+        $totalDelivered = $this->marketingOrderDeliveryProcessDetail->getGrandtotal();
+        $bobot = $this->qty / $this->marketingOrderDeliveryProcessDetail->qty;
         $total = $bobot * $totalDelivered;
         return $total;
     }

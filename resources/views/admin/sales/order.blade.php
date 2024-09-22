@@ -230,10 +230,8 @@
                                                         <th>% DP</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
-                                                        <th>Diskon</th>
                                                         <th>{{ __('translations.total') }}</th>
                                                         <th>{{ __('translations.tax') }}</th>
-                                                        <th>Total Stlh PPN</th>
                                                         <th>{{ __('translations.grandtotal') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
                                                         <th>By</th>
@@ -1731,11 +1729,9 @@
                 { name: 'percent_dp', className: 'center-align' },
                 { name: 'note_internal', className: '' },
                 { name: 'note_external', className: '' },
-                { name: 'discount', className: 'right-align' },
                 { name: 'total', className: 'right-align' },
                 { name: 'tax', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-                { name: 'balance', className: 'right-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'center-align' },

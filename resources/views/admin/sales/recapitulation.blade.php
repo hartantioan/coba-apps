@@ -90,12 +90,8 @@
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tgl.Post</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">TOP</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Note</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.subtotal') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Discount</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.total') }}</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.tax') }}</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Total+PPN</th>
-                                                        <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Pembulatan</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">{{ __('translations.grandtotal') }}</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terjadwal</th>
                                                         <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Terkirim</th>
@@ -170,12 +166,8 @@
                                     <td class="center-align">`+val.post_date+`</td>
                                     <td class="center-align">`+val.top+`</td>
                                     <td>`+val.note+`</td>
-                                    <td class="right-align">`+val.subtotal+`</td>
-                                    <td class="right-align">`+val.discount+`</td>
                                     <td class="right-align">`+val.total+`</td>
                                     <td class="right-align">`+val.tax+`</td>
-                                    <td class="right-align">`+val.total_after_tax+`</td>
-                                    <td class="right-align">`+val.rounding+`</td>
                                     <td class="right-align">`+val.grandtotal+`</td>
                                     <td class="right-align">`+val.schedule+`</td>
                                     <td class="right-align">`+val.sent+`</td>

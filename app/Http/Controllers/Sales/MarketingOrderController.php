@@ -192,12 +192,9 @@ class MarketingOrderController extends Controller
             'currency_rate',
             'note_internal',
             'note_external',
-           
-            'discount',
             'total',
             'tax',
             'grandtotal',
-            'balance'
         ];
 
         $start  = $request->start;
@@ -407,10 +404,8 @@ class MarketingOrderController extends Controller
                     number_format($val->percent_dp,2,',','.'),
                     $val->note_internal,
                     $val->note_external,
-                    number_format($val->discount,2,',','.'),
                     number_format($val->total,2,',','.'),
                     number_format($val->tax,2,',','.'),
-                    number_format($val->total_after_tax,2,',','.'),
                     number_format($val->grandtotal,2,',','.'),
                     $val->status(),
                     (

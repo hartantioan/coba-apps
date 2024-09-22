@@ -98,6 +98,7 @@ class MarketingOrderController extends Controller
 
     public function getSalesItemInformation(Request $request){
         $item = Item::find($request->item_id);
+        $place = Place::where('code',$request->place_code)->first();
         $account_id   = $request->account_id;
         $date   = $request->date;
         $city   = $request->city;
@@ -106,7 +107,9 @@ class MarketingOrderController extends Controller
         $user = User::find($account_id);
         $transportation = Transportation::find($request->transportation_id);
         $cek_price = ItemPricelist::where('group_id',$user->group_id)
-            ->where('item_id',$item->id)
+            ->where('brand_id',$item->brand_id)
+            ->where('grade_id',$item->grade_id)
+            ->where('place_id',$place->id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
             ->where('status','1')

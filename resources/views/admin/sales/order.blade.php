@@ -1342,6 +1342,7 @@
                 type: 'POST',
                 dataType: 'JSON',
                 data: {
+                    place_code: $('#code_place_id').val(),
                     item_id: $("#arr_item" + nil).val(),
                     account_id: $('#account_id').val(),
                     date: $('#post_date').val(),

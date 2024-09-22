@@ -49,7 +49,7 @@ class deliveryCostStandard implements OnEachRow, WithHeadingRow
         DB::beginTransaction();
         try {
             if (isset($row['kota']) && $row['kota']) {
-                info('masuk');
+                
                 if(isset($row['code']) && $row['code']){
                     $check = ModelsDeliveryCostStandard::where('code',$row['code'])->first();
                     

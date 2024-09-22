@@ -7,12 +7,8 @@
             <th>Tgl.Post</th>
             <th>TOP</th>
             <th>Note</th>
-            <th>{{ __('translations.subtotal') }}</th>
-            <th>Discount</th>
             <th>{{ __('translations.total') }}</th>
             <th>{{ __('translations.tax') }}</th>
-            <th>Total+PPN</th>
-            <th>Pembulatan</th>
             <th>{{ __('translations.grandtotal') }}</th>
             <th>Terjadwal</th>
             <th>Terkirim</th>
@@ -32,12 +28,8 @@
                 <td>{{ $row['post_date'] }}</td>
                 <td>{{ $row['top'] }}</td>
                 <td>{{ $row['note'] }}</td>
-                <td>{{ $row['subtotal'] }}</td>
-                <td>{{ $row['discount'] }}</td>
                 <td>{{ $row['total'] }}</td>
                 <td>{{ $row['tax'] }}</td>
-                <td>{{ $row['total_after_tax'] }}</td>
-                <td>{{ $row['rounding'] }}</td>
                 <td>{{ $row['grandtotal'] }}</td>
                 <td>{{ $row['schedule'] }}</td>
                 <td>{{ $row['sent'] }}</td>
@@ -50,7 +42,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="20" align="center">
+                <td colspan="16" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

@@ -110,6 +110,7 @@ class MarketingOrderController extends Controller
             ->where('brand_id',$item->brand_id)
             ->where('grade_id',$item->grade_id)
             ->where('place_id',$place->id)
+            ->where('customer_id',$account_id)
             ->whereDate('start_date', '<=', $date)
             ->whereDate('end_date', '>=', $date)
             ->where('status','1')

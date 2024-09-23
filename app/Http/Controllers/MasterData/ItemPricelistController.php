@@ -70,12 +70,12 @@ class ItemPricelistController extends Controller
         $query_data = ItemPricelist::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->whereHas('item',function($query) use ($search, $request) {
+                        $query->whereHas('type',function($query) use ($search, $request) {
                             $query->where('code', 'like', "%$search%")
                                 ->orWhere('name', 'like', "%$search%");
                         })
-                        ->orWhereHas('place',function($query) use ($search, $request) {
-                            $query->where('code', 'like', "%$search%")
+                        ->orWhereHas('customer',function($query) use ($search, $request) {
+                            $query->where('employee_no', 'like', "%$search%")
                                 ->orWhere('name', 'like', "%$search%");
                         });
                     });
@@ -93,13 +93,15 @@ class ItemPricelistController extends Controller
         $total_filtered = ItemPricelist::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
-                        $query->whereHas('item',function($query) use ($search, $request) {
-                            $query->where('code', 'like', "%$search%")
-                                ->orWhere('name', 'like', "%$search%");
-                        })
-                        ->orWhereHas('place',function($query) use ($search, $request) {
-                            $query->where('code', 'like', "%$search%")
-                                ->orWhere('name', 'like', "%$search%");
+                        $query->where(function($query) use ($search, $request) {
+                            $query->whereHas('type',function($query) use ($search, $request) {
+                                $query->where('code', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
+                            })
+                            ->orWhereHas('customer',function($query) use ($search, $request) {
+                                $query->where('employee_no', 'like', "%$search%")
+                                    ->orWhere('name', 'like', "%$search%");
+                            });
                         });
                     });
                 }

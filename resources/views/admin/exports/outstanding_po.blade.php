@@ -22,6 +22,7 @@
             <th class="center-align">{{ __('translations.unit') }}</th>
             <th class="center-align">Qty PO.</th>
             <th class="center-align">Qty GR</th>
+            <th class="center-align">Qty Retur</th>
             <th class="center-align">Tunggakan</th>
         </tr>
     </thead>
@@ -47,6 +48,7 @@
                 <td>{{ $row['satuan'] }}</td>
                 <td>{{ $row['qty'] }}</td>
                 <td>{{ $row['qty_gr'] }}</td>
+                <td>{{ $row['qty_retur'] }}</td>
                 <td>{{ $row['qty_balance'] }}</td>
                 
             </tr>

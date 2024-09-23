@@ -574,7 +574,7 @@ class GoodReceiptPOController extends Controller
 
                     $tolerance_gr = $pod->item->tolerance_gr ? $pod->item->tolerance_gr : 0;
 
-                    $balanceqtygr = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR();
+                    $balanceqtygr = floatval(str_replace(',','.',str_replace('.','',$request->arr_qty[$key]))) + $pod->qtyGR() - $pod->qtyRetur();
 
                     $balance = round($balanceqtygr - $pod->qty,2);
                     $percent_balance = round(($balance / $pod->qty) * 100,2);

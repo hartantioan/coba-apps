@@ -105,6 +105,21 @@ class MarketingOrderDeliveryProcess extends Model
         return implode(', ',$arr);
     }
 
+    public function getSalesOrderCode(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,$arr)){
+                $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code;
+            }
+        }
+        return implode(', ',$arr);
+    }
+
+    public function getNote() {
+        $text = 'Based On Sales Order '.$this->getSalesOrderCode().'. Based on Marketing Order Delivery '.$this->marketingOrderDelivery->code.'. Based on Delivery Order '.$this->code.'.';
+        return $text;
+    }
+
     public function totalQty(){
         $total = 0;
         foreach($this->marketingOrderDeliveryProcessDetail as $row){

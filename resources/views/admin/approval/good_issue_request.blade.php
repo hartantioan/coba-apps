@@ -210,13 +210,9 @@
                         <th class="center-align">{{ __('translations.division') }}</th>
                         <th class="center-align">{{ __('translations.project') }}</th>
                         <th class="center-align">{{ __('translations.requester') }}</th>
-                        <th class="center-align">{{ __('translations.value_of_goods') }}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @php
-                        $total = 0;
-                    @endphp
                     @foreach($data->goodIssueRequestDetail as $key => $row)
                     <tr>
                         <td class="center-align">
@@ -241,17 +237,13 @@
                         <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                         <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="">{{ $row->requester }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
                     </tr>
                     <tr>
-                        <td colspan="14">{{ __('translations.note') }} 1 : {{ $row->note }}</td>
+                        <td colspan="13">{{ __('translations.note') }} 1 : {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="14">{{ __('translations.note') }} 2 : {{ $row->note2 }}</td>
+                        <td colspan="13">{{ __('translations.note') }} 2 : {{ $row->note2 }}</td>
                     </tr>
-                    @php
-                        $total += $row->total;
-                    @endphp
                     @endforeach
                 </tbody>
             </table>
@@ -265,9 +257,6 @@
                 </div>
                 <div class="col m4 s12 l4">
                     {{ __('translations.note') }} : {{ $data->note }}
-                </div>
-                <div class="col m4 s12 l4 right-align">
-                    <h6>{{ __('translations.value_of_goods') }} : {{ number_format($total,2,',','.') }}</h6>
                 </div>
             </div>
             <table class="mt-3" width="100%" border="0">

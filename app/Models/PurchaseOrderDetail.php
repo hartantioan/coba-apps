@@ -227,10 +227,22 @@ class PurchaseOrderDetail extends Model
             $balance = $this->goodScale->qty_final;
         }else{ */
             $received = $this->goodReceiptDetail()->sum('qty');
-            $balance = $this->qty - $received;
+            $return = 0;
+            foreach($this->goodReceiptDetail as $row){
+                $return += $row->goodReturnPODetail()->sum('qty');
+            }
+            $balance = $this->qty - $received + $return;
         /* } */
         
         return $balance;
+    }
+
+    public function qtyRetur(){
+        $return = 0;
+        foreach($this->goodReceiptDetail as $row){
+            $return += $row->goodReturnPODetail()->sum('qty');
+        }
+        return $return;
     }
 
     public function getBalanceReceiptRM()
@@ -239,7 +251,13 @@ class PurchaseOrderDetail extends Model
             $balance = $this->goodScale->qty_final;
         }else{ */
             $received = $this->goodReceiptDetail()->sum('qty');
-            $balance = $this->qty + ($this->qty * ($this->item->tolerance_gr / 100)) - $received;
+
+            $return = 0;
+            foreach($this->goodReceiptDetail as $row){
+                $return += $row->goodReturnPODetail()->sum('qty');
+            }
+
+            $balance = $this->qty + ($this->qty * ($this->item->tolerance_gr / 100)) - $received + $return;
         /* } */
         
         return $balance;

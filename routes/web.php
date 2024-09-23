@@ -518,7 +518,7 @@ Route::prefix('admin')->group(function () {
                 });
             });
 
-            Route::prefix('approval')->middleware('direct.access')->group(function () {
+            Route::prefix('approval')/* ->middleware('direct.access') */->group(function () {
                 Route::get('/',[ApprovalController::class, 'approvalIndex']);
                 Route::get('datatable',[ApprovalController::class, 'approvalDatatable']);
                 Route::get('row_detail',[ApprovalController::class, 'approvalRowDetail']);

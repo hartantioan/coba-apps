@@ -28,7 +28,7 @@ class SendMailProcurementOutstandPR extends Mailable
         return $this->from('reminder@superior.co.id')
         ->subject('Report Outstand PR Procurement')
         ->view('admin.mail.report_procurement_outstand_pr')
-        ->attach(Storage::url('/public/auto_email/OutstandPR.xlsx'), [
+        ->attach(Storage::url('app/public/auto_email/OutstandPR.xlsx'), [
             'as' => 'Outstand PR.xlsx',
             'mime' => 'application/xlsx',
         ]);

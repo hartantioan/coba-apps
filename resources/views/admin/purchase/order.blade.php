@@ -2541,7 +2541,7 @@
                 $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#delivery_date').val(response.delivery_date);
-                $('#delivery_date').attr('max',response.post_date);
+                $('#delivery_date').attr('min',response.post_date);
                 $('#received_date').val(response.received_date);
                 $('#percent_tax').val(response.percent_tax);
                 $('#receiver_name').val(response.receiver_name);

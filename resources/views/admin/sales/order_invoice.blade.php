@@ -1113,6 +1113,7 @@
                         `);
 
                         $('#user_data_id').val(datakuy.user_data_id).trigger('change');
+                        $('#note').val(datakuy.note);
 
                         addDueDateByValue(datakuy.top_customer);
                         addDueDateByValueInternal(datakuy.top_internal);

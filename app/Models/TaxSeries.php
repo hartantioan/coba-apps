@@ -75,8 +75,8 @@ class TaxSeries extends Model
 	}
 
     public static function getListCurrentTaxSeries($company_id,$year,$prefix){
-        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->get();
-        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,8,2) = '$year'")->whereNotNull('tax_no')->get();
+        $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,9,2) = '$year'")->whereNotNull('tax_no')->get();
+        $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,9,2) = '$year'")->whereNotNull('tax_no')->get();
         $arr = [];
         foreach($dataInvoice as $row){
             if(!in_array($row->tax_no,$arr)){

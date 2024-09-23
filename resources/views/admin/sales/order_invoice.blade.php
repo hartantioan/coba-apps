@@ -2060,6 +2060,7 @@
                 $('#grandtotal').val(response.grandtotal);
                 $('#downpayment').val(response.downpayment);
                 $('#tax_no').val(response.tax_no);
+                $('#type').val(response.type).formSelect();
                 $('#marketing_order_delivery_process_id').empty();
                 if(response.modp_code){
                     $('#marketing_order_delivery_process_id').append(`

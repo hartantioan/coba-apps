@@ -210,13 +210,13 @@
                         <th class="center-align">{{ __('translations.division') }}</th>
                         <th class="center-align">{{ __('translations.project') }}</th>
                         <th class="center-align">{{ __('translations.requester') }}</th>
-                        <th class="center-align">{{ __('translations.value_of_goods') }}</th>
+                        {{-- <th class="center-align">{{ __('translations.value_of_goods') }}</th> --}}
                     </tr>
                 </thead>
                 <tbody>
-                    @php
+                    {{-- @php
                         $total = 0;
-                    @endphp
+                    @endphp --}}
                     @foreach($data->goodIssueRequestDetail as $key => $row)
                     <tr>
                         <td class="center-align">
@@ -241,17 +241,17 @@
                         <td class="center-align">{{ $row->department()->exists() ? $row->department->name : '-' }}</td>
                         <td class="center-align">{{ $row->project()->exists() ? $row->project->name : '-' }}</td>
                         <td class="">{{ $row->requester }}</td>
-                        <td class="right-align">{{ number_format($row->total,2,',','.') }}</td>
+                        {{-- <td class="right-align">{{ number_format($row->total,2,',','.') }}</td> --}}
                     </tr>
                     <tr>
-                        <td colspan="14">{{ __('translations.note') }} 1 : {{ $row->note }}</td>
+                        <td colspan="13">{{ __('translations.note') }} 1 : {{ $row->note }}</td>
                     </tr>
                     <tr>
-                        <td colspan="14">{{ __('translations.note') }} 2 : {{ $row->note2 }}</td>
+                        <td colspan="13">{{ __('translations.note') }} 2 : {{ $row->note2 }}</td>
                     </tr>
-                    @php
+                    {{-- @php
                         $total += $row->total;
-                    @endphp
+                    @endphp --}}
                     @endforeach
                 </tbody>
             </table>

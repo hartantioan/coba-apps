@@ -117,6 +117,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function getNote() {
         $text = 'Based On Sales Order '.$this->getSalesOrderCode().'. Based on Delivery Order '.$this->code.'.';
+        return $text;
     }
 
     public function totalQty(){

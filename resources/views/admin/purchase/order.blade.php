@@ -336,7 +336,7 @@
                                 <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
                             </div>
                             <div class="input-field col m3 s12 step14">
-                                <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" max="{{ date('Y'.'-12-31') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. kirim">
+                                <input id="delivery_date" name="delivery_date" type="date" placeholder="Tgl. kirim">
                                 <label class="active" for="delivery_date">Tgl. Kirim</label>
                             </div>
                             <div class="input-field col m3 s12 step15">
@@ -812,6 +812,7 @@
                 }
                 /* $('#pr-show,#gi-show,#sj-show').show(); */
                 $('#inventory_type').formSelect().trigger('change');
+                changeDateMinimum($('#post_date').val());
             },
             onCloseEnd: function(modal, trigger){
                 $('input').css('border', 'none');
@@ -2131,6 +2132,8 @@
             }
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
+            $('#delivery_date').val(val);
+            $('#delivery_date').attr('max',val);
         }
     }
 

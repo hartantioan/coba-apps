@@ -1331,6 +1331,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $data->createJournalSentDocument();
             }
 
+            if($request->status_tracking == '3'){
+                $data->createJournalReceiveDocument();
+                $data->createInvoice();
+            }
+
             CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate.',$data->user_id);
 
             $response = [
@@ -1406,10 +1411,10 @@ class MarketingOrderDeliveryProcessController extends Controller
 
                 $datakuy = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
 
-                if($datakuy){
+                /* if($datakuy){
                     $datakuy->createJournalReceiveDocument();
                     $datakuy->createInvoice();
-                }
+                } */
 
                 CustomHelper::sendNotification($datakuy->getTable(),$datakuy->id,'Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali','Dokumen Surat Jalan No. '.$datakuy->code.' telah kembali.',session('bo_id'));
 

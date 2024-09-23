@@ -441,6 +441,7 @@ class MarketingOrderInvoiceController extends Controller
                         $query->marketing_order_delivery_process_id = $request->marketing_order_delivery_process_id;
                         $query->post_date = $request->post_date;
                         $query->due_date = $request->due_date;
+                        $query->due_date_internal = $request->due_date_internal;
                         $query->status = '1';
                         $query->type = $request->type;
                         $query->tax_id = $request->tempTaxId ?? NULL;
@@ -498,6 +499,7 @@ class MarketingOrderInvoiceController extends Controller
                         'marketing_order_delivery_process_id' => $request->marketing_order_delivery_process_id,
                         'post_date'                     => $request->post_date,
                         'due_date'                      => $request->due_date,
+                        'due_date_internal'             => $request->due_date_internal,
                         'status'                        => '1',
                         'type'                          => $request->type,
                         'tax_id'                        => $request->tempTaxId ?? NULL,
@@ -1123,10 +1125,10 @@ class MarketingOrderInvoiceController extends Controller
         $po['percent_tax'] = $po->taxMaster()->exists() ? CustomHelper::formatConditionalQty($po->taxMaster->percentage) : '0,00';
         $po['user_datas'] = $po->account->getBillingAddress();
 
-        if($po->tax_no){
+        /* if($po->tax_no){
             $newprefix = '011.'.explode('.',$po->tax_no)[1].'.'.explode('.',$po->tax_no)[2];
             $po['tax_no'] = $newprefix;
-        }
+        } */
 
         $arrSj = [];
         $arrDp = [];

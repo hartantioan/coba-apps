@@ -2133,7 +2133,7 @@
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
             $('#delivery_date').val(val);
-            $('#delivery_date').attr('max',val);
+            $('#delivery_date').attr('min',val);
         }
     }
 

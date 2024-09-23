@@ -80,12 +80,12 @@ class TaxSeries extends Model
         $arr = [];
         foreach($dataInvoice as $row){
             if(!in_array($row->tax_no,$arr)){
-                $arr[] = substr($row->tax_no,10,8);
+                $arr[] = substr($row->tax_no,11,8);
             }
         }
         foreach($dataDp as $row){
             if(!in_array($row->tax_no,$arr)){
-                $arr[] = substr($row->tax_no,10,8);
+                $arr[] = substr($row->tax_no,11,8);
             }
         }
         rsort($arr);

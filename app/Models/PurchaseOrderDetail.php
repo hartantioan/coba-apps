@@ -237,6 +237,14 @@ class PurchaseOrderDetail extends Model
         return $balance;
     }
 
+    public function qtyRetur(){
+        $return = 0;
+        foreach($this->goodReceiptDetail as $row){
+            $return += $row->goodReturnPODetail()->sum('qty');
+        }
+        return $return;
+    }
+
     public function getBalanceReceiptRM()
     {
         /* if($this->goodScale()->exists()){

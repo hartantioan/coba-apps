@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\InventoryTransferOut;
-use App\Models\inventoryTransferOutDetail;
+use App\Models\InventoryTransferOutDetail;
 use App\Models\User;
 use App\Models\Company;
 use App\Helpers\CustomHelper;

@@ -254,7 +254,7 @@
                                 <tr>
                                     <td style="width:5% !important">{{ ($key + 1) }}</td>
                                     <td style="width:40% !important;padding-left:5px">{{ $row->lookable->itemStock->item->name.$boxQty }}</td>
-                                    <td style="width:10% !important;padding-left:20px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td style="width:10% !important;padding-left:57px" align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
                                     <td style="width:5% !important" align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
                                     <td style="width:5% !important"align="right">{{ $row->lookable->itemStock->item->uomUnit->code }}</td>
                                     <td style="width:10% !important" align="right">{{ number_format($row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->price,2,',','.') }}</td>
@@ -301,11 +301,11 @@
                                 </tr>
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right">{{ number_format($data->tax,2,',','.') }}</td>
+                                    <td align="right" align="right" >{{ number_format($data->tax,2,',','.') }}</td>
                                 </tr>
                                 <tr class="break-row">
                                     <td align="right"></td>
-                                    <td align="right" align="right">{{ number_format($data->grandtotal,2,',','.') }}</td>
+                                    <td align="right" align="right" style="padding-top: 0px;padding-bottom:2px">{{ number_format($data->grandtotal,2,',','.') }}</td>
                                 </tr>
                             </table>
                         </div>

@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class SendMailProcurementOutstandPR extends Mailable
 {
@@ -27,7 +28,7 @@ class SendMailProcurementOutstandPR extends Mailable
         return $this->from('reminder@superior.co.id')
         ->subject('Report Outstand PR Procurement')
         ->view('admin.mail.report_procurement_outstand_pr')
-        ->attach(storage_path('app/Public/AutoEmail/OutstandPR.xlsx'), [
+        ->attach(Storage::url('public/AutoEmail/OutstandPR.xlsx'), [
             'as' => 'Outstand PR.xlsx',
             'mime' => 'application/xlsx',
         ]);

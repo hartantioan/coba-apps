@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class SendMailProcurementOutstandPO extends Mailable
 {
@@ -24,7 +25,7 @@ class SendMailProcurementOutstandPO extends Mailable
         return $this->from('reminder@superior.co.id')
         ->subject('Report Outstand PO Procurement')
         ->view('admin.mail.report_procurement_outstand_po')
-        ->attach(storage_path('app/Public/AutoEmail/OutstandPO.xlsx'), [
+        ->attach(Storage::url('public/AutoEmail/OutstandPO.xlsx'), [
             'as' => 'Outstand PO.xlsx',
             'mime' => 'application/xlsx',
         ]);

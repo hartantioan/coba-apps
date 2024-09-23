@@ -32,7 +32,7 @@ class MailReportProcurementOutstandPR extends Command
     public function handle()
     {
         $recipient = ['edp@superior.co.id','heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
-        Excel::store(new ExportProcurementOutstandPR, 'Public/AutoEmail/OutstandPR.xlsx', 'local');
+        Excel::store(new ExportProcurementOutstandPR, 'public/AutoEmail/OutstandPR.xlsx', 'local');
         Mail::to($recipient)->send(new SendMailProcurementOutstandPR());
     }
 }

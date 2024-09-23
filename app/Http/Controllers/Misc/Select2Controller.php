@@ -3464,8 +3464,6 @@ class Select2Controller extends Controller {
                 'city_name'         => $d->city->name,
                 'district_id'       => $d->district_id,
                 'district_name'     => $d->district->name,
-                'subdistrict_id'    => $d->subdistrict_id,
-                'subdistrict_name'  => $d->subdistrict->name,
                 'cities'            => $d->province->getCity(),
             ];
         }

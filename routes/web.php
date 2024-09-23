@@ -158,6 +158,7 @@ use App\Http\Controllers\Sales\MarketingOrderOutstandingController;
 use App\Http\Controllers\Sales\MarketingOrderPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderPriceController;
 use App\Http\Controllers\Sales\MarketingOrderAgingController;
+use App\Http\Controllers\Sales\StockFinishedGoodController;
 use App\Http\Controllers\Sales\MarketingOrderDPReportController;
 use App\Http\Controllers\Sales\MarketingHandoverInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderReceiptController;
@@ -2688,6 +2689,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[MarketingOrderReportController::class, 'index']);
                         Route::post('filter_by_date',[MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export',[MarketingOrderReportController::class, 'export']);
+                    });
+
+                    Route::prefix('stock_finished_good')->middleware('operation.access:stock_finished_good,view')->group(function () {
+                        Route::get('/',[StockFinishedGoodController::class, 'index']);
+                        Route::post('filter',[StockFinishedGoodController::class, 'filter']);
+                        Route::get('export',[StockFinishedGoodController::class, 'export']);
                     });
 
                     Route::prefix('sales_outstanding')->middleware('operation.access:sales_outstanding,view')->group(function () {

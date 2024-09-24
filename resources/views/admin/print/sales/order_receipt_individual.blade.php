@@ -265,7 +265,7 @@
             </div>
         </main>
         <hr style="border: 1px dashed #000000;">
-        <div style="margin-top:15px;">
+        <div style="margin-top:5px;">
             <table border="0" width="100%">
                 <tr>
                     <td width="33%">

@@ -94,11 +94,11 @@ class ItemCogs extends Model
         $cogs = ItemCogs::where('item_id',$this->item_id)->where('place_id',$this->place_id)->where('warehouse_id',$this->warehouse_id)->where('item_shading_id',$this->item_shading_id)->where('production_batch_id',$this->production_batch_id)->where('date','<=',$this->date)->orderBy('date')->orderBy('id')->get();
         foreach($cogs as $row){
             if($row->type == 'IN'){
-                $qty += $row->qty_in;
-                $total += $row->total_in;
+                $qty += round($row->qty_in,3);
+                $total += round($row->total_in,2);
             }elseif($row->type == 'OUT'){
-                $qty -= $row->qty_out;
-                $total -= $row->total_out;
+                $qty -= round($row->qty_out,3);
+                $total -= round($row->total_out,2);
             }
         }
         $arr = [

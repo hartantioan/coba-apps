@@ -106,7 +106,7 @@ class ProductionBatchStockController extends Controller
                 'item' => $row->item->name,
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
-                'area' => $row->area->code ?? '-',
+                'area' => $row->area->name ?? '-',
                 'shading' => $row->itemShading->code ?? '-',
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'final'=>number_format($priceNow,2,',','.'),

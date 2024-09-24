@@ -127,7 +127,7 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                         'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
                         'item'         => $row->item->name,
                         'satuan'       => $row->item->uomUnit->code,
-                        'area'         => $row->area->code ?? '-',
+                        'area'         => $row->area->name ?? '-',
                         'production_batch' => '-',
                         'shading' => $row->shading->code ?? '-',
                         'kode'         => $row->item->code,

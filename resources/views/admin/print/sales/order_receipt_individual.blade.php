@@ -50,7 +50,7 @@
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
-                    font-size:13px !important;
+                    font-size:12px !important;
                 }
         
                 table > thead > tr > th {
@@ -71,7 +71,7 @@
                 }
         
                 table > thead > tr > th {
-                    font-size:13px !important;
+                    font-size:12px !important;
                     font-weight: 800 !important;
                 }
         

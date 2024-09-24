@@ -46,12 +46,12 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->where('id',$this->item);
                     });
                 }
-                if($this->plant != 'all'){
+                if($this->plant !== 'all'){
                     $query->whereHas('place',function($query) {
                         $query->where('id',$this->plant);
                     });
                 }
-                if($this->warehouse != 'all'){
+                if($this->warehouse !== 'all'){
                     $query->whereHas('warehouse',function($query) {
                         $query->where('id',$this->warehouse);
                     });
@@ -85,12 +85,12 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->where('id',$this->item);
                     });
                 }
-                if($this->plant != 'all'){
+                if($this->plant !== 'all'){
                     $query->whereHas('place',function($query){
                         $query->where('id',$this->plant);
                     });
                 }
-                if($this->warehouse != 'all'){
+                if($this->warehouse !== 'all'){
                     $query->whereHas('warehouse',function($query){
                         $query->where('id',$this->warehouse);
                     });
@@ -150,44 +150,47 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                 'cum_val' => number_format($row->total_final,2,',','.'),
             ];
             $array_filter[]=$data_tempura;
-            if ($row->item_id !== $previousId) {
-              
-                $query_first =
-                ItemCogs::where(function($query) use ( $row) {
-                    $query->where('item_id',$row->item_id)
-                    ->where('date', '<', $row->date);
-                    
-                    if($this->plant != 'all'){
-                        $query->whereHas('place',function($query){
-                            $query->where('id',$this->plant);
-                        });
-                    }
-                    if($this->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query){
-                            $query->where('id',$this->warehouse);
-                        });
-                    }
-                })
-                ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                ->orderBy('id','desc')
-                ->first();
+            
+            if($this->type !== 'final'){
+                if ($row->item_id !== $previousId) {
+                
+                    $query_first =
+                    ItemCogs::where(function($query) use ( $row) {
+                        $query->where('item_id',$row->item_id)
+                        ->where('date', '<', $row->date);
+                        
+                        if($this->plant !== 'all'){
+                            $query->whereHas('place',function($query){
+                                $query->where('id',$this->plant);
+                            });
+                        }
+                        if($this->warehouse !== 'all'){
+                            $query->whereHas('warehouse',function($query){
+                                $query->where('id',$this->warehouse);
+                            });
+                        }
+                    })
+                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                    ->orderBy('id','desc')
+                    ->first();
 
-                $array_last_item[] = [
-                    'perlu'        => 1,
-                    'item_id'      => $row->item->id,
-                    'id'           => $query_first->id ?? null,
-                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                    'area'         => $row->area->name ?? '-',
-                    'production_batch' => '-',
-                    'shading'      => $row->itemShading->code ?? '-',
-                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
-                    'item'         => $row->item->name,
-                    'satuan'       => $row->item->uomUnit->code,
-                    'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? $query_first->qty_final : 0,
-                ];
+                    $array_last_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row->item->id,
+                        'id'           => $query_first->id ?? null,
+                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'area'         => $row->area->name ?? '-',
+                        'production_batch' => '-',
+                        'shading'      => $row->itemShading->code ?? '-',
+                        'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                        'item'         => $row->item->name,
+                        'satuan'       => $row->item->uomUnit->code,
+                        'kode'         => $row->item->code,
+                        'last_qty'     => $query_first ? $query_first->qty_final : 0,
+                    ];
 
 
+                }
             }
             $previousId = $row->item_id;
             
@@ -197,7 +200,7 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
             
             
         }
-        if( $this->type != 'final'){
+        if( $this->type !== 'final'){
             if(!$this->item){
                 $query_no = ItemCogs::whereIn('id', function ($query) {            
                     $query->selectRaw('MAX(id)')
@@ -213,12 +216,12 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->whereDate('date','<=', $this->finish_date);
                     }
                     
-                    if($this->plant != 'all'){
+                    if($this->plant !== 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
                         });
                     }
-                    if($this->warehouse != 'all'){
+                    if($this->warehouse !== 'all'){
                         $query->whereHas('warehouse',function($query) {
                             $query->where('id',$this->warehouse);
                         });
@@ -252,12 +255,12 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->whereDate('date','<=', $this->finish_date);
                     }
                     
-                    if($this->plant != 'all'){
+                    if($this->plant !== 'all'){
                         $query->whereHas('place',function($query) {
                             $query->where('id',$this->plant);
                         });
                     }
-                    if($this->warehouse != 'all'){
+                    if($this->warehouse !== 'all'){
                         $query->whereHas('warehouse',function($query) {
                             $query->where('id',$this->warehouse);
                         });

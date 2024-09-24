@@ -231,45 +231,46 @@ class StockInRupiahController extends Controller
             ];
             $array_filter[]=$data_tempura;
             
-            
-            /* if ($row->item_id !== $previousId) {
-              
-                $query_first =
-                ItemCogs::where(function($query) use ( $request,$row) {
-                    $query->where('item_id',$row->item_id)
-                    ->where('date', '<', $row->date);
-                    
-                    if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
-                    }
-                    if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query) use($request){
-                            $query->where('id',$request->warehouse);
-                        });
-                    }
-                })
-                ->orderBy('id', 'desc')
-                ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                ->first();
-                $array_last_item[] = [
-                    'perlu'        => 1,
-                    'item_id'      => $row->item->id,
-                    'id'           => $query_first->id ?? null, 
-                    'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                    'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
-                    'item'         => $row->item->name,
-                    'satuan'       => $row->item->uomUnit->code,
-                    'area' => $row->area->name ?? '-',
-                    'production_batch' => '-',
-                    'shading' => $row->itemShading->code ?? '-',
-                    'kode'         => $row->item->code,
-                    'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
-                ];
+            if($request->type !== "final"){
+                if ($row->item_id !== $previousId) {
+                
+                    $query_first =
+                    ItemCogs::where(function($query) use ( $request,$row) {
+                        $query->where('item_id',$row->item_id)
+                        ->where('date', '<', $row->date);
+                        
+                        if($request->plant != 'all'){
+                            $query->whereHas('place',function($query) use($request){
+                                $query->where('id',$request->plant);
+                            });
+                        }
+                        if($request->warehouse != 'all'){
+                            $query->whereHas('warehouse',function($query) use($request){
+                                $query->where('id',$request->warehouse);
+                            });
+                        }
+                    })
+                    ->orderBy('id', 'desc')
+                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
+                    ->first();
+                    $array_last_item[] = [
+                        'perlu'        => 1,
+                        'item_id'      => $row->item->id,
+                        'id'           => $query_first->id ?? null, 
+                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                        'item'         => $row->item->name,
+                        'satuan'       => $row->item->uomUnit->code,
+                        'area' => $row->area->name ?? '-',
+                        'production_batch' => '-',
+                        'shading' => $row->itemShading->code ?? '-',
+                        'kode'         => $row->item->code,
+                        'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
+                    ];
 
 
-            } */
+                }
+            }
             $previousId = $row->item_id;
             
             if($uom_unit ===null){

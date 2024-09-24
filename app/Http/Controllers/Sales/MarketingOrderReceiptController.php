@@ -330,7 +330,8 @@ class MarketingOrderReceiptController extends Controller
                 $arr_id = [];
                 foreach($request->arr_id as $row){
                     $moi = MarketingOrderInvoice::where('code',CustomHelper::decrypt($row))->first();
-                    $grandtotal += $moi->balancePaymentIncoming();
+                    /* $grandtotal += $moi->balancePaymentIncoming(); */
+                    $grandtotal += $moi->grandtotal;
                     $arr_id[] = $moi->id;
                 }
                 

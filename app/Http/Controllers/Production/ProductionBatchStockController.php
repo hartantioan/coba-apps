@@ -86,34 +86,34 @@ class ProductionBatchStockController extends Controller
         $all_total = 0;
     
         foreach($query_data as $row){
-
             $arr = $row->infoFg();
-
-            $priceNow = $arr['qty'] > 0 ? $arr['total'] / $arr['qty'] : 0;
-        
-            $all_total += round($arr['total'],2);
+            if($arr['qty'] > 0){
+                $priceNow = $arr['total'] / $arr['qty'];
             
-            $data_tempura = [
-                'item_id'      => $row->item->id,
-                'perlu'        => 0,
-                'plant' => $row->place->code,
-                'warehouse' => $row->warehouse->name,
-                'item' => $row->item->name,
-                'satuan' => $row->item->uomUnit->code,
-                'kode' => $row->item->code,
-                'area' => $row->area->name ?? '-',
-                'shading' => $row->itemShading->code ?? '-',
-                'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                'final'=>number_format($priceNow,2,',','.'),
-                'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
-                'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($arr['qty']),
-                'date' =>  date('d/m/Y',strtotime($row->date)),
-                'document' => $row->lookable->code,
-                'cum_qty' => CustomHelper::formatConditionalQty($arr['qty']),
-                'cum_val' => number_format($arr['total'],2,',','.'),
-            ];
+                $all_total += round($arr['total'],2);
+                
+                $data_tempura = [
+                    'item_id'      => $row->item->id,
+                    'perlu'        => 0,
+                    'plant' => $row->place->code,
+                    'warehouse' => $row->warehouse->name,
+                    'item' => $row->item->name,
+                    'satuan' => $row->item->uomUnit->code,
+                    'kode' => $row->item->code,
+                    'area' => $row->area->name ?? '-',
+                    'shading' => $row->itemShading->code ?? '-',
+                    'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
+                    'final'=>number_format($priceNow,2,',','.'),
+                    'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
+                    'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($arr['qty']),
+                    'date' =>  date('d/m/Y',strtotime($row->date)),
+                    'document' => $row->lookable->code,
+                    'cum_qty' => CustomHelper::formatConditionalQty($arr['qty']),
+                    'cum_val' => number_format($arr['total'],2,',','.'),
+                ];
 
-            $array_filter[]=$data_tempura;
+                $array_filter[]=$data_tempura;
+            }
         }
       
         $end_time = microtime(true);

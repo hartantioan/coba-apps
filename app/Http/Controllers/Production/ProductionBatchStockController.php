@@ -82,10 +82,6 @@ class ProductionBatchStockController extends Controller
         
         $cum_qty = 0;
         $cum_val = 0 ;
-        
-        $firstDate = null;
-        $uom_unit = null;
-        $previousId = null;
         $array_last_item = [];
         $array_first_item = [];
         $all_total = 0;

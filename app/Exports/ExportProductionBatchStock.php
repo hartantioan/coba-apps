@@ -53,6 +53,7 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                 });
             }
         })
+        ->where('qty_final','>',0)
         ->whereHas('productionBatch')
         ->orderBy('date', 'desc')
         ->get();

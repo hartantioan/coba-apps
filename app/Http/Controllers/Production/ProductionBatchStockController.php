@@ -76,6 +76,7 @@ class ProductionBatchStockController extends Controller
             }
 
         })
+        ->where('qty_final','>',0)
         ->whereHas('productionBatch')
         ->orderBy('date', 'desc')
         ->get();

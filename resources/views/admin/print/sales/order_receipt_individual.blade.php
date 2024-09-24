@@ -227,7 +227,7 @@
                     </table>
                     
                     <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row" style="margin-top:10px;">
+                    <div class="invoice-subtotal break-row" style="margin-top:2px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="100%" class="left-align">
@@ -345,7 +345,7 @@
                     </table>
                     
                     <!-- invoice subtotal -->
-                    <div class="invoice-subtotal break-row" style="margin-top:10px;">
+                    <div class="invoice-subtotal break-row" style="margin-top:2px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="100%" class="left-align">

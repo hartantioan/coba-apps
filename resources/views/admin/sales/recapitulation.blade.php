@@ -38,6 +38,11 @@
                                                 <div id="validation_alert_multi" style="display:none;"></div>
                                             </div>
                                             <div class="col s12">
+                                                <div class="card-alert card green">
+                                                    <div class="card-content white-text">
+                                                        <p>INFO : Untuk Ekspor CSV Pajak, data yang diambil adalah sesuai urutan dari ARDP (AR Down Payment)kemudian ARIN (AR Invoice).</p>
+                                                    </div>
+                                                </div>
                                                 <div class="row">
                                                     <div class="col m3 s6 ">
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>

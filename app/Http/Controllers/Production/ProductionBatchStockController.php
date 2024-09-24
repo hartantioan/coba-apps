@@ -121,7 +121,7 @@ class ProductionBatchStockController extends Controller
         $execution_time = ($end_time - $start_time);
        
         $response =[
-            'status'=>200,
+            'status'        =>200,
             'message'       => $array_filter,
             'latest'        => $array_last_item,
             'first'         => $array_first_item,

@@ -47,7 +47,7 @@
                                                         <label for="end_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="end_date" name="end_date" value="{{ date('Y-m-d') }}">
                                                     </div>
-                                                    <div class="col m4 s6 pt-2">
+                                                    <div class="col m6 s6 pt-2">
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="filterByDate();">
                                                             <i class="material-icons hide-on-med-and-up">search</i>
                                                             <span class="hide-on-small-onl">Filter</span>
@@ -61,6 +61,11 @@
                                                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportExcel();">
                                                             <i class="material-icons hide-on-med-and-up">view_list</i>
                                                             <span class="hide-on-small-onl">Excel</span>
+                                                            <i class="material-icons right">view_list</i>
+                                                        </a>
+                                                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn mr-3" href="javascript:void(0);" onclick="exportCsv();">
+                                                            <i class="material-icons hide-on-med-and-up">view_list</i>
+                                                            <span class="hide-on-small-onl">CSV PAJAK</span>
                                                             <i class="material-icons right">view_list</i>
                                                         </a>
                                                     </div>
@@ -135,6 +140,10 @@
     function exportExcel(){
         var start_date = $('#start_date').val(), end_date = $('#end_date').val();
         window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date;
+    }
+    function exportCsv(){
+        var start_date = $('#start_date').val(), end_date = $('#end_date').val();
+        window.location = "{{ Request::url() }}/export_csv?start_date=" + start_date + "&end_date=" + end_date;
     }
     function filterByDate(){
         var formData = new FormData($('#form_data_filter')[0]);

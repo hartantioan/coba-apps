@@ -288,6 +288,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserData');
     }
 
+    public function userDataDefault(){
+        return $this->userData()->whereNotNull('is_default')->first();
+    }
+
     public function userDestination(){
         return $this->hasMany('App\Models\UserDestination');
     }

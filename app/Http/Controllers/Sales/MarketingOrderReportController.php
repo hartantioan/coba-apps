@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Sales;
 use App\Exports\ExportMarketingRecapitulation;
+use App\Exports\ExportMarketingRecapitulationCsv;
 use App\Http\Controllers\Controller;
 use App\Models\MarketingOrder;
 use Illuminate\Http\Request;
@@ -82,5 +83,9 @@ class MarketingOrderReportController extends Controller
 
     public function export(Request $request){
 		return Excel::download(new ExportMarketingRecapitulation($request->start_date,$request->end_date), 'sales_recapitulation_'.uniqid().'.xls');
+    }
+
+    public function exportCsv(Request $request){
+		return Excel::download(new ExportMarketingRecapitulationCsv($request->start_date,$request->end_date), 'sales_csv_'.uniqid().'.csv', \Maatwebsite\Excel\Excel::CSV);
     }
 }

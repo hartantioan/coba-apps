@@ -2689,6 +2689,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('/',[MarketingOrderReportController::class, 'index']);
                         Route::post('filter_by_date',[MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export',[MarketingOrderReportController::class, 'export']);
+                        Route::get('export_csv',[MarketingOrderReportController::class, 'exportCsv']);
                     });
 
                     Route::prefix('stock_finished_good')->middleware('operation.access:stock_finished_good,view')->group(function () {

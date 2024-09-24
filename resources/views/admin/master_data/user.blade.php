@@ -2579,9 +2579,11 @@
                     `);
                 }
 
-                $('#district_id').append(`
-                    <option value="` + response.district_id + `">` + response.district_name + `</option>
-                `);
+                if(response.district_name){
+                    $('#district_id').append(`
+                        <option value="` + response.district_id + `">` + response.district_name + `</option>
+                    `);
+                }
 
                 $('#id_card').val(response.id_card);
                 $('#id_card_address').val(response.id_card_address);

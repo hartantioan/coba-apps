@@ -1385,6 +1385,7 @@ class UserController extends Controller
         $user = User::find($request->id);
         $user['province_name'] = $user->province()->exists() ? $user->province->code.' - '.$user->province->name : '';
         $user['city_name'] = $user->city()->exists() ? $user->city->code.' - '.$user->city->name : '';
+        $user['district_name'] = $user->district()->exists() ? $user->district->code.' - '.$user->district->name : '';
         $user['country_name'] = $user->country()->exists() ? $user->country->name : '';
         $user['limit_credit'] = number_format($user->limit_credit, 0, ',', '.');
         $user['cities'] = $user->province()->exists() ? $user->province->getCity() : '';

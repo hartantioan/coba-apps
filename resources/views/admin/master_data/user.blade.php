@@ -1319,6 +1319,32 @@
         select2ServerSide('#province_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#province_area_id', '{{ url("admin/select2/province") }}');
         select2ServerSide('#city_id', '{{ url("admin/select2/city") }}');
+        
+        $('#district_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/district_by_city") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        city: $("#city_id").select2().find(":selected").data("code"),
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
         select2ServerSide('#country_id', '{{ url("admin/select2/country") }}');
         select2ServerSide('#arr_user', '{{ url("admin/select2/employee") }}');
         select2ServerSide('#brand_id', '{{ url("admin/select2/brand") }}');
@@ -1583,7 +1609,7 @@
         if($('#province_id').val()){
             $.each($('#province_id').select2('data')[0].cities, function(i, value) {
                 $('#city_id').append(`
-                    <option value="` + value.id + `" data-district='` + JSON.stringify(value.district) + `'>` + value.code + ` - `  + value.name + `</option>
+                    <option value="` + value.id + `" data-code="` + value.code + `">` + value.code + ` - `  + value.name + `</option>
                 `);
             });
         }
@@ -1594,6 +1620,7 @@
             <option value="">--{{ __('translations.select') }}--</option>
         `);
         if($('#city_id').val()){
+            console.log($("#city_id").select2().find(":selected").data("district"));
             $.each($("#city_id").select2().find(":selected").data("district"), function(i, value) {
                 $('#district_id').append(`
                     <option value="` + value.id + `">` + value.code + ` - ` + value.name + `</option>
@@ -2536,33 +2563,14 @@
                     select2ServerSide('#manager_id', '{{ url("admin/select2/employee") }}');
                 }
                 
-                $('#district_id,#city_id').empty().append(`
-                    <option value="">--{{ __('translations.select') }}--</option>
-                `);
+                $('#district_id,#city_id').empty();
 
                 if(response.cities){
                     $.each(response.cities, function(i, val) {
                         $('#city_id').append(`
-                            <option value="` + val.id + `" ` + (val.id == response.city_id ? 'selected' : '') + `>` + val.code + ` - ` + val.name + `</option>
+                            <option value="` + val.id + `" data-code="` + val.code + `" ` + (val.id == response.city_id ? 'selected' : '') + `>` + val.code + ` - ` + val.name + `</option>
                         `);
                     });
-
-                    let index = -1;
-
-                    $.each(response.cities, function(i, val) {
-                        if(val.id == response.city_id){
-                            index = i;
-                        }
-                    });
-
-                    if(index >= 0){
-                        $.each(response.cities[index].district, function(i, value) {
-                            let selected = '';
-                            $('#district_id').append(`
-                                <option value="` + value.id + `" ` + (value.id == response.district_id ? 'selected' : '') + `>` + value.code + ` - ` + value.name + `</option>
-                            `);
-                        });
-                    }
                 }
 
                 if(response.country_id){
@@ -2570,6 +2578,10 @@
                         <option value="` + response.country_id + `">` + response.country_name + `</option>
                     `);
                 }
+
+                $('#district_id').append(`
+                    <option value="` + response.district_id + `">` + response.district_name + `</option>
+                `);
 
                 $('#id_card').val(response.id_card);
                 $('#id_card_address').val(response.id_card_address);

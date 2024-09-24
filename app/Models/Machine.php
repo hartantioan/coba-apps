@@ -16,7 +16,6 @@ class Machine extends Model
     protected $dates = ['deleted_at'];
     protected $fillable = [
         'code',
-        'line_id',
         'name',
         'note',
         'status'
@@ -48,7 +47,7 @@ class Machine extends Model
         return $status;
     }
 
-    public function line(){
-        return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
-    }
+    // public function line(){
+    //     return $this->belongsTo('App\Models\Line','line_id','id')->withTrashed();
+    // }
 }

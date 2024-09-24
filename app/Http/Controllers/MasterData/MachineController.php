@@ -33,7 +33,6 @@ class MachineController extends Controller
         $column = [
             'id',
             'code',
-            'line_id',
             'name',
             'note',
         ];
@@ -51,15 +50,7 @@ class MachineController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('line',function($query) use ($search, $request) {
-                                $query->where('code', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ->orWhereHas('place',function($query) use ($search, $request) {
-                                        $query->where('code', 'like', "%$search%")
-                                            ->orWhere('name', 'like', "%$search%");
-                                    });
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
@@ -77,15 +68,7 @@ class MachineController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
-                            ->orWhere('note', 'like', "%$search%")
-                            ->orWhereHas('line',function($query) use ($search, $request) {
-                                $query->where('code', 'like', "%$search%")
-                                    ->orWhere('name', 'like', "%$search%")
-                                    ->orWhereHas('place',function($query) use ($search, $request) {
-                                        $query->where('code', 'like', "%$search%")
-                                            ->orWhere('name', 'like', "%$search%");
-                                    });
-                            });
+                            ->orWhere('note', 'like', "%$search%");
                     });
                 }
 
@@ -103,7 +86,6 @@ class MachineController extends Controller
                 $response['data'][] = [
                     $nomor,
                     $val->code,
-                    $val->line->name.' - '.$val->line->place->name,
                     $val->name,
                     $val->note,
                     $val->status(),
@@ -133,12 +115,11 @@ class MachineController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'code' 				=> $request->temp ? ['required', Rule::unique('machines', 'code')->ignore($request->temp)] : 'required|unique:machines,code',
-            'line_id'           => 'required',
+           
             'name'              => 'required',
         ], [
             'code.required' 	    => 'Kode tidak boleh kosong.',
             'code.unique'           => 'Kode telah terpakai.',
-            'line_id.required'      => 'Line tidak boleh kosong.',
             'name.required'         => 'Nama tidak boleh kosong.',
         ]);
 
@@ -153,7 +134,6 @@ class MachineController extends Controller
                 try {
                     $query = Machine::find($request->temp);
                     $query->code            = $request->code;
-                    $query->line_id         = $request->line_id;
                     $query->name	        = $request->name;
                     $query->note            = $request->note;
                     $query->status          = $request->status ? $request->status : '2';
@@ -167,7 +147,6 @@ class MachineController extends Controller
                 try {
                     $query = Machine::create([
                         'code'          => $request->code,
-                        'line_id'       => $request->line_id,
                         'name'			=> $request->name,
                         'note'          => $request->note,
                         'status'        => $request->status ? $request->status : '2'

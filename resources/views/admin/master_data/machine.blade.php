@@ -85,7 +85,6 @@
                                                     <tr>
                                                         <th>#</th>
                                                         <th>{{ __('translations.code') }}</th>
-                                                        <th>Line-Plant</th>
                                                         <th>{{ __('translations.name') }}</th>
                                                         <th>{{ __('translations.note') }}</th>
                                                         <th>{{ __('translations.status') }}</th>
@@ -122,14 +121,14 @@
                             <input id="code" name="code" type="text" placeholder="Kode">
                             <label class="active" for="code">{{ __('translations.code') }}</label>
                         </div>
-                        <div class="input-field col s12 m6">
+                        {{-- <div class="input-field col s12 m6">
                             <select id="line_id" name="line_id">
                                 @foreach($line as $row)
                                     <option value="{{ $row->id }}">{{ $row->code.' - '.$row->name }}</option>
                                 @endforeach
                             </select>
                             <label for="line_id">{{ __('translations.line') }}</label>
-                        </div>
+                        </div> --}}
                         <div class="input-field col s12 m6">
                             <input id="name" name="name" type="text" placeholder="Nama">
                             <label class="active" for="name">{{ __('translations.name') }}</label>
@@ -258,7 +257,6 @@
             columns: [
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'code', className: 'center-align' },
-                { name: 'line_id', className: 'center-align' },
                 { name: 'name', className: 'center-align' },
                 { name: 'note', className: 'center-align' },
                 { name: 'status', searchable: false, orderable: false, className: 'center-align' },
@@ -392,7 +390,6 @@
                 $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#code').val(response.code);
-                $('#line_id').val(response.line_id).formSelect();
                 $('#name').val(response.name);
                 $('#note').val(response.note);
                 if(response.status == '1'){

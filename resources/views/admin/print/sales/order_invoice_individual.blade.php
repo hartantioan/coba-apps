@@ -183,7 +183,7 @@
                                     </tr>
                                 </table>
                             </td>
-                            <td width="40%" class="left-align" style="padding-top: 0">
+                            <td width="40%" class="left-align" style="padding-top: 0px">
                                 <table border="0" width="100%" >
                                     <tr>
                                         <td width="50%">
@@ -210,30 +210,21 @@
 
                     <table border="0" width="100%">
                         <tr>
-                            <td width="60%" class="left-align">
-                                <table border="0" width="100%">
-                                    <tr>
-                                        <td width="20%">
-                                            
-                                        </td>
-                                        
-                                        <td width="80%">
-                                            {{ $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="20%">
-                                            
-                                        </td>
-                                        
-                                        <td width="80%">
-                                            {{ $data->marketingOrderDeliveryProcess->code }}
-                                        </td>
-                                    </tr>
-                                </table>
+                            <td width="11%">
+                                
                             </td>
-                            <td width="40%" class="left-align">
-                               
+                            
+                            <td width="80%">
+                                {{ $data->marketingOrderDeliveryProcess->marketingOrderDelivery->code }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="11%">
+                                
+                            </td>
+                            
+                            <td width="80%">
+                                {{ $data->marketingOrderDeliveryProcess->code }}
                             </td>
                         </tr>
                     </table>

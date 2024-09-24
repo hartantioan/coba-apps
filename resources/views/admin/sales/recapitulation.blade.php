@@ -40,7 +40,7 @@
                                             <div class="col s12">
                                                 <div class="card-alert card green">
                                                     <div class="card-content white-text">
-                                                        <p>INFO : Untuk Ekspor CSV Pajak, data yang diambil adalah sesuai urutan dari ARDP (AR Down Payment)kemudian ARIN (AR Invoice).</p>
+                                                        <p>INFO : Untuk Ekspor CSV Pajak, data yang diambil adalah sesuai urutan dari ARDP (AR Down Payment) kemudian ARIN (AR Invoice).</p>
                                                     </div>
                                                 </div>
                                                 <div class="row">

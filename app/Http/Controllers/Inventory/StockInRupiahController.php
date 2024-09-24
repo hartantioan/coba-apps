@@ -277,7 +277,7 @@ class StockInRupiahController extends Controller
             }
         }
 
-        if($request->type != 'final'){
+        if($request->type !== 'final'){
             if(!$request->item_id){
                 $query_no = ItemCogs::whereIn('id', function ($query) use ($request) {            
                     $query->selectRaw('MAX(id)')

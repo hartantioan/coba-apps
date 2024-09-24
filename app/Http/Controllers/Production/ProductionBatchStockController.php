@@ -80,12 +80,7 @@ class ProductionBatchStockController extends Controller
         ->orderBy('date', 'desc')
         ->get();
         
-        $cum_qty = 0;
         $cum_val = 0 ;
-        
-        $firstDate = null;
-        $uom_unit = null;
-        $previousId = null;
         $array_last_item = [];
         $array_first_item = [];
         $all_total = 0;
@@ -119,85 +114,7 @@ class ProductionBatchStockController extends Controller
             ];
 
             $array_filter[]=$data_tempura;
-            
-            if ($row->item_id !== $previousId) {
-              
-                $query_first =
-                ItemCogs::where(function($query) use ( $request,$row) {
-                    $query->where('item_id',$row->item_id)
-                    ->where('date', '<', $row->date);
-                    
-                    if($request->plant != 'all'){
-                        $query->whereHas('place',function($query) use($request){
-                            $query->where('id',$request->plant);
-                        });
-                    }
-                    if($request->warehouse != 'all'){
-                        $query->whereHas('warehouse',function($query) use($request){
-                            $query->where('id',$request->warehouse);
-                        });
-                    }
-                })
-                ->orderBy('id', 'desc')
-                ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                ->first();
-
-                if($query_first){
-                    $arrFirst = $query_first->infoFg();
-                    $array_last_item[] = [
-                        'perlu'        => 1,
-                        'item_id'      => $row->item->id,
-                        'id'           => $query_first->id ?? null, 
-                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                        'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
-                        'item'         => $row->item->name,
-                        'satuan'       => $row->item->uomUnit->code,
-                        'area'         => $row->area->code ?? '-',
-                        'production_batch' => '-',
-                        'shading' => $row->shading->code ?? '-',
-                        'kode'         => $row->item->code,
-                        'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
-                    ];
-                }
-            }
-            $previousId = $row->item_id;
-            
-            if($uom_unit ===null){
-                $uom_unit = $row->item->uomUnit->code;
-            }
         }
-
-        $combinedArray = [];
-
-        // Merge $array_filter into $combinedArray
-        foreach ($array_filter as $item) {
-            $combinedArray[] = $item;
-        }
-
-        // Merge $array_last_item into $combinedArray
-        foreach ($array_last_item as $item) {
-            $combinedArray[] = $item;
-        }
-
-        // Merge $array_first_item into $combinedArray
-        foreach ($array_first_item as $item) {
-            $combinedArray[] = $item;
-        }
-        
-        usort($combinedArray, function ($a, $b) {
-            // First, sort by 'kode' in ascending order
-            $kodeComparison = strcmp($a['kode'], $b['kode']);
-            
-            if ($kodeComparison !== 0) {
-                return $kodeComparison;
-            }
-        
-            // If 'kode' is the same, prioritize 'perlu' in descending order
-            return $b['perlu'] - $a['perlu'];
-        });
-       
-        $combinedArray=$array_filter;
- 
       
         $end_time = microtime(true);
        
@@ -205,7 +122,7 @@ class ProductionBatchStockController extends Controller
        
         $response =[
             'status'=>200,
-            'message'       => $combinedArray,
+            'message'       => $array_filter,
             'latest'        => $array_last_item,
             'first'         => $array_first_item,
             'perlu'         => $perlu,

@@ -78,7 +78,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             ];
             foreach($row->marketingOrderInvoiceDetail as $rowdetail){
                 $arr[] = [
-                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.round($rowdetail->tax,2).';0;0;;;;;;;;;;',
+                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,0).';0;'.round($rowdetail->total,0).';'.floor($rowdetail->tax).';0;0;;;;;;;;;;',
                 ];
             }
         }

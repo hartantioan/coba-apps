@@ -153,7 +153,7 @@
                     <td align="center" width="33%">
                         <img src="{{ $image }}" width="50%" style="position: absolute; top:5px; width:20%">
                     </td>
-                    <td align="center" width="33%" style="padding-top:10px;font-size:25px !important;">
+                    <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
                         <b>{{ $title }}</b>
                     </td>
                     <td align="center" width="33%" style="padding-top:10px;">
@@ -241,7 +241,7 @@
                         </table>
                     </div>
 
-                    <div class="invoice-subtotal break-row" style="margin-top:10px;">
+                    <div class="invoice-subtotal break-row" style="margin-top:2px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="70%" style="border:1px solid black;padding:10px;">
@@ -265,13 +265,13 @@
             </div>
         </main>
         <hr style="border: 1px dashed #000000;">
-        <div style="margin-top:5px;">
+        <div style="margin-top:15px;">
             <table border="0" width="100%">
                 <tr>
                     <td width="33%">
                         <img src="{{ $image }}" width="50%" style="top:5px; width:60%">
                     </td>
-                    <td align="center" width="33%" style="padding-top:10px;font-size:25px !important;">
+                    <td align="center" width="33%" style="padding-top:10px;font-size:20px !important;">
                         <b>{{ $title }}</b>
                     </td>
                     <td align="center" width="33%" style="padding-top:10px;">
@@ -359,7 +359,7 @@
                         </table>
                     </div>
 
-                    <div class="invoice-subtotal break-row" style="margin-top:10px;">
+                    <div class="invoice-subtotal break-row" style="margin-top:2px;">
                         <table border="0" width="100%">
                             <tr>
                                 <td width="70%" style="border:1px solid black;padding:10px;">

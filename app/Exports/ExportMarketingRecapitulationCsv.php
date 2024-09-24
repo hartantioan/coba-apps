@@ -62,7 +62,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 '1'     => 'FK;01;0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->account->userDataDefault()->npwp.';'.$row->account->userDataDefault()->title.';'.$row->account->userDataDefault()->address.';'.round($row->total,0).';'.round($row->tax,0).';0;;1;'.round($row->total,2).';'.round($row->tax,2).';0;'.$row->code.';;'
             ];
             $arr[] = [
-                '1'     => 'OF;1;'.$row->note.';'.round($row->total,2).';1.00;'.round($row->total,2).';0;'.round($row->total,2).';'.round($row->tax,2).';0;0;;;;;;;;'.$row->code.';;',
+                '1'     => 'OF;1;'.$row->note.';'.round($row->total,2).';1.00;'.round($row->total,2).';0;'.round($row->total,2).';'.round($row->tax,2).';0;0;;;;;;;;;;',
             ];
         }
         
@@ -78,7 +78,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             ];
             foreach($row->marketingOrderInvoiceDetail as $rowdetail){
                 $arr[] = [
-                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.$rowdetail->price.';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.round($rowdetail->tax,2).';0;0;;;;;;;;'.$row->code.';;',
+                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.$rowdetail->price.';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.round($rowdetail->tax,2).';0;0;;;;;;;;;;',
                 ];
             }
         }

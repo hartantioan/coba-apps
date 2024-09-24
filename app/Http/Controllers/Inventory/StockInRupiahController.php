@@ -232,7 +232,7 @@ class StockInRupiahController extends Controller
             $array_filter[]=$data_tempura;
             
             
-            if ($row->item_id !== $previousId) {
+            /* if ($row->item_id !== $previousId) {
               
                 $query_first =
                 ItemCogs::where(function($query) use ( $request,$row) {
@@ -269,7 +269,7 @@ class StockInRupiahController extends Controller
                 ];
 
 
-            }
+            } */
             $previousId = $row->item_id;
             
             if($uom_unit ===null){

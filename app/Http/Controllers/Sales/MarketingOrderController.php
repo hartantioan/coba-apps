@@ -135,6 +135,7 @@ class MarketingOrderController extends Controller
             $cek_discount = CustomerDiscount::where('account_id',$user->id)
             ->where('brand_id',$item->brand_id)
             ->where('city_id',$city)
+            ->where('type_id',$item->type_id)
             ->where('payment_type',$payment_type)
             ->where('status','1')
             ->first() ?? 0;

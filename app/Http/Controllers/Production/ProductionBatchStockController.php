@@ -118,52 +118,7 @@ class ProductionBatchStockController extends Controller
                 ];
 
                 $array_filter[]=$data_tempura;
-                
-                if ($row->item_id !== $previousId) {
-                
-                    $query_first =
-                    ItemCogs::where(function($query) use ( $request,$row) {
-                        $query->where('item_id',$row->item_id)
-                        ->where('date', '<', $row->date);
-                        
-                        if($request->plant != 'all'){
-                            $query->whereHas('place',function($query) use($request){
-                                $query->where('id',$request->plant);
-                            });
-                        }
-                        if($request->warehouse != 'all'){
-                            $query->whereHas('warehouse',function($query) use($request){
-                                $query->where('id',$request->warehouse);
-                            });
-                        }
-                    })
-                    ->orderBy('id', 'desc')
-                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
-                    ->first();
-
-                    if($query_first){
-                        $arrFirst = $query_first->infoFg();
-                        $array_last_item[] = [
-                            'perlu'        => 1,
-                            'item_id'      => $row->item->id,
-                            'id'           => $query_first->id ?? null, 
-                            'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                            'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
-                            'item'         => $row->item->name,
-                            'satuan'       => $row->item->uomUnit->code,
-                            'area'         => $row->area->code ?? '-',
-                            'production_batch' => '-',
-                            'shading' => $row->shading->code ?? '-',
-                            'kode'         => $row->item->code,
-                            'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
-                        ];
-                    }
-                }
-                $previousId = $row->item_id;
-                
-                if($uom_unit ===null){
-                    $uom_unit = $row->item->uomUnit->code;
-                }
+            
             }
         }
 

@@ -3161,7 +3161,7 @@ class Select2Controller extends Controller {
             });
         })
         ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-            $query->whereIn('status',['4','5']);
+            $query->whereIn('status',['3','4','5']);
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")

@@ -1307,12 +1307,12 @@ class MarketingOrderDeliveryProcessController extends Controller
             }
             $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
 
-            if($data->weight_netto <= 0){
+            /* if($data->weight_netto <= 0){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Surat Jalan belum ditimbang / qty netto 0, silahkan timbang terlebih dahulu.'
                 ]);
-            }
+            } */
 
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status',$request->status_tracking)->first();
             if($cek){

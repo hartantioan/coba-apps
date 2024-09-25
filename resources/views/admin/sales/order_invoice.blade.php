@@ -1848,10 +1848,12 @@
             beforeSend: function() {
             },
             success: function(response) {
-                printService.submit({
-                    'type': 'INVOICE',
-                    'url': response.message
-                });
+                loadingClose('.modal-content');
+                window.open(response.message, '_blank');
+                // printService.submit({
+                //     'type': 'INVOICE',
+                //     'url': response.message
+                // });
             },
             error: function() {
                 swal({
@@ -2641,5 +2643,18 @@
                 });
             }
         });
+    }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var type = $('#filter_type').val();
+        var account = $('#filter_account').val();
+        var company = $('#filter_company').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type=" + type + "&account=" + account + "&company=" + company  + "&end_date=" + end_date + "&start_date=" + start_date;
+       
     }
 </script>

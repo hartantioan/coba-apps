@@ -246,6 +246,7 @@
                                                 <tr>
                                                     <th class="center">{{ __('translations.item') }}</th>
                                                     <th class="center">Ambil Dari</th>
+                                                    <th class="center">Tujuan</th>
                                                     <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan Stock</th>
                                                     <th class="center">Serial</th>
@@ -993,6 +994,7 @@
                                 <tr>
                                     <td>` + val.name + `</td>
                                     <td>` + val.origin + `</td>
+                                    <td>` + val.destination + `</td>
                                     <td class="center-align">` + val.qty + `</td>
                                     <td>` + val.unit + `</td>
                                     <td>` + val.list_serial + `</td>

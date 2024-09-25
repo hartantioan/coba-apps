@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use App\Http\Controllers\Controller;
 use App\Models\Item;
+use App\Models\ItemGroup;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
 use App\Models\Place;
@@ -25,6 +26,7 @@ use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Exports\ExportInventoryTransferOut;
 use App\Exports\ExportInventoryTransferOutTransactionPage;
+use App\Models\ItemGroupWarehouse;
 use App\Models\ItemSerial;
 use App\Models\Menu;
 use App\Models\MenuUser;
@@ -357,15 +359,25 @@ class InventoryTransferOutController extends Controller
             $passedSameStockAndArea = true;
             $passedQty = true;
             $arrItemNotPassed = [];
+            $arr_no_stock = [];
+            $passed_stock = true;
             
             foreach($request->arr_item as $key => $row){
                 $qtyout = str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
                 $item = Item::find(intval($row));
+                $itemGroup_warehouse = $item->itemGroup->itemGroupWarehouse->pluck('id')->toArray();
+                $item_stock_to = in_array($request->warehouse_to, $itemGroup_warehouse);
+              
+                if(!$item_stock_to){
+                    $arr_no_stock[]=$item->name;  
+                    $passed_stock = false;
+                }
                 $itemCogsBefore = ItemCogs::where('place_id',$request->place_from)->where('warehouse_id',$request->warehouse_from)->where('item_id',$row)->whereDate('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                 $itemCogsAfter = ItemCogs::where('place_id',$request->place_from)->where('warehouse_id',$request->warehouse_from)->where('item_id',$row)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();
-
+                
                 if($itemCogsBefore){
                     if($itemCogsBefore->qty_final < $qtyout){
+                  
                         $passed = false;
                         $arrItemNotPassed[] = $item->name;
                     }else{
@@ -383,6 +395,7 @@ class InventoryTransferOutController extends Controller
                     }
                 }else{
                     $passed = false;
+                    $arrItemNotPassed[] = $item->name;
                 }
 
                 if(!in_array(intval($request->warehouse_to),$item->arrWarehouse())){
@@ -410,6 +423,13 @@ class InventoryTransferOutController extends Controller
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Maaf, Stok dan Area tujuan tidak boleh sama.',
+                ]);
+            }
+
+            if($passed_stock == false){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Maaf, pada tanggal '.date('d/m/Y',strtotime($request->post_date)).', barang '.implode(", ",$arr_no_stock).', item masih belum ada di plant dan gudang yang dituju mohon ditambahkan di master data terlebih dahulu',
                 ]);
             }
 

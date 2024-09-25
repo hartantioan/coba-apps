@@ -2566,6 +2566,7 @@ class Select2Controller extends Controller {
                     $details[] = [
                         'name'          => $row->item->code.' - '.$row->item->name,
                         'origin'        => $row->itemStock->place->code.' - '.$row->itemStock->warehouse->name.' - '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '').' - Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
+                        'destination'   => $row->inventoryTransferOut->warehouseTo->name,
                         'qty'           => CustomHelper::formatConditionalQty($row->qty),
                         'unit'          => $row->item->uomUnit->code,
                         'note'          => $row->note ? $row->note : '',

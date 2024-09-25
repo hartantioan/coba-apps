@@ -2503,6 +2503,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[MarketingOrderDownPaymentController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderDownPaymentController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [MarketingOrderDownPaymentController::class, 'removeUsedData']);
+                    Route::get('export_from_page',[MarketingOrderDownPaymentController::class, 'exportFromTransactionPage']);
                     Route::post('send_used_data',[MarketingOrderDownPaymentController::class, 'sendUsedData'])->middleware('operation.access:sales_down_payment,update');
                     Route::get('view_journal/{id}',[MarketingOrderDownPaymentController::class, 'viewJournal'])->middleware('operation.access:sales_down_payment,journal');
                     Route::post('create',[MarketingOrderDownPaymentController::class, 'create'])->middleware('operation.access:sales_down_payment,update');
@@ -2542,6 +2543,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [MarketingOrderDeliveryProcessController::class, 'show']);
                     Route::post('get_code', [MarketingOrderDeliveryProcessController::class, 'getCode']);
                     Route::post('get_stock_by_barcode', [MarketingOrderDeliveryProcessController::class, 'getStockByBarcode']);
+                    Route::get('export_from_page',[MarketingOrderDeliveryProcessController::class, 'exportFromTransactionPage']);
                     Route::post('print',[MarketingOrderDeliveryProcessController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderDeliveryProcessController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderDeliveryProcessController::class, 'viewStructureTree']);
@@ -2572,6 +2574,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [MarketingOrderReturnController::class, 'getCode']);
                     Route::post('print',[MarketingOrderReturnController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderReturnController::class, 'printByRange']);
+                    Route::get('export_from_page',[MarketingOrderReturnController::class, 'exportFromTransactionPage']);
                     Route::get('viewstructuretree',[MarketingOrderReturnController::class, 'viewStructureTree']);
                     Route::post('remove_used_data', [MarketingOrderReturnController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}',[MarketingOrderReturnController::class, 'viewJournal'])->middleware('operation.access:marketing_order_return,journal');
@@ -2585,6 +2588,7 @@ Route::prefix('admin')->group(function () {
 
                 Route::prefix('marketing_order_invoice')->middleware(['operation.access:marketing_order_invoice,view','lockacc'])->group(function () {
                     Route::get('/',[MarketingOrderInvoiceController::class, 'index']);
+                    Route::get('export_from_page',[MarketingOrderInvoiceController::class, 'exportFromTransactionPage']);
                     Route::get('datatable',[MarketingOrderInvoiceController::class, 'datatable']);
                     Route::get('row_detail',[MarketingOrderInvoiceController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderInvoiceController::class, 'show']);

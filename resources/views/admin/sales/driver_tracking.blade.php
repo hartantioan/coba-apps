@@ -57,22 +57,7 @@
                             </a>
                             @endif
                         </div>
-                        <div class="col l2 m6 s6 p-3 center-align">
-                            <div class="card z-depth-0 grey lighten-4 border-radius-6">
-                                <div class="card-image">
-                                    <img src="{{ url('website/unload.png') }}" class="responsive-img" id="imageTracking4" alt="" style="filter:{{ in_array('4',$arrTracking) ? '' : 'grayscale(100%)' }};">
-                                </div>
-                                <div class="card-content center-align">
-                                    Barang selesai dibongkar.
-                                    <p class="teal-text lighten-2 truncate" id="dateTracking4">-</p>
-                                </div>
-                            </div>
-                            @if(!in_array('4',$arrTracking))
-                            <a class="mb-6 btn-floating btn-large waves-effect waves-light gradient-45deg-green-teal gradient-shadow center" href="javascript:void(0);" onclick="save('4')">
-                                <i class="material-icons">check</i>
-                            </a>
-                            @endif
-                        </div>
+                        
                         <div class="col l12 m12 s12 p-3 center-align">
                             Silahkan tekan tanda centang untuk update tracking.
                         </div>

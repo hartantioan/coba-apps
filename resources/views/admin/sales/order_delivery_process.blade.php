@@ -498,7 +498,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_tracking">
-                <div class="col l2 m2 s2 p-3">
+                <div class="col l3 m3 s3 p-3">
                     <div class="card z-depth-0 grey lighten-4 border-radius-6">
                         <div class="card-image">
                             <img src="{{ url('website/document.png') }}" class="responsive-img" id="imageTracking1" alt="" style="filter:grayscale(100%);">
@@ -509,7 +509,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col l2 m2 s2 p-3">
+                <div class="col l3 m3 s3 p-3">
                     <div class="card z-depth-0 grey lighten-4 border-radius-6">
                         <div class="card-image">
                             <img src="{{ url('website/delivery.png') }}" class="responsive-img" id="imageTracking2" alt="" style="filter:grayscale(100%);">
@@ -520,7 +520,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col l2 m2 s2 p-3">
+                <div class="col l3 m3 s3 p-3">
                     <div class="card z-depth-0 grey lighten-4 border-radius-6">
                         <div class="card-image">
                             <img src="{{ url('website/arrive.png') }}" class="responsive-img" id="imageTracking3" alt="" style="filter:grayscale(100%);">
@@ -531,18 +531,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="col l2 m2 s2 p-3">
-                    <div class="card z-depth-0 grey lighten-4 border-radius-6">
-                        <div class="card-image">
-                            <img src="{{ url('website/unload.png') }}" class="responsive-img" id="imageTracking4" alt="" style="filter:grayscale(100%);">
-                        </div>
-                        <div class="card-content center-align">
-                            Barang selesai dibongkar.
-                            <p class="teal-text lighten-2 truncate" id="dateTracking4">-</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col l2 m2 s2 p-3">
+                
+                <div class="col l3 m3 s3 p-3">
                     <div class="card z-depth-0 grey lighten-4 border-radius-6">
                         <div class="card-image">
                             <img src="{{ url('website/returned.png') }}" class="responsive-img" id="imageTracking5" alt="" style="filter:grayscale(100%);">
@@ -571,7 +561,6 @@
                                         <option value="1">Dokumen SJ telah dibuat</option>
                                         <option value="2">Barang telah dikirimkan</option>
                                         <option value="3">Barang tiba di customer</option>
-                                        <option value="4">Barang selesai dibongkar</option>
                                         <option value="5">Surat Jalan telah kembali</option>
                                     </select>
                                     <label class="active" for="status_tracking">Status Tracking</label>
@@ -2698,6 +2687,19 @@ document.addEventListener('focusin', function (event) {
                 window.open(data, '_blank');
             }
         });
+    }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var account_id = $('#filter_account').val();
+        var company = $('#filter_company').val();
+        var marketing_order = null;
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account_id=" + account_id + "&marketing_order=" + marketing_order + "&company=" + company   + "&end_date=" + end_date + "&start_date=" + start_date;
+       
     }
 
     function done(id){

@@ -80,6 +80,7 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
             $entry["shipping_type"] = $row->purchaseOrder->shippingType();
             $entry["satuan"] =$row->itemUnit->unit->code;
             $entry["qty"] = $row->qty;
+            $entry["qty_retur"] = $row->qtyRetur();
             $entry["qty_gr"] = $row->qtyGR();
             $entry["plant"] =$row->place->code;
             $entry["warehouse"] =$row->warehouse->name;
@@ -87,8 +88,6 @@ class ExportOutstandingPOHide implements FromView,ShouldAutoSize
             if($row->getBalanceReceipt()> 0){
                 $array[] = $entry;
             }
-            
-            
         }
         
         activity()

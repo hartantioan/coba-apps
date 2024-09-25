@@ -103,6 +103,7 @@ class OutstandingPurchaseOrderController extends Controller
                                 <th class="center-align">Satuan</th>
                                 <th class="center-align">Qty Order.</th>
                                 <th class="center-align">Qty Diterima</th>
+                                <th class="center-align">Qty Retur</th>
                                 <th class="center-align">Tunggakan</th>
                             </tr>
                         </thead><tbody>';
@@ -129,6 +130,7 @@ class OutstandingPurchaseOrderController extends Controller
                     <td class="center-align">'.$row->itemUnit->unit->code.'</td>
                     <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty,3,',','.').'</td>
                     <td class="right-align">'.CustomHelper::formatConditionalQty($row->qtyGR(),3,',','.').'</td>
+                    <td class="right-align">'.CustomHelper::formatConditionalQty($row->qtyRetur(),3,',','.').'</td>
                     <td class="right-align">'.number_format($row->getBalanceReceipt(),3,',','.').'</td>
                 </tr>';
             }

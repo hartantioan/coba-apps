@@ -471,6 +471,7 @@
                                 <fieldset style="min-width: 100%;">
                                     <legend>5. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
+                                        Note : Harga Ongkir dan Harga Grup BP tidak mempengaruhi harga jual.
                                         <p class="mt-2 mb-2">
                                             <table class="bordered" style="width:3500px;" id="table-detail">
                                                 <thead>
@@ -482,6 +483,8 @@
                                                         <th class="center">Qty On Hand</th>
                                                         <th class="center">Qty Pesan</th>
                                                         <th class="center">Satuan Stok</th>
+                                                        <th class="center">Harga Ongkir</th>
+                                                        <th class="center">Harga Grup BP</th>
                                                         <th class="center">Harga Dasar</th>
                                                         <th class="center">Qty Jual</th>
                                                         <th class="center">Satuan Jual</th>
@@ -1434,8 +1437,6 @@
                     <tr class="row_item">
                         <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="0,00">
                         <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="0,00">
-                        <input name="arr_price_delivery[]" type="hidden" value="0,00" id="rowPriceDelivery`+ count +`">
-                        <input name="arr_price_type_bp[]" type="hidden" value="0,00" id="rowPriceTypeBp`+ count +`">
                         <input name="arr_price[]" type="hidden" value="0,00" id="rowPrice`+ count +`">
                         <td>
                             <label>
@@ -1458,6 +1459,12 @@
                             <input name="arr_qty_uom[]" type="text" value="0" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
                         </td>
                         <td class="center-align" id="arr_uom_unit` + count + `">-</td>
+                        <td class="center">
+                            <input name="arr_price_delivery[]" type="text" value="0,00" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`" readonly>
+                        </td>
+                        <td class="center">
+                            <input name="arr_price_type_bp[]" type="text" value="0,00" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                        </td>
                         <td class="center">
                             <input name="arr_price_list[]" type="text" value="0,00" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
                         </td>
@@ -2075,8 +2082,6 @@
                             <tr class="row_item">
                                 <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                 <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
-                                <input name="arr_price_delivery[]" type="hidden" value="` + val.price_delivery + `" id="rowPriceDelivery`+ count +`">
-                                <input name="arr_price_type_bp[]" type="hidden" value="` + val.price_type_bp + `" id="rowPriceTypeBp`+ count +`">
                                 <input name="arr_price[]" type="hidden" value="` + val.price + `" id="rowPrice`+ count +`">
                                 <td>
                                     <label>
@@ -2100,6 +2105,12 @@
                                     <input name="arr_qty_uom[]" type="text" value="` + val.qty_uom + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
                                 </td>
                                 <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
+                                <td class="center">
+                                    <input name="arr_price_delivery[]" type="text" value="` + val.price_delivery + `" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`" readonly>
+                                </td>
+                                <td class="center">
+                                    <input name="arr_price_type_bp[]" type="text" value="` + val.price_type_bp + `" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                                </td>
                                 <td class="center">
                                     <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
                                 </td>
@@ -2703,8 +2714,6 @@
                                     <tr class="row_item">
                                         <input type="hidden" name="arr_tax_nominal[]" id="arr_tax_nominal` + count + `" value="` + val.tax + `">
                                         <input type="hidden" name="arr_grandtotal[]" id="arr_grandtotal` + count + `" value="` + val.grandtotal + `">
-                                        <input name="arr_price_delivery[]" type="hidden" value="` + val.price_delivery + `" id="rowPriceDelivery`+ count +`">
-                                        <input name="arr_price_type_bp[]" type="hidden" value="` + val.price_type_bp + `" id="rowPriceTypeBp`+ count +`">
                                         <input name="arr_price[]" type="hidden" value="` + val.price + `" id="rowPrice`+ count +`">
                                         <td>
                                             <label>
@@ -2728,6 +2737,12 @@
                                             <input name="arr_qty_uom[]" type="text" value="` + val.qty_uom + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="0" style="text-align:right;" id="rowQtyUom`+ count +`">
                                         </td>
                                         <td class="center-align" id="arr_uom_unit` + count + `">` + val.uom + `</td>
+                                        <td class="center">
+                                            <input name="arr_price_delivery[]" type="text" value="` + val.price_delivery + `" style="text-align:right;border-bottom:none;" id="rowPriceDelivery`+ count +`" readonly>
+                                        </td>
+                                        <td class="center">
+                                            <input name="arr_price_type_bp[]" type="text" value="` + val.price_type_bp + `" style="text-align:right;border-bottom:none;" id="rowPriceTypeBp`+ count +`" readonly>
+                                        </td>
                                         <td class="center">
                                             <input name="arr_price_list[]" type="text" value="` + val.price_list + `" onkeyup="formatRupiah(this);countRow('` + count + `');" style="text-align:right;" id="rowPriceList`+ count +`">
                                         </td>

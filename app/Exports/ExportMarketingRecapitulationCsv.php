@@ -59,7 +59,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $year = date('Y',strtotime($row->post_date));
             $newdate = date('d/n/Y',strtotime($row->post_date));
             $arr[] = [
-                '1'     => 'FK;01;0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->account->userDataDefault()->npwp.';'.$row->account->userDataDefault()->title.';'.$row->account->userDataDefault()->address.';'.round($row->total,0).';'.round($row->tax,0).';0;;1;'.round($row->total,2).';'.round($row->tax,2).';0;'.$row->code.';;'
+                '1'     => 'FK;01;0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->account->userDataDefault()->npwp.';'.$row->account->userDataDefault()->title.';'.$row->account->userDataDefault()->address.';'.round($row->total,0).';'.round($row->tax,0).';0;;1;'.floor($row->total).';'.round($row->tax,2).';0;'.$row->code.';;'
             ];
             $arr[] = [
                 '1'     => 'OF;1;'.$row->note.';'.round($row->total,2).';1.00;'.round($row->total,2).';0;'.round($row->total,2).';'.round($row->tax,2).';0;0;;;;;;;;;;',
@@ -74,11 +74,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $year = date('Y',strtotime($row->post_date));
             $newdate = date('d/n/Y',strtotime($row->post_date));
             $arr[] = [
-                '1'     => 'FK;01;0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->userData->npwp.';'.$row->userData->title.';'.$row->userData->address.';'.round($row->total,0).';'.round($row->tax,0).';0;;0;0;0;0;'.$row->code.';;'
+                '1'     => 'FK;01;0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->userData->npwp.';'.$row->userData->title.';'.$row->userData->address.';'.floor($row->total).';'.round($row->tax,0).';0;;0;0;0;0;'.$row->code.';;'
             ];
             foreach($row->marketingOrderInvoiceDetail as $rowdetail){
                 $arr[] = [
-                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,0).';0;'.round($rowdetail->total,0).';'.floor($rowdetail->tax).';0;0;;;;;;;;;;',
+                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.floor($rowdetail->tax).';0;0;;;;;;;;;;',
                 ];
             }
         }

@@ -63,11 +63,11 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
 
         foreach($query_data as $key => $row){
             if($this->start_date && $this->end_date) {
-                $periode = "DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= '$this->end_date'";
+                $periode = "AND DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= '$this->end_date'";
             } else if($this->start_date) {
-                $periode = "DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= CURDATE()";
+                $periode = "AND DATE(post_date) >= '$this->start_date' AND DATE(post_date) <= CURDATE()";
             } else if($this->end_date) {
-                $periode = "DATE(post_date) >= CURDATE() AND DATE(post_date) <= '$this->end_date'";
+                $periode = "AND DATE(post_date) >= CURDATE() AND DATE(post_date) <= '$this->end_date'";
             } else {
                 $periode = "";
             }
@@ -119,33 +119,45 @@ class ExportLedger implements FromCollection, WithTitle, WithHeadings, ShouldAut
             $total_debit = 0;
             $total_credit = 0;
 
-            $ending_debit  = $row->journalDebit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode)
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
-                        }
-                    });
-            })->get();
+            $datadebit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND jd.type = '1'
+                    AND j.status IN ('2','3')
+                    ".$periode."
+                    ".($this->closing_journal ? " AND (lookable_type != 'closing_journals' OR lookable_type IS NULL)" : "")."
+            ", array(
+                'coa_id'    => $row->id,
+            ));
             
-            $ending_credit = $row->journalCredit()->whereHas('journal',function($query)use($periode){
-                $query->whereRaw($periode)
-                    ->where(function($query){
-                        if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
-                        }
-                    });
-            })->get();
+            $datacredit = DB::select("
+                SELECT 
+                    IFNULL(SUM(ROUND(nominal,2)),0) AS total
+                FROM journal_details jd
+                JOIN journals j
+                    ON jd.journal_id = j.id
+                WHERE 
+                    jd.coa_id = :coa_id 
+                    AND jd.deleted_at IS NULL
+                    AND j.deleted_at IS NULL
+                    AND jd.type = '2'
+                    AND j.status IN ('2','3')
+                    ".$periode."
+                    ".($this->closing_journal ? " AND (lookable_type != 'closing_journals' OR lookable_type IS NULL)" : "")."
+            ", array(
+                'coa_id'    => $row->id,
+            ));
 
-            foreach($ending_debit as $rowdebit){
-                $total_debit += round($rowdebit->nominal,2);
-            }
+            $total_debit = $datadebit[0]->total;
 
-            foreach($ending_credit as $rowcredit){
-                $total_credit += round($rowcredit->nominal,2);
-            }
+            $total_credit = $datacredit[0]->total;
 
             $ending_total  = $balance + $total_debit - $total_credit;
 

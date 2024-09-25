@@ -216,7 +216,7 @@
                                 <div class="input-field col m3 s12">
                                     <select class="browser-default" id="machine_id" name="machine_id" >
                                         @foreach ($machines as $row)
-                                            <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                            <option value="{{ $row->id }}" >{{ $row->code }}-{{ $row->note }}</option>
                                         @endforeach 
                                     </select>
                                     <label class="active" for="machine_id">Mesin</label>

@@ -389,7 +389,7 @@ class MarketingOrder extends Model
             foreach($row->marketingOrderDeliveryDetail as $rowmodd){
                 foreach($rowmodd->marketingOrderDeliveryProcessDetail as $rowmodpd){
                     foreach($rowmodpd->marketingOrderInvoiceDetail as $rowinvoice){
-                        $total += $rowinvoice->grandtotal;
+                        $total += $rowinvoice->getGrandtotal();
                     }
                 }
             }

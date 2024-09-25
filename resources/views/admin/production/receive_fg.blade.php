@@ -2168,6 +2168,7 @@
                     `);
                 });
 
+                count();
                 countAll();
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);

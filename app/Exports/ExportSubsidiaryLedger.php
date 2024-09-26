@@ -65,7 +65,7 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                                 ->orWhereNull('lookable_type');
                         }
                     });
-            })->where('nominal','!=',0)->get()->sortBy('post_date');
+            })->where('nominal','!=',0)->get();
             $balance = $row->getBalanceFromDate($date_start);
             $arr[] = [
                 'code'      => $row->code,

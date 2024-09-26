@@ -2075,6 +2075,7 @@
                             </td>
                         </tr>
                     `);
+                    arrBatch.push(val.code);
                 });
 
                 count();

@@ -85,4 +85,9 @@ class ProductionFgReceiveDetail extends Model
     {
         return $this->hasOne('App\Models\ProductionBatch', 'lookable_id', 'id')->where('lookable_type',$this->table);
     }
+
+    public function productionBarcodeDetail()
+    {
+        return $this->belongsTo('App\Models\ProductionBarcodeDetail', 'pallet_no', 'pallet_no');
+    }
 }

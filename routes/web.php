@@ -210,6 +210,7 @@ use App\Http\Controllers\MasterData\InventoryCoaController;
 use App\Http\Controllers\MasterData\ItemPricelistController;
 use App\Http\Controllers\MasterData\ItemFGPictureController;
 use App\Http\Controllers\MasterData\SalaryComponentController;
+use App\Http\Controllers\Production\ProductionBarcodeController;
 use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ProductionBatchStockController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
@@ -415,6 +416,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('delivery_cost', [Select2Controller::class, 'deliveryCost']);
                 Route::get('production_order', [Select2Controller::class, 'productionOrder']);
                 Route::get('production_order_detail', [Select2Controller::class, 'productionOrderDetail']);
+                Route::get('production_barcode_detail', [Select2Controller::class, 'productionBarcodeDetail']);
                 Route::get('production_order_receive', [Select2Controller::class, 'productionOrderReceive']);
                 Route::get('production_order_detail_receive', [Select2Controller::class, 'productionOrderDetailReceive']);
                 Route::get('production_order_receive_fg', [Select2Controller::class, 'productionOrderReceiveFg']);
@@ -2328,6 +2330,33 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}',[ProductionReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [ProductionReceiveController::class, 'voidStatus'])->middleware('operation.access:production_receive,void');
                     Route::post('destroy', [ProductionReceiveController::class, 'destroy'])->middleware('operation.access:production_receive,delete');
+                });
+
+                Route::prefix('production_barcode')->middleware(['operation.access:production_barcode,view','lockacc'])->group(function () {
+                    Route::get('/',[ProductionBarcodeController::class, 'index']);
+                    Route::get('datatable',[ProductionBarcodeController::class, 'datatable']);
+                    Route::get('row_detail',[ProductionBarcodeController::class, 'rowDetail']);
+                    Route::post('show', [ProductionBarcodeController::class, 'show']);
+                    Route::post('get_code', [ProductionBarcodeController::class, 'getCode']);
+                    Route::post('get_pallet_barcode', [ProductionBarcodeController::class, 'getPalletBarcode']);
+                    Route::post('get_child_fg', [ProductionBarcodeController::class, 'getChildFg']);
+                    Route::post('print',[ProductionBarcodeController::class, 'print']);
+                    Route::post('done',[ProductionBarcodeController::class, 'done'])->middleware('operation.access:production_barcode,update');
+                    Route::post('print_by_range',[ProductionBarcodeController::class, 'printByRange']);
+                    Route::get('export',[ProductionBarcodeController::class, 'export']);
+                    Route::get('export_from_page',[ProductionBarcodeController::class, 'exportFromTransactionPage']);
+                    Route::get('print_barcode/{id}',[ProductionBarcodeController::class, 'printBarcode']);
+                    Route::get('viewstructuretree',[ProductionBarcodeController::class, 'viewStructureTree']);
+                    Route::post('send_used_data',[ProductionBarcodeController::class, 'sendUsedData']);
+                    Route::post('get_account_data', [ProductionBarcodeController::class, 'getAccountData']);
+                    Route::post('remove_used_data', [ProductionBarcodeController::class, 'removeUsedData']);
+                    Route::post('create',[ProductionBarcodeController::class, 'create'])->middleware('operation.access:production_barcode,update');
+                    Route::post('send_used_data',[ProductionBarcodeController::class, 'sendUsedData'])->middleware('operation.access:production_barcode,update');
+                    Route::get('view_journal/{id}',[ProductionBarcodeController::class, 'viewJournal'])->middleware('operation.access:production_barcode,journal');
+                    Route::get('approval/{id}',[ProductionBarcodeController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_individual/{id}',[ProductionBarcodeController::class, 'printIndividual'])->withoutMiddleware('direct.access');
+                    Route::post('void_status', [ProductionBarcodeController::class, 'voidStatus'])->middleware('operation.access:production_barcode,void');
+                    Route::post('destroy', [ProductionBarcodeController::class, 'destroy'])->middleware('operation.access:production_barcode,delete');
                 });
 
                 Route::prefix('production_fg_receive')->middleware(['operation.access:production_fg_receive,view','lockacc'])->group(function () {

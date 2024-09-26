@@ -72,6 +72,7 @@ use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\MarketingOrder;
 use App\Models\MaterialRequest;
+use App\Models\ProductionBarcode;
 use App\Models\ProductionBatch;
 use App\Models\ProductionFgReceive;
 use App\Models\ProductionHandover;
@@ -5443,6 +5444,9 @@ class CustomHelper {
 					]);
 				}
 			}
+		}elseif($table_name == 'production_barcodes'){
+
+			
 
 		}elseif($table_name == 'production_fg_receives'){
 
@@ -5558,6 +5562,16 @@ class CustomHelper {
 						NULL,
 						NULL,
 					);
+				}
+			}
+
+			foreach($pir->productionFgReceiveDetail as $row){
+				if($row->productionBarcodeDetail()->exists()){
+					if($row->productionBarcodeDetail->productionBarcode->alreadyReceived()){
+						$row->productionBarcodeDetail->productionBarcode->update([
+							'status'	=> '3'
+						]);
+					}
 				}
 			}
 

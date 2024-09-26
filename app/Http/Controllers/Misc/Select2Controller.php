@@ -93,6 +93,7 @@ use App\Models\CustomerDiscount;
 use App\Models\DeliveryCostStandard;
 use App\Models\Group;
 use App\Models\ListBgCheck;
+use App\Models\ProductionBarcodeDetail;
 use App\Models\StandardCustomerPrice;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -4522,6 +4523,36 @@ class Select2Controller extends Controller {
                 'bom_detail'                    => $bomdetail,
                 'bom_group'                     => strtoupper($d->productionScheduleDetail->bom->group()),
                 'note'                          => 'NO. '.$d->productionOrder->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function productionBarcodeDetail(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+       
+        $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
+            $query->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
+                ->whereIn('status',['2','3']);
+            if($request->production_order_detail_id){
+                $query->where('production_order_detail_id',$request->production_order_detail_id);
+            }
+        })
+        ->whereDoesntHave('productionFgReceiveDetail')
+        ->where(function($query)use($request){
+            if($request->batch_used){
+                $query->whereNotIn('pallet_no',$request->batch_used);
+            }
+        })
+        ->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'    => $d->id,
+                'text'  => $d->item->code.' - '.$d->item->name.' No : '.$d->pallet_no.' Shading : '.$d->shading,
             ];
         }
 

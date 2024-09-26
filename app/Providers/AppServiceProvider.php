@@ -120,6 +120,8 @@ class AppServiceProvider extends ServiceProvider
             'list_bg_checks'                        => 'App\Models\ListBgCheck',
             'production_repacks'                    => 'App\Models\ProductionRepack',
             'production_repack_details'             => 'App\Models\ProductionRepackDetail',
+            'production_barcodes'                   => 'App\Models\ProductionBarcode',
+            'production_barcode_details'            => 'App\Models\ProductionBarcodeDetail',
         ]);
     }
 }

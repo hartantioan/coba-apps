@@ -20,7 +20,7 @@
         @endphp
         @foreach($data as $i => $row)
             <tr>
-                <td align="center">{{ $x + 1 }}</td>
+                <td align="center">{{ $i + 1 }}</td>
                 <td align="center">{{$row['production_batch']}}</td>
                 <td align="center">{{$row['plant']}}</td>
                 <td align="center">{{$row['warehouse']}}</td>

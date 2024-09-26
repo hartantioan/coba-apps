@@ -92,7 +92,6 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                 $array_filter[]=$data_tempura;
             }
         }
-     
 
         activity()
             ->performedOn(new ItemCogs())

@@ -633,13 +633,18 @@ class ProductionBarcodeController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.'</div><div class="col s12"><table style="min-width:100%;" class="bordered" id="table-detail-row">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="7" style="font-size:20px !important;">Daftar Barcode</th>
+                                <th class="center-align" colspan="12" style="font-size:20px !important;">Daftar Barcode</th>
                             </tr>
                             <tr>
                                 <th class="center">'.__('translations.no').'</th>
                                 <th class="center">'.__('translations.item').'</th>
                                 <th class="center">No.Batch/Palet</th>
                                 <th class="center">Shading</th>
+                                <th class="center">Qty Diterima</th>
+                                <th class="center">Satuan</th>
+                                <th class="center">Konversi</th>
+                                <th class="center">Qty Produksi</th>
+                                <th class="center">Satuan</th>
                                 <th class="center">Palet</th>
                                 <th class="center">Grade</th>
                                 <th class="center">Ref.Dokumen</th>
@@ -651,6 +656,11 @@ class ProductionBarcodeController extends Controller
                 <td>'.$row->item->code.' - '.$row->item->name.'</td>
                 <td>'.$row->pallet_no.'</td>
                 <td>'.$row->shading.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty_sell).'</td>
+                <td class="center-align">'.$row->itemUnit->unit->code.'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->conversion).'</td>
+                <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.$row->item->uomUnit->code.'</td>
                 <td class="">'.$row->pallet->code.'</td>
                 <td class="">'.$row->grade->code.'</td>
                 <td class="">'.($row->productionFgReceiveDetail()->exists() ? $row->productionFgReceiveDetail->productionFgReceive->code : '-').'</td>

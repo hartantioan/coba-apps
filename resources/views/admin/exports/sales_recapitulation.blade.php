@@ -1,4 +1,4 @@
-<table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
+<table>
     <thead>
         <tr>
             <th>{{ __('translations.no') }}.</th>

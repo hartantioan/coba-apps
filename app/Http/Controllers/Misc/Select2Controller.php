@@ -331,6 +331,32 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function itemForProductionIssue(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $data = Item::where(function($query) use($search){
+                    $query->where('code', 'like', "%$search%")
+                        ->orWhere('name', 'like', "%$search%");
+                })->where('status','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - '.$d->name,
+                'code'              => $d->code,
+                'name'              => $d->name,
+                'uom'               => $d->uomUnit->code,
+                'stock_list'        => $d->currentStock($this->dataplaces,$this->datawarehouses),
+                'list_warehouse'    => $d->warehouseList(),
+                'is_activa'         => $d->itemGroup->is_activa ? $d->itemGroup->is_activa : '',
+                'has_bom'           => $d->bom()->exists() ? '1' : '',
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function itemParentFg(Request $request)
     {
         $response = [];

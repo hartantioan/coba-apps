@@ -1202,7 +1202,7 @@
             `);
 
             if(type == 'items'){
-                select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/item") }}');
+                select2ServerSideLonger('#arr_lookable_id' + count, '{{ url("admin/select2/item_for_production_issue") }}');
             }else if(type == 'resources'){
                 select2ServerSide('#arr_lookable_id' + count, '{{ url("admin/select2/resource") }}');
             }

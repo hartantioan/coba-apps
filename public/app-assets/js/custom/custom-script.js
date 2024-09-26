@@ -161,6 +161,32 @@ function select2ServerSide(selector, endpoint) {
 	});
  }
 
+ function select2ServerSideLonger(selector, endpoint) {
+	$(selector).select2({
+		placeholder: '-- Pilih ya --',
+		minimumInputLength: 4,
+		allowClear: true,
+		cache: true,
+		width: 'resolve',
+		dropdownParent: $('body').parent(),
+		ajax: {
+			url: endpoint,
+			type: 'GET',
+			dataType: 'JSON',
+			data: function(params) {
+				return {
+					search: params.term
+				};
+			},
+			processResults: function(data) {
+				return {
+					results: data.items
+				}
+			}
+		}
+	});
+ }
+
 function makeid(length) {
 	let result = '';
 	const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';

@@ -1638,8 +1638,6 @@ class GoodReceiptPOController extends Controller
                             'status'  => 200,
                             'message' => 'Data berhasil diupdate.'
                         ];
-
-                        info('kambing');
                     }else{
                         $response = [
                             'status'  => 500,

@@ -81,12 +81,12 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                     'shading' => $row->itemShading->code ?? '-',
                     'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                     'final'=>number_format($priceNow,2,',','.'),
-                    'total'=>$perlu == 0 ? '-' : number_format($cum_val,2,',','.'),
-                    'qty' => $perlu == 0 ? '-' : CustomHelper::formatConditionalQty($arr['qty']),
+                    'total'=>$perlu == 0 ? '-' : round($cum_val,3),
+                    'qty' => $perlu == 0 ? '-' : round($arr['qty'],3),
                     'date' =>  date('d/m/Y',strtotime($row->date)),
                     'document' => $row->lookable->code,
-                    'cum_qty' => CustomHelper::formatConditionalQty($arr['qty']),
-                    'cum_val' => number_format($arr['total'],2,',','.'),
+                    'cum_qty' => round($arr['qty'],3),
+                    'cum_val' => round($arr['total'],2),
                 ];
 
                 $array_filter[]=$data_tempura;

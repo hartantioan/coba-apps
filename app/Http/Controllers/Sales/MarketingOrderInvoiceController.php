@@ -382,12 +382,17 @@ class MarketingOrderInvoiceController extends Controller
                 $balanceNow = $limit - $creditNow - $user->grandtotalUninvoiceDoCredit() - $user->grandtotalUnsentModCredit();
                 $creditInvoice = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
-                if($creditInvoice > $balanceNow){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
-                    ]);
+                $modp = MarketingOrderDeliveryProcess::find($request->marketing_order_delivery_process_id);
+
+                if(in_array($modp->marketingOrderDelivery->so_type,['1','2'])){
+                    if($creditInvoice > $balanceNow){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
+                        ]);
+                    }
                 }
+                
                 
                 if($request->temp){
                     

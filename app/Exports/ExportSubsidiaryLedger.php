@@ -58,14 +58,17 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
         $arr = [];
         foreach($coas as $key => $row){
             $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
-                $query->whereRaw("post_date BETWEEN '$date_start' AND '$date_end'")
+                $query->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
                     ->where(function($query){
                         if($this->closing_journal){
-                            $query->where('lookable_type','!=','closing_journals')
-                                ->orWhereNull('lookable_type');
+                            $query->where('journals.lookable_type','!=','closing_journals')
+                                ->orWhereNull('journals.lookable_type');
                         }
                     });
-            })->where('nominal','!=',0)->get();
+            })
+            ->where('journal_details.nominal','!=',0)
+            ->join('journals', 'journal_details.journal_id', '=', 'journals.id')
+            ->orderBy('journals.post_date', 'ASC')->get();
             $balance = $row->getBalanceFromDate($date_start);
             $arr[] = [
                 'code'      => $row->code,

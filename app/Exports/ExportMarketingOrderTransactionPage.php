@@ -94,27 +94,24 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
             // Apply the search conditions within the 'purchaseOrder' relationship
             $query->where(function($query){
                 $query->where('code', 'like', "%$this->search%")
-                    ->orWhere('document_no', 'like', "%$this->search%")
-                    ->orWhere('note', 'like', "%$this->search%")
-                    ->orWhere('subtotal', 'like', "%$this->search%")
-                    ->orWhere('discount', 'like', "%$this->search%")
-                    ->orWhere('total', 'like', "%$this->search%")
-                    ->orWhere('tax', 'like', "%$this->search%")
-                    ->orWhere('grandtotal', 'like', "%$this->search%")
-                    ->orWhereHas('user',function($query){
-                        $query->where('name','like',"%$this->search%")
-                            ->orWhere('employee_no','like',"%$this->search%");
-                    })
-                    ->orWhereHas('sales',function($query){
-                        $query->where('name','like',"%$this->search%")
-                            ->orWhere('employee_no','like',"%$this->search%");
-                    })
-                    ->orWhereHas('marketingOrderDetail',function($query) {
-                        $query->whereHas('item',function($query){
-                            $query->where('code','like',"%$this->search%")
-                                ->orWhere('name','like',"%$this->search%");
-                        });
+                ->orWhere('document_no', 'like', "%$this->search%")
+                ->orWhere('note_internal', 'like', "%$this->search%")
+                ->orWhere('note_external', 'like', "%$this->search%")
+                ->orWhere('discount', 'like', "%$this->search%")
+                ->orWhere('total', 'like', "%$this->search%")
+                ->orWhere('tax', 'like', "%$this->search%")
+                ->orWhere('grandtotal', 'like', "%$this->search%")
+                ->orWhere('phone', 'like', "%$this->search%")
+                ->orWhereHas('user',function($query){
+                    $query->where('name','like',"%$this->search%")
+                        ->orWhere('employee_no','like',"%$this->search%");
+                })
+                ->orWhereHas('marketingOrderDetail',function($query) {
+                    $query->whereHas('item',function($query) {
+                        $query->where('code','like',"%$this->search%")
+                            ->orWhere('name','like',"%$this->search%");
                     });
+                });
             });
     
             // Other conditions for the 'purchaseOrder' relationship
@@ -197,23 +194,23 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                 'customer'          => $row->account->name,
                 'company'           => $row->company->name,
                 'type'              => $row->type,
-                'project'           => $row->project->name,
+                'project'           => $row->project->name ?? '-',
                 'deliv_type'        => $row->type_delivery,
                 'sender'            => $row->sender()->exists() ? $row->sender->name : '-',
-                'transport_type'    => $row->transport->name,
+                'transport_type'    => $row->transport->name ?? '-',
                 'delivery_date'     => date('d/m/Y',strtotime($row->delivery_date)),
                 'TOP_IN'            => $row->top_internal,
                 'TOP_Customer'      => $row->top_customer,
                 'is_guarantee'      => $row->is_guarantee,
                 'billing_address'   => $row->billing_address,
-                'outlet'            => $row->outlet->name,
+                'outlet'            => $row->outlet->name ?? '-',
                 'destination_address'=> $row->destination_address,
-                'province'          => $row->province->name,
-                'city'              => $row->com_print_typeinfo->name,
-                'district_id'       => $row->district->name,
-                'subdistrict_id'    => $row->subdistrict->name,
-                'sales'             => $row->sales->name,
-                'currency_id'       => $row->currency->name,
+                'province'          => $row->province->name  ?? '-',
+                'city'              => $row->com_print_typeinfo->name  ?? '-',
+                'district_id'       => $row->district->name  ?? '-',
+                'subdistrict_id'    => $row->subdistrict->name  ?? '-',
+                'sales'             => $row->sales->name  ?? '-',
+                'currency_id'       => $row->currency->name  ?? '-',
                 'currency_rate'     => number_format($row->currency_rate,2,',','.'),
                 'dp'                => $row->percent_dp,
                 'department'        => $row->note_internal,

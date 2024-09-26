@@ -1093,6 +1093,9 @@
 
 <!-- END: Page Main-->
 <script>
+    document.querySelectorAll('input').forEach(input => {
+        input.setAttribute('autocomplete', 'off');
+    });
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');

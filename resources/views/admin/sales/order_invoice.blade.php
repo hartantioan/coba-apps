@@ -1850,10 +1850,6 @@
             success: function(response) {
                 loadingClose('.modal-content');
                 window.open(response.message, '_blank');
-                // printService.submit({
-                //     'type': 'INVOICE',
-                //     'url': response.message
-                // });
             },
             error: function() {
                 swal({

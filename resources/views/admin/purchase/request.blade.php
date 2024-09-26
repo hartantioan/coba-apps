@@ -2440,7 +2440,7 @@
         if(countItem > 59){
             swal({
                 title: 'Ups!',
-                text: 'Satu PO tidak boleh memiliki baris item lebih dari 60.',
+                text: 'Satu PR tidak boleh memiliki baris item lebih dari 60.',
                 icon: 'error'
             });
             return false;

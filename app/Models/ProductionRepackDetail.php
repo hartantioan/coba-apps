@@ -38,6 +38,10 @@ class ProductionRepackDetail extends Model
         return $this->belongsTo('App\Models\ProductionRepack','production_repack_id','id')->withTrashed();
     }
 
+    public function parent(){
+        return $this->belongsTo('App\Models\ProductionRepack','production_repack_id','id')->withTrashed();
+    }
+
     public function itemSource(){
         return $this->belongsTo('App\Models\Item','item_source_id','id')->withTrashed();
     }

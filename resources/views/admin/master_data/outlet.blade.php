@@ -175,6 +175,7 @@
                                 <option value="5">Toko Online</option>
                                 <option value="6">Marketplace</option>
                                 <option value="7">Institusi</option>
+                                <option value="8">Toko Offline</option>
                             </select>
                             <label class="active" for="type">{{ __('translations.type') }}</label>
                         </div>

@@ -157,6 +157,7 @@
                                                         <th>{{ __('translations.code') }}</th>
                                                         <th>Petugas</th>
                                                         <th>{{ __('translations.company') }}</th>
+                                                        <th>Customer</th>
                                                         <th>Ekspedisi</th>
                                                         <th>MOD</th>
                                                         <th>Tgl.Post</th>
@@ -1903,6 +1904,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'code', className: '' },
                 { name: 'user_id', className: '' },
                 { name: 'company_id', className: '' },
+                { name: 'customer_id', orderable: false, className: '' },
                 { name: 'account_id', className: '' },
                 { name: 'marketing_order_delivery_no', searchable: false, orderable: false, className: '' },
                 { name: 'post_date', className: '' },

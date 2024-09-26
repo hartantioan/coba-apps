@@ -137,6 +137,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'code',
             'user_id',
             'company_id',
+            'customer_id',
             'account_id',
             'marketing_order_delivery_no',
             'post_date',
@@ -178,6 +179,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                                             $query->where('code','like',"%$search%")
                                                 ->orWhere('name','like',"%$search%");
                                             });
+                                    })
+                                    ->orWhereHas('customer',function($query) use ($search, $request){
+                                        $query->where('name','like',"%$search%")
+                                            ->orWhere('employee_no','like',"%$search%");
                                     });
                             });
                     });
@@ -236,6 +241,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                                             $query->where('code','like',"%$search%")
                                                 ->orWhere('name','like',"%$search%");
                                             });
+                                    })
+                                    ->orWhereHas('customer',function($query) use ($search, $request){
+                                        $query->where('name','like',"%$search%")
+                                            ->orWhere('employee_no','like',"%$search%");
                                     });
                             });
                     });
@@ -293,6 +302,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->code,
                     $val->user->name,
                     $val->company->name,
+                    $val->marketingOrderDelivery->customer->name,
                     $val->account->name,
                     $val->marketingOrderDelivery->code,
                     date('d/m/Y',strtotime($val->post_date)),

@@ -87,7 +87,7 @@ class ProductionBatchStockController extends Controller
     
         foreach($query_data as $row){
             $arr = $row->infoFg();
-            if($arr['qty'] > 0){
+            if(round($arr['qty'],3) > 0){
                 $priceNow = $arr['total'] / $arr['qty'];
             
                 $all_total += round($arr['total'],2);

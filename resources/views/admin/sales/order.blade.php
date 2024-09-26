@@ -2641,9 +2641,11 @@
                         $('#transportation_id').empty().append(`
                             <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
                         `);
-                        $('#outlet_id').empty().append(`
-                            <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
-                        `);
+                        if(response.outlet_name){
+                            $('#outlet_id').empty().append(`
+                                <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
+                            `);
+                        }
                         $('#billing_address').empty();
                         $.each(response.user_data, function(i, val) {
                             $('#billing_address').append(`

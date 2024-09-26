@@ -82,7 +82,10 @@ class MarketingOrderReportController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportMarketingRecapitulation($request->start_date,$request->end_date), 'sales_recapitulation_'.uniqid().'.xlsx');
+        $response = Excel::download(new ExportMarketingRecapitulation($request->start_date,$request->end_date), 'sales_recapitulation_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        ob_end_clean();
+
+        return $response;
     }
 
     public function exportCsv(Request $request){

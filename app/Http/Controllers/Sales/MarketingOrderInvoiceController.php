@@ -334,63 +334,63 @@ class MarketingOrderInvoiceController extends Controller
     }
 
     public function create(Request $request){
-        
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
-             */'code_place_id'                 => 'required',
-            'company_id'			        => 'required',
-            'marketing_order_delivery_process_id' => 'required',
-            'user_data_id'                  => 'required',
-            'account_id'	                => 'required',
-            'post_date'		                => 'required',
-            'due_date'                      => 'required',
-            'type'		                    => 'required',
-            'arr_lookable_id'		        => 'required|array',
-            'arr_total'                     => 'required|array',
-        ], [
-            'code.required' 	                    => 'Kode tidak boleh kosong.',
-           /*  'code.string'                           => 'Kode harus dalam bentuk string.',
-            'code.min'                              => 'Kode harus minimal 18 karakter.',
-            'code.unique'                           => 'Kode telah dipakai.', */
-            'marketing_order_delivery_process_id.required' => 'Surat jalan harus dipilih.',
-            'user_data_id.required'                 => 'Alamat penagihan tidak boleh kosong.',
-            'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
-            'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
-            'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
-            'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
-            'due_date.required' 			        => 'Tanggal tenggat tidak boleh kosong.',
-            'type.required'                         => 'Tipe pembayaran tidak boleh kosong.',
-            'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
-            'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
-            'arr_total.required'                    => 'Total tidak boleh kosong.',
-            'arr_total.array'                       => 'Total harus dalam bentuk array.',
-        ]);
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_invoices', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_invoices,code',
+                */'code_place_id'                 => 'required',
+                'company_id'			        => 'required',
+                'marketing_order_delivery_process_id' => 'required',
+                'user_data_id'                  => 'required',
+                'account_id'	                => 'required',
+                'post_date'		                => 'required',
+                'due_date'                      => 'required',
+                'type'		                    => 'required',
+                'arr_lookable_id'		        => 'required|array',
+                'arr_total'                     => 'required|array',
+            ], [
+                'code.required' 	                    => 'Kode tidak boleh kosong.',
+            /*  'code.string'                           => 'Kode harus dalam bentuk string.',
+                'code.min'                              => 'Kode harus minimal 18 karakter.',
+                'code.unique'                           => 'Kode telah dipakai.', */
+                'marketing_order_delivery_process_id.required' => 'Surat jalan harus dipilih.',
+                'user_data_id.required'                 => 'Alamat penagihan tidak boleh kosong.',
+                'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
+                'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
+                'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
+                'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
+                'due_date.required' 			        => 'Tanggal tenggat tidak boleh kosong.',
+                'type.required'                         => 'Tipe pembayaran tidak boleh kosong.',
+                'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
+                'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
+                'arr_total.required'                    => 'Total tidak boleh kosong.',
+                'arr_total.array'                       => 'Total harus dalam bentuk array.',
+            ]);
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
 
-            $user = User::find($request->account_id);
+                $user = User::find($request->account_id);
 
-            $limit = $user->limit_credit;
-            $creditNow = $user->count_limit_credit;
-            $balanceNow = $limit - $creditNow - $user->grandtotalUninvoiceDoCredit() - $user->grandtotalUnsentModCredit();
-            $creditInvoice = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                $limit = $user->limit_credit;
+                $creditNow = $user->count_limit_credit;
+                $balanceNow = $limit - $creditNow - $user->grandtotalUninvoiceDoCredit() - $user->grandtotalUnsentModCredit();
+                $creditInvoice = str_replace(',','.',str_replace('.','',$request->grandtotal));
 
-            if($creditInvoice > $balanceNow){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
-                ]);
-            }
-            
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if($creditInvoice > $balanceNow){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
+                    ]);
+                }
+                
+                if($request->temp){
+                    
                     $query = MarketingOrderInvoice::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -461,20 +461,13 @@ class MarketingOrderInvoiceController extends Controller
                         foreach($query->marketingOrderInvoiceDetail as $row){
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status AR Invoice detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status AR Invoice detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -515,75 +508,77 @@ class MarketingOrderInvoiceController extends Controller
                         'note'                          => $request->note,
                         
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}
-			
-			if($query) {
-
-                foreach($request->arr_lookable_id as $key => $row){
-                    if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
-                        $rowdata = MarketingOrderDeliveryProcessDetail::find($row);
-                        MarketingOrderInvoiceDetail::create([
-                            'marketing_order_invoice_id'    => $query->id,
-                            'lookable_type'                 => $request->arr_lookable_type[$key],
-                            'lookable_id'                   => $row,
-                            'qty'                           => $rowdata->qty,
-                            'price'                         => $rowdata->realPriceAfterGlobalDiscount(),
-                            'is_include_tax'                => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
-                            'percent_tax'                   => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
-                            'tax_id'                        => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id,
-                            'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
-                            'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
-                            'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
-                            'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDeliveryProcess->code,
-                        ]);
-                    }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
-                        $rowdata = MarketingOrderDownPayment::find($row);
-                        $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
-                        $rowtax = $rowdata->taxId()->exists() ? round($rowdata->tax * ($rowtotal / $rowdata->total),2) : 0;
-                        $rowgrandtotal = $rowtotal + $rowtax;
-                        MarketingOrderInvoiceDetail::create([
-                            'marketing_order_invoice_id'    => $query->id,
-                            'lookable_type'                 => $request->arr_lookable_type[$key],
-                            'lookable_id'                   => $row,
-                            'qty'                           => 1,
-                            'price'                         => $rowtotal,
-                            'is_include_tax'                => $rowdata->is_include_tax,
-                            'percent_tax'                   => $rowdata->percent_tax,
-                            'tax_id'                        => $rowdata->tax_id,
-                            'total'                         => $rowtotal,
-                            'tax'                           => $rowtax,
-                            'grandtotal'                    => $rowgrandtotal,
-                            'note'                          => $rowdata->code,
-                        ]);
                         
-                    }
                 }
+                
+                if($query) {
 
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
+                    foreach($request->arr_lookable_id as $key => $row){
+                        if($request->arr_lookable_type[$key] == 'marketing_order_delivery_process_details'){
+                            $rowdata = MarketingOrderDeliveryProcessDetail::find($row);
+                            MarketingOrderInvoiceDetail::create([
+                                'marketing_order_invoice_id'    => $query->id,
+                                'lookable_type'                 => $request->arr_lookable_type[$key],
+                                'lookable_id'                   => $row,
+                                'qty'                           => $rowdata->qty,
+                                'price'                         => $rowdata->realPriceAfterGlobalDiscount(),
+                                'is_include_tax'                => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
+                                'percent_tax'                   => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,
+                                'tax_id'                        => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id,
+                                'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
+                                'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDeliveryProcess->code,
+                            ]);
+                        }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
+                            $rowdata = MarketingOrderDownPayment::find($row);
+                            $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
+                            $rowtax = $rowdata->taxId()->exists() ? round($rowdata->tax * ($rowtotal / $rowdata->total),2) : 0;
+                            $rowgrandtotal = $rowtotal + $rowtax;
+                            MarketingOrderInvoiceDetail::create([
+                                'marketing_order_invoice_id'    => $query->id,
+                                'lookable_type'                 => $request->arr_lookable_type[$key],
+                                'lookable_id'                   => $row,
+                                'qty'                           => 1,
+                                'price'                         => $rowtotal,
+                                'is_include_tax'                => $rowdata->is_include_tax,
+                                'percent_tax'                   => $rowdata->percent_tax,
+                                'tax_id'                        => $rowdata->tax_id,
+                                'total'                         => $rowtotal,
+                                'tax'                           => $rowtax,
+                                'grandtotal'                    => $rowgrandtotal,
+                                'note'                          => $rowdata->code,
+                            ]);
+                            
+                        }
+                    }
 
-                activity()
-                    ->performedOn(new MarketingOrderInvoice())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit AR Invoice.');
+                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Invoice No. '.$query->code,$query->note,session('bo_id'));
 
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+                    activity()
+                        ->performedOn(new MarketingOrderInvoice())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit AR Invoice.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+            }
+
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+            info($e->getMessage());
+        }
 
 		return response()->json($response);
     }

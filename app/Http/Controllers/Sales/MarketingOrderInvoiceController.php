@@ -478,7 +478,7 @@ class MarketingOrderInvoiceController extends Controller
                     $newCode=MarketingOrderInvoice::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
                     $taxno = '';
-                    if($request->tax_id > 0){
+                    if($request->tempTaxId > 0){
                         $no = TaxSeries::getTaxCode($request->company_id,$request->post_date,$request->prefix_tax);
                         if($no['status'] == 200){
                             $taxno = $no['no'];

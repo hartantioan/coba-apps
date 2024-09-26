@@ -2898,7 +2898,7 @@
             }
         });
     }
-    /* function exportExcel(){
+    function exportExcel(){
         var search = table.search();
         var status = $('#filter_status').val();
         var type_buy = $('#filter_inventory').val();
@@ -2915,5 +2915,5 @@
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
        
-    } */
+    }
 </script>

@@ -2484,6 +2484,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('done',[MarketingOrderController::class, 'done'])->middleware('operation.access:sales_order,update');
                     Route::post('print_by_range',[MarketingOrderController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderController::class, 'viewStructureTree']);
+                    Route::get('export_from_page',[MarketingOrderController::class, 'exportFromTransactionPage']);
                     Route::post('create',[MarketingOrderController::class, 'create'])->middleware('operation.access:sales_order,update');
                     Route::get('approval/{id}',[MarketingOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');
@@ -2620,6 +2621,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[MarketingOrderMemoController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderMemoController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderMemoController::class, 'viewStructureTree']);
+                    Route::get('export_from_page',[MarketingOrderMemoController::class, 'exportFromTransactionPage']);
                     Route::post('remove_used_data', [MarketingOrderMemoController::class, 'removeUsedData']);
                     Route::get('view_journal/{id}',[MarketingOrderMemoController::class, 'viewJournal'])->middleware('operation.access:marketing_order_memo,journal');
                     Route::post('create',[MarketingOrderMemoController::class, 'create'])->middleware('operation.access:marketing_order_memo,update');
@@ -2639,6 +2641,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('get_code', [MarketingHandoverInvoiceController::class, 'getCode']);
                     Route::post('get_marketing_invoice', [MarketingHandoverInvoiceController::class, 'getMarketingInvoice']);
                     Route::post('print',[MarketingHandoverInvoiceController::class, 'print']);
+                    
+                    Route::get('export_from_page',[MarketingHandoverInvoiceController::class, 'exportFromTransactionPage']);
                     Route::post('print_by_range',[MarketingHandoverInvoiceController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingHandoverInvoiceController::class, 'viewStructureTree']);
                     Route::post('create',[MarketingHandoverInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_handover_invoice,update');
@@ -2655,6 +2659,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('row_detail',[MarketingOrderReceiptController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderReceiptController::class, 'show']);
                     Route::post('get_code', [MarketingOrderReceiptController::class, 'getCode']);
+                    
+                    Route::get('export_from_page',[MarketingOrderReceiptController::class, 'exportFromTransactionPage']);
                     Route::post('get_marketing_invoice', [MarketingOrderReceiptController::class, 'getMarketingInvoice']);
                     Route::post('print',[MarketingOrderReceiptController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderReceiptController::class, 'printByRange']);
@@ -2677,6 +2683,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('print',[MarketingOrderHandoverReceiptController::class, 'print']);
                     Route::post('print_by_range',[MarketingOrderHandoverReceiptController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderHandoverReceiptController::class, 'viewStructureTree']);
+                    Route::get('export_from_page',[MarketingOrderHandoverReceiptController::class, 'exportFromTransactionPage']);
                     Route::post('create',[MarketingOrderHandoverReceiptController::class, 'create'])->middleware('operation.access:marketing_order_handover_receipt,update');
                     Route::get('approval/{id}',[MarketingOrderHandoverReceiptController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::prefix('update_document')->withoutMiddleware('direct.access')->withoutMiddleware('login')->withoutMiddleware('operation.access:marketing_order_handover_receipt,view')->withoutMiddleware('lock')->group(function (){

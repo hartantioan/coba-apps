@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Helpers\TreeHelper;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportTransactionPageMarketingOrderHandoverInvoice;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
@@ -994,5 +996,15 @@ class MarketingHandoverInvoiceController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $company = $request->company ? $request->company : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderHandoverInvoice($search,$status,$company,$end_date,$start_date), 'marketing_order_handover_invoice_'.uniqid().'.xlsx');
     }
 }

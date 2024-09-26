@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ExportTransactionPageMarketingOrderHandoverReceipt;
 use App\Models\MarketingOrderHandoverReceipt;
 use App\Models\MarketingOrderHandoverReceiptDetail;
 use App\Models\MarketingOrderInvoice;
@@ -1806,5 +1808,16 @@ class MarketingOrderHandoverReceiptController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $account_id = $request->account? $request->account : '';
+        $company = $request->company ? $request->company : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderHandoverReceipt($search,$status,$account_id,$company,$end_date,$start_date), 'marketing_order_delivery_process_'.uniqid().'.xlsx');
     }
 }

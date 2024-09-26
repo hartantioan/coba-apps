@@ -48,7 +48,7 @@ class ProductionWorkingHourController extends Controller
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'area'          => Area::where('status','1')->get(),
-            'machines'       => MachineWorkingHour::where('status',1)->get(),
+            'machines'      => MachineWorkingHour::where('status','1')->get(),
             'line'          => Line::where('status','1')->whereIn('place_id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
             'minDate'       => $request->get('minDate'),

@@ -6,6 +6,8 @@ use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
 
+use App\Exports\ExportTransactionPageMarketingOrderInvoice;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\TreeHelper;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
@@ -1511,5 +1513,18 @@ class MarketingOrderInvoiceController extends Controller
         }
 
         return response()->json($response);
+    }
+
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $type = $request->type? $request->type :'';
+        $account_id = $request->account? $request->account : '';
+        $company = $request->company ? $request->company : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderInvoice($search,$status,$account_id,$type,$company,$end_date,$start_date), 'marketing_order_invoices_'.uniqid().'.xlsx');
     }
 }

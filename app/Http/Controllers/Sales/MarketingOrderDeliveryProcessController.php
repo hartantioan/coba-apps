@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Sales;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Helpers\TreeHelper;
-use App\Models\IncomingPayment;
+use App\Exports\ExportTransactionPageOrderDeliveryProcess;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
@@ -1715,5 +1716,17 @@ class MarketingOrderDeliveryProcessController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $account_id = $request->account_id? $request->account_id : '';
+        $company = $request->company ? $request->company : '';
+        $marketing_order = $request->marketing_order ? $request->marketing_order:'';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageOrderDeliveryProcess($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'marketing_order_delivery_'.uniqid().'.xlsx');
     }
 }

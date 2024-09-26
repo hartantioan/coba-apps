@@ -2296,6 +2296,21 @@
         });
     }
 
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var account = $('#filter_account').val();
+        var type = $('#filter_type').val();
+        var company = $('#filter_company').val();
+        var currency = $('#filter_currency').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+       
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type=" + type + "&account=" + account + "&company=" + company  + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date;
+       
+    }
+
     function cancelStatus(id){
         Swal.fire({
             title: "Pilih tanggal tutup!",

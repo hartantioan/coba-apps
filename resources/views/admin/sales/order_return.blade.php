@@ -1971,4 +1971,17 @@
             }
         });
     }
+
+    function exportExcel(){
+        var search = table.search();
+        var status = $('#filter_status').val();
+        var account = $('#filter_account').val();
+        var company = $('#filter_company').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#finish_date').val();
+
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account=" + account + "&company=" + company  + "&end_date=" + end_date + "&start_date=" + start_date;
+       
+    }
+
 </script>

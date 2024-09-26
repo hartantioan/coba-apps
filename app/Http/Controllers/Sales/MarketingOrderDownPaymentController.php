@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Sales;
 
+
+use App\Exports\ExporMarketingDownPaymentTransactionPage;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\IncomingPayment;
@@ -1988,5 +1990,18 @@ class MarketingOrderDownPaymentController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $type = $request->type ? $request->type : '';
+        $account = $request->account ? $request->account : '';
+        $company = $request->company ? $request->company : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExporMarketingDownPaymentTransactionPage($search,$status,$type,$account,$company,$currency,$end_date,$start_date), 'marketing_order_down_payment'.uniqid().'.xlsx');
     }
 }

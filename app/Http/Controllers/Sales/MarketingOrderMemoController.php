@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\IncomingPayment;
 use App\Models\MarketingOrder;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\MarketingOrderDelivery;
 use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDeliveryProcess;
@@ -26,6 +27,7 @@ use App\Helpers\PrintHelper;
 use App\Models\Tax;
 use App\Models\TaxSeries;
 use App\Models\User;
+use App\Exports\ExportTransactionPageMarketingOrderMemo;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -1984,5 +1986,16 @@ class MarketingOrderMemoController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function exportFromTransactionPage(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $account_id = $request->account? $request->account : '';
+        $company = $request->company ? $request->company : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderMemo($search,$status,$account_id,$company,$end_date,$start_date), 'marketing_order_memo_'.uniqid().'.xlsx');
     }
 }

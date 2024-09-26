@@ -299,6 +299,14 @@
                                     <div class="input-field col m3 s12 step11">
                                         <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
                                             <option value="010">010</option>
+                                            <option value="020">020</option>
+                                            <option value="030">030</option>
+                                            <option value="040">040</option>
+                                            <option value="050">050</option>
+                                            <option value="060">060</option>
+                                            <option value="070">070</option>
+                                            <option value="080">080</option>
+                                            <option value="090">090</option>
                                         </select>
                                         <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
                                     </div>

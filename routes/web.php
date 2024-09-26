@@ -2515,6 +2515,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('print_by_range',[MarketingOrderController::class, 'printByRange']);
                     Route::get('viewstructuretree',[MarketingOrderController::class, 'viewStructureTree']);
                     Route::get('export_from_page',[MarketingOrderController::class, 'exportFromTransactionPage']);
+                    Route::get('export_from_page_detail1',[MarketingOrderController::class, 'exportFromTransactionPageDetail1']);
+                    Route::get('export_from_page_detail2',[MarketingOrderController::class, 'exportFromTransactionPageDetail2']);
                     Route::post('create',[MarketingOrderController::class, 'create'])->middleware('operation.access:sales_order,update');
                     Route::get('approval/{id}',[MarketingOrderController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}',[MarketingOrderController::class, 'printIndividual'])->withoutMiddleware('direct.access');

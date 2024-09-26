@@ -258,6 +258,20 @@ class MarketingOrder extends Model
         return $status;
     }
 
+    public function statusSAP(){
+        $status = match ($this->status) {
+            '1' => 'W',
+            '2' => 'Y',
+            '3' => 'Y',
+            '4' => 'N',
+            '5' => 'C',
+            '6' => 'R',
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
+
     public function attachment() 
     {
         if($this->document !== NULL && Storage::exists($this->document)) {

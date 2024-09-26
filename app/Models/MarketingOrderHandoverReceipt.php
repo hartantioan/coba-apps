@@ -84,6 +84,12 @@ class MarketingOrderHandoverReceipt extends Model
         return $this->belongsTo('App\Models\Company', 'company_id', 'id')->withTrashed();
     }
 
+    public function marketingOrderReceipt()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderReceipt')->withTrashed();
+    }
+    
+
     public function marketingOrderHandoverReceiptDetail()
     {
         return $this->hasMany('App\Models\MarketingOrderHandoverReceiptDetail');

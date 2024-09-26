@@ -22,6 +22,10 @@ use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Line;
 use App\Exports\ExportMarketingOrderTransactionPage;
+
+use App\Exports\ExportTransactionPageMarketingOrderDetail1;
+
+use App\Exports\ExportTransactionPageMarketingOrderDetail2;
 use App\Models\MarketingOrderDetail;
 
 use App\Models\Place;
@@ -1515,6 +1519,40 @@ class MarketingOrderController extends Controller
         $start_date = $request->start_date? $request->start_date : '';
       
 		return Excel::download(new ExportMarketingOrderTransactionPage($search,$status,$type_sales,$type_pay,$type_deliv,$type_pay,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPageDetail1(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $type_sales = $request->type_sales ? $request->type_sales : '';
+        $type_pay = $request->type_pay ? $request->type_pay : '';
+        $type_deliv = $request->type_deliv? $request->type_deliv : '';
+        $company = $request->company ? $request->company : '';
+        $customer = $request->customer? $request->customer : '';
+        $delivery = $request->delivery? $request->delivery : '';
+        $sales = $request->sales ? $request->sales : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail1($search,$status,$type_sales,$type_pay,$type_deliv,$type_pay,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail1'.uniqid().'.xlsx');
+    }
+
+    public function exportFromTransactionPageDetail2(Request $request){
+        $search= $request->search? $request->search : '';
+        $status = $request->status? $request->status : '';
+        $type_sales = $request->type_sales ? $request->type_sales : '';
+        $type_pay = $request->type_pay ? $request->type_pay : '';
+        $type_deliv = $request->type_deliv? $request->type_deliv : '';
+        $company = $request->company ? $request->company : '';
+        $customer = $request->customer? $request->customer : '';
+        $delivery = $request->delivery? $request->delivery : '';
+        $sales = $request->sales ? $request->sales : '';
+        $currency = $request->currency ? $request->currency : '';
+        $end_date = $request->end_date ? $request->end_date : '';
+        $start_date = $request->start_date? $request->start_date : '';
+      
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$type_pay,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail2'.uniqid().'.xlsx');
     }
 
 }

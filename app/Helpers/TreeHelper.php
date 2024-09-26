@@ -2516,7 +2516,7 @@ class TreeHelper {
                                 "name"=>$row_incoming_payment->incomingPayment->code,
                                 "key" => $row_incoming_payment->incomingPayment->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_incoming_payment->incomingPayment->code),
+                                'url'=>request()->root()."/admin/finance/incoming_payment?code=".CustomHelper::encrypt($row_incoming_payment->incomingPayment->code),
                             ];
                             $data_go_chart[]=$mo_incoming_payment;
                             $data_link[]=[
@@ -2728,7 +2728,7 @@ class TreeHelper {
                                 "name"=>$row_mo_h_receipt_detail->lookable->code,
                                 "key" => $row_mo_h_receipt_detail->lookable->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+                                'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
@@ -2740,6 +2740,58 @@ class TreeHelper {
                                 $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
                                 $added = true;
                             }
+                        }
+                        if($row_mo_h_receipt_detail->marketingOrderReceipt()){
+                            $properties = [
+                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],
+                            ];
+                            
+                            if (!$hide_nominal) {
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->marketingOrderReceipt->grandtotal,2,',','.')]
+                                ;
+                            }
+                            $mo_invoice_tempura=[
+                                "name"=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+                                "key" => $row_mo_h_receipt_detail->marketingOrderReceipt->code,
+                                'properties'=>$properties,
+                                'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->marketingOrderReceipt->code),
+                            ];
+                            $data_go_chart[]=$mo_invoice_tempura;
+                            $data_link[]=[
+                                'from'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code,
+                                'to'=>$query_handover_receipt->code,
+                                'string_link'=>$row_mo_h_receipt_detail->marketingOrderReceipt->code.$query_handover_receipt->code,
+                            ];
+                            if(!in_array($row_mo_h_receipt_detail->marketingOrderReceipt->id, $data_id_mo_receipt)){
+                                $data_id_mo_receipt[] = $row_mo_h_receipt_detail->marketingOrderReceipt->id;
+                                $added = true;
+                            }
+                        }
+                    }
+                    if($query_handover_receipt->marketingOrderReceipt()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal :".$query_handover_receipt->marketingOrderReceipt->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_handover_receipt->marketingOrderReceipt->grandtotal,2,',','.')]
+                            ;
+                        }
+                        $mo_receipt_tempura=[
+                            "name"=>$query_handover_receipt->marketingOrderReceipt->code,
+                            "key" => $query_handover_receipt->marketingOrderReceipt->code,
+                            'properties'=>$properties,
+                            'url'=>request()->root()."/admin/sales/marketing_order_receipt?code=".CustomHelper::encrypt($query_handover_receipt->marketingOrderReceipt->code),
+                        ];
+                        $data_go_chart[]=$mo_receipt_tempura;
+                        $data_link[]=[
+                            'from'=>$query_handover_receipt->marketingOrderReceipt->code,
+                            'to'=>$query_handover_receipt->code,
+                            'string_link'=>$query_handover_receipt->marketingOrderReceipt->code.$query_handover_receipt->code,
+                        ];
+                        if(!in_array($query_handover_receipt->marketingOrderReceipt->id, $data_id_mo_receipt)){
+                            $data_id_mo_receipt[] = $query_handover_receipt->marketingOrderReceipt->id;
+                            $added = true;
                         }
                     }
                 }

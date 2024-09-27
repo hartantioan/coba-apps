@@ -427,6 +427,13 @@ class ApprovalController extends Controller
                             ]);
                         }
                     }
+                    if(session('bo_employee_no') == '120171'){
+                        foreach($query->approvalSource->lookable->materialRequestDetail as $rowupdate){
+                            $rowupdate->update([
+                                'status'    => '1'
+                            ]);
+                        }
+                    }
                 }
                 if($query->approvalSource->lookable_type == 'good_issue_requests'){
                     if($request->arr_status_good_issue_request){

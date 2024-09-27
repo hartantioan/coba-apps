@@ -16,19 +16,22 @@
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>{{ __('translations.post_date') }}</th>
+            <th>Status Kirim</th>
+            <th>Tgl. Kirim</th>
+            <th>Tipe Pengiriman</th>
+            <th>Ekspedisi</th>
+            <th>Pelanggan</th>
             <th>Kode Item</th>
             <th>{{ __('translations.item') }}</th>
-            <th>Ekspedisi</th>
-            <th>Tgl. Kirim</th>
-            <th>Note Internal</th>
-            <th>Note External</th>
-            <th>Pelanggan</th>
-            <th>Status Kirim</th>
+            <th>Plant</th>
+            <th>Qty Konversi</th>
+            <th>Satuan Konversi</th>
             <th>Qty </th>
             <th>{{ __('translations.unit') }}</th>
+            <th>Note Internal</th>
+            <th>Note External</th>
             <th>Note </th>
-            <th>Plant </th>
-            <th>Grandtotal</th>
+            <th>No.SJ</th>
         </tr>
     </thead>
     <tbody>
@@ -53,19 +56,22 @@
                     <td>{{ $row->user->employee_no }}</td>
                     <td>{{ $row->user->name }}</td>
                     <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
+                    <td>{{ $row->sendStatus() }}</td>
+                    <td>{{ date('d/m/Y',strtotime($row->delivery_date)) }}</td>
+                    <td>{{ $row->deliveryType() }}</td>
+                    <td>{{ $row->account->name ?? '-' }}</td>
+                    <td>{{ $row->customer->name  ?? '-'}}</td>
                     <td>{{ $row_detail->item->code}}</td>
                     <td>{{ $row_detail->item->name }}</td>
-                    <td>{{ $row_detail->account->name ?? '-' }}</td>
-                    <td>{{ date('d/m/Y',strtotime($row->delivery_date)) }}</td>
+                    <td>{{ $row_detail->place->code }}</td>
                     <td>{{ $row->note_internal}}</td>
                     <td>{{ $row->note_external }}</td>
-                    <td>{{ $row_detail->customer->name  ?? '-'}}</td>
-                    <td>{{ $row->sendStatus() }}</td>
                     <td>{{ $row_detail->qty }}</td>
+                    <td>{{ $row_detail->marketingOrderDetail->itemUnit->unit->code }}</td>
+                    <td>{{ round($row_detail->qty * $row_detail->marketingOrderDetail->qty_conversion,3) }}</td>
                     <td>{{ ($row_detail->item->uomUnit->code) }}</td>
                     <td>{{ $row_detail->note }}</td>
-                    <td>{{ $row_detail->place->code}}</td>
-                    <td>{{ $row->grandtotal }}</td>
+                    <td>{{ $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-' }}</td>
                 </tr>
                 @php
                     $no++;

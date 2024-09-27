@@ -910,7 +910,11 @@
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
 
         $('#body-item').on('click', '.delete-data-item', function() {
+            var codeToRemove = $(this).closest('tr').data('code'); 
             $(this).closest('tr').remove();
+            arrBatch = arrBatch.filter(function(code) {
+                return code !== codeToRemove;
+            });
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
@@ -1380,7 +1384,7 @@
                                 let no = $('.row_item').length + 1;
 
                                 $('#body-item').append(`
-                                    <tr class="row_item">
+                                    <tr class="row_item" data-code="` + val.code + `">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
                                         <input type="hidden" name="arr_pallet_id[]" value="` + val.pallet_id + `">
@@ -2026,7 +2030,7 @@
                 $.each(response.details, function(i, val) {
                     var count = makeid(10);
                     $('#body-item').append(`
-                        <tr class="row_item">
+                        <tr class="row_item" data-code="` + val.code + `">
                             <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
                             <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
                             <input type="hidden" name="arr_pallet_id[]" value="` + val.pallet_id + `">

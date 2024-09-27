@@ -1403,7 +1403,7 @@
                         if(response.details.length > 0){
                             let countItem = $('.row_item').length + response.details.length;
 
-                            if(countItem > 60){
+                            /* if(countItem > 60){
                                 swal({
                                     title: 'Ups!',
                                     text: 'Satu PO tidak boleh memiliki baris item lebih dari 60.',
@@ -1411,7 +1411,7 @@
                                 });
                                 removeUsedData(response.id,type);
                                 return false;
-                            }
+                            } */
 
                             if(type == 'sj'){
                                 $('#supplier_id').empty().append(`

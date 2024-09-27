@@ -133,7 +133,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                 'satuan' => $row->item->uomUnit->code,
                 'area'         => $row->area->code ?? '-',
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                'shading'      => $row->shading->code ?? '-',
+                'shading'      => $row->itemShading->code ?? '-',
                 'kode' => $row->item->code,
                 'final'=>number_format($row->price_final,2,',','.'),
                 'total'=>number_format($cum_val,2,',','.'),
@@ -177,7 +177,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                     'satuan'       => $row->item->uomUnit->code,
                     'area'         => $row->area->code ?? '-',
                     'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
-                    'shading'      => $row->shading->code ?? '-',
+                    'shading'      => $row->itemShading->code ?? '-',
                     'kode'         => $row->item->code,
                     'last_qty'     => $query_first ? $query_first->qty_final : 0,
                 ];
@@ -293,7 +293,7 @@ class ExportStockMovement implements FromView,ShouldAutoSize
                         'satuan'       => $row_tidak_ada->item->uomUnit->code,
                         'area'         => $row_tidak_ada->area->code ?? '-',
                         'production_batch' => $row_tidak_ada->productionBatch()->exists() ? $row_tidak_ada->productionBatch->code : '-',
-                        'shading'      => $row_tidak_ada->shading->code ?? '-',
+                        'shading'      => $row_tidak_ada->itemShading->code ?? '-',
                         'kode'         => $row_tidak_ada->item->code,
                         'last_qty'     => $row_tidak_ada ? $row_tidak_ada->qty_final : 0,
                     ]; 

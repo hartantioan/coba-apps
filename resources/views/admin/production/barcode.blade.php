@@ -170,7 +170,7 @@
                         <div id="validation_alert" style="display:none;"></div>
                     </div>
                     <div class="col s12">
-                        <div class="row">
+                        <div class="row first-inputs">
                             <div class="col s12">
                                 <fieldset>
                                     <legend>1. {{ __('translations.main_info') }}</legend>
@@ -247,7 +247,7 @@
                                 </fieldset>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row first-inputs">
                             <div class="col s12">
                                 <fieldset>
                                     <legend>2. Opsi Palet/Curah</legend>
@@ -794,6 +794,9 @@
                     }
                     return 'You will lose all changes made since your last save';
                 };
+                if($('#temp').val()){
+                    $('.first-inputs').css('pointer-events','none');
+                }
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
@@ -1226,6 +1229,7 @@
 
                                 $('#body-item').append(`
                                     <tr class="row_item">
+                                        <input type="hidden" name="arr_id[]" value="0">
                                         <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
                                         <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
                                         <input type="hidden" name="arr_pallet_id[]" value="` + $('#pallet_id').val() + `">
@@ -1269,7 +1273,7 @@
                                         <td class="center-align">
                                             ` + val.group + `
                                         </td>
-                                        <td class="center-align">
+                                        <td class="center-align first-inputs">
                                             <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                                 <i class="material-icons">delete</i>
                                             </a>
@@ -1509,6 +1513,14 @@
         let qtyConvert = qty * conversion;
         $('#qty').val(formatRupiahIni(qtyConvert.toFixed(3).toString().replace('.',',')));
         $('#qty').trigger('keyup');
+    }
+
+    function convert(code){
+        let qty = parseFloat($('#arr_qty_sell' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let conversion = parseFloat($('#arr_qty_convert' + code).val().replaceAll(".", "").replaceAll(",","."));
+        let qtyConvert = qty * conversion;
+        $('#arr_qty_uom' + code).val(formatRupiahIni(qtyConvert.toFixed(3).toString().replace('.',',')));
+        countAll();
     }
 
      function loadDataTable() {
@@ -1793,6 +1805,7 @@
                     var count = makeid(10);
                     $('#body-item').append(`
                         <tr class="row_item">
+                            <input type="hidden" name="arr_id[]" value="` + val.id + `">
                             <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
                             <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
                             <input type="hidden" name="arr_pallet_id[]" value="` + val.pallet_id + `">
@@ -1813,16 +1826,16 @@
                                 <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + val.shading + `" readonly>
                             </td>
                             <td class="right-align">
-                                <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
+                                <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" onkeyup="convert('` + count + `')">
                             </td>
                             <td class="center-align">
                                 ` + val.sell_unit + `
                             </td>
                             <td class="right-align">
-                                <input name="arr_qty_convert[]" id="arr_qty_convert` + count + `" type="text" value="` + val.conversion + `" readonly>
+                                <input name="arr_qty_convert[]" id="arr_qty_convert` + count + `" type="text" value="` + val.conversion + `" readonly style="border-bottom:none;">
                             </td>
                             <td class="right-align">
-                                <input name="arr_qty_uom[]" id="arr_qty_uom` + count + `" type="text" value="` + val.qty + `" readonly>
+                                <input name="arr_qty_uom[]" id="arr_qty_uom` + count + `" type="text" value="` + val.qty + `" readonly style="border-bottom:none;">
                             </td>
                             <td class="center-align">
                                 ` + val.unit + `
@@ -1836,7 +1849,7 @@
                             <td class="center-align">
                                 ` + val.group + `
                             </td>
-                            <td class="center-align">
+                            <td class="center-align first-inputs">
                                 <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
                                     <i class="material-icons">delete</i>
                                 </a>

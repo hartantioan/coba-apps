@@ -421,10 +421,10 @@ class ProductionBarcodeController extends Controller
                         ]);
                     }
 
-                    if(in_array($query->status,['1','6'])){
+                    if(in_array($query->status,['1','2','3','6'])){
 
                         $query->user_id = session('bo_id');
-                        $query->code = $request->code;
+                        /* $query->code = $request->code;
                         $query->company_id = $request->company_id;
                         $query->production_order_detail_id = $request->production_order_detail_id;
                         $query->item_id = $pod->productionScheduleDetail->item_id;
@@ -434,13 +434,26 @@ class ProductionBarcodeController extends Controller
                         $query->line_id = $request->line_id;
                         $query->post_date = $request->post_date;
                         $query->note = $request->note;
-                        $query->status = '1';
+                        $query->status = '1'; */
 
                         $query->save();
                         
-                        foreach($query->productionBarcodeDetail as $row){
+                        /* foreach($query->productionBarcodeDetail as $row){
                             $row->delete();
+                        } */
+                        
+                        if($request->arr_id){
+                            foreach($request->arr_id as $key => $row){
+                                $dataupdate = ProductionBarcodeDetail::find($row);
+                                if($dataupdate){
+                                    $dataupdate->update([
+                                        'qty_sell'  => str_replace(',','.',str_replace('.','',$request->arr_qty_sell[$key])),
+                                        'qty'       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
+                                    ]);
+                                }
+                            }
                         }
+                        
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -469,34 +482,36 @@ class ProductionBarcodeController extends Controller
                 }
                 
                 if($query) {
-                    foreach($request->arr_qty_uom as $key => $row){
-                        $bom_id = NULL;
+                    if(!$request->temp){
+                        foreach($request->arr_qty_uom as $key => $row){
+                            $bom_id = NULL;
 
-                        $bomAlternative = BomAlternative::whereHas('bom',function($query)use($request,$key){
-                            $query->where('item_id',$request->arr_item_id[$key])->orderByDesc('created_at');
-                        })->whereNotNull('is_default')->first();
+                            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($request,$key){
+                                $query->where('item_id',$request->arr_item_id[$key])->orderByDesc('created_at');
+                            })->whereNotNull('is_default')->first();
 
-                        if($bomAlternative){
-                            $bom_id = $bomAlternative->bom_id;
+                            if($bomAlternative){
+                                $bom_id = $bomAlternative->bom_id;
+                            }
+
+                            $pfrd = ProductionBarcodeDetail::create([
+                                'production_barcode_id'     => $query->id,
+                                'item_id'                   => $request->arr_item_id[$key],
+                                'bom_id'                    => $bom_id ?? NULL,
+                                'item_unit_id'              => $request->arr_item_unit_id[$key],
+                                'pallet_no'                 => $request->arr_pallet_no[$key],
+                                'shading'                   => $request->arr_shading[$key],
+                                'qty_sell'                  => str_replace(',','.',str_replace('.','',$request->arr_qty_sell[$key])),
+                                'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
+                                'conversion'                => str_replace(',','.',str_replace('.','',$request->arr_qty_convert[$key])),
+                                'pallet_id'                 => $request->arr_pallet_id[$key],
+                                'grade_id'                  => $request->arr_grade_id[$key],
+                            ]);
                         }
-
-                        $pfrd = ProductionBarcodeDetail::create([
-                            'production_barcode_id'     => $query->id,
-                            'item_id'                   => $request->arr_item_id[$key],
-                            'bom_id'                    => $bom_id ?? NULL,
-                            'item_unit_id'              => $request->arr_item_unit_id[$key],
-                            'pallet_no'                 => $request->arr_pallet_no[$key],
-                            'shading'                   => $request->arr_shading[$key],
-                            'qty_sell'                  => str_replace(',','.',str_replace('.','',$request->arr_qty_sell[$key])),
-                            'qty'                       => str_replace(',','.',str_replace('.','',$request->arr_qty_uom[$key])),
-                            'conversion'                => str_replace(',','.',str_replace('.','',$request->arr_qty_convert[$key])),
-                            'pallet_id'                 => $request->arr_pallet_id[$key],
-                            'grade_id'                  => $request->arr_grade_id[$key],
-                        ]);
+                        
+                        CustomHelper::sendApproval($query->getTable(),$query->id,'Production Barcode No. '.$query->code);
+                        CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Barcode No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
                     }
-                    
-                    CustomHelper::sendApproval($query->getTable(),$query->id,'Production Barcode No. '.$query->code);
-                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Production Barcode No. '.$query->code,'Pengajuan Production Receive No. '.$query->code,session('bo_id'));
 
                     activity()
                         ->performedOn(new ProductionBarcode())
@@ -532,6 +547,7 @@ class ProductionBarcodeController extends Controller
 
         foreach($po->productionBarcodeDetail()->orderBy('id')->get() as $key => $row){
             $detail_receive[] = [
+                'id'                    => $row->id,
                 'item_id'               => $row->item_id,
                 'item_code'             => $row->item->code,
                 'item_name'             => $row->item->name,

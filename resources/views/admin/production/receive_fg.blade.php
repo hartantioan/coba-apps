@@ -1494,7 +1494,9 @@
     }
 
     function removeBatch(element){
+        arrBatch = [];
         $(element).parent().parent().remove();
+
     }
 
     function printMultiSelect(){

@@ -1005,7 +1005,7 @@
 
         $('#arr_itemkuy' + count).select2({
             placeholder: '-- Pilih ya --',
-            minimumInputLength: 1,
+            minimumInputLength: 4,
             allowClear: true,
             cache: true,
             width: 'resolve',

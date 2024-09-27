@@ -95,15 +95,15 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
         
-        $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query){
+        /* $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query){
             $query->whereIn('status',['2','3']);
         })->get();
 
@@ -120,7 +120,7 @@ class MenuController extends Controller
                     'total'         => 0,
                 ]);
             }
-        }
+        } */
 
         /* $purchase = PurchaseOrder::whereIn('code',['PORD-24P1-00001412','PORD-24P1-00001411','PORD-24P1-00001409','PORD-24P1-00001408','PORD-24P1-00001407','PORD-24P1-00001573','PORD-24P1-00001579','PORD-24P1-00001596','PORD-24P1-00001602','PORD-24P1-00001627'])->whereIn('status',['2','3'])->get();
         $total = 0;

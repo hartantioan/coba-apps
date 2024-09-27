@@ -41,6 +41,8 @@ use App\Models\MaterialRequestDetail;
 use App\Models\MenuUser;
 use App\Models\OutgoingPayment;
 use App\Models\PaymentRequest;
+use App\Models\ProductionBarcodeDetail;
+use App\Models\ProductionBatch;
 use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseOrder;
@@ -93,13 +95,32 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+        
+        $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query){
+            $query->whereIn('status',['2','3']);
+        })->get();
+
+        foreach($data as $row){
+            $cekBatch = ProductionBatch::where('code',$row->pallet_no)->first();
+            if(!$cekBatch){
+                ProductionBatch::create([
+                    'code'          => $row->pallet_no,
+                    'item_id'       => $row->item_id,
+                    'place_id'      => $row->productionBarcode->place_id,
+                    'warehouse_id'  => $row->item->warehouse(),
+                    'qty'           => $row->qty,
+                    'qty_real'      => $row->qty,
+                    'total'         => 0,
+                ]);
+            }
+        }
 
         /* $purchase = PurchaseOrder::whereIn('code',['PORD-24P1-00001412','PORD-24P1-00001411','PORD-24P1-00001409','PORD-24P1-00001408','PORD-24P1-00001407','PORD-24P1-00001573','PORD-24P1-00001579','PORD-24P1-00001596','PORD-24P1-00001602','PORD-24P1-00001627'])->whereIn('status',['2','3'])->get();
         $total = 0;

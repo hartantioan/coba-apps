@@ -188,7 +188,7 @@ class MarketingOrder extends Model
             '1' => 'Proyek',
             '2' => 'Retail',
             '3' => 'Khusus',
-            '4' => 'Sampel',
+            '4' => 'Sample',
             default => 'Invalid',
         };
 

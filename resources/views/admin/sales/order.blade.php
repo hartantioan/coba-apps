@@ -90,7 +90,7 @@
                                                         <option value="1">Proyek</option>
                                                         <option value="2">Retail</option>
                                                         <option value="3">Khusus</option>
-                                                        <option value="4">Sampel</option>
+                                                        <option value="4">Sample</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -333,7 +333,7 @@
                                             <option value="1">Proyek</option>
                                             <option value="2">Retail</option>
                                             <option value="3">Khusus</option>
-                                            <option value="4">Sampel</option>
+                                            <option value="4">Sample</option>
                                         </select>
                                         <label class="" for="type">Tipe Penjualan</label>
                                     </div>

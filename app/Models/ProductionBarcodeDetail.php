@@ -43,6 +43,11 @@ class ProductionBarcodeDetail extends Model
         return $this->belongsTo('App\Models\ProductionBarcode', 'production_barcode_id', 'id')->withTrashed();
     }
 
+    public function parent()
+    {
+        return $this->belongsTo('App\Models\ProductionBarcode', 'production_barcode_id', 'id')->withTrashed();
+    }
+
     public function item()
     {
         return $this->belongsTo('App\Models\Item', 'item_id', 'id')->withTrashed();

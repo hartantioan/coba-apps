@@ -349,6 +349,7 @@ class ProductionFgReceiveController extends Controller
                 $arrItemMore = [];
                 $arrItem = [];
                 $arrQty = [];
+                $passedBatchCode = true;
 
                 if($request->arr_production_batch_id){
                     foreach($request->arr_production_batch_id as $key => $row){
@@ -378,6 +379,11 @@ class ProductionFgReceiveController extends Controller
                 }
 
                 if($request->arr_item_id){
+                    $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
+                    if(!$batch){
+                        $passedBatchCode = false;
+                    }
+
                     foreach($request->arr_item_id as $key => $row){
                         $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
                             $query->where('item_id',$row)->orderByDesc('created_at');
@@ -434,6 +440,13 @@ class ProductionFgReceiveController extends Controller
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Mohon maaf! '.implode(', ',$arrBatchError),
+                    ]);
+                }
+
+                if(!$passedBatchCode){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf! batch tidak ditemukan di transaksi Produksi Barcode.',
                     ]);
                 }
                 
@@ -620,17 +633,14 @@ class ProductionFgReceiveController extends Controller
                             'total'                     => $rowtotal,
                         ]);
 
-                        ProductionBatch::create([
-                            'code'          => $request->arr_pallet_no[$key],
-                            'item_id'       => $pfrd->item_id,
-                            'place_id'      => $query->place_id,
-                            'warehouse_id'  => $pfrd->item->warehouse(),
-                            'lookable_type' => $pfrd->getTable(),
-                            'lookable_id'   => $pfrd->id,
-                            'qty'           => $pfrd->qty,
-                            'qty_real'      => $pfrd->qty,
-                            'total'         => $pfrd->total,
-                        ]);
+                        $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
+                        if($batch){
+                            $batch->update([
+                                'lookable_type' => $pfrd->getTable(),
+                                'lookable_id'   => $pfrd->id,
+                                'total'         => $pfrd->total,
+                            ]);
+                        }
 
                         $totalCostAll -= $rowtotalbatch;
                     }
@@ -1009,8 +1019,10 @@ class ProductionFgReceiveController extends Controller
                 }
                 
                 foreach($query->productionFgReceiveDetail as $row){
-                    if($row->productionBatch()->exists()){
-                        $row->productionBatch()->delete();
+                    if(!$row->productionBarcodeDetail()->exists()){
+                        if($row->productionBatch()->exists()){
+                            $row->productionBatch()->delete();
+                        }
                     }
                     if($row->productionBarcodeDetail()->exists()){
                         if($row->productionBarcodeDetail->productionBarcode->alreadyReceived()){

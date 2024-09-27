@@ -54,7 +54,7 @@ class ProductionBatchController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = ProductionBatch::count();
+        $total_data = ProductionBatch::whereNotNull('lookable_type')->count();
         
         $query_data = ProductionBatch::where(function($query) use ($search, $request) {
                 if($search) {
@@ -87,6 +87,7 @@ class ProductionBatchController extends Controller
                 }
 
             })
+            ->whereNotNull('lookable_type')
             ->offset($start)
             ->limit($length)
             ->orderBy($order, $dir)
@@ -122,6 +123,7 @@ class ProductionBatchController extends Controller
                     $query->whereDate('created_at','<=', $request->finish_date);
                 }
             })
+            ->whereNotNull('lookable_type')
             ->count();
 
         $response['data'] = [];

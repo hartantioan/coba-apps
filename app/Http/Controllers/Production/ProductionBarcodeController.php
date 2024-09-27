@@ -507,6 +507,16 @@ class ProductionBarcodeController extends Controller
                                 'pallet_id'                 => $request->arr_pallet_id[$key],
                                 'grade_id'                  => $request->arr_grade_id[$key],
                             ]);
+
+                            ProductionBatch::create([
+                                'code'          => $request->arr_pallet_no[$key],
+                                'item_id'       => $pfrd->item_id,
+                                'place_id'      => $query->place_id,
+                                'warehouse_id'  => $pfrd->item->warehouse(),
+                                'qty'           => $pfrd->qty,
+                                'qty_real'      => $pfrd->qty,
+                                'total'         => 0,
+                            ]);
                         }
                         
                         CustomHelper::sendApproval($query->getTable(),$query->id,'Production Barcode No. '.$query->code);
@@ -772,6 +782,10 @@ class ProductionBarcodeController extends Controller
                 ];
             }else{
                 $tempStatus = $query->status;
+
+                foreach($query->productionBarcodeDetail as $row){
+                    ProductionBatch::where('code',$row->pallet_no)->delete();
+                }
 
                 $query->update([
                     'status'    => '5',

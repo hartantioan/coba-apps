@@ -385,7 +385,7 @@ class DocumentTaxController extends Controller
         ->where('replace', $xmlObject->fgPengganti)
         ->where('transaction_code', $xmlObject->kdJenisTransaksi)
         ->whereNull('deleted_at')
-        ->whereIn('status',['1','2']) 
+        ->whereIn('status',['1','2','4']) 
         ->exists();
         
         

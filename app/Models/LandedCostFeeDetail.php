@@ -69,4 +69,14 @@ class LandedCostFeeDetail extends Model
 
         return $total;
     }
+
+    public function totalInvoice(){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceRealDetail as $rowinvoice){
+            $total += round($rowinvoice->total,2);
+        }
+
+        return $total;
+    }
 }

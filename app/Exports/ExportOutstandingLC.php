@@ -50,7 +50,7 @@ class ExportOutstandingLC implements FromView,ShouldAutoSize
             $entry["nama_coa"] = $row->landedCostFee->coa->name;
             $entry["total_rupiah"] = number_format($row->landedCost->total*$row->landedCost->currency_rate,2,',','.');
             $entry["tagihan"] = number_format($row->total * $row->landedCost->currency_rate,2,',','.');
-            $entry["dibayar"] = number_format($row->landedCost->totalInvoice(),2,',','.');
+            $entry["dibayar"] = number_format($row->totalInvoice() * $row->landedCost->currency_rate,2,',','.');
             $entry["sisa"] = number_format($row->balanceInvoice() * $row->landedCost->currency_rate,2,',','.');
             if($row->balanceInvoice() > 0){
                 $array[] = $entry;

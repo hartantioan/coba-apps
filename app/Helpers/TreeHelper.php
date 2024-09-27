@@ -2282,9 +2282,9 @@ class TreeHelper {
                     $finished_data_id_pr[]=$pr_id;
                     $query_pr = PurchaseRequest::find($pr_id);
                     foreach($query_pr->purchaseRequestDetail as $purchase_request_detail){
-                        if($purchase_request_detail->purchaseOrderDetail()->exists()){
+                        if($purchase_request_detail->purchaseOrderDetailnoStatus()->exists()){
                         
-                            foreach($purchase_request_detail->purchaseOrderDetail as $purchase_order_detail){
+                            foreach($purchase_request_detail->purchaseOrderDetailnoStatus as $purchase_order_detail){
                                 if($purchase_order_detail->purchaseOrder->isSecretPo()){
                                     $name = null;
                                    

@@ -1875,12 +1875,12 @@
                 <input type="hidden" name="arr_id_data_destination[]" value="">
                 <td class="center">
                     <label>
-                        <input class="with-gap" name="check_destination" type="radio" value="` + count + `" `+checked+`>
+                        <input class="with-gap" name="check_destination" autocomplete="off" type="radio" value="` + count + `" `+checked+`>
                         <span>Pilih</span>
                     </label>
                 </td>
                 <td class="center">
-                    <input name="arr_address_destination[]" type="text" placeholder="Alamat Kantor">
+                    <input name="arr_address_destination[]" type="text" autocomplete="off" placeholder="Alamat Kantor">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_country_destination` + code + `" name="arr_country_destination[]"></select>
@@ -1986,7 +1986,7 @@
                     </label>
                 </td>
                 <td class="center">
-                    <input name="arr_address_document[]" type="text" placeholder="Alamat Kantor">
+                    <input autocomplete="off" name="arr_address_document[]" type="text" placeholder="Alamat Kantor">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_country_document` + code + `" name="arr_country_document[]"></select>
@@ -2091,16 +2091,16 @@
                     </label>
                 </td>
                 <td>
-                    <input name="arr_bank[]" type="text" placeholder="Nama Bank">
+                    <input autocomplete="off" name="arr_bank[]" type="text" placeholder="Nama Bank">
                 </td>
                 <td>
-                    <input name="arr_name[]" type="text" placeholder="Atas nama">
+                    <input autocomplete="off" name="arr_name[]" type="text" placeholder="Atas nama">
                 </td>
                 <td class="center">
-                    <input name="arr_no[]" type="text" placeholder="No rekening">
+                    <input autocomplete="off" name="arr_no[]" type="text" placeholder="No rekening">
                 </td>
                 <td>
-                    <input name="arr_branch[]" type="text" placeholder="Cabang">
+                    <input autocomplete="off" name="arr_branch[]" type="text" placeholder="Cabang">
                 </td>
                 
                 <td class="center">
@@ -2131,16 +2131,16 @@
                     </label>
                 </td>
                 <td>
-                    <input name="arr_title[]" type="text" style="width:200px !important;">
+                    <input autocomplete="off" name="arr_title[]" type="text" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    <input name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;">
+                    <input autocomplete="off" name="arr_content[]" type="text" placeholder="Isi informasi tambahan" style="width:200px !important;">
                 </td>
                 <td class="center">
-                    <input name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" class="npwp">
+                    <input autocomplete="off" name="arr_npwp[]" type="text" placeholder="Nomor NPWP" style="width:200px !important;" class="npwp">
                 </td>
                 <td class="center">
-                    <input name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;">
+                    <input autocomplete="off" name="arr_address[]" type="text" placeholder="Alamat Kantor" style="width:200px !important;">
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_country` + count + `" name="arr_country[]"></select>
@@ -2236,10 +2236,10 @@
             <tr class="row_driver">
                 <input type="hidden" name="arr_id_driver[]" value="">
                 <td>
-                    <input name="arr_driver_name[]" type="text" placeholder="Nama supir...">
+                    <input autocomplete="off" name="arr_driver_name[]" type="text" placeholder="Nama supir...">
                 </td>
                 <td class="center">
-                    <input name="arr_driver_hp[]" type="text" placeholder="Ex: 081333313123">
+                    <input autocomplete="off" name="arr_driver_hp[]" type="text" placeholder="Ex: 081333313123">
                 </td>
                 <td class="center">
                     <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-driver" href="javascript:void(0);">

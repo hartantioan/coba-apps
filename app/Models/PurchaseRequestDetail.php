@@ -139,6 +139,14 @@ class PurchaseRequestDetail extends Model
             $query->whereIn('status',['1','2','3']);
         });
     }
+
+    public function purchaseOrderDetailnoStatus()
+    {
+        return $this->hasMany('App\Models\PurchaseOrderDetail', 'purchase_request_detail_id', 'id')->whereHas('purchaseOrder',function($query){
+            
+        });
+    }
+
     public function purchaseOrderDetailProgressReport()
     {
         return $this->hasMany('App\Models\PurchaseOrderDetail', 'purchase_request_detail_id', 'id')->whereHas('purchaseOrder',function($query){

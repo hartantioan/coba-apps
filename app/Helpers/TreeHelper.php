@@ -526,33 +526,33 @@ class TreeHelper {
                         }
                     }
 
-                    if($query_gs->goodScaleDetail()->exists()){
-                        foreach($query_gs->goodScaleDetail as $row_detail){
-                            if($row_detail->marketingOrderDelivery()->exists()){
-                                 $mod_tempura = [
-                                     'properties'=> [
-                                         ['name'=> "Tanggal: ".$row_detail->marketingOrderDelivery->post_date],
+                    // if($query_gs->goodScaleDetail()->exists()){
+                    //     foreach($query_gs->goodScaleDetail as $row_detail){
+                    //         if($row_detail->marketingOrderDelivery()->exists()){
+                    //              $mod_tempura = [
+                    //                  'properties'=> [
+                    //                      ['name'=> "Tanggal: ".$row_detail->marketingOrderDelivery->post_date],
                                          
-                                     ],
-                                     'key'=>$row_detail->marketingOrderDelivery->code,
-                                     'name'=>$row_detail->marketingOrderDelivery->code,
-                                     'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($row_scale->goodReceipt->code),
-                                 ];
+                    //                  ],
+                    //                  'key'=>$row_detail->marketingOrderDelivery->code,
+                    //                  'name'=>$row_detail->marketingOrderDelivery->code,
+                    //                  'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($row_scale->goodReceipt->code),
+                    //              ];
  
-                                 $data_go_chart[]=$mod_tempura;
-                                 $data_link[]=[
-                                     'from'=>$row_detail->marketingOrderDelivery->code,
-                                     'to'=>$query_gs->code,
-                                     'string_link'=>$row_detail->marketingOrderDelivery->code.$query_gs->code
-                                 ];
-                                 if(!in_array($row_detail->marketingOrderDelivery->id, $data_id_mo_delivery)){
-                                     $data_id_mo_delivery[]= $row_detail->marketingOrderDelivery->id; 
-                                     $added = true; 
-                                 }
-                                 $data_id_gr[]= $row_scale->goodReceipt->id;
-                            }
-                        }
-                    }
+                    //              $data_go_chart[]=$mod_tempura;
+                    //              $data_link[]=[
+                    //                  'from'=>$row_detail->marketingOrderDelivery->code,
+                    //                  'to'=>$query_gs->code,
+                    //                  'string_link'=>$row_detail->marketingOrderDelivery->code.$query_gs->code
+                    //              ];
+                    //              if(!in_array($row_detail->marketingOrderDelivery->id, $data_id_mo_delivery)){
+                    //                  $data_id_mo_delivery[]= $row_detail->marketingOrderDelivery->id; 
+                    //                  $added = true; 
+                    //              }
+                    //              $data_id_gr[]= $row_scale->goodReceipt->id;
+                    //         }
+                    //     }
+                    // }
 
                     // if($query_gs->purchaseOrderDetail()->exists()){
                     //     $po = [

@@ -2374,6 +2374,17 @@
                     }
                 }
 
+                let countItem = $('.row_item').length;
+
+                if(countItem > 60){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Maaf, tidak bisa menyimpan lebih dari 60 item.',
+                        icon: 'error'
+                    });
+                    return false;
+                }
+
                 if(passedUpload){
                     var formData = new FormData($('#form_data')[0]), passedUnit = true;
 

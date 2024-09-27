@@ -44,6 +44,7 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
         'Tgl Posting',
         'Valid Date',
         'Perusahaan',
+        'Customer',
         'Ekspedisi',
         'MOD',
         'Nama Supir',
@@ -88,6 +89,9 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
                                         $query->where('code','like',"%$this->search%")
                                             ->orWhere('name','like',"%$this->search%");
                                         });
+                                })->orWhereHas('customer',function($query){
+                                    $query->where('name','like',"%$this->search%")
+                                        ->orWhere('employee_no','like',"%$this->search%");
                                 });
                         });
                 });
@@ -141,6 +145,7 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
                 'valid_date'        => date('d/m/Y',strtotime($row->valid_date)),
                 'perusahaan'           => $row->company->name,
                 'ekspedisi'              => $row->account->name,
+                'ekspedisi'              => $row->marketingOrderDelivery->customer->name,
                 'mod'           =>  $row->marketingOrderDelivery->code,
                 'nama_supir'        => $row->driver_name,
                 'no_wa_supir'            => $row->driver_hp,

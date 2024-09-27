@@ -176,7 +176,7 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                 $arr[] = [
                     'no'                => ($key + 1),
                     'code'              => $row->code,
-                    'code'              => $row->document_no,
+                    'babi'              => $row->document_no,
                     'status'            => $row->statusRaw(),
                     'nik'               => $row->user->employee_no,
                     'user'              => $row->user->name,

@@ -64,12 +64,12 @@
                     <td>{{ $row_detail->item->code}}</td>
                     <td>{{ $row_detail->item->name }}</td>
                     <td>{{ $row_detail->place->code }}</td>
-                    <td>{{ $row->note_internal}}</td>
-                    <td>{{ $row->note_external }}</td>
                     <td>{{ $row_detail->qty }}</td>
                     <td>{{ $row_detail->marketingOrderDetail->itemUnit->unit->code }}</td>
                     <td>{{ round($row_detail->qty * $row_detail->marketingOrderDetail->qty_conversion,3) }}</td>
                     <td>{{ ($row_detail->item->uomUnit->code) }}</td>
+                    <td>{{ $row->note_internal}}</td>
+                    <td>{{ $row->note_external }}</td>
                     <td>{{ $row_detail->note }}</td>
                     <td>{{ $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-' }}</td>
                 </tr>

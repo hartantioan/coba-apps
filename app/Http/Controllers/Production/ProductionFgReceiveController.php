@@ -633,7 +633,7 @@ class ProductionFgReceiveController extends Controller
                             'total'                     => $rowtotal,
                         ]);
 
-                        $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
+                        $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->whereNull('lookable_type')->first();
                         if($batch){
                             $batch->update([
                                 'lookable_type' => $pfrd->getTable(),
@@ -1023,6 +1023,12 @@ class ProductionFgReceiveController extends Controller
                         if($row->productionBatch()->exists()){
                             $row->productionBatch()->delete();
                         }
+                    }else{
+                        $row->productionBatch->update([
+                            'lookable_type' => NULL,
+                            'lookable_id'   => NULL,
+                            'total'         => 0,
+                        ]);
                     }
                     if($row->productionBarcodeDetail()->exists()){
                         if($row->productionBarcodeDetail->productionBarcode->alreadyReceived()){

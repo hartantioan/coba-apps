@@ -191,6 +191,7 @@ class ProductionBatch extends Model
         $query = ProductionBatch::selectRaw('RIGHT(code, 5) as code')
             ->whereRaw("RIGHT(code, 9) LIKE '$yearmonth%'")
             ->withTrashed()
+            ->orderByDesc('code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();

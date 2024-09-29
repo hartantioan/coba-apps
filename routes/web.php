@@ -298,6 +298,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('province', [Select2Controller::class, 'province']);
                 Route::get('country', [Select2Controller::class, 'country']);
                 Route::get('item', [Select2Controller::class, 'item']);
+                Route::get('simple_item', [Select2Controller::class, 'simpleItem']);
                 Route::get('item_for_production_issue', [Select2Controller::class, 'itemForProductionIssue']);
                 Route::get('bom_standard', [Select2Controller::class, 'bomStandard']);
                 Route::get('bom_item', [Select2Controller::class, 'bomItem']);

@@ -190,7 +190,7 @@
             dropdownAutoWidth: true,
             width: '100%',
         });
-        select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
+        select2ServerSide('#item_id', '{{ url("admin/select2/simple_item") }}');
     });
     function filter(){
         var formData = new FormData($('#form_data')[0]);

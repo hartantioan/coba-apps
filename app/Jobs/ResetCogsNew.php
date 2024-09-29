@@ -903,13 +903,13 @@ class ResetCogsNew implements ShouldQueue
                     $productionReceive = ProductionReceive::where('id',$rowreceiveissue->production_receive_id)->whereIn('status',['2','3'])->first();
                     if($productionReceive){
                         $productionReceive->recalculate();
-                        foreach($productionReceive->productionReceiveDetail as $rowreceive){
+                        /* foreach($productionReceive->productionReceiveDetail as $rowreceive){
                             if($rowreceive->productionBatch()->exists()){
                                 foreach($rowreceive->productionBatch as $rowbatch2){
                                     self::dispatch($dateloop,$productionReceive->company_id,$rowbatch2->place_id,$rowbatch2->item_id,NULL,NULL,$rowbatch2->id);
                                 }
                             }
-                        }
+                        } */
                     }
                 }
             }
@@ -917,7 +917,7 @@ class ResetCogsNew implements ShouldQueue
                 $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                 if($productionFgReceive){
                     $productionFgReceive->recalculate($dateloop);
-                    self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL);
+                    /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
                 }
             }
             if($row->productionIssue->journal()->exists()){

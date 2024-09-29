@@ -99,13 +99,13 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
         /* $dataissue = ProductionIssue::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get();
 
@@ -115,11 +115,11 @@ class MenuController extends Controller
 
         $datahandover = ProductionHandover::whereIn('status',['2','3'])->where('post_date','>=','2024-09-23')->get(); */
 
-        $data = ProductionBatch::whereNotNull('lookable_type')->whereIn('lookable_type',['production_handover_details'])->where('post_date','>=','2024-09-23')->get();
+        /* $data = ProductionBatch::whereNotNull('lookable_type')->whereIn('lookable_type',['production_handover_details'])->where('post_date','>=','2024-09-23')->get();
 
         foreach($data as $batch){
             ResetCogsNew::dispatch($batch->post_date,1,$batch->place_id,$batch->item_id,$batch->area_id,$batch->item_shading_id,$batch->id);
-        }
+        } */
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();
 

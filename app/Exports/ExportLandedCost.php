@@ -2,8 +2,10 @@
 
 namespace App\Exports;
 
+use App\Helpers\CustomHelper;
 use App\Models\LandedCost;
 use App\Models\LandedCostDetail;
+use App\Models\LandedCostFeeDetail;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -42,32 +44,31 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
         'Kode Broker',
         'Nama Broker',
         'Keterangan',
-        'Kode Item',
-        'Nama Item',
-        'Plant',
-        'Qty',
-        'Satuan',
+        'Kode Biaya',
+        'Nama Biaya',
         'Total',
+        'PPN',
+        'PPh',
+        'Grandtotal',
         'Based On',
     ];
 
     public function collection()
     {
         if($this->mode == '1'){
-            $data = LandedCostDetail::whereHas('landedCost',function ($query) {
+            $data = LandedCostFeeDetail::whereHas('landedCost',function ($query) {
                 $query->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->end_date);
             })
             ->get();
         }elseif($this->mode == '2'){
-            $data = LandedCostDetail::withTrashed()->whereHas('landedCost',function ($query) {
+            $data = LandedCostFeeDetail::withTrashed()->whereHas('landedCost',function ($query) {
                 $query->where(function ($query) {
                     $query->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<=', $this->end_date);
                 });
             })
             ->where(function ($query) {
-                    
                 $query->whereNull('deleted_at')
                       ->orWhereHas('landedCost', function ($query) {
                           $query->withTrashed()->whereNotNull('deleted_at');
@@ -95,12 +96,12 @@ class ExportLandedCost implements FromCollection, WithTitle, WithHeadings, Shoul
                 'broker_code'   => $row->landedCost->account->employee_no,
                 'broker'        => $row->landedCost->account->name,
                 'note'          => $row->landedCost->note,
-                'item_code'     => $row->item->code,
-                'item_name'     => $row->item->name,
-                'place'         => $row->place->code,
-                'qty'           => $row->qty,
-                'unit'          => $row->item->uomUnit->code,
-                'total'         => number_format($row->nominal,2,',','.'),
+                'item_code'     => $row->landedCostFee->code,
+                'item_name'     => $row->landedCostFee->name,
+                'total'         => round($row->total * $row->landedCost->currency_rate,3),
+                'tax'           => round($row->tax * $row->landedCost->currency_rate,3),
+                'wtax'          => round($row->wtax * $row->landedCost->currency_rate,3),
+                'grandtotal'    => round($row->grandtotal * $row->landedCost->currency_rate,3),
                 'based_on'      => $row->landedCost->getReference(),
             ];
         }

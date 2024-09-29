@@ -95,13 +95,21 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $data = ProductionBatch::whereNotNull('lookable_type')->get();
+
+        foreach($data as $row){
+            $row->update([
+                'post_date' => $row->lookable->parent->post_date,
+            ]);
+        }
 
         /* CustomHelper::accumulateCogs('2024-09-20',1,1,5388); */
         

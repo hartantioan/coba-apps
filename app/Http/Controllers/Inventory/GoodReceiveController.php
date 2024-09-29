@@ -579,6 +579,7 @@ class GoodReceiveController extends Controller
                                 'qty'               => $grd->qty,
                                 'qty_real'          => $grd->qty,
                                 'total'             => $grd->total,
+                                'post_date'         => $query->post_date,
                             ]);
                         }
                     }

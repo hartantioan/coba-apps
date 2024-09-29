@@ -706,7 +706,8 @@ class ProductionReceiveController extends Controller
                                         'lookable_id'   => $querydetail->id,
                                         'qty'           => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
                                         'qty_real'      => str_replace(',','.',str_replace('.','',$request->arr_qty_batch[$keydetail])),
-                                        'total'         => 0
+                                        'total'         => 0,
+                                        'post_date'     => $query->post_date,
                                     ]);
                                 }
                             }

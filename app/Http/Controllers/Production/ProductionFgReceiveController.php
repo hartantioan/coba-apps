@@ -639,6 +639,7 @@ class ProductionFgReceiveController extends Controller
                                 'lookable_type' => $pfrd->getTable(),
                                 'lookable_id'   => $pfrd->id,
                                 'total'         => $pfrd->total,
+                                'post_date'     => $query->post_date,
                             ]);
                         }
 
@@ -1028,6 +1029,7 @@ class ProductionFgReceiveController extends Controller
                             'lookable_type' => NULL,
                             'lookable_id'   => NULL,
                             'total'         => 0,
+                            'post_date'     => NULL,
                         ]);
                     }
                     if($row->productionBarcodeDetail()->exists()){

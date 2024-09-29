@@ -426,6 +426,7 @@ class ProductionRepackController extends Controller
                                 'qty'               => $prd->qty,
                                 'qty_real'          => $prd->qty,
                                 'total'             => $total,
+                                'post_date'         => $query->post_date,
                             ]);
 
                             $prd->update([

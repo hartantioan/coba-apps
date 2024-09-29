@@ -498,6 +498,7 @@ class ProductionHandoverController extends Controller
                                 'qty'           => $qtyuom,
                                 'qty_real'      => $qtyuom,
                                 'total'         => $rowcost,
+                                'post_date'     => $query->post_date,
                             ]);
                         }
                     }

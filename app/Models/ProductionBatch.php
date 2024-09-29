@@ -25,7 +25,8 @@ class ProductionBatch extends Model
         'lookable_id',
         'qty',
         'qty_real',
-        'total'
+        'total',
+        'post_date',
     ];
 
     public function itemShading(){

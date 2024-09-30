@@ -39,10 +39,16 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
                 'post_date'         => date('d/m/Y', strtotime($row->post_date)),
                 'customer' => $row->account->name,
                 'deliveraddress' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address,
+                'subtotal' => $row->subtotal,
+                'dp' => $row->downpayment,
+                'tax' => $row->tax,
                 'total' => $row->grandtotal,
                 'taxno' => $row->tax_no,
                 'payment' => $row->type(),
                 'duedateinternal' => date('d/m/Y', strtotime($row->due_date_internal)),
+                'nonpwp' => $row->userData->npwp,
+                'namanpwp' => $row->userData->title,
+                'alamatnpwp' => $row->userData->address,
             ];
         }
 

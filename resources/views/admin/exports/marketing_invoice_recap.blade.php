@@ -8,7 +8,13 @@
             <th class="center-align">Customer</th>
             <th class="center-align">Deliver Address</th>
             <th class="center-align">Tax No</th>
+            <th class="center-align">No NPWP</th>
+            <th class="center-align">Nama NPWP</th>
+            <th class="center-align">Alamat NPWP</th>
             <th class="center-align">Tipe Payment</th>
+            <th class="center-align">Subtotal</th>
+            <th class="center-align">DP</th>
+            <th class="center-align">Tax</th>
             <th class="center-align">Total</th>
            
         </tr>
@@ -23,7 +29,13 @@
             <td>{{ $row['customer'] }}</td>
             <td>{{ $row['deliveraddress'] }}</td>
             <td>{{ $row['taxno'] }}</td>
+            <td>{{ $row['nonpwp'] }}</td>
+            <td>{{ $row['namanpwp'] }}</td>
+            <td>{{ $row['alamatnpwp'] }}</td>
             <td>{{ $row['payment'] }}</td>
+            <td>{{ $row['subtotal'] }}</td>
+            <td>{{ $row['dp'] }}</td>
+            <td>{{ $row['tax'] }}</td>
             <td>{{ $row['total'] }}</td>
         
                 

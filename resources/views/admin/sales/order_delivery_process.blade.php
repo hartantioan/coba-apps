@@ -564,7 +564,7 @@
                                         <option value="1">Dokumen SJ telah dibuat</option>
                                         <option value="2">Barang telah dikirimkan</option>
                                         <option value="3">Barang tiba di customer</option>
-                                        <option value="5">Surat Jalan telah kembali</option>
+                                        {{-- <option value="5">Surat Jalan telah kembali</option> --}}
                                     </select>
                                     <label class="active" for="status_tracking">Status Tracking</label>
                                 </div>

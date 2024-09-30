@@ -176,6 +176,7 @@ use App\Http\Controllers\Sales\MarketingOrderRecapController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
+use App\Http\Controllers\Sales\MarketingARDPrecapController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -2836,6 +2837,11 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_marketing_invoice')->middleware('operation.access:report_marketing_invoice,view')->group(function () {
                         Route::get('/', [MarketingInvoiceRecapController::class, 'index']);
                         Route::get('export', [MarketingInvoiceRecapController::class, 'export']);
+                    });
+
+                    Route::prefix('report_marketing_down_payment')->middleware('operation.access:report_marketing_down_payment,view')->group(function () {
+                        Route::get('/', [MarketingARDPrecapController::class, 'index']);
+                        Route::get('export', [MarketingARDPrecapController::class, 'export']);
                     });
 
                     Route::prefix('outstanding_sales_order')->middleware('operation.access:outstanding_sales_order,view')->group(function () {

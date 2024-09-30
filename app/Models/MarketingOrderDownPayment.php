@@ -241,6 +241,24 @@ class MarketingOrderDownPayment extends Model
             $query->whereIn('status',['2','3']);
         });
     }
+    
+    public function getCodeIncomingPayments()
+    {
+        $arr = [];
+        $tanggal = [];
+        foreach ($this->incomingPaymentDetail as $row)
+        {
+            if (!in_array($row->incomingPayment->code,$arr))
+            {
+                $arr[]=$row->incomingPayment->code;
+                $tanggal[]=$row->incomingPayment->post_date;
+            }
+        }
+        
+        $no = implode(',',$arr);
+        $tanggal = implode(',',$tanggal);
+        return array($no,$tanggal);
+    }
 
     public function marketingOrderMemoDetail(){
         return $this->hasMany('App\Models\MarketingOrderMemoDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderMemo',function($query){

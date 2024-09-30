@@ -161,6 +161,8 @@
                                                         <th>Ekspedisi</th>
                                                         <th>MOD</th>
                                                         <th>Tgl.Post</th>
+                                                        <th>Tgl.Terima Cust.</th>
+                                                        <th>Tgl.SJ Kembali</th>
                                                         <th>Nama Supir</th>
                                                         <th>No.HP/WA Supir</th>
                                                         <th>Tipe Kendaraan</th>
@@ -558,7 +560,7 @@
                             <div class="col s12">
                                 <div class="input-field col m6 s12">
                                     <input type="hidden" name="tempTracking" id="tempTracking">
-                                    <select class="browser-default" id="status_tracking" name="status_tracking">
+                                    <select class="browser-default" id="status_tracking" name="status_tracking" onchange="showReceiveDate(this.value);">
                                         <option value="1">Dokumen SJ telah dibuat</option>
                                         <option value="2">Barang telah dikirimkan</option>
                                         <option value="3">Barang tiba di customer</option>
@@ -568,6 +570,10 @@
                                 </div>
                                 <div class="file-field input-field col m6 s12">
                                     <button class="btn waves-effect waves-light teal submit" onclick="saveTracking();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+                                </div>
+                                <div class="input-field col m6 s12 hide" id="div-receive-date">
+                                    <input id="receive_date" name="receive_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl.Diterima Customer">
+                                    <label class="active" for="receive_date">Tgl.Diterima Customer</label>
                                 </div>
                             </div>
                         </div>
@@ -872,6 +878,7 @@ document.addEventListener('focusin', function (event) {
             },
             onOpenEnd: function(modal, trigger) { 
                 $('#status_tracking option:not([disabled]):first').attr("selected",true);
+                $('#status_tracking').trigger('change');
             },
             onCloseEnd: function(modal, trigger){
                 $('#tempTracking').val('');
@@ -883,6 +890,8 @@ document.addEventListener('focusin', function (event) {
                     $('#imageTracking' + i).css("filter", "grayscale(100%)");
                     $('#dateTracking' + i).text('-');
                 }
+                $('#receive_date').val('');
+                $('#div-receive-date').addClass('hide');
             }
         });
 
@@ -938,6 +947,14 @@ document.addEventListener('focusin', function (event) {
             } 
         }); 
     });
+
+    function showReceiveDate(val){
+        if(val){
+            if(val == '3'){
+                $('#div-receive-date').removeClass('hide');
+            }
+        }
+    }
 
     function getMarketingOrderDelivery(){
         if($('#marketing_order_delivery_id').val()){
@@ -1645,6 +1662,7 @@ document.addEventListener('focusin', function (event) {
                             $('#imageTracking' + response.param).css("filter", "");
                             $('#dateTracking' + response.param).text(response.date);
                             loadDataTable();
+                            $('#status_tracking').trigger('change');
                         } else if(response.status == 422) {
                             $('#validation_alert_tracking').show();
                             $('.modal-content').scrollTop(0);
@@ -1908,6 +1926,8 @@ document.addEventListener('focusin', function (event) {
                 { name: 'account_id', className: '' },
                 { name: 'marketing_order_delivery_no', searchable: false, orderable: false, className: '' },
                 { name: 'post_date', className: '' },
+                { name: 'receive_date', className: '' },
+                { name: 'return_date', className: '' },
                 { name: 'driver_name', className: '' },
                 { name: 'driver_no', className: '' },
                 { name: 'vehicle_name', className: '' },

@@ -141,6 +141,8 @@ class MarketingOrderDeliveryProcessController extends Controller
             'account_id',
             'marketing_order_delivery_no',
             'post_date',
+            'receive_date',
+            'return_date',
             'driver_name',
             'driver_no',
             'vehicle_name',
@@ -306,6 +308,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->account->name,
                     $val->marketingOrderDelivery->code,
                     date('d/m/Y',strtotime($val->post_date)),
+                    $val->receive_date ? date('d/m/Y',strtotime($val->receive_date)) : '-',
+                    $val->return_date ? date('d/m/Y',strtotime($val->return_date)) : '-',
                     $val->driver_name,
                     $val->driver_hp,
                     $val->vehicle_name,
@@ -1316,6 +1320,16 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'message' => 'Status kembali hanya bisa diisi melalui form disamping kanan / Surat Jalan Kembali.'
                 ]);
             }
+
+            if($request->status_tracking == '3'){
+                if(!$request->receive_date){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Tanggal terima di Customer tidak boleh kosong.',
+                    ]);
+                }
+            }
+
             $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->tempTracking))->first();
 
             /* if($data->weight_netto <= 0){
@@ -1343,6 +1357,9 @@ class MarketingOrderDeliveryProcessController extends Controller
             }
 
             if($request->status_tracking == '3'){
+                $data->update([
+                    'receive_date'  => $request->receive_date,
+                ]);
                 $data->createJournalReceiveDocument();
                 $data->createInvoice();
             }
@@ -1619,6 +1636,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'marketing_order_delivery_process_id'   => $modp->id,
                     'status'                                => $request->status,
                 ]);
+            }
+
+            if($request->status == '3'){
+                $modp->update([
+                    'receive_date'  => $request->receive_date,
+                ]);
+                $modp->createJournalReceiveDocument();
+                $modp->createInvoice();
             }
 
             return response()->json([

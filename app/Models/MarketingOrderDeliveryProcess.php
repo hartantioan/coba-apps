@@ -24,6 +24,7 @@ class MarketingOrderDeliveryProcess extends Model
         'account_id',
         'marketing_order_delivery_id',
         'post_date',
+        'receive_date',
         'return_date',
         'user_driver_id',
         'driver_name',
@@ -387,7 +388,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function createInvoice(){
         #linkkan ke AR Invoice
-        $query = $this;
+        $query = MarketingOrderDeliveryProcess::find($this->id);
         $passed = true;
         foreach($query->marketingOrderDeliveryProcessDetail as $row){
             if($row->marketingOrderInvoiceDetail()->exists()){
@@ -617,15 +618,15 @@ class MarketingOrderDeliveryProcess extends Model
     }
 
     public function createJournalReceiveDocument(){
-        $modp = $this;
+        $modp = MarketingOrderDeliveryProcess::find($this->id);
 			
         $query = Journal::create([
             'user_id'		=> $modp->user_id,
             'company_id'    => $modp->company_id,
-            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->return_date)).'00'),
+            'code'			=> Journal::generateCode('JOEN-'.date('y',strtotime($modp->receive_date)).'00'),
             'lookable_type'	=> 'marketing_order_delivery_processes',
             'lookable_id'	=> $modp->id,
-            'post_date'		=> $modp->return_date,
+            'post_date'		=> $modp->receive_date,
             'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);

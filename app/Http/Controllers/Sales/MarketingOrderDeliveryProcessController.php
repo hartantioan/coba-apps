@@ -1285,7 +1285,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         foreach($data->marketingOrderDeliveryProcessTrack as $key => $row){
             $arrTracking[] = [
                 'status'    => $row->status,
-                'date'      => ($row->status == '3' ?  date('d/m/Y',strtotime($data->receive_date)).'<br>' : '').date('d/m/Y H:i:s',strtotime($row->updated_at)),
+                'date'      => ($row->status == '3' ?  'Tgl. Terima customer : '.date('d/m/Y',strtotime($data->receive_date)).'<br>' : '').date('d/m/Y H:i:s',strtotime($row->updated_at)),
             ];
         }
 

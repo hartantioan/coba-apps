@@ -3958,6 +3958,10 @@ class CustomHelper {
 			$journal = Journal::find($query->id);
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();
+			
+			$moi->marketingOrderDeliveryProcess->update([
+				'status'	=> '3'
+			]);
 
 		}elseif($table_name == 'marketing_order_memos'){
 

@@ -1605,7 +1605,7 @@ document.addEventListener('focusin', function (event) {
                     $.each(response.tracking, function(i, val) {
                         $("#status_tracking option[value='"+ val.status + "']").attr("disabled","disabled");
                         $('#imageTracking' + val.status).css("filter", "");
-                        $('#dateTracking' + val.status).text(val.date);
+                        $('#dateTracking' + val.status).html(val.date);
                     });
                     $('#status_tracking option:not([disabled]):first').attr("selected",true);
                 },

@@ -252,9 +252,16 @@ class MarketingOrderDeliveryProcess extends Model
     public function statusTrackingRaw(){
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
 
-        if($status){
-            return $status->status;
-        }else{
+        if ($status) {
+            $xstatus = match ($status->status) { 
+                '1' => 'Dokumen dibuat',
+                '2' => 'Barang dikirimkan',
+                '3' => 'Barang sampai di cust',
+                '5' => 'SJ kembali ke admin',
+                default => 'Invalid',
+            };
+            return $xstatus;
+        } else {
             return 'Status tracking tidak ditemukan.';
         }
     }

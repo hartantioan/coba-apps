@@ -31,6 +31,7 @@
             <th>Note Internal</th>
             <th>Note External</th>
             <th>Note </th>
+            <th>SO Ref.</th>
             <th>No.SJ</th>
         </tr>
     </thead>
@@ -71,6 +72,7 @@
                     <td>{{ $row->note_internal}}</td>
                     <td>{{ $row->note_external }}</td>
                     <td>{{ $row_detail->note }}</td>
+                    <td>{{ $row_detail->marketingOrderDetail->marketingOrder->code }}</td>
                     <td>{{ $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-' }}</td>
                 </tr>
                 @php

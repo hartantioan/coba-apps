@@ -250,22 +250,22 @@ class StockInRupiahController extends Controller
                             });
                         }
                     })
+                    ->orderBy('date', 'desc')
                     ->orderBy('id', 'desc')
-                    ->orderBy('date', 'desc') // Order by 'date' column in descending order
                     ->first();
                     $array_last_item[] = [
-                        'perlu'        => 1,
-                        'item_id'      => $row->item->id,
-                        'id'           => $query_first->id ?? null, 
-                        'date'         => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
-                        'last_nominal' => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
-                        'item'         => $row->item->name,
-                        'satuan'       => $row->item->uomUnit->code,
-                        'area' => $row->area->name ?? '-',
-                        'production_batch' => '-',
-                        'shading' => $row->itemShading->code ?? '-',
-                        'kode'         => $row->item->code,
-                        'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
+                        'perlu'                 => 1,
+                        'item_id'               => $row->item->id,
+                        'id'                    => $query_first->id ?? null, 
+                        'date'                  => $query_first ? date('d/m/Y', strtotime($query_first->date)) : null,
+                        'last_nominal'          => $query_first ? number_format($query_first->total_final, 2, ',', '.') : 0,
+                        'item'                  => $row->item->name,
+                        'satuan'                => $row->item->uomUnit->code,
+                        'area'                  => $row->area->name ?? '-',
+                        'production_batch'      => '-',
+                        'shading'               => $row->itemShading->code ?? '-',
+                        'kode'                  => $row->item->code,
+                        'last_qty'              => $query_first ? CustomHelper::formatConditionalQty($query_first->qty_final) : 0,
                     ];
 
 
@@ -323,7 +323,7 @@ class StockInRupiahController extends Controller
                 ->orderBy('id', 'desc')
                 ->get();
             }else{
-                /* $query_no=[];
+                $query_no=[];
                 $first = ItemCogs::where(function($query) use ( $request,$array_last_item) {
                     $query->whereHas('item',function($query) use($request){
                         $query->whereIn('status',['1','2'])->where('id',$request->item_id);
@@ -362,10 +362,10 @@ class StockInRupiahController extends Controller
                 ->first();
                 if($first){
                     $query_no[]=$first;
-                } */
+                }
             }
     
-            /* foreach($query_no as $row_tidak_ada){
+            foreach($query_no as $row_tidak_ada){
                 
                 if($row_tidak_ada->qty_final > 0){
                     $array_first_item[] = [
@@ -384,7 +384,7 @@ class StockInRupiahController extends Controller
                     ]; 
                 }
                 
-            } */
+            }
         }
         $combinedArray = [];
 

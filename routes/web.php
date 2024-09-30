@@ -177,6 +177,7 @@ use App\Http\Controllers\Sales\MarketingOrderDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
 use App\Http\Controllers\Sales\MarketingARDPrecapController;
+use App\Http\Controllers\Sales\ReportReceivableCardController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -2863,6 +2864,11 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('outstanding_marketing_invoice')->middleware('operation.access:outstanding_marketing_invoice,view')->group(function () {
                         Route::get('/', [MarketingOrderOutstandingInvoiceController::class, 'index']);
                         Route::get('export', [MarketingOrderOutstandingInvoiceController::class, 'export']);
+                    });
+
+                    Route::prefix('report_receivable_card')->middleware('operation.access:report_receivable_card,view')->group(function () {
+                        Route::get('/', [ReportReceivableCardController::class, 'index']);
+                        Route::get('export', [ReportReceivableCardController::class, 'export']);
                     });
                 });
             });

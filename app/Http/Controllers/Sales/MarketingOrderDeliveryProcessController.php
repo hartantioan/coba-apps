@@ -1104,13 +1104,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                             '.$query->user->name.'
                             </div>
                             <div class="col" id="post_date_jurnal">
-                            '.date('d/m/Y',strtotime($query->post_date)).'
+                            '.date('d/m/Y',strtotime($rowmain->post_date)).'
                             </div>
                             <div class="col" id="note_jurnal">
-                            '.$query->note.'
+                            '.$rowmain->note.'
                             </div>
                             <div class="col" id="ref_jurnal">
-                            '.$query->code.'
+                            '.$rowmain->code.'
                             </div>
                             <div class="col" id="company_jurnal">
                             '.$query->company->name.'

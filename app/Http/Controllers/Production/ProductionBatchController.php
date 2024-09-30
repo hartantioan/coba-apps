@@ -41,7 +41,7 @@ class ProductionBatchController extends Controller
             'id',
             'code',
             'item_id',
-            'created_at',
+            'post_date',
             'place_id',
             'warehouse_id',
             'area_id',
@@ -78,12 +78,12 @@ class ProductionBatchController extends Controller
                 }
 
                 if($request->start_date && $request->finish_date) {
-                    $query->whereDate('created_at', '>=', $request->start_date)
-                        ->whereDate('created_at', '<=', $request->finish_date);
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
                 } else if($request->start_date) {
-                    $query->whereDate('created_at','>=', $request->start_date);
+                    $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
-                    $query->whereDate('created_at','<=', $request->finish_date);
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
 
             })
@@ -115,12 +115,12 @@ class ProductionBatchController extends Controller
                 }
 
                 if($request->start_date && $request->finish_date) {
-                    $query->whereDate('created_at', '>=', $request->start_date)
-                        ->whereDate('created_at', '<=', $request->finish_date);
+                    $query->whereDate('post_date', '>=', $request->start_date)
+                        ->whereDate('post_date', '<=', $request->finish_date);
                 } else if($request->start_date) {
-                    $query->whereDate('created_at','>=', $request->start_date);
+                    $query->whereDate('post_date','>=', $request->start_date);
                 } else if($request->finish_date) {
-                    $query->whereDate('created_at','<=', $request->finish_date);
+                    $query->whereDate('post_date','<=', $request->finish_date);
                 }
             })
             ->whereNotNull('lookable_type')
@@ -134,7 +134,7 @@ class ProductionBatchController extends Controller
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->code,
                     $val->item->code.' - '.$val->item->name,
-                    date('d/m/Y H:i:s',strtotime($val->created_at)),
+                    date('d/m/Y H:i:s',strtotime($val->post_date)),
                     $val->place()->exists() ? $val->place->code : '-',
                     $val->warehouse()->exists() ? $val->warehouse->name : '-',
                     $val->area()->exists() ? $val->area->code : '-',
@@ -196,7 +196,7 @@ class ProductionBatchController extends Controller
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
                 <td>'.(method_exists($row->lookable,'parent') ? $row->lookable->parent->code : $row->lookable->code).'</td>
-                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->created_at)).'</td>
+                <td class="center-align">'.date('d/m/Y H:i:s',strtotime($row->post_date)).'</td>
                 <td class="center-align">'.$data->item->uomUnit->code.'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="right-align">'.CustomHelper::formatConditionalQty($balance).'</td>

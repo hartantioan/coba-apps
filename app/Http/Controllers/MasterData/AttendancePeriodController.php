@@ -166,7 +166,7 @@ class AttendancePeriodController extends Controller
         $end_date = Carbon::parse($attendance_period->end_date);
         
         $user_data = User::where(function($query) use ( $request) {
-            $query->where('employee_type','2');
+            $query->where('employee_type','3');
             // $query->whereIn('employee_no',['312401001','3230801','312312001','312312002','312310001','312401002','312401003','312402001','312402004','312402002','312402038','312402039','312402051','312403006'
             // ,'312403008','312403012']);
             // $query->whereIn('employee_no',['312401001']);

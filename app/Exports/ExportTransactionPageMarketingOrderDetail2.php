@@ -34,6 +34,9 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Variant Item',
         'No DO',
         'Status',
+
+        'No. SO',
+
         'No. MOD',
         'No Invoice',
         'PPN',
@@ -54,7 +57,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         'Alamat Tujuan',
         'Kabupaten Tujuan',
         'Kecamatan Tujuan',
-        'Tipe Pembayaran',
+
         'Tipe Penjualan',
         'Tipe Pengiriman',
         'Ekspedisi Name',
@@ -159,7 +162,10 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     'variant_item'      => $row_detail->item->type->name,
                     'no_do'             => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '-',
                     'status'            => $row->statusSAP(),
-                    'no_mod'            => $row->code,
+                    'no_so'             => $row->code,
+
+                    'no_mod'            => $row_detail->listCodeMOD(),
+
                     'no_invoice'        => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->marketingOrderInvoice->code??'-',
                     'ppn'               => $row_detail->tax,
                     'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
@@ -180,7 +186,6 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     'alamat_kirim'      => $row->destination_address,
                     'kabupaten_tujuan'  => $row->city->name,
                     'kecamatan_tujuan'  => $row->district->name,
-                    'tipe_pembayaran'   => $row->paymentType(),
                     'tipe_penjualan'   => $row->Type(),
                     'tipe_pengiriman'   => $row->deliveryType(),
                     'ekspedisi_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->account->name ?? '-',

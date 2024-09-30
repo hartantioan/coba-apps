@@ -66,6 +66,23 @@ class MarketingOrderDetail extends Model
         });
     }
 
+    public function listCodeMOD(){
+        $arr = [];
+
+        if($this->marketingOrderDeliveryDetail()->exists()){
+            foreach($this->marketingOrderDeliveryDetail as $key=>$row){
+                $code = $row->marketingorderdelivery->code;
+
+                // Check if the code is not already in the array
+                if (!in_array($code, $arr)) {
+                    $arr[] = $code; 
+                }   
+            }
+        }
+        $codesString = implode(',', $arr);
+        return $codesString;
+    }
+
     public function marketingOrderPlanDetail(){
         return $this->hasMany('App\Models\MarketingOrderPlanDetail','marketing_order_detail_id','id')->whereHas('marketingOrderPlan',function($query){
             $query->whereIn('status',['1','2','3']);

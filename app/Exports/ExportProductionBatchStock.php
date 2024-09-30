@@ -84,6 +84,7 @@ class ExportProductionBatchStock implements FromView,ShouldAutoSize
                     'total'=>$perlu == 0 ? '-' : round($cum_val,3),
                     'qty' => $perlu == 0 ? '-' : round($arr['qty'],3),
                     'date' =>  date('d/m/Y',strtotime($row->date)),
+                    'post_date' =>  date('d/m/Y',strtotime($row->post_date)),
                     'document' => $row->lookable->code,
                     'cum_qty' => round($arr['qty'],3),
                     'cum_val' => round($arr['total'],2),

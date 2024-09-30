@@ -3,6 +3,7 @@
         <tr align="center">
             <th align="center">{{ __('translations.no') }}.</th>
             <th align="center">Batch Produksi</th>
+            <th align="center">Post Date</th>
             <th align="center">{{ __('translations.plant') }}</th>
             <th align="center">{{ __('translations.warehouse') }}</th>
             <th align="center">{{ __('translations.code') }}</th>
@@ -22,6 +23,7 @@
             <tr>
                 <td align="center">{{ $i + 1 }}</td>
                 <td align="center">{{$row['production_batch']}}</td>
+                <td align="center">{{$row['post_date']}}</td>
                 <td align="center">{{$row['plant']}}</td>
                 <td align="center">{{$row['warehouse']}}</td>
                 <td align="center">{{$row['kode']}}</td>

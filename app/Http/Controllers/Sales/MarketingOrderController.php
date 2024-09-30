@@ -1535,7 +1535,7 @@ class MarketingOrderController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
       
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail1($search,$status,$type_sales,$type_pay,$type_deliv,$type_pay,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail1'.uniqid().'.xlsx');
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail1($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail1'.uniqid().'.xlsx');
     }
 
     public function exportFromTransactionPageDetail2(Request $request){
@@ -1552,7 +1552,7 @@ class MarketingOrderController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
       
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$type_pay,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail2'.uniqid().'.xlsx');
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail2'.uniqid().'.xlsx');
     }
 
 }

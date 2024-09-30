@@ -154,6 +154,10 @@ use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderMemoController;
 use App\Http\Controllers\Sales\MarketingOrderReportController;
+use App\Http\Controllers\Sales\ReportMarketingOrderDeliveryController;
+use App\Http\Controllers\Sales\ReportSalesOrderRecapController;
+use App\Http\Controllers\Sales\ReportSalesOrderController;
+use App\Http\Controllers\Sales\ReportMarketingInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderOutstandingController;
 use App\Http\Controllers\Sales\MarketingOrderPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderPriceController;
@@ -2736,6 +2740,34 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter_by_date', [MarketingOrderReportController::class, 'filterByDate']);
                         Route::get('export', [MarketingOrderReportController::class, 'export']);
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);
+                    });
+
+                    Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {
+                        Route::get('/',[ReportMarketingOrderDeliveryController::class, 'index']);
+                        Route::post('filter',[ReportMarketingOrderDeliveryController::class, 'filter']);
+                        Route::get('export',[ReportMarketingOrderDeliveryController::class, 'export']);
+                        Route::get('export_csv',[ReportMarketingOrderDeliveryController::class, 'exportCsv']);
+                    });
+
+                    Route::prefix('sales_order_report_recap')->middleware('operation.access:sales_order_report_recap,view')->group(function () {
+                        Route::get('/',[ReportSalesOrderRecapController::class, 'index']);
+                        Route::post('filter',[ReportSalesOrderRecapController::class, 'filter']);
+                        Route::get('export',[ReportSalesOrderRecapController::class, 'export']);
+                        Route::get('export_csv',[ReportSalesOrderRecapController::class, 'exportCsv']);
+                    });
+
+                    Route::prefix('report_sales_order')->middleware('operation.access:report_sales_order,view')->group(function () {
+                        Route::get('/',[ReportSalesOrderController::class, 'index']);
+                        Route::post('filter',[ReportSalesOrderController::class, 'filter']);
+                        Route::get('export',[ReportSalesOrderController::class, 'export']);
+                        Route::get('export_csv',[ReportSalesOrderController::class, 'exportCsv']);
+                    });
+
+                    Route::prefix('report_marketing_invoice')->middleware('operation.access:report_marketing_invoice,view')->group(function () {
+                        Route::get('/',[ReportMarketingInvoiceController::class, 'index']);
+                        Route::post('filter',[ReportMarketingInvoiceController::class, 'filter']);
+                        Route::get('export',[ReportMarketingInvoiceController::class, 'export']);
+                        Route::get('export_csv',[ReportMarketingInvoiceController::class, 'exportCsv']);
                     });
 
                     Route::prefix('stock_finished_good')->middleware('operation.access:stock_finished_good,view')->group(function () {

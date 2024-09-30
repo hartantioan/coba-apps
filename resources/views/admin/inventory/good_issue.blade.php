@@ -1376,7 +1376,7 @@
             let optionStock = '<select class="browser-default" id="arr_item_stock' + val + '" name="arr_item_stock[]" required onchange="resetQty(`'+ val +'`)">';
             if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
+                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + ' ' + value.batch + '</option>';
                 });
             }else{
                 optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';
@@ -1768,7 +1768,7 @@
                         let optionStock = '<select class="browser-default" id="arr_item_stock' + count + '" name="arr_item_stock[]" required onchange="resetQty(`'+ count +'`)">';
                         if(val.stock_list.length > 0){
                             $.each(val.stock_list, function(i, value) {
-                                optionStock += '<option value="' + value.id + '" data-qty="' + (value.id == val.item_stock_id ? val.qtyraw : value.qty_raw ) + '" ' + (value.id == val.item_stock_id ? 'selected' : '') + '>' + value.name + ' ' + value.shading + ' ' + value.qty + '</option>';
+                                optionStock += '<option value="' + value.id + '" data-qty="' + (value.id == val.item_stock_id ? val.qtyraw : value.qty_raw ) + '" ' + (value.id == val.item_stock_id ? 'selected' : '') + '>' + value.name + ' ' + value.shading + ' ' + value.qty +  ' ' + value.batch + '</option>';
                             });
                         }else{
                             optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';

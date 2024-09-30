@@ -49,6 +49,7 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
                 'nonpwp' => $row->userData->npwp,
                 'namanpwp' => $row->userData->title,
                 'alamatnpwp' => $row->userData->address,
+                'tipepenjualan'=>$row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType(),
             ];
         }
 

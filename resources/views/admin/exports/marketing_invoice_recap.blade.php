@@ -5,6 +5,7 @@
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Due Date Internal</th>
+            <th class="center-align">Tipe Penjualan</th>
             <th class="center-align">Customer</th>
             <th class="center-align">Deliver Address</th>
             <th class="center-align">Tax No</th>
@@ -26,6 +27,7 @@
             <td>{{ $row['code'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['duedateinternal'] }}</td>
+            <td>{{ $row['tipepenjualan'] }}</td>
             <td>{{ $row['customer'] }}</td>
             <td>{{ $row['deliveraddress'] }}</td>
             <td>{{ $row['taxno'] }}</td>

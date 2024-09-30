@@ -1640,7 +1640,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
             if($request->status == '3'){
                 $modp->update([
-                    'receive_date'  => $request->receive_date,
+                    'receive_date'  => date('Y-m-d'),
                 ]);
                 $modp->createJournalReceiveDocument();
                 $modp->createInvoice();

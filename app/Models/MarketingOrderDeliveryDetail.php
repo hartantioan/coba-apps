@@ -95,4 +95,10 @@ class MarketingOrderDeliveryDetail extends Model
 
         return $total;
     }
+
+    public function getQtyM2(){
+        $konversi = $this->marketingOrderDetail->qty_conversion;
+        return $konversi;
+    }
+
 }

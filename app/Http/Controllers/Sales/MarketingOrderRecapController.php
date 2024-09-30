@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Http\Controllers\Sales;
+
+use App\Exports\ExportMarketingOrderRecap;
+use App\Exports\ExportMarketingRecapitulation;
+use App\Exports\ExportMarketingRecapitulationCsv;
+use App\Http\Controllers\Controller;
+use App\Models\MarketingOrder;
+use Illuminate\Http\Request;
+use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
+
+class MarketingOrderRecapController extends Controller
+{
+    protected $dataplaces, $dataplacecode, $datawarehouses;
+
+    public function __construct(){
+        $user = User::find(session('bo_id'));
+
+        $this->dataplaces = $user ? $user->userPlaceArray() : [];
+        $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
+
+    }
+    
+    public function index(Request $request)
+    {
+        $data = [
+            'title'         => 'Rekapitulasi SO',
+            'content'       => 'admin.sales.recap_marketing_order',
+        ];
+
+        return view('admin.layouts.index', ['data' => $data]);
+    }
+
+  
+    public function export(Request $request){
+        ob_end_clean();
+        ob_start();
+        $response = Excel::download(new ExportMarketingOrderRecap($request->start_date,$request->end_date), 'so_recap_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        return $response;
+    }
+
+   
+}

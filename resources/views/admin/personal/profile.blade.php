@@ -51,7 +51,7 @@
                                                 <div class="col s12"><hr></div>
                                                 <div class="col s4">{{ __('translations.company') }}</div><div class="col s8">: {{ $data->company()->exists() ? $data->company->name : '' }}</div>
                                                 <div class="col s4">Penempatan</div><div class="col s8">: {{ $data->place_id ? $data->place->code : '-' }}</div>
-                                                <div class="col s4">Departemen</div><div class="col s8">: {{ $data->department_id ? $data->department->name : '-' }}</div>
+                                                <div class="col s4">Departemen</div><div class="col s8">: {{ $data->position()->exists() ? $data->position->division->name.' - '.$data->position->division->department->name : '-' }}</div>
                                                 <div class="col s4">Posisi</div><div class="col s8">: {{ $data->position_id ? $data->position->name : '-' }}</div>
                                                 <div class="col s12"><hr></div>
                                                 <div class="col s4">Update Pass</div><div class="col s8">: <span class="{{ $data->needChangePassword() ? 'badge red' : 'badge gradient-45deg-light-blue-cyan' }}">{{ $data->last_change_password }}</span></div>

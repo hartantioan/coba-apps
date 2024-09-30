@@ -83,6 +83,20 @@ class MarketingOrderDetail extends Model
         return $qty;
     }
 
+    public function balanceQtyModM2(){
+        $qty = $this->qty;
+        $konversi=$this->qty_conversion;
+
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $qty -= $row->qty;
+           
+        }
+
+        return $qty*$konversi;
+    }
+
+
+
     public function item(){
         return $this->belongsTo('App\Models\Item','item_id','id')->withTrashed();
     }

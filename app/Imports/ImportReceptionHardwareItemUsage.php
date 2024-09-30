@@ -63,13 +63,15 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
             if (isset($row['item']) && $row['item']) {
                
 
-                $note = $row['catatan'];$divisi=$row['divisi'];$location=$row['lokasi'];
+                $note = trim($row['catatan']);;$divisi=$row['divisi'];$location=$row['lokasi'];
                 $item = HardwareItem::where('code', explode('#', $row['item'])[0])->first();
                 $user = User::where('employee_no',explode('#', $row['user'])[0])->first();
                 if(!$item && $this->error ==null){
                     $this->error = "Item ada yang salah.";
                 }elseif(!$note && $this->error ==null){
                     $this->error = "Belum ada keterangan.";
+                }elseif(!$location && $this->error ==null){
+                    $this->error = "Belum ada Lokasi.";
                 }
                 if($user->position()->exists()){
                     $divisi = $user->position->division->name;
@@ -77,7 +79,7 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
 
                 $dateTime1 = DateTime::createFromFormat('U', ($row['tanggal'] - 25569) * 86400);
                 $dateFormatted1 = $dateTime1->format('Y/m/d');
-               
+                if($this->error ==null){
                     $query = ReceptionHardwareItemsUsage::create([
                         'code' => ReceptionHardwareItemsUsage::generateCode(),
                         'user_id'           => session('bo_id'),
@@ -91,6 +93,12 @@ class handleReceptionHardwareItem implements OnEachRow, WithHeadingRow
                         'status_item'       => 1,
                         'location'			=> $location,
                     ]);
+                }else{
+                    DB::rollback();
+                    $sheet='Header';
+                    throw new RowImportException('ada yang kurang', $row->getIndex(),$this->error,$sheet);
+                }
+                    
                     
                    
             }else{

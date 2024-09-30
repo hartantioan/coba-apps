@@ -70,7 +70,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
         foreach($invoice as $key => $row){
             $arrTemp = explode('.',$row->tax_no);
             /* $transactionCode = substr_count($arrTemp[0],'0') == 2 ? substr($arrTemp[0],0,3) : intval($arrTemp[0]); */
-            $transactionCode = $arrTemp[0];
+            $transactionCode = preg_replace('/\s+/', '',$arrTemp[0]);
             array_splice($arrTemp,0,1);
             $tax_no = implode('',$arrTemp);
             $month = date('n',strtotime($row->post_date));

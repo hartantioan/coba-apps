@@ -1100,6 +1100,15 @@ class FundRequestController extends Controller
                     'message' => 'Mohon maaf saldo limit BS & Pinjaman anda adalah '.number_format($balance,2,',','.'),
                 ]);
             }
+
+            if($request->type == '2'){
+                if(!$request->document_status || $request->document_status == '2'){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Tipe Permohonan PINJAMAN harus memilih Status Dokumen TIDAK LENGKAP',
+                    ]);
+                }
+            }
                     
 			if($request->temp){
                 DB::beginTransaction();

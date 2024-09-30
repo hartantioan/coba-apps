@@ -1340,6 +1340,19 @@ class MarketingOrderDeliveryProcessController extends Controller
             } */
 
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status',$request->status_tracking)->first();
+
+            if($request->status_tracking == '3' && $request->receive_date){
+                $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status','2')->first();
+                if($ceksent){
+                    if($request->receive_date < date('Y-m-d',strtotime($ceksent->created_at))){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, tanggal terima customer tidak boleh kurang dari tanggal kirim dari gudang / plant.',
+                        ]);
+                    }
+                }
+            }
+
             if($cek){
                 $cek->update([
                     'user_id' => session('bo_id'),

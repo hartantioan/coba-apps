@@ -20,9 +20,10 @@
             <th>Item Code</th>
             <th>Item Name</th>
             <th>Plant</th>
+            <th>Qty Delivery</th>
+            <th>Konversi</th>
+            <th>Satuan</th>
             <th>Qty (M2)</th>
-            <th>Satuan Konversi</th>
-            <th>Qty</th>
             <th>Satuan</th>
             <th>Gudang</th>
             <th>Area</th>
@@ -65,6 +66,7 @@
                 <td>{{ $row['itemcode'] }}</td>
                 <td>{{ $row['itemname'] }}</td>
                 <td>{{ $row['plant'] }}</td>
+                <td>{{ $row['qtysj'] }}</td>
                 <td>{{ $row['qty_konversi'] }}</td>
                 <td>{{ $row['satuan_konversi'] }}</td>
                 <td>{{ $row['qty'] }}</td>

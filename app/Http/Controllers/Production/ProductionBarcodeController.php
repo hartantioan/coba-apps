@@ -408,7 +408,7 @@ class ProductionBarcodeController extends Controller
                     if(!$passed){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Production Barcode telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Production Barcode telah dipakai, silahkan cek kembali.'
                         ]);
                     }
                 }

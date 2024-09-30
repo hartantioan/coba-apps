@@ -20,41 +20,9 @@ class ExportOutstandingMOD implements FromView, WithEvents
     public function __construct() {}
     public function view(): View
     {
-        $array_filter = [];
-
-
-
         $query_data = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->whereIn('status', ['2','3']);
+            $query->whereIn('status', ['2','3'])->whereDoesntHave('marketingOrderDeliveryProcess');
         })->get();
-
-        foreach ($query_data as $row) {
-
-            $array_filter[] = [
-                'code'              => $row->marketingOrderDelivery->code,
-                'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),
-                'customer' =>$row->marketingOrderDelivery->customer->name,
-                'expedisi'              => $row->marketingOrderDelivery->costDeliveryType(),
-                'pengiriman'                => $row->marketingOrderDelivery->deliveryType(),
-                'alamatkirim'                => $row->marketingOrderDelivery->destination_address,
-                'kota' => $row->marketingOrderDelivery->city->name,
-                'kecamatan' => $row->marketingOrderDelivery->district->name,
-                'truk'=>$row->marketingOrderDelivery->transportation->name,
-                'statuskirim' => $row->marketingOrderDelivery->sendStatus(),
-                'noteinternal' => $row->marketingOrderDelivery->note_internal,
-                'noteexternal' => $row->marketingOrderDelivery->note_external,
-                'itemcode' => $row->item->code,
-                'itemname' => $row->item->name,
-                'qty' => $row->qty,
-                'konversi' => $row->getQtyM2(),
-                'noteitem' => $row->note,
-                'nosj'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '',
-                'noso'=>$row->marketingOrderDetail->marketingOrder->code,
-            ];
-        }
-
-
-
 
         activity()
             ->performedOn(new MarketingOrderDelivery())
@@ -63,7 +31,7 @@ class ExportOutstandingMOD implements FromView, WithEvents
             ->log('Export Outstanding MOD.');
 
         return view('admin.exports.outstanding_mod', [
-            'data'          => $array_filter,
+            'data'          => $query_data,
 
         ]);
     }

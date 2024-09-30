@@ -59,8 +59,8 @@ class ReceptionHardwareItemsUsage extends Model
 
     public function statusRaw(){
         $status = match ($this->status) {
-          '1' => 'Active',
-          '2' => 'Not Active',
+          '1' => 'Penyerahan',
+          '2' => 'Pengembalian',
           '3' => '',
           '4' => 'Di Gudang',
           default => 'Invalid',

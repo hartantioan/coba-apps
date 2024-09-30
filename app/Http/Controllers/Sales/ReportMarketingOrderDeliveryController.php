@@ -137,7 +137,6 @@ class ReportMarketingOrderDeliveryController extends Controller
             }
                 
         }
-info($newData);
         $end_time = microtime(true);
         
         $execution_time = ($end_time - $start_time);

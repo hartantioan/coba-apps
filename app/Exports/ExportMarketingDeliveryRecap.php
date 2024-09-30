@@ -32,22 +32,56 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
         })->get();
 
 
-        foreach ($mo as $row) {
+        foreach ($mo as $key=>$row) {
       
             $array_filter[] = [
+                'no'                => ($key+1),
                 'code'              => $row->marketingOrderDeliveryProcess->code,
+                'status'              => $row->marketingOrderDeliveryProcess->statusRaw(),
+                'voider'          => $row->marketingOrderDeliveryProcess->voidUser()->exists() ? $row->marketingOrderDeliveryProcess->voidUser->name : '',
+                'tgl_void'         => $row->marketingOrderDeliveryProcess->voidUser()->exists() ? date('d/m/Y',strtotime($row->marketingOrderDeliveryProcess->void_date)) : '' ,
+                'ket_void'               => $row->marketingOrderDeliveryProcess->voidUser()->exists() ? $row->marketingOrderDeliveryProcess->void_note : '' ,
+                'deleter'              =>$row->marketingOrderDeliveryProcess->deleteUser()->exists() ? $row->marketingOrderDeliveryProcess->deleteUser->name : '',
+                'tgl_delete'             => $row->marketingOrderDeliveryProcess->deleteUser()->exists() ? date('d/m/Y',strtotime($row->marketingOrderDeliveryProcess->deleted_at)) : '',
+                'ket_delete'               => $row->marketingOrderDeliveryProcess->deleteUser()->exists() ? $row->marketingOrderDeliveryProcess->delete_note : '',
+                'doner'        => ($row->marketingOrderDeliveryProcess->status == 3 && is_null($row->marketingOrderDeliveryProcess->done_id)) ? 'sistem' : (($row->marketingOrderDeliveryProcess->status == 3 && !is_null($row->marketingOrderDeliveryProcess->done_id)) ? $row->marketingOrderDeliveryProcess->doneUser->name : null),
+                'tgl_done'          => $row->marketingOrderDeliveryProcess->doneUser ? $row->marketingOrderDeliveryProcess->done_date : '',
+                'ket_done'              => $row->marketingOrderDeliveryProcess->doneUser ? $row->marketingOrderDeliveryProcess->done_note : '' ,
+                
+                'nik' =>$row->marketingOrderDeliveryProcess->user->employee_no,
+                'user' =>$row->marketingOrderDeliveryProcess->user->name,
+
                 'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->post_date)),
                 'customer' =>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->customer->name,
-                'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
-                'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,
-                'truk'=>$row->marketingOrderDeliveryProcess->vehicle_name,
-                'nopol' => $row->marketingOrderDeliveryProcess->vehicle_no,
                 'itemcode' => $row->marketingOrderDeliveryDetail->item->code,
                 'itemname' => $row->marketingOrderDeliveryDetail->item->name,
+
+                'plant' => $row->marketingOrderDeliveryDetail->plant->name??'-',
+                'qty_konversi' => $row->marketingOrderDeliveryDetail->getQtyM2(),
+                'satuan_konversi' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                 'qty' => $row->qty * $row->marketingOrderDeliveryDetail->getQtyM2(),
-                'konversi' => $row->marketingOrderDeliveryDetail->getQtyM2(),
-                'mod' => $row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                'satuan' => $row->itemStock->item->uomUnit->code,
+                'gudang' => $row->itemStock->warehouse->name,
+                'area' => $row->itemStock->area->name,
+                'shading' => $row->itemStock->itemShading->name,
+                'batch' => $row->itemStock->productionBatch->code,
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                
+
+                'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
+                'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,
+                'no_wa_supir'                => $row->marketingOrderDeliveryProcess->driver_hp,
+                'truk'=>$row->marketingOrderDeliveryProcess->vehicle_name,
+                'nopol' => $row->marketingOrderDeliveryProcess->vehicle_no,
+                'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                'outlet' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
+                'alamat_tujuan'=> $row->marketingOrderDeliveryDetail->marketingOrderDelivery->destination_address,
+                'catatan_internal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_internal,
+                'catatan_eksternal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_external,
+                'tracking'=>$row->marketingOrderDeliveryProcess->statusTrackingRaw(),
+                'tgl_kembali_sj'=>date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date)),
+                'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,  
+               
             ];
         }
 

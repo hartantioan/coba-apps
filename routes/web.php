@@ -2742,12 +2742,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('export_csv', [MarketingOrderReportController::class, 'exportCsv']);
                     });
 
-                    Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {
-                        Route::get('/',[ReportMarketingOrderDeliveryController::class, 'index']);
-                        Route::post('filter',[ReportMarketingOrderDeliveryController::class, 'filter']);
-                        Route::get('export',[ReportMarketingOrderDeliveryController::class, 'export']);
-                        Route::get('export_csv',[ReportMarketingOrderDeliveryController::class, 'exportCsv']);
-                    });
+                    // Route::prefix('report_mod')->middleware('operation.access:report_mod,view')->group(function () {
+                    //     Route::get('/',[ReportMarketingOrderDeliveryController::class, 'index']);
+                    //     Route::post('filter',[ReportMarketingOrderDeliveryController::class, 'filter']);
+                    //     Route::get('export',[ReportMarketingOrderDeliveryController::class, 'export']);
+                    //     Route::get('export_csv',[ReportMarketingOrderDeliveryController::class, 'exportCsv']);
+                    // });
 
                     Route::prefix('sales_order_report_recap')->middleware('operation.access:sales_order_report_recap,view')->group(function () {
                         Route::get('/',[ReportSalesOrderRecapController::class, 'index']);

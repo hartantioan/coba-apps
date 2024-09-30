@@ -393,21 +393,24 @@ class ProductionBarcodeController extends Controller
             } else {
                 
                 $pod = ProductionOrderDetail::find($request->production_order_detail_id);
-                $passed = true;
-                foreach($request->arr_pallet_no as $key => $row){
-                    $cek = ProductionBarcodeDetail::where('pallet_no',$row)->whereHas('productionBarcode',function($query){
-                        $query->whereIn('status',['2','3']);
-                    })->first();
-                    if($cek){
-                        $passed = false;
-                    }
-                }
 
-                if(!$passed){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Production Barcode telah diapprove, anda tidak bisa melakukan perubahan.'
-                    ]);
+                if(!$request->temp){
+                    $passed = true;
+                    foreach($request->arr_pallet_no as $key => $row){
+                        $cek = ProductionBarcodeDetail::where('pallet_no',$row)->whereHas('productionBarcode',function($query){
+                            $query->whereIn('status',['2','3']);
+                        })->first();
+                        if($cek){
+                            $passed = false;
+                        }
+                    }
+
+                    if(!$passed){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Production Barcode telah diapprove, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
                 }
 
                 if($request->temp){

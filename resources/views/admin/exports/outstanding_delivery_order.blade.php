@@ -8,6 +8,7 @@
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Customer</th>
+            <th class="center-align">Expedisi</th>
             <th class="center-align">Sopir</th>
             <th class="center-align">Truk</th>
             <th class="center-align">Nopol</th>
@@ -24,6 +25,7 @@
             <td>{{ $row['code'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['customer'] }}</td>
+            <td>{{ $row['expedisi'] }}</td>
             <td>{{ $row['sopir'] }}</td>
             <td>{{ $row['truk'] }}</td>
             <td>{{ $row['nopol'] }}</td>

@@ -33,7 +33,8 @@ class ExportOutstandingDeliveryOrder implements FromView, WithEvents
             $array_filter[] = [
                 'code'              => $row->marketingOrderDeliveryProcess->code,
                 'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->post_date)),
-                'customer' =>$row->marketingOrderDeliveryProcess->account->name,
+                'customer' =>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->customer->name,
+                'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
                 'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,
                 'truk'=>$row->marketingOrderDeliveryProcess->vehicle_name,
                 'nopol' => $row->marketingOrderDeliveryProcess->vehicle_no,

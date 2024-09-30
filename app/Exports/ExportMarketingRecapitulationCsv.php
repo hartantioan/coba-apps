@@ -54,7 +54,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
         foreach($ardp as $key => $row){
             $arrTemp = explode('.',$row->tax_no);
             $firstcode = preg_replace('/\s+/', '',$arrTemp[0]);
-            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,3) : intval($firstcode);
+            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,2) : intval($firstcode);
             array_splice($arrTemp,0,1);
             $tax_no = implode('',$arrTemp);
             $month = date('n',strtotime($row->post_date));
@@ -71,7 +71,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
         foreach($invoice as $key => $row){
             $arrTemp = explode('.',$row->tax_no);
             $firstcode = preg_replace('/\s+/', '',$arrTemp[0]);
-            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,3) : intval($firstcode);
+            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,2) : intval($firstcode);
             array_splice($arrTemp,0,1);
             $tax_no = implode('',$arrTemp);
             $month = date('n',strtotime($row->post_date));

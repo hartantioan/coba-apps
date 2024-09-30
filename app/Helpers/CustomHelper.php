@@ -2361,15 +2361,15 @@ class CustomHelper {
 					WaBlas::kirim_wa($sj->driver_hp,'Dokumen Surat Jalan '.$sj->code.' sudah bisa diupdate oleh driver. Silahkan klik link : '.env('APP_URL').'/admin/sales/delivery_order/driver/'.CustomHelper::encrypt($sj->code).'?d='.CustomHelper::encrypt($sj->driver_name).'&p='.CustomHelper::encrypt($sj->driver_hp));
 					WaBlas::kirim_wa('081330074432','Dokumen Surat Jalan '.$sj->code.' sudah bisa diupdate oleh driver. Silahkan klik link : '.env('APP_URL').'/admin/sales/delivery_order/driver/'.CustomHelper::encrypt($sj->code).'?d='.CustomHelper::encrypt($sj->driver_name).'&p='.CustomHelper::encrypt($sj->driver_hp));
 				}
+				$sj->marketingOrderDelivery->update([
+					'status'	=> '3'
+				]);
 			}
 
 		}elseif($table_name == 'marketing_order_deliveries'){
 			$mod = MarketingOrderDelivery::find($table_id);
 			if($mod){
 				if($mod->status == '2' && $mod->user_update_id){
-					$mod->update([
-						'status'	=> '3',
-					]);
 					foreach($mod->marketingOrderDeliveryDetail as $row){
 						if(!$row->marketingOrderDetail->marketingOrder->hasBalanceMod()){
 							$row->marketingOrderDetail->marketingOrder->update([

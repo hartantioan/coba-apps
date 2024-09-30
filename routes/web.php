@@ -2562,6 +2562,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable', [MarketingOrderDeliveryController::class, 'datatable']);
                     Route::get('row_detail', [MarketingOrderDeliveryController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderDeliveryController::class, 'show']);
+                    Route::post('edit_note', [MarketingOrderDeliveryController::class, 'editNote']);
+                    Route::post('save_update', [MarketingOrderDeliveryController::class, 'saveUpdate'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::post('get_code', [MarketingOrderDeliveryController::class, 'getCode']);
                     Route::post('print', [MarketingOrderDeliveryController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderDeliveryController::class, 'printByRange']);

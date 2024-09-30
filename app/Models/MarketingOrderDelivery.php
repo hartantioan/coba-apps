@@ -37,6 +37,7 @@ class MarketingOrderDelivery extends Model
         'note_external',
         'status',
         'send_status',
+        'stage_status',
         'grandtotal',
         'void_id',
         'void_note',

@@ -1501,6 +1501,10 @@ class MarketingOrderDeliveryProcessController extends Controller
             }else{
                 $tempStatus = $query->status;
                 
+                $query->marketingOrderDelivery->update([
+					'status'	=> '3'
+				]);
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),

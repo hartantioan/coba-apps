@@ -85,6 +85,7 @@ class MarketingOrderDeliveryController extends Controller
             'id',
             'send_status',
             'code',
+            'stage_status',
             'user_id',
             'user_update_id',
             'company_id',
@@ -242,6 +243,7 @@ class MarketingOrderDeliveryController extends Controller
                         </select>
                     ',
                     $val->code,
+                    $val->stage_status,
                     $val->user->name,
                     $val->userUpdate()->exists() ? $val->userUpdate->name : '-',
                     $val->company->name,
@@ -279,8 +281,8 @@ class MarketingOrderDeliveryController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
+                        <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Edit Keterangan Internal & Eksternal" onclick="editNote(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">border_color</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
@@ -507,6 +509,7 @@ class MarketingOrderDeliveryController extends Controller
                         /* $query->code = $request->code; */
                         $query->account_id = $request->account_id;
                         $query->cost_delivery_type = $request->cost_delivery_type;
+                        $query->stage_status = '2';
                         /* $query->company_id = $request->company_id;
                         $query->customer_id = $request->customer_id;
                         $query->post_date = $request->post_date;
@@ -558,6 +561,7 @@ class MarketingOrderDeliveryController extends Controller
                         'note_internal'             => $request->note_internal,
                         'note_external'             => $request->note_external,
                         'status'                    => '1',
+                        'stage_status'              => '1',
                     ]);
 
                     DB::commit();
@@ -618,9 +622,38 @@ class MarketingOrderDeliveryController extends Controller
 		return response()->json($response);
     }
 
+    public function saveUpdate(Request $request){
+        $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->where('status','2')->first();
+
+        if($query){
+            $query->update([
+                'note_internal'     => $request->note,
+                'note_external'     => $request->note2,
+            ]);
+
+            $response = [
+                'status'  => 200,
+                'message' => 'Data berhasil diupdate.'
+            ];
+
+            activity()
+                ->performedOn(new MarketingOrderDelivery())
+                ->causedBy(session('bo_id'))
+                ->withProperties($query)
+                ->log('Edit note internal / external marketing order delivery.');
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data tidak ditemukan.'
+            ];
+        }
+
+		return response()->json($response);
+    }
+
     public function show(Request $request){
         $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
-        if($po->status !== '2'){
+        if($po->status !== '2' || $po->stage_status == '2'){
             return response()->json([
                 'status'  => 500,
                 'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
@@ -668,6 +701,18 @@ class MarketingOrderDeliveryController extends Controller
         }
 
         $po['details'] = $arr;
+        				
+		return response()->json($po);
+    }
+
+    public function editNote(Request $request){
+        $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
+        if($po->status !== '2'){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
+            ]);
+        }
         				
 		return response()->json($po);
     }
@@ -1194,10 +1239,10 @@ class MarketingOrderDeliveryController extends Controller
     public function updateSendStatus(Request $request){
         $data = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
-            if($data->status !== '3'){
+            if($data->status !== '2' || $data->goodScaleDetail()->exists()){
                 $response = [
                     'status'  => 500,
-                    'message' => 'Maaf, data tidak bisa diupdate, karena dokumen SELESAI saja yang bisa dirubah.',
+                    'message' => 'Maaf, data tidak bisa diupdate, karena dokumen PROSES saja yang bisa dirubah atau masih ditarik pada dokumen timbangan.',
                     'value'   => '',
                 ];
             }else{

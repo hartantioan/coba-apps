@@ -3159,8 +3159,9 @@ class Select2Controller extends Controller {
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
-        ->whereIn('status',['3'])
+        ->where('status','2')
         ->whereNotNull('send_status')
+        ->where('stage_status','2')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
         ->whereDoesntHave('goodScaleDetail')
         ->where(function($query)use($arrmod,$request){

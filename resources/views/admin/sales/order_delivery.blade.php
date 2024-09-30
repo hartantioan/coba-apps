@@ -131,7 +131,7 @@
                                     </h4>
                                     <div class="card-alert card red">
                                         <div class="card-content white-text">
-                                            <p>Info Penting! : MOD dijalankan pada 2 tahap. Tahap 1 adalah ketika user 1 menambahkan baru (ada approval). Tahap 2 adalah ketika user 2 mengedit (tombol pensil) pada saat status dokumen PROSES (setelah approval tahap 1). Dokumen status SELESAI adalah dokumen yang selesai tahap 2 atau siap lanjut ke dokumen Surat Jalan.</p>
+                                            <p>Info Penting! : MOD dijalankan pada 2 tahap. Tahap 1 adalah ketika user 1 menambahkan baru (ada approval). Tahap 2 adalah ketika user 2 mengedit (tombol pensil) pada saat status dokumen PROSES (setelah approval tahap 1). Dokumen status SELESAI adalah dokumen yang telah ditarik menjadi Surat Jalan. MOD yang muncul pada timbangan adalah MOD pada TAHAP 2 dan status dokumen PROSES.</p>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -153,6 +153,7 @@
                                                         <th>#</th>
                                                         <th>Status Kirim</th>
                                                         <th>{{ __('translations.code') }}</th>
+                                                        <th>Tahap</th>
                                                         <th>Petugas Tahap 1</th>
                                                         <th>Petugas Tahap 2</th>
                                                         <th>{{ __('translations.company') }}</th>
@@ -357,6 +358,29 @@
     <div class="modal-footer">
         <button class="btn waves-effect waves-light purple btn-panduan" onclick="startIntro();">Panduan <i class="material-icons right">help_outline</i></button>
         <button class="btn waves-effect waves-light right submit step12" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal6" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>Form Update Keterangan Internal & Eksternal <i id="text-update"></i></h4>
+                <div class="input-field col m4 s12 step10 first-inputs">
+                    <input type="hidden" id="temp_update" name="temp_update">
+                    <textarea class="materialize-textarea" id="note_internal_update" name="note_internal_update" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
+                    <label class="active" for="note_internal_update">Keterangan Internal</label>
+                </div>
+                <div class="input-field col m4 s12 step11 first-inputs">
+                    <textarea class="materialize-textarea" id="note_external_update" name="note_external_update" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
+                    <label class="active" for="note_external_update">Keterangan Eksternal</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light right submit step12" onclick="saveUpdate();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
     </div>
 </div>
@@ -612,6 +636,20 @@ document.addEventListener('focusin', function (event) {
                         </td>
                     </tr>
                 `);
+            }
+        });
+
+        $('#modal6').modal({
+            dismissible: false,
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                M.updateTextFields();
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#text-update').text('');
+                $('#temp_update,#note_internal_update,#note_external_update').val('');
             }
         });
 
@@ -1362,6 +1400,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'id', searchable: false, className: 'center-align details-control' },
                 { name: 'send_status', className: '' },
                 { name: 'code', className: '' },
+                { name: 'stage_status', className: 'center-align' },
                 { name: 'user_id', className: '' },
                 { name: 'user_update_id', className: '' },
                 { name: 'company_id', className: '' },
@@ -1460,6 +1499,60 @@ document.addEventListener('focusin', function (event) {
             }
         });
 	}
+
+    function saveUpdate(){
+		swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                $.ajax({
+                    url: '{{ Request::url() }}/save_update',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        id : $('#temp_update').val(),
+                        note : $('#note_internal_update').val(),
+                        note2 : $('#note_external_update').val(),
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('#modal6');
+                    },
+                    success: function(response) {
+                        loadingClose('#modal6');
+                        if(response.status == 200) {
+                            successUpdate();
+                            M.toast({
+                                html: response.message
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('#modal6');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+        });
+    }
 
     function save(){
 		swal({
@@ -1604,6 +1697,11 @@ document.addEventListener('focusin', function (event) {
         $('#modal1').modal('close');
     }
 
+    function successUpdate(){
+        loadDataTable();
+        $('#modal6').modal('close');
+    }
+
     function show(id){
         $.ajax({
             url: '{{ Request::url() }}/show',
@@ -1716,6 +1814,50 @@ document.addEventListener('focusin', function (event) {
                             no++;
                         });
                     }
+                    
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function editNote(id){
+        $.ajax({
+            url: '{{ Request::url() }}/edit_note',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 500){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
+                    $('#modal6').modal('open');
+                    $('#temp_update').val(id);
+                    $('#text-update').text(response.code);
+                    $('#note_internal_update').val(response.note_internal);
+                    $('#note_external_update').val(response.note_external);
                     
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();

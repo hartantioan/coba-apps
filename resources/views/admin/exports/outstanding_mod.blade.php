@@ -6,6 +6,7 @@
         <tr>
             <th class="center-align">No</th>
             <th class="center-align">Dokumen</th>
+            <th class="center-align">No SO</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Customer</th>
             <th class="center-align">Tipe Perhitungan Expedisi</th>
@@ -26,9 +27,11 @@
     <tbody>
         @if(count($data) > 0)
         @foreach($data as $key => $row)
+        @if ($row['nosj']=='')
         <tr>
             <td>{{ $key + 1 }}.</td>
             <td>{{ $row['code'] }}</td>
+            <td>{{ $row['noso'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['customer'] }}</td>
             <td>{{ $row['expedisi'] }}</td>
@@ -49,6 +52,7 @@
             <td>{{$row['noteitem']}}</td>
             @endif
         </tr>
+        @endif
         @endforeach
 
         @endif

@@ -25,7 +25,7 @@ class ExportOutstandingMOD implements FromView, WithEvents
 
 
         $query_data = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->whereIn('status', ['2']);
+            $query->whereIn('status', ['2','3']);
         })->get();
 
         foreach ($query_data as $row) {
@@ -48,6 +48,8 @@ class ExportOutstandingMOD implements FromView, WithEvents
                 'qty' => $row->qty,
                 'konversi' => $row->getQtyM2(),
                 'noteitem' => $row->note,
+                'nosj'=>$row->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '',
+                'noso'=>$row->marketingOrderDetail->marketingOrder->code,
             ];
         }
 

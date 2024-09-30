@@ -91,6 +91,8 @@ class StockFinishedGoodController extends Controller
         $array_last_item = [];
         $array_first_item = [];
         $all_total = 0;
+        $total_palet= 0;
+        $total_box = 0;
     
         foreach($query_data as $row){
 
@@ -99,6 +101,8 @@ class StockFinishedGoodController extends Controller
             $priceNow = $arr['qty'] > 0 ? $arr['total'] / $arr['qty'] : 0;
          
             $all_total += $arr['qty'];
+            $total_palet+= $arr['qty']/$row->item->sellConversion();
+            $total_box += ($arr['qty']/$row->item->sellConversion())*$row->item->pallet->box_conversion;
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -107,7 +111,7 @@ class StockFinishedGoodController extends Controller
                 'item' => $row->item->name,
                 'satuan' => $row->item->uomUnit->code,
                 'kode' => $row->item->code,
-                'area' => $row->area->code ?? '-',
+                'area' => $row->area->name ?? '-',
                 'shading' => $row->itemShading->code ?? '-',
                 'production_batch' => $row->productionBatch()->exists() ? $row->productionBatch->code : '-',
                 'final'=>number_format($priceNow,2,',','.'),
@@ -154,9 +158,9 @@ class StockFinishedGoodController extends Controller
                         'last_nominal' => $query_first ? number_format($arrFirst['total'], 2, ',', '.') : 0,
                         'item'         => $row->item->name,
                         'satuan'       => $row->item->uomUnit->code,
-                        'area'         => $row->area->code ?? '-',
+                        'area'         => $row->area->name ?? '-',
                         'production_batch' => '-',
-                        'shading' => $row->shading->code ?? '-',
+                        'shading' => $row->itemShading->code ?? '-',
                         'kode'         => $row->item->code,
                         'last_qty'     => $query_first ? CustomHelper::formatConditionalQty($arrFirst['qty']) : 0,
                     ];
@@ -213,6 +217,8 @@ class StockFinishedGoodController extends Controller
             'perlu'         => $perlu,
             'time'          => " Waktu proses : ".$execution_time." detik",
             'alltotal'      => number_format($all_total,2,',','.'),
+            'total_palet'      => number_format($total_palet,3,',','.'),
+            'total_box'      => number_format($total_box,3,',','.'),
         ];
         return response()->json($response);
     }

@@ -30,13 +30,11 @@ class ExportSalesFinishedGood implements FromCollection, WithTitle, WithHeadings
         'Gudang',
         'Kode',
         'Nama Item',
-        'Satuan',
-        'Konversi Palet',
-        'Konversi Box',
         'Area',
         'Shading',
-        'Cumulative Qty',
-       
+        'Qty (M2)',
+        'Qty (Palet)',
+        'Qty (Box)',
     ];
 
     public function collection()
@@ -86,7 +84,8 @@ class ExportSalesFinishedGood implements FromCollection, WithTitle, WithHeadings
         $array_last_item = [];
         $array_first_item = [];
         $all_total = 0;
-    
+        $total_palet= 0;
+        $total_box = 0;
         foreach($query_data as $row){
 
             $arr = $row->infoFg();
@@ -94,6 +93,8 @@ class ExportSalesFinishedGood implements FromCollection, WithTitle, WithHeadings
             $priceNow = $arr['qty'] > 0 ? $arr['total'] / $arr['qty'] : 0;
          
             $all_total += $arr['qty'];
+            $total_palet+= $arr['qty']/$row->item->sellConversion();
+            $total_box += ($arr['qty']/$row->item->sellConversion())*$row->item->pallet->box_conversion;
             $data_tempura = [
                 'item_id'      => $row->item->id,
                 'perlu'        => 0,
@@ -202,12 +203,11 @@ class ExportSalesFinishedGood implements FromCollection, WithTitle, WithHeadings
                 'gudang' =>$row_arr['warehouse'],
                 'kode' =>$row_arr['kode'],
                 'nama_item' =>$row_arr['item'],
-                'satuan' =>$row_arr['satuan'],
-                'konversi_palet' =>$row_arr['pallet_conversion'],
-                'konversi_box' =>$row_arr['box_conversion'],
                 'area' =>$row_arr['area'],
                 'shading' =>$row_arr['shading'],
                 'cumulative_qty' =>$row_arr['cum_qty'],
+                'konversi_palet' =>$row_arr['pallet_conversion'],
+                'konversi_box' =>$row_arr['box_conversion'],
             ];
         }
 

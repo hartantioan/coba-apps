@@ -20,9 +20,7 @@ class ExportOutstandingMOD implements FromView, WithEvents
     public function __construct() {}
     public function view(): View
     {
-        $query_data = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->whereIn('status', ['2','3'])->whereDoesntHave('marketingOrderDeliveryProcess');
-        })->get();
+        $query_data = MarketingOrderDelivery::whereIn('status', ['2','3'])->whereDoesntHave('marketingOrderDeliveryProcess')->get();
 
         activity()
             ->performedOn(new MarketingOrderDelivery())

@@ -358,7 +358,7 @@ class MarketingOrderDeliveryController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
       
-		return Excel::download(new ExportTransactionPageOrderDelivery($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'marketing_order_delivery_'.uniqid().'.xlsx');
+		return Excel::download(new ExportTransactionPageOrderDelivery($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'mod_'.uniqid().'.xlsx');
     }
 
     public function removeUsedData(Request $request){

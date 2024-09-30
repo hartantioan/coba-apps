@@ -2534,11 +2534,11 @@ class TreeHelper {
                     if($query_dp->marketingOrderInvoiceDetail()->exists()){
                         $arr = [];
                         foreach($query_dp->marketingOrderInvoiceDetail as $row_invoice_detail){
-                            if($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess()->exists()){
-                                foreach($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess as $rowmoidp){
-                                    $arr[] = $rowmoidp->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;  
-                                }
-                            }
+                            // if($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess()->exists()){
+                            //     foreach($row_invoice_detail->marketingOrderInvoice->marketingOrderInvoiceDeliveryProcess as $rowmoidp){
+                            //         $arr[] = $rowmoidp->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code;  
+                            //     }
+                            // }
                             
                             $newArray = array_unique($arr);
                             $string = implode(', ', $newArray);
@@ -2703,6 +2703,34 @@ class TreeHelper {
                         
                         if(!in_array($query_mo_delivery_process->marketingOrderInvoice->id, $data_id_mo_invoice)){
                             $data_id_mo_invoice[] =$query_mo_delivery_process->marketingOrderInvoice->id;
+                            $added = true;
+                        } 
+                    }
+
+                    if($query_mo_delivery_process->marketingOrderDelivery()->exists()){
+                        $properties = [
+                            ['name'=> "Tanggal :".$query_mo_delivery_process->marketingOrderDelivery->post_date],
+                        ];
+                        
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($query_mo_delivery_process->marketingOrderDelivery->grandtotal,2,',','.')]
+                            ;
+                        }
+                        $marketing_order_delivery_tempura=[
+                            "name"=>$query_mo_delivery_process->marketingOrderDelivery->code,
+                            "key" =>$query_mo_delivery_process->marketingOrderDelivery->code,
+                            'properties'=>$properties,
+                            'url'=>request()->root()."admin/purchase/purchase_order?code=".CustomHelper::encrypt($query_mo_delivery_process->marketingOrderDelivery->code),
+                        ];
+                        $data_go_chart[]=$marketing_order_delivery_tempura;
+                        $data_link[]=[
+                            'from'=>$query_mo_delivery_process->marketingOrderDelivery->code,
+                            'to'=>$query_mo_delivery_process->code,
+                            'string_link'=>$query_mo_delivery_process->marketingOrderDelivery->code.$query_mo_delivery_process->code,
+                        ];
+                        
+                        if(!in_array($query_mo_delivery_process->marketingOrderDelivery->id, $data_id_mo_delivery)){
+                            $data_id_mo_delivery[] =$query_mo_delivery_process->marketingOrderDelivery->id;
                             $added = true;
                         } 
                     }

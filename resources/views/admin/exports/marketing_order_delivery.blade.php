@@ -33,6 +33,7 @@
             <th>Note </th>
             <th>SO Ref.</th>
             <th>No.SJ</th>
+            <th>Based On</th>
         </tr>
     </thead>
     <tbody>
@@ -74,6 +75,7 @@
                     <td>{{ $row_detail->note }}</td>
                     <td>{{ $row_detail->marketingOrderDetail->marketingOrder->code }}</td>
                     <td>{{ $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-' }}</td>
+                    <td>{{ $row_detail->marketingOrderDetail->marketingOrder->code }}</td>
                 </tr>
                 @php
                     $no++;

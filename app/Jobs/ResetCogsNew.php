@@ -1006,7 +1006,7 @@ class ResetCogsNew implements ShouldQueue
                 'price_out'			    => round($price,5),
                 'total_out'			    => $total,
                 'qty_final'			    => $qty_final,
-                'price_final'		    => round($total_final / $qty_final,5),
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
                 'total_final'		    => $total_final,
                 'date'				    => $dateloop,
                 'type'				    => 'OUT',

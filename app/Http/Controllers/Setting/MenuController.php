@@ -141,8 +141,7 @@ class MenuController extends Controller
         })->get();
 
         foreach($data as $item){
-            /* ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL); */
-            echo $item->name.'<br>';
+            ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         }
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();

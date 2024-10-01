@@ -2832,7 +2832,7 @@ class TreeHelper {
                     $finished_data_id_handover_invoice[]=$row_handover_invoice_id;
                     $query_handover_invoice = MarketingOrderHandoverInvoice::find($row_handover_invoice_id);
                     foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
-                        if($row_mo_h_invoice_detail->marketingOrderInvoice->exists()){
+                        if($row_mo_h_invoice_detail->marketingOrderInvoice()->exists()){
                             $properties = [
                                 ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
                                 ];

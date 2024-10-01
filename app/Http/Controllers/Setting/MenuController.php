@@ -136,13 +136,13 @@ class MenuController extends Controller
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = Item::whereHas('itemGroup',function($query){
+        /* $data = Item::whereHas('itemGroup',function($query){
             $query->where('parent_id',3);
         })->get();
 
         foreach($data as $item){
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
-        }
+        } */
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();
 

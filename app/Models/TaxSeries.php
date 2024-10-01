@@ -89,7 +89,6 @@ class TaxSeries extends Model
             }
         }
         rsort($arr);
-        info($arr);
         return $arr;
     } 
 

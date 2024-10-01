@@ -2435,7 +2435,7 @@
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(roundTwoDecimal(grandtotal).toString().replace('.',','))
         );
 
-        if(tax > 0){
+        if(subtotal > 0){
             $('#textTax').show();
             getTaxSeries();
         }else{

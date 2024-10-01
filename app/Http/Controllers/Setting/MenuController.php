@@ -100,13 +100,13 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
         /* $data = MarketingOrderDeliveryProcess::whereHas('marketingOrderInvoice')->get();
 

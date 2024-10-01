@@ -79,15 +79,16 @@ class TaxSeries extends Model
         $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->where('company_id',$company_id)->whereRaw("SUBSTRING(tax_no,9,2) = '$year'")->whereNotNull('tax_no')->get();
         $arr = [];
         foreach($dataInvoice as $row){
-            if(!in_array(substr($row->tax_no,11,8),$arr)){
+            if(!in_array(substr($row->tax_no,11,8),$arr) && $row->tax_no){
                 $arr[] = substr($row->tax_no,11,8);
             }
         }
         foreach($dataDp as $row){
-            if(!in_array(substr($row->tax_no,11,8),$arr)){
+            if(!in_array(substr($row->tax_no,11,8),$arr) && $row->tax_no){
                 $arr[] = substr($row->tax_no,11,8);
             }
         }
+        info($arr);
         rsort($arr);
         info($arr);
         return $arr;

@@ -3,7 +3,7 @@
         <tr align="center">
             <th>Jenis Dok.</th>
             <th>No. Dokumen</th>
-            <th>No. Invoice</th>
+            <th>No. Referensi</th>
             <th>Tanggal</th>
             <th>Customer</th>
             <th>GrandTotal</th>

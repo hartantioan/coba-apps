@@ -1205,7 +1205,7 @@ class FundRequestController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-                
+                try {
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -1253,7 +1253,9 @@ class FundRequestController extends Controller
                     ]);
 
                     DB::commit();
-                
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
 			}
 			
 			if($query) {

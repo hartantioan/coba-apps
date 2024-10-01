@@ -144,7 +144,7 @@ class MenuController extends Controller
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        ResetCogsNew::dispatch('2024-09-30',1,1,4137,NULL,NULL,NULL);
+        ResetCogsNew::dispatch('2024-09-30',1,1,4385,NULL,NULL,NULL);
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();
 

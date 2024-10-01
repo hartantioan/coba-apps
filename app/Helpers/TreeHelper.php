@@ -136,7 +136,7 @@ class TreeHelper {
         $finished_data_id_production_handover=[];
         $finished_data_id_mo_receipt=[];
         $finished_data_id_handover=[];
-        
+
         if (!isset($$data_id) || !is_array($$data_id)) {
             
             $$data_id = [];
@@ -2745,32 +2745,32 @@ class TreeHelper {
                     $finished_data_id_handover[]=$row_handover_id;
                     $query_handover_receipt = MarketingOrderHandoverReceipt::find($row_handover_id);
                     foreach($query_handover_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_receipt_detail){
-                        if($row_mo_h_receipt_detail->marketingOrderInvoice()){
-                            $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
-                            ];
+                        // if($row_mo_h_receipt_detail->marketingOrderInvoice()){
+                        //     $properties = [
+                        //         ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+                        //     ];
                             
-                            if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
-                                ;
-                            }
-                            $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_receipt_detail->lookable->code,
-                                "key" => $row_mo_h_receipt_detail->lookable->code,
-                                'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
-                            ];
-                            $data_go_chart[]=$mo_invoice_tempura;
-                            $data_link[]=[
-                                'from'=>$query_handover_receipt->code,
-                                'to'=>$row_mo_h_receipt_detail->lookable->code,
-                                'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
-                            ];
-                            if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
-                                $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
-                                $added = true;
-                            }
-                        }
+                        //     if (!$hide_nominal) {
+                        //         $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+                        //         ;
+                        //     }
+                        //     $mo_invoice_tempura=[
+                        //         "name"=>$row_mo_h_receipt_detail->lookable->code,
+                        //         "key" => $row_mo_h_receipt_detail->lookable->code,
+                        //         'properties'=>$properties,
+                        //         'url'=>request()->root()."/admin/sales/marketing_order_handover_receipt?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+                        //     ];
+                        //     $data_go_chart[]=$mo_invoice_tempura;
+                        //     $data_link[]=[
+                        //         'from'=>$query_handover_receipt->code,
+                        //         'to'=>$row_mo_h_receipt_detail->lookable->code,
+                        //         'string_link'=>$query_handover_receipt->code.$row_mo_h_receipt_detail->lookable->code,
+                        //     ];
+                        //     if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
+                        //         $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
+                        //         $added = true;
+                        //     }
+                        // }
                         if($row_mo_h_receipt_detail->marketingOrderReceipt()){
                             $properties = [
                                 ['name'=> "Tanggal :".$row_mo_h_receipt_detail->marketingOrderReceipt->post_date],

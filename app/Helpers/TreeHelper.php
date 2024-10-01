@@ -2834,27 +2834,27 @@ class TreeHelper {
                     foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
                         if($row_mo_h_invoice_detail->marketingOrderInvoice()){
                             $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date ?? '-'],
+                                ['name'=> "Tanggal :".$row_mo_h_invoice_detail->lookable->post_date ?? '-'],
                                 ];
                             
                             if (!$hide_nominal) {
-                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_receipt_detail->lookable->grandtotal,2,',','.')]
+                                $properties[] =['name'=> "Nominal : Rp.:".number_format($row_mo_h_invoice_detail->lookable->grandtotal,2,',','.')]
                                 ;
                             }
                             $mo_invoice_tempura=[
-                                "name"=>$row_mo_h_receipt_detail->lookable->code,
-                                "key" => $row_mo_h_receipt_detail->lookable->code,
+                                "name"=>$row_mo_h_invoice_detail->lookable->code,
+                                "key" => $row_mo_h_invoice_detail->lookable->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_receipt_detail->lookable->code),
+                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
                                 'from'=>$query_handover_invoice->code,
-                                'to'=>$row_mo_h_receipt_detail->lookable->code,
-                                'string_link'=>$query_handover_invoice->code.$row_mo_h_receipt_detail->lookable->code,
+                                'to'=>$row_mo_h_invoice_detail->lookable->code,
+                                'string_link'=>$query_handover_invoice->code.$row_mo_h_invoice_detail->lookable->code,
                             ];
-                            if(!in_array($row_mo_h_receipt_detail->lookable->id, $data_id_mo_invoice)){
-                                $data_id_mo_invoice[] = $row_mo_h_receipt_detail->lookable->id;
+                            if(!in_array($row_mo_h_invoice_detail->lookable->id, $data_id_mo_invoice)){
+                                $data_id_mo_invoice[] = $row_mo_h_invoice_detail->lookable->id;
                                 $added = true;
                             }
                         }

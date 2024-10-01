@@ -176,9 +176,11 @@
                                         </td>
                                         
                                         <td width="80%">
+                                            <div style="min-height:40px">
                                             {{ $data->userData->title }}
                                             <br>
                                             {{ $data->userData->address }}
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>

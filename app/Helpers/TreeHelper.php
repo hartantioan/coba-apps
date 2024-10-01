@@ -134,6 +134,7 @@ class TreeHelper {
         $finished_data_id_production_receive=[];
         $finished_data_id_production_fg_receive=[];
         $finished_data_id_production_handover=[];
+        $finished_data_id_mo_receipt=[];
 
         if (!isset($$data_id) || !is_array($$data_id)) {
             

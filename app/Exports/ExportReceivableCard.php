@@ -30,10 +30,8 @@ class ExportReceivableCard implements FromView, WithEvents
 
         $submit = DB::select($query);
 
-        info($submit);
-
         activity()
-            ->performedOn(new MarketingOrderDelivery())
+            ->performedOn(new MarketingOrderInvoice())
             ->causedBy(session('bo_id'))
             ->withProperties(null)
             ->log('Export Receivable Card.');

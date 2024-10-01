@@ -137,7 +137,7 @@ class MenuController extends Controller
         } */
 
         $data = Item::whereHas('itemGroup',function($query){
-            $query->where('name','like',"SUPPORT%")->where('parent_id',3);
+            $query->where('parent_id',3);
         })->get();
 
         foreach($data as $item){

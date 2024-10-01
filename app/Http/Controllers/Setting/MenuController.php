@@ -144,7 +144,7 @@ class MenuController extends Controller
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = ProductionBatch::whereNotNull('lookable_type')->whereIn('lookable_type',['production_receive_details'])->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
+        $data = ProductionBatch::whereNotNull('lookable_type')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
             $query->where('item_group_id',46);
         })->get();
 

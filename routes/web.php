@@ -178,6 +178,7 @@ use App\Http\Controllers\Sales\ReportSalesSummaryStockFgController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
 use App\Http\Controllers\Sales\MarketingARDPrecapController;
+use App\Http\Controllers\Sales\ReportReceivableCardController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -2562,6 +2563,8 @@ Route::prefix('admin')->group(function () {
                     Route::get('datatable', [MarketingOrderDeliveryController::class, 'datatable']);
                     Route::get('row_detail', [MarketingOrderDeliveryController::class, 'rowDetail']);
                     Route::post('show', [MarketingOrderDeliveryController::class, 'show']);
+                    Route::post('edit_note', [MarketingOrderDeliveryController::class, 'editNote']);
+                    Route::post('save_update', [MarketingOrderDeliveryController::class, 'saveUpdate'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::post('get_code', [MarketingOrderDeliveryController::class, 'getCode']);
                     Route::post('print', [MarketingOrderDeliveryController::class, 'print']);
                     Route::post('print_by_range', [MarketingOrderDeliveryController::class, 'printByRange']);
@@ -2870,6 +2873,11 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('outstanding_marketing_invoice')->middleware('operation.access:outstanding_marketing_invoice,view')->group(function () {
                         Route::get('/', [MarketingOrderOutstandingInvoiceController::class, 'index']);
                         Route::get('export', [MarketingOrderOutstandingInvoiceController::class, 'export']);
+                    });
+
+                    Route::prefix('report_receivable_card')->middleware('operation.access:report_receivable_card,view')->group(function () {
+                        Route::get('/', [ReportReceivableCardController::class, 'index']);
+                        Route::get('export', [ReportReceivableCardController::class, 'export']);
                     });
                 });
             });

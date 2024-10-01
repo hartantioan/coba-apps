@@ -80,7 +80,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $arr[] = [
                 '1'     => 'FK;'.$transactionCode.';0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->userData->npwp.';'.$row->userData->title.';'.$row->userData->address.';'.floor($row->total).';'.floor($row->tax).';0;;0;0;0;0;'.$row->code.';;'
             ];
-            foreach($row->marketingOrderInvoiceDetail as $rowdetail){
+            foreach($row->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details')->get() as $rowdetail){
                 $arr[] = [
                     '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.floor($rowdetail->tax).';0;0;;;;;;;;;;',
                 ];

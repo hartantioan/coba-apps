@@ -211,6 +211,12 @@ class MarketingOrderInvoice extends Model
         return $ada;
     }
 
+    public function getAge(){
+        $age = time() -  strtotime($this->post_date);
+        
+        return round($age / (60 * 60 * 24));
+    }
+
     public function hasChildDocument(){
         $hasRelation = false;
 

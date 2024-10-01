@@ -38,7 +38,7 @@ class ExportOutstandingMarketingInvoice implements FromView, WithEvents
                 'taxno' => $row->tax_no,
                 'payment'=>$row->type(),
                 'duedateinternal'=>date('d/m/Y', strtotime($row->due_date_internal)),
-               
+               'aging' => $row->getAge(),
            
             ];
         }

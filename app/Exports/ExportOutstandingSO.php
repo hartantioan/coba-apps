@@ -2,88 +2,105 @@
 
 namespace App\Exports;
 
-use App\Models\MarketingOrderInvoice;
-use App\Models\MarketingOrderDownPayment;
-use Illuminate\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
-use App\Helpers\CustomHelper;
-use App\Helpers\PrintHelper;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Models\MarketingOrder;
 use App\Models\MarketingOrderDetail;
 
-class ExportOutstandingSO implements FromView, WithEvents
+class ExportOutstandingSO implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
-
-
-    public function __construct() {}
-    public function view(): View
+    public function __construct()
     {
-        $array_filter = [];
+        
+    }
 
-
-
-        $query_data = MarketingOrderDetail::whereHas('marketingOrder', function ($query) {
-            $query->whereIn('status', ['2']);
-        })->get();
-
-        foreach ($query_data as $row) {
-
-            $array_filter[] = [
-                'code'              => $row->marketingOrder->code,
-                'customer'          => $row->marketingOrder->account->name,
-                'post_date'         => date('d/m/Y', strtotime($row->marketingOrder->post_date)),
-                'top'               => $row->marketingOrder->account->top,
-                'tipe'              => $row->marketingOrder->type(),
-                'po'                => $row->marketingOrder->document_no,
-                'pengiriman'                => $row->marketingOrder->deliveryType(),
-                'alamatkirim'                => $row->marketingOrder->destination_address,
-                'provinsi' => $row->marketingOrder->province->name,
-                'kota' => $row->marketingOrder->city->name,
-                'kecamatan' => $row->marketingOrder->district->name,
-                'noteinternal' => $row->marketingOrder->note_internal,
-                'noteexternal' => $row->marketingOrder->note_external,
-                'itemcode' => $row->item->code,
-                'itemname' => $row->item->name,
-                'qty'=>$row->qty_uom,
-                'price'=>$row->price,
-                'disc1'=>$row->percent_discount_1,
-                'disc2'=>$row->percent_discount_2,
-                'disc3'=>$row->discount_3,
-                'truck'=>$row->marketingOrder->transportation->name,
-                'qtymod'=>$row->balanceQtyModM2(),
-                'pembayaran'=>$row->marketingOrder->paymentType(),
-                
-            ];
+    private $headings = [
+        'No',
+        'No. Document',
+        'Status',
+        'Tgl. Post',
+        'PO Cust',
+        'Customer',
+        'Variant Item',
+        'Item Code',
+        'Item Name',
+        'Tipe Penjualan',
+        'Pengiriman',
+        'Tipe Customer',
+        'Transport',
+        'Alamat Kirim',
+        'Kabupaten',
+        'Kecamatan',
+        'Pembayaran',
+        'TOP',
+        'Qty',
+        'Harga Satuan',
+        'Discount 1',
+        'Discount 2',
+        'Discount 3',
+        'DP',
+        'Total',
+        'PPN',
+        'Grandtotal',
+    ];
+    public function collection()
+    {
+        $data =  MarketingOrder::whereIn('status',['2'])->get();
+        $arr = [];
+        $x=1;
+        foreach($data as $key => $row){
+            $subtotal = $row->subtotal * $row->currency_rate;
+            $discount = $row->discount * $row->currency_rate;
+            $total = $subtotal - $discount;
+            foreach($row->marketingOrderDetail as  $key_detail =>$row_detail){
+                $arr[] = [
+                    'no'                => $x,
+                    'no_document'             => $row->code,
+                    'status'            => $row->statusSAP(),
+                    'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
+                    'po_cust'             => $row->document_no,
+                    'customer'         => $row->account->name,
+                    'variant_item'      => $row_detail->item->type->name,
+                    'item_code'              => $row_detail->item->code,
+                    'item_name'              => $row_detail->item->name,
+                    'tipe_penjualan'    => $row->type(),
+                    'pengiriman'     => $row->deliveryType(),
+                    'tipe_customer'     => $row->group->name ?? '-',
+                    'transport'   => $row->transportation->name,
+                    'alamat_kirim'      => $row->destination_address,
+                    'kabupaten'  => $row->city->name,
+                    'kecamatan'  => $row->district->name,
+                    'pembayaran'   => $row->paymentType(),
+                    'top'               => $row->top_customer,
+                    'qty'               => $row_detail->qty,
+                    'harga_satuan'      => $row_detail->price,
+                    'discount_1'        => $row_detail->percent_discount_1,
+                    'discount_2'        => $row_detail->percent_discount_2,
+                    'discount_3'        => $row_detail->discount_3,
+                    'dp'                => $row->percent_dp,
+                    'total'             => $row_detail->total,
+                    'ppn'               => $row_detail->tax,
+                    'grandtotal'        => $row_detail->grandtotal,
+                    
+                ];
+                $x++;
+            }
+            
+        
+            
         }
 
-
-
-
-        activity()
-            ->performedOn(new MarketingOrder())
-            ->causedBy(session('bo_id'))
-            ->withProperties(null)
-            ->log('Export Outstanding SO.');
-
-        return view('admin.exports.outstanding_so', [
-            'data'          => $array_filter,
-
-        ]);
+        return collect($arr);
     }
-
-    public function registerEvents(): array
+    public function title(): string
     {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                // Auto-fit columns A to Z
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setWrapText(true);
-                $event->sheet->getDelegate()->getStyle('A:Z')->getAlignment()->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
-                $event->sheet->autoSize();
-                $event->sheet->freezePane("A1");
-            }
-        ];
+        return 'Outstanding SO';
     }
+
+    public function headings() : array
+	{
+		return $this->headings;
+	}
 }

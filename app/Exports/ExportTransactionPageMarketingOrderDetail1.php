@@ -27,19 +27,6 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
         $this->currency = $currency ? $currency : '';
         $this->delivery = $delivery ? $delivery : '';
         $this->sales = $sales ? $sales : '';
-        info($this->search);
-        info($this->status);
-        info($this->type_sales);
-        info($this->type_pay);
-        info($this->type_deliv);
-        info($this->company);
-        info($this->customer);
-        info($this->delivery);
-        info($this->sales);
-        info($this->currency);
-        
-        info($this->end_date);
-        info($this->start_date);
     }
 
     private $headings = [
@@ -47,19 +34,21 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
         'No. Document',
         'Status',
         'Tgl. Post',
-        'No. PO',
-        'Pelanggan',
+        'PO Cust',
+        'Customer',
         'Variant Item',
-        'Item',
+        'Item Code',
+        'Item Name',
         'Tipe Penjualan',
-        'Tipe Pengiriman',
+        'Pengiriman',
         'Tipe Customer',
-        'Jenis Transport',
+        'Transport',
         'Alamat Kirim',
-        'Kabupaten Tujuan',
-        'Kecamatan Tujuan',
-        'Tipe Pembayaran',
+        'Kabupaten',
+        'Kecamatan',
+        'Pembayaran',
         'TOP',
+        'Qty',
         'Harga Satuan',
         'Discount 1',
         'Discount 2',
@@ -73,29 +62,7 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
     public function collection()
     {
         $data = MarketingOrder::where(function($query) {
-        //    if($this->search){
-        //         $query->where(function($query){
-        //             $query->where('code', 'like', "%$this->search%")
-        //             ->orWhere('document_no', 'like', "%$this->search%")
-        //             ->orWhere('note_internal', 'like', "%$this->search%")
-        //             ->orWhere('note_external', 'like', "%$this->search%")
-        //             ->orWhere('discount', 'like', "%$this->search%")
-        //             ->orWhere('total', 'like', "%$this->search%")
-        //             ->orWhere('tax', 'like', "%$this->search%")
-        //             ->orWhere('grandtotal', 'like', "%$this->search%")
-        //             ->orWhere('phone', 'like', "%$this->search%")
-        //             ->orWhereHas('user',function($query){
-        //                 $query->where('name','like',"%$this->search%")
-        //                     ->orWhere('employee_no','like',"%$this->search%");
-        //             })
-        //             ->orWhereHas('marketingOrderDetail',function($query) {
-        //                 $query->whereHas('item',function($query) {
-        //                     $query->where('code','like',"%$this->search%")
-        //                         ->orWhere('name','like',"%$this->search%");
-        //                 });
-        //             });
-        //         });
-        //    }
+          
             
     
             // Other conditions for the 'purchaseOrder' relationship
@@ -152,7 +119,7 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
            
         })->get();
         $arr = [];
-        info($data);
+        
         $x=1;
         foreach($data as $key => $row){
             $subtotal = $row->subtotal * $row->currency_rate;
@@ -164,19 +131,21 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
                     'no_document'             => $row->code,
                     'status'            => $row->statusSAP(),
                     'tgl_post'          => date('d/m/Y',strtotime($row->post_date)),
-                    'no_po'             => $row->document_no,
-                    'pelanggan'         => $row->account->name,
+                    'po_cust'             => $row->document_no,
+                    'customer'         => $row->account->name,
                     'variant_item'      => $row_detail->item->type->name,
-                    'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
+                    'item_code'              => $row_detail->item->code,
+                    'item_name'              => $row_detail->item->name,
                     'tipe_penjualan'    => $row->type(),
-                    'tipe_delivery'     => $row->deliveryType(),
+                    'pengiriman'     => $row->deliveryType(),
                     'tipe_customer'     => $row->group->name ?? '-',
-                    'jenis_transport'   => $row->transportation->name,
+                    'transport'   => $row->transportation->name,
                     'alamat_kirim'      => $row->destination_address,
-                    'kabupaten_tujuan'  => $row->city->name,
-                    'kecamatan_tujuan'  => $row->district->name,
-                    'tipe_pembayaran'   => $row->paymentType(),
+                    'kabupaten'  => $row->city->name,
+                    'kecamatan'  => $row->district->name,
+                    'pembayaran'   => $row->paymentType(),
                     'top'               => $row->top_customer,
+                    'qty'               => $row_detail->qty,
                     'harga_satuan'      => $row_detail->price,
                     'discount_1'        => $row_detail->percent_discount_1,
                     'discount_2'        => $row_detail->percent_discount_2,

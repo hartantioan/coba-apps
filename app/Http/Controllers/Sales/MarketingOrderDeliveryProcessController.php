@@ -1696,7 +1696,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
 
             $data_go_chart[]= $data_marketing_order_process;
-            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_delivery',$query->id);
+            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_delivery_process',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;

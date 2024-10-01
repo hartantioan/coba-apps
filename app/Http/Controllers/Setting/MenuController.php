@@ -176,7 +176,7 @@ class MenuController extends Controller
 
         $data = ProductionBatch::whereNotNull('lookable_type')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
             $query->where('item_group_id',7);
-        })->get();
+        })->orderBy('post_date')->orderBy('id')->get();
 
         foreach($data as $batch){
             ResetCogsNew::dispatch($batch->post_date,1,$batch->place_id,$batch->item_id,$batch->area_id,$batch->item_shading_id,$batch->id);

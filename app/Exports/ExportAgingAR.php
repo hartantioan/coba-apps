@@ -13,18 +13,18 @@ class ExportAgingAR implements FromView , WithEvents
     /**
     * @return \Illuminate\Support\Collection
     */
-    public function __construct(string $date, int $interval, int $column, int $type)
+    public function __construct()
     {
-        $this->date = $date ? $date : '';
+       /* $this->date = $date ? $date : '';
         $this->interval = $interval ? $interval : 0;
 		$this->column = $column ? $column : 0;
-        $this->type = $type ? $type : 1;
+        $this->type = $type ? $type : 1;*/
     }
     public function view(): View
     {
         $totalAll=0;
         $array_filter = [];
-        $query_data = DB::select("
+       /* $query_data = DB::select("
             SELECT 
             *,
             IFNULL((SELECT 
@@ -313,7 +313,16 @@ class ExportAgingAR implements FromView , WithEvents
                 'countPeriod'   => $countPeriod,
                 'totalall'      => $totalAll
             ]);
-        }
+        }*/
+
+        $query = "CALL report_aging_ar;";
+
+        $submit = DB::select($query);
+
+        return view('admin.exports.aging_ar_summary', [
+            'data'          => $submit,
+           
+        ]);
     }
 
     public function registerEvents(): array

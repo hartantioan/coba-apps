@@ -156,7 +156,7 @@
     });
 
     function exportExcel(){
-        if($('.row_detail').length > 0){
+       /* if($('.row_detail').length > 0){
             var date = $('#date').val(), interval = $('#interval').val(), column = $('#column').val(), type = $('#type').val();
             window.location = "{{ Request::url() }}/export?date=" + date + "&interval=" + interval + "&column=" + column + "&type=" + type;
         }else{
@@ -165,7 +165,8 @@
                 text: 'Silahkan filter laporan terlebih dahulu ya.',
                 icon: 'warning'
             });
-        }
+        }*/
+        window.location = "{{ Request::url() }}/export?date=" + date;
     }
     
     function filterByDate(){

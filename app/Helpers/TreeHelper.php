@@ -2582,7 +2582,7 @@ class TreeHelper {
                     $finished_data_id_mo_receipt[]=$id_mo_receipt;
                     $query_mo_receipt = MarketingOrderReceipt::find($id_mo_receipt);
 
-                    if($query_mo_receipt->marketingOrderHandoverReceiptDetail->exists()){
+                    if($query_mo_receipt->marketingOrderHandoverReceiptDetail()->exists()){
                         foreach($query_mo_receipt->marketingOrderHandoverReceiptDetail as $row_mo_h_rd){
                             $properties =[
                                 ['name'=> "Tanggal :".$row_mo_h_rd->marketingOrderHandoverReceipt->post_date],

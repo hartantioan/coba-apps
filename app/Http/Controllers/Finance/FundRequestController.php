@@ -1112,7 +1112,7 @@ class FundRequestController extends Controller
                     
 			if($request->temp){
                 DB::beginTransaction();
-               
+                try {
                     $query = FundRequest::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -1200,10 +1200,12 @@ class FundRequestController extends Controller
 					        'message' => 'Status purchase request sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                
+                }catch(\Exception $e){
+                    DB::rollback();
+                }
 			}else{
                 DB::beginTransaction();
-                try {
+                
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=FundRequest::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -1251,9 +1253,7 @@ class FundRequestController extends Controller
                     ]);
 
                     DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
+                
 			}
 			
 			if($query) {

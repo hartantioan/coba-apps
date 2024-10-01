@@ -130,10 +130,19 @@ class MenuController extends Controller
             ResetCogsNew::dispatch($batch->post_date,1,$batch->place_id,$batch->item_id,$batch->area_id,$batch->item_shading_id,$batch->id);
         } */
 
-        $data = Item::where('item_group_id',2)->get();
+        /* $data = Item::where('item_group_id',2)->get();
 
         foreach($data as $item){
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
+        } */
+
+        $data = Item::whereHas('itemGroup',function($query){
+            $query->where('name','like',"SUPPORT%")->where('parent_id',3);
+        })->get();
+
+        foreach($data as $item){
+            /* ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL); */
+            echo $item->name.'<br>';
         }
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();

@@ -13,6 +13,7 @@
             <th class="center-align">Tax No</th>
             <th class="center-align">Tipe Payment</th>
             <th class="center-align">Total</th>
+            <th class="center-align">Aging (Days)</th>
            
         </tr>
     </thead>
@@ -29,6 +30,7 @@
             <td>{{ $row['taxno'] }}</td>
             <td>{{ $row['payment'] }}</td>
             <td>{{ $row['total'] }}</td>
+            <td>{{ $row['aging'] }}</td>
         
         </tr>
         @endforeach

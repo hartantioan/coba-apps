@@ -100,13 +100,13 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
 
         /* $data = MarketingOrderDeliveryProcess::whereHas('marketingOrderInvoice')->get();
 
@@ -143,6 +143,8 @@ class MenuController extends Controller
         foreach($data as $item){
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
+
+        ResetCogsNew::dispatch('2024-09-30',1,1,4137,NULL,NULL,NULL);
 
         /* $data = ProductionBatch::whereNotNull('lookable_type')->get();
 

@@ -2834,7 +2834,7 @@ class TreeHelper {
                     foreach($query_handover_invoice->marketingOrderHandoverInvoiceDetail as $row_mo_h_invoice_detail){
                         if($row_mo_h_invoice_detail->marketingOrderInvoice()){
                             $properties = [
-                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date],
+                                ['name'=> "Tanggal :".$row_mo_h_receipt_detail->lookable->post_date ?? '-'],
                                 ];
                             
                             if (!$hide_nominal) {

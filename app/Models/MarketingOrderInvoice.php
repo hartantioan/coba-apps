@@ -70,6 +70,23 @@ class MarketingOrderInvoice extends Model
     {
         return $this->belongsTo('App\Models\UserData', 'user_data_id', 'id')->withTrashed();
     }
+    public function getNpwp()
+    {
+        $npwp='';
+
+        if ($this->account->type_body==3)
+        {
+            $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
+          
+        }
+        else
+        {
+            $npwp=str_replace('.','',str_replace('-','',$this->userData->npwp));
+        }
+
+        return $npwp;
+    }
+
 
     public function voidUser()
     {

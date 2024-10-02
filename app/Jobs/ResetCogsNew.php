@@ -150,6 +150,9 @@ class ResetCogsNew implements ShouldQueue
             if($area_id && $item_shading_id && $production_batch_id){
                 $query->whereHas('productionBatch',function($query)use($area_id,$item_shading_id,$production_batch_id){
                     $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('id',$production_batch_id);
+                })
+                ->orWhereHas('itemStock',function($query)use($area_id,$item_shading_id,$production_batch_id){
+                    $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('production_batch_id',$production_batch_id);
                 });
             }
         })->get();
@@ -180,7 +183,7 @@ class ResetCogsNew implements ShouldQueue
                     'type'				        => 'IN',
                     'area_id'                   => $row ->area_id ?? NULL,
                     'item_shading_id'           => $row->item_shading_id ?? NULL,
-                    'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
+                    'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
                 ]);
             }
             $qtyBefore = $qty_final;

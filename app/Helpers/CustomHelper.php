@@ -2152,7 +2152,7 @@ class CustomHelper {
 					$gr->post_date,
 					$row->area_id,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-					$row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
+					$row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
 					$row->getTable(),
 					$row->id,
 				);
@@ -2165,7 +2165,7 @@ class CustomHelper {
 					'IN',
 					$row->area_id ? $row->area_id : NULL,
 					$row->item_shading_id ? $row->item_shading_id : NULL,
-					$row->productionBatch()->exists() ? $row->productionBatch->id : NULL,
+					$row->productionBatch()->exists() ? $row->productionBatch->id : ($row->itemStock()->exists() ? $row->itemStock->production_batch_id : NULL),
 				);
 			}
 
@@ -4853,54 +4853,50 @@ class CustomHelper {
 				foreach($arrBom as $rowbom){
 					foreach($pir->productionIssueDetail()->whereNull('is_wip')->where('bom_id',$rowbom)->orderBy('id')->get() as $row){
 						if($row->lookable_type == 'items'){
-							if($row->is_wip){
-								//do nothing
-							}else{
-								JournalDetail::create([
-									'journal_id'	=> $query->id,
-									'coa_id'		=> $row->lookable->itemGroup->coa_id,
-									'place_id'		=> $row->itemStock->place_id,
-									'line_id'		=> $row->productionIssue->line_id,
-									'item_id'		=> $row->itemStock->item_id,
-									'warehouse_id'	=> $row->itemStock->warehouse_id,
-									'type'			=> '2',
-									'nominal'		=> $row->total,
-									'nominal_fc'	=> $row->total,
-									'note'			=> $pir->productionOrderDetail->productionOrder->code,
-									'lookable_type'	=> $table_name,
-									'lookable_id'	=> $table_id,
-									'detailable_type'=> $row->getTable(),
-									'detailable_id'	=> $row->id,
-								]);
-				
-								self::sendCogs($table_name,
-									$pir->id,
-									$pir->company_id,
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									$row->total,
-									'OUT',
-									$pir->post_date,
-									NULL,
-									NULL,
-									NULL,
-									$row->getTable(),
-									$row->id,
-								);
-				
-								self::sendStock(
-									$row->itemStock->place_id,
-									$row->itemStock->warehouse_id,
-									$row->itemStock->item_id,
-									$row->qty,
-									'OUT',
-									NULL,
-									NULL,
-									NULL,
-								);
-							}
+							JournalDetail::create([
+								'journal_id'	=> $query->id,
+								'coa_id'		=> $row->lookable->itemGroup->coa_id,
+								'place_id'		=> $row->itemStock->place_id,
+								'line_id'		=> $row->productionIssue->line_id,
+								'item_id'		=> $row->itemStock->item_id,
+								'warehouse_id'	=> $row->itemStock->warehouse_id,
+								'type'			=> '2',
+								'nominal'		=> $row->total,
+								'nominal_fc'	=> $row->total,
+								'note'			=> $pir->productionOrderDetail->productionOrder->code,
+								'lookable_type'	=> $table_name,
+								'lookable_id'	=> $table_id,
+								'detailable_type'=> $row->getTable(),
+								'detailable_id'	=> $row->id,
+							]);
+			
+							self::sendCogs($table_name,
+								$pir->id,
+								$pir->company_id,
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								$row->total,
+								'OUT',
+								$pir->post_date,
+								$row->itemStock->area_id,
+								$row->itemStock->item_shading_id,
+								$row->itemStock->production_batch_id,
+								$row->getTable(),
+								$row->id,
+							);
+			
+							self::sendStock(
+								$row->itemStock->place_id,
+								$row->itemStock->warehouse_id,
+								$row->itemStock->item_id,
+								$row->qty,
+								'OUT',
+								$row->itemStock->area_id,
+								$row->itemStock->item_shading_id,
+								$row->itemStock->production_batch_id,
+							);
 						}elseif($row->lookable_type == 'resources'){
 							if($row->bomDetail()->exists()){
 								if($row->bomDetail->cost_distribution_id){

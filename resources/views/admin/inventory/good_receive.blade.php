@@ -236,8 +236,8 @@
                                             <thead>
                                                 <tr>
                                                     <th class="center">{{ __('translations.item') }}</th>
-                                                    <th class="center" width="150px">Stok Skrg</th>
-                                                    <th class="center" width="150px">Tujuan</th>
+                                                    <th class="center" width="150px">Ke Stok Lama</th>
+                                                    <th class="center" width="150px">Ke Stok Baru</th>
                                                     <th class="center">{{ __('translations.qty') }}</th>
                                                     <th class="center">Satuan Stock</th>
                                                     <th class="center" width="250px">Nomor Serial (Jika ada)</th>
@@ -807,29 +807,31 @@
     }
 
     function getRowUnit(val){
-        $('#tempPrice' + val).empty();
         $("#arr_place_warehouse" + val).empty();
         $('#area' + val).empty();
         $('#shading' + val).empty();
         $('#batch' + val).empty();
+        $("#arr_item_stock_id" + val).empty();
         if($("#arr_item" + val).val()){
             $('#arr_unit' + val).text($("#arr_item" + val).select2('data')[0].uom);
-            if($("#arr_item" + val).select2('data')[0].price_list.length){
-                $.each($("#arr_item" + val).select2('data')[0].price_list, function(i, value) {
-                    $('#tempPrice' + val).append(`
-                        <option value="` + value.price + `">` + value.description + `</option>
-                    `);
-                });
-            }
-            if($("#arr_item" + val).select2('data')[0].stock_list.length){
-                $('#arr_stock' + val).empty();
+            if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
+                $('#arr_item_stock_id' + val).append(`
+                    <option value="">--Pilih jika ke Stock Lama--</option>
+                `);
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    $('#arr_stock' + val).append(`
-                        ` + value.warehouse + ` - ` + value.qty + `<br>
+                    $('#arr_item_stock_id' + val).append(`
+                        <option value="` + value.id + `" data-areaname="` + value.area + `" data-areaid="` + value.area_id + `" data-shading="` + value.item_shading_id + `" data-batch="` + value.batch + `">` + value.warehouse + `</option>
                     `);
                 });
+            }else{
+                $('#arr_item_stock_id' + val).append(`
+                    <option value="">--Stok tidak ditemukan--</option>
+                `);
             }
             if($("#arr_item" + val).select2('data')[0].list_warehouse.length > 0){
+                $('#arr_place_warehouse' + val).append(`
+                    <option value="">--Pilih jika ke Stok Baru--</option>
+                `);
                 @foreach ($place as $row)
                     $.each($("#arr_item" + val).select2('data')[0].list_warehouse, function(i, value) {
                         $('#arr_place_warehouse' + val).append(`
@@ -849,6 +851,7 @@
                 select2ServerSide('#arr_area' + val, '{{ url("admin/select2/area") }}');
                 let optionShading = '<select class="browser-default" id="arr_shading' + val + '" name="arr_shading[]" required>';
                 if($("#arr_item" + val).select2('data')[0].list_shading.length > 0){
+                    optionShading += '<option value="">--Silahkan pilih shading--</option>';
                     $.each($("#arr_item" + val).select2('data')[0].list_shading, function(i, value) {
                         optionShading += '<option value="' + value.id + '">' + value.code + '</option>';
                     });
@@ -861,16 +864,17 @@
                 $('#area' + val).append(` - `);
                 $('#shading' + val).append(` - `);
             }
-            if($("#arr_item" + val).select2('data')[0].bom_group && $("#arr_item" + val).select2('data')[0].is_sales_item){
+            if($("#arr_item" + val).select2('data')[0].bom_group){
                 $('#batch' + val).append(`
                     <input name="arr_batch_no[]" type="text" placeholder="Akan membuat baru." id="arr_batch_no` + val + `">
                 `);
             }
         }else{
             $("#arr_item" + val).empty();
-            $('#tempPrice' + val).empty();
-            $('#arr_stock' + val).text('-');
             $("#arr_place_warehouse" + val).append(`
+                <option value="">--Silahkan pilih item--</option>
+            `);
+            $("#arr_item_stock_id" + val).append(`
                 <option value="">--Silahkan pilih item--</option>
             `);
             $('#area' + val).append(` - `);
@@ -994,6 +998,39 @@
         });
 	}
 
+    function getStockInfo(val){
+        $('#arr_place_warehouse' + val).val('');
+        if($('#arr_batch_no' + val).length > 0){
+            $('#arr_batch_no' + val).val('');
+        }
+        if($('#arr_shading' + val).length > 0){
+            $('#arr_shading' + val).val('');
+        }
+        if($('#arr_area' + val).length > 0){
+            $('#arr_area' + val).empty();
+        }
+        if($('#arr_item_stock_id' + val).val()){
+            if($('#arr_item_stock_id' + val + ' option:selected').data('batch')){
+                if($('#arr_batch_no' + val).length > 0){
+                    $('#arr_batch_no' + val).val($('#arr_item_stock_id' + val + ' option:selected').data('batch'));
+                }
+            }
+            if($('#arr_item_stock_id' + val + ' option:selected').data('shading')){
+                if($('#arr_shading' + val).length > 0){
+                    $('#arr_shading' + val).val($('#arr_item_stock_id' + val + ' option:selected').data('shading'));
+                }
+            }
+
+            if($('#arr_item_stock_id' + val + ' option:selected').data('areaid')){
+                if($('#arr_area' + val).length > 0){
+                    $('#arr_area' + val).append(`
+                        <option value="` + $('#arr_item_stock_id' + val + ' option:selected').data('areaid') + `">` + $('#arr_item_stock_id' + val + ' option:selected').data('areaname') + `</option>
+                    `);
+                }
+            }
+        }
+    }
+
     function addItem(){
         var count = makeid(10);
         $('#last-row-item').before(`
@@ -1003,7 +1040,9 @@
                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
                 </td>
                 <td class="center">
-                    <span id="arr_stock` + count + `">-</span>
+                    <select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]" onchange="getStockInfo('` + count + `');">
+                        <option value="">--Silahkan pilih item--</option>    
+                    </select>
                 </td>
                 <td class="center">
                     <select class="browser-default" id="arr_place_warehouse` + count + `" name="arr_place_warehouse[]">
@@ -1154,7 +1193,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passed = true;
+                var formData = new FormData($('#form_data')[0]), passed = true, passedStock = true;
 
                 formData.delete("arr_area[]");
                 formData.delete("arr_shading[]");
@@ -1166,12 +1205,25 @@
                 formData.delete("arr_inventory_coa[]");
                 formData.delete("arr_cost_distribution[]");
                 formData.delete("arr_place_cost[]");
+                formData.delete("arr_item_stock_id[]");
 
                 $('select[name^="arr_place_warehouse[]"]').each(function(index){
-                    if(!$(this).val()){
-                        passed = false;
+                    if(!$(this).val() && !$('select[name^="arr_item_stock_id[]"]').eq(index).val()){
+                        passedStock = false;
+                    }
+                    if($(this).val() && $('select[name^="arr_item_stock_id[]"]').eq(index).val()){
+                        passedStock = false;
                     }
                 });
+
+                if(!passedStock){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Tujuan stok harus diisi salah satu tidak boleh kedua. Atau keduanya kosong.',
+                        icon: 'error'
+                    });
+                    return false;
+                }
 
                 $('select[name^="arr_coa[]"]').each(function(index){
                     if(!$(this).val()){
@@ -1180,6 +1232,18 @@
                 });
 
                 $('input[name^="arr_batch_no[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('select[name^="arr_shading[]"]').each(function(index){
+                    if(!$(this).val()){
+                        passed = false;
+                    }
+                });
+
+                $('select[name^="arr_area[]"]').each(function(index){
                     if(!$(this).val()){
                         passed = false;
                     }
@@ -1196,6 +1260,7 @@
                     formData.append('arr_inventory_coa[]',($('#arr_inventory_coa' + $(this).data('id')).val() ? $('#arr_inventory_coa' + $(this).data('id')).val() : '' ));
                     formData.append('arr_cost_distribution[]',($('#arr_cost_distribution' + $(this).data('id')).val() ? $('#arr_cost_distribution' + $(this).data('id')).val() : '' ));
                     formData.append('arr_place_cost[]',($('#arr_place_cost' + $(this).data('id')).val() ? $('#arr_place_cost' + $(this).data('id')).val() : '' ));
+                    formData.append('arr_item_stock_id[]',($('#arr_item_stock_id' + $(this).data('id')).length > 0 ? ($('#arr_item_stock_id' + $(this).data('id')).val() ? $('#arr_item_stock_id' + $(this).data('id')).val() : '' )  : ''));
                 });
                 var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
@@ -1332,9 +1397,6 @@
                                 <input type="hidden" name="arr_purchase[]" value="0">
                                 <td>
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
-                                </td>
-                                <td class="center">
-                                    <span id="arr_stock` + count + `">-</span>
                                 </td>
                                 <td class="center">
                                     <select class="browser-default" id="arr_place_warehouse` + count + `" name="arr_place_warehouse[]">

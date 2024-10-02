@@ -337,7 +337,7 @@ class Item extends Model
         foreach($data as $detail){
             $arrData[] = [
                 'id'                => $detail->id,
-                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : ''),
+                'warehouse'         => $detail->place->code.' - '.$detail->warehouse->name.' - '.($detail->area()->exists() ? $detail->area->name : '').' - '.($detail->productionBatch()->exists() ? $detail->productionBatch->code : '').' - '.($detail->itemShading()->exists() ? $detail->itemShading->code : '').' - '.CustomHelper::formatConditionalQty($detail->qty),
                 'name'              => $detail->place->code.' Gudang: '.$detail->warehouse->name.($detail->area()->exists() ? ' Area: '.$detail->area->name : ''),
                 'warehouse_id'      => $detail->warehouse_id,
                 'place_id'          => $detail->place_id,

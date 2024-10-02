@@ -26,6 +26,7 @@ use App\Exports\ExportGoodReceive;
 use App\Exports\ExportGoodReceiveTransactionPage;
 use App\Models\Division;
 use App\Models\ItemSerial;
+use App\Models\ItemStock;
 use App\Models\Line;
 use App\Models\Machine;
 use App\Models\Menu;
@@ -362,12 +363,12 @@ class GoodReceiveController extends Controller
                     }
                 }
 
-                if($request->arr_batch_no[$key]){
+                /* if($request->arr_batch_no[$key]){
                     $cek = ProductionBatch::where('code',$request->arr_batch_no[$key])->first();
                     if($cek){
                         $passedBatch = false;
                     }
-                }
+                } */
             }
 
             if(!$passedBatch){
@@ -426,8 +427,8 @@ class GoodReceiveController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $query = GoodReceive::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -490,19 +491,19 @@ class GoodReceiveController extends Controller
                             $row->delete();
                         }
 
-                        DB::commit();
+                        /* DB::commit(); */
                     }else{
                         return response()->json([
                             'status'  => 500,
 					        'message' => 'Status barang masuk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
+                /* }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}else{
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=GoodReceive::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
@@ -520,21 +521,34 @@ class GoodReceiveController extends Controller
                         'grandtotal'            => $grandtotal
                     ]);
 
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 			}
 			
 			if($query) {
-                DB::beginTransaction();
-                try {
+                /* DB::beginTransaction();
+                try { */
                     foreach($request->arr_item as $key => $row){
-                        $place = explode('-',$request->arr_place_warehouse[$key])[0];
-                        $warehouse = explode('-',$request->arr_place_warehouse[$key])[1];
+                        $place = '';
+                        $warehouse= '';
+                        $itemStock = '';
+                        if($request->arr_place_warehouse[$key]){
+                            $place = explode('-',$request->arr_place_warehouse[$key])[0];
+                            $warehouse = explode('-',$request->arr_place_warehouse[$key])[1];
+                        }
+                        if($request->arr_item_stock_id[$key]){
+                            $itemStock = ItemStock::find($request->arr_item_stock_id[$key]);
+                            if($itemStock){
+                                $place = $itemStock->place_id;
+                                $warehouse = $itemStock->warehouse_id;
+                            }
+                        }
                         $grd = GoodReceiveDetail::create([
                             'good_receive_id'       => $query->id,
                             'item_id'               => $row,
+                            'item_stock_id'         => $request->arr_item_stock_id[$key] ?? NULL,
                             'warehouse_id'          => $warehouse,
                             'place_id'              => $place,
                             'qty'                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
@@ -566,31 +580,43 @@ class GoodReceiveController extends Controller
                             }
                         }
 
-                        if($request->arr_batch_no[$key]){
-                            ProductionBatch::create([
-                                'code'              => $request->arr_batch_no[$key],
-                                'item_id'           => $row,
-                                'place_id'          => $place,
-                                'warehouse_id'      => $warehouse,
-                                'area_id'           => $request->arr_area[$key] ?? NULL,
-                                'item_shading_id'   => $request->arr_shading[$key] ?? NULL,
-                                'lookable_type'     => $grd->getTable(),
-                                'lookable_id'       => $grd->id,
-                                'qty'               => $grd->qty,
-                                'qty_real'          => $grd->qty,
-                                'total'             => $grd->total,
-                                'post_date'         => $query->post_date,
-                            ]);
+                        if($request->arr_batch_no[$key] && $itemStock){
+                            if($itemStock->production_batch_id){
+                                $productionBatch = ProductionBatch::find($itemStock->production_batch_id);
+                                if($productionBatch){
+                                    $productionBatch->update([
+                                        'qty_real'  => $productionBatch->qty_real + $grd->qty,
+                                        'total'     => $productionBatch->total + $grd->total,
+                                    ]);
+                                }
+                            }
+                        }else{
+                            if($request->arr_batch_no[$key]){
+                                ProductionBatch::create([
+                                    'code'              => $request->arr_batch_no[$key],
+                                    'item_id'           => $row,
+                                    'place_id'          => $place,
+                                    'warehouse_id'      => $warehouse,
+                                    'area_id'           => $request->arr_area[$key] ?? NULL,
+                                    'item_shading_id'   => $request->arr_shading[$key] ?? NULL,
+                                    'lookable_type'     => $grd->getTable(),
+                                    'lookable_id'       => $grd->id,
+                                    'qty'               => $grd->qty,
+                                    'qty_real'          => $grd->qty,
+                                    'total'             => $grd->total,
+                                    'post_date'         => $query->post_date,
+                                ]);
+                            }
                         }
                     }
 
                     CustomHelper::sendApproval('good_receives',$query->id,$query->note);
                     CustomHelper::sendNotification('good_receives',$query->id,'Barang Masuk No. '.$query->code,$query->note,session('bo_id'));
                     
-                    DB::commit();
+                    /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
-                }
+                } */
 
                 activity()
                     ->performedOn(new GoodReceive())
@@ -851,6 +877,14 @@ class GoodReceiveController extends Controller
                     $row->itemSerial()->delete();
                     if($row->productionBatch()->exists()){
                         $row->productionBatch()->delete();
+                    }
+                    if($row->itemStock()->exists()){
+                        if($row->itemStock->productionBatch()->exists()){
+                            $row->itemStock->productionBatch->update([
+                                'qty_real'  => $row->itemStock->productionBatch->qty_real - $row->qty,
+                                'total'     => $row->itemStock->productionBatch->total - $row->total,
+                            ]);
+                        }
                     }
                 }
 

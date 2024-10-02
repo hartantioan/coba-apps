@@ -17,6 +17,7 @@ class GoodReceiveDetail extends Model
     protected $fillable = [
         'good_receive_id',
         'item_id',
+        'item_stock_id',
         'place_id',
         'warehouse_id',
         'qty',
@@ -107,6 +108,11 @@ class GoodReceiveDetail extends Model
     public function inventoryCoa()
     {
         return $this->belongsTo('App\Models\InventoryCoa', 'inventory_coa_id', 'id')->withTrashed();
+    }
+
+    public function itemStock()
+    {
+        return $this->belongsTo('App\Models\ItemStock', 'item_stock_id', 'id');
     }
 
     public function goodReceive()

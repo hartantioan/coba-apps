@@ -930,7 +930,7 @@ class ResetCogsNew implements ShouldQueue
             }
         }
 
-        /* $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
+        $productionhandoverout = ProductionHandoverDetail::whereHas('productionHandover',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->whereHas('productionFgReceiveDetail',function($query)use($item_id){
             $query->whereHas('productionFgReceive',function($query)use($item_id){
@@ -974,7 +974,7 @@ class ResetCogsNew implements ShouldQueue
             $totalBefore = $total_final;
             $qtyBefore = $qty_final;
             self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
-        } */
+        }
 
         $productionrepack = ProductionRepackDetail::whereHas('productionRepack',function($query)use($dateloop){
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);

@@ -63,6 +63,23 @@ class MarketingOrderDownPayment extends Model
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
+    public function getNpwp()
+    {
+        $npwp='';
+
+        if ($this->account->type_body==3)
+        {
+            $npwp=substr(str_replace('.','',str_replace('-','',$this->account->userDataDefault()->npwp)),1);
+          
+        }
+        else
+        {
+            $npwp=str_replace('.','',str_replace('-','',$this->account->userDataDefault()->npwp));
+        }
+
+        return $npwp;
+    }
+
     public function account()
     {
         return $this->belongsTo('App\Models\User', 'account_id', 'id')->withTrashed();

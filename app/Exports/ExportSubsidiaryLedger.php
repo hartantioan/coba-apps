@@ -57,7 +57,9 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
         $date_end = $this->dateend;
         $arr = [];
         foreach($coas as $key => $row){
-            $rowdata = $row->journalDetail()->whereHas('journal',function($query)use($date_start,$date_end){
+            $rowdata = $row->journalDetail()
+            ->selectRaw('*,journal_details.note AS notekuy')
+            ->whereHas('journal',function($query)use($date_start,$date_end){
                 $query->whereRaw("journals.post_date BETWEEN '$date_start' AND '$date_end'")
                     ->where(function($query){
                         if($this->closing_journal){
@@ -109,7 +111,7 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                     'credit_rp' => $rowdetail->type == '2' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0',
                     'balance'   => number_format($balance, 2, ',', '.'),
                     'note1'     => $rowdetail->journal->note,
-                    'note2'     => $rowdetail->note.$additional_ref,
+                    'note2'     => $rowdetail->notekuy.$additional_ref,
                     'note3'     => $rowdetail->note2,
                     'place'     => $rowdetail->place()->exists() ? $rowdetail->place->code : '-',
                     'warehouse' => $rowdetail->warehouse()->Exists() ? $rowdetail->warehouse->name : '-',

@@ -79,11 +79,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             $newdate = date('d/n/Y', strtotime($row->post_date));
             if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . str_replace('-','',str_replace('.','',$row->userData->npwp)) . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;;0;0;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;;0;0;0;0;' . $row->code . ';;'
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . str_replace('-','',str_replace('.','',$row->userData->npwp)) . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
                 ];
             }
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $rowdetail) {

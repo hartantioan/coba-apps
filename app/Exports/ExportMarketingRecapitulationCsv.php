@@ -83,7 +83,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->userData->npwp . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;0;2;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->userData->npwp . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
                 ];
             }
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $rowdetail) {

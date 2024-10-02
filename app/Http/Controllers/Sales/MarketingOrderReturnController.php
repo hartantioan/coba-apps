@@ -6,6 +6,7 @@ use App\Exports\ExportTransactionPageMarketingOrderReturn;
 use App\Models\Area;
 use App\Models\Company;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\TreeHelper;
 use App\Models\ItemStock;
 use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDeliveryProcess;
@@ -280,6 +281,71 @@ class MarketingOrderReturnController extends Controller
             'status'    => 200,
             'message'   => ''
         ]);
+    }
+
+    public function viewStructureTree(Request $request){
+        function formatNominal($model) {
+            if ($model->currency) {
+                return $model->currency->symbol;
+            } else {
+                return "Rp.";
+            }
+        }
+        $query = MarketingOrderReturn::where('code',CustomHelper::decrypt($request->id))->first();
+        $data_go_chart = [];
+        $data_link = [];
+        
+
+        if($query){
+            $data_mo_delivery = [
+                "name"=>$query->code,
+                "key" => $query->code,
+                "color"=>"lightblue",
+                'properties'=> [
+                    ['name'=> "Tanggal :".$query->post_date],
+                    ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
+                 ],
+                'url'=>request()->root()."/admin/sales/marketing_order_return?code=".CustomHelper::encrypt($query->code),           
+            ];
+
+            $data_go_chart[]= $data_mo_delivery;
+            $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_return',$query->id);
+            $array1 = $result[0];
+            $array2 = $result[1];
+            $data_go_chart = $array1;
+            $data_link = $array2; 
+
+            function unique_key($array,$keyname){
+
+                $new_array = array();
+                foreach($array as $key=>$value){
+                
+                    if(!isset($new_array[$value[$keyname]])){
+                    $new_array[$value[$keyname]] = $value;
+                    }
+                
+                }
+                $new_array = array_values($new_array);
+                return $new_array;
+            }
+        
+            $data_go_chart = unique_key($data_go_chart,'name');
+            $data_link=unique_key($data_link,'string_link');
+
+            $response = [
+                'status'  => 200,
+                'message' => $data_go_chart,
+                'link'    => $data_link
+            ];
+
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data failed to delete.'
+            ];
+        }
+
+        return response()->json($response);
     }
 
     public function create(Request $request){

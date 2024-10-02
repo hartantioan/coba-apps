@@ -3318,10 +3318,13 @@ class TreeHelper {
                                 "name"=> $row_delivery_detail->marketingOrderDetail->marketingOrder->code,
                                 "key" => $row_delivery_detail->marketingOrderDetail->marketingOrder->code,
                                 'properties'=> $properties,
-                                'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($row_delivery_detail->marketingOrderDetail->marketingOrder->code),           
+                                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($row_delivery_detail->marketingOrderDetail->marketingOrder->code),           
                             ];
                             $data_go_chart[]= $data_marketing_order;
-                            $data_id_mo[]=$row_delivery_detail->marketingOrderDetail->marketingOrder->id;
+                            if(!in_array($row_delivery_detail->marketingOrderDetail->marketingOrder->id, $data_id_mo)){
+                                $data_id_mo[]=$row_delivery_detail->marketingOrderDetail->marketingOrder->id;
+                                $added = true;
+                            }
                         }
                     }
                     if($query_mo_delivery->goodScaleDetail()->exists()){

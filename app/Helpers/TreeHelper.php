@@ -2287,11 +2287,15 @@ class TreeHelper {
                         if($purchase_request_detail->purchaseOrderDetailnoStatus()->exists()){
                         
                             foreach($purchase_request_detail->purchaseOrderDetailnoStatus as $purchase_order_detail){
+                                $color = 'grey';
                                 if($purchase_order_detail->purchaseOrder->isSecretPo()){
                                     $name = null;
                                    
                                 }else{
                                     $name = $purchase_order_detail->purchaseOrder->supplier->name ?? null;
+                                }
+                                if($purchase_order_detail->purchaseOrder->status == '5'){
+                                    $color= 'red';
                                 }
                                
                                 $po_tempura = [
@@ -2299,6 +2303,7 @@ class TreeHelper {
                                         ['name'=> "Tanggal : ".$purchase_order_detail->purchaseOrder->post_date],
                                         ['name'=> "Vendor  : ".($name !== null ? $name : '-')],
                                     ],
+                                    "color"=>$color,
                                     'key'=>$purchase_order_detail->purchaseOrder->code,
                                     'name'=>$purchase_order_detail->purchaseOrder->code,
                                     'url'=>request()->root()."/admin/purchase/purchase_order?code=".CustomHelper::encrypt($purchase_order_detail->purchaseOrder->code),
@@ -4016,6 +4021,16 @@ class TreeHelper {
         
             return $filteredArray;
         }
+        $data_go_chart[]=[
+            "name"=>'Legend',
+            "key" => 1,
+            "loc" => "100 50",
+            'properties'=> [['name'=> 'Abu-abu = Status Proses/Selesai'],
+                            ['name'=> "Merah = Status Void PO"],
+                            ['name'=> "Biru = Kode Data saat Ini"]
+                            ],
+            
+        ];
         $data_link = filterDuplicates($data_link);
        
         return [$data_go_chart, $data_link];

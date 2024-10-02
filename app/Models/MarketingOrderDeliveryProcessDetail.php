@@ -69,7 +69,7 @@ class MarketingOrderDeliveryProcessDetail extends Model
     public function itemStock(){
         return $this->belongsTo('App\Models\ItemStock','item_stock_id','id');
     }
-    
+
     public function marketingOrderReturnDetail()
     {
         return $this->hasMany('App\Models\MarketingOrderReturnDetail')->whereHas('marketingOrderReturn',function($query){
@@ -81,6 +81,19 @@ class MarketingOrderDeliveryProcessDetail extends Model
         return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
             $query->whereIn('status',['2','3']);
         });
+    }
+
+    public function listMarketingOrderInvoice(){
+        $arr=[];
+        if($this->marketingOrderInvoiceDetail()->exists()){
+            foreach($this->marketingOrderInvoiceDetail()->get() as $item){
+                $arr[] = $item->marketingOrderInvoice->code;
+            }
+            $x=implode(',', $arr);
+        }else{
+            $x= '-';
+        }
+        return $x;
     }
 
     public function balanceInvoice(){

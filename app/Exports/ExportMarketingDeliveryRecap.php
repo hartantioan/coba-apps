@@ -33,7 +33,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
 
 
         foreach ($mo as $key=>$row) {
-      
+
             $array_filter[] = [
                 'no'                => ($key+1),
                 'code'              => $row->marketingOrderDeliveryProcess->code,
@@ -47,7 +47,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'doner'        => ($row->marketingOrderDeliveryProcess->status == 3 && is_null($row->marketingOrderDeliveryProcess->done_id)) ? 'sistem' : (($row->marketingOrderDeliveryProcess->status == 3 && !is_null($row->marketingOrderDeliveryProcess->done_id)) ? $row->marketingOrderDeliveryProcess->doneUser->name : null),
                 'tgl_done'          => $row->marketingOrderDeliveryProcess->doneUser ? $row->marketingOrderDeliveryProcess->done_date : '',
                 'ket_done'              => $row->marketingOrderDeliveryProcess->doneUser ? $row->marketingOrderDeliveryProcess->done_note : '' ,
-                
+
                 'nik' =>$row->marketingOrderDeliveryProcess->user->employee_no,
                 'user' =>$row->marketingOrderDeliveryProcess->user->name,
 
@@ -67,8 +67,8 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'shading' => $row->itemStock->itemShading->code,
                 'batch' => $row->itemStock->productionBatch->code,
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
-                
 
+                'list_invoice' =>$row->listMarketingOrderInvoice(),
                 'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
                 'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,
                 'no_wa_supir'                => $row->marketingOrderDeliveryProcess->driver_hp,
@@ -80,8 +80,8 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'catatan_eksternal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_external,
                 'tracking'=>$row->marketingOrderDeliveryProcess->statusTrackingRaw(),
                 'tgl_kembali_sj'=>date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->statusTrackingDate())),
-                'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,  
-               
+                'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+
             ];
         }
 

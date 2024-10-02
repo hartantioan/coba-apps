@@ -41,6 +41,7 @@
             <th>Catatan Eksternal</th>
             <th>Tracking</th>
             <th>Tgl Tracking</th>
+            <th>No Invoice</th>
             <th>Based On</th>
         </tr>
     </thead>
@@ -87,8 +88,9 @@
                 <td>{{ $row['catatan_eksternal'] }}</td>
                 <td>{{ $row['tracking'] }}</td>
                 <td>{{ $row['tgl_kembali_sj'] }}</td>
+                <td>{{ $row['list_invoice'] }}</td>
                 <td>{{ $row['based_on'] }}</td>
-                
+
             </tr>
         @endforeach
         @if(count($data) == 0)

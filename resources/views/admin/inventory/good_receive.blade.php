@@ -1399,6 +1399,11 @@
                                     <select class="browser-default item-array" id="arr_item` + count + `" name="arr_item[]" onchange="getRowUnit('` + count + `')" data-id="` + count + `"></select>
                                 </td>
                                 <td class="center">
+                                    <select class="browser-default" id="arr_item_stock_id` + count + `" name="arr_item_stock_id[]" onchange="getStockInfo('` + count + `');">
+                                        <option value="">--Silahkan pilih item--</option>    
+                                    </select>
+                                </td>
+                                <td class="center">
                                     <select class="browser-default" id="arr_place_warehouse` + count + `" name="arr_place_warehouse[]">
                                         <option value="">--Silahkan pilih item--</option>    
                                     </select>
@@ -1536,6 +1541,7 @@
                         select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
 
                         if(val.is_sales_item){
+                            $('#shading' + count).empty();
                             let optionShading = '<select class="browser-default" id="arr_shading' + val + '" name="arr_shading[]" required>';
                             if(val.list_shading.length > 0){
                                 $.each(val.list_shading, function(i, value) {
@@ -1545,7 +1551,7 @@
                                 optionShading += '<option value="">--Shading tidak ditemukan--</option>';
                             }
                             optionShading += '</select>';
-                            $('#shading' + val).append(optionShading);
+                            $('#shading' + count).append(optionShading);
                         }
 
                         if(val.cost_distribution_id){
@@ -1555,6 +1561,21 @@
                         }
 
                         select2ServerSide('#arr_cost_distribution' + count, '{{ url("admin/select2/cost_distribution") }}');
+
+                        if(val.stock_list.length > 0){
+                            $("#arr_item_stock_id" + count).empty();
+                            $('#arr_item_stock_id' + count).append(`
+                                <option value="">--Pilih jika ke Stock Lama--</option>
+                            `);
+                            $.each(val.stock_list, function(i, value) {
+                                $('#arr_item_stock_id' + count).append(`
+                                    <option value="` + value.id + `" data-areaname="` + value.area + `" data-areaid="` + value.area_id + `" data-shading="` + value.item_shading_id + `" data-batch="` + value.batch + `">` + value.warehouse + `</option>
+                                `);
+                            });
+                            if(val.item_stock_id){
+                                $('#arr_item_stock_id' + count).val(val.item_stock_id);
+                            }
+                        }
                     });
                 }
                 

@@ -36,13 +36,14 @@ use Illuminate\Support\Str;
 use App\Models\UsedData;
 class GoodReceiveController extends Controller
 {
-    protected $dataplaces, $dataplacecode;
+    protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
         $user = User::find(session('bo_id'));
 
         $this->dataplaces = $user ? $user->userPlaceArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
+        $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
 
     public function index(Request $request)
@@ -784,6 +785,7 @@ class GoodReceiveController extends Controller
             $arr[] = [
                 'item_id'                   => $row->item_id,
                 'item_name'                 => $row->item->code.' - '.$row->item->name,
+                'item_stock_id'             => $row->item_stock_id ?? '',
                 'place_warehouse_id'        => $row->place_id.'-'.$row->warehouse_id,
                 'place_warehouse_name'      => $row->place->code.'-'.$row->warehouse->name,
                 'qty'                       => CustomHelper::formatConditionalQty($row->qty),
@@ -807,13 +809,15 @@ class GoodReceiveController extends Controller
                 'project_id'                => $row->project()->exists() ? $row->project->id : '',
                 'project_name'              => $row->project()->exists() ? $row->project->name : '',
                 'note'                      => $row->note ? $row->note : '',
-                'item_shading_id'           => $row->item_shading_id,
+                'item_shading_id'           => $row->item_shading_id ?? '',
                 'list_shading'              => $row->item->arrShading(),
                 'is_sales_item'             => $row->item->is_sales_item ? $row->item->is_sales_item : '',
                 'list_serial'               => $row->listSerial(),
                 'list_warehouse'            => $row->item->warehouseList(),
                 'production_batch_id'       => $row->productionBatch()->exists() ? $row->productionBatch->id : '',
                 'batch_no'                  => $row->batch_no ?? '',
+                'stock_list'                => $row->item->currentStock($this->dataplaces,$this->datawarehouses),
+                'bom_group'                 => $row->item->bom()->exists() ? $row->item->bom()->first()->group : '',
             ];
         }
 

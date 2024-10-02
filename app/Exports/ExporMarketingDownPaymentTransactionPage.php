@@ -37,6 +37,7 @@ class ExporMarketingDownPaymentTransactionPage implements FromCollection, WithTi
     private $headings = [
         'No',
         'Kode',
+        'Post Date',
         'User',
         'BP',
         'Nama NPWP',
@@ -44,7 +45,6 @@ class ExporMarketingDownPaymentTransactionPage implements FromCollection, WithTi
         'Alamat. NPWP',
         'Perusahaan',
         'Tipe',
-        'Date',
         'Currency',
         'Note',
         'Pajak',
@@ -116,6 +116,7 @@ class ExporMarketingDownPaymentTransactionPage implements FromCollection, WithTi
             $array[]=[
                 'no' => $index+1,
                 'kode' =>$row_arr->code,
+                'post_date' =>date('d/m/Y',strtotime($row_arr->post_date)),
                 'user' =>$user,
                 'bp' =>$account,
                 'npwp_name' => $row_arr->account->userDataDefault()->title,
@@ -123,7 +124,6 @@ class ExporMarketingDownPaymentTransactionPage implements FromCollection, WithTi
                 'npwp_address' => $row_arr->account->userDataDefault()->address,
                 'perusahaan' =>$row_arr->plant,
                 'tipe' =>$row_arr->type(),
-                'date' =>$row_arr->date,
                 'currency' =>$row_arr->currency->code,
                 'note' =>$row_arr->note,
                 'pajak' =>$row_arr->tax_no,

@@ -108,7 +108,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status'        => 200,
                         'place'         => $data->place->code,
                         'warehouse'     => $data->warehouse->name,
-                        'area'          => $data->area->code,
+                        'area'          => $data->area->name,
                         'shading'       => $data->itemShading->code,
                         'batch'         => $data->productionBatch->code,
                         'qty'           => $qtyNeeded,
@@ -784,7 +784,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="right-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
                 <td class="center-align">'.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code.'</td>
                 <td class="">'.$row->itemStock->itemShading->code.'</td>
-                <td class="">'.$row->itemStock->area->code.'</td>
+                <td class="">'.$row->itemStock->area->name.'</td>
                 <td class="">'.$row->itemStock->productionBatch->code.'</td>
                 <td class="">'.$row->marketingOrderDeliveryDetail->note.'</td>
             </tr>';
@@ -1257,7 +1257,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'item_name'     => $row->itemStock->place->code.' / Gudang : '.$row->itemStock->warehouse->name.' / Area : '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($row->itemStock->balanceWithUnsent() / $moddd->marketingOrderDetail->qty_conversion).' '.$row->itemStock->item->uomUnit->code.' / Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
                     'place_name'    => $row->itemStock->place->code,
                     'warehouse_name'=> $row->itemStock->warehouse->name,
-                    'area_name'     => $row->itemStock->area()->exists() ? $row->itemStock->area->code : '-',
+                    'area_name'     => $row->itemStock->area()->exists() ? $row->itemStock->area->name : '-',
                     'shading'       => $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-',
                     'batch'         => $row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-',
                     'qty'           => CustomHelper::formatConditionalQty($row->qty),

@@ -16,26 +16,26 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, ShouldAutoSize
 {
     /**
-    * @return \Illuminate\Support\Collection
-    */
+     * @return \Illuminate\Support\Collection
+     */
 
     protected $start_date, $end_date, $mode;
 
     public function __construct(string $start_date, string $end_date)
     {
         $this->start_date = $start_date ? $start_date : '';
-		$this->end_date = $end_date ? $end_date : '';
+        $this->end_date = $end_date ? $end_date : '';
     }
 
     public function collection()
     {
-        $ardp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])
-                ->whereDate('post_date', '>=', $this->start_date)
-                ->whereDate('post_date', '<=', $this->end_date)->get();
+        $ardp = MarketingOrderDownPayment::whereIn('status', ['2', '3'])
+            ->whereDate('post_date', '>=', $this->start_date)
+            ->whereDate('post_date', '<=', $this->end_date)->get();
 
-        $invoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])
-                ->whereDate('post_date', '>=', $this->start_date)
-                ->whereDate('post_date', '<=', $this->end_date)->get();
+        $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
+            ->whereDate('post_date', '>=', $this->start_date)
+            ->whereDate('post_date', '<=', $this->end_date)->get();
 
         $arr = [];
 
@@ -51,38 +51,44 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             '1'     => 'OF;KODE_OBJEK;NAMA;HARGA_SATUAN;JUMLAH_BARANG;HARGA_TOTAL;DISKON;DPP;PPN;TARIF_PPNBM;PPNBM;;;;;;;;;;'
         ];
 
-        foreach($ardp as $key => $row){
-            $arrTemp = explode('.',$row->tax_no);
-            $firstcode = preg_replace('/\s+/', '',$arrTemp[0]);
-            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,2) : intval($firstcode);
-            array_splice($arrTemp,0,1);
-            $tax_no = implode('',$arrTemp);
-            $month = date('n',strtotime($row->post_date));
-            $year = date('Y',strtotime($row->post_date));
-            $newdate = date('d/n/Y',strtotime($row->post_date));
+        foreach ($ardp as $key => $row) {
+            $arrTemp = explode('.', $row->tax_no);
+            $firstcode = preg_replace('/\s+/', '', $arrTemp[0]);
+            $transactionCode = substr_count($firstcode, '0') == 2 ? substr($firstcode, 0, 2) : intval($firstcode);
+            array_splice($arrTemp, 0, 1);
+            $tax_no = implode('', $arrTemp);
+            $month = date('n', strtotime($row->post_date));
+            $year = date('Y', strtotime($row->post_date));
+            $newdate = date('d/n/Y', strtotime($row->post_date));
             $arr[] = [
-                '1'     => 'FK;'.$transactionCode.';0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->account->userDataDefault()->npwp.';'.$row->account->userDataDefault()->title.';'.$row->account->userDataDefault()->address.';'.round($row->total,0).';'.round($row->tax,0).';0;;1;'.floor($row->total).';'.floor($row->tax).';0;'.$row->code.';;'
+                '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->account->userDataDefault()->npwp . ';' . $row->account->userDataDefault()->title . ';' . $row->account->userDataDefault()->address . ';' . round($row->total, 0) . ';' . round($row->tax, 0) . ';0;;1;' . floor($row->total) . ';' . floor($row->tax) . ';0;' . $row->code . ';;'
             ];
             $arr[] = [
-                '1'     => 'OF;1;'.$row->note.';'.round($row->total,2).';1.00;'.round($row->total,2).';0;'.round($row->total,2).';'.round($row->tax,2).';0;0;;;;;;;;;;',
+                '1'     => 'OF;1;' . $row->note . ';' . round($row->total, 2) . ';1.00;' . round($row->total, 2) . ';0;' . round($row->total, 2) . ';' . round($row->tax, 2) . ';0;0;;;;;;;;;;',
             ];
         }
-        
-        foreach($invoice as $key => $row){
-            $arrTemp = explode('.',$row->tax_no);
-            $firstcode = preg_replace('/\s+/', '',$arrTemp[0]);
-            $transactionCode = substr_count($firstcode,'0') == 2 ? substr($firstcode,0,2) : intval($firstcode);
-            array_splice($arrTemp,0,1);
-            $tax_no = implode('',$arrTemp);
-            $month = date('n',strtotime($row->post_date));
-            $year = date('Y',strtotime($row->post_date));
-            $newdate = date('d/n/Y',strtotime($row->post_date));
-            $arr[] = [
-                '1'     => 'FK;'.$transactionCode.';0;'.$tax_no.';'.$month.';'.$year.';'.$newdate.';'.$row->userData->npwp.';'.$row->userData->title.';'.$row->userData->address.';'.floor($row->total).';'.floor($row->tax).';0;;0;0;0;0;'.$row->code.';;'
-            ];
-            foreach($row->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details')->get() as $rowdetail){
+
+        foreach ($invoice as $key => $row) {
+            $arrTemp = explode('.', $row->tax_no);
+            $firstcode = preg_replace('/\s+/', '', $arrTemp[0]);
+            $transactionCode = substr_count($firstcode, '0') == 2 ? substr($firstcode, 0, 2) : intval($firstcode);
+            array_splice($arrTemp, 0, 1);
+            $tax_no = implode('', $arrTemp);
+            $month = date('n', strtotime($row->post_date));
+            $year = date('Y', strtotime($row->post_date));
+            $newdate = date('d/n/Y', strtotime($row->post_date));
+            if ($row->total > 0) {
                 $arr[] = [
-                    '1'     => 'OF;'.$rowdetail->lookable->itemStock->item->code.';'.$rowdetail->lookable->itemStock->item->name.';'.round($rowdetail->price,2).';'.round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,2).';'.round($rowdetail->total,2).';0;'.round($rowdetail->total,2).';'.floor($rowdetail->tax).';0;0;;;;;;;;;;',
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->userData->npwp . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->total) . ';' . floor($row->tax) . ';0;;0;0;0;0;' . $row->code . ';;'
+                ];
+            } else {
+                $arr[] = [
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->userData->npwp . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
+                ];
+            }
+            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $rowdetail) {
+                $arr[] = [
+                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . floor($rowdetail->tax) . ';0;0;;;;;;;;;;',
                 ];
             }
         }

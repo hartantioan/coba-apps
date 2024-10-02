@@ -266,6 +266,21 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
+    public function statusTrackingDate() {
+        $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
+        if ($status) {
+            $xstatus = match ($status->status) { 
+                '1', '2', '3' => $status->updated_at,
+                '5' => $this->return_date,
+                default => 'Invalid',
+            };
+            return $xstatus;
+        } else {
+            return 'Status tracking tidak ditemukan.';
+        }
+    }
+    
+
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);

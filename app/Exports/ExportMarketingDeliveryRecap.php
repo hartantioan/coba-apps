@@ -74,13 +74,12 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'no_wa_supir'                => $row->marketingOrderDeliveryProcess->driver_hp,
                 'truk'=>$row->marketingOrderDeliveryProcess->vehicle_name,
                 'nopol' => $row->marketingOrderDeliveryProcess->vehicle_no,
-                'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
                 'outlet' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
                 'alamat_tujuan'=> $row->marketingOrderDeliveryDetail->marketingOrderDelivery->destination_address,
                 'catatan_internal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_internal,
                 'catatan_eksternal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_external,
                 'tracking'=>$row->marketingOrderDeliveryProcess->statusTrackingRaw(),
-                'tgl_kembali_sj'=>date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date)),
+                'tgl_kembali_sj'=>date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->statusTrackingDate())),
                 'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,  
                
             ];

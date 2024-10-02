@@ -40,7 +40,7 @@
             <th>Catatan Internal</th>
             <th>Catatan Eksternal</th>
             <th>Tracking</th>
-            <th>Tgl Kembali SJ</th>
+            <th>Tgl Tracking</th>
             <th>Based On</th>
         </tr>
     </thead>

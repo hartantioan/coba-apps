@@ -29,11 +29,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
 
     public function collection()
     {
-        $ardp = MarketingOrderDownPayment::whereIn('status', ['2', '3', '5'])
+        $ardp = MarketingOrderDownPayment::whereIn('status', ['2', '3'])
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)->get();
 
-        $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3', '5'])
+        $invoice = MarketingOrderInvoice::whereIn('status', ['2', '3'])
             ->whereDate('post_date', '>=', $this->start_date)
             ->whereDate('post_date', '<=', $this->end_date)->get();
 

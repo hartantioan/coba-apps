@@ -39,7 +39,6 @@
             <th>Alamat Tujuan</th>
             <th>Catatan Internal</th>
             <th>Catatan Eksternal</th>
-            <th>Tracking</th>
             <th>Barang dikirimkan</th>
             <th>Barang diterima customer</th>
             <th>SJ Kembali</th>
@@ -88,7 +87,6 @@
                 <td>{{ $row['alamat_tujuan'] }}</td>
                 <td>{{ $row['catatan_internal'] }}</td>
                 <td>{{ $row['catatan_eksternal'] }}</td>
-                <td>{{ $row['tracking'] }}</td>
                 <td>{{ $row['status_item_sent'] }}</td>
                 <td>{{ $row['status_received_by_customer'] }}</td>
                 <td>{{ $row['status_returned_document'] }}</td>

@@ -52,11 +52,11 @@ class MarketingOrderDeliveryController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Marketing Order Delivery',
@@ -76,7 +76,7 @@ class MarketingOrderDeliveryController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderDelivery::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -111,7 +111,7 @@ class MarketingOrderDeliveryController extends Controller
         $search = $request->input('search.value');
 
         $total_data = MarketingOrderDelivery::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = MarketingOrderDelivery::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -156,7 +156,7 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->marketing_order_id){
                     $query->whereIn('marketing_order_id',$request->marketing_order_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -212,7 +212,7 @@ class MarketingOrderDeliveryController extends Controller
                 if($request->marketing_order_id){
                     $query->whereIn('marketing_order_id',$request->marketing_order_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -232,7 +232,7 @@ class MarketingOrderDeliveryController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->code).'`)"><i class="material-icons">speaker_notes</i></button>',
@@ -359,7 +359,7 @@ class MarketingOrderDeliveryController extends Controller
         $marketing_order = $request->marketing_order ? $request->marketing_order:'';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportTransactionPageOrderDelivery($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'mod_'.uniqid().'.xlsx');
     }
 
@@ -372,7 +372,7 @@ class MarketingOrderDeliveryController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             /* 'code'			        => $request->temp ? ['required', Rule::unique('marketing_order_deliveries', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_deliveries,code',
@@ -429,9 +429,9 @@ class MarketingOrderDeliveryController extends Controller
             $grandtotalUnsentModDp = $user->grandtotalUnsentModDp();
             $grandtotalUnsentDoCredit = $user->grandtotalUninvoiceDoCredit();
             $grandtotalUnsentDoDp = $user->grandtotalUninvoiceDoDp();
-           
+
             $arrmo = array_unique($request->arr_mo);
-            
+
             $total = 0;
             $tax = 0;
             $grandtotal = 0;
@@ -452,7 +452,7 @@ class MarketingOrderDeliveryController extends Controller
             $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
             $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
             $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
-            
+
             /* if($balanceLimitCredit < 0){
                 $passedCreditLimit = false;
             }
@@ -467,7 +467,7 @@ class MarketingOrderDeliveryController extends Controller
                     'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
                 ]);
             } */
-            
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -524,7 +524,7 @@ class MarketingOrderDeliveryController extends Controller
                         $query->status = '1'; */
 
                         $query->save();
-            
+
                         DB::commit();
                     }else{
                         return response()->json([
@@ -537,11 +537,11 @@ class MarketingOrderDeliveryController extends Controller
                 }
 			}else{
                 DB::beginTransaction();
-          
+
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDelivery::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MarketingOrderDelivery::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -565,9 +565,9 @@ class MarketingOrderDeliveryController extends Controller
                     ]);
 
                     DB::commit();
-                
+
 			}
-			
+
 			if($query) {
                 if(!$request->temp){
                     foreach($query->marketingOrderDeliveryDetail as $row){
@@ -667,7 +667,7 @@ class MarketingOrderDeliveryController extends Controller
         $po['transportation_name'] = $po->transportation->name;
 
         $arr = [];
-        
+
         foreach($po->marketingOrderDeliveryDetail as $row){
             $arrstock = [];
 
@@ -697,11 +697,11 @@ class MarketingOrderDeliveryController extends Controller
                 'type_delivery'         => $row->marketingOrderDetail->marketingOrder->type_delivery,
                 'uom_unit'              => $row->item->uomUnit->code,
             ];
-            
+
         }
 
         $po['details'] = $arr;
-        				
+
 		return response()->json($po);
     }
 
@@ -713,7 +713,7 @@ class MarketingOrderDeliveryController extends Controller
                 'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
             ]);
         }
-        				
+
 		return response()->json($po);
     }
 
@@ -759,9 +759,9 @@ class MarketingOrderDeliveryController extends Controller
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="3"> Total </td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
                 <td colspan="2"></td>
-            </tr>  
+            </tr>
         ';
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-2"><table style="min-width:100%;" class="bordered">
@@ -777,7 +777,7 @@ class MarketingOrderDeliveryController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -785,7 +785,7 @@ class MarketingOrderDeliveryController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -797,7 +797,7 @@ class MarketingOrderDeliveryController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -820,14 +820,14 @@ class MarketingOrderDeliveryController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $mod = MarketingOrderDelivery::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($mod){
             $data = [
                 'title'     => 'Print Marketing Order Delivery',
@@ -842,22 +842,22 @@ class MarketingOrderDeliveryController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MarketingOrderDelivery::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
-            
+
             $pdf = PrintHelper::print($pr,'Print Marketing Order Delivery','a4','portrait','admin.print.sales.order_delivery_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 750, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
-            $document_po = PrintHelper::savePrint($content);     
-    
+
+            $document_po = PrintHelper::savePrint($content);
+
             return $document_po;
         }else{
             abort(404);
@@ -870,7 +870,7 @@ class MarketingOrderDeliveryController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -882,7 +882,7 @@ class MarketingOrderDeliveryController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = MarketingOrderDelivery::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Print Marketing Order Delivery','a4','portrait','admin.print.sales.order_delivery_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -909,8 +909,8 @@ class MarketingOrderDeliveryController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -938,7 +938,7 @@ class MarketingOrderDeliveryController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -946,19 +946,19 @@ class MarketingOrderDeliveryController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderDelivery::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Print Marketing Order Delivery','a4','portrait','admin.print.sales.order_delivery_individual');
@@ -968,7 +968,7 @@ class MarketingOrderDeliveryController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -979,21 +979,21 @@ class MarketingOrderDeliveryController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1002,7 +1002,7 @@ class MarketingOrderDeliveryController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1022,18 +1022,18 @@ class MarketingOrderDeliveryController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1046,7 +1046,7 @@ class MarketingOrderDeliveryController extends Controller
 
     public function voidStatus(Request $request){
         $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -1081,13 +1081,13 @@ class MarketingOrderDeliveryController extends Controller
                         ]);
                     }
                 }
-    
+
                 activity()
                     ->performedOn(new MarketingOrderDelivery())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the marketing order delivery data');
-    
+
                 CustomHelper::sendNotification('marketing_order_deliveries',$query->id,'Marketing Order Delivery No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('marketing_order_deliveries',$query->id);
 
@@ -1139,7 +1139,7 @@ class MarketingOrderDeliveryController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1190,7 +1190,7 @@ class MarketingOrderDeliveryController extends Controller
                 ['name'=> "Tanggal :".$query->post_date],
                 ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
              ],
-            'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
+            'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($query->code),
         ];
         $data_go_chart[]= $data_mo_delivery;
         if($query){
@@ -1198,26 +1198,26 @@ class MarketingOrderDeliveryController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;       
-            
+            $data_link = $array2;
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
-  
+
 
             $response = [
                 'status'  => 200,
@@ -1250,9 +1250,9 @@ class MarketingOrderDeliveryController extends Controller
                     $data->update([
                         'send_status'   => $request->status ? $request->status : NULL,
                     ]);
-    
+
                     CustomHelper::sendNotification($data->getTable(),$data->id,'Status Pengiriman Surat Jalan No. '.$data->code.' telah diupdate','Status pengiriman dokumen anda telah dinyatakan '.$data->sendStatus().'.',session('bo_id'));
-    
+
                     $response = [
                         'status'  => 200,
                         'message' => 'Status berhasil dirubah.',
@@ -1288,13 +1288,13 @@ class MarketingOrderDeliveryController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MarketingOrderDelivery())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Marketing Order Delivery data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'

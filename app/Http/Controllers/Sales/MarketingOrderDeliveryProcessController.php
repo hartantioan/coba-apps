@@ -1525,7 +1525,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
                         $rowdetail->delete();
                     }
-                    $row->delete();
+                    /* $row->delete(); */
                 }
     
                 activity()

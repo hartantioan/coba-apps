@@ -1077,12 +1077,30 @@ class PurchaseInvoiceController extends Controller
             $downpayment = str_replace(',','.',str_replace('.','',$request->downpayment));
             $rounding = str_replace(',','.',str_replace('.','',$request->rounding));
 
+            if ($wtax>0 && strlen($request->tax_cut_no)<5)
+            {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'No Bukti Potong Belum Diisi'
+                ]);
+            }
+
+           
+
             if($request->arr_total){
                 foreach($request->arr_total as $key => $row){
                     $total += str_replace(',','.',str_replace('.','',$row));
                     $tax += str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
                     $grandtotal += str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
                 }
+            }
+
+            if ($tax>0 && strlen($request->tax_no)<5)
+            {
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'No Faktur Pajak Belum Diisi'
+                ]);
             }
 
             if($request->arr_multi_total){

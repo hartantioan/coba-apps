@@ -71,7 +71,9 @@ class MarketingOrderInvoice extends Model
         return $this->belongsTo('App\Models\UserData', 'user_data_id', 'id')->withTrashed();
     }
     public function getNpwp()
+    //bedain perorangan ambil 15 digit, selain itu 16 digit
     {
+
         $npwp='';
 
         if ($this->account->type_body==3)

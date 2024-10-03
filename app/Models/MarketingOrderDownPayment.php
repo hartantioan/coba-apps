@@ -64,6 +64,7 @@ class MarketingOrderDownPayment extends Model
     }
 
     public function getNpwp()
+    //bedain perorangan ambil 15 digit, selain itu 16 digit
     {
         $npwp='';
 

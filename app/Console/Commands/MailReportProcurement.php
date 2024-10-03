@@ -31,7 +31,7 @@ class MailReportProcurement extends Command
     {
         $recipient = ['edp@superior.co.id', 'heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
 
-            $scale = GoodScale::where('post_date', date('Y-m-d'))
+            $scale = GoodScale::where('post_date', date('Y-m-d'))->where('type','=','1' )
                 ->selectRaw("SUM(qty_balance) as totalnet")->selectRaw("count(code) as truck")
                 ->selectRaw("account_id")->selectRaw("item_id")
                 ->groupBy('account_id', 'item_id')->orderBy('item_id', 'ASC')->orderBy('account_id', 'ASC')->get();

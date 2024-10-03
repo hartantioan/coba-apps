@@ -43,7 +43,9 @@
             <th>Catatan Internal</th>
             <th>Catatan Eksternal</th>
             <th>Tracking</th>
-            <th>Tgl Tracking</th>
+            <th>Barang dikirimkan</th>
+            <th>Barang diterima customer</th>
+            <th>SJ Kembali</th>
             <th>Based On</th>
         </tr>
     </thead>
@@ -90,7 +92,9 @@
                 <td>{{ $row['catatan_internal'] }}</td>
                 <td>{{ $row['catatan_eksternal'] }}</td>
                 <td>{{ $row['tracking'] }}</td>
-                <td>{{ $row['tgl_kembali_sj'] }}</td>
+                <td>{{ $row['status_item_sent'] }}</td>
+                <td>{{ $row['status_received_by_customer'] }}</td>
+                <td>{{ $row['status_returned_document'] }}</td>
                 <td>{{ $row['based_on'] }}</td>
         </tr>
         @endforeach

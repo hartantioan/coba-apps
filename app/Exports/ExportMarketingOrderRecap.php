@@ -25,7 +25,7 @@ class ExportMarketingOrderRecap implements FromView, WithEvents
         $totalAll = 0;
         $array_filter = [];
         $mo = MarketingOrderDetail::whereHas('marketingOrder', function ($query) {
-            $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
+            $query->where('post_date', '>=', $this->start_date)
                 ->where('post_date', '<=', $this->end_date);
         })->get();
 
@@ -54,7 +54,7 @@ class ExportMarketingOrderRecap implements FromView, WithEvents
                 'disc2' => $row->percent_discount_2,
                 'disc3' => $row->discount_3,
                 'truck' => $row->marketingOrder->transportation->name,
-                
+
                 'pembayaran' => $row->marketingOrder->paymentType(),
 
 

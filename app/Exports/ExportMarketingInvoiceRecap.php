@@ -27,7 +27,7 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
     {
         $totalAll = 0;
         $array_filter = [];
-        $mo = MarketingOrderInvoice::whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
+        $mo = MarketingOrderInvoice::where('post_date', '>=', $this->start_date)
             ->where('post_date', '<=', $this->end_date)
             ->get();
 

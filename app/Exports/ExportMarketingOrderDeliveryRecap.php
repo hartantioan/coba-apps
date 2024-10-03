@@ -35,8 +35,17 @@ class ExportMarketingOrderDeliveryRecap implements FromView, WithEvents
 
             $array_filter[] = [
                 'code'              => $row->marketingOrderDelivery->code,
-                'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),
                 'customer' => $row->marketingOrderDelivery->customer->name,
+                'voider'            => $row->marketingOrderDelivery->voidUser()->exists() ? $row->marketingOrderDelivery->voidUser->name : '',
+                'void_date'         => $row->marketingOrderDelivery->voidUser()->exists() ? $row->marketingOrderDelivery->void_date : '',
+                'void_note'         => $row->marketingOrderDelivery->voidUser()->exists() ? $row->marketingOrderDelivery->void_note : '',
+                'deleter'           => $row->marketingOrderDelivery->deleteUser()->exists() ? $row->marketingOrderDelivery->deleteUser->name : '',
+                'delete_date'       => $row->marketingOrderDelivery->deleteUser()->exists() ? $row->marketingOrderDelivery->deleted_at : '',
+                'delete_note'       => $row->marketingOrderDelivery->deleteUser()->exists() ? $row->marketingOrderDelivery->delete_note : '',
+                'doner'             => ($row->marketingOrderDelivery->status == 3 && is_null($row->marketingOrderDelivery->done_id)) ? 'sistem' : (($row->marketingOrderDelivery->status == 3 && !is_null($row->marketingOrderDelivery->done_id)) ? $row->marketingOrderDelivery->doneUser->name : null),
+                'done_date'         => $row->marketingOrderDelivery->doneUser()->exists() ? $row->marketingOrderDelivery->done_date : '',
+                'done_note'         => $row->marketingOrderDelivery->doneUser()->exists() ? $row->marketingOrderDelivery->done_note : '',
+                'post_date'         => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),
                 'expedisi'              => $row->marketingOrderDelivery->costDeliveryType(),
                 'pengiriman'                => $row->marketingOrderDelivery->deliveryType(),
                 'alamatkirim'                => $row->marketingOrderDelivery->destination_address,
@@ -49,10 +58,12 @@ class ExportMarketingOrderDeliveryRecap implements FromView, WithEvents
                 'noteexternal' => $row->marketingOrderDelivery->note_external,
                 'itemcode' => $row->item->code,
                 'itemname' => $row->item->name,
+                'nik' => $row->marketingOrderDelivery->user->employee_no,
+                'user' => $row->marketingOrderDelivery->user->name,
                 'qty' => $row->qty,
                 'konversi' => $row->getQtyM2(),
                 'noteitem' => $row->note,
-                'so'=> $row->marketingOrderDetail->marketingOrder->code,
+                'so'=> $row->marketingOrderDetail->marketingOrder->code ?? '-',
             ];
         }
 

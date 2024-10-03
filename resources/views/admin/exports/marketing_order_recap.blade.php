@@ -4,8 +4,19 @@
             <th>{{ __('translations.no') }}.</th>
             <th>Status</th>
             <th>No Dokumen</th>
-            <th>Customer</th>
+            <th>Voider</th>
+            <th>Tgl. Void</th>
+            <th>Ket. Void</th>
+            <th>Deleter</th>
+            <th>Tgl. Delete</th>
+            <th>Ket. Delete</th>
+            <th>Doner</th>
+            <th>Tgl. Done</th>
+            <th>Ket. Done</th>
+            <th>NIK</th>
+            <th>Pengguna</th>
             <th>Tgl.Post</th>
+            <th>Customer</th>
             <th>TOP</th>
             <th>Tipe</th>
             <th>PO Cust</th>
@@ -34,8 +45,19 @@
                 <td>{{ $key + 1 }}.</td>
                 <td>{{ $row['status'] }}</td>
                 <td>{{ $row['code'] }}</td>
-                <td>{{ $row['customer'] }}</td>
+                <td>{{ $row['voider'] }}</td>
+                <td>{{ $row['void_date'] }}</td>
+                <td>{{ $row['void_note'] }}</td>
+                <td>{{ $row['deleter'] }}</td>
+                <td>{{ $row['delete_date'] }}</td>
+                <td>{{ $row['delete_note'] }}</td>
+                <td>{{ $row['doner'] }}</td>
+                <td>{{ $row['done_date'] }}</td>
+                <td>{{ $row['done_note'] }}</td>
+                <td>{{ $row['nik'] }}</td>
+                <td>{{ $row['user'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
+                <td>{{ $row['customer'] }}</td>
                 <td>{{ $row['top'] }}</td>
                 <td>{{ $row['tipe'] }}</td>
                 <td>{{ $row['po'] }}</td>

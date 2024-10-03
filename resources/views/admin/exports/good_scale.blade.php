@@ -37,7 +37,7 @@
             <th>Viscositas</th>
             <th>Residu</th>
             <th>Kadar Air</th>
-            <th>Ref.PO</th>
+            <th>Ref.PO/MOD</th>
             <th>Ref.GRPO</th>
         </tr>
     </thead>
@@ -89,7 +89,7 @@
                 <td>{{ $row->viscosity }}</td>
                 <td>{{ $row->residue }}</td>
                 <td>{{ $row->water_content }}</td>
-                <td>{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : '-' }}</td>
+                <td>{{ $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : $row->getSalesSuratJalan() }}</td>
                 <td>{{ $row->goodReceiptDetailExcel() }}</td>
 
 

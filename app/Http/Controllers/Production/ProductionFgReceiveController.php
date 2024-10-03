@@ -380,7 +380,9 @@ class ProductionFgReceiveController extends Controller
 
                 if($request->arr_item_id){
                     foreach($request->arr_item_id as $key => $row){
-                        $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
+                        $batch = ProductionBarcodeDetail::where('pallet_no',$request->arr_pallet_no[$key])->whereHas('productionBarcode',function($query){
+                            $query->whereIn('status',['2','3']);
+                        })->first();
                         if(!$batch){
                             $passedBatchCode = false;
                         }

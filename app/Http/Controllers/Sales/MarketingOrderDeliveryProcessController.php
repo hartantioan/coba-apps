@@ -1502,7 +1502,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $tempStatus = $query->status;
                 
                 $query->marketingOrderDelivery->update([
-					'status'	=> '3'
+					'status'	=> '2'
 				]);
 
                 $query->update([

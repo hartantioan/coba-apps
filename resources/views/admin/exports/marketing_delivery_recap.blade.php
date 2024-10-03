@@ -78,7 +78,7 @@
                 <td>{{ $row['area'] }}</td>
                 <td>{{ $row['shading'] }}</td>
                 <td>{{ $row['batch'] }}</td>
-                <td>{{ $row['type_delivery'] }}</td>
+                <td>{{ $row['delivery_type'] }}</td>
                 <td>{{ $row['expedisi'] }}</td>
                 <td>{{ $row['sopir'] }}</td>
                 <td>{{ $row['no_wa_supir'] }}</td>

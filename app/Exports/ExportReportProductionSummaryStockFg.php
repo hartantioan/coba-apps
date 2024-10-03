@@ -194,7 +194,6 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out));
 
             $arr[] = [
-                'item_codde'=> $row->id,
                 'item_code'=> $row->item->code,
                 'item_name'=>$row->item->name,
                 'shading'=>$row->code,

@@ -312,6 +312,24 @@
                                             {{ $data->destination_address.', '.ucwords(strtolower($data->district->name.' - '.$data->city->name.' - '.$data->province->name)) }}
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>
+                                            TOP Customer
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->top_customer }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            TOP Internal
+                                        </td>
+                                        <td width="1%">:</td>
+                                        <td>
+                                            {{ $data->top_internal }}
+                                        </td>
+                                    </tr>
                                 </table>
                             </td>
                         </tr>

@@ -3994,7 +3994,7 @@ class TreeHelper {
                                     "name"=>$row_mo_delivery_detail->marketingorderdelivery->code,
                                     "key" => $row_mo_delivery_detail->marketingorderdelivery->code,
                                     'properties'=>$properties,
-                                    'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_mo_delivery_detail->marketingorderdelivery->code),
+                                    'url'=>request()->root()."/admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($row_mo_delivery_detail->marketingorderdelivery->code),
                                 ];
 
                                 $data_go_chart[]=$modelvery;

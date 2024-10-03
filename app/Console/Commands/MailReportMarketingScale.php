@@ -2,20 +2,21 @@
 
 namespace App\Console\Commands;
 
+use App\Mail\SendMailMarketingScale;
 use App\Models\GoodScale;
 use App\Mail\SendMailProcurement;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
-class MailReportProcurement extends Command
+class MailReportMarketingScale extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'emailprocurement:run';
+    protected $signature = 'emailmarketingscale:run';
 
     /**
      * The console command description.
@@ -29,18 +30,16 @@ class MailReportProcurement extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id', 'heny@superior.co.id','livia@superior.co.id','rmpurch@superiorporcelain.co.id'];
+        $recipient = ['edp@superior.co.id','eunike@superior.co.id'];
 
-            $scale = GoodScale::where('post_date', date('Y-m-d'))->where('type','=','1' )
+            $scale = GoodScale::where('post_date', date('Y-m-d'))->where('type','=','2' )
                 ->selectRaw("SUM(qty_balance) as totalnet")->selectRaw("count(code) as truck")
                 ->selectRaw("account_id")->selectRaw("item_id")
                 ->groupBy('account_id', 'item_id')->orderBy('item_id', 'ASC')->orderBy('account_id', 'ASC')->get();
             $data = [];
             $data2 = [];
-            $scale2 =  DB::table('item_stocks')
-                ->leftJoin('items', 'items.id', '=', 'item_stocks.item_id')
-                ->whereIn('items.item_group_id', ['2'])
-                ->get(['items.name', 'item_stocks.qty']);
+            $scale2 =  GoodScale::where('post_date', date('Y-m-d'))->where('type','=','2' )
+            ->orderBy('account_id', 'ASC')->get();
             foreach ($scale as $row) {
                 $data[] = [
                     'nama'  => $row->account->name,
@@ -53,13 +52,17 @@ class MailReportProcurement extends Command
             }
             foreach ($scale2 as $row) {
                 $data2[] = [
-                    'nama'  => $row->name,
-                    'qty'  => $row->qty,
+                    'code'  => $row->code,
+                    'nopol'  => $row->vehicle_no,
+                    'driver'  => $row->driver,
+                    'note'  => $row->note,
+                    'netto'  => $row->qty_balance,
                 ];
             }
+           
             $obj = json_decode(json_encode($data));
             $obj2 = json_decode(json_encode($data2));
-            Mail::to($recipient)->send(new SendMailProcurement($obj, $obj2));
+            Mail::to($recipient)->send(new SendMailMarketingScale($obj, $obj2));
            
         
 

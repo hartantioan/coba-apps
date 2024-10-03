@@ -101,15 +101,15 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = [
+        $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]); */
+        return view('admin.layouts.index', ['data' => $data]);
 
-        $data = GoodScale::where('type','2')->whereDoesntHave('journal')->whereIn('status',['2','3'])->get();
+        /* $data = GoodScale::where('type','2')->whereDoesntHave('journal')->whereIn('status',['2','3'])->get();
         foreach($data as $gs){
             foreach($gs->goodScaleDetail as $row){
                 if($row->lookable_type == 'marketing_order_deliveries'){
@@ -124,7 +124,7 @@ class MenuController extends Controller
                 }
             }
             CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
-        }
+        } */
 
         /* $data = MarketingOrderDeliveryProcess::whereHas('marketingOrderInvoice')->get();
 

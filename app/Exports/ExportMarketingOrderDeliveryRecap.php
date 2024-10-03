@@ -64,6 +64,8 @@ class ExportMarketingOrderDeliveryRecap implements FromView, WithEvents
                 'konversi' => $row->getQtyM2(),
                 'noteitem' => $row->note,
                 'so'=> $row->marketingOrderDetail->marketingOrder->code ?? '-',
+                'sj'=>$row->getSuratJalan() ?? '-',
+                'timbangan'=>$row->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
             ];
         }
 

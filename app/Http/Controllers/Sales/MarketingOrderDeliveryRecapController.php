@@ -37,7 +37,7 @@ class MarketingOrderDeliveryRecapController extends Controller
     public function export(Request $request){
         ob_end_clean();
         ob_start();
-        $response = Excel::download(new ExportMarketingOrderDeliveryRecap($request->start_date,$request->end_date), 'mo_delivery_recap'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new ExportMarketingOrderDeliveryRecap($request->start_date,$request->end_date), 'mod_recap'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         return $response;
     }
 

@@ -26,7 +26,7 @@
         <div class="col s12">
             <div class="container">
                 <div class="section">
-                    
+
                     <div class="row">
                         <div class="col s12 m12 l12" id="main-display">
                             <ul class="collapsible collapsible-accordion">
@@ -114,13 +114,17 @@
                                                             <select class="browser-default" id="filter_sales" name="filter_sales" multiple="multiple" style="width:100% !important;" ></select>
                                                         </div>
                                                     </div>
-                                                    
+
                                                     <div class="col m3 s6 ">
                                                         <label for="start_date" style="font-size:1rem;">Tanggal Mulai Posting :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
                                                     </div> --}}
                                                     <div class="col m3 s6 ">
-                                                        <label for="finish_date" style="font-size:1rem;">Tanggal Akhir Posting :</label>
+                                                        <label for="start_date" style="font-size:1rem;">Tanggal Awal :</label>
+                                                        <input type="date" max="{{ date('9999'.'-12-31') }}" id="start_date" name="start_date" value="{{ date('Y-m-d') }}">
+                                                    </div>
+                                                    <div class="col m3 s6 ">
+                                                        <label for="finish_date" style="font-size:1rem;">Tanggal Akhir :</label>
                                                         <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date" value="{{ date('Y-m-d') }}">
                                                     </div>
                                                     <div class="col m6 s6 pt-2">
@@ -142,9 +146,9 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            
+
                                             </div>
-                                        </form>  
+                                        </form>
                                     </div>
                                 </li>
                             </ul>
@@ -199,8 +203,8 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                        </div>  
-                                        
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -208,7 +212,7 @@
                     </div>
                 </div>
 
-                
+
                 <!-- / Intro -->
             </div>
             <div class="content-overlay"></div>
@@ -237,8 +241,8 @@
         var end_date = $('#finish_date').val();
         var account_id = $('#filter_account').val();
         var $search = '';
-        window.location = "{{ Request::url() }}/export?end_date=" + end_date+"&search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&start_date=" + start_date;
-       
+        window.location = "{{ Request::url() }}/export?start_date=" + start_date+"&end_date=" + end_date + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&start_date=" + start_date;
+
     }
     function exportCsv(){
         var start_date = $('#start_date').val(), end_date = $('#end_date').val();
@@ -314,7 +318,7 @@
                             </tr>
                         `);
                     }
-           
+
                     M.toast({
                         html: 'Sukses proses data'
                     });
@@ -333,12 +337,12 @@
                     icon: 'error'
                 });
             }
-            
+
         });
     }
 
     function reset(){
         $('#form_data_filter')[0].reset();
-        
+
     }
 </script>

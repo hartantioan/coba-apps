@@ -31,7 +31,7 @@ class ReportProductionSummaryStockFgController extends Controller
     public function index(Request $request)
     {
         $parentSegment = request()->segment(2);
-       
+
         $data = [
             'title'     => 'Report Summary Stock FG',
             'content'   => 'admin.production.production_summary_stock_fg',
@@ -47,17 +47,17 @@ class ReportProductionSummaryStockFgController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-      
+
         $query_data = ItemStock::where(function($querys) use ( $request) {
             $querys->whereHas('item',function($query){
                 $query->where('status',1);
             });
             // if($request->item_shading_id != 'null'){
-           
+
             //     $querys->where('item_shading_id',$request->item_shading_id);
             // }
             // if($request->production_batch_id != 'null'){
-           
+
             //     $querys->where('production_batch_id',$request->production_batch_id);
             // }
             // if($request->area != 'all'){
@@ -67,11 +67,11 @@ class ReportProductionSummaryStockFgController extends Controller
             //     $querys->where('place_id',$request->plant);
             // }
         })
-        ->join('items', 'item_stocks.item_id', '=', 'items.id') 
-        ->selectRaw('item_stocks.*, items.code, items.name, SUM(item_stocks.qty) as total_quantity') 
-        ->groupBy('item_stocks.item_id', 'items.code', 'items.name') 
+        ->join('items', 'item_stocks.item_id', '=', 'items.id')
+        ->selectRaw('item_stocks.*, items.code, items.name, SUM(item_stocks.qty) as total_quantity')
+        ->groupBy('item_stocks.item_id', 'items.code', 'items.name')
         ->get();
-        
+
         info($query_data);
         $newData = [];
 
@@ -109,15 +109,15 @@ class ReportProductionSummaryStockFgController extends Controller
         //             'note_external'               => $row->note_external,
         //             'note'        => $row_detail->note,
         //             'no_sj'          => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-',
-        //         ];        
+        //         ];
         //     }
-                
+
         // }
 
         $end_time = microtime(true);
-        
+
         $execution_time = ($end_time - $start_time);
-        
+
         $response =[
             'status'            => 200,
             'content'           => $newData,
@@ -128,7 +128,9 @@ class ReportProductionSummaryStockFgController extends Controller
     }
 
     public function export(Request $request){
+
+        $start_date = $request->start_date;
         $finish_date = $request->end_date;
-		return Excel::download(new ExportReportProductionSummaryStockFg($finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportProductionSummaryStockFg($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
     }
 }

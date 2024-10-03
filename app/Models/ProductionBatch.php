@@ -60,7 +60,7 @@ class ProductionBatch extends Model
         }else{
             $price = $this->price();
         }
-        
+
         return $price;
     }
 
@@ -109,7 +109,7 @@ class ProductionBatch extends Model
         }else{
             $totalnew = round($qtycheck * $this->price(),2);
         }
-        
+
         return $totalnew;
     }
 

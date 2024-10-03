@@ -2,6 +2,7 @@
     <thead>
         <tr>
         <th class="center-align">No</th>
+        <th class="center-align">Status</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Due Date Internal</th>
@@ -17,13 +18,14 @@
             <th class="center-align">DP</th>
             <th class="center-align">Tax</th>
             <th class="center-align">Total</th>
-           
+
         </tr>
     </thead>
     <tbody>
         @foreach($data as $key => $row)
             <tr>
             <td>{{ $key + 1 }}.</td>
+            <td>{{ $row['status'] }}</td>
             <td>{{ $row['code'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['duedateinternal'] }}</td>
@@ -39,8 +41,8 @@
             <td>{{ $row['dp'] }}</td>
             <td>{{ $row['tax'] }}</td>
             <td>{{ $row['total'] }}</td>
-        
-                
+
+
             </tr>
         @endforeach
         @if(count($data) == 0)

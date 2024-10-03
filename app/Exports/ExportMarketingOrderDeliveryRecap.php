@@ -43,6 +43,7 @@ class ExportMarketingOrderDeliveryRecap implements FromView, WithEvents
                 'kota' => $row->marketingOrderDelivery->city->name,
                 'kecamatan' => $row->marketingOrderDelivery->district->name,
                 'truk' => $row->marketingOrderDelivery->transportation->name,
+                'status'=> $row->marketingOrderDelivery->statusRaw(),
                 'statuskirim' => $row->marketingOrderDelivery->sendStatus(),
                 'noteinternal' => $row->marketingOrderDelivery->note_internal,
                 'noteexternal' => $row->marketingOrderDelivery->note_external,

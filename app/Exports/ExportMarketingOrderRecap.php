@@ -54,7 +54,7 @@ class ExportMarketingOrderRecap implements FromView, WithEvents
                 'disc2' => $row->percent_discount_2,
                 'disc3' => $row->discount_3,
                 'truck' => $row->marketingOrder->transportation->name,
-
+                'status'=> $row->marketingOrder->statusRaw(),
                 'pembayaran' => $row->marketingOrder->paymentType(),
 
 

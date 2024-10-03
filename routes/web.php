@@ -228,6 +228,7 @@ use App\Http\Controllers\MasterData\SalaryComponentController;
 use App\Http\Controllers\Production\ProductionBarcodeController;
 use App\Http\Controllers\Production\ProductionBatchController;
 use App\Http\Controllers\Production\ReportProductionSummaryStockFgController;
+use App\Http\Controllers\Production\ReportStockFGPerBatchController;
 use App\Http\Controllers\Production\ProductionBatchStockController;
 use App\Http\Controllers\Production\ProductionFgReceiveController;
 use App\Http\Controllers\Production\ProductionHandoverController;
@@ -2502,6 +2503,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportProductionSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportProductionSummaryStockFgController::class, 'filter']);
                         Route::get('export', [ReportProductionSummaryStockFgController::class, 'export']);
+                    });
+
+                    Route::prefix('report_stock_fg_per_batch')->middleware('operation.access:report_stock_fg_per_batch,view')->group(function () {
+                        Route::get('/', [ReportStockFGPerBatchController::class, 'index']);
+                        Route::post('filter', [ReportStockFGPerBatchController::class, 'filter']);
+                        Route::get('export', [ReportStockFGPerBatchController::class, 'export']);
                     });
 
                     Route::prefix('production_batch_stock')->middleware('operation.access:production_batch_stock,view')->group(function () {

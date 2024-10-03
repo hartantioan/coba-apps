@@ -35,6 +35,7 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
         foreach ($mo as $row) {
 
             $array_filter[] = [
+                'status'              => $row->statusRaw(),
                 'code'              => $row->code,
                 'post_date'         => date('d/m/Y', strtotime($row->post_date)),
                 'customer' => $row->account->name,

@@ -1,20 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Sales;
+namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\ItemShading;
 use App\Models\ItemStock;
 use App\Models\Place;
 use App\Models\User;
-use Illuminate\Http\Request;
-
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\ExportReportSalesSummaryStockFg;
-
-class ReportSalesSummaryStockFgController extends Controller
+use App\Exports\ExportReportStockFgPerBatch;
+class ReportStockFGPerBatchController extends Controller
 {
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
@@ -26,13 +24,14 @@ class ReportSalesSummaryStockFgController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
+
     public function index(Request $request)
     {
         $parentSegment = request()->segment(2);
 
         $data = [
-            'title'     => 'Report Summary Stock FG',
-            'content'   => 'admin.sales.sales_summary_stock_fg',
+            'title'     => 'Report Summary Stock FG Per Batch',
+            'content'   => 'admin.production.report_stock_fg_per_batch',
             'shading'      => ItemShading::get(),
             'company'       => Company::where('status','1')->get(),
             'area'       => Area::where('status','1')->get(),
@@ -126,8 +125,9 @@ class ReportSalesSummaryStockFgController extends Controller
     }
 
     public function export(Request $request){
+
         $start_date = $request->start_date;
         $finish_date = $request->end_date;
-		return Excel::download(new ExportReportSalesSummaryStockFg($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportStockFgPerBatch($start_date,$finish_date), 'stock_fg_per_batch'.uniqid().'.xlsx');
     }
 }

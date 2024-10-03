@@ -2,6 +2,7 @@
     <thead>
         <tr>
             <th>{{ __('translations.no') }}.</th>
+            <th>Status</th>
             <th>No Dokumen</th>
             <th>Customer</th>
             <th>Tgl.Post</th>
@@ -24,13 +25,14 @@
             <th>Disc 1</th>
             <th>Disc 2</th>
             <th>Disc 3</th>
-           
+
         </tr>
     </thead>
     <tbody>
         @foreach($data as $key => $row)
             <tr>
                 <td>{{ $key + 1 }}.</td>
+                <td>{{ $row['status'] }}</td>
                 <td>{{ $row['code'] }}</td>
                 <td>{{ $row['customer'] }}</td>
                 <td>{{ $row['post_date'] }}</td>
@@ -53,8 +55,8 @@
                 <td>{{ $row['disc1'] }}</td>
                 <td>{{ $row['disc2'] }}</td>
                 <td>{{ $row['disc3'] }}</td>
-              
-                
+
+
             </tr>
         @endforeach
         @if(count($data) == 0)

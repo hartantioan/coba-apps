@@ -1,7 +1,8 @@
 <table>
     <thead>
         <tr>
-        <th class="center-align">No</th>
+            <th class="center-align">No</th>
+            <th class="center-align">Status</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">SO</th>
             <th class="center-align">Tgl.Post</th>
@@ -19,13 +20,14 @@
             <th class="center-align">Item Name</th>
             <th class="center-align">Qty MOD (M2)</th>
             <th class="center-align">Note Item</th>
-           
+
         </tr>
     </thead>
     <tbody>
         @foreach($data as $key => $row)
             <tr>
             <td>{{ $key + 1 }}.</td>
+            <td>{{ $row['status'] }}</td>
             <td>{{ $row['code'] }}</td>
             <td>{{ $row['so'] }}</td>
             <td>{{ $row['post_date'] }}</td>
@@ -47,7 +49,7 @@
             @else
             <td>{{$row['noteitem']}}</td>
             @endif
-                
+
             </tr>
         @endforeach
         @if(count($data) == 0)

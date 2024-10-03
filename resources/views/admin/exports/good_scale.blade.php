@@ -4,12 +4,13 @@
             <th>No</th>
             <th>No Dokumen</th>
             <th>{{ __('translations.status') }}</th>
-            <th>Deleter</th>
-            <th>Tgl.Delete</th>
-            <th>Ket.Delete</th>
             <th>Voider</th>
             <th>Tgl.Void</th>
             <th>Ket.Void</th>
+            <th>Deleter</th>
+            <th>Tgl.Delete</th>
+            <th>Ket.Delete</th>
+
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>Tgl Terima</th>
@@ -50,16 +51,18 @@
                 <td>{{ $no }}</td>
                 <td>{{ $row->code }}</td>
                 <td>{{ $row->statusRaw() }}</td>
-                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
-                <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
-                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
+
                 <td>{{ $row->voidUser()->exists() ? $row->voidUser->name : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? date('d/m/Y',strtotime($row->void_date)) : '' }}</td>
                 <td>{{ $row->voidUser()->exists() ? $row->void_note : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->deleteUser->name : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? date('d/m/Y',strtotime($row->deleted_at)) : '' }}</td>
+                <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                 <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->type() }}</td>
+
                 <td>{{ $row->delivery_no ?? '-' }}</td>
                 <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>

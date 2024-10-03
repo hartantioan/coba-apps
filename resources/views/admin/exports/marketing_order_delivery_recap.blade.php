@@ -5,6 +5,17 @@
             <th class="center-align">Status</th>
             <th class="center-align">Dokumen</th>
             <th class="center-align">SO</th>
+            <th>Voider</th>
+            <th>Tgl. Void</th>
+            <th>Ket. Void</th>
+            <th>Deleter</th>
+            <th>Tgl. Delete</th>
+            <th>Ket. Delete</th>
+            <th>Doner</th>
+            <th>Tgl. Done</th>
+            <th>Ket. Done</th>
+            <th>NIK</th>
+            <th>Pengguna</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Customer</th>
             <th class="center-align">Tipe Perhitungan Expedisi</th>
@@ -30,6 +41,17 @@
             <td>{{ $row['status'] }}</td>
             <td>{{ $row['code'] }}</td>
             <td>{{ $row['so'] }}</td>
+            <td>{{ $row['voider'] }}</td>
+            <td>{{ $row['void_date'] }}</td>
+            <td>{{ $row['void_note'] }}</td>
+            <td>{{ $row['deleter'] }}</td>
+            <td>{{ $row['delete_date'] }}</td>
+            <td>{{ $row['delete_note'] }}</td>
+            <td>{{ $row['doner'] }}</td>
+            <td>{{ $row['done_date'] }}</td>
+            <td>{{ $row['done_note'] }}</td>
+            <td>{{ $row['nik'] }}</td>
+            <td>{{ $row['user'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['customer'] }}</td>
             <td>{{ $row['expedisi'] }}</td>

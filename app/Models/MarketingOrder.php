@@ -503,7 +503,7 @@ class MarketingOrder extends Model
         foreach($this->marketingOrderDetail as $row){
             $standardprice = $this->account->getStandarPrice($this->post_date);
             $cogsPerItem = $row->item->cogsSales($row->place_id,$this->post_date) + 10000;
-            $salePerItem = round($row->price_after_discount,2) - $standardprice;
+            $salePerItem = round($row->price_after_discount,2) - $standardprice - $row->price_delivery;
             if($salePerItem < $cogsPerItem){
                 $under = true;
             }

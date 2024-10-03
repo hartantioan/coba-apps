@@ -938,7 +938,7 @@ class ResetCogsNew implements ShouldQueue
         })->whereHas('productionFgReceiveDetail',function($query)use($item_id){
             $query->whereHas('productionFgReceive',function($query)use($item_id){
                 $query->where('item_id',$item_id)->whereHas('item',function($query){
-                    $query->where('item_group_id','<>',7);
+                    $query->where('item_group_id','!=',7);
                 });
             });
         })->get();

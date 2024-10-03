@@ -311,6 +311,33 @@ class MarketingOrderDeliveryProcess extends Model
         }
     }
 
+    public function isItemSent(){
+        $status = false;
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','2')->count();
+        if($count > 0){
+            $status = true;
+        }
+        return $status;
+    }
+
+    public function isDelivered(){
+        $status = false;
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','3')->count();
+        if($count > 0){
+            $status = true;
+        }
+        return $status;
+    }
+
+    public function isReturnedSj(){
+        $status = false;
+        $count = $this->marketingOrderDeliveryProcessTrack()->where('status','5')->count();
+        if($count > 0){
+            $status = true;
+        }
+        return $status;
+    }
+
     public function marketingOrderDeliveryProcessTrack(){
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcessTrack','marketing_order_delivery_process_id','id');
     }

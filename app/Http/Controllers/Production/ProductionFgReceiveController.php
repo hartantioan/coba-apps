@@ -379,12 +379,12 @@ class ProductionFgReceiveController extends Controller
                 }
 
                 if($request->arr_item_id){
-                    $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
-                    if(!$batch){
-                        $passedBatchCode = false;
-                    }
-
                     foreach($request->arr_item_id as $key => $row){
+                        $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->first();
+                        if(!$batch){
+                            $passedBatchCode = false;
+                        }
+
                         $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
                             $query->where('item_id',$row)->orderByDesc('created_at');
                         })->whereNotNull('is_default')->first();

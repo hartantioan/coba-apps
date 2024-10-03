@@ -30,7 +30,7 @@ class MailReportMarketingScale extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id'];
+        $recipient = ['edp@superior.co.id','eunike@superior.co.id'];
 
             $scale = GoodScale::where('post_date', date('Y-m-d'))->where('type','=','2' )
                 ->selectRaw("SUM(qty_balance) as totalnet")->selectRaw("count(code) as truck")

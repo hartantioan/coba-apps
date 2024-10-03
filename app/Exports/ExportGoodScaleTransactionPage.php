@@ -10,13 +10,14 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
 class ExportGoodScaleTransactionPage implements FromView,ShouldAutoSize
 {
-    protected $search,$start_date, $end_date, $status, $modedata, $type;
-    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata, string $type)
+    protected $search,$start_date, $end_date, $status, $modedata, $type, $status_qc;
+    public function __construct(string $search ,string $start_date, string $end_date,string $status, string $modedata,string $status_qc, string $type)
     {
         $this->search = $search ? $search : '';
         $this->start_date = $start_date ? $start_date : '';
 		$this->end_date = $end_date ? $end_date : '';
         $this->status   = $status ? $status : '';
+        $this->status_qc   = $status_qc ? $status_qc : '';
         $this->modedata = $modedata ? $modedata : '';
         $this->type = $type ? $type : '';
     }

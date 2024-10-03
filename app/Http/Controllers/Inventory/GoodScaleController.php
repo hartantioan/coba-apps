@@ -1009,6 +1009,13 @@ class GoodScaleController extends Controller
         
         if($query) {
 
+            if(!$request->msg){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Catatan/Keterangan void harus diisi.'
+                ]);
+            }
+
             if(!CustomHelper::checkLockAcc($query->post_date)){
                 return response()->json([
                     'status'  => 500,

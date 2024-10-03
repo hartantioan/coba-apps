@@ -108,26 +108,6 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]);
 
-        /* $data = ItemCogs::where('item_id',5388)->orderBy('date')->orderBy('id')->get();
-
-        foreach($data as $row){
-            if($row->type == 'IN'){
-                $itemStock = ItemStock::where('item_id',$row->item_id)->where('production_batch_id',$row->production_batch_id)->first();
-                if($itemStock){
-                    $itemStock->update([
-                        'qty'  => $itemStock->qty + $row->qty_in,
-                    ]);
-                }
-            }else{
-                $itemStock = ItemStock::where('item_id',$row->item_id)->where('production_batch_id',$row->production_batch_id)->first();
-                if($itemStock){
-                    $itemStock->update([
-                        'qty'  => $itemStock->qty - $row->qty_out,
-                    ]);
-                }
-            }
-        } */
-
         /* $data = MarketingOrderDeliveryProcess::whereHas('marketingOrderInvoice')->get();
 
         foreach($data as $row){
@@ -194,7 +174,7 @@ class MenuController extends Controller
             ResetCogsNew::dispatch('2024-09-03',1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        /* $data = ProductionBatch::whereNotNull('lookable_type')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
+        /* $data = ProductionBatch::whereNotNull('lookable_type')->whereNotNull('area_id')->whereNotNull('item_shading_id')->where('post_date','>=','2024-09-03')->whereHas('item',function($query){
             $query->where('item_group_id',7);
         })->orderBy('post_date')->orderBy('id')->get();
 

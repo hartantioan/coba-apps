@@ -33,6 +33,7 @@ use App\Models\GoodReceiptDetail;
 use App\Models\GoodReceive;
 use App\Models\GoodReceiveDetail;
 use App\Models\GoodReturnPO;
+use App\Models\GoodScale;
 use App\Models\Item;
 use App\Models\ItemCogs;
 use App\Models\ItemStock;
@@ -100,13 +101,30 @@ class MenuController extends Controller
             ResetCogsHelper::gas($startdate,1,1,$item->id,NULL,NULL,NULL);
         } */
 
-        $data = [
+        /* $data = [
             'title'     => 'Menu',
             'menu'      => Menu::whereNull('parent_id')->where('status','1')->oldest('order')->get(),
             'content'   => 'admin.setting.menu'
         ];
 
-        return view('admin.layouts.index', ['data' => $data]);
+        return view('admin.layouts.index', ['data' => $data]); */
+
+        $data = GoodScale::where('type','2')->whereDoesntHave('journal')->whereIn('status',['2','3'])->get();
+        foreach($data as $gs){
+            foreach($gs->goodScaleDetail as $row){
+                if($row->lookable_type == 'marketing_order_deliveries'){
+                    if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                        if($row->qty > 0){
+                            $total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($row->qty);
+                            $row->update([
+                                'total' => $total,
+                            ]);
+                        }
+                    }
+                }
+            }
+            CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
+        }
 
         /* $data = MarketingOrderDeliveryProcess::whereHas('marketingOrderInvoice')->get();
 

@@ -993,9 +993,9 @@ class ResetCogsNew implements ShouldQueue
         })->get();
 
         foreach($productionrepack as $row){
-            $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
-            $total = round($price * $row->qty,2);
+            $total = round($row->itemStock->priceFgNow($dateloop) * $row->qty,2);
             $qty = $row->qty;
+            $price = $total / $qty;
             $total_final = $totalBefore - $total;
             $qty_final = $qtyBefore - $qty;
             ItemCogs::create([

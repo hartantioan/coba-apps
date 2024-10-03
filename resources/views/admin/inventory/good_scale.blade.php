@@ -2782,8 +2782,9 @@
         var end_date = $('#finish_date').val();
         var modedata = '{{ $modedata }}';
         var type = $('#filter_type').val();
+        var status_qc = $('#filter_status_qc').val();
 
-        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata + "&type=" + type;
+        window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata + "&status_qc=" + type + "&type=" + type;
        
     }
 </script>

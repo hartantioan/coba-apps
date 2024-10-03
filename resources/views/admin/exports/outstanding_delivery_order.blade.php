@@ -32,7 +32,7 @@
             <th>Area</th>
             <th>Shading</th>
             <th>Batch</th>
-            <th>SO</th>
+            <th>Tipe Pengiriman</th>
             <th>Expedisi</th>
             <th>Sopir</th>
             <th>No WA Sopir</th>
@@ -47,6 +47,7 @@
             <th>Barang diterima customer</th>
             <th>SJ Kembali</th>
             <th>Based On</th>
+            <th>SO</th>
         </tr>
     </thead>
     <tbody>
@@ -81,7 +82,7 @@
                 <td>{{ $row['area'] }}</td>
                 <td>{{ $row['shading'] }}</td>
                 <td>{{ $row['batch'] }}</td>
-                <td>{{ $row['so'] }}</td>
+                <td>{{ $row['type_delivery'] }}</td>
                 <td>{{ $row['expedisi'] }}</td>
                 <td>{{ $row['sopir'] }}</td>
                 <td>{{ $row['no_wa_supir'] }}</td>
@@ -96,6 +97,7 @@
                 <td>{{ $row['status_received_by_customer'] }}</td>
                 <td>{{ $row['status_returned_document'] }}</td>
                 <td>{{ $row['based_on'] }}</td>
+                <td>{{ $row['so'] }}</td>
         </tr>
         @endforeach
 

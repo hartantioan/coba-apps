@@ -63,7 +63,7 @@ class ExportOutstandingDeliveryOrder implements FromView, WithEvents
                 'shading' => $row->itemStock->itemShading->code,
                 'batch' => $row->itemStock->productionBatch->code,
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
-                
+                'delivery_type' => $row->marketingOrderDeliveryDetail->marketingOrderDelivery->deliveryType(),
 
                 'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
                 'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,

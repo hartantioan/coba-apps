@@ -66,8 +66,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'area' => $row->itemStock->area->name,
                 'shading' => $row->itemStock->itemShading->code,
                 'batch' => $row->itemStock->productionBatch->code,
-                'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
-
+                'delivery_type' => $row->marketingOrderDeliveryDetail->marketingOrderDelivery->deliveryType(),
                 'list_invoice' =>$row->listMarketingOrderInvoice(),
                 'expedisi' =>$row->marketingOrderDeliveryProcess->account->name,
                 'sopir'                => $row->marketingOrderDeliveryProcess->driver_name,
@@ -83,7 +82,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'status_received_by_customer'=>$row->marketingOrderDeliveryProcess->isDelivered() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->receive_date)) : '',
                 'status_returned_document'=>$row->marketingOrderDeliveryProcess->isReturnedSj() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date)) : '',
                 'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
-
+                'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
             ];
         }
 

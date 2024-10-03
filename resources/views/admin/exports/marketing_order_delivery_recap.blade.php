@@ -31,6 +31,8 @@
             <th class="center-align">Item Name</th>
             <th class="center-align">Qty MOD (M2)</th>
             <th class="center-align">Note Item</th>
+            <th class="center-align">SJ</th>
+            <th class="center-align">Timbangan</th>
 
         </tr>
     </thead>
@@ -71,7 +73,8 @@
             @else
             <td>{{$row['noteitem']}}</td>
             @endif
-
+            <td>{{ $row['sj'] }}</td>
+            <td>{{ $row['timbangan'] }}</td>
             </tr>
         @endforeach
         @if(count($data) == 0)

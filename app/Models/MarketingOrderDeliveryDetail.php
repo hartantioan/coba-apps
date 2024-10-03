@@ -79,6 +79,19 @@ class MarketingOrderDeliveryDetail extends Model
         });
     }
 
+    
+
+    public function getSuratJalan()
+    {
+        $sj = '';
+
+        foreach ($this->marketingOrderDeliveryProcessDetail as $row) {
+            $sj = $row->marketingOrderDeliveryProcess->code;
+        }
+
+        return $sj;
+    }
+
     public function qtyReturn(){
         $total = 0;
         foreach($this->marketingOrderDeliveryProcessDetail as $row){

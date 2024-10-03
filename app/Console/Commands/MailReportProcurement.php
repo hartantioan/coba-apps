@@ -44,7 +44,7 @@ class MailReportProcurement extends Command
             foreach ($scale as $row) {
                 $data[] = [
                     'nama'  => $row->account->name,
-                    'item'  => $row->item->name,
+                    'item'  => $row->item->name ?? '',
                     'totalnet' => $row->totalnet,
                     'account_id' => $row->account_id,
                     'item_id' => $row->item_id,

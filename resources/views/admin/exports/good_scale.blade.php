@@ -13,6 +13,7 @@
             <th>NIK</th>
             <th>{{ __('translations.user') }}</th>
             <th>Tgl Terima</th>
+            <th>Tipe Timbangan</th>
             <th>No SJ</th>
             <th>No Kendaraan</th>
             <th>Supir</th>
@@ -58,7 +59,7 @@
                 <td>{{ $row->user->employee_no }}</td>
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
-       
+                <td>{{ $row->type() }}</td>
                 <td>{{ $row->delivery_no ?? '-' }}</td>
                 <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>

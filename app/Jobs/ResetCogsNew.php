@@ -147,7 +147,7 @@ class ResetCogsNew implements ShouldQueue
             $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
         })->where('item_id',$item_id)
         ->where(function($query)use($area_id,$item_shading_id,$production_batch_id){
-            if($area_id && $item_shading_id && $production_batch_id){
+            if($production_batch_id){
                 $query->whereHas('productionBatch',function($query)use($area_id,$item_shading_id,$production_batch_id){
                     $query->where('area_id',$area_id)->where('item_shading_id',$item_shading_id)->where('id',$production_batch_id);
                 })

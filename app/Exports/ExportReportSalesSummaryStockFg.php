@@ -293,6 +293,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 $box_conversion=($total/$row->item->sellConversion())*$row->item->pallet->box_conversion;
             }
 
+            if($pallet_conversion==$box_conversion || $pallet_conversion==$total){
+                $pallet_conversion= 0;
+            }
+
             $arr[] = [
                 'item_code'=> $row->item->code,
                 'item_name'=>$row->item->name,

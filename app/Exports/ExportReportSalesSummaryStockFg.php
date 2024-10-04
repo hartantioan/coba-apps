@@ -353,14 +353,15 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         $uniqueItems = $item->unique('item_id');
 
         foreach($uniqueItems as $k=>$v){
-
+            //palet
             $mod_p = MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
                 $q->where('item_id', $v->item_id)
                 ->whereHas('pallet',function ($query) {
                     $query->where('box_conversion', '>', 1);
                 });
             })->whereHas('marketingOrderDelivery',function ($query) {
-                $query->whereIn('status', ['2','3']);
+                $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
             })->sum('qty');
 
             $first_mod_p =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
@@ -369,7 +370,8 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                     $query->where('box_conversion', '>', 1);
                 });
             })->whereHas('marketingOrderDelivery',function ($query) {
-                $query->whereIn('status', ['2','3']);
+                $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
             })->first();
 
             if($first_mod_p){
@@ -379,14 +381,15 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 $mod_p_to_m2 = $mod_p;
             }
 
-
+            //box
             $mod_b = MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
                 $q->where('item_id', $v->item_id)
                 ->whereHas('pallet',function ($query) {
                     $query->where('box_conversion', '=', 1);
                 });
             })->whereHas('marketingOrderDelivery',function ($query) {
-                $query->whereIn('status', ['2','3']);
+                $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
             })->sum('qty');
 
             $first_mod_b =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
@@ -395,18 +398,30 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                     $query->where('box_conversion', '=', 1);
                 });
             })->whereHas('marketingOrderDelivery',function ($query) {
-                $query->whereIn('status', ['2','3']);
+                $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
             })->first();
+
 
             if($first_mod_b){
                 $mod_b_to_m2 = $first_mod_b->marketingOrderDetail->qty_conversion * $mod_b;
             }else{
                 $mod_b_to_m2 = $mod_b;
             }
+            //curah
+            $mod_curah = MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
+                $q->where('item_id', $v->item_id)
+                ->whereHas('pallet',function ($query) {
+                    $query->where('box_conversion', '=', 0);
+                });
+            })->whereHas('marketingOrderDelivery',function ($query) {
+                $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date);
+            })->sum('qty');
 
 
 
-            $total_m2_mod = $mod_p_to_m2+$mod_b_to_m2;
+            $total_m2_mod = $mod_p_to_m2+$mod_b_to_m2+$mod_curah;
 
             $box_conversion = $v->item->pallet->box_conversion ?? 1;
 

@@ -362,7 +362,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->whereHas('marketingOrderDelivery',function ($query) {
                 $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date);
-            })->sum('qty');
+            })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
             $first_mod_p =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
                 $q->where('item_id', $v->item_id)
@@ -372,7 +372,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->whereHas('marketingOrderDelivery',function ($query) {
                 $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date);
-            })->first();
+            })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->first();
 
             if($first_mod_p){
 
@@ -390,7 +390,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->whereHas('marketingOrderDelivery',function ($query) {
                 $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date);
-            })->sum('qty');
+            })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
             $first_mod_b =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
                 $q->where('item_id', $v->item_id)
@@ -400,7 +400,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->whereHas('marketingOrderDelivery',function ($query) {
                 $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date);
-            })->first();
+            })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->first();
 
 
             if($first_mod_b){
@@ -417,7 +417,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })->whereHas('marketingOrderDelivery',function ($query) {
                 $query->whereIn('status', ['2','3'])->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date);
-            })->sum('qty');
+            })->whereDoesntHave('marketingOrderDeliveryProcessDetail')->sum('qty');
 
 
 

@@ -138,7 +138,7 @@ class Item extends Model
     public function palletUnit(){
         return $this->belongsTo('App\Models\Pallet', 'pallet_unit', 'id')->withTrashed();
     }
-    
+
     public function sellUnit(){
         /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
         $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
@@ -154,7 +154,7 @@ class Item extends Model
         /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
         $itemUnit = $this->itemUnit()->whereNotNull('is_default')->first();
 
-        
+
         return $itemUnit;
     }
 
@@ -171,7 +171,7 @@ class Item extends Model
     public function sellConversion(){
         /* return $this->belongsTo('App\Models\Unit', 'sell_unit', 'id')->withTrashed(); */
         $itemUnit = $this->itemUnit()->whereNotNull('is_default')->whereNotNull('is_sell_unit')->first();
-        $unit = '';
+        $unit = 1;
         if($itemUnit){
             $unit = $itemUnit->conversion;
         }
@@ -222,7 +222,7 @@ class Item extends Model
 
     public function currentCogs($dataplaces){
         $arrPrice = [];
-            
+
         $price = ItemCogs::where('item_id',$this->id)->whereIn('place_id',$dataplaces)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
             $arrPrice[] = [
@@ -230,7 +230,7 @@ class Item extends Model
                 'price'         => number_format($price->price_final,2,',','.'),
             ];
         }
-        
+
         return $arrPrice;
     }
 
@@ -239,7 +239,7 @@ class Item extends Model
         $po = PurchaseOrder::whereHas('purchaseOrderDetail', function($query) use ($dataplaces){
                 $query->where('item_id',$this->id)->whereIn('place_id',$dataplaces);
             })->whereIn('status',['2','3'])->orderByDesc('post_date')->get();
-        
+
         foreach($po as $row){
             foreach($row->purchaseOrderDetail as $rowdetail){
                 $arrPrice[] = [
@@ -251,7 +251,7 @@ class Item extends Model
                 ];
             }
         }
-        
+
         return $arrPrice;
     }
 
@@ -260,7 +260,7 @@ class Item extends Model
         $po = MarketingOrder::whereHas('marketingOrderDetail', function($query) use ($dataplaces){
                 $query->where('item_id',$this->id)->whereIn('place_id',$dataplaces);
             })->whereIn('status',['2','3'])->orderByDesc('post_date')->get();
-        
+
         foreach($po as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
                 $arrPrice[] = [
@@ -272,7 +272,7 @@ class Item extends Model
                 ];
             }
         }
-        
+
         return $arrPrice;
     }
 
@@ -291,7 +291,7 @@ class Item extends Model
         if($price){
             $pricenow = $price->qty_final > 0 ? $price->total_final / $price->qty_final : 0;
         }
-        
+
         return $pricenow;
     }
 
@@ -305,7 +305,7 @@ class Item extends Model
                 $pricenow = $this->bomCalculator->grandtotal;
             }
         }
-        
+
         return $pricenow;
     }
 
@@ -326,7 +326,7 @@ class Item extends Model
         if($price){
             $pricenow = $price->qty_final > 0 ? round($price->total_final / $price->qty_final,6) : 0;
         }
-        
+
         return $pricenow;
     }
 
@@ -350,7 +350,7 @@ class Item extends Model
                 'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -374,7 +374,7 @@ class Item extends Model
                 'batch'             => $detail->productionBatch()->exists() ? $detail->productionBatch->code : '',
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -402,7 +402,7 @@ class Item extends Model
                 'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -425,7 +425,7 @@ class Item extends Model
                 'qty_commited'  => CustomHelper::formatConditionalQty($detail->totalUndeliveredItemSales()),
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -445,7 +445,7 @@ class Item extends Model
                 'qty_raw'       => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -461,7 +461,7 @@ class Item extends Model
                 'qty_raw'               => CustomHelper::formatConditionalQty($detail->qty),
             ];
         }
-        
+
         return $arrData;
     }
 
@@ -811,7 +811,7 @@ class Item extends Model
                                                     $details[] = [
                                                         'name'      => $row->item->code.' - '.$row->item->name,
                                                         'qty'       => $row->qty,
-                                                        'unit'      => $row->item->uomUnit->code, 
+                                                        'unit'      => $row->item->uomUnit->code,
                                                     ];
                                                 }
                                                 $data5['details'] = $details;
@@ -869,7 +869,7 @@ class Item extends Model
                     $result .= '<i class="material-icons">arrow_forward</i><a class="waves-effect waves-light btn '.$color.' box-shadow-none border-round mb-1">'.$row['name'].'</a>';
                 }
             }
-            
+
         }
         return $result;
     }

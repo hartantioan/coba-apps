@@ -6,6 +6,7 @@ use App\Models\GoodIssueDetail;
 use App\Models\GoodReceiveDetail;
 use App\Models\Item;
 use App\Models\ItemShading;
+use App\Models\MarketingOrderDeliveryDetail;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\ProductionHandover;
@@ -30,10 +31,9 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         'Kode',
         'Item',
         'Shading',
-        'Total',
-        'Total Konversi (Palet)',
-        'Total Konversi (Box)',
-
+        'Qty On Hand (M2)',
+        'Qty On Hand (Palet)',
+        'Qty On Hand (Box)',
     ];
 
     // private $headings = [
@@ -148,7 +148,11 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
 
 
         $arr = [];
-        foreach($item as $row){
+        $total_m2=[];
+        $total_palet=[];
+        $total_box=[];
+        $uniqueItems = [];
+        foreach($item as $key=>$row){
 
 
             $handover_awal = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
@@ -292,6 +296,20 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 $pallet_conversion= $total/$row->item->sellConversion();
                 $box_conversion=($total/$row->item->sellConversion())*$row->item->pallet->box_conversion;
             }
+            if (!isset($total_m2[$row->item->id])) {
+                $total_m2[$row->item->id] = 0;
+            }
+            $total_m2[$row->item->id] += $total;
+
+            if (!isset($total_palet[$row->item->id])) {
+                $total_palet[$row->item->id] = 0;
+            }
+            $total_palet[$row->item->id] += $pallet_conversion;
+
+            if (!isset($total_box[$row->item->id])) {
+                $total_box[$row->item->id] = 0;
+            }
+            $total_box[$row->item->id] += $box_conversion;
 
             if($pallet_conversion==$box_conversion || $pallet_conversion==$total){
                 $pallet_conversion= 0;
@@ -303,10 +321,129 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 'shading'=>$row->code,
                 'total'=>$total,
                 'pallet_conversion'=>$pallet_conversion,
-                'box_conversion'=>$box_conversion
+                'box_conversion'=>$box_conversion,
             ];
 
+
         }
+
+        $arr[] = [
+            'item_code'=>'',
+            'item_name'=>'',
+            'shading'=>'',
+            'total'=>'',
+            'pallet_conversion'=>'',
+            'box_conversion'=>'',
+        ];
+
+        $arr[] = [
+            'item_code'=>'Kode Item',
+            'item_name'=>'Nama Item',
+            'total'=>'On Hand(M2)',
+            'pallet_conversion'=>'On Hand(Palet)',
+            'box_conversion'=>'On Hand(Box)',
+            'on_hand'=>'MOD(m2)',
+            'on_hand_p'=>'MOD(Palet)',
+            'on_hand_b'=>'MOD(Box)',
+            'aviable'=>'Aviable(m2)',
+            'aviable2'=>'Aviable(Palet)',
+            'aviable3'=>'Aviable(Box)',
+        ];
+
+        $uniqueItems = $item->unique('item_id');
+
+        foreach($uniqueItems as $k=>$v){
+
+            $mod_p = MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
+                $q->where('item_id', $v->item_id)
+                ->whereHas('pallet',function ($query) {
+                    $query->where('box_conversion', '>', 1);
+                });
+            })->whereHas('marketingOrderDelivery',function ($query) {
+                $query->whereIn('status', ['2','3']);
+            })->sum('qty');
+
+            $first_mod_p =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
+                $q->where('item_id', $v->item_id)
+                ->whereHas('pallet',function ($query)  {
+                    $query->where('box_conversion', '>', 1);
+                });
+            })->whereHas('marketingOrderDelivery',function ($query) {
+                $query->whereIn('status', ['2','3']);
+            })->first();
+
+            if($first_mod_p){
+
+                $mod_p_to_m2 = $first_mod_p->marketingOrderDetail->qty_conversion * $mod_p;
+            }else{
+                $mod_p_to_m2 = $mod_p;
+            }
+
+
+            $mod_b = MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
+                $q->where('item_id', $v->item_id)
+                ->whereHas('pallet',function ($query) {
+                    $query->where('box_conversion', '=', 1);
+                });
+            })->whereHas('marketingOrderDelivery',function ($query) {
+                $query->whereIn('status', ['2','3']);
+            })->sum('qty');
+
+            $first_mod_b =MarketingOrderDeliveryDetail::whereHas('item', function($q) use($v){
+                $q->where('item_id', $v->item_id)
+                ->whereHas('pallet',function ($query)  {
+                    $query->where('box_conversion', '=', 1);
+                });
+            })->whereHas('marketingOrderDelivery',function ($query) {
+                $query->whereIn('status', ['2','3']);
+            })->first();
+
+            if($first_mod_b){
+                $mod_b_to_m2 = $first_mod_b->marketingOrderDetail->qty_conversion * $mod_b;
+            }else{
+                $mod_b_to_m2 = $mod_b;
+            }
+
+
+
+            $total_m2_mod = $mod_p_to_m2+$mod_b_to_m2;
+
+            $box_conversion = $v->item->pallet->box_conversion ?? 1;
+
+            $total_palet_mod = $total_m2_mod/$v->item->sellConversion();
+
+            $total_box_mod = $total_palet_mod*$box_conversion;
+
+            $aviable = $total_m2[$v->item->id] - $total_m2_mod;
+            $aviable2 = $total_palet[$v->item->id] - $total_palet_mod;
+            $aviable3 = $total_box[$v->item->id] - $total_box_mod;
+
+            if($aviable2 == $aviable3 || $aviable2 == $aviable){
+                $aviable2 = 0;
+            }
+            if($total_palet_mod == $total_m2_mod || $total_palet_mod == $total_box_mod){
+                $total_palet_mod = 0;
+            }
+
+            if($total_palet[$v->item->id] == $total_m2[$v->item->id] ||$total_palet[$v->item->id] == $total_box[$v->item->id]){
+                $total_palet[$v->item->id] = 0;
+            }
+
+            $arr[] = [
+                'item_code'=>$v->item->code,
+                'item_name'=>$v->item->name,
+                'total'=>$total_m2[$v->item->id],
+                'pallet_conversion'=>$total_palet[$v->item->id],
+                'box_conversion'=>$total_box[$v->item->id],
+                'on_hand'=>$total_m2_mod,
+                'on_hand_p'=>$total_palet_mod,
+                'on_hand_b'=>$total_box_mod,
+                'aviable'=>$aviable,
+                'aviable2'=>$aviable2,
+                'aviable3'=>$aviable3,
+            ];
+        }
+
 
 
         return collect($arr);
@@ -316,7 +453,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
 
     public function title(): string
     {
-        return 'Marketing Order Detail 2';
+        return 'Summary Stock Penjualan';
     }
 
     public function headings() : array

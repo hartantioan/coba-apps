@@ -229,7 +229,7 @@ class ExportReportStockFgPerBatch implements FromCollection, WithTitle, WithHead
             $arr[] = [
                 'item_code'=> $row->item->code,
                 'item_name'=>$row->item->name,
-                'shading'=>$row->code,
+                'shading'=>$row->itemShading->code,
                 'batch'=>$row->code,
                 'awal'=>$awal,
                 'receiveFG'=>$total_handover,

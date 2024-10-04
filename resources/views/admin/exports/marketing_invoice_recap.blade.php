@@ -4,6 +4,15 @@
         <th class="center-align">No</th>
         <th class="center-align">Status</th>
             <th class="center-align">Dokumen</th>
+            <th>Voider</th>
+            <th>Tgl. Void</th>
+            <th>Ket. Void</th>
+            <th>Deleter</th>
+            <th>Tgl. Delete</th>
+            <th>Ket. Delete</th>
+            <th>Doner</th>
+            <th>Tgl. Done</th>
+            <th>Ket. Done</th>
             <th class="center-align">Tgl.Post</th>
             <th class="center-align">Due Date Internal</th>
             <th class="center-align">Tipe Penjualan</th>
@@ -27,6 +36,15 @@
             <td>{{ $key + 1 }}.</td>
             <td>{{ $row['status'] }}</td>
             <td>{{ $row['code'] }}</td>
+            <td>{{ $row['voider'] }}</td>
+            <td>{{ $row['void_date'] }}</td>
+            <td>{{ $row['void_note'] }}</td>
+            <td>{{ $row['deleter'] }}</td>
+            <td>{{ $row['delete_date'] }}</td>
+            <td>{{ $row['delete_note'] }}</td>
+            <td>{{ $row['doner'] }}</td>
+            <td>{{ $row['done_date'] }}</td>
+            <td>{{ $row['done_note'] }}</td>
             <td>{{ $row['post_date'] }}</td>
             <td>{{ $row['duedateinternal'] }}</td>
             <td>{{ $row['tipepenjualan'] }}</td>

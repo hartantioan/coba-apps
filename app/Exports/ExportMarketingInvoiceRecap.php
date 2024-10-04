@@ -37,6 +37,16 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
             $array_filter[] = [
                 'status'              => $row->statusRaw(),
                 'code'              => $row->code,
+                'voider'            => $row->voidUser()->exists() ? $row->voidUser->name : '',
+                'void_date'         => $row->voidUser()->exists() ? $row->void_date : '',
+                'void_note'         => $row->voidUser()->exists() ? $row->void_note : '',
+                'deleter'           => $row->deleteUser()->exists() ? $row->deleteUser->name : '',
+                'delete_date'       => $row->deleteUser()->exists() ? $row->deleted_at : '',
+                'delete_note'       => $row->deleteUser()->exists() ? $row->delete_note : '',
+                'doner'             => ($row->status == 3 && is_null($row->done_id)) ? 'sistem' : (($row->status == 3 && !is_null($row->done_id)) ? $row->doneUser->name : null),
+                'done_date'         => $row->doneUser()->exists() ? $row->done_date : '',
+                'done_note'         => $row->doneUser()->exists() ? $row->done_note : '',
+
                 'post_date'         => date('d/m/Y', strtotime($row->post_date)),
                 'customer' => $row->account->name,
                 'deliveraddress' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address,

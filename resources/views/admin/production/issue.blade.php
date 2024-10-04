@@ -2117,7 +2117,7 @@
                     $('.qty-batch-' + id).each(function(index){
                         qtyBatch += parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
                     });
-                    if(qtyNeeded !== qtyBatch){
+                    if(qtyNeeded.toFixed(3) !== qtyBatch.toFixed(3)){
                         passedStock = false;
                     }
                     console.log(qtyNeeded);

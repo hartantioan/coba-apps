@@ -1283,9 +1283,17 @@ class MarketingOrderDeliveryProcessController extends Controller
         $arrTracking = [];
 
         foreach($data->marketingOrderDeliveryProcessTrack as $key => $row){
+            $date = '';
+            if($row->status == '3'){
+                $date = 'Tgl. Terima customer : '.date('d/m/Y',strtotime($data->receive_date)).'<br>'.date('d/m/Y H:i:s',strtotime($row->updated_at));
+            }elseif($row->status == '2'){
+                $date = 'Tgl. Kirim / Post Date : '.date('d/m/Y',strtotime($data->post_date)).'<br>'.date('d/m/Y H:i:s',strtotime($row->updated_at));
+            }else{
+                $date = date('d/m/Y H:i:s',strtotime($row->updated_at));
+            }
             $arrTracking[] = [
                 'status'    => $row->status,
-                'date'      => ($row->status == '3' ?  'Tgl. Terima customer : '.date('d/m/Y',strtotime($data->receive_date)).'<br>' : '').date('d/m/Y H:i:s',strtotime($row->updated_at)),
+                'date'      => $date,
             ];
         }
 
@@ -1344,7 +1352,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             if($request->status_tracking == '3' && $request->receive_date){
                 $ceksent = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status','2')->first();
                 if($ceksent){
-                    if($request->receive_date < date('Y-m-d',strtotime($ceksent->created_at))){
+                    if($request->receive_date < $data->post_date){
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Mohon maaf, tanggal terima customer tidak boleh kurang dari tanggal kirim dari gudang / plant.',

@@ -205,6 +205,7 @@ use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\ClosingJournalController;
 use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
+use App\Http\Controllers\Finance\HistoryEmployeeReceivableController;
 use App\Http\Controllers\Inventory\GoodReturnIssueController;
 use App\Http\Controllers\Setting\MenuController;
 use App\Http\Controllers\Setting\MenuCoaController;
@@ -3019,6 +3020,11 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [EmployeeReceivableController::class, 'index']);
                         Route::post('filter', [EmployeeReceivableController::class, 'filter']);
                         Route::get('export', [EmployeeReceivableController::class, 'export']);
+                    });
+                    Route::prefix('report_history_employee_bs')->middleware('operation.access:report_history_employee_bs,view')->group(function () {
+                        Route::get('/', [HistoryEmployeeReceivableController::class, 'index']);
+                        Route::post('filter', [HistoryEmployeeReceivableController::class, 'filter']);
+                        Route::get('export', [HistoryEmployeeReceivableController::class, 'export']);
                     });
                     Route::prefix('cash_bank')->middleware('operation.access:cash_bank,view')->group(function () {
                         Route::get('/', [CashBankController::class, 'index']);

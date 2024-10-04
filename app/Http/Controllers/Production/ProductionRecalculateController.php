@@ -379,6 +379,7 @@ class ProductionRecalculateController extends Controller
                 
                 if($query) {
                     
+                    $arrIssue = [];
                     foreach($request->arr_production_issue_id as $key => $row){
                         $nominal = str_replace(',','.',str_replace('.','',$request->arr_nominal[$key]));
                         if($nominal < 0 || $nominal > 0){
@@ -391,7 +392,33 @@ class ProductionRecalculateController extends Controller
                                 'resource_id'                   => $request->arr_resource_id[$key],
                                 'total'                         => $nominal,
                             ]);
+                            $updateProductionIssue = ProductionIssue::find($row);
+                            if($updateProductionIssue){
+                                $pid = ProductionIssueDetail::create([
+                                    'production_issue_id'               => $updateProductionIssue->id,
+                                    'production_order_detail_id'        => $updateProductionIssue->production_order_detail_id,
+                                    'lookable_type'                     => 'resources',
+                                    'lookable_id'                       => $request->arr_resource_id[$key],
+                                    'qty'                               => 1,
+                                    'nominal'                           => $nominal,
+                                    'total'                             => $nominal,
+                                    'qty_bom'                           => 0,
+                                    'nominal_bom'                       => 0,
+                                    'total_bom'                         => 0,
+                                    'qty_planned'                       => 0,
+                                    'nominal_planned'                   => 0,
+                                    'total_planned'                     => 0,
+                                    'place_id'                          => $updateProductionIssue->place_id,
+                                    'production_recalculate_detail_id'  => $querydetail->id,
+                                ]);
+                                $arrIssue[] = $pid->production_issue_id;
+                            }
                         }
+                    }
+                    $arrIssue = array_unique($arrIssue);
+
+                    foreach(ProductionIssue::whereIn('id',$arrIssue)->get() as $row){
+                        $row->reJournalAndRecalculateReceive();
                     }
                     
                     CustomHelper::sendApproval($query->getTable(),$query->id,'Rekalkulasi Produksi No. '.$query->code);
@@ -600,9 +627,7 @@ class ProductionRecalculateController extends Controller
                 ];
             }else{
 
-                if(in_array($query->status,['2',3])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
-                }
+                $tempStatus = $query->status;
 
                 $query->update([
                     'status'    => '5',
@@ -610,6 +635,23 @@ class ProductionRecalculateController extends Controller
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
+
+                if(in_array($tempStatus,['2','3'])){
+                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    $arrIssue = [];
+                    foreach($query->productionRecalculateDetail as $row){
+                        if($row->productionIssueDetail()->exists()){
+                            $arrIssue[] = $row->productionIssueDetail->production_issue_id;
+                            $row->productionIssueDetail->delete();
+                        }
+                    }
+
+                    $arrIssue = array_unique($arrIssue);
+
+                    foreach(ProductionIssue::whereIn('id',$arrIssue)->get() as $row){
+                        $row->reJournalAndRecalculateReceive();
+                    }
+                }
 
                 activity()
                     ->performedOn(new ProductionRecalculate())
@@ -636,7 +678,7 @@ class ProductionRecalculateController extends Controller
     }
 
     public function destroy(Request $request){
-        $query = ProductionHandover::where('code',CustomHelper::decrypt($request->id))->first();
+        $query = ProductionRecalculate::where('code',CustomHelper::decrypt($request->id))->first();
 
         $approved = false;
         $revised = false;
@@ -671,12 +713,12 @@ class ProductionRecalculateController extends Controller
         
         if($query->delete()){
             
-            $query->update([
+            /* $query->update([
                 'delete_id'     => session('bo_id'),
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->productionHandoverDetail as $row){
+            foreach($query->productionRecalculateDetail as $row){
                 if($row->productionBatchUsage()->exists()){
                     CustomHelper::updateProductionBatch($row->productionBatchUsage->production_batch_id,$row->productionBatchUsage->qty,'IN');
                 }
@@ -691,7 +733,7 @@ class ProductionRecalculateController extends Controller
                 ->performedOn(new ProductionHandover())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Delete the Rekalkulasi Produksi data');
+                ->log('Delete the Rekalkulasi Produksi data'); */
 
             $response = [
                 'status'  => 200,

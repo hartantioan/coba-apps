@@ -1070,6 +1070,19 @@ class CustomHelper {
 							}
 						}
 					}
+
+					#CREATE PO
+					/* $purchaseOrder = PurchaseOrder::create([
+						'code'				=> PurchaseOrder::generateCode('PORD-'.date('y',strtotime($gs->post_date)).$place->code),
+						'user_id'			=> $gs->user_id,
+						'account_id'		=> $gs->account_id,
+						'company_id'		=> $place->company_id,
+						'inventory_type'	=> '2',
+						'shipping_type'		=> '1',
+						'document_no'		=> $gs->code,
+						'document_po'		=> '',
+						'payment_type'		=> ''
+					]); */
 				}
 			}
 			

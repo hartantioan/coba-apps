@@ -2161,7 +2161,7 @@
                         icon: 'error'
                     });
                 }else{
-                    var path = window.location.pathname;
+                    /* var path = window.location.pathname;
                         path = path.replace(/^\/|\/$/g, '');
 
                         
@@ -2238,7 +2238,7 @@
                                 icon: 'error'
                             });
                         }
-                    });
+                    }); */
                 }
             }
         });

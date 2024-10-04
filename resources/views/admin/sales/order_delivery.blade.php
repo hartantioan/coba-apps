@@ -33,9 +33,9 @@
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
-            
+
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -49,13 +49,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                      
+
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            
+
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
@@ -120,7 +120,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -182,7 +182,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -389,7 +389,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -451,7 +451,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -474,7 +474,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -491,7 +491,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -502,10 +502,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -531,7 +531,7 @@
 
 
 <script>
-    var tempAccount = null, paymentType = null;  
+    var tempAccount = null, paymentType = null;
 
 document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
@@ -539,13 +539,13 @@ document.addEventListener('focusin', function (event) {
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -576,9 +576,9 @@ document.addEventListener('focusin', function (event) {
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -586,7 +586,7 @@ document.addEventListener('focusin', function (event) {
         });
 
         window.table.search('{{ $code }}').draw();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -595,7 +595,7 @@ document.addEventListener('focusin', function (event) {
                 $('#due_date').attr('min','{{ date("Y-m-d") }}');
                 $('#required_date').attr('min','{{ date("Y-m-d") }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#name').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
@@ -655,9 +655,9 @@ document.addEventListener('focusin', function (event) {
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -667,9 +667,9 @@ document.addEventListener('focusin', function (event) {
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -683,7 +683,7 @@ document.addEventListener('focusin', function (event) {
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -695,9 +695,8 @@ document.addEventListener('focusin', function (event) {
                 $('#temp').val('');
             }
         });
-        
+
         $('#body-item').on('click', '.delete-data-item', function() {
-            $(this).closest('tr').next().remove();
             $(this).closest('tr').remove();
             if($('.row_item').length == 0){
                 $('#body-item').append(`
@@ -708,8 +707,8 @@ document.addEventListener('focusin', function (event) {
                     </tr>
                 `);
                 $('#form_data')[0].reset();
-                $('#table-item').animate( { 
-                    scrollLeft: '0' }, 
+                $('#table-item').animate( {
+                    scrollLeft: '0' },
                 500);
             }
         });
@@ -915,7 +914,7 @@ document.addEventListener('focusin', function (event) {
                                         </td>
                                     </tr>
                                 `);
-                               
+
                                 no++;
                             });
                         }
@@ -964,7 +963,7 @@ document.addEventListener('focusin', function (event) {
             `);
         }
     }
-    
+
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
@@ -973,7 +972,7 @@ document.addEventListener('focusin', function (event) {
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1018,13 +1017,13 @@ document.addEventListener('focusin', function (event) {
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1054,11 +1053,11 @@ document.addEventListener('focusin', function (event) {
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -1070,11 +1069,11 @@ document.addEventListener('focusin', function (event) {
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1096,8 +1095,8 @@ document.addEventListener('focusin', function (event) {
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1105,7 +1104,7 @@ document.addEventListener('focusin', function (event) {
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1114,10 +1113,10 @@ document.addEventListener('focusin', function (event) {
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1141,7 +1140,7 @@ document.addEventListener('focusin', function (event) {
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1154,17 +1153,17 @@ document.addEventListener('focusin', function (event) {
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1182,8 +1181,8 @@ document.addEventListener('focusin', function (event) {
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     function viewStructureTree(id){
@@ -1191,7 +1190,7 @@ document.addEventListener('focusin', function (event) {
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1204,7 +1203,7 @@ document.addEventListener('focusin', function (event) {
                 loadingClose('.modal-content');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1216,7 +1215,7 @@ document.addEventListener('focusin', function (event) {
             }
         });
     }
-    
+
     function getPlaceWarehouse(element,nil){
         if($(element).val()){
             $('#arr_place' + nil).val($(element).find(':selected').data('p'));
@@ -1291,14 +1290,14 @@ document.addEventListener('focusin', function (event) {
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -1437,7 +1436,7 @@ document.addEventListener('focusin', function (event) {
         var end_date = $('#finish_date').val();
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account_id=" + account_id + "&company=" + company + "&marketing_order=" + marketing_order + "&end_date=" + end_date + "&start_date=" + start_date ;
-       
+
     }
 
     function printData(){
@@ -1472,7 +1471,7 @@ document.addEventListener('focusin', function (event) {
                 });
             }
         });
-        
+
     }
 
     function rowDetail(data) {
@@ -1574,7 +1573,7 @@ document.addEventListener('focusin', function (event) {
                 formData.delete("arr_item_stock[]");
                 formData.delete("arr_qty[]");
                 formData.delete("arr_note[]");
-                
+
                 if($('input[name^="arr_modi[]"]').length > 0){
                     $('input[name^="arr_modi[]"]').each(function(index){
                         formData.append('arr_modi[]',$(this).val());
@@ -1601,17 +1600,17 @@ document.addEventListener('focusin', function (event) {
                         }
                     });
                 }
-                
+
                 if(passed == true){
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1643,7 +1642,7 @@ document.addEventListener('focusin', function (event) {
                                 $.each(response.error, function(field, errorMessage) {
                                     $('#' + field).addClass('error-input');
                                     $('#' + field).css('border', '1px solid red');
-                                    
+
                                 });
                                 swal({
                                     title: 'Ups! Validation',
@@ -1754,7 +1753,7 @@ document.addEventListener('focusin', function (event) {
                     $('#city-info').text(response.city_name);
                     $('#transportation-info').text(response.transportation_name);
                     $('#destination_address').val(response.destination_address);
-                    
+
                     if(response.details.length > 0){
                         $('#last-row-item').remove();
 
@@ -1814,7 +1813,7 @@ document.addEventListener('focusin', function (event) {
                             no++;
                         });
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();
@@ -1858,7 +1857,7 @@ document.addEventListener('focusin', function (event) {
                     $('#text-update').text(response.code);
                     $('#note_internal_update').val(response.note_internal);
                     $('#note_external_update').val(response.note_external);
-                    
+
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();
                     M.updateTextFields();
@@ -1895,7 +1894,7 @@ document.addEventListener('focusin', function (event) {
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1904,10 +1903,10 @@ document.addEventListener('focusin', function (event) {
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function voidStatus(id){
@@ -1993,7 +1992,7 @@ document.addEventListener('focusin', function (event) {
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
             qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",",".")),
             qtyconversion = parseFloat($('#arr_conversion' + id).val().toString().replaceAll(".", "").replaceAll(",",".")),
             qtyconverted = 0;
@@ -2011,7 +2010,7 @@ document.addEventListener('focusin', function (event) {
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2019,7 +2018,7 @@ document.addEventListener('focusin', function (event) {
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2044,7 +2043,7 @@ document.addEventListener('focusin', function (event) {
                 {
                     title : 'Sales Order',
                     element : document.querySelector('.step3'),
-                    intro : 'Dokumen ini adalah terusan dari Sales Order, maka silahkan pilih sales order untuk mendapatkan data item yang ingin dikirimkan.' 
+                    intro : 'Dokumen ini adalah terusan dari Sales Order, maka silahkan pilih sales order untuk mendapatkan data item yang ingin dikirimkan.'
                 },
                 {
                     title : 'Ekspedisi',
@@ -2054,22 +2053,22 @@ document.addEventListener('focusin', function (event) {
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step5'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step6'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Tgl. Kirim',
                     element : document.querySelector('.step7'),
-                    intro : 'Tanggal rencana pengiriman sesuai aslinya.' 
+                    intro : 'Tanggal rencana pengiriman sesuai aslinya.'
                 },
                 {
                     title : 'Sales Order Terpakai',
                     element : document.querySelector('.step8'),
-                    intro : 'Data Sales Order yang dipilih akan masuk ke tabel ini, dan secara langsung tidak akan bisa diakses di form lainnya. Silahkan hapus list Sales Order agar bisa dipakai di form lainnya.' 
+                    intro : 'Data Sales Order yang dipilih akan masuk ke tabel ini, dan secara langsung tidak akan bisa diakses di form lainnya. Silahkan hapus list Sales Order agar bisa dipakai di form lainnya.'
                 },
                 {
                     title : 'Produk Detail',
@@ -2079,17 +2078,17 @@ document.addEventListener('focusin', function (event) {
                 {
                     title : 'Keterangan Internal',
                     element : document.querySelector('.step10'),
-                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.' 
+                    intro : 'Silahkan isi / tambahkan keterangan internal untuk dokumen ini untuk catatan antar departemen (internal perusahaan) saja.'
                 },
                 {
                     title : 'Keterangan Eksternal',
                     element : document.querySelector('.step11'),
-                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.' 
+                    intro : 'Silahkan isi / tambahkan keterangan eksternal untuk dokumen ini dan kepentingan luar perusahaan.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step12'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2103,7 +2102,7 @@ document.addEventListener('focusin', function (event) {
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');

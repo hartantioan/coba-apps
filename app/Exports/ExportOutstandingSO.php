@@ -13,7 +13,7 @@ class ExportOutstandingSO implements FromCollection, WithTitle, WithHeadings, Sh
 {
     public function __construct()
     {
-        
+
     }
 
     private $headings = [
@@ -35,15 +35,8 @@ class ExportOutstandingSO implements FromCollection, WithTitle, WithHeadings, Sh
         'Kecamatan',
         'Pembayaran',
         'TOP',
-        'Qty',
-        'Harga Satuan',
-        'Discount 1',
-        'Discount 2',
-        'Discount 3',
-        'DP',
-        'Total',
-        'PPN',
-        'Grandtotal',
+        'Qty (Palet)',
+        'Qty (M2)',
     ];
     public function collection()
     {
@@ -75,21 +68,14 @@ class ExportOutstandingSO implements FromCollection, WithTitle, WithHeadings, Sh
                     'pembayaran'   => $row->paymentType(),
                     'top'               => $row->top_customer,
                     'qty'               => $row_detail->qty,
-                    'harga_satuan'      => $row_detail->price,
-                    'discount_1'        => $row_detail->percent_discount_1,
-                    'discount_2'        => $row_detail->percent_discount_2,
-                    'discount_3'        => $row_detail->discount_3,
-                    'dp'                => $row->percent_dp,
-                    'total'             => $row_detail->total,
-                    'ppn'               => $row_detail->tax,
-                    'grandtotal'        => $row_detail->grandtotal,
-                    
+                    'qty_m2'               => $row_detail->qty_uom,
+
                 ];
                 $x++;
             }
-            
-        
-            
+
+
+
         }
 
         return collect($arr);

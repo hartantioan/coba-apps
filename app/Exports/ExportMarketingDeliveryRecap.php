@@ -83,6 +83,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'status_returned_document'=>$row->marketingOrderDeliveryProcess->isReturnedSj() ? date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->return_date)) : '',
                 'based_on'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
                 'so' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code,
+                'po_customer' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,
             ];
         }
 
@@ -92,7 +93,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
             ->withProperties(null)
             ->log('Export Delivery Recap.');
 
-        return view('admin.exports.marketing_delivery_recap', [
+        return view('admin.exports.marketing_delivery_recap', [ 
             'data'      => $array_filter,
         ]);
     }

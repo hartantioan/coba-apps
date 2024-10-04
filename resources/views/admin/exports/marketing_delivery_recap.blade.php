@@ -44,6 +44,7 @@
             <th>SJ Kembali</th>
             <th>No Invoice</th>
             <th>Based On</th>
+            <th>Po.Customer</th>
             <th>SO</th>
         </tr>
     </thead>
@@ -93,6 +94,7 @@
                 <td>{{ $row['status_returned_document'] }}</td>
                 <td>{{ $row['list_invoice'] }}</td>
                 <td>{{ $row['based_on'] }}</td>
+                <td>{{ $row['po_customer'] }}</td>
                 <td>{{ $row['so'] }}</td>
 
             </tr>

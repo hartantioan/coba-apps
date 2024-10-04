@@ -75,8 +75,8 @@ class MarketingOrderDetail extends Model
 
                 // Check if the code is not already in the array
                 if (!in_array($code, $arr)) {
-                    $arr[] = $code; 
-                }   
+                    $arr[] = $code;
+                }
             }
         }
         $codesString = implode(',', $arr);
@@ -106,10 +106,67 @@ class MarketingOrderDetail extends Model
 
         foreach($this->marketingOrderDeliveryDetail as $row){
             $qty -= $row->qty;
-           
+
         }
 
-        return $qty*$konversi;
+         return round($qty*$konversi,3);
+    }
+
+    public function totalQtyModM2(){
+        $qty = 0;
+        $konversi=$this->qty_conversion;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $qty += $row->qty;
+
+        }
+         return round($qty*$konversi,3);
+    }
+
+    public function totalQtyDOM2(){
+        $qty = 0;
+        $konversi=$this->qty_conversion;
+
+        foreach($this->marketingOrderDeliveryDetail as $row){
+
+            foreach($row->marketingOrderDeliveryProcessDetail as $row2){
+                $qty += $row2->qty;
+            }
+
+        }
+
+        return round($qty*$konversi,3);
+    }
+
+    public function totalQtyBox(){
+        $qty = $this->qty;
+        $box_conversion = $this->item->pallet->box_conversion;
+
+         return round($qty*$box_conversion,3);
+    }
+
+    public function totalQtyModBox(){
+        $qty = 0;
+        $box_conversion = $this->item->pallet->box_conversion;
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $qty += $row->qty;
+
+        }
+         return round($qty*$box_conversion,3);
+    }
+
+    public function totalQtyDOBox(){
+        $qty = 0;
+        $box_conversion = $this->item->pallet->box_conversion;
+
+        foreach($this->marketingOrderDeliveryDetail as $row){
+
+            foreach($row->marketingOrderDeliveryProcessDetail as $row2){
+                $qty += $row2->qty;
+            }
+
+        }
+
+         return round($qty*$box_conversion,3);
     }
 
 

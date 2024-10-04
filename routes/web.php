@@ -175,6 +175,7 @@ use App\Http\Controllers\Sales\MarketingOrderOutstandingInvoiceController;
 use App\Http\Controllers\Sales\MarketingOrderRecapController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryRecapController;
 use App\Http\Controllers\Sales\ReportSalesSummaryStockFgController;
+use App\Http\Controllers\Sales\ReportTrackingSalesOrderController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
 use App\Http\Controllers\Sales\MarketingARDPrecapController;
@@ -2851,6 +2852,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportSalesSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportSalesSummaryStockFgController::class, 'filter']);
                         Route::get('export', [ReportSalesSummaryStockFgController::class, 'export']);
+                    });
+
+                    Route::prefix('report_tracking_sales_order')->middleware('operation.access:report_mod,view')->group(function () {
+                        Route::get('/', [ReportTrackingSalesOrderController::class, 'index']);
+                        Route::post('filter', [ReportTrackingSalesOrderController::class, 'filter']);
+                        Route::get('export', [ReportTrackingSalesOrderController::class, 'export']);
                     });
 
                     Route::prefix('report_marketing_delivery_order')->middleware('operation.access:report_marketing_delivery_order,view')->group(function () {

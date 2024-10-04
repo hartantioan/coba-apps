@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th class="center-align">No</th>
-            <th class="center-align">Status</th>
             <th class="center-align">Dokumen</th>
+            <th class="center-align">Status</th>
             <th class="center-align">SO</th>
             <th>Voider</th>
             <th>Tgl. Void</th>
@@ -40,8 +40,8 @@
         @foreach($data as $key => $row)
             <tr>
             <td>{{ $key + 1 }}.</td>
-            <td>{{ $row['status'] }}</td>
             <td>{{ $row['code'] }}</td>
+            <td>{{ $row['status'] }}</td>
             <td>{{ $row['so'] }}</td>
             <td>{{ $row['voider'] }}</td>
             <td>{{ $row['void_date'] }}</td>

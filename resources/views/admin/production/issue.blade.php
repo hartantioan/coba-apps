@@ -2120,8 +2120,6 @@
                     if(qtyNeeded.toFixed(3) !== qtyBatch.toFixed(3)){
                         passedStock = false;
                     }
-                    console.log(qtyNeeded);
-                    console.log(qtyBatch);
                 });
                 
                 $('*[name^="arr_qty[]"]').each(function(index){
@@ -2161,7 +2159,7 @@
                         icon: 'error'
                     });
                 }else{
-                    /* var path = window.location.pathname;
+                    var path = window.location.pathname;
                         path = path.replace(/^\/|\/$/g, '');
 
                         
@@ -2238,7 +2236,7 @@
                                 icon: 'error'
                             });
                         }
-                    }); */
+                    });
                 }
             }
         });

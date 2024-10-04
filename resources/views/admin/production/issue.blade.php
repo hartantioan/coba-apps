@@ -2120,6 +2120,8 @@
                     if(qtyNeeded !== qtyBatch){
                         passedStock = false;
                     }
+                    console.log(qtyNeeded);
+                    console.log(qtyBatch);
                 });
                 
                 $('*[name^="arr_qty[]"]').each(function(index){

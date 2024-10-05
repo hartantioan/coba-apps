@@ -43,7 +43,7 @@
                 @endforeach
             @else
             <tr>
-                <td align="center">Data pemakaian tidak ditemukan.</td>
+                <td align="center" colspan="7">Data pemakaian tidak ditemukan.</td>
             </tr>
             @endif
         @endforeach

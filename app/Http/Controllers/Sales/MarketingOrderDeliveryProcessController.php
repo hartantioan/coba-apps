@@ -696,9 +696,9 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'production_batch_id'   => $querydetail->itemStock->production_batch_id,
                         'lookable_type'         => $querydetail->getTable(),
                         'lookable_id'           => $querydetail->id,
-                        'qty'                   => $querydetail->qty,
+                        'qty'                   => round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),
                     ]);
-                    CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,$querydetail->qty,'OUT');
+                    CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
                 }
 
                 if(!$request->tempSwitch){

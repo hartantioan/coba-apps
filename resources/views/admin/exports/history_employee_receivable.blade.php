@@ -29,7 +29,7 @@
                 <td style="background-color:red;color:white;">Keterangan</td>
                 <td style="background-color:red;color:white;">Nominal</td>
             </tr>
-            @if (count($row['details'] > 0))
+            @if (count($row['details']) > 0))
                 @foreach($row['details'] as $rowdetail)
                     <tr>
                         <td></td>

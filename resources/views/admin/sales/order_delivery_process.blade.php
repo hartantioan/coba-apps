@@ -984,7 +984,7 @@ document.addEventListener('focusin', function (event) {
 
                         $('#marketing_order_delivery_id').empty();
                     }else{
-                        $('#post_date').val(response.delivery_date);
+                        /* $('#post_date').val(response.delivery_date); */
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
 

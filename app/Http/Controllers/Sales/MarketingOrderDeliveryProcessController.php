@@ -519,6 +519,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ]);
                 }
             }
+
+            if($request->post_date < $mod->post_date){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari tanggal MOD (Jadwal Kirim).'
+                ]);
+            }
             
 			if($request->temp){
                 DB::beginTransaction();

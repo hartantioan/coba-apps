@@ -177,19 +177,19 @@
                     {{ __('translations.bussiness_partner') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->account->name }}
+                    {{ $data->account()->exists() ? $data->account->name : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.address') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->account->address }}
+                    {{ $data->account()->exists() ? $data->account->address : '-' }}
                 </div>
                 <div class="col s4">
                     {{ __('translations.phone_number') }}
                 </div>
                 <div class="col s8">
-                    {{ $data->account->phone.' / '.$data->account->office_no }}
+                    {{ $data->account()->exists() ? $data->account->phone.' / '.$data->account->office_no : '-' }}
                 </div>
             </div>
             <div class="col s6 row mt-2">

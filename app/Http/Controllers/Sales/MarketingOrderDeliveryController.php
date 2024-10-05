@@ -377,7 +377,7 @@ class MarketingOrderDeliveryController extends Controller
             'code'                      => 'required',
             /* 'code'			        => $request->temp ? ['required', Rule::unique('marketing_order_deliveries', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_deliveries,code',
              */'code_place_id'          => 'required',
-            'account_id' 				=> 'required',
+            'account_id' 				=> $request->temp ? 'required' : '',
             'company_id'			    => 'required',
             'customer_id'		        => 'required',
             'post_date'		            => 'required',
@@ -545,7 +545,7 @@ class MarketingOrderDeliveryController extends Controller
                     $query = MarketingOrderDelivery::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
-                        'account_id'                => $request->account_id,
+                        'account_id'                => $request->account_id ?? NULL,
                         'company_id'                => $request->company_id,
                         'customer_id'	            => $request->customer_id,
                         'post_date'                 => $request->post_date,

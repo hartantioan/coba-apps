@@ -130,7 +130,9 @@ class ItemStock extends Model
                 ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
                     $query->whereNotIn('status',['2']);
                 });
-        })->get();
+        })
+        ->where('item_stock_id',$this->id)
+        ->get();
 
         foreach($modp as $row){
             $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);

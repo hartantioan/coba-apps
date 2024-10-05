@@ -29,17 +29,23 @@
                 <td style="background-color:red;color:white;">Keterangan</td>
                 <td style="background-color:red;color:white;">Nominal</td>
             </tr>
-            @foreach($row['details'] as $rowdetail)
+            @if (count($row['details'] > 0))
+                @foreach($row['details'] as $rowdetail)
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>{{ $rowdetail['no'] }}</td>
+                        <td>{{ $rowdetail['post_date'] }}</td>
+                        <td>{{ $rowdetail['status'] }}</td>
+                        <td>{{ $rowdetail['note'] }}</td>
+                        <td align="right">{{ $rowdetail['nominal'] }}</td>
+                    </tr>
+                @endforeach
+            @else
             <tr>
-                <td></td>
-                <td></td>
-                <td>{{ $rowdetail['no'] }}</td>
-                <td>{{ $rowdetail['post_date'] }}</td>
-                <td>{{ $rowdetail['status'] }}</td>
-                <td>{{ $rowdetail['note'] }}</td>
-                <td align="right">{{ $rowdetail['nominal'] }}</td>
+                <td align="center">Data pemakaian tidak ditemukan.</td>
             </tr>
-            @endforeach
+            @endif
         @endforeach
         @if(count($data) == 0)
             <tr>

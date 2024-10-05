@@ -47,6 +47,11 @@
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
                                     <div class="collapsible-body">
                                         <form class="row" id="form_data_filter" onsubmit="return false;">
+                                            <div class="card-alert card red">
+                                                <div class="card-content white-text">
+                                                    <p>Info Penting! : Data yang ditampilkan disini hanya FREQ dengan tipe <b>PEMBAYARAN</b> dan tipe Dokumen <b>TIDAK LENGKAP</b>. Karena itu yang merupakan syarat BS Karyawan terjadi.</p>
+                                                </div>
+                                            </div>
                                             <div class="col s12">
                                                 <div class="row">
                                                     <div class="col m3 s12 ">
@@ -134,8 +139,8 @@
 
     function exportExcel(){
         if($('.row_detail').length > 0){
-            var date = $('#date').val();
-            window.location = "{{ Request::url() }}/export?date=" + date;
+            var start_date = $('#start_date').val(), end_date = $('#end_date').val(), account_id = $('#account_id').val();
+            window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&end_date=" + end_date + "&account_id=" + account_id;
         }else{
             swal({
                 title: 'Ups!',
@@ -168,9 +173,36 @@
                     $('#detail-result').html('');
                     if(response.content.length > 0){
                         $.each(response.content, function(i, val) {
+                            let detail = `<table class="bordered" style="font-size:10px;">
+                                                <thead id="head_detail">
+                                                    <tr>
+                                                        <th class="center-align">No.Dokumen</th>
+                                                        <th class="center-align">Tgl.Post</th>
+                                                        <th class="center-align">Status</th>
+                                                        <th class="center-align">Nominal</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="detail-result">`;
+                            if(val.details.length > 0){
+                                $.each(val.details, function(j, value) {
+                                    detail += `
+                                        <tr>
+                                            <td>` + value.no + `</td>
+                                            <td>` + value.post_date + `</td>
+                                            <td class="center-align">` + value.status + `</td>
+                                            <td class="right-align">` + value.nominal + `</td>
+                                        </tr>
+                                    `;
+                                });
+                            }else{
+                                detail += `<tr>
+                                            <td class="center-align" colspan="4">Data pemakaian tidak ditemukan.</td>
+                                        </tr>`;
+                            }
+                            detail += `</tbody></table>`;
                             $('#detail-result').append(`
-                                <tr class="row_detail">
-                                    <td class="center-align">` + (i+1) + `</td>
+                                <tr class="row_detail" style="background-color:` + getRandomColor() + `;font-weight:700;">
+                                    <td class="center-align" rowspan="2">` + (i+1) + `</td>
                                     <td>` + val.code + `</td>
                                     <td>` + val.employee_name + `</td>
                                     <td>` + val.post_date + `</td>
@@ -178,6 +210,9 @@
                                     <td>` + val.note + `</td>
                                     <td class="right-align">` + val.grandtotal + `</td>
                                 </tr>
+                                <tr>
+                                    <td colspan="6">` + detail + `</td>
+                                </tr
                             `);
                         });
                         $('#detail-result').append(`
@@ -217,7 +252,7 @@
         $('#form_data_filter')[0].reset();
         $('#detail-result').html('').append(`
             <tr>
-                <td class="center-align" colspan="13">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                <td class="center-align" colspan="7">Silahkan pilih tanggal dan tekan tombol filter.</td>
             </tr>
         `);
     }

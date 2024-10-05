@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Finance;
 
+use App\Exports\ExportHistoryEmployeeReceivable;
 use App\Helpers\CustomHelper;
 use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
@@ -64,6 +65,32 @@ class HistoryEmployeeReceivableController extends Controller
         $results = [];
 
         foreach($data as $row){
+            $detail = [];
+
+            foreach($row->personalCloseBillDetail as $rowcb){
+                $detail[] = [
+                    'no'            => $rowcb->personalCloseBill->code,
+                    'post_date'     => date('d/m/Y',strtotime($rowcb->personalCloseBill->post_date)),
+                    'status'        => $rowcb->personalCloseBill->status(),
+                    'nominal'       => CustomHelper::formatConditionalQty($rowcb->nominal),
+                ];
+            }
+
+            foreach($row->hasPaymentRequestDetail()->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment',function($query){
+                    $query->whereHas('paymentRequestCross');
+                });
+            })->get() as $rowpay){
+                foreach($rowpay->paymentRequest->outgoingPayment->paymentRequestCross as $rowcross){
+                    $detail[] = [
+                        'no'            => $rowcross->paymentRequest->code,
+                        'post_date'     => date('d/m/Y',strtotime($rowcross->paymentRequest->post_date)),
+                        'status'        => $rowcross->paymentRequest->status(),
+                        'nominal'       => CustomHelper::formatConditionalQty($rowcross->nominal),
+                    ];
+                }
+            }
+
             $results[] = [
                 'code'          => $row->code,
                 'employee_name' => $row->account->name,
@@ -71,6 +98,7 @@ class HistoryEmployeeReceivableController extends Controller
                 'required_date' => date('d/m/Y',strtotime($row->required_date)),
                 'note'          => $row->note,
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                'details'       => $detail,
             ];
         }
 
@@ -88,6 +116,9 @@ class HistoryEmployeeReceivableController extends Controller
     }
 
     public function export(Request $request){
-		return Excel::download(new ExportEmployeeReceivable($request->date), 'employee_receivable_'.uniqid().'.xlsx');
+        $start_date = $request->start_date ?? '';
+        $end_date = $request->end_date ?? '';
+        $account_id = $request->account_id ?? '';
+		return Excel::download(new ExportHistoryEmployeeReceivable($start_date,$end_date, $account_id), 'history_employee_receivable_'.uniqid().'.xlsx');
     }
 }

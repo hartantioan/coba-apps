@@ -289,7 +289,7 @@
                                     <legend>4. Produk Detail</legend>
                                     <div class="col m12 s12" style="overflow:auto;width:100% !important;" id="table-item">
                                         <p class="mt-2 mb-2">
-                                            <h5>STOK YANG TAMPIL ADALAH STOK REAL - STOK BARANG DI SJ YANG BELUM DI UPDATE STATUS KIRIM</h5>
+                                            <h6><b><i>STOK YANG TAMPIL ADALAH STOK REAL - STOK BARANG DI SJ YANG BELUM DI UPDATE STATUS KIRIM</i></b></h6>
                                             <table class="bordered" id="table-detail">
                                                 <thead>
                                                     <tr>

@@ -477,7 +477,7 @@ class MarketingOrderController extends Controller
                 'delivery_date'             => 'required',
                 'delivery_schedule'         => 'required',
                 'transportation_id'         => $request->type_delivery == '2' ? 'required' : '',
-                
+                'document_so'               => 'required',
                 'billing_address'           => 'required',
                 'destination_address'       => 'required',
                 'province_id'               => 'required',
@@ -532,7 +532,7 @@ class MarketingOrderController extends Controller
                 'delivery_date.required'            => 'Tanggal pengiriman estimasi tidak boleh kosong.',
                 'delivery_schedule.required'        => 'Jadwal kirim tidak boleh kosong.',
                 'transportation_id.required'        => 'Tipe transportasi tidak boleh kosong.',
-            
+                'document_so.required'              => 'File bukti PO / Referensi tidak boleh kosong.',
                 'billing_address.required'          => 'Alamat penagihan tidak boleh kosong.',
                 'destination_address.required'      => 'Alamat tujuan tidak boleh kosong.',
                 'province_id.required'              => 'Provinsi tujuan tidak boleh kosong.',

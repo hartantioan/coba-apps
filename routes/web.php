@@ -21,6 +21,7 @@ use App\Http\Controllers\HR\ShiftRequestController;
 use App\Http\Controllers\HR\RevisionAttendanceHRDController;
 use App\Http\Controllers\Inventory\DeadStockController;
 use App\Http\Controllers\Inventory\AgingGRPOController;
+use App\Http\Controllers\Inventory\ReportGoodScaleController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\QualityControlController;
 
@@ -2212,6 +2213,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [AgingGRPOController::class, 'index']);
                         Route::post('filter', [AgingGRPOController::class, 'filter']);
                         Route::get('export', [AgingGRPOController::class, 'export']);
+                    });
+
+                    Route::prefix('report_good_scale')->middleware('operation.access:report_good_scale,view')->group(function () {
+                        Route::get('/', [ReportGoodScaleController::class, 'index']);
+                        Route::post('filter', [ReportGoodScaleController::class, 'filter']);
+                        Route::get('export', [ReportGoodScaleController::class, 'export']);
                     });
                 });
             });

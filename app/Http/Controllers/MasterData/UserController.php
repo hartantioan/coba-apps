@@ -652,7 +652,7 @@ class UserController extends Controller
                     $query->pic_no          = $request->pic_no ? $request->pic_no : NULL;
                     $query->office_no       = $request->office_no ? $request->office_no : NULL;
                     $query->limit_credit    = $request->limit_credit ? str_replace(',','.',str_replace('.','',$request->limit_credit)) : ($query->limit_credit > 0 ? $query->limit_credit : 0);
-                    $query->count_limit_credit = $request->limit_credit ? 0 : $query->count_limit_credit;
+                    /* $query->count_limit_credit = $request->limit_credit ? 0 : $query->count_limit_credit; */
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
 

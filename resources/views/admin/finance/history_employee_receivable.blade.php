@@ -106,15 +106,12 @@
                                                         <th class="center-align">Tgl.Pengajuan</th>
                                                         <th class="center-align">Tgl.Req.Bayar</th>
                                                         <th class="center-align">{{ __('translations.note') }}</th>
-                                                        <th class="center-align">{{ __('translations.total') }}</th>
-                                                        <th class="center-align">{{ __('translations.tax') }}</th>
-                                                        <th class="center-align">{{ __('translations.wtax') }}</th>
                                                         <th class="center-align">{{ __('translations.grandtotal') }}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="detail-result">
                                                     <tr>
-                                                        <td class="center-align" colspan="10">Silahkan pilih tanggal dan tekan tombol filter.</td>
+                                                        <td class="center-align" colspan="7">Silahkan pilih tanggal dan tekan tombol filter.</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -179,28 +176,19 @@
                                     <td>` + val.post_date + `</td>
                                     <td>` + val.required_date + `</td>
                                     <td>` + val.note + `</td>
-                                    <td class="right-align">` + val.total + `</td>
-                                    <td class="right-align">` + val.tax + `</td>
-                                    <td class="right-align">` + val.wtax + `</td>
                                     <td class="right-align">` + val.grandtotal + `</td>
                                 </tr>
                             `);
                         });
                         $('#detail-result').append(`
                             <tr id="text-grandtotal">
-                                <td class="right-align" colspan="12">Total</td>
-                                <td class="right-align">` + response.totalbalance + `</td>
-                            </tr>
-                        `);
-                        $('#detail-result').append(`
-                            <tr id="text-grandtotal">
-                                <td class="center-align" colspan="13">Waktu proses : ` + response.execution_time  + ` detik</td>
+                                <td class="center-align" colspan="7">Waktu proses : ` + response.execution_time  + ` detik</td>
                             </tr>
                         `);
                     }else{
                         $('#detail-result').append(`
                             <tr>
-                                <td class="center-align" colspan="13">Data tidak ditemukan.</td>
+                                <td class="center-align" colspan="7">Data tidak ditemukan.</td>
                             </tr>
                         `);
                     }

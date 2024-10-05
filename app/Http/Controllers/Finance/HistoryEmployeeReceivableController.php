@@ -48,18 +48,20 @@ class HistoryEmployeeReceivableController extends Controller
         $end_date = $request->end_date;
 
         $data = FundRequest::where('type','1')->whereIn('status',['2','3'])->where('document_status','3')->whereHas('hasPaymentRequestDetail',function($query)use($start_date,$end_date){
-            $query->whereHas('paymentRequest',function($query)use($start_date,$end_date){
-                $query->whereHas('outgoingPayment',function($query)use($start_date,$end_date){
-                    $query->whereDate('post_date','<=',$end_date)
-                        ->whereDate('post_date','>=',$start_date);
-                });
+            $query->whereHas('paymentRequest',function($query){
+                $query->whereHas('outgoingPayment');
             });
         })
-        ->whereIn('account_id',$request->account_id)->get();
+        ->whereDate('post_date','<=',$end_date)
+        ->whereDate('post_date','>=',$start_date)
+        ->where(function($query)use($request){
+            if($request->account_id){
+                $query->whereIn('account_id',$request->account_id);
+            }
+        })
+        ->get();
 
         $results = [];
-
-        $totalbalance = 0;
 
         foreach($data as $row){
             $results[] = [
@@ -68,9 +70,6 @@ class HistoryEmployeeReceivableController extends Controller
                 'post_date'     => date('d/m/Y',strtotime($row->post_date)),
                 'required_date' => date('d/m/Y',strtotime($row->required_date)),
                 'note'          => $row->note,
-                'total'         => number_format($row->total,2,',','.'),
-                'tax'           => number_format($row->tax,2,',','.'),
-                'wtax'          => number_format($row->wtax,2,',','.'),
                 'grandtotal'    => number_format($row->grandtotal,2,',','.'),
             ];
         }
@@ -82,7 +81,6 @@ class HistoryEmployeeReceivableController extends Controller
         $response =[
             'status'            => 200,
             'content'           => $results,
-            'totalbalance'      => number_format($totalbalance,2,',','.'),
             'execution_time'    => $execution_time,
         ];
 

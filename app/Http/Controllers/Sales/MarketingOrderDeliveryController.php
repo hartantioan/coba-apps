@@ -247,7 +247,7 @@ class MarketingOrderDeliveryController extends Controller
                     $val->user->name,
                     $val->userUpdate()->exists() ? $val->userUpdate->name : '-',
                     $val->company->name,
-                    $val->account->name,
+                    $val->account->name ?? '-',
                     $val->customer->name ?? '-',
                     $val->destination_address,
                     $val->district->name,
@@ -660,7 +660,7 @@ class MarketingOrderDeliveryController extends Controller
             ]);
         }
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['account_name'] = $po->account->employee_no.' - '.$po->account->name;
+        $po['account_name'] = $po->account()->exists() ? $po->account->employee_no.' - '.$po->account->name : '';
         $po['customer_name'] = $po->customer->employee_no.' - '.$po->customer->name;
         $po['district_name'] = $po->district->name;
         $po['city_name'] = $po->city->name;

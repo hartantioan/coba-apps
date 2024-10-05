@@ -1728,9 +1728,11 @@ document.addEventListener('focusin', function (event) {
                     $('#code_place_id').val(response.code_place_id).formSelect();
                     $('#code').val(response.code);
                     $('#account_id').empty();
-                    $('#account_id').append(`
-                        <option value="` + response.account_id + `">` + response.account_name + `</option>
-                    `);
+                    if(response.account_name){
+                        $('#account_id').append(`
+                            <option value="` + response.account_id + `">` + response.account_name + `</option>
+                        `);
+                    }
                     $('#customer_id').empty();
                     $('#customer_id').append(`
                         <option value="` + response.customer_id + `">` + response.customer_name + `</option>

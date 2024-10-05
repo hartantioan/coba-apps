@@ -68,13 +68,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                       
+
                     </div>
                 </div>
             </div>
@@ -221,7 +221,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -313,7 +313,7 @@
                             </div>
                             <div class="input-field col m3 s12 hide-inputs">
                                 <select class="browser-default" id="item_unit_id" name="item_unit_id" required>
-                                    <option value="">--Silahkan pilih item--</option>    
+                                    <option value="">--Silahkan pilih item--</option>
                                 </select>
                                 <label class="active" for="item_unit_id">{{ __('translations.unit') }}</label>
                             </div>
@@ -358,7 +358,7 @@
                                 <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                     Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                     <br>
-                                    
+
                                 </div>
                                 <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                    Clear
@@ -411,7 +411,7 @@
                             <div class="col m12 s12">
                                 <h6><b>PO Terpakai</b> (hapus untuk bisa diakses pengguna lain) : <i id="list-used-data"></i></h6>
                             </div>
-                            
+
                         </div>
                     </div>
                 </form>
@@ -518,7 +518,7 @@
                                 </div>
                             </div>
                             <div class="col s12 mt-3">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -536,7 +536,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -583,7 +583,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -694,7 +694,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -717,7 +717,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -734,7 +734,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -745,10 +745,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -817,7 +817,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -825,18 +825,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -844,16 +844,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -872,22 +872,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -919,13 +919,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -944,7 +944,7 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         const noteTextarea = document.getElementById('note');
@@ -953,7 +953,7 @@
 
         noteTextarea.addEventListener('input', function() {
             const currentLength = noteTextarea.value.length;
-            
+
             if (currentLength > maxChars) {
                 noteTextarea.value = noteTextarea.value.substring(0, maxChars);
             }
@@ -967,9 +967,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -980,7 +980,7 @@
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 getWeight();
                 $('.icon-stop-start-out').text('stop');
                 if($('.icon-stop-start-out').parent().hasClass('green')){
@@ -1016,13 +1016,13 @@
 
         $('#modal7').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -1031,7 +1031,7 @@
                 $('#post_date_jurnal').empty();
             }
         });
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -1095,10 +1095,10 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
-                
+
             },
             onCloseEnd: function(modal, trigger){
                 $('#codeUpdateLast,#plantUpdateLast,#warehouseUpdateLast,#purchaseOrderUpdateLast').text('');
@@ -1111,7 +1111,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -1121,16 +1121,16 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             },
             dismissible:false,
         });
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -1480,7 +1480,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -1773,7 +1773,7 @@
                 $.map(table_purchase_order.rows('.selected').nodes(), function (item) {
                     po_id = $(item).data('id');
                 });
-                
+
                 if(po_id){
                     $.ajax({
                         url: '{{ Request::url() }}/get_purchase_order',
@@ -1894,14 +1894,14 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-po="' + id + '"]').remove();
@@ -1933,7 +1933,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1968,11 +1968,11 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data')[0]), passedMod = true;
 
                 var s = $('#previewImage').attr('src') ? $('#previewImage').attr('src') : '';
-                
+
                 if($('#type').val() == '2'){
                     if($('select[name^="arr_marketing_order_delivery_id[]"]').length == 0){
                         passedMod = false;
@@ -1994,10 +1994,10 @@
 
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
                     formData.append('image_in', s);
-                    
+
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
@@ -2024,7 +2024,7 @@
                                 } else if(response.status == 422) {
                                     $('#validation_alert').show();
                                     $('.modal-content').scrollTop(0);
-                                    
+
                                     swal({
                                         title: 'Ups! Validation',
                                         text: 'Check your form.',
@@ -2091,7 +2091,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data_update')[0]);
 
                 var s = $('#previewImage1').attr('src') ? $('#previewImage1').attr('src') : '';
@@ -2160,7 +2160,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 var formData = new FormData($('#form_data_last')[0]);
 
                 $.ajax({
@@ -2250,7 +2250,7 @@
                     }else{
                         $('.supplier-class').removeClass('hide');
                     }
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 }
@@ -2294,7 +2294,7 @@
                     $('#vehicleNoLast').val(response.data.vehicle_no);
                     $('#driverLast').val(response.data.driver);
                     $('#noteUpdateLast').val(response.data.note);
-                    
+
                     $('.modal-content').scrollTop(0);
                     M.updateTextFields();
                 }else{
@@ -2302,7 +2302,7 @@
                         html: response.message
                     });
                 }
-                
+
             },
             error: function() {
                 $('.modal-content').scrollTop(0);
@@ -2429,7 +2429,7 @@
                     const fileUrl = baseUrl + filePath;
                     displayFile(fileUrl);
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -2530,7 +2530,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2538,7 +2538,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -2561,7 +2561,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2570,12 +2570,12 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
-    
+
     function printData(){
         let arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -2618,7 +2618,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -2663,13 +2663,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -2699,11 +2699,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function whatPrinting(code){
@@ -2714,7 +2714,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2785,6 +2785,6 @@
         var status_qc = $('#filter_status_qc').val();
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata + "&status_qc=" + type + "&type=" + type;
-       
+
     }
 </script>

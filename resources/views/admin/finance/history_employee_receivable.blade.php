@@ -179,6 +179,7 @@
                                                         <th class="center-align">No.Dokumen</th>
                                                         <th class="center-align">Tgl.Post</th>
                                                         <th class="center-align">Status</th>
+                                                        <th class="center-align">Keterangan</th>
                                                         <th class="center-align">Nominal</th>
                                                     </tr>
                                                 </thead>
@@ -190,13 +191,14 @@
                                             <td>` + value.no + `</td>
                                             <td>` + value.post_date + `</td>
                                             <td class="center-align">` + value.status + `</td>
+                                            <td>` + value.note + `</td>
                                             <td class="right-align">` + value.nominal + `</td>
                                         </tr>
                                     `;
                                 });
                             }else{
                                 detail += `<tr>
-                                            <td class="center-align" colspan="4">Data pemakaian tidak ditemukan.</td>
+                                            <td class="center-align" colspan="5">Data pemakaian tidak ditemukan.</td>
                                         </tr>`;
                             }
                             detail += `</tbody></table>`;

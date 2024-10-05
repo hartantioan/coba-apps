@@ -73,6 +73,7 @@ class HistoryEmployeeReceivableController extends Controller
                     'post_date'     => date('d/m/Y',strtotime($rowcb->personalCloseBill->post_date)),
                     'status'        => $rowcb->personalCloseBill->status(),
                     'nominal'       => CustomHelper::formatConditionalQty($rowcb->nominal),
+                    'note'          => $rowcb->note.' - '.$rowcb->personalCloseBill->note,
                 ];
             }
 
@@ -87,6 +88,7 @@ class HistoryEmployeeReceivableController extends Controller
                         'post_date'     => date('d/m/Y',strtotime($rowcross->paymentRequest->post_date)),
                         'status'        => $rowcross->paymentRequest->status(),
                         'nominal'       => CustomHelper::formatConditionalQty($rowcross->nominal),
+                        'note'          => $rowcross->paymentRequest->note,
                     ];
                 }
             }

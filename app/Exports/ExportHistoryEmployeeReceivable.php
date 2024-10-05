@@ -54,6 +54,7 @@ class ExportHistoryEmployeeReceivable implements FromView , WithEvents
                     'post_date'     => date('d/m/Y',strtotime($rowcb->personalCloseBill->post_date)),
                     'status'        => $rowcb->personalCloseBill->statusRaw(),
                     'nominal'       => $rowcb->nominal,
+                    'note'          => $rowcb->note.' - '.$rowcb->personalCloseBill->note,
                 ];
             }
 
@@ -68,6 +69,7 @@ class ExportHistoryEmployeeReceivable implements FromView , WithEvents
                         'post_date'     => date('d/m/Y',strtotime($rowcross->paymentRequest->post_date)),
                         'status'        => $rowcross->paymentRequest->statusRaw(),
                         'nominal'       => $rowcross->nominal,
+                        'note'          => $rowcross->paymentRequest->note,
                     ];
                 }
             }

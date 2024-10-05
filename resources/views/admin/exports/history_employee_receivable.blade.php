@@ -22,20 +22,21 @@
                 <td align="right">{{ $row['grandtotal'] }}</td>
             </tr>
             <tr>
-                <td colspan="3" align="right" style="background-color:red;color:white;">PEMAKAIAN</td>
+                <td colspan="2" align="right" style="background-color:red;color:white;">PEMAKAIAN</td>
                 <td style="background-color:red;color:white;">No.Dokumen</td>
                 <td style="background-color:red;color:white;">Tgl.Post</td>
                 <td style="background-color:red;color:white;">Status</td>
+                <td style="background-color:red;color:white;">Keterangan</td>
                 <td style="background-color:red;color:white;">Nominal</td>
             </tr>
             @foreach($row['details'] as $rowdetail)
             <tr>
                 <td></td>
                 <td></td>
-                <td></td>
                 <td>{{ $rowdetail['no'] }}</td>
                 <td>{{ $rowdetail['post_date'] }}</td>
                 <td>{{ $rowdetail['status'] }}</td>
+                <td>{{ $rowdetail['note'] }}</td>
                 <td align="right">{{ $rowdetail['nominal'] }}</td>
             </tr>
             @endforeach

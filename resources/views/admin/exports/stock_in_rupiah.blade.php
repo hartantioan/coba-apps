@@ -34,9 +34,9 @@
                         <td align="center">{{ $row['kode'] }}</td>
                         <td align="center">{{ $row['item'] }}</td>
                         <td align="center">{{ $row['satuan'] }}</td>
-                        <td align="center">{{ $row['area'] }}</td>
-                        <td align="center">{{ $row['shading'] }}</td>
-                        <td align="center">{{$row['production_batch']}}</td>
+                        <td align="center"></td>
+                        <td align="center"></td>
+                        <td align="center"></td>
                         <td align="center">Saldo Awal</td>
                         <td align="center"></td>
                         <td align="center"></td>
@@ -68,7 +68,7 @@
                     </tr>
                 @endif
             @endforeach
-          
+
             @if(count($data) == 0)
                 <tr>
                     <td colspan="13" align="center">
@@ -76,9 +76,9 @@
                     </td>
                 </tr>
             @endif
-            
+
         </tbody>
-        
+
     </table>
 @else
     <table border="1" cellpadding="2" cellspacing="0" style="width:100%; font-size:13px;border-collapse: collapse;">
@@ -96,7 +96,7 @@
                 <th align="center">Cumulative Value</th>
             </tr>
         </thead>
-        <tbody>            
+        <tbody>
             @foreach($data as $key => $row)
             <tr>
                 <td align="center">{{$key+1}}</td>
@@ -118,8 +118,8 @@
                     </td>
                 </tr>
             @endif
-            
+
         </tbody>
-        
+
     </table>
 @endif

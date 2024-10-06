@@ -60,7 +60,7 @@ class ExportReportGoodScale implements FromCollection, WithTitle, WithHeadings, 
         'Residu',
         'Kadar Air',
         'Ref.PO/MOD',
-        'Ref.GRPO',
+        'Ref GRPO/DO',
     ];
 
     public function collection()
@@ -91,7 +91,6 @@ class ExportReportGoodScale implements FromCollection, WithTitle, WithHeadings, 
         })
         ->get();
         $arr = [];
-        info($query_data);
         foreach($query_data as $key=>$row){
             $arr[] = [
                 'no'                    => ($key+1),
@@ -130,8 +129,8 @@ class ExportReportGoodScale implements FromCollection, WithTitle, WithHeadings, 
                 'viscositas'            => $row->viscosity,
                 'residu'                => $row->residue,
                 'kadar_air'             => $row->water_content,
-                'ref_po_mod'            => $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : $row->getSalesSuratJalan(),
-                'ref_grpo'              => $row->goodReceiptDetailExcel(),
+                'ref_po_mod'            => $row->purchase_order_detail_id ? $row->purchaseOrderDetail->purchaseOrder->code : $row->referencePO(),
+                'ref_grpo'              => $row->referenceGRPODO(),
             ];
 
         }

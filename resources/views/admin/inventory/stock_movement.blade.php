@@ -30,7 +30,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                       
+
                     </div>
                 </div>
             </div>
@@ -80,7 +80,7 @@
                                         </div>
                                         <div class="input-field col m4 s12">
                                             <select class="select2 browser-default" id="item_id" name="item_id">
-                                                
+
                                             </select>
                                             <label class="active" for="item">ITEM</label>
                                         </div>
@@ -88,7 +88,7 @@
                                         </div>
                                         <div class="input-field col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
-                                            
+
                                                 <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">
                                                     @foreach($group->whereNull('parent_id') as $c)
                                                         @if(!$c->childSub()->exists())
@@ -128,7 +128,7 @@
                                                         @endif
                                                 @endforeach
                                                 </select>
-                                            
+
                                         </div>
                                         <div class="col m1">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
@@ -141,7 +141,7 @@
                             </form>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="row" id="table_laporan">
                     <table class="bordered" style="font-size:10px;">
@@ -166,7 +166,7 @@
                         <tbody id="movement_body">
                         </tbody>
                     </table>
-                    
+
                 </div>
             </div>
         </div>
@@ -177,7 +177,7 @@
     $(function() {
         $('#type').on('change', function () {
             var selectedType = $(this).val();
-            
+
             if (selectedType === 'final') {
                 $('#start_date').prop('disabled', true);
             } else {
@@ -234,11 +234,11 @@
                                 <th class="center-align">Batch Produksi</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
-                        $.each(response.message, function(i, val) { 
-                            
+                        $.each(response.message, function(i, val) {
+
                             $('#movement_body').append(`
                                 <tr>
-                                    <td class="center-align">`+(i+1)+`</td>               
+                                    <td class="center-align">`+(i+1)+`</td>
                                     <td >`+val.plant+`</td>
                                     <td >`+val.warehouse+`</td>
                                     <td >`+val.kode+`</td>
@@ -272,7 +272,7 @@
                                 <th class="center-align">Mutasi</th>
                                 <th class="center-align">Balance</th>
                             </tr>`);
-                        
+
                         var itung = 0;
                         $.each(response.message, function(i, val) {
                             if(val.perlu == 1){
@@ -286,9 +286,9 @@
                                         <td class="">` + val.item + `</td>
                                         <td class="">` + val.satuan + `</td>
                                         <td >`+val.requester+`</td>
-                                        <td >`+val.area+`</td>
-                                        <td >`+val.shading+`</td>
-                                        <td >`+val.production_batch+`</td>
+                                        <td ></td>
+                                        <td ></td>
+                                        <td ></td>
                                         <td>Saldo Awal</td>
                                         <td class="right-align"></td>
                                         <td class="right-align">` + val.last_qty +  `</td>
@@ -316,18 +316,18 @@
                                 `);
                             }
                         });
-                    } 
-                    
+                    }
+
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                 
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
                         icon: 'warning'
                     });
-                    
+
                     $.each(response.error, function(i, val) {
                         $.each(val, function(i, val) {
                             $('#validation_alert_multi').append(`
@@ -357,7 +357,7 @@
                     icon: 'error'
                 });
             }
-            
+
         });
     }
 

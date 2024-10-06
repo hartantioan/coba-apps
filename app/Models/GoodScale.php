@@ -113,7 +113,7 @@ class GoodScale extends Model
     }
 
     public function goodReceiptDetailExcel(){
-        
+
         $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
             $query->whereIn('status',['2','3']);
         })->get();
@@ -197,7 +197,7 @@ class GoodScale extends Model
         return $ada;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -208,7 +208,7 @@ class GoodScale extends Model
         return $document;
     }
 
-    public function imageIn() 
+    public function imageIn()
     {
         if($this->image_in !== NULL && Storage::exists($this->image_in)) {
             $image = asset(Storage::url($this->image_in));
@@ -219,7 +219,7 @@ class GoodScale extends Model
         return $image;
     }
 
-    public function imageOut() 
+    public function imageOut()
     {
         if($this->image_out !== NULL && Storage::exists($this->image_out)) {
             $image = asset(Storage::url($this->image_out));
@@ -230,7 +230,7 @@ class GoodScale extends Model
         return $image;
     }
 
-    public function imageQc() 
+    public function imageQc()
     {
         if($this->image_qc !== NULL && Storage::exists($this->image_qc)) {
             $image = asset(Storage::url($this->image_qc));
@@ -371,7 +371,37 @@ class GoodScale extends Model
         }
         return implode(', ',$data);
     }
-    
+
+    public function referenceGRPODO(){
+
+        $data = [];
+        if($this->type == '1'){
+            $x = $this->hasMany('App\Models\GoodReceiptDetail','good_scale_id','id')->whereHas('goodReceipt',function($query){
+                $query->whereIn('status',['2','3']);
+            })->get();
+            $array = [];
+            foreach($x as  $row){
+                $array[]=$row->goodReceipt->code;
+            }
+            $data = implode(', ', $array);
+
+            return $data;
+        }
+        if($this->type == '2'){
+            foreach($this->goodScaleDetail as $row){
+                if($row->lookable_type == 'marketing_order_deliveries'){
+                    if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                        $data[] = $row->lookable->marketingOrderDeliveryProcess->code;
+                    }
+                }
+            }
+            return implode(', ',$data);
+        }else{
+            return implode(', ',$data);
+        }
+
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -437,7 +467,7 @@ class GoodScale extends Model
                 $fileTo = 'public/good_receipts/'.$name;
                 Storage::copy($fileFrom,$fileTo);
             }
-            
+
             $query = GoodReceipt::create([
                 'code'			        => GoodReceipt::generateCode($this->post_date),
                 'user_id'		        => session('bo_id'),
@@ -523,7 +553,7 @@ class GoodScale extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

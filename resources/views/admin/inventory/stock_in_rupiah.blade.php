@@ -30,7 +30,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                       
+
                     </div>
                 </div>
             </div>
@@ -79,13 +79,13 @@
                                         </div>
                                         <div class="input-field col m3 s12">
                                             <select class="browser-default item-array" id="item_id" name="item_id">
-                                                
+
                                             </select>
                                             <label class="active" for="item_id">ITEM</label>
                                         </div>
                                         <div class="input-field  col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
-                                            
+
                                             <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]" onchange="loadDataTable()">
                                                 @foreach($group->whereNull('parent_id') as $c)
                                                     @if(!$c->childSub()->exists())
@@ -125,7 +125,7 @@
                                                     @endif
                                             @endforeach
                                             </select>
-                                            
+
                                         </div>
                                         <div class="col col m1 s12 mt-1">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
@@ -138,7 +138,7 @@
                             </form>
                         </div>
                     </div>
-                    
+
                 </div>
                 <div class="row" id="table_laporan">
                     <table class="bordered" style="font-size:10px;">
@@ -165,7 +165,7 @@
                         <tbody id="table_body">
                         </tbody>
                     </table>
-                    
+
                 </div>
             </div>
         </div>
@@ -177,13 +177,13 @@
     $(function() {
         $('#type').on('change', function () {
             var selectedType = $(this).val();
-            
+
             if (selectedType === 'final') {
                 $('#start_date').prop('disabled', true);
-                
+
             } else {
                 $('#start_date').prop('disabled', false);
-                
+
             }
         });
         $(".select2").select2({
@@ -215,10 +215,10 @@
                 loadingClose('#main');
                 if(response.status == 200) {
                     $('#table_body').empty();
-                  
-                              
+
+
                     if (response.message.length > 0) {
-                       
+
                         if($('#type').val() == 'final'){
                             $('#t_head').empty();
                             $('#t_head').append(`
@@ -235,11 +235,11 @@
                                     <th class="center-align">Cumulative Qty.</th>
                                     <th class="center-align">Cumulative Value</th>
                                 </tr>`);
-                            $.each(response.message, function(i, val) { 
-                                
+                            $.each(response.message, function(i, val) {
+
                                 $('#table_body').append(`
                                     <tr>
-                                        <td class="center-align">`+(i+1)+`</td>               
+                                        <td class="center-align">`+(i+1)+`</td>
                                         <td >`+val.plant+`</td>
                                         <td >`+val.warehouse+`</td>
                                         <td >`+val.kode+`</td>
@@ -255,7 +255,7 @@
                             });
                             $('#table_body').append(`
                                 <tr>
-                                    <td class="center-align" colspan="6"></td>     
+                                    <td class="center-align" colspan="6"></td>
                                     <td class="center-align">Total</td>
                                     <td class="right-align">`+response.alltotal+`</td>
                                 </tr>
@@ -294,9 +294,9 @@
                                             <td class="center-align">` + val.kode + `</td>
                                             <td class="">` + val.item + `</td>
                                             <td class="center-align">` + val.satuan + `</td>
-                                            <td class="center-align">` + val.area + `</td>
-                                            <td class="center-align">` + val.shading + `</td>
-                                            <td class="center-align">`+val.production_batch+`</td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
+                                            <td class="center-align"></td>
                                             <td class="center-align">Saldo Awal</td>
                                             <td class="center-align"></td>
                                             <td class="center-align"></td>
@@ -327,12 +327,12 @@
                                             <td class="right-align">`+val.cum_val+`</td>
                                         </tr>
                                     `);
-                                }         
-                                
+                                }
+
                             });
-                            
-                        }   
-                        
+
+                        }
+
                         M.toast({
                             html: 'filtered'
                         });
@@ -342,17 +342,17 @@
                                 <td colspan="6" class="center-align">BELUM ADA STOCK</td>
                             </tr>`);
                     }
-                    
+
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                   
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
                         icon: 'warning'
                     });
-                    
+
                     $.each(response.error, function(i, val) {
                         $.each(val, function(i, val) {
                             $('#validation_alert_multi').append(`
@@ -382,10 +382,10 @@
                     icon: 'error'
                 });
             }
-            
+
         });
 
-        
+
     }
 
     function exportExcel(){

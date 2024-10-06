@@ -126,16 +126,15 @@ class ItemStock extends Model
         
         $modp = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
             $query->whereIn('status',['2'])
-                ->whereDoesntHave('marketingOrderInvoice')
-                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                    $query->whereNotIn('status',['2']);
-                });
+                ->whereDoesntHave('marketingOrderInvoice');
         })
         ->where('item_stock_id',$this->id)
         ->get();
 
         foreach($modp as $row){
-            $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);
+            if(!$row->marketingOrderDeliveryProcess->isItemSent()){
+                $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);
+            }
         }
 
         return $balance;

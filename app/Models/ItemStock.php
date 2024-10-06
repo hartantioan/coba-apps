@@ -124,7 +124,7 @@ class ItemStock extends Model
     public function balanceWithUnsent(){
         $balance = $this->qty;
         
-        /* $modp = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
+        $modp = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess',function($query){
             $query->whereIn('status',['2','3'])
                 ->whereDoesntHave('marketingOrderInvoice')
                 ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
@@ -136,7 +136,7 @@ class ItemStock extends Model
 
         foreach($modp as $row){
             $balance -= round(($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),3);
-        } */
+        }
 
         return $balance;
     }

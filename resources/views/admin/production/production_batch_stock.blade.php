@@ -99,6 +99,7 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
+                                <th class="center-align">Tanggal</th>
                                 <th class="center-align">Qty.</th>
                                 <th class="center-align">Nilai Stok</th>
                             </tr>
@@ -168,9 +169,10 @@
                                 <th class="center-align">Nama Item</th>
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
-                                <th class="center-align">Shading</th>
-                                <th class="center-align">Cumulative Qty.</th>
-                                <th class="center-align">Cumulative Value</th>
+                                <th class="center-align">Shading</th>\
+                                <th class="center-align">Tanggal</th>
+                                <th class="center-align">Qty.</th>
+                                <th class="center-align">Nilai</th>
                             </tr>`);
                         $.each(response.message, function(i, val) { 
                             
@@ -185,6 +187,7 @@
                                     <td class="center-align">`+val.satuan+`</td>
                                     <td class="center-align">`+val.area+`</td>
                                     <td class="center-align">`+val.shading+`</td>
+                                    <td class="center-align">`+val.date+`</td>
                                     <td class="right-align">`+val.cum_qty+`</td>
                                     <td class="right-align">`+val.cum_val+`</td>
                                 </tr>
@@ -192,7 +195,7 @@
                         });
                         $('#table_body').append(`
                             <tr>
-                                <td class="center-align" colspan="7"></td>
+                                <td class="center-align" colspan="8"></td>
                                 <td class="center-align">Execution time :</td>
                                 <td class="center-align">` + response.time + `</td>
                                 <td class="center-align">Total</td>

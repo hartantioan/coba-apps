@@ -99,8 +99,8 @@
                                 <th class="center-align">{{ __('translations.unit') }}</th>
                                 <th class="center-align">Area</th>
                                 <th class="center-align">Shading</th>
-                                <th class="center-align">Cumulative Qty.</th>
-                                <th class="center-align">Cumulative Value</th>
+                                <th class="center-align">Qty.</th>
+                                <th class="center-align">Nilai Stok</th>
                             </tr>
                         </thead>
                         <tbody id="table_body">

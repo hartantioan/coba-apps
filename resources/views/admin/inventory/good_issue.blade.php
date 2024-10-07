@@ -66,13 +66,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -204,7 +204,7 @@
                                     </select>
                                     <label class="" for="company_id">{{ __('translations.company') }}</label>
                                 </div>
-                                
+
                                 <div class="input-field col m4 s12 step4">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                     <label class="active" for="post_date">Tgl. Post</label>
@@ -217,7 +217,7 @@
                                     <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                         Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                         <br>
-                                        
+
                                     </div>
                                     <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                        Clear
@@ -282,7 +282,7 @@
                                                 <tbody id="body-item">
                                                     <tr id="last-row-item">
                                                         <td colspan="18">
-                                                            
+
                                                         </td>
                                                     </tr>
                                                 </tbody>
@@ -301,7 +301,7 @@
                                 <label class="active" for="note">{{ __('translations.note') }}</label>
                             </div>
                             <div class="col s12 mt-3">
-                                
+
                             </div>
                         </div>
                     </div>
@@ -320,7 +320,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -382,7 +382,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -405,7 +405,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -422,7 +422,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -433,10 +433,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -452,7 +452,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -499,7 +499,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -554,7 +554,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -562,18 +562,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -581,16 +581,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -609,22 +609,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -656,13 +656,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -687,14 +687,14 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -711,9 +711,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -759,7 +759,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -772,7 +772,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -782,19 +782,19 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -922,7 +922,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -1024,6 +1024,12 @@
                             });
                             return false;
                         }
+                        inputField = document.getElementById('note');
+                        const currentValue = inputField.value;
+                        const valueToAdd = datakuy.code;
+
+
+                        inputField.value = currentValue + valueToAdd;
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
                                 ` + datakuy.code + `
@@ -1032,7 +1038,7 @@
                         `);
 
                         $('.row_item[data-id=""]').remove();
-                        
+
                         $.each(datakuy.details, function(i, val) {
                             var count = makeid(10);
                             $('#last-row-item').before(`
@@ -1082,14 +1088,14 @@
                                             @foreach ($line as $rowline)
                                                 <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);">
                                             <option value="">--{{ __('translations.empty') }}--</option>
                                             @foreach ($machine as $row)
                                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                            @endforeach    
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td>
@@ -1098,7 +1104,7 @@
                                             @foreach ($department as $rowdept)
                                                 <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                             @endforeach
-                                        </select>    
+                                        </select>
                                     </td>
                                     <td>
                                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1203,7 +1209,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -1211,7 +1217,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -1284,14 +1290,14 @@
                         @foreach ($line as $rowline)
                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
                         <option value="">--{{ __('translations.empty') }}--</option>
                         @foreach ($machine as $row)
                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                        @endforeach    
+                        @endforeach
                     </select>
                 </td>
                 <td>
@@ -1300,7 +1306,7 @@
                         @foreach ($department as $rowdept)
                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                         @endforeach
-                    </select>    
+                    </select>
                 </td>
                 <td>
                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1494,7 +1500,7 @@
                 formData.delete('arr_project[]');
                 formData.delete('arr_serial[]');
                 formData.delete("arr_cost_distribution[]");
-                
+
                 $('select[name^="arr_item_stock"]').each(function(index){
                     if(!$(this).val()){
                         passed = false;
@@ -1558,12 +1564,12 @@
                         var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                         $.ajax({
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
@@ -1590,7 +1596,7 @@
                                 } else if(response.status == 422) {
                                     $('#validation_alert').show();
                                     $('.modal-content').scrollTop(0);
-                                    
+
                                     swal({
                                         title: 'Ups! Validation',
                                         text: 'Check your form.',
@@ -1679,7 +1685,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                
+
                 if(response.details.length > 0){
                     $.each(response.details, function(i, val) {
                         var count = makeid(10);
@@ -1729,14 +1735,14 @@
                                         @foreach ($line as $rowline)
                                             <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->code }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" onchange="changeLine(this);" style="width:200px !important;">
                                         <option value="">--{{ __('translations.empty') }}--</option>
                                         @foreach ($machine as $row)
                                             <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                        @endforeach    
+                                        @endforeach
                                     </select>
                                 </td>
                                 <td>
@@ -1745,7 +1751,7 @@
                                         @foreach ($department as $rowdept)
                                             <option value="{{ $rowdept->id }}">{{ $rowdept->name }}</option>
                                         @endforeach
-                                    </select>    
+                                    </select>
                                 </td>
                                 <td>
                                     <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
@@ -1867,7 +1873,7 @@
                             </div>
                         `);
                     });
-                    
+
                 }
 
                 if(response.document){
@@ -1876,7 +1882,7 @@
                     const fileUrl = baseUrl + filePath;
                     displayFile(fileUrl);
                 }
-                
+
                 $('.modal-content').scrollTop(0);
                 $('#note').focus();
                 M.updateTextFields();
@@ -1983,7 +1989,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1995,7 +2001,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -2003,10 +2009,10 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
-    
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -2049,7 +2055,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -2094,13 +2100,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -2130,11 +2136,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
     function makeTreeOrg(data,link){
         var $ = go.GraphObject.make;
@@ -2145,11 +2151,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -2171,8 +2177,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -2180,7 +2186,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -2189,10 +2195,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -2216,7 +2222,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -2229,17 +2235,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -2257,15 +2263,15 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
     function viewStructureTree(id){
         $.ajax({
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -2278,7 +2284,7 @@
                 loadingClose('#main');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -2311,7 +2317,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -2320,10 +2326,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function viewJournal(id){
@@ -2334,7 +2340,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2378,27 +2384,27 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan tempat memo ini dibuat atau diperuntukkan' 
+                    intro : 'Perusahaan tempat memo ini dibuat atau diperuntukkan'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.stepfile'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : ' Item Request (Jika Ada)',
                     element : document.querySelector('.step6'),
-                    intro : 'Digunakan apabila ada Item Request terkain yang nantinya item dari Item Request akan diinput ke dalam list detail produk.' 
+                    intro : 'Digunakan apabila ada Item Request terkain yang nantinya item dari Item Request akan diinput ke dalam list detail produk.'
                 },
                 {
                     title : 'Detail Produk',
                     element : document.querySelector('.step7'),
-                    intro : 'List Produk yang terkait' 
+                    intro : 'List Produk yang terkait'
                 },
                 {
                     title : 'Keterangan',
@@ -2408,7 +2414,7 @@
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step9'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2422,7 +2428,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2492,6 +2498,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

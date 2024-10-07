@@ -1089,7 +1089,7 @@ class ResetCogsNew implements ShouldQueue
             $totalBefore = $total_final;
         }
       }
-      /* CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id); */
+      CustomHelper::accumulateCogs($this->date,$company_id,$place_id,$item_id);
       /* $itemstock = ItemStock::where('item_id',$item_id)->where('place_id',$place_id)->where('warehouse_id',$item->warehouse())->first();
       if($itemstock){
           $itemstock->update([

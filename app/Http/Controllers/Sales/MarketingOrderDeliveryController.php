@@ -595,6 +595,7 @@ class MarketingOrderDeliveryController extends Controller
                         'note_external'                 => $request->note_external,
                         'status'                        => $request->tempRevision ? '2' : '1',
                         'stage_status'                  => $request->tempRevision ? '2' : '1',
+                        'send_status'                   => $request->tempRevision ? '1' : NULL,
                     ]);
 
                     if($queryrevision){

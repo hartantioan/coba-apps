@@ -3195,6 +3195,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('print', [CapitalizationController::class, 'print']);
                         Route::post('done', [CapitalizationController::class, 'done'])->middleware('operation.access:capitalization,update');
                         Route::post('print_by_range', [CapitalizationController::class, 'printByRange']);
+                        Route::post('get_account_data', [CapitalizationController::class, 'getAccountData']);
+                        Route::post('get_asset', [CapitalizationController::class, 'getAsset']);
                         Route::get('print_individual/{id}', [CapitalizationController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                         Route::get('export', [CapitalizationController::class, 'export']);
                         Route::post('create', [CapitalizationController::class, 'create'])->middleware('operation.access:capitalization,update');

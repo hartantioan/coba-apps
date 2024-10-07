@@ -723,7 +723,7 @@ class MarketingOrderDeliveryController extends Controller
                     ]);
                 }
             }
-            if(!$po->marketingOrderDeliveryProcess()->exists()){
+            if($po->marketingOrderDeliveryProcess()->exists()){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf, SJ aktif harus divoid jika ingin menggunakan Remapping.',

@@ -1084,6 +1084,11 @@ class CustomHelper {
 						'payment_type'		=> ''
 					]); */
 				}
+				if($gs->type == '2'){
+					$gs->update([
+						'status'	=> '3',
+					]);
+				}
 			}
 			
 		}elseif($table_name == 'leave_requests'){

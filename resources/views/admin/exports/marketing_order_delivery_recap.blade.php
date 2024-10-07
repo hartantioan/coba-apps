@@ -25,6 +25,7 @@
             <th class="center-align">Kecamatan</th>
             <th class="center-align">Truck</th>
             <th class="center-align">Status Siap Kirim</th>
+            <th class="center-align">Tgl.Kirim</th>
             <th class="center-align">Note Internal</th>
             <th class="center-align">Note External</th>
             <th class="center-align">Item Code</th>
@@ -63,6 +64,7 @@
             <td>{{ $row['kecamatan'] }}</td>
             <td>{{ $row['truk'] }}</td>
             <td>{{ $row['statuskirim'] }}</td>
+            <td>{{ $row['delivery_date'] }}</td>
             <td>{{ $row['noteinternal'] }}</td>
             <td>{{ $row['noteexternal'] }}</td>
             <td>{{ $row['itemcode'] }}</td>
@@ -79,7 +81,7 @@
         @endforeach
         @if(count($data) == 0)
             <tr>
-                <td colspan="16" align="center">
+                <td colspan="17" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

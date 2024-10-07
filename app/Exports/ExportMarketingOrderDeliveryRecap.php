@@ -66,6 +66,7 @@ class ExportMarketingOrderDeliveryRecap implements FromView, WithEvents
                 'so'=> $row->marketingOrderDetail->marketingOrder->code ?? '-',
                 'sj'=>$row->getSuratJalan() ?? '-',
                 'timbangan'=>$row->marketingOrderDelivery->goodScaleDetail->goodScale->code ?? '-',
+                'delivery_date' => date('d/m/Y', strtotime($row->marketingOrderDelivery->delivery_date)),
             ];
         }
 

@@ -154,7 +154,7 @@ class CustomHelper {
 	public static function sendCogs($lookable_type = null, $lookable_id = null, $company_id = null, $place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $total = null, $type = null, $date = null, $area_id = null, $shading = null, $batch = null, $detail_type = null, $detail_id = null){
 		/* ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
 		self::accumulateCogs($date,$company_id,$place_id,$item_id); */
-		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch);
+		ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$shading,$batch, $detail_type = null, $detail_id = null);
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
@@ -6825,9 +6825,11 @@ class CustomHelper {
 				$qty = $row->qty_in ? $row->qty_in : $row->qty_out;
 				$type = $row->qty_in ? 'IN' : 'OUT';
 				$date = $row->date;
+				$detailable_type = $row->detailable_type;
+				$detailable_id = $row->detailable_id;
 				$row->delete();
 				/* ResetCogsHelper::gas($date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id); */
-				ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id);
+				ResetCogsNew::dispatch($date,$company_id,$place_id,$item_id,$area_id,$item_shading_id,$production_batch_id,$detailable_type,$detailable_id);
 			}
 		}
 	}

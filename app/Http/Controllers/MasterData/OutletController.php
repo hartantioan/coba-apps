@@ -180,7 +180,7 @@ class OutletController extends Controller
             'address.required'          => 'Alamat tidak boleh kosong.',
             'phone.required'            => 'Telepon tidak boleh kosong.',
             'province_id.required'      => 'Provinsi tidak boleh kosong.',
-            'group_outlet_id.required'      => 'Grup Outlet tidak boleh kosong.',
+            'outlet_group_id.required'      => 'Grup Outlet tidak boleh kosong.',
             'city_id.required'          => 'Kota tidak boleh kosong.',
             'district_id.required'      => 'Kecamatan tidak boleh kosong.',
         ]);

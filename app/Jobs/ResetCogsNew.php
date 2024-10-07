@@ -792,6 +792,9 @@ class ResetCogsNew implements ShouldQueue
         })
         ->get();
 
+        $arrProductionReceive = [];
+        $arrProductionFgReceive = [];
+
         foreach($productionissue as $row){
             $total = 0;
             if($row->productionBatchUsage()->exists()){
@@ -905,7 +908,9 @@ class ResetCogsNew implements ShouldQueue
                 foreach($row->productionIssue->productionReceiveIssue as $rowreceiveissue){
                     $productionReceive = ProductionReceive::where('id',$rowreceiveissue->production_receive_id)->whereIn('status',['2','3'])->first();
                     if($productionReceive){
-                        $productionReceive->recalculate();
+                        if(!in_array($productionReceive->id,$arrProductionReceive)){
+                            $arrProductionReceive[] = $productionReceive->id;
+                        }
                         /* foreach($productionReceive->productionReceiveDetail as $rowreceive){
                             if($rowreceive->productionBatch()->exists()){
                                 foreach($rowreceive->productionBatch as $rowbatch2){
@@ -919,7 +924,9 @@ class ResetCogsNew implements ShouldQueue
             if($row->productionIssue->productionFgReceive()->exists()){
                 $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                 if($productionFgReceive){
-                    $productionFgReceive->recalculate($dateloop);
+                    if(!in_array(needle: $productionFgReceive->id,$arrProductionFgReceive)){
+                        $arrProductionFgReceive[] = $productionFgReceive->id;
+                    }
                     /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
                 }
             }
@@ -930,6 +937,18 @@ class ResetCogsNew implements ShouldQueue
                         'nominal'     => $row->productionIssue->total(),
                     ]);
                 }
+            }
+        }
+
+        if(count($arrProductionReceive) > 0){
+            foreach($arrProductionReceive as $row){
+                ProductionReceive::find($row)->recalculate();
+            }
+        }
+
+        if(count($arrProductionFgReceive) > 0){
+            foreach($arrProductionFgReceive as $row){
+                ProductionFgReceive::find($row)->recalculate($dateloop);
             }
         }
 

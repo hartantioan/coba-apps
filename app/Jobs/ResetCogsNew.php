@@ -924,7 +924,7 @@ class ResetCogsNew implements ShouldQueue
             if($row->productionIssue->productionFgReceive()->exists()){
                 $productionFgReceive = ProductionFgReceive::where('id',$row->productionIssue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
                 if($productionFgReceive){
-                    if(!in_array(needle: $productionFgReceive->id,$arrProductionFgReceive)){
+                    if(!in_array($productionFgReceive->id,$arrProductionFgReceive)){
                         $arrProductionFgReceive[] = $productionFgReceive->id;
                     }
                     /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */

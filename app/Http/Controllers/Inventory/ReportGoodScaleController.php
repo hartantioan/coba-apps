@@ -48,7 +48,7 @@ class ReportGoodScaleController extends Controller
         $status = $request->status ? $request->status : '';
         $type = $request->type ? $request->type : '';
         $status_qc = $request->status_qc ? $request->status_qc : '';
-        info($request);
+
 		return Excel::download(new ExportReportGoodScale($start_date,$finish_date,$status,$type,$status_qc), 'good_scale_'.uniqid().'.xlsx');
     }
 }

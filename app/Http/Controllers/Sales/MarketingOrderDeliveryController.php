@@ -704,7 +704,13 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
         }else{
-            if($po->status !== '2' || $po->marketing_order_delivery_id){
+            if($po->marketing_order_delivery_id){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf MOD hasil remap tidak bisa diremap ulang.',
+                ]);
+            }
+            if($po->status !== '2'){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',

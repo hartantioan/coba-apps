@@ -11,8 +11,9 @@
             <th align="center">{{ __('translations.unit') }}</th>
             <th align="center">Area</th>
             <th align="center">Shading</th>
-            <th align="center">Cumulative Qty.</th>
-            <th align="center">Cumulative Value</th>
+            <th align="center">Tanggal</th>
+            <th align="center">Qty.</th>
+            <th align="center">Nilai</th>
         </tr>
     </thead>
     <tbody>
@@ -31,6 +32,7 @@
                 <td align="center">{{$row['satuan']}}</td>
                 <td align="center">{{$row['area']}}</td>
                 <td align="center">{{$row['shading']}}</td>
+                <td align="center">{{$row['post_date']}}</td>
                 <td align="center">{{$row['cum_qty']}}</td>
                 <td align="center">{{$row['cum_val']}}</td>
             </tr>
@@ -38,7 +40,7 @@
       
         @if(count($data) == 0)
             <tr>
-                <td colspan="13" align="center">
+                <td colspan="14" align="center">
                     Data tidak ditemukan
                 </td>
             </tr>

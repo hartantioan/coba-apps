@@ -577,6 +577,8 @@ class MarketingOrderDeliveryController extends Controller
                     $query = MarketingOrderDelivery::create([
                         'code'			                => $queryrevision ? $request->code : $newCode,
                         'user_id'		                => session('bo_id'),
+                        'user_update_id'                => $request->tempRevision ? session('bo_id') : NULL,
+                        'update_time'                   => $request->tempRevision ? date('Y-m-d H:i:s') : NULL,
                         'account_id'                    => $request->account_id ?? NULL,
                         'company_id'                    => $request->company_id,
                         'customer_id'	                => $request->customer_id,

@@ -55,13 +55,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                       
+
                     </div>
                 </div>
             </div>
@@ -102,7 +102,7 @@
                                                     <input class="form-control" type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -235,6 +235,11 @@
                                     </div>
                                 </p>
                             </div>
+
+                            <div class="input-field col m3 s12 step4">
+                                <a href="javascript:void(0);" class="btn waves-effect waves-light cyan" onclick="getAccountData();" id="btn-show">Tampilkan Data<i class="material-icons right">assignment</i></a>
+                                <label class="active">&nbsp;</label>
+                            </div>
                         </div>
                         <div class="col s12">
                             <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
@@ -290,7 +295,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -309,6 +314,57 @@
     </div>
     <div class="modal-footer">
         <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
+<div id="modal_asset" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Asset </h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple darken-1 text-white" style="color:white;"><i class="material-icons">library_books</i>Asset</div>
+                                <div class="collapsible-body" style="display:block;">
+                                    <div class="mt-2 mb-2" style="overflow:scroll;width:100% !important;">
+                                        <div id="datatable_asset"></div>
+                                        <i class="right">Gunakan *pilih semua* untuk memilih seluruh data yang anda inginkan. Atau pilih baris untuk memilih data yang ingin dipindahkan.</i>
+                                        <table id="table_asset" class="display" width="100%">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">No</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kode</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Nama</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Grup</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Tanggal Pengkapitalan</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Nominal</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Akumulasi Penyusutan</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Saldo</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Sisa Penyusutan</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Metode</th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Catatan </th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kode Inventaris </th>
+                                                    <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Status </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-detail-asset"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light amber" onclick="startIntro2();">Panduan <i class="material-icons right">help_outline</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit step23" onclick="applyDocuments();">Gunakan <i class="material-icons right">forward</i></button>
     </div>
 </div>
 
@@ -337,7 +393,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -360,7 +416,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -377,7 +433,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -388,10 +444,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -407,7 +463,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -454,7 +510,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -487,17 +543,71 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
+        });
+
+        $('#modal_asset').modal({
+            onOpenStart: function(modal,trigger) {
+
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_asset = $('#table_asset').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    select: {
+                        style: 'multi'
+                    },
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    }
+                });
+                $('#table_asset_wrapper > .dt-buttons').appendTo('#datatable_buttons_asset');
+                $('select[name="table_asset_length"]').addClass('browser-default');
+                $('.collapsible').on('shown.bs.collapse', function () {
+                    table_asset.columns.adjust().draw();
+                });
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-asset').empty();
+                $('#preview_data').html('');
+                $('#table_asset').DataTable().clear().destroy();
+            }
         });
 
         loadDataTable();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -524,7 +634,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -536,9 +646,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -548,7 +658,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -558,19 +668,19 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -581,7 +691,7 @@
         });
 
         select2ServerSide('#asset_id', '{{ url("admin/select2/asset_capitalization") }}');
-        
+
         $("#item_id").on("select2:unselecting", function(e) {
             $('#code').val('');
             $('#name').val('');
@@ -596,6 +706,277 @@
     String.prototype.replaceAt = function(index, replacement) {
         return this.substring(0, index) + replacement + this.substring(index + replacement.length);
     };
+
+    function getAccountData(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }
+
+        $.ajax({
+            url: '{{ Request::url() }}/get_account_data',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('.modal-content');
+            },
+            success: function(response) {
+                loadingClose('.modal-content');
+                $('#modal_asset').modal('open');
+
+                if(response.asset.length > 0){
+                        $.each(response.asset, function(i, val) {
+                            $('#body-detail-asset').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td class="center">
+                                        ` + i+1 + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.code + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.name + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.group + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.date + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.nominal + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.accumulation_total + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.book_balance + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.count_balance + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.method + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.note + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.item_code + `
+                                    </td>
+                                    <td class="">
+                                        ` + val.status + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+
+                $('.modal-content').scrollTop(0);
+                M.updateTextFields();
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('.modal-content');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    }
+    function applyDocuments(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_asset_id = [], passed = true;
+                $.map(table_asset.rows('.selected').nodes(), function (item) {
+                    arr_asset_id.push($(item).data('id'));
+                });
+
+
+
+                if(arr_asset_id.length == 0 ){
+                    passed = false;
+                }
+
+                if(passed){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_asset',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_asset_id: arr_asset_id,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+
+                            if($('.data-used').length > 0){
+                                $('.data-used').trigger('click');
+                            }
+
+                            $('.last_row_item').remove();
+
+                            if(!$('#temp').val()){
+                                $('.row_item').each(function(){
+                                    $(this).remove();
+                                });
+                            }
+
+                            $('#last-row-item').remove();
+
+
+                            if(passed){
+                                $.each(response, function(i, val) {
+
+                                console.log(val);
+                                    if(val.details.length > 0){
+                                        $('#list-used-data').append(`
+                                            <div class="chip purple darken-4 gradient-shadow white-text">
+                                                ` + val.code + `
+                                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.lookable_type + `','` + val.id + `')">close</i>
+                                            </div>
+                                        `);
+
+                                        $.each(val.details, function(i, valdetail) {
+                                            $('#empty-detail').remove();
+                                            var count = makeid(10);
+                                            var no = $('.row_asset').length + 1;
+                                            $('#body-asset').append(`
+                                                <tr class="row_asset">
+                                                    <input type="hidden" name="arr_asset_id[]" value="` +val.id + `">
+                                                    <td class="center">
+                                                        ` + no + `
+                                                    </td>
+                                                    <td>
+                                                        ` +val.code + `
+                                                    </td>
+                                                    <td>
+                                                        ` +val.name + `
+                                                    </td>
+                                                    <td>
+                                                        ` +val.place_code + `
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]" style="width:200px !important;">
+                                                            <option value="">--{{ __('translations.empty') }}--</option>
+                                                            @foreach ($place as $row)
+                                                                <option value="{{ $row->id }}">{{ $row->code }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
+                                                            <option value="">--{{ __('translations.empty') }}--</option>
+                                                            @foreach ($line as $rowline)
+                                                                <option value="{{ $rowline->id }}" data-place="{{ $rowline->place_id }}">{{ $rowline->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_machine` + count + `" name="arr_machine[]" style="width:200px !important;" onchange="changeLine(this);">
+                                                            <option value="">--{{ __('translations.empty') }}--</option>
+                                                            @foreach ($machine as $row)
+                                                                <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_department` + count + `" name="arr_department[]" style="width:200px !important;">
+                                                            <option value="">--{{ __('translations.empty') }}--</option>
+                                                            @foreach ($department as $row)
+                                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
+                                                    </td>
+                                                    <td class="center">
+                                                        <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
+                                                    </td>
+                                                    <td class="center">
+                                                        <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0" onkeyup="formatRupiah(this);count();">
+                                                    </td>
+                                                    <td class="center">
+                                                        <input type="text" id="arr_qty` + count + `" name="arr_qty[]" onfocus="emptyThis(this);" value="1" onkeyup="formatRupiah(this);count();" readonly>
+                                                    </td>
+                                                    <td class="center">
+                                                        <select class="browser-default" id="arr_unit` + count + `" name="arr_unit[]"></select>
+                                                    </td>
+                                                    <td class="center">
+                                                        <input type="text" id="arr_total` + count + `" name="arr_total[]" onfocus="emptyThis(this);" value="0,000" onkeyup="formatRupiah(this);" readonly>
+                                                    </td>
+                                                    <td>
+                                                        <input name="arr_note[]" type="text" placeholder="Keterangan">
+                                                    </td>
+                                                    <td class="center">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-asset" href="javascript:void(0);">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            `);
+                                            select2ServerSide('#arr_unit' + count, '{{ url("admin/select2/unit") }}');
+                                            select2ServerSide('#arr_project' + count, '{{ url("admin/select2/project") }}');
+                                            select2ServerSide('#arr_cost_distribution_cost' + count, '{{ url("admin/select2/cost_distribution") }}');
+                                            $('#asset_id').empty();
+                                            reInitializedAsset();
+                                        });
+                                    }
+
+
+
+                                });
+                                $('#modal_asset').modal('close');
+                            }else{
+                                $.each(errormessage, function(i, val) {
+                                    M.toast({
+                                        html: val
+                                    });
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan pilih data terlebih dahulu.',
+                        icon: 'error'
+                    });
+                }
+            }
+        });
+    }
 
     function getCode(val){
         if(val){
@@ -697,7 +1078,7 @@
                             @foreach ($place as $row)
                                 <option value="{{ $row->id }}">{{ $row->code }}</option>
                             @endforeach
-                        </select>    
+                        </select>
                     </td>
                     <td>
                         <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
@@ -712,7 +1093,7 @@
                             <option value="">--{{ __('translations.empty') }}--</option>
                             @foreach ($machine as $row)
                                 <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                            @endforeach    
+                            @endforeach
                         </select>
                     </td>
                     <td>
@@ -727,7 +1108,7 @@
                         <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                     </td>
                     <td class="center">
-                        <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select> 
+                        <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
                     </td>
                     <td class="center">
                         <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="0" onkeyup="formatRupiah(this);count();">
@@ -873,7 +1254,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -976,7 +1357,7 @@
                             $.each(response.error, function(field, errorMessage) {
                                 $('#' + field).addClass('error-input');
                                 $('#' + field).css('border', '1px solid red');
-                                
+
                             });
                             swal({
                                 title: 'Ups! Validation',
@@ -1040,7 +1421,7 @@
             success: function(response) {
                 loadingClose('#main');
                 $('#modal1').modal('open');
-                
+
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
@@ -1078,7 +1459,7 @@
                                     @foreach ($place as $row)
                                         <option value="{{ $row->id }}">{{ $row->code }}</option>
                                     @endforeach
-                                </select>    
+                                </select>
                             </td>
                             <td>
                                 <select class="browser-default" id="arr_line` + count + `" name="arr_line[]" style="width:200px !important;" onchange="changePlace(this);">
@@ -1093,7 +1474,7 @@
                                     <option value="">--{{ __('translations.empty') }}--</option>
                                     @foreach ($machine as $row)
                                         <option value="{{ $row->id }}" data-line="{{ $row->line_id }}">{{ $row->name }}</option>
-                                    @endforeach    
+                                    @endforeach
                                 </select>
                             </td>
                             <td>
@@ -1108,7 +1489,7 @@
                                 <select class="browser-default" id="arr_project` + count + `" name="arr_project[]"></select>
                             </td>
                             <td class="center">
-                                <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select> 
+                                <select class="browser-default" id="arr_cost_distribution_cost` + count + `" name="arr_cost_distribution_cost[]" onchange="applyCoa('` + count + `');"></select>
                             </td>
                             <td class="center">
                                 <input type="text" id="arr_price` + count + `" name="arr_price[]" onfocus="emptyThis(this);" value="` + val.price + `" onkeyup="formatRupiah(this);count();">
@@ -1255,7 +1636,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1263,10 +1644,10 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
-    
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -1343,13 +1724,13 @@
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
-                    
+
                     swal({
                         title: 'Ups! Validation',
                         text: 'Check your form.',
                         icon: 'warning'
                     });
-                    
+
                     $.each(response.error, function(i, val) {
                         $.each(val, function(i, val) {
                             $('#validation_alert_multi').append(`
@@ -1379,7 +1760,7 @@
                     icon: 'error'
                 });
             }
-            
+
         });
     }
 
@@ -1402,7 +1783,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1411,10 +1792,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function viewJournal(id){
@@ -1425,7 +1806,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1469,37 +1850,37 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan tempat ini dibuat atau diperuntukkan' 
+                    intro : 'Perusahaan tempat ini dibuat atau diperuntukkan'
                 },
                 {
                     title : 'Mata Uang',
                     element : document.querySelector('.step4'),
-                    intro : 'Mata Uang yang digunakan dalam mendefinisikan' 
+                    intro : 'Mata Uang yang digunakan dalam mendefinisikan'
                 },
                 {
                     title : 'Konversi',
                     element : document.querySelector('.step5'),
-                    intro : 'Konversi mata uang pada form ini' 
+                    intro : 'Konversi mata uang pada form ini'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step6'),
-                    intro : 'Tanggal Tenggat dari grpo pada form' 
+                    intro : 'Tanggal Tenggat dari grpo pada form'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step7'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Aset',
                     element : document.querySelector('.step8'),
-                    intro : 'Pemilihan Aset yang akan digunakan dalam pembuatan form' 
+                    intro : 'Pemilihan Aset yang akan digunakan dalam pembuatan form'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step9'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -1513,7 +1894,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1600,6 +1981,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&type_buy=" + type_buy + "&type_deliv=" + type_deliv + "&company=" + company + "&type_pay=" + type_pay + "&supplier=" + supplier + "&currency=" + currency + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

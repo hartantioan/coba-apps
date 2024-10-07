@@ -470,7 +470,7 @@ class MarketingOrderDeliveryController extends Controller
             } */
             $queryrevision = NULL;
             if($request->tempRevision){
-                $queryrevision = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->tempRevision))->where('status','3')->whereNull('marketing_order_delivery_id')->first();
+                $queryrevision = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->tempRevision))->where('status','2')->whereNull('marketing_order_delivery_id')->first();
                 if($queryrevision){
                     if(!$queryrevision->marketingOrderDeliveryRemap()->exists()){
                         $queryrevision->update([
@@ -704,7 +704,7 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
         }else{
-            if($po->status !== '3' || $po->marketing_order_delivery_id){
+            if($po->status !== '2' || $po->marketing_order_delivery_id){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',

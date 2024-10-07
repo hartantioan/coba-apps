@@ -618,8 +618,8 @@ class MarketingOrderController extends Controller
                     if($item){
                         $priceNett = $item->cogsSales($codePlace->id,$request->post_date);
                         if($priceNett <= 0){
-                            $passedNettPrice = false;
-                            $arrMessage[] = 'Item '.$item->code.' - '.$item->name.' belum memiliki harga nett price dari hpp atau kalkulator BOM.';
+                            /* $passedNettPrice = false;
+                            $arrMessage[] = 'Item '.$item->code.' - '.$item->name.' belum memiliki harga nett price dari hpp atau kalkulator BOM.'; */
                         }
                     }
                 }
@@ -785,11 +785,11 @@ class MarketingOrderController extends Controller
                 }
                 
                 if($query) {
-                    $marginprice = $query->account->getStandarPrice($request->post_date);
                     foreach($request->arr_item as $key => $row){
                         $itemUnit = ItemUnit::find(intval($request->arr_unit[$key]));
                         $codePlace = Place::where('code',$request->arr_place[$key])->where('status','1')->first();
                         $item = Item::find($row);
+                        $price_nett = $item->cogsSales($codePlace->id,$request->post_date) + 10000;
                         MarketingOrderDetail::create([
                             'marketing_order_id'            => $query->id,
                             'item_id'                       => $row,
@@ -801,7 +801,7 @@ class MarketingOrderController extends Controller
                             'price_list'                    => str_replace(',','.',str_replace('.','',$request->arr_price_list[$key])),
                             'price_delivery'                => str_replace(',','.',str_replace('.','',$request->arr_price_delivery[$key])),
                             'price_type_bp'                 => str_replace(',','.',str_replace('.','',$request->arr_price_type_bp[$key])),
-                            'price_nett'                    => $item->cogsSales($codePlace->id,$request->post_date) + $marginprice,
+                            'price_nett'                    => $price_nett,
                             'is_include_tax'                => $request->arr_is_include_tax[$key],
                             'percent_tax'                   => $request->arr_tax[$key],
                             'tax_id'                        => $request->arr_tax_id[$key],

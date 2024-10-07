@@ -307,9 +307,11 @@ class Item extends Model
         }
 
         if($pricenow <= 0){
-            $cogsparent = $this->parentFg->parent->cogsSales($place_id,$date);
-            if($cogsparent){
-                $pricenow = $cogsparent->qty_final > 0 ? $cogsparent->total_final / $cogsparent->qty_final : 0;
+            if($this->parentFg()->exists()){
+                $cogsparent = $this->parentFg->parent->cogsSales($place_id,$date);
+                if($cogsparent){
+                    $pricenow = $cogsparent->qty_final > 0 ? $cogsparent->total_final / $cogsparent->qty_final : 0;
+                }
             }
         }
 

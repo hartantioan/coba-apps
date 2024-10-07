@@ -460,8 +460,8 @@ class MarketingOrderController extends Controller
     }
 
     public function create(Request $request){
-        DB::beginTransaction();
-        try {
+        /* DB::beginTransaction();
+        try { */
             $validation = Validator::make($request->all(), [
                 'code'                      => 'required',
             /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_orders', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_orders,code',
@@ -838,10 +838,10 @@ class MarketingOrderController extends Controller
                 }
             }
 
-            DB::commit();
+            /* DB::commit();
         }catch(\Exception $e){
             DB::rollback();
-        }
+        } */
 
 		return response()->json($response);
     }

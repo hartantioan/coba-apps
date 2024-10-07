@@ -367,12 +367,16 @@
         <div class="row">
             <div class="col s12">
                 <h4>Form Update Keterangan Internal & Eksternal <i id="text-update"></i></h4>
-                <div class="input-field col m4 s12 step10 first-inputs">
+                <div class="input-field col m4 s12">
+                    <input id="delivery_date_update" name="delivery_date_update" type="date" placeholder="Tgl. Pengiriman">
+                    <label class="active" for="delivery_date_update">Tgl. Kirim</label>
+                </div>
+                <div class="input-field col m4 s12">
                     <input type="hidden" id="temp_update" name="temp_update">
                     <textarea class="materialize-textarea" id="note_internal_update" name="note_internal_update" placeholder="Catatan / Keterangan Internal" rows="3"></textarea>
                     <label class="active" for="note_internal_update">Keterangan Internal</label>
                 </div>
-                <div class="input-field col m4 s12 step11 first-inputs">
+                <div class="input-field col m4 s12">
                     <textarea class="materialize-textarea" id="note_external_update" name="note_external_update" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
                     <label class="active" for="note_external_update">Keterangan Eksternal</label>
                 </div>
@@ -649,7 +653,7 @@ document.addEventListener('focusin', function (event) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#text-update').text('');
-                $('#temp_update,#note_internal_update,#note_external_update').val('');
+                $('#temp_update,#note_internal_update,#note_external_update,#delivery_date_update').val('');
             }
         });
 
@@ -1517,6 +1521,7 @@ document.addEventListener('focusin', function (event) {
                     dataType: 'JSON',
                     data: {
                         id : $('#temp_update').val(),
+                        delivery_date : $('#delivery_date_update').val(),
                         note : $('#note_internal_update').val(),
                         note2 : $('#note_external_update').val(),
                     },
@@ -1857,6 +1862,7 @@ document.addEventListener('focusin', function (event) {
                     $('#modal6').modal('open');
                     $('#temp_update').val(id);
                     $('#text-update').text(response.code);
+                    $('#delivery_date_update').val(response.delivery_date);
                     $('#note_internal_update').val(response.note_internal);
                     $('#note_external_update').val(response.note_external);
 

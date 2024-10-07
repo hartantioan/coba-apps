@@ -627,6 +627,7 @@ class MarketingOrderDeliveryController extends Controller
 
         if($query){
             $query->update([
+                'delivery_date'     => $request->delivery_date,
                 'note_internal'     => $request->note,
                 'note_external'     => $request->note2,
             ]);
@@ -640,7 +641,7 @@ class MarketingOrderDeliveryController extends Controller
                 ->performedOn(new MarketingOrderDelivery())
                 ->causedBy(session('bo_id'))
                 ->withProperties($query)
-                ->log('Edit note internal / external marketing order delivery.');
+                ->log('Edit note delivery date dan internal / external note marketing order delivery.');
         }else{
             $response = [
                 'status'  => 500,

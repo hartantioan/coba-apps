@@ -32,7 +32,7 @@
                 <td align="center">{{$row['satuan']}}</td>
                 <td align="center">{{$row['area']}}</td>
                 <td align="center">{{$row['shading']}}</td>
-                <td align="center">{{$row['post_date']}}</td>
+                <td align="center">{{$row['date']}}</td>
                 <td align="center">{{$row['cum_qty']}}</td>
                 <td align="center">{{$row['cum_val']}}</td>
             </tr>

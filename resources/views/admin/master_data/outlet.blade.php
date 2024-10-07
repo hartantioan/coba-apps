@@ -201,7 +201,7 @@
                             <select class="select2 browser-default" id="district_id" name="district_id" onchange="getSubdistrict();">
                                 <option value="">--{{ __('translations.select') }}--</option>
                             </select>
-                            <label class="active" for="district_id">{{ __('translations.subdistrict') }}</label>
+                            <label class="active" for="district_id">{{ __('translations.district') }}</label>
                         </div>
                         <div class="input-field col s3">
                             <select class="select2 browser-default" id="subdistrict_id" name="subdistrict_id">

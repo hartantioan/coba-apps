@@ -172,7 +172,6 @@ class OutletController extends Controller
             'outlet_group_id'       => 'required',
             'city_id'           => 'required',
             'district_id'       => 'required',
-            'subdistrict_id'    => 'required',
         ], [
             'code.required' 	        => 'Kode tidak boleh kosong.',
             'code.unique'               => 'Kode telah terpakai.',
@@ -184,7 +183,6 @@ class OutletController extends Controller
             'group_outlet_id.required'      => 'Grup Outlet tidak boleh kosong.',
             'city_id.required'          => 'Kota tidak boleh kosong.',
             'district_id.required'      => 'Kecamatan tidak boleh kosong.',
-            'subdistrict_id.required'   => 'Kelurahan tidak boleh kosong.',
         ]);
 
         if($validation->fails()) {
@@ -207,7 +205,7 @@ class OutletController extends Controller
                     $query->outlet_group_id     = $request->group_outlet_id;
                     $query->city_id         = $request->city_id;
                     $query->district_id     = $request->district_id;
-                    $query->subdistrict_id  = $request->subdistrict_id;
+                    $query->subdistrict_id  = $request->subdistrict_id ?? NULL;
                     $query->link_gmap       = $request->link_gmap;
                     $query->status          = $request->status ? $request->status : '2';
                     $query->save();
@@ -229,7 +227,7 @@ class OutletController extends Controller
                         'outlet_group_id'   => $request->group_outlet_id,
                         'city_id'           => $request->city_id,
                         'district_id'       => $request->district_id,
-                        'subdistrict_id'    => $request->subdistrict_id,
+                        'subdistrict_id'    => $request->subdistrict_id ?? NULL,
                         'link_gmap'         => $request->link_gmap,
                         'status'            => $request->status ? $request->status : '2'
                     ]);

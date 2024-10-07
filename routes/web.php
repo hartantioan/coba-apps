@@ -2671,6 +2671,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('create', [MarketingOrderInvoiceController::class, 'create'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::post('send_used_data', [MarketingOrderInvoiceController::class, 'sendUsedData'])->middleware('operation.access:marketing_order_invoice,update');
                     Route::get('approval/{id}', [MarketingOrderInvoiceController::class, 'approval'])->withoutMiddleware('direct.access');
+                    Route::get('print_full_individual/{id}', [MarketingOrderInvoiceController::class, 'printFullIndividual'])->withoutMiddleware('direct.access');
                     Route::get('print_individual/{id}', [MarketingOrderInvoiceController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderInvoiceController::class, 'voidStatus'])->middleware('operation.access:marketing_order_invoice,void');
                     Route::post('cancel_status', [MarketingOrderInvoiceController::class, 'cancelStatus'])->middleware('operation.access:marketing_order_invoice,void');

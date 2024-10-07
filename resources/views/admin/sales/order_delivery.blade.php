@@ -238,6 +238,7 @@
                                     </div>
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
+                                        <input type="hidden" id="tempRevision" name="tempRevision">
                                         <select class="browser-default" id="marketing_order_id" name="marketing_order_id"></select>
                                         <label class="active" for="marketing_order_id">Sales Order</label>
                                     </div>
@@ -250,9 +251,14 @@
                                                 <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman, Prosentase DP, Tipe SO, dan TOP Internal adalah SAMA.</p>
                                             </div>
                                         </div>
-                                        <div class="card-alert card green hide" id="alert-phase2">
+                                        <div class="card-alert card blue hide" id="alert-phase2">
                                             <div class="card-content white-text">
                                                 <p>Info : Anda hanya bisa merubah Ekspedisi saja.</p>
+                                            </div>
+                                        </div>
+                                        <div class="card-alert card red hide" id="alert-phase3">
+                                            <div class="card-content white-text">
+                                                <p>Info : Ini adalah mode Remapping, anda bisa merubah nilai qty dan akan membuat dokumen baru, namun akan menutup dokumen lama. Remapping akan mengganti Timbangan MOD Lama ke MOD Baru</p>
                                             </div>
                                         </div>
                                     </div>
@@ -617,6 +623,7 @@ document.addEventListener('focusin', function (event) {
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#tempRevision').val('');
                 $('#account_id,#customer_id,#marketing_order_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -632,7 +639,7 @@ document.addEventListener('focusin', function (event) {
                 $('.second-inputs').css('pointer-events','auto');
                 $('.first-inputs').css('pointer-events','auto');
                 $('#alert-phase1').removeClass('hide');
-                $('#alert-phase2').addClass('hide');
+                $('#alert-phase2,#alert-phase3').addClass('hide');
                 $('#body-item').empty().append(`
                     <tr id="last-row-item">
                         <td colspan="11">
@@ -1742,8 +1749,140 @@ document.addEventListener('focusin', function (event) {
                     $('#customer_id').append(`
                         <option value="` + response.customer_id + `">` + response.customer_name + `</option>
                     `);
-                    $('#alert-phase1').addClass('hide');
+                    $('#alert-phase1,#alert-phase3').addClass('hide');
                     $('#alert-phase2').removeClass('hide');
+                    $('#company_id').val(response.company_id).formSelect();
+                    $('#post_date').val(response.post_date);
+                    $('#delivery_date').val(response.delivery_date);
+                    $('#note_internal').val(response.note_internal);
+                    $('#note_external').val(response.note_external);
+                    $('#tempDistrict').val(response.district_id);
+                    $('#tempCity').val(response.city_id);
+                    $('#tempTransport').val(response.transportation_id);
+                    if(response.top_internal){
+                        $('#tempTopInternal').val(response.top_internal);
+                    }
+                    $('#tempSoType').val(response.so_type);
+                    $('#district-info').text(response.district_name);
+                    $('#city-info').text(response.city_name);
+                    $('#transportation-info').text(response.transportation_name);
+                    $('#destination_address').val(response.destination_address);
+
+                    if(response.details.length > 0){
+                        $('#last-row-item').remove();
+
+                        $('.row_item').each(function(){
+                            $(this).remove();
+                        });
+                        let no = 1;
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + val.mo + `">
+                                    <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + val.marketing_order_id + `">
+                                    <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
+                                    <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
+                                    <input type="hidden" name="arr_place[]" id="arr_place` + count + `" value="` + val.place_id + `">
+                                    <input type="hidden" name="arr_conversion[]" id="arr_conversion` + count + `" value="` + val.qty_conversion + `">
+                                    <td rowspan="1" id="row-main` + count + `">
+                                        ` + no + `
+                                    </td>
+                                    <td>
+                                        ` + val.so_no + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td id="arr_stock` + count + `" class="right-align">
+                                        ` + val.stock + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" class="browser-default" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty_original + `" style="text-align:right;width:100%;" id="rowQty`+ count +`">
+                                    </td>
+                                    <td class="center">
+                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td>
+                                        <input type="text" value="` + val.qty_uom + `" style="text-align:right;width:100%;border-bottom:none;" id="rowQtyUom`+ count +`" readonly>
+                                    </td>
+                                    <td class="center">
+                                        ` + val.uom_unit + `
+                                    </td>
+                                    <td>
+                                        <span class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">` + val.warehouse + `</span>
+                                    </td>
+                                    <td>
+                                        <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                    </td>
+                                    <td class="center">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#tempPayment').val(val.payment_type);
+                            $('#tempDownPayment').val(val.down_payment);
+                            $('#tempTypeDelivery').val(val.type_delivery);
+                            no++;
+                        });
+                    }
+
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }
+            },
+            error: function() {
+                $('.modal-content').scrollTop(0);
+                loadingClose('#main');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+    }
+
+    function revision(id){
+        $.ajax({
+            url: '{{ Request::url() }}/show',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                id: id,
+                revision: '1',
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            success: function(response) {
+                loadingClose('#main');
+                if(response.status == 500){
+                    M.toast({
+                        html: response.message
+                    });
+                }else{
+                    $('#modal1').modal('open');
+                    $('#code_place_id').val(response.code_place_id).formSelect();
+                    $('#code').val(response.code);
+                    $('#tempRevision').val(id);
+                    $('#account_id').empty();
+                    if(response.account_name){
+                        $('#account_id').append(`
+                            <option value="` + response.account_id + `">` + response.account_name + `</option>
+                        `);
+                    }
+                    $('#customer_id').empty();
+                    $('#customer_id').append(`
+                        <option value="` + response.customer_id + `">` + response.customer_name + `</option>
+                    `);
+                    $('#alert-phase1,#alert-phase2').addClass('hide');
+                    $('#alert-phase3').removeClass('hide');
                     $('#company_id').val(response.company_id).formSelect();
                     $('#post_date').val(response.post_date);
                     $('#delivery_date').val(response.delivery_date);

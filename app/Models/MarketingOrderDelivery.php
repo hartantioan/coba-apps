@@ -23,6 +23,7 @@ class MarketingOrderDelivery extends Model
         'company_id',
         'account_id',
         'customer_id',
+        'marketing_order_delivery_id',
         'post_date',
         'delivery_date',
         'destination_address',
@@ -162,6 +163,11 @@ class MarketingOrderDelivery extends Model
     public function marketingOrderDeliveryDetail()
     {
         return $this->hasMany('App\Models\MarketingOrderDeliveryDetail');
+    }
+
+    public function marketingOrderDeliveryRemap()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDelivery');
     }
 
     public function marketingOrderDeliveryProcess()

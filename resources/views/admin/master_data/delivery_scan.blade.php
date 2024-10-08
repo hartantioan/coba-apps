@@ -68,11 +68,7 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="print();">
-                            <i class="material-icons hide-on-med-and-up">local_printshop</i>
-                            <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
-                            <i class="material-icons right">local_printshop</i>
-                        </a>
+
 
                     </div>
                 </div>

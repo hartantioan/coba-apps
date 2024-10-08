@@ -418,7 +418,7 @@ class ResetCogsNew implements ShouldQueue
         })->where('item_id',$item_id)->get();
 
         foreach($productionhandover as $row){
-            $total = $row->total;
+            $total = $row->productionFgReceiveDetail->total;
             $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
             $total_final = $totalBefore + $total;
             $qty_final = $qtyBefore + $qty;

@@ -34,6 +34,13 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         'Qty On Hand (M2)',
         'Qty On Hand (Palet)',
         'Qty On Hand (Box)',
+        'Qty SJ Blm Terkirim(M2)',
+        'Qty SJ Blm Terkirim(Palet)',
+        'Qty SJ Blm Terkirim(Box)',
+        'Total Aviable (M2)',
+        'Total Aviable (Palet)',
+        'Total Aviable (Box)',
+
     ];
 
     // private $headings = [
@@ -204,13 +211,42 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 });
             })->get();
 
+            //sj yang belum terkirim bor
+            $delivery_process_awal_blm_terkirim = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '<', $this->start_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                    $query->whereNotIn('status',['2']);
+                });
+            })->get();
+
             $total_sj_awal = 0;
+            $total_sj_awal_blm_terkirim = 0;
+            $total_sj_awal_blm_terkirim_pallet = 0 ;
+            $total_sj_awal_blm_terkirim_box = 0;
             if($delivery_process_awal){
                 foreach ($delivery_process_awal as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
                     $total_sj_awal += $row_sj->qty * $qtyConversion;
                 }
+            }
+            //belum terkirim
+            if($delivery_process_awal_blm_terkirim){
+                foreach ($delivery_process_awal_blm_terkirim as $row_sj) {
+                    $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
+
+                    $total_sj_awal_blm_terkirim += $row_sj->qty * $qtyConversion;
+                }
+            }
+
+            if($total_sj_awal_blm_terkirim != 0){
+                $total_sj_awal_blm_terkirim_pallet = $total_sj_awal_blm_terkirim / $row->item->sellConversion();
+                $total_sj_awal_blm_terkirim_box = ($total_sj_awal_blm_terkirim / $row->item->sellConversion())*$row->item->pallet->box_conversion;
             }
 
 
@@ -256,12 +292,34 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 });
             })->get();
 
+            $delivery_process_blm_terkirim = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                    $query->whereNotIn('status',['2']);
+                });
+            })->get();
+
             $total_sj = 0;
+            $total_sj_blm_terkirim = 0;
             if($delivery_process){
                 foreach ($delivery_process as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
                     $total_sj += $row_sj->qty * $qtyConversion;
+                }
+            }
+
+            if($delivery_process_blm_terkirim){
+                foreach ($delivery_process_blm_terkirim as $row_sj) {
+                    $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
+
+                    $total_sj_blm_terkirim += $row_sj->qty * $qtyConversion;
                 }
             }
 
@@ -295,7 +353,11 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             if($total != 0 ){
                 $pallet_conversion= $total/$row->item->sellConversion();
                 $box_conversion=($total/$row->item->sellConversion())*$row->item->pallet->box_conversion;
+                $total_sum_sj_blm_terkirim = $total - ($total_sj_blm_terkirim + $total_sj_awal_blm_terkirim);
+                $pallet_conversion_total_sum = $total_sum_sj_blm_terkirim / $row->item->sellConversion();
+                $box_conversion_total_sum = ($total_sum_sj_blm_terkirim / $row->item->sellConversion() * $row->item->pallet->box_conversion);
             }
+            //utk yg ke 2
             if (!isset($total_m2[$row->item->id])) {
                 $total_m2[$row->item->id] = 0;
             }
@@ -315,6 +377,14 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 $pallet_conversion= 0;
             }
 
+            if($total_sj_awal_blm_terkirim_pallet == $total_sj_awal_blm_terkirim || $total_sj_awal_blm_terkirim_pallet == $total_sj_awal_blm_terkirim_box){
+                $total_sj_awal_blm_terkirim_pallet = 0;
+            }
+
+            if($pallet_conversion_total_sum == $total_sum_sj_blm_terkirim || $pallet_conversion_total_sum == $box_conversion_total_sum){
+                $pallet_conversion_total_sum = 0;
+            }
+
             $arr[] = [
                 'item_code'=> $row->item->code,
                 'item_name'=>$row->item->name,
@@ -322,6 +392,12 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 'total'=>$total,
                 'pallet_conversion'=>$pallet_conversion,
                 'box_conversion'=>$box_conversion,
+                'sj_belum_terkirim'=> $total_sj_awal_blm_terkirim,
+                'sj_belum_terkirim_pallet'=> $total_sj_awal_blm_terkirim_pallet,
+                'sj_belum_terkirim_box'=> $total_sj_awal_blm_terkirim_box,
+                'total_sum_sj_blm_terkirim'=>$total_sum_sj_blm_terkirim,
+                'pallet_conversion_total_sum'=>$pallet_conversion_total_sum,
+                'box_conversion_total_sum'=>$box_conversion_total_sum,
             ];
 
 

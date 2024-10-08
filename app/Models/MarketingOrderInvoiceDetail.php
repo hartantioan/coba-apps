@@ -81,19 +81,16 @@ class MarketingOrderInvoiceDetail extends Model
     }
 
     public function proportionalTaxFromHeader(){
-        $tax = $this->marketingOrderInvoice->tax;
-        $bobot = $this->total / $this->marketingOrderInvoice->total;
-        $rowtax = round($tax * $bobot,2);
-        $stringtax = strval($rowtax);
+        $stringtax = strval($this->marketingOrderInvoice->tax);
         $arr = explode('.',$stringtax);
         if(count($arr) > 1){
             if(intval($arr[1]) >= 50){
-                return round($rowtax);
+                return round($this->marketingOrderInvoice->tax);
             }else{
-                return floor($rowtax);
+                return floor($this->marketingOrderInvoice->tax);
             }
         }else{
-            return floor($rowtax);
+            return floor($this->marketingOrderInvoice->tax);
         }
     }
 

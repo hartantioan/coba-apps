@@ -455,6 +455,11 @@ class ResetCogsNew implements ShouldQueue
             $row->update([
                 'total' => $total,
             ]);
+            if($row->productionBatch()->exists()){
+                $row->productionBatch->update([
+                    'total' => $total,
+                ]);
+            }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
         }

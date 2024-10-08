@@ -86,13 +86,10 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                     '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
                 ];
             }
-            $balanceTax = $row->tax;
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $rowdetail) {
-                $rowtax = $balanceTax - floor($rowdetail->tax) >= 0 ? $balanceTax : floor($rowdetail->tax);
                 $arr[] = [
-                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $rowtax . ';0;0;;;;;;;;;;',
+                    '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $rowdetail->proportionalTaxFromHeader() . ';0;0;;;;;;;;;;',
                 ];
-                $balanceTax = $balanceTax - floor($rowdetail->tax);
             }
         }
 

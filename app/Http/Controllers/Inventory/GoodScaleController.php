@@ -70,7 +70,7 @@ class GoodScaleController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = GoodScale::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -96,7 +96,7 @@ class GoodScaleController extends Controller
         $search = $request->input('search.value');
 
         $total_data = GoodScale::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = GoodScale::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -206,7 +206,7 @@ class GoodScaleController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 $updateBtn = '';
                 if($val->alreadyChecked()){
@@ -385,9 +385,9 @@ class GoodScaleController extends Controller
                 'code'                      => 'required',
                 'code_place_id'             => 'required',
                 'company_id'                => 'required',
-               
+
                 // 'account_id'                => $request->purchase_order_detail_id ? '' : 'required',
-               
+
                 // 'purchase_order_detail_id'  => $request->type == '1' ? 'required' : '',
                 'place_id'                  => 'required',
                 'post_date'		            => 'required',
@@ -453,7 +453,7 @@ class GoodScaleController extends Controller
                 /* 'item_unit_id.required'             => 'Satuan item tidak boleh kosong.', */
             ]);
         }
-        
+
 
         if($validation->fails()) {
             $response = [
@@ -462,7 +462,7 @@ class GoodScaleController extends Controller
             ];
         } else {
             DB::beginTransaction();
-           
+
 
                 $imageName = '';
                 $newFile = '';
@@ -490,9 +490,9 @@ class GoodScaleController extends Controller
                         ]);
                     }
                 }
-                
+
                 if($request->temp){
-                
+
                     $query = GoodScale::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -537,7 +537,7 @@ class GoodScaleController extends Controller
                                 $path_document=storage_path('app/public/good_scales/'.$document_name);
                                 $newFile_document = CustomHelper::compress($request->document,$path_document,30);
                                 $basePath = storage_path('app');
-                            
+
                                 $document = explode($basePath.'/', $newFile_document)[1];
                             } else {
                                 $document = $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL;
@@ -584,14 +584,14 @@ class GoodScaleController extends Controller
                         $query->status = '1';
 
                         $query->save();
-                        
+
                     }else{
                         return response()->json([
                             'status'  => 500,
                             'message' => 'Status Timbangan Truk sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    
+
                 }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
@@ -603,12 +603,12 @@ class GoodScaleController extends Controller
                             $path_document=storage_path('app/public/good_scales/'.$document_name);
                             $newFile_document = CustomHelper::compress($request->document,$path_document,30);
                             $basePath = storage_path('app');
-                        
+
                             $document = explode($basePath.'/', $newFile_document)[1];
                         } else {
                             $document = $request->file('document') ? $request->file('document')->store('public/good_scales') : NULL;
                         }
-                        
+
                     }else{
                         $document = null;
                     }
@@ -647,9 +647,9 @@ class GoodScaleController extends Controller
                         'water_content'             => 0,
                         'status'                    => '1',
                     ]);
-                        
+
                 }
-                
+
                 if($query) {
 
                     if($request->arr_marketing_order_delivery_id){
@@ -684,9 +684,9 @@ class GoodScaleController extends Controller
                     ];
                 }
                 DB::commit();
-            
+
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -704,7 +704,7 @@ class GoodScaleController extends Controller
 
         $string = '<div class="row pt-1 pb-1 lighten-4">
                     <div class="col s12">'.$data->code.$x.'</div>';
-                    
+
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
                         <thead>
                             <tr>
@@ -718,7 +718,7 @@ class GoodScaleController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -726,7 +726,7 @@ class GoodScaleController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -738,7 +738,7 @@ class GoodScaleController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -761,7 +761,7 @@ class GoodScaleController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
@@ -783,7 +783,7 @@ class GoodScaleController extends Controller
         if($data->account()->exists()){
             $data['account_name'] = $data->account->employee_no.' - '.$data->account->name;
         }
-       
+
         $data['image_in'] = $data->imageIn();
         $data['item_name'] = $data->item()->exists() ? $data->item->code.' - '.$data->item->name : '';
         $data['purchase_code'] = $data->purchaseOrderDetail()->exists() ? $data->purchaseOrderDetail->purchaseOrder->code : $data->referencePO();
@@ -814,12 +814,12 @@ class GoodScaleController extends Controller
             }elseif($data->warehouse()->exists()){
                 $data['warehouse_name'] = $data->warehouse->name;
             }
-         
-          
+
+
             $data['place_code'] = $data->place->code;
-          
+
             $response = [
-                'status'    => 200,  
+                'status'    => 200,
                 'data'      => $data
             ];
         }
@@ -866,7 +866,7 @@ class GoodScaleController extends Controller
                 if($percent_balance > $tolerance_gr){
                     $overtolerance = true;
                 }
-    
+
                 if($overtolerance){
                     return response()->json([
                         'status'  => 500,
@@ -887,10 +887,10 @@ class GoodScaleController extends Controller
                 $qty_qc = 0;
                 $qty_final = $balanceweight;
             }
-    
+
             $adapo = false;
             $idgs = 0;
-    
+
             $imageName = '';
             $newFile = '';
             if($request->image_out){
@@ -938,14 +938,14 @@ class GoodScaleController extends Controller
                     }
                 }
                 CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
-            }            
-    
+            }
+
             /* if($adapo){
                 if($idgs > 0){
                     GoodScale::find($idgs)->createGoodReceipt();
                 }
             } */
-    
+
             $response = [
                 'status'    => 200,
                 'message'   => 'Data successfully updated.',
@@ -978,7 +978,7 @@ class GoodScaleController extends Controller
                     ->causedBy(session('bo_id'))
                     ->withProperties($gs)
                     ->log('Change information good scale data');
-    
+
             $response = [
                 'status'    => 200,
                 'message'   => 'Data successfully updated.',
@@ -1006,7 +1006,7 @@ class GoodScaleController extends Controller
 
     public function voidStatus(Request $request){
         $query = GoodScale::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!$request->msg){
@@ -1045,23 +1045,23 @@ class GoodScaleController extends Controller
                 }
 
                 CustomHelper::removeJournal($query->getTable(),$query->id);
-               
+
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
-    
+
                 activity()
                     ->performedOn(new GoodScale())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the good scale data');
-    
+
                 CustomHelper::sendNotification('good_scales',$query->id,'Timbangan Truk No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('good_scales',$query->id);
-                
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data closed successfully.'
@@ -1110,7 +1110,7 @@ class GoodScaleController extends Controller
                 'message' => 'Goods Scale (Timbangan Truk) PO sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1141,9 +1141,9 @@ class GoodScaleController extends Controller
     }
 
     public function approval(Request $request,$id){
-        
+
         $gs = GoodScale::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($gs){
             $data = [
                 'title'     => 'Print Timbangan Masuk',
@@ -1158,25 +1158,25 @@ class GoodScaleController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = GoodScale::where('code',CustomHelper::decrypt($id))->first();
         $currentDateTime = Date::now();
-        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');        
+        $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
         if($pr){
 
             $pdf = PrintHelper::print($pr,'Good Scale','a5','landscape','admin.print.inventory.good_scale_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -1190,7 +1190,7 @@ class GoodScaleController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -1202,7 +1202,7 @@ class GoodScaleController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = GoodScale::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Good Scale','a5','landscape','admin.print.inventory.good_scale_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -1212,7 +1212,7 @@ class GoodScaleController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -1228,8 +1228,8 @@ class GoodScaleController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -1258,7 +1258,7 @@ class GoodScaleController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1266,19 +1266,19 @@ class GoodScaleController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = GoodScale::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Good Scale','a5','landscape','admin.print.inventory.good_scale_individual');
@@ -1288,7 +1288,7 @@ class GoodScaleController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1301,21 +1301,21 @@ class GoodScaleController extends Controller
 
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1324,7 +1324,7 @@ class GoodScaleController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1345,22 +1345,22 @@ class GoodScaleController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
-                    
-                    
+
+
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1386,7 +1386,7 @@ class GoodScaleController extends Controller
         $status_qc = $request->status_qc ? $request->status_qc : '';
 		$modedata = $request->modedata ? $request->modedata : '';
         $type = $request->type ? $request->type : '';
-		return Excel::download(new ExportGoodScaleTransactionPage($search,$post_date,$end_date,$status,$modedata,$status_qc,$type), 'good_scale'.uniqid().'.xlsx');
+		return Excel::download(new ExportGoodScaleTransactionPage($search,$post_date,$end_date,$status,$modedata,$status_qc,$type), 'good_scale_'.uniqid().'.xlsx');
     }
 
     public function done(Request $request){
@@ -1400,13 +1400,13 @@ class GoodScaleController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new GoodScale())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Good Scale data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1455,7 +1455,7 @@ class GoodScaleController extends Controller
                     $total_kredit_asli += $row->nominal_fc;
                     $total_kredit_konversi += $row->nominal;
                 }
-                
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -1474,7 +1474,7 @@ class GoodScaleController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
 
-                
+
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
@@ -1483,12 +1483,12 @@ class GoodScaleController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
-            $response["tbody"] = $string; 
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }

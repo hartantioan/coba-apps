@@ -84,41 +84,55 @@ class DeliveryScanController extends Controller
                 ];
                 return response()->json($response);
             }
-        }
-        if($query->status == '2'){
-
-            $delivery_scan = DeliveryScan::create([
-                'user_id'		            => session('bo_id'),
-                'lookable_type'             => 'marketing_order_delivery_processes',
-                'lookable_id'               => $query->id,
-                'post_date'                 => now(),
-            ]);
-            if($delivery_scan){
-                MarketingOrderDeliveryProcessTrack::create([
-                    'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
-                    'marketing_order_delivery_process_id'   => $request->temp,
-                    'status'                                => '2',
-                ]);
-                $query->createJournalSentDocument();
+            
+            if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
                 $response = [
-                    'status'    => 200,
-                    'message'   => 'Data successfully saved.',
+                    'status'  => 500,
+                    'message' => 'Dokumen belum memiliki Surat Jalan'
                 ];
+                return response()->json($response);
+            }
+
+            if($query->status == '2'){
+
+                $delivery_scan = DeliveryScan::create([
+                    'user_id'		            => session('bo_id'),
+                    'lookable_type'             => 'marketing_order_delivery_processes',
+                    'lookable_id'               => $query->id,
+                    'post_date'                 => now(),
+                ]);
+                if($delivery_scan){
+                    MarketingOrderDeliveryProcessTrack::create([
+                        'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                        'marketing_order_delivery_process_id'   => $request->temp,
+                        'status'                                => '2',
+                    ]);
+                    $query->createJournalSentDocument();
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                }else{
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
+                }
+                return response()->json($response);
             }else{
                 $response = [
                     'status'  => 500,
-                    'message' => 'Data failed to save.'
+                    'message' => 'Status Dokumen Harus Dalam status Proses'
                 ];
+                
             }
-            return response()->json($response);
         }else{
             $response = [
                 'status'  => 500,
-                'message' => 'Status Dokumen Harus Dalam status Proses'
+                'message' => 'Data tidak ditemukan'
             ];
-            return response()->json($response);
         }
+
+        return response()->json($response);
     }
-
-
 }

@@ -147,7 +147,7 @@
                         <img src="{{ $image }}" width="50%" style="width:60%;">
                     </td>
                     <td width="33%" align="center">
-                        <h5 style="margin-top:0px;">INVOICE</h5>
+                        <h5 style="margin-top:0px;">PROFORMA INVOICE</h5>
                         <h5 style="margin-top:-15px;">{{ $data->code }}</h5>
                     </td>
                     <td width="33%">

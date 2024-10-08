@@ -209,7 +209,7 @@
 
       codeReader.listVideoInputDevices()
         .then((videoInputDevices) => {
-          const sourceSelect = document.getElementById('sourceSelect')
+          const sourceSelect = document.getElementById('sourceSelect');
           selectedDeviceId = videoInputDevices[0].deviceId;
 
 

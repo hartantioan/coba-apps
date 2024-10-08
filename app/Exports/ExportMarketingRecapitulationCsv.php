@@ -92,7 +92,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 $arr[] = [
                     '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $rowtax . ';0;0;;;;;;;;;;',
                 ];
-                $balanceTax = $balanceTax - floor($row->rowdetail);
+                $balanceTax = $balanceTax - floor($rowdetail->tax);
             }
         }
 

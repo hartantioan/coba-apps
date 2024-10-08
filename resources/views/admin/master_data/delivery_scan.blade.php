@@ -220,7 +220,7 @@
             if (videoInputDevices.length >= 1) {
             videoInputDevices.forEach((element) => {
                 $('#sourceSelect').append(`<option value="${element.deviceId}">${element.label}</option>`);
-            })
+            });
 
             sourceSelect.onchange = () => {
                 selectedDeviceId = sourceSelect.value;

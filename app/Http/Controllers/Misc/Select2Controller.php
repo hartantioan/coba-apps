@@ -3128,8 +3128,10 @@ class Select2Controller extends Controller {
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
         ->whereHas('goodScaleDetail',function($query)use($search){
-            $query->where('vehicle_no','like',"%$search%")
-                ->orWhere('driver','like',"%$search%");
+            $query->whereHas('goodScale',function($query)use($search){
+                $query->where('vehicle_no','like',"%$search%")
+                    ->orWhere('driver','like',"%$search%");
+            });
         })
         ->get();
 

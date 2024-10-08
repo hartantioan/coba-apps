@@ -598,7 +598,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
         })->get();
 
         $tempgiprice = 0;
-        info($totalBefore);
+        info($totalBefore.'-'.$dateloop);
         foreach($goodissue as $row){
             $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
            /*  if($tempgiprice > 0){

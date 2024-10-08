@@ -600,11 +600,11 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
         $tempgiprice = 0;
         foreach($goodissue as $row){
             $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
-            if($tempgiprice > 0){
+           /*  if($tempgiprice > 0){
                 $price = $tempgiprice;
             }else{
                 $tempgiprice = $price;
-            }
+            } */
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
             $total_final = $totalBefore - $total;

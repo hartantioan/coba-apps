@@ -663,6 +663,16 @@ class GoodIssueController extends Controller
                                 ]);
                             }
                         }
+
+                        if($gid->itemStock->productionBatch()->exists()){
+                            ProductionBatchUsage::create([
+                                'production_batch_id'   => $gid->itemStock->productionBatch->id,
+                                'lookable_type'         => $gid->getTable(),
+                                'lookable_id'           => $gid->id,
+                                'qty'                   => $gid->qty,
+                            ]);
+                            CustomHelper::updateProductionBatch($gid->itemStock->productionBatch->id,$gid->qty,'OUT');
+                        }
                     }
 
                     CustomHelper::sendApproval('good_issues',$query->id,$query->note);
@@ -928,6 +938,12 @@ class GoodIssueController extends Controller
                         'usable_type'=> NULL,
                     ]);
                     /* $row->delete(); */
+                    if($row->productionBatchUsage()->exists()){
+                        foreach($row->productionBatchUsage as $rowdetail){
+                            CustomHelper::updateProductionBatch($rowdetail->production_batch_id,$rowdetail->qty,'IN');
+                            $rowdetail->delete();
+                        }
+                    }
                 }
 
                 $query->updateRootDocumentStatusProcess();

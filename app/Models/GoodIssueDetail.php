@@ -183,6 +183,10 @@ class GoodIssueDetail extends Model
         return $this->belongsTo('App\Models\Project', 'project_id', 'id')->withTrashed();
     }
 
+    public function productionBatchUsage(){
+        return $this->hasMany('App\Models\ProductionBatchUsage','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
     public function department()
     {
         return $this->belongsTo('App\Models\Division', 'department_id', 'id')->withTrashed();

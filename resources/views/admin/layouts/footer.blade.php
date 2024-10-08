@@ -26,8 +26,8 @@
     <script src="{{ url('app-assets/js/search.js?v=11') }}"></script>
     <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js?v=147') }}"></script>
-    <script disable-devtool-auto src='{{ url('app-assets/js/custom/disabledevtools.js') }}' disable-menu='false'></script>
-    
+    {{-- <script disable-devtool-auto src='{{ url('app-assets/js/custom/disabledevtools.js') }}' disable-menu='false'></script>
+     --}}
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>
     @if(session('bo_id'))
         <script>
@@ -48,7 +48,7 @@
                     });
                 }
                 async function resetSession() {
-                    
+
                     await triggerClick();
                     fetch('/admin/flush-session', {
                         method: 'POST',
@@ -68,7 +68,7 @@
                     .catch(error => {
                         console.error('An error occurred:', error);
                     });
-                    
+
                     location.reload();
                 }
                 function trackActivity() {

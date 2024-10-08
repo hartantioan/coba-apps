@@ -70,11 +70,11 @@ class LandedCostController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
     }
-    
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
         $data = [
@@ -100,7 +100,7 @@ class LandedCostController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = LandedCost::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -109,7 +109,7 @@ class LandedCostController extends Controller
         $account = NULL;
 
         if($request->id){
-            
+
             $account = User::find($request->id);
 
             $goods_receipt = [];
@@ -120,7 +120,7 @@ class LandedCostController extends Controller
                     $query->whereDoesntHave('landedCostDetail');
                 })->orWhere('status_lc','!=','2');
             })->get();
-            
+
             foreach($datagr as $row){
                 if(!$row->used()->exists()){
                     $goods_receipt[] = [
@@ -137,7 +137,7 @@ class LandedCostController extends Controller
                     ];
                 }
             }
-        
+
             $datalc = LandedCost::where('supplier_id',$request->id)->whereIn('status',['2','3'])->get();
 
             foreach($datalc as $row){
@@ -198,15 +198,15 @@ class LandedCostController extends Controller
                 $data['from_address'] = $data->account->city()->exists() ? $data->account->city->name.' - '.$data->account->subdistrict->name : '';
                 $data['subdistrict_from_id'] = $data->account->subdistrict_id;
                 $data['code'] = $data->code.' - SJ : '.$data->delivery_no;
-            
+
                 if($data->used()->exists()){
                     $data['status'] = '500';
                     $data['message'] = 'Goods Receipt '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
                 }else{
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
-        
+
                     $details = [];
-                    
+
                     foreach($data->goodReceiptDetail as $row){
                         $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
                         $details[] = [
@@ -238,7 +238,7 @@ class LandedCostController extends Controller
                         $data['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;
                         $data['subdistrict_to_id'] = $row->place->subdistrict_id;
                     }
-        
+
                     $data['details'] = $details;
                     $data['fees'] = [];
                 }
@@ -254,13 +254,13 @@ class LandedCostController extends Controller
                 $data['account_name'] = $data->vendor->name;
                 $data['from_address'] = ($data->supplier->city()->exists() ? $data->supplier->city->name : '');
                 $data['subdistrict_from_id'] = $data->supplier->subdistrict_id;
-            
+
                 if($data->used()->exists()){
                     $data['status'] = '500';
                     $data['message'] = 'Landed Cost '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
                 }else{
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
-        
+
                     $details = [];
                     $fees = [];
 
@@ -276,7 +276,7 @@ class LandedCostController extends Controller
                             'grandtotal'        => number_format($row->grandtotal,2,',','.'),
                         ];
                     }
-                    
+
                     foreach($data->landedCostDetail as $row){
                         $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->place->company_id)->where('status','1')->first();
                         $details[] = [
@@ -308,7 +308,7 @@ class LandedCostController extends Controller
                         $data['to_address'] = $row->place->city->name.' - '.$row->place->subdistrict->name;
                         $data['subdistrict_to_id'] = $row->place->subdistrict_id;
                     }
-        
+
                     $data['details'] = $details;
                     $data['fees'] = $fees;
                 }
@@ -326,15 +326,15 @@ class LandedCostController extends Controller
                 $data['to_address'] = $data->inventoryTransferOut->placeTo->city->name.' - '.$data->inventoryTransferOut->placeTo->subdistrict->name;
                 $data['subdistrict_from_id'] = $data->inventoryTransferOut->placeFrom->subdistrict_id;
                 $data['subdistrict_to_id'] = $data->inventoryTransferOut->placeTo->subdistrict_id;
-            
+
                 if($data->used()->exists()){
                     $data['status'] = '500';
                     $data['message'] = 'Landed Cost '.$data->used->lookable->code.' telah dipakai di '.$data->used->ref.', oleh '.$data->used->user->name.'.';
                 }else{
                     CustomHelper::sendUsedData($data->getTable(),$data->id,'Form Landed Cost');
-        
+
                     $details = [];
-                    
+
                     foreach($data->inventoryTransferOut->inventoryTransferOutDetail as $row){
                         $coa = Coa::where('code','500.02.01.13.01')->where('company_id',$row->itemStock->place->company_id)->where('status','1')->first();
                         $details[] = [
@@ -363,7 +363,7 @@ class LandedCostController extends Controller
                             'coa_name'                  => $coa ? $coa->name : '',
                         ];
                     }
-        
+
                     $data['details'] = $details;
                     $data['fees'] = [];
                 }
@@ -407,7 +407,7 @@ class LandedCostController extends Controller
                 $query->where('user_id',session('bo_id'));
             }
         })->count();
-        
+
         $query_data = LandedCost::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -452,7 +452,7 @@ class LandedCostController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -463,7 +463,7 @@ class LandedCostController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -516,7 +516,7 @@ class LandedCostController extends Controller
                 }
 
                 if(!$request->modedata){
-                    
+
                     /*if(session('bo_position_id') == ''){
                         $query->where('user_id',session('bo_id'));
                     }else{
@@ -527,7 +527,7 @@ class LandedCostController extends Controller
                         });
                     }*/
                     $query->where('user_id',session('bo_id'));
-                    
+
                 }
             })
             ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -664,7 +664,7 @@ class LandedCostController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
-                
+
                 $total = str_replace(',','.',str_replace('.','',$request->total));
                 $tax = str_replace(',','.',str_replace('.','',$request->tax));
                 $wtax = str_replace(',','.',str_replace('.','',$request->wtax));
@@ -678,7 +678,7 @@ class LandedCostController extends Controller
                 }
 
                 if($request->temp){
-                    
+
                     $query = LandedCost::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     if($query->hasChildDocument()){
@@ -745,7 +745,7 @@ class LandedCostController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=LandedCost::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = LandedCost::create([
                         'code'			            => $newCode,
                         'user_id'		            => session('bo_id'),
@@ -765,9 +765,9 @@ class LandedCostController extends Controller
                         'status'                    => '1'
                     ]);
                 }
-                
+
                 if($query) {
-                    
+
                     if($request->arr_item){
                         foreach($request->arr_item as $key => $row){
                             $item = Item::find(intval($row));
@@ -805,7 +805,7 @@ class LandedCostController extends Controller
                                 ]);
                             }
                         }
-                            
+
                     }
 
                     CustomHelper::sendApproval('landed_costs',$query->id,$query->note);
@@ -833,7 +833,7 @@ class LandedCostController extends Controller
         }catch(\Exception $e){
             DB::rollback();
         }
-		
+
 		return response()->json($response);
     }
 
@@ -894,14 +894,14 @@ class LandedCostController extends Controller
                     <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalqty, 3, ',', '.') . '</td>
                     <td class="right-align" style="font-weight: bold; font-size: 16px;"></td>
                     <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalnominal, 2, ',', '.') . '</td>
-                </tr>  
+                </tr>
             ';
         }else{
             $string .= '<tr>
                 <td class="center-align" colspan="12">Data item tidak ditemukan.</td>
             </tr>';
         }
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;max-width:100%;">
@@ -945,7 +945,7 @@ class LandedCostController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -953,7 +953,7 @@ class LandedCostController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -965,7 +965,7 @@ class LandedCostController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -988,14 +988,14 @@ class LandedCostController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $lc = LandedCost::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($lc){
             $data = [
                 'title'     => 'Print Landed Cost',
@@ -1010,12 +1010,12 @@ class LandedCostController extends Controller
 
     public function show(Request $request){
         $lc = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
-        if(!CustomHelper::checkLockAcc($lc->post_date)){
-            return response()->json([
-                'status'  => 500,
-                'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-            ]);
-        }
+        // if(!CustomHelper::checkLockAcc($lc->post_date)){
+        //     return response()->json([
+        //         'status'  => 500,
+        //         'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+        //     ]);
+        // }
         $lc['code_place_id'] = substr($lc->code,7,2);
         $lc['supplier_name'] = $lc->supplier()->exists() ? $lc->supplier->name : '';
         $lc['account_name'] = $lc->vendor()->exists() ? $lc->vendor->name : '';
@@ -1076,13 +1076,13 @@ class LandedCostController extends Controller
 
         $lc['details'] = $arr;
         $lc['fees'] = $fees;
-        				
+
 		return response()->json($lc);
     }
 
     public function voidStatus(Request $request){
         $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -1112,13 +1112,13 @@ class LandedCostController extends Controller
 
                 CustomHelper::removeJournal('landed_costs',$query->id);
                 CustomHelper::removeCogs('landed_costs',$query->id);
-    
+
                 activity()
                     ->performedOn(new LandedCost())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the landed cost data');
-    
+
                 CustomHelper::sendNotification('landed_costs',$query->id,'Landed Cost No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('landed_costs',$query->id);
                 CustomHelper::removeJournal('landed_costs',$query->id);
@@ -1171,18 +1171,18 @@ class LandedCostController extends Controller
                 'message' => 'Jurnal sudah dalam progres, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             CustomHelper::removeApproval('landed_costs',$query->id);
-            
+
             foreach($query->landedCostDetail as $rowdetail){
                 ItemCogs::where('lookable_type','landed_costs')->where('lookable_id',$query->id)->delete();
                 ResetCogs::dispatch($query->post_date,$rowdetail->place_id,$rowdetail->item_id);
             }
 
             $query->landedCostDetail()->delete();
-            
+
             CustomHelper::removeJournal('landed_costs',$query->id);
 
             activity()
@@ -1246,7 +1246,7 @@ class LandedCostController extends Controller
             })
             ->get()
 		];
-		
+
 		return view('admin.print.purchase.landed_cost', $data);
     }
 
@@ -1256,7 +1256,7 @@ class LandedCostController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -1268,9 +1268,9 @@ class LandedCostController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key =>$row){
                 $pr = LandedCost::where('code',$row)->first();
-                
+
                 if($pr){
-                    
+
                     $pdf = PrintHelper::print($pr,'Landed Cost','a4','portrait','admin.print.purchase.landed_cost_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
                     $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
@@ -1279,7 +1279,7 @@ class LandedCostController extends Controller
                     $content = $pdf->download()->getOriginalContent();
                     $temp_pdf[]=$content;
                 }
-                    
+
             }
             $merger = new Merger();
             foreach ($temp_pdf as $pdfContent) {
@@ -1297,8 +1297,8 @@ class LandedCostController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -1326,7 +1326,7 @@ class LandedCostController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1334,30 +1334,30 @@ class LandedCostController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = LandedCost::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Landed Cost','a4','portrait','admin.print.purchase.landed_cost_individual');
                             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
-                            
+
                             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $query->printCounter()->count(), $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
                             $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1370,21 +1370,21 @@ class LandedCostController extends Controller
 
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1393,7 +1393,7 @@ class LandedCostController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1414,20 +1414,20 @@ class LandedCostController extends Controller
                             $pdf->getCanvas()->page_text(422, 810, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
-    
+
+
                     $result = $merger->merge();
-    
-    
+
+
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1440,25 +1440,25 @@ class LandedCostController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = LandedCost::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Landed Cost','a4','portrait','admin.print.purchase.landed_cost_individual',$menuUser->mode);
-    
+
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $pr->printCounter()->count(), $font, 10, array(0,0,0));
             $pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
-            
+
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-    
-    
+
+
             return $document_po;
         }else{
             abort(404);
@@ -1469,7 +1469,7 @@ class LandedCostController extends Controller
         $post_date = $request->start_date? $request->start_date : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $mode = $request->mode ? $request->mode : '';
-		
+
 		return Excel::download(new ExportLandedCost($post_date,$end_date,$mode), 'landed_cost'.uniqid().'.xlsx');
     }
 
@@ -1483,7 +1483,7 @@ class LandedCostController extends Controller
 		$modedata = $request->modedata ? $request->modedata : '';
 		return Excel::download(new ExportLandedCostTransactionPage($search,$post_date,$end_date,$currency,$supplier,$status,$modedata), 'landed_cost_'.uniqid().'.xlsx');
     }
-    
+
     public function removeUsedData(Request $request){
         CustomHelper::removeUsedData($request->type,$request->id);
         return response()->json([
@@ -1516,27 +1516,27 @@ class LandedCostController extends Controller
                 'url'=>request()->root()."/admin/purchase/landed_cost?code=".CustomHelper::encrypt($query->code),
             ];
             $data_go_chart[]=$lc;
-            
+
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_lc',$query->id);
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;          
+            $data_link = $array2;
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
@@ -1615,12 +1615,12 @@ class LandedCostController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
-            $response["tbody"] = $string; 
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -1640,13 +1640,13 @@ class LandedCostController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new LandedCost())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Landed Cost data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1663,7 +1663,7 @@ class LandedCostController extends Controller
     }
     public function cancelStatus(Request $request){
         $query = LandedCost::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($request->cancel_date)){
@@ -1684,7 +1684,7 @@ class LandedCostController extends Controller
                     'message' => 'Data telah digunakan pada A/P Invoice.'
                 ];
             }else{
-                
+
                 CustomHelper::removeApproval($query->getTable(),$query->id);
 
                 $query->update([
@@ -1701,15 +1701,15 @@ class LandedCostController extends Controller
                 ]);
 
                 CustomHelper::cancelJournal($cd,$request->cancel_date);
-    
+
                 activity()
                     ->performedOn(new LandedCost())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void cancel the Landed cost data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Landed Cost No. '.$query->code.' telah ditutup dengan tombol cancel void.','Landed Cost No. '.$query->code.' telah ditutup dengan tombol cancel void.',$query->user_id);
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data closed successfully.'

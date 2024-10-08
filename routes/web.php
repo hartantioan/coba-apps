@@ -111,6 +111,7 @@ use App\Http\Controllers\MasterData\DiscountCustomerController;
 use App\Http\Controllers\MasterData\DeliveryCostStandardController;
 use App\Http\Controllers\MasterData\BottomPriceController;
 use App\Http\Controllers\MasterData\PalletController;
+use App\Http\Controllers\MasterData\DeliveryScanController;
 use App\Http\Controllers\MasterData\TransportationController;
 use App\Http\Controllers\MasterData\OutletController;
 use App\Http\Controllers\MasterData\OutletPriceController;
@@ -786,6 +787,8 @@ Route::prefix('admin')->group(function () {
                         Route::post('destroy', [PalletController::class, 'destroy'])->middleware('operation.access:packing,delete');
                     });
 
+
+
                     Route::prefix('item_group')->middleware('operation.access:item_group,view')->group(function () {
                         Route::get('/', [ItemGroupController::class, 'index']);
                         Route::get('datatable', [ItemGroupController::class, 'datatable']);
@@ -1359,6 +1362,17 @@ Route::prefix('admin')->group(function () {
                         Route::post('show', [TransportationController::class, 'show']);
                         Route::post('create', [TransportationController::class, 'create'])->middleware('operation.access:transportation,update');
                         Route::post('destroy', [TransportationController::class, 'destroy'])->middleware('operation.access:transportation,delete');
+                    });
+
+                    Route::prefix('delivery_scan')->middleware('operation.access:delivery_scan,view')->group(function () {
+                        Route::get('/', [DeliveryScanController::class, 'index']);
+                        Route::get('datatable', [DeliveryScanController::class, 'datatable']);
+                        Route::post('show', [DeliveryScanController::class, 'show']);
+                        Route::post('show_from_barcode', [DeliveryScanController::class, 'showFromBarcode']);
+                        Route::post('print', [DeliveryScanController::class, 'print']);
+                        Route::get('export', [DeliveryScanController::class, 'export']);
+                        Route::post('create', [DeliveryScanController::class, 'create'])->middleware('operation.access:delivery_scan,update');
+                        Route::post('destroy', [DeliveryScanController::class, 'destroy'])->middleware('operation.access:delivery_scan,delete');
                     });
 
 

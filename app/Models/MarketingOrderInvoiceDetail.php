@@ -84,7 +84,17 @@ class MarketingOrderInvoiceDetail extends Model
         $tax = $this->marketingOrderInvoice->tax;
         $bobot = $this->total / $this->marketingOrderInvoice->total;
         $rowtax = round($tax * $bobot,2);
-        return $rowtax;
+        $stringtax = strval($rowtax);
+        $arr = explode('.',$stringtax);
+        if(count($arr) > 1){
+            if(intval($arr[1]) >= 50){
+                return round($rowtax);
+            }else{
+                return floor($rowtax);
+            }
+        }else{
+            return floor($rowtax);
+        }
     }
 
     public function arrBalanceMemo(){

@@ -80,6 +80,13 @@ class MarketingOrderInvoiceDetail extends Model
         return $price;
     }
 
+    public function proportionalTaxFromHeader(){
+        $tax = $this->marketingOrderInvoice->tax;
+        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        $rowtax = round($tax * $bobot,2);
+        return $rowtax;
+    }
+
     public function arrBalanceMemo(){
         $total = round($this->total,2);
         $tax = round($this->tax,2);

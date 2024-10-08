@@ -283,7 +283,13 @@ class FundRequest extends Model
                 })->get() as $row){
                     $total += $row->totalOutgoingUsedWeight() + $row->totalIncomingUsedWeight();
                 }
-                foreach($this->personalCloseBillDetail as $row){
+                foreach($this->personalCloseBillDetail()->whereHas('personalCloseBill',function($query){
+                    $query->whereHas('closeBillDetail',function($query){
+                        $query->whereHas('closeBill',function($query){
+                            $query->whereIn('status',['2','3']);
+                        });
+                    });
+                })->get() as $row){
                     $total += $row->nominal;
                 }
             }else{

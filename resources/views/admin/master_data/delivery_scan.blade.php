@@ -17,7 +17,7 @@
                             <div class="card-content row" style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
 
                                 <div style="text-align: center;">
-                                    <video id="video" width="300" height="200" style="border: 1px solid gray;"></video>
+                                    <video id="video" width="100%" height="auto" style="border: 1px solid gray;"></video>
                                 </div>
 
                                 <div id="sourceSelectPanel" style="display:none">

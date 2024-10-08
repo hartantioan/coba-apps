@@ -434,77 +434,90 @@
 
     function save(){
 
-        var formData = new FormData($('#form_data')[0]);
+        swal({
+            title: "Apakah anda yakin ingin simpan?",
+            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                var formData = new FormData($('#form_data')[0]);
 
-        $.ajax({
-            url: '{{ Request::url() }}/create',
-            type: 'POST',
-            dataType: 'JSON',
-            data: formData,
-            contentType: false,
-            processData: false,
-            cache: true,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            beforeSend: function() {
-                $('#validation_alert').hide();
-                $('#validation_alert').html('');
-                loadingOpen('.modal-content');
-            },
-            success: function(response) {
-                $('input').css('border', 'none');
-                $('input').css('border-bottom', '0.5px solid black');
-                loadingClose('.modal-content');
-                if(response.status == 200) {
+                $.ajax({
+                    url: '{{ Request::url() }}/create',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    cache: true,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        $('#validation_alert').hide();
+                        $('#validation_alert').html('');
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        $('input').css('border', 'none');
+                        $('input').css('border-bottom', '0.5px solid black');
+                        loadingClose('.modal-content');
+                        if(response.status == 200) {
 
-                    $('#form_data')[0].reset();
-                    $('#table_body').empty();
-                    $('#status_document').empty().text('Status: ');
-                    M.toast({
-                        html: response.message
-                    });
-                } else if(response.status == 422) {
-                    $('#validation_alert').show();
-                    $('.modal-content').scrollTop(0);
-                    $.each(response.error, function(field, errorMessage) {
-                        $('#' + field).addClass('error-input');
-                        $('#' + field).css('border', '1px solid red');
+                            $('#form_data')[0].reset();
+                            $('#table_body').empty();
+                            $('#status_document').empty().text('Status: ');
+                            M.toast({
+                                html: response.message
+                            });
+                        } else if(response.status == 422) {
+                            $('#validation_alert').show();
+                            $('.modal-content').scrollTop(0);
+                            $.each(response.error, function(field, errorMessage) {
+                                $('#' + field).addClass('error-input');
+                                $('#' + field).css('border', '1px solid red');
 
-                    });
-                    swal({
-                        title: 'Ups! Validation',
-                        text: 'Check your form.',
-                        icon: 'warning'
-                    });
+                            });
+                            swal({
+                                title: 'Ups! Validation',
+                                text: 'Check your form.',
+                                icon: 'warning'
+                            });
 
-                    $.each(response.error, function(i, val) {
-                        $.each(val, function(i, val) {
-                            $('#validation_alert').append(`
-                                <div class="card-alert card red">
-                                    <div class="card-content white-text">
-                                        <p>` + val + `</p>
-                                    </div>
-                                    <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">×</span>
-                                    </button>
-                                </div>
-                            `);
+                            $.each(response.error, function(i, val) {
+                                $.each(val, function(i, val) {
+                                    $('#validation_alert').append(`
+                                        <div class="card-alert card red">
+                                            <div class="card-content white-text">
+                                                <p>` + val + `</p>
+                                            </div>
+                                            <button type="button" class="close white-text" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
+                                    `);
+                                });
+                            });
+                        } else {
+                            M.toast({
+                                html: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
                         });
-                    });
-                } else {
-                    M.toast({
-                        html: response.message
-                    });
-                }
-            },
-            error: function() {
-                $('.modal-content').scrollTop(0);
-                loadingClose('.modal-content');
-                swal({
-                    title: 'Ups!',
-                    text: 'Check your internet connection.',
-                    icon: 'error'
+                    }
                 });
             }
         });

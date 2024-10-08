@@ -210,7 +210,7 @@
       codeReader.listVideoInputDevices()
         .then((videoInputDevices) => {
           const sourceSelect = document.getElementById('sourceSelect')
-          selectedDeviceId = videoInputDevices[0].deviceId
+          selectedDeviceId = videoInputDevices[0].deviceId;
 
 
           document.getElementById('startButton').addEventListener('click', () => {

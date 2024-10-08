@@ -3127,13 +3127,16 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
-        ->whereHas('goodScaleDetail')
+        ->whereHas('goodScaleDetail',function($query)use($search){
+            $query->where('vehicle_no','like',"%$search%")
+                ->orWhere('driver','like',"%$search%");
+        })
         ->get();
 
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
-                'text' 			=> $d->code,
+                'text' 			=> $d->code.' - '.($d->goodScaleDetail()->exists() ? $d->goodScaleDetail->goodScale->vehicle_no.' - '.$d->goodScaleDetail->goodScale->driver : ''),
                 'vehicle_no'    => $d->goodScaleDetail()->exists() ? $d->goodScaleDetail->goodScale->vehicle_no : '',
                 'vehicle_name'  => $d->transportation()->exists() ? $d->transportation->name : '',
             ];

@@ -868,10 +868,10 @@ class GoodScaleController extends Controller
                 }
     
                 if($overtolerance){
-                    return response()->json([
+                    /* return response()->json([
                         'status'  => 500,
                         'message' => 'Prosentase qty diterima melebihi prosentase toleransi yang telah diatur.'
-                    ]);
+                    ]); */
                 }
 
                 $qty_qc = 0;

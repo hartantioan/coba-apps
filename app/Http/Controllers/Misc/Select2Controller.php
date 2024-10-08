@@ -3120,6 +3120,12 @@ class Select2Controller extends Controller {
                 ->orWhereHas('account',function($query) use ($search){
                     $query->where('name','like',"%$search%")
                         ->orWhere('employee_no','like',"%$search%");
+                })
+                ->orWhereHas('goodScaleDetail',function($query)use($search){
+                    $query->whereHas('goodScale',function($query)use($search){
+                        $query->where('vehicle_no','like',"%$search%")
+                            ->orWhere('driver','like',"%$search%");
+                    });
                 });
         })
         ->whereDoesntHave('used')
@@ -3127,12 +3133,7 @@ class Select2Controller extends Controller {
         ->whereIn('status',['2','3'])
         ->whereNotNull('send_status')
         ->whereDoesntHave('marketingOrderDeliveryProcess')
-        ->whereHas('goodScaleDetail',function($query)use($search){
-            $query->whereHas('goodScale',function($query)use($search){
-                /* $query->where('vehicle_no','like',"%$search%")
-                    ->orWhere('driver','like',"%$search%"); */
-            });
-        })
+        ->whereHas('goodScaleDetail')
         ->get();
 
         foreach($data as $d) {

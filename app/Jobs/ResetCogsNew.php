@@ -448,10 +448,13 @@ class ResetCogsNew implements ShouldQueue
             }
             foreach($row->journalDetail as $rowjournal){
                 $rowjournal->update([
-                    'nominal_fc'  => $row->total,
-                    'nominal'     => $row->total,
+                    'nominal_fc'  => $total,
+                    'nominal'     => $total,
                 ]);
             }
+            $row->update([
+                'total' => $total,
+            ]);
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;
         }

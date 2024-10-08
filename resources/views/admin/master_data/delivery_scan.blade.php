@@ -222,9 +222,9 @@
               if (err && !(err instanceof ZXing.NotFoundException)) {
 
               }
-            })
+            });
 
-          })
+          });
 
           document.getElementById('resetButton').addEventListener('click', () => {
             codeReader.reset();

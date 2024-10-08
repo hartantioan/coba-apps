@@ -20,6 +20,12 @@
                                     <video id="video" width="300" height="200" style="border: 1px solid gray;"></video>
                                 </div>
 
+                                <div id="sourceSelectPanel" style="display:none">
+                                    <label for="sourceSelect">Change video source:</label>
+                                    <select id="sourceSelect" style="max-width:400px" class="browser-default">
+                                    </select>
+                                </div>
+
                                 <div style="margin-top: 10px; text-align: center;">
                                     <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" id="startButton">Start</a>
                                     <a class="btn btn-small waves-effect waves-light breadcrumbs-btn" id="resetButton">Reset</a>
@@ -204,31 +210,42 @@
 <script>
 
     window.addEventListener('load', function () {
-      let selectedDeviceId;
-      const codeReader = new ZXing.BrowserMultiFormatReader();
+        let selectedDeviceId;
+        const codeReader = new ZXing.BrowserMultiFormatReader();
 
-      codeReader.listVideoInputDevices()
+        codeReader.listVideoInputDevices()
         .then((videoInputDevices) => {
-          const sourceSelect = document.getElementById('sourceSelect');
-          selectedDeviceId = videoInputDevices[0].deviceId;
+            const sourceSelect = document.getElementById('sourceSelect');
+            selectedDeviceId = videoInputDevices[0].deviceId;
+            if (videoInputDevices.length >= 1) {
+            videoInputDevices.forEach((element) => {
+                $('#sourceSelect').append(`<option value="${element.deviceId}">${element.label}</option>`);
+            })
 
+            sourceSelect.onchange = () => {
+                selectedDeviceId = sourceSelect.value;
+            };
 
-          document.getElementById('startButton').addEventListener('click', () => {
+            const sourceSelectPanel = document.getElementById('sourceSelectPanel');
+            sourceSelectPanel.style.display = 'block';
+            }
+
+            document.getElementById('startButton').addEventListener('click', () => {
             codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
-              if (result) {
+                if (result) {
                 document.getElementById('barcode-input').value = result.text;
                 submitBarcode();
-              }
-              if (err && !(err instanceof ZXing.NotFoundException)) {
+                }
+                if (err && !(err instanceof ZXing.NotFoundException)) {
 
-              }
+                }
             });
 
-          });
+            });
 
-          document.getElementById('resetButton').addEventListener('click', () => {
+            document.getElementById('resetButton').addEventListener('click', () => {
             codeReader.reset();
-          });
+            });
 
         })
         .catch((err) => {

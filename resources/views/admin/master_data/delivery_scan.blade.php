@@ -206,7 +206,7 @@
 window.addEventListener('load', function () {
       let selectedDeviceId;
       const codeReader = new ZXing.BrowserMultiFormatReader()
-      console.log('ZXing code reader initialized')
+
       codeReader.listVideoInputDevices()
         .then((videoInputDevices) => {
           const sourceSelect = document.getElementById('sourceSelect')
@@ -220,20 +220,19 @@ window.addEventListener('load', function () {
                 submitBarcode();
               }
               if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.log(err)
+
               }
             })
-            console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+
           })
 
           document.getElementById('resetButton').addEventListener('click', () => {
             codeReader.reset()
-            console.log('Reset.')
           })
 
         })
         .catch((err) => {
-          console.error(err)
+
         })
     })
 

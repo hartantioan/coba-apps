@@ -8,6 +8,7 @@ use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessTrack;
 use Illuminate\Http\Request;
 
+use App\Helpers\CustomHelper;
 class DeliveryScanController extends Controller
 {
     public function index()
@@ -37,7 +38,7 @@ class DeliveryScanController extends Controller
                 $detail[] = [
                     'item_code'=> $value->itemStock->item->code,
                     'item_name'=> $value->itemStock->item->name,
-                    'qty_jual'=> $value->qty,
+                    'qty_jual'=>CustomHelper::formatConditionalQty($value->qty),
                     'satuan'=> $value->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                 ];
 
@@ -84,7 +85,7 @@ class DeliveryScanController extends Controller
                 ];
                 return response()->json($response);
             }
-            
+
             if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
                 $response = [
                     'status'  => 500,
@@ -124,7 +125,7 @@ class DeliveryScanController extends Controller
                     'status'  => 500,
                     'message' => 'Status Dokumen Harus Dalam status Proses'
                 ];
-                
+
             }
         }else{
             $response = [

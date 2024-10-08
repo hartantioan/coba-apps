@@ -203,9 +203,9 @@
 <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
 <script>
 
-window.addEventListener('load', function () {
+    window.addEventListener('load', function () {
       let selectedDeviceId;
-      const codeReader = new ZXing.BrowserMultiFormatReader()
+      const codeReader = new ZXing.BrowserMultiFormatReader();
 
       codeReader.listVideoInputDevices()
         .then((videoInputDevices) => {
@@ -227,14 +227,14 @@ window.addEventListener('load', function () {
           })
 
           document.getElementById('resetButton').addEventListener('click', () => {
-            codeReader.reset()
-          })
+            codeReader.reset();
+          });
 
         })
         .catch((err) => {
 
-        })
-    })
+        });
+    });
 
     $(function() {
 

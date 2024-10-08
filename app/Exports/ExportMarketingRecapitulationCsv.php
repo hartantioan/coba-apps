@@ -88,11 +88,11 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
             }
             $balanceTax = $row->tax;
             foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_process_details')->get() as $rowdetail) {
-                $rowtax = $balanceTax - floor($row->tax) >= 0 ? $balanceTax : floor($row->tax);
+                $rowtax = $balanceTax - floor($rowdetail->tax) >= 0 ? $balanceTax : floor($rowdetail->tax);
                 $arr[] = [
                     '1'     => 'OF;' . $rowdetail->lookable->itemStock->item->code . ';' . $rowdetail->lookable->itemStock->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $rowtax . ';0;0;;;;;;;;;;',
                 ];
-                $balanceTax = $balanceTax - floor($row->tax);
+                $balanceTax = $balanceTax - floor($row->rowdetail);
             }
         }
 

@@ -86,6 +86,7 @@
     <thead>
         <tr>
             <th>{{ __('translations.item') }}</th>
+            <th>Group</th>
             <th>Gudang</th>
             <th>Created</th>
             <th>IR Code</th>
@@ -146,6 +147,7 @@
                             <tr>
                                 
                                     <td>{{ $row['item'] }}</td>
+                                    <td>{{ $row['group'] }}</td>
                                     <td>{{ $row['warehouse'] }}</td>
                                     <td>{{ $row['user'] }}</td>
                                     <td>{{ $row['ir_code'] }}</td>

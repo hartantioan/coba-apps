@@ -83,6 +83,7 @@ class PurchaseProgressController extends Controller
                 $array_item_req = [
                     'item'         => $row_item_request_detail->item->name,
                     'item_code'    => $row_item_request_detail->item->code,
+                    'group'        => $row_item_request_detail->item->itemGroup->name,
                     'ir_code'      => $row_item_request->code,
                     'user'         => $row_item_request->user->name ?? '-',
                     'ir_date'      => $row_item_request->post_date,
@@ -341,6 +342,7 @@ class PurchaseProgressController extends Controller
         $tableHtml .= '<thead>';
         $tableHtml .= '<tr>';
         $tableHtml .= '<th>Item</th>';
+        $tableHtml .= '<th>Group</th>';
         $tableHtml .= '<th>Gudang</th>';
         $tableHtml .= '<th>Dibuat Oleh</th>';
         $tableHtml .= '<th>IR Code</th>';
@@ -410,6 +412,7 @@ class PurchaseProgressController extends Controller
                         if($masuk == 1){
                             if ($prIndex === 0 && $poIndex === 0 && $grpoIndex === 0) {
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['item'] . '</td>';
+                                $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['group'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['warehouse'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['user'] . '</td>';
                                 $tableHtml .= '<td rowspan="' . $row['rowspan'] . '">' . $row['ir_code'] . '</td>';

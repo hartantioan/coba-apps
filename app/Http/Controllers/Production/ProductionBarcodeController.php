@@ -391,6 +391,23 @@ class ProductionBarcodeController extends Controller
                     'error'  => $validation->errors()
                 ];
             } else {
+
+                $passedQty = true;
+
+                if($request->arr_qty_uom){
+                    foreach($request->arr_qty_uom as $row){
+                        if(str_replace(',','.',str_replace('.','',$row)) <= 0){
+                            $passedQty = false;
+                        }
+                    }
+                }
+
+                if(!$passedQty){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Qty tidak boleh 0.'
+                    ]);
+                }
                 
                 $pod = ProductionOrderDetail::find($request->production_order_detail_id);
 

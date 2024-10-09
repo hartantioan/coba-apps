@@ -1554,7 +1554,7 @@ class MarketingOrderController extends Controller
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
 
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'marketing_order_detail2'.uniqid().'.xlsx');
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail2($search,$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'report_sales_'.uniqid().'.xlsx');
     }
 
 }

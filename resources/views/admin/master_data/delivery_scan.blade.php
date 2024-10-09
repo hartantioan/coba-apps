@@ -100,6 +100,10 @@
                                                         <label class="active" for="code">No. Dokumen</label>
                                                     </div>
                                                     <div class="input-field col s12">
+                                                        <input id="shipping_type" name="shipping_type" type="text" placeholder="Tipe Pengiriman">
+                                                        <label class="active" for="shipping_type">Tipe Pengiriman</label>
+                                                    </div>
+                                                    <div class="input-field col s12">
                                                         <input id="no_pol" name="no_pol" type="text" placeholder="No Pol">
                                                         <label class="active" for="no_pol">No. Pol</label>
                                                     </div>
@@ -337,6 +341,8 @@
                             $('#status_document').text('Status: ').append(status);
                             $('#code').val(response.mop['code']);
                             $('#no_pol').val(response.mop['vehicle_no']);
+
+                            $('#shipping_type').val(response.shipping_type);
                             $('#driver').val(response.mop['driver_name']);
                             $('#type').val(response.mop['vehicle_name']);
                             $('#table_body').empty();
@@ -493,12 +499,14 @@
                 if(response.status == 200) {
 
                     if(response.mop){
+                        console.log(response);
                         $('#table_body').empty();
                         var status = response.status_s;
                         $('#temp').val(response.id);
                         $('#status_document').text('Status: ').append(status);
                         $('#code').val(response.mop['code']);
                         $('#no_pol').val(response.mop['vehicle_no']);
+                        $('#shipping_type').val(response.shipping_type);
                         $('#driver').val(response.mop['driver_name']);
                         $('#type').val(response.mop['vehicle_name']);
 

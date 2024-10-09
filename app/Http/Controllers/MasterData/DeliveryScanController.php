@@ -130,6 +130,7 @@ class DeliveryScanController extends Controller
                 'mop'       => $mop ,
                 'status_s'  => $status,
                 'detail'    => $detail,
+                'shipping_type'        => $mop->marketingOrderDelivery->deliveryType(),
                 'id'        => $mop->id,
                 'message'   => 'Data successfully Fetch.',
             ];

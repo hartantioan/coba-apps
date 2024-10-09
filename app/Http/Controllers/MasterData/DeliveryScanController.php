@@ -9,6 +9,8 @@ use App\Models\MarketingOrderDeliveryProcessTrack;
 use Illuminate\Http\Request;
 
 use App\Helpers\CustomHelper;
+use Carbon\Carbon;
+
 class DeliveryScanController extends Controller
 {
     public function index()
@@ -26,6 +28,75 @@ class DeliveryScanController extends Controller
         $country = MarketingOrderDeliveryProcess::where('code', $barcode)->first();
 
 		return response()->json($country);
+    }
+
+    public function datatable(Request $request){
+        $column = [
+            'id',
+            'code',
+            'created_at',
+        ];
+
+        $start  = $request->start;
+        $length = $request->length;
+        $order  = $column[$request->input('order.0.column')];
+        $dir    = $request->input('order.0.dir');
+        $search = $request->input('search.value');
+
+        $total_data = DeliveryScan::count();
+
+        $query_data = DeliveryScan::where(function($query) use ($search, $request) {
+
+            if($search) {
+                $query->whereHas('lookable', function($query) use ($search) {
+                    $query->where('code', 'like', "%$search%");
+                });
+            }
+
+        })
+        ->whereDate('created_at', '>=', Carbon::now()->subDays(2))
+        ->whereDate('created_at', '<=', Carbon::now())
+        ->offset($start)
+        ->limit($length)
+        ->orderBy($order, $dir)
+        ->get();
+
+        $total_filtered = DeliveryScan::where(function($query) use ($search, $request) {
+            if($search) {
+                $query->whereHas('lookable', function($query) use ($search) {
+                    $query->where('code', 'like', "%$search%");
+                });
+            }
+        })
+        ->whereDate('created_at', '>=', Carbon::now()->subDays(2))
+        ->whereDate('created_at', '<=', Carbon::now())
+        ->count();
+
+        $response['data'] = [];
+        if($query_data <> FALSE) {
+            $nomor = $start + 1;
+            foreach($query_data as $val) {
+                $response['data'][] = [
+                    $nomor,
+                    $val->lookable->code,
+                    date('d/m/Y H:i:s', strtotime($val->created_at)),
+                ];
+
+                $nomor++;
+            }
+        }
+
+        $response['recordsTotal'] = 0;
+        if($total_data <> FALSE) {
+            $response['recordsTotal'] = $total_data;
+        }
+
+        $response['recordsFiltered'] = 0;
+        if($total_filtered <> FALSE) {
+            $response['recordsFiltered'] = $total_filtered;
+        }
+
+        return response()->json($response);
     }
 
     public function showFromBarcode(Request $request){

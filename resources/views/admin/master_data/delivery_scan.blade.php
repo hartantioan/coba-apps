@@ -135,9 +135,37 @@
                                             </form>
                                         </div>
                                     </div>
+                                    <div class="row mt-5">
+                                        <div class="col s12 m12">
+                                            <div class="card-alert card gradient-45deg-purple-amber">
+                                                <div class="card-content white-text">
+                                                    <p>Info : SJ yang ditampilkan hanya SJ yang telah di scan 2 hari kebelakang.</p>
+                                                </div>
+                                            </div>
+                                            <div class="col s12">
+                                                <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
+                                                    <i class="material-icons hide-on-med-and-up">refresh</i>
+                                                    <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
+                                                    <i class="material-icons right">refresh</i>
+                                                </a>
+
+                                                <table id="datatable_serverside" >
+                                                    <thead>
+                                                        <tr>
+                                                            <th>#</th>
+                                                            <th>Kode</th>
+                                                            <th>Tanggal Di Scan</th>
+                                                        </tr>
+                                                    </thead>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -250,7 +278,7 @@
     });
 
     $(function() {
-
+        loadDataTable();
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
@@ -358,6 +386,84 @@
             });
 
     });
+
+    function loadDataTable() {
+		window.table = $('#datatable_serverside').DataTable({
+            "scrollCollapse": true,
+            "scrollY": '400px',
+            "responsive": false,
+            "scrollX": true,
+            "stateSave": true,
+            "serverSide": true,
+            "deferRender": true,
+            "destroy": true,
+            "iDisplayInLength": 10,
+            "fixedColumns": {
+                left: 2,
+                right: 1
+            },
+            "order": [[0, 'desc']],
+            ajax: {
+                url: '{{ Request::url() }}/datatable',
+                type: 'GET',
+                data: {
+                    'status' : $('#filter_status').val(),
+                    start_date : $('#start_date').val(),
+                    finish_date : $('#finish_date').val(),
+                },
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                complete: function() {
+                    loadingClose('#datatable_serverside');
+                },
+                error: function() {
+                    loadingClose('#datatable_serverside');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            },
+            columns: [
+                { name: 'id', searchable: false, className: 'center-align details-control' },
+                { name: 'code', className: 'center-align' },
+                { name: 'user_id', className: 'center-align' },
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                'columnsToggle',
+                'selectNone'
+            ],
+            "language": {
+                "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                "zeroRecords": "Data tidak ditemukan / kosong",
+                "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                "infoEmpty": "Data tidak ditemukan / kosong",
+                "infoFiltered": "(disaring dari _MAX_ total data)",
+                "search": "Cari",
+                "paginate": {
+                    first:      "<<",
+                    previous:   "<",
+                    next:       ">",
+                    last:       ">>"
+                },
+                "buttons": {
+                    selectAll: "Pilih semua",
+                    selectNone: "Hapus pilihan"
+                },
+                "select": {
+                    rows: "%d baris terpilih"
+                }
+            },
+            select: {
+                style: 'multi'
+            },
+        });
+        $('.dt-buttons').appendTo('#datatable_buttons');
+        $('select[name="datatable_serverside_length"]').addClass('browser-default');
+	}
 
     function submitBarcode() {
         var formData = new FormData($('#barcode-form')[0]);
@@ -468,7 +574,7 @@
                         $('input').css('border-bottom', '0.5px solid black');
                         loadingClose('.modal-content');
                         if(response.status == 200) {
-
+                            loadDataTable();
                             $('#form_data')[0].reset();
                             $('#table_body').empty();
                             $('#status_document').empty().text('Status: ');

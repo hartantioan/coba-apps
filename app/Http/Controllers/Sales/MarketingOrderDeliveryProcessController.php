@@ -57,12 +57,12 @@ class MarketingOrderDeliveryProcessController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         /* MarketingOrderDeliveryProcess::find(1)->createInvoice(); */
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'Surat Jalan',
@@ -82,7 +82,7 @@ class MarketingOrderDeliveryProcessController extends Controller
     public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderDeliveryProcess::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
@@ -94,7 +94,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             ->where('place_id',$request->place)
             ->where('item_id',$request->item)
             ->first();
-            
+
             if($data){
                 $qtyStock = round($data->qty / $request->conversion,3);
                 $qtyNeeded = 1;
@@ -127,7 +127,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'status'  => 500,
                 'message' => 'Kode tidak boleh kosong.'
             ];
-        }        				
+        }
 		return response()->json($response);
     }
 
@@ -159,7 +159,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $search = $request->input('search.value');
 
         $total_data = MarketingOrderDeliveryProcess::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = MarketingOrderDeliveryProcess::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -210,7 +210,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($request->marketing_order_delivery_id){
                     $query->whereIn('marketing_order_delivery_id',$request->marketing_order_delivery_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -272,7 +272,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($request->marketing_order_delivery_id){
                     $query->whereIn('marketing_order_delivery_id',$request->marketing_order_delivery_id);
                 }
-                
+
                 if($request->company_id){
                     $query->where('company_id',$request->company_id);
                 }
@@ -292,7 +292,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
 				if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
@@ -346,7 +346,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         <a href="delivery_order/driver/'.CustomHelper::encrypt($val->code).'?d='.CustomHelper::encrypt($val->driver_name).'&p='.CustomHelper::encrypt($val->driver_hp).'" class="btn-floating btn-small mb-1 btn-flat waves-effect waves-light indigo accent-1 white-text" data-popup="tooltip" title="Driver Update Tracking" target="_blank"><i class="material-icons dp48">streetview</i></a>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
@@ -428,7 +428,7 @@ class MarketingOrderDeliveryProcessController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
             'code_place_id'             => 'required',
@@ -441,6 +441,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'driver_hp'                     => 'required',
             'vehicle_name'                  => 'required',
             'vehicle_no'                    => 'required',
+            'no_container'                    => 'required',
             'arr_modd_id'                   => 'required|array',
             'arr_item_stock_id'             => 'required|array',
             'arr_qty'                       => 'required|array',
@@ -457,6 +458,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'driver_hp.required'                    => 'No HP/WA supir tidak boleh kosong.',
             'vehicle_name.required'                 => 'Nama/Tipe kendaraan tidak boleh kosong.',
             'vehicle_no.required'                   => 'Nopol kendaraan tidak boleh kosong.',
+            'no_container.required'                 => ' Nomor Kontainer tidak boleh kosong.',
             'arr_modd_id.required'                  => 'Detail item tidak boleh kosong.',
             'arr_modd_id.array'                     => 'Detail item harus array.',
             'arr_item_stock_id.required'            => 'Detail stock tidak boleh kosong.',
@@ -526,7 +528,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari tanggal MOD (Jadwal Kirim).'
                 ]);
             }
-            
+
 			if($request->temp){
                 DB::beginTransaction();
                 try {
@@ -568,7 +570,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 foreach($cekquery as $key => $rowcek){
                                     if($detail->qty !== $rowcek->qty){
                                         $error[] = 'Produk '.$detail->item->name.' memiliki selisih qty. Jumlah qty harus sama untuk MOD lama dan baru.';
-                                    }   
+                                    }
                                 }
                             }else{
                                 $error[] = 'Produk '.$detail->item->name.' tidak ditemukan pada MOD lama.';
@@ -614,6 +616,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->driver_hp = $request->driver_hp;
                         $query->vehicle_name = $request->vehicle_name;
                         $query->vehicle_no = $request->vehicle_no;
+                        $query->no_container = $request->no_container;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
                         $query->status = $request->tempSwitch ? $query->status : '1';
@@ -656,7 +659,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MarketingOrderDeliveryProcess::create([
                         'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
@@ -669,6 +672,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'driver_hp'                     => $request->driver_hp,
                         'vehicle_name'                  => $request->vehicle_name,
                         'vehicle_no'                    => $request->vehicle_no,
+                        'no_container'                  => $request->no_container,
                         'weight_netto'                  => 0,
                         'note_internal'                 => $request->note_internal,
                         'note_external'                 => $request->note_external,
@@ -684,7 +688,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 foreach($request->arr_item_stock_id as $key => $row){
@@ -716,14 +720,14 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ]);
                     CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
                 }
-                
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
 
                 if($request->tempSwitch){
                     $mod = MarketingOrderDelivery::find(intval($request->marketing_order_delivery_id));
                     if($query->journal()->exists()){
                         foreach($query->journal as $row){
-                            foreach($row->journalDetail as $rowdetail){ 
+                            foreach($row->journalDetail as $rowdetail){
                                 $rowdetail->update([
                                     'account_id'    => $mod->marketingOrder->account_id,
                                 ]);
@@ -801,7 +805,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . CustomHelper::formatConditionalQty($totalqty) . '</td>
                 <td class="center-align" colspan="5"></td>
             </tr>';
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
@@ -817,7 +821,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -825,7 +829,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -837,7 +841,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -860,14 +864,14 @@ class MarketingOrderDeliveryProcessController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $mod = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($mod){
             $data = [
                 'title'     => 'Print Marketing Order Delivery Process',
@@ -882,22 +886,22 @@ class MarketingOrderDeliveryProcessController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
-            
+
             $pdf = PrintHelper::print($pr,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
 
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -905,16 +909,16 @@ class MarketingOrderDeliveryProcessController extends Controller
     }
 
     public function printBarcode(Request $request,$id){
-        
+
         $pr = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
             $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,188.98,78.59),'portrait','admin.print.sales.order_delivery_proces_barcode_individual');
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);$var_link=$document_po;
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -927,7 +931,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -939,7 +943,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = MarketingOrderDeliveryProcess::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -966,8 +970,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -995,7 +999,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -1003,19 +1007,19 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderDeliveryProcess::where('Code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_individual');
@@ -1025,7 +1029,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -1036,21 +1040,21 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -1059,7 +1063,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -1079,18 +1083,18 @@ class MarketingOrderDeliveryProcessController extends Controller
                             $pdf->getCanvas()->page_text(422, 760, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -1147,7 +1151,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                             <th class="center-align">Debit</th>
                                             <th class="center-align">Kredit</th>
                                         </tr>
-                                    
+
                                 </thead>
                                 <tbody>';
                 $total_debit_asli = 0;
@@ -1205,12 +1209,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'status'    => 200,
                 'message'   => 'Data berhasil dimuat.',
                 'data'      => $main
-            ]; 
+            ];
         }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -1248,7 +1252,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $modd[] = $row->marketing_order_delivery_detail_id;
             }
         }
-        
+
         foreach($modd as $rowmod){
             $moddd = MarketingOrderDeliveryDetail::find($rowmod);
             $moddd['item_name'] = $moddd->item->code.' - '.$moddd->item->name;
@@ -1274,19 +1278,19 @@ class MarketingOrderDeliveryProcessController extends Controller
             $moddd['details'] = $details;
             $arrResult[] = $moddd;
         }
-        
+
 
         $po['details'] = $arrResult;
-        				
+
 		return response()->json($po);
     }
 
     public function getTracking(Request $request)
     {
         $data   = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->code))->first();
-        
+
         $string = '<h6>Status Tracking : Surat Jalan No. '.$data->code.'</h6><div class="row pt-1 pb-1 lighten-4">';
-        
+
         $arrTracking = [];
 
         foreach($data->marketingOrderDeliveryProcessTrack as $key => $row){
@@ -1308,7 +1312,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'status'    => 200,
             'tracking'  => $arrTracking,
         ];
-		
+
         return response()->json($response);
     }
 
@@ -1328,7 +1332,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-            
+
             if($request->status_tracking == '5'){
                 return response()->json([
                     'status'  => 500,
@@ -1378,7 +1382,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'marketing_order_delivery_process_id'   => $data->id,
                     'status'                                => $request->status_tracking,
                 ]);
-            }            
+            }
 
             if($request->status_tracking == '2'){
                 $data->createJournalSentDocument();
@@ -1402,7 +1406,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             ];
         }
 
-        return response()->json($response); 
+        return response()->json($response);
     }
 
     public function updateReturn(Request $request){
@@ -1452,7 +1456,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ]);
 
                 $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$data->id)->where('status','5')->first();
-                
+
                 if($cek){
                     $cek->update([
                         'user_id' => session('bo_id'),
@@ -1488,12 +1492,12 @@ class MarketingOrderDeliveryProcessController extends Controller
             }
         }
 
-        return response()->json($response); 
+        return response()->json($response);
     }
 
     public function voidStatus(Request $request){
         $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -1515,7 +1519,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ];
             }else{
                 $tempStatus = $query->status;
-                
+
                 $query->marketingOrderDelivery->update([
 					'status'	=> '2'
 				]);
@@ -1542,13 +1546,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                     }
                     /* $row->delete(); */
                 }
-    
+
                 activity()
                     ->performedOn(new MarketingOrderDeliveryProcess())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the  data');
-    
+
                 CustomHelper::sendNotification('marketing_order_delivery_processes',$query->id,'Surat Jalan No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval('marketing_order_delivery_processes',$query->id);
 
@@ -1600,7 +1604,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1634,7 +1638,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
     public function driverIndex(Request $request, $id){
         $modp = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->whereIn('status',['2','3'])->first();
-        
+
         if($modp){
             $data = [
                 'title'         => 'Driver Update Tracking',
@@ -1687,13 +1691,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'status'    => 500,
                 'message'   => 'Data tracking surat jalan tidak ditemukan.'
             ]);
-        }        
+        }
     }
 
     public function viewStructureTree(Request $request){
         $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
-        
-        
+
+
 
         $data_go_chart=[];
         $data_link=[];
@@ -1707,7 +1711,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                  ],
-                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/sales/sales_order?code=".CustomHelper::encrypt($query->code),
             ];
 
             $data_go_chart[]= $data_marketing_order_process;
@@ -1715,29 +1719,29 @@ class MarketingOrderDeliveryProcessController extends Controller
             $array1 = $result[0];
             $array2 = $result[1];
             $data_go_chart = $array1;
-            $data_link = $array2;       
-            
+            $data_link = $array2;
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
 
-           
+
             $data_go_chart = unique_key($data_go_chart,'name');
             $data_link=unique_key($data_link,'string_link');
 
-            
 
-            
+
+
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
@@ -1763,13 +1767,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MarketingOrderDeliveryProcess())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Marketing Order Delivery Process data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1793,7 +1797,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $marketing_order = $request->marketing_order ? $request->marketing_order:'';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportTransactionPageOrderDeliveryProcess($search,$status,$account_id,$company,$marketing_order,$end_date,$start_date), 'marketing_delivery_order_'.uniqid().'.xlsx');
     }
 }

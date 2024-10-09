@@ -22,10 +22,10 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
 		$this->end_date = $end_date ? $end_date : '';
         $this->status = $status ? $status : '';
         $this->account_id = $account_id ? $account_id : '';
-       
+
         $this->marketing_order = $marketing_order ? $marketing_order : '';
         $this->company = $company ? $company : '';
-        
+
     }
 
     private $headings = [
@@ -52,6 +52,7 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
         'No WA Supir',
         'Tipe Kendaraan',
         'Nopol Kendaraan',
+        'No Kontainer',
         'Catatan Internal',
         'Catatan Eksternal',
         'Berat (KG)',
@@ -116,19 +117,19 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
                 $query->whereIn('account_id',$groupIds);
             }
 
-            
-            
+
+
             if($this->company){
                 $query->where('company_id',$this->company);
             }
         })
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->get();
-        
-        
+
+
         $arr=[];
         foreach($data as $key => $row){
-            
+
             $arr[] = [
                 'no'                => ($key + 1),
                 'code'              => $row->code,
@@ -153,6 +154,7 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
                 'no_wa_supir'            => $row->driver_hp,
                 'tipe_kendaraan'    => $row->vehicle_name,
                 'nopol_kendaraan'     => $row->vehicle_no,
+                'no_kontainer'          => $row->no_container,
                 'catatan_internal'            => $row->note_internal,
                 'catatan_eksternal'      => $row->note_external,
                 'berat_(kg)'      => $row->weight_netto,
@@ -160,10 +162,10 @@ class ExportTransactionPageOrderDeliveryProcess implements FromCollection, WithT
                 'tracking'            =>  $row->statusTracking(),
                 'status'            => $row->statusRaw(),
             ];
-        
-            
+
+
         }
-        
+
         return collect($arr);
     }
 

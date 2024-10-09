@@ -73,6 +73,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
                 'no_wa_supir'                => $row->marketingOrderDeliveryProcess->driver_hp,
                 'truk'=>$row->marketingOrderDeliveryProcess->vehicle_name,
                 'nopol' => $row->marketingOrderDeliveryProcess->vehicle_no,
+                'no_kontainer'          => $row->marketingOrderDeliveryProcess->no_container,
                 'outlet' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->outlet->name ?? '-',
                 'alamat_tujuan'=> $row->marketingOrderDeliveryDetail->marketingOrderDelivery->destination_address,
                 'catatan_internal'=>$row->marketingOrderDeliveryDetail->marketingOrderDelivery->note_internal,
@@ -93,7 +94,7 @@ class ExportMarketingDeliveryRecap implements FromView, WithEvents
             ->withProperties(null)
             ->log('Export Delivery Recap.');
 
-        return view('admin.exports.marketing_delivery_recap', [ 
+        return view('admin.exports.marketing_delivery_recap', [
             'data'      => $array_filter,
         ]);
     }

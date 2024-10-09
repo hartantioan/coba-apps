@@ -31,6 +31,7 @@ class MarketingOrderDeliveryProcess extends Model
         'driver_hp',
         'vehicle_name',
         'vehicle_no',
+        'no_container',
         'weight_netto',
         'note_internal',
         'note_external',
@@ -64,7 +65,7 @@ class MarketingOrderDeliveryProcess extends Model
         foreach($this->marketingOrderDeliveryProcessDetail as $row){
             if(!in_array($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no,$arr)){
                 if($row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no){
-                    
+
                 $arr[] = $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->document_no;
                 }
             }
@@ -134,7 +135,7 @@ class MarketingOrderDeliveryProcess extends Model
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -253,7 +254,7 @@ class MarketingOrderDeliveryProcess extends Model
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
 
         if ($status) {
-            $xstatus = match ($status->status) { 
+            $xstatus = match ($status->status) {
                 '1' => 'Dokumen dibuat',
                 '2' => 'Barang dikirimkan',
                 '3' => 'Barang sampai di cust',
@@ -269,7 +270,7 @@ class MarketingOrderDeliveryProcess extends Model
     public function statusTrackingDate() {
         $status = $this->marketingOrderDeliveryProcessTrack()->orderByDesc('status')->first();
         if ($status) {
-            $xstatus = match ($status->status) { 
+            $xstatus = match ($status->status) {
                 '1', '2', '3' => $status->updated_at,
                 '5' => $this->return_date,
                 default => 'Invalid',
@@ -279,7 +280,7 @@ class MarketingOrderDeliveryProcess extends Model
             return 'Status tracking tidak ditemukan.';
         }
     }
-    
+
 
     public static function generateCode($prefix)
     {
@@ -402,7 +403,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function updateJournal(){
         $journal = Journal::where('lookable_type',$this->table)->where('lookable_id',$this->id)->first();
-        
+
         if($journal){
             foreach($this->marketingOrderDeliveryProcessDetail as $row){
                 $total = $row->getHpp();
@@ -457,7 +458,7 @@ class MarketingOrderDeliveryProcess extends Model
                 $percent_dp = 0;
                 $tax_id = 0;
                 $tax_no = '';
-                
+
                 foreach($query->marketingOrderDeliveryProcessDetail as $row){
                     $subtotal += $row->getTotal();
                     $tax += $row->getTax();
@@ -569,10 +570,10 @@ class MarketingOrderDeliveryProcess extends Model
                             'note'                          => $rowdata['code'],
                         ]);
                     }
-    
+
                     CustomHelper::sendApproval($querymoi->getTable(),$querymoi->id,$querymoi->note_internal.' - '.$querymoi->note_external);
                     CustomHelper::sendNotification($querymoi->getTable(),$querymoi->id,'Pengajuan AR Invoice No. '.$querymoi->code,$querymoi->note_internal.' - '.$querymoi->note_external,$query->user_id);
-    
+
                     activity()
                         ->performedOn(new MarketingOrderInvoice())
                         ->causedBy($query->user_id)
@@ -586,7 +587,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function createJournalSentDocument(){
         $modp = $this;
-			
+
         $query = Journal::create([
             'user_id'		=> $modp->user_id,
             'company_id'    => $modp->company_id,
@@ -597,7 +598,7 @@ class MarketingOrderDeliveryProcess extends Model
             'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);
-        
+
         $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
 
         foreach($modp->marketingOrderDeliveryProcessDetail as $row){
@@ -668,7 +669,7 @@ class MarketingOrderDeliveryProcess extends Model
 
     public function createJournalReceiveDocument(){
         $modp = MarketingOrderDeliveryProcess::find($this->id);
-			
+
         $query = Journal::create([
             'user_id'		=> $modp->user_id,
             'company_id'    => $modp->company_id,
@@ -679,7 +680,7 @@ class MarketingOrderDeliveryProcess extends Model
             'note'			=> $modp->note_internal.' - '.$modp->note_external,
             'status'		=> '3'
         ]);
-        
+
         $coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$modp->company_id)->first();
         $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$modp->company_id)->first();
 
@@ -741,7 +742,7 @@ class MarketingOrderDeliveryProcess extends Model
                 $total = round($price,2);
             }
         }
-        
+
         return $total;
     }
 
@@ -762,7 +763,7 @@ class MarketingOrderDeliveryProcess extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

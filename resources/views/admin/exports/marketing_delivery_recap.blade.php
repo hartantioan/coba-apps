@@ -35,6 +35,7 @@
             <th>No WA Sopir</th>
             <th>Truk</th>
             <th>Nopol</th>
+            <th>No Kontainer</th>
             <th>Outlet</th>
             <th>Alamat Tujuan</th>
             <th>Catatan Internal</th>
@@ -85,6 +86,7 @@
                 <td>{{ $row['no_wa_supir'] }}</td>
                 <td>{{ $row['truk'] }}</td>
                 <td>{{ $row['nopol'] }}</td>
+                <td>{{ $row['no_kontainer'] }}</td>
                 <td>{{ $row['outlet'] }}</td>
                 <td>{{ $row['alamat_tujuan'] }}</td>
                 <td>{{ $row['catatan_internal'] }}</td>

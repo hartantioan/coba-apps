@@ -19,7 +19,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 		$this->end_date = $end_date ? $end_date : '';
         $this->status = $status ? $status : '';
         $this->type_sales = $type_sales ? $type_sales : '';
-       
+
         $this->type_deliv = $type_deliv ? $type_deliv : '';
         $this->company = $company ? $company : '';
         $this->type_pay = $type_pay ? $type_pay : '';
@@ -27,47 +27,43 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         $this->currency = $currency ? $currency : '';
         $this->delivery = $delivery ? $delivery : '';
         $this->sales = $sales ? $sales : '';
-        
+
     }
 
     private $headings = [
         'Variant Item',
-        'No DO',
         'Status',
-
+        'No DO',
         'No. SO',
-
         'No. MOD',
         'No Invoice',
+
+        'Customer Code',
+        'Customer',
+        'Cust Detail',
+        'Alamat Tujuan',
+        'Tipe Penjualan',
+        'Tipe Pengiriman',
+        'Kabupaten Tujuan',
+        'Kecamatan Tujuan',
+
         'PPN',
         'Item',
-        'Delivery Date',
+        'Tanggal Kirim',
         'Quantity',
         'Unit',
-        'Harga Satuan',
+        'Harga Satuan(Exclude PPN)',
         'Discount 1',
         'Discount 2',
         'Discount 3',
         'Disc Global',
         'DP Percentage',
         'Payment Type',
-        'Customer Code',
-        'Customer',
-        'Cust Detail',
-        'Alamat Tujuan',
-        'Kabupaten Tujuan',
-        'Kecamatan Tujuan',
 
-        'Tipe Penjualan',
-        'Tipe Pengiriman',
         'Ekspedisi Name',
         'Transport Name',
         'Plat No',
-        'Nama Supir',
         'Sales Employee Name',
-        'Project Name',
-        'Other Fee',
-        'Ongkir',
     ];
 
     public function collection()
@@ -95,13 +91,13 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     });
                 });
             });
-    
+
             // Other conditions for the 'purchaseOrder' relationship
             if($this->status){
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
             }
-    
+
             if($this->start_date && $this->end_date) {
                 $query->whereDate('post_date', '>=', $this->start_date)
                     ->whereDate('post_date', '<=', $this->end_date);
@@ -110,15 +106,15 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
             } else if($this->end_date) {
                 $query->whereDate('post_date','<=', $this->end_date);
             }
-    
+
             if($this->type_sales){
                 $query->where('type',$this->type_sales);
             }
-    
+
             if($this->type_deliv){
                 $query->where('shipping_type',$this->type_deliv);
             }
-    
+
             if($this->customer){
                 $groupIds = explode(',', $this->customer);
                 $query->whereIn('account_id',$groupIds);
@@ -133,43 +129,51 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                 $groupIds = explode(',', $this->delivery);
                 $query->whereIn('sender_id',$groupIds);
             }
-            
+
             if($this->company){
                 $query->where('company_id',$this->company);
             }
-    
+
             if($this->type_pay){
                 $query->where('payment_type',$this->type_pay);
-            }                
-            
+            }
+
             if($this->currency){
                 $groupIds = explode(',', $this->currency);
                 $query->whereIn('currency_id',$groupIds);
             }
-    
-           
+
+
         })->get();
-    
+
 
         $x=1;
         foreach($data as $key => $row){
             $subtotal = $row->subtotal * $row->currency_rate;
             $discount = $row->discount * $row->currency_rate;
             $total = $subtotal - $discount;
-            
+
             foreach($row->marketingOrderDetail as  $key_detail =>$row_detail){
                 $arr[] = [
                     'variant_item'      => $row_detail->item->type->name,
-                    'no_do'             => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '-',
                     'status'            => $row->statusSAP(),
+                    'no_do'             => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '-',
                     'no_so'             => $row->code,
-
                     'no_mod'            => $row_detail->listCodeMOD(),
-
                     'no_invoice'        => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->marketingOrderInvoice->code??'-',
-                    'ppn'               => $row_detail->tax,
+                    'customer_code'     => $row->account->employee_no,
+                    'customer'          => $row->account->name,
+                    'customer_detail'   => isset($row->outlet->name) ? $row->outlet->name : '-',
+                    'alamat_kirim'      => $row->destination_address,
+                    'tipe_penjualan'   => $row->type(),
+                    'tipe_pengiriman'   => $row->deliveryType(),
+                    'kabupaten_tujuan'  => $row->city->name,
+                    'kecamatan_tujuan'  => $row->district->name,
+
+
+                    'ppn'               => $row_detail->percent_tax,
                     'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
-                    
+
                     'delivery_date'     => date('d/m/Y',strtotime($row->delivery_date)),
                     'qty'               => $row_detail->qty,
                     'unit'              => $row_detail->itemUnit->unit->code,
@@ -180,29 +184,21 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     'disc_global'       => $row->discount,
                     'dp_percentage'     => $row->percent_dp,
                     'tipe_pembayaran'    => $row->paymentType(),
-                    'customer_code'     => $row->account->employee_no,
-                    'customer'          => $row->account->name,
-                    'customer_detail'   => $row->deliveryType(),
-                    'alamat_kirim'      => $row->destination_address,
-                    'kabupaten_tujuan'  => $row->city->name,
-                    'kecamatan_tujuan'  => $row->district->name,
-                    'tipe_penjualan'   => $row->type(),
-                    'tipe_pengiriman'   => $row->deliveryType(),
                     'ekspedisi_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->account->name ?? '-',
                     'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->vehicle_name ?? '-',
                     'plat_no'                      => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->vehicle_no ?? '-',
-                    'nama_supir'                   => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->driver_name ?? '-',
+                    // 'nama_supir'                   => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->driver_name ?? '-',
                     'sales_employee_name'          => $row->sales->name,
-                    'project_name'               => $row->project->name??'-',
+                    /* 'project_name'               => $row->project->name??'-',
                     'other_fee'             => $row_detail->other_fee,
-                    'ongkir'        => $row_detail->price_delivery,
-                    
+                    'ongkir'        => $row_detail->price_delivery, */
+
                 ];
                 $x++;
             }
-            
-        
-            
+
+
+
         }
 
         return collect($arr);

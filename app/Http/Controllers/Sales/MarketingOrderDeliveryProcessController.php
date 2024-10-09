@@ -1314,6 +1314,7 @@ class MarketingOrderDeliveryProcessController extends Controller
         $response =[
             'status'    => 200,
             'tracking'  => $arrTracking,
+            'sj_code'   => $data->code,
         ];
 
         return response()->json($response);

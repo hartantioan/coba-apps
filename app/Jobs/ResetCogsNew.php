@@ -910,6 +910,12 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
                     'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
                 ]);
+            }
+            $row->update([
+                'nominal' => $total / $row->qty,
+                'total'   => $total,
+            ]);
+            if($row->journalDetail()->exists() && $row->productionBatchUsage()->exists() && $bomGroup !== '1' && $bomGroup){
                 foreach($row->journalDetail as $rowjournal){
                     $rowjournal->update([
                         'nominal_fc'  => $total,
@@ -917,10 +923,6 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     ]);
                 }
             }
-            $row->update([
-                'nominal' => $total / $row->qty,
-                'total'   => $total,
-            ]);
             if($row->productionIssue->productionReceiveIssue()->exists()){
                 foreach($row->productionIssue->productionReceiveIssue as $rowreceiveissue){
                     $productionReceive = ProductionReceive::where('id',$rowreceiveissue->production_receive_id)->whereIn('status',['2','3'])->first();

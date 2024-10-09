@@ -167,6 +167,7 @@
                                                         <th>No.HP/WA Supir</th>
                                                         <th>Tipe Kendaraan</th>
                                                         <th>Nopol Kendaraan</th>
+                                                        <th>No. Kontainer</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
                                                         <th>Berat (KG)</th>
@@ -1940,6 +1941,7 @@ document.addEventListener('focusin', function (event) {
                 { name: 'vehicle_name', className: '' },
                 { name: 'vehicle_no', className: '' },
                 { name: 'note_internal', className: '' },
+                { name: 'note_external', className: '' },
                 { name: 'note_external', className: '' },
                 { name: 'weight_netto', className: 'right-align' },
                 { name: 'return_date', searchable: false, orderable: false, className: '' },

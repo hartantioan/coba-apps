@@ -40,7 +40,7 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseMemo;
 use App\Models\PurchaseOrderDetail;
-
+use App\Models\ProductionBatchUsage;
 
 use App\Models\PurchaseRequest;
 use Illuminate\Support\Facades\DB;

@@ -26,7 +26,7 @@ class DeliveryScheduleController extends Controller
     public function index(Request $request)
     {
         $data = [
-            'title'         => 'Rekapitulasi MOD',
+            'title'         => 'Report Jadwal Kirim',
             'content'       => 'admin.sales.delivery_schedule',
         ];
 
@@ -37,7 +37,7 @@ class DeliveryScheduleController extends Controller
     public function export(Request $request){
         ob_end_clean();
         ob_start();
-        $response = Excel::download(new ExportDeliveryScheduleReport($request->start_date,$request->end_date), 'mod_recap'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
+        $response = Excel::download(new ExportDeliveryScheduleReport($request->start_date,$request->end_date), 'report_jadwal_kirim_'.uniqid().'.xlsx', \Maatwebsite\Excel\Excel::XLSX);
         return $response;
     }
 }

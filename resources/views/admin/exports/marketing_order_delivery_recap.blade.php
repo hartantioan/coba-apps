@@ -30,6 +30,8 @@
             <th class="center-align">Note External</th>
             <th class="center-align">Item Code</th>
             <th class="center-align">Item Name</th>
+            <th class="center-align">Qty Konversi</th>
+            <th class="center-align">Satuan Konversi</th>
             <th class="center-align">Qty MOD (M2)</th>
             <th class="center-align">Note Item</th>
             <th class="center-align">SJ</th>
@@ -69,6 +71,8 @@
             <td>{{ $row['noteexternal'] }}</td>
             <td>{{ $row['itemcode'] }}</td>
             <td>{{ $row['itemname'] }}</td>
+            <td>{{ $row['qty_conversion'] }}</td>
+            <td>{{ $row['unit_conversion'] }}</td>
             <td>{{ $row['qty']*$row['konversi'] }}</td>
             @if ($row['noteitem'] == 'null')
             <td></td>

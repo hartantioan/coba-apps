@@ -34,12 +34,12 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
         'Qty On Hand (M2)',
         'Qty On Hand (Palet)',
         'Qty On Hand (Box)',
-        'Qty SJ Blm Terkirim(M2)',
-        'Qty SJ Blm Terkirim(Palet)',
-        'Qty SJ Blm Terkirim(Box)',
-        'Total Aviable (M2)',
-        'Total Aviable (Palet)',
-        'Total Aviable (Box)',
+        // 'Qty SJ Blm Terkirim(M2)',
+        // 'Qty SJ Blm Terkirim(Palet)',
+        // 'Qty SJ Blm Terkirim(Box)',
+        // 'Total Aviable (M2)',
+        // 'Total Aviable (Palet)',
+        // 'Total Aviable (Box)',
 
     ];
 
@@ -205,10 +205,10 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             })
             ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
-                ->where('post_date', '<', $this->start_date)
-                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                    $query->whereIn('status',['2']);
-                });
+                ->where('post_date', '<', $this->start_date);
+                // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                //     $query->whereIn('status',['2']);
+                // });
             })->get();
 
             //sj yang belum terkirim bor
@@ -287,9 +287,9 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 $query->whereIn('status',["2","3"])
                 ->where('post_date', '>=',$this->start_date)
                 ->where('post_date', '<=', $this->finish_date)
-                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                /* ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
                     $query->whereIn('status',['2']);
-                });
+                }) */;
             })->get();
 
             $delivery_process_blm_terkirim = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
@@ -392,12 +392,12 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 'total'=>$total,
                 'pallet_conversion'=>$pallet_conversion,
                 'box_conversion'=>$box_conversion,
-                'sj_belum_terkirim'=> $total_sj_awal_blm_terkirim,
-                'sj_belum_terkirim_pallet'=> $total_sj_awal_blm_terkirim_pallet,
-                'sj_belum_terkirim_box'=> $total_sj_awal_blm_terkirim_box,
-                'total_sum_sj_blm_terkirim'=>$total_sum_sj_blm_terkirim,
-                'pallet_conversion_total_sum'=>$pallet_conversion_total_sum,
-                'box_conversion_total_sum'=>$box_conversion_total_sum,
+                // 'sj_belum_terkirim'=> $total_sj_awal_blm_terkirim,
+                // 'sj_belum_terkirim_pallet'=> $total_sj_awal_blm_terkirim_pallet,
+                // 'sj_belum_terkirim_box'=> $total_sj_awal_blm_terkirim_box,
+                // 'total_sum_sj_blm_terkirim'=>$total_sum_sj_blm_terkirim,
+                // 'pallet_conversion_total_sum'=>$pallet_conversion_total_sum,
+                // 'box_conversion_total_sum'=>$box_conversion_total_sum,
             ];
 
 

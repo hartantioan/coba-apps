@@ -517,6 +517,7 @@
                         <div class="card-content center-align">
                             Dokumen SJ telah dibuat.
                             <p class="teal-text lighten-2 truncate" id="dateTracking1">-</p>
+                            <p class="teal-text lighten-2 truncate" id="userTracking1">-</p>
                         </div>
                     </div>
                 </div>
@@ -528,6 +529,7 @@
                         <div class="card-content center-align">
                             Barang telah dikirimkan.
                             <p class="teal-text lighten-2 truncate" id="dateTracking2">-</p>
+                            <p class="teal-text lighten-2 truncate" id="userTracking2">-</p>
                         </div>
                     </div>
                 </div>
@@ -539,6 +541,7 @@
                         <div class="card-content center-align">
                             Barang tiba di customer.
                             <p class="teal-text lighten-2 truncate" id="dateTracking3">-</p>
+                            <p class="teal-text lighten-2 truncate" id="userTracking3">-</p>
                         </div>
                     </div>
                 </div>
@@ -551,6 +554,7 @@
                         <div class="card-content center-align">
                             Surat Jalan telah kembali.
                             <p class="teal-text lighten-2 truncate" id="dateTracking5">-</p>
+                            <p class="teal-text lighten-2 truncate" id="userTracking5">-</p>
                         </div>
                     </div>
                 </div>
@@ -1614,6 +1618,7 @@ document.addEventListener('focusin', function (event) {
                         $("#status_tracking option[value='"+ val.status + "']").attr("disabled","disabled");
                         $('#imageTracking' + val.status).css("filter", "");
                         $('#dateTracking' + val.status).html(val.date);
+                        $('#userTracking' + val.status).html(val.user);
                     });
                     $('#status_tracking option:not([disabled]):first').attr("selected",true);
                 },

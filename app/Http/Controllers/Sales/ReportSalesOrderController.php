@@ -46,7 +46,7 @@ class ReportSalesOrderController extends Controller
 
     public function filter(Request $request){
         $start_time = microtime(true);
-        
+
         $start_date = $request->start_date;
         $end_date = $request->end_date;
         $search = $request->search;
@@ -73,13 +73,13 @@ class ReportSalesOrderController extends Controller
                     });
                 });
             });
-    
+
             // Other conditions for the 'purchaseOrder' relationship
             if($request->status){
                 $groupIds = explode(',', $request->status);
                 $query->whereIn('status', $groupIds);
             }
-    
+
             if($request->start_date && $request->end_date) {
                 $query->whereDate('post_date', '>=', $request->start_date)
                     ->whereDate('post_date', '<=', $request->end_date);
@@ -88,15 +88,15 @@ class ReportSalesOrderController extends Controller
             } else if($request->end_date) {
                 $query->whereDate('post_date','<=', $request->end_date);
             }
-    
+
             if($request->type_sales){
                 $query->where('type',$request->type_sales);
             }
-    
+
             if($request->type_deliv){
                 $query->where('shipping_type',$request->type_deliv);
             }
-    
+
             if($request->customer){
                 $groupIds = explode(',', $request->customer);
                 $query->whereIn('account_id',$groupIds);
@@ -111,23 +111,23 @@ class ReportSalesOrderController extends Controller
                 $groupIds = explode(',', $request->delivery);
                 $query->whereIn('sender_id',$groupIds);
             }
-            
+
             if($request->company){
                 $query->where('company_id',$request->company);
             }
-    
+
             if($request->type_pay){
                 $query->where('payment_type',$request->type_pay);
-            }                
-            
+            }
+
             if($request->currency){
                 $groupIds = explode(',', $request->currency);
                 $query->whereIn('currency_id',$groupIds);
             }
-    
-           
+
+
         })->get();
-        
+
         $newData = [];
 
         foreach($query_data as $index_data =>$row){
@@ -164,15 +164,15 @@ class ReportSalesOrderController extends Controller
                     'note_external'               => $row->note_external,
                     'note'        => $row_detail->note,
                     'no_sj'          => $row->marketingOrderDeliveryProcess()->exists() ? $row->marketingOrderDeliveryProcess->code : '-',
-                ];        
+                ];
             }
-                
+
         }
 
         $end_time = microtime(true);
-        
+
         $execution_time = ($end_time - $start_time);
-        
+
         $response =[
             'status'            => 200,
             'content'           => $newData,
@@ -185,7 +185,7 @@ class ReportSalesOrderController extends Controller
     public function export(Request $request){
         ob_end_clean();
         ob_start();
-        
+
         $search= null;
         $status = $request->status? $request->status : '';
         $type_sales = $request->type_sales ? $request->type_sales : '';
@@ -198,7 +198,7 @@ class ReportSalesOrderController extends Controller
         $currency = $request->currency ? $request->currency : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
-		return Excel::download(new ExportTransactionPageMarketingOrderDetail2('',$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'sales_order_recap'.uniqid().'.xlsx');
+
+		return Excel::download(new ExportTransactionPageMarketingOrderDetail2('',$status,$type_sales,$type_pay,$type_deliv,$company,$customer,$delivery,$sales,$currency,$end_date,$start_date), 'report_sales_'.uniqid().'.xlsx');
     }
 }

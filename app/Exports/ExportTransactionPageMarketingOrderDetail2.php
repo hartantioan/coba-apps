@@ -185,7 +185,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                     'dp_percentage'     => $row->percent_dp,
                     'tipe_pembayaran'    => $row->paymentType(),
                     'ekspedisi_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->account->name ?? '-',
-                    'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->vehicle_name ?? '-',
+                    'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
                     'plat_no'                      => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->vehicle_no ?? '-',
                     // 'nama_supir'                   => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->driver_name ?? '-',
                     'sales_employee_name'          => $row->sales->name,

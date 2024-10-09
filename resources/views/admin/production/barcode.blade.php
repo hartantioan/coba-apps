@@ -1826,7 +1826,7 @@
                                 <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + val.shading + `" readonly>
                             </td>
                             <td class="right-align">
-                                <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" onkeyup="convert('` + count + `')">
+                                <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" onkeyup="formatRupiahNoMinus(this);convert('` + count + `');">
                             </td>
                             <td class="center-align">
                                 ` + val.sell_unit + `

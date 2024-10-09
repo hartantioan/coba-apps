@@ -509,6 +509,9 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_tracking">
+                <div>
+                    <h4 id="sj_code"></h4>
+                </div>
                 <div class="col l3 m3 s3 p-3">
                     <div class="card z-depth-0 grey lighten-4 border-radius-6">
                         <div class="card-image">
@@ -1614,9 +1617,11 @@ document.addEventListener('focusin', function (event) {
                     }
                     loadingClose('.modal-content');
                     $('#tempTracking').val(val);
+                    $('#sj_code').html(response.sj_code);
                     $.each(response.tracking, function(i, val) {
                         $("#status_tracking option[value='"+ val.status + "']").attr("disabled","disabled");
                         $('#imageTracking' + val.status).css("filter", "");
+
                         $('#dateTracking' + val.status).html(val.date);
                         $('#userTracking' + val.status).html(val.user);
                     });

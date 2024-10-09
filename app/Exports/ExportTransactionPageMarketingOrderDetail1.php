@@ -139,7 +139,7 @@ class ExportTransactionPageMarketingOrderDetail1 implements FromCollection, With
                     'tipe_penjualan'    => $row->type(),
                     'pengiriman'     => $row->deliveryType(),
                     'tipe_customer'     => $row->group->name ?? '-',
-                    'transport'   => $row->transportation->name,
+                    'transport'   => $row->transportation->name ?? '-',
                     'alamat_kirim'      => $row->destination_address,
                     'kabupaten'  => $row->city->name,
                     'kecamatan'  => $row->district->name,

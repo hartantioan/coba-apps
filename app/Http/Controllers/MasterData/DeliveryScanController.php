@@ -152,7 +152,7 @@ class DeliveryScanController extends Controller
 
                 $response = [
                     'status'  => 500,
-                    'message' => 'Dokumen telah di scan'
+                    'message' => 'Gagal Simpan , Dokumen telah di scan pada '. date('d/m/Y H:i:s', strtotime($query_track->first()->created_at))
                 ];
                 return response()->json($response);
             }
@@ -182,7 +182,7 @@ class DeliveryScanController extends Controller
                     $query->createJournalSentDocument();
                     $response = [
                         'status'    => 200,
-                        'message'   => 'Data successfully saved.',
+                        'message'   => 'Data Sukses Discan  dan Disimpan.',
                     ];
                 }else{
                     $response = [

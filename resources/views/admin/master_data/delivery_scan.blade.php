@@ -137,12 +137,10 @@
                                     </div>
                                     <div class="row mt-5">
                                         <div class="col s12 m12">
-                                            <div class="card-alert card gradient-45deg-purple-amber">
-                                                <div class="card-content white-text">
-                                                    <p>Info : SJ yang ditampilkan hanya SJ yang telah di scan 2 hari kebelakang.</p>
-                                                </div>
+                                            <div id="card_info_save">
+
                                             </div>
-                                            <div class="col s12">
+                                            {{-- <div class="col s12">
                                                 <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right" href="javascript:void(0);" onclick="loadDataTable();">
                                                     <i class="material-icons hide-on-med-and-up">refresh</i>
                                                     <span class="hide-on-small-onl">{{ __('translations.refresh') }}</span>
@@ -158,7 +156,7 @@
                                                         </tr>
                                                     </thead>
                                                 </table>
-                                            </div>
+                                            </div> --}}
 
                                         </div>
                                     </div>
@@ -278,7 +276,7 @@
     });
 
     $(function() {
-        loadDataTable();
+
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
@@ -465,6 +463,17 @@
         $('select[name="datatable_serverside_length"]').addClass('browser-default');
 	}
 
+    function formatDate(date) {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+
+        return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+    }
+
     function submitBarcode() {
         var formData = new FormData($('#barcode-form')[0]);
         $.ajax({
@@ -484,6 +493,7 @@
                 if(response.status == 200) {
 
                     if(response.mop){
+                        $('#table_body').empty();
                         var status = response.status_s;
                         $('#temp').val(response.id);
                         $('#status_document').text('Status: ').append(status);
@@ -491,7 +501,7 @@
                         $('#no_pol').val(response.mop['vehicle_no']);
                         $('#driver').val(response.mop['driver_name']);
                         $('#type').val(response.mop['vehicle_name']);
-                        $('#table_body').empty();
+
                         $.each(response.detail, function(i, val) {
                             $('#table_body').append(`
                                 <tr>
@@ -574,8 +584,16 @@
                         $('input').css('border-bottom', '0.5px solid black');
                         loadingClose('.modal-content');
                         if(response.status == 200) {
-                            loadDataTable();
-                            $('#form_data')[0].reset();
+                            const now = new Date();
+                            const formattedDateTime = formatDate(now);
+                            const message = `Barang telah dikirimkan: ${formattedDateTime}`;
+                            $('#card_info_save').empty();
+                            $('#card_info_save').append(`<div class="card-alert card gradient-45deg-green-teal" >
+                                <div class="card-content white-text">
+                                    <p>${response.message}</p>
+                                    <p>${message}</p>
+                                </div>
+                            </div>`);
                             $('#table_body').empty();
                             $('#status_document').empty().text('Status: ');
                             M.toast({
@@ -610,6 +628,13 @@
                                 });
                             });
                         } else {
+
+                            $('#card_info_save').empty();
+                            $('#card_info_save').append(`<div class="card-alert card red" >
+                                <div class="card-content white-text">
+                                    <p>${response.message}</p>
+                                </div>
+                            </div>`);
                             M.toast({
                                 html: response.message
                             });

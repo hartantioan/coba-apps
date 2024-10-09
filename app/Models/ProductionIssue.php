@@ -317,7 +317,7 @@ class ProductionIssue extends Model
             $this->journal->delete();
         }
         
-        CustomHelper::sendJournal($this->getTable(),$this->id);
+        CustomHelper::sendJournal($this->table,$this->id);
 
         if($this->productionReceiveIssue()->exists()){
             foreach($this->productionReceiveIssue as $row){

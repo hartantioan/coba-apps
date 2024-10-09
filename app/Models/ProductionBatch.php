@@ -133,7 +133,7 @@ class ProductionBatch extends Model
     }
 
     public function journalDetail(){
-        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->getTable())->whereHas('journal',function($query){
+        return $this->hasMany('App\Models\JournalDetail','detailable_id','id')->where('detailable_type',$this->table)->whereHas('journal',function($query){
             $query->whereIn('status',['2','3']);
         });
     }

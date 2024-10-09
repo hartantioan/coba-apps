@@ -47,7 +47,7 @@ class Resource extends Model
     }
 
     public function bomStandardDetail(){
-        return $this->hasMany('App\Models\BomStandardDetail','lookable_id','id')->where('lookable_type',$this->getTable());
+        return $this->hasMany('App\Models\BomStandardDetail','lookable_id','id')->where('lookable_type',$this->table);
     }
 
     public function place()

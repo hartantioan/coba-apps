@@ -33,6 +33,7 @@ use App\Models\ProductionFgReceive;
 use App\Models\ProductionFgReceiveDetail;
 use App\Models\ProductionHandoverDetail;
 use App\Models\ProductionIssueDetail;
+use App\Models\ProductionIssue;
 use App\Models\ProductionReceive;
 use App\Models\ProductionReceiveDetail;
 use App\Models\ProductionRepackDetail;
@@ -806,9 +807,13 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
 
         $arrProductionReceive = [];
         $arrProductionFgReceive = [];
+        $arrProductionIssue = [];
 
         foreach($productionissue as $row){
             $total = 0;
+            if(!in_array($row->productionIssue->id,$arrProductionIssue)){
+                $arrProductionIssue[] = $row->productionIssue->id;
+            }
             if($row->productionBatchUsage()->exists()){
                 foreach($row->productionBatchUsage as $rowbatch){
                     if($bomGroup == '1'){
@@ -942,12 +947,18 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
                 }
             }
-            if($row->productionIssue->journal()->exists()){
-                foreach($row->productionIssue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
-                    $rowjournal->update([
-                        'nominal_fc'  => $row->productionIssue->total(),
-                        'nominal'     => $row->productionIssue->total(),
-                    ]);
+        }
+
+        if(count($arrProductionIssue) > 0){
+            foreach($arrProductionIssue as $row){
+                $issue = ProductionIssue::find($row);
+                if($issue){
+                    foreach($issue->journal->journalDetail()->where('type','1')->get() as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $issue->total(),
+                            'nominal'     => $issue->total(),
+                        ]);
+                    }
                 }
             }
         }

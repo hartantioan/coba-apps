@@ -2028,9 +2028,11 @@
                     $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                 }
                 $('#delivery_date').val(response.delivery_date);
-                $('#transportation_id').empty().append(`
-                    <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
-                `);
+                if(response.transportation_name){
+                    $('#transportation_id').empty().append(`
+                        <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
+                    `);
+                }
                 if(response.outlet_name){
                     $('#outlet_id').empty().append(`
                         <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>
@@ -2662,9 +2664,11 @@
                             $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                         }
                         $('#delivery_date').val(response.delivery_date);
-                        $('#transportation_id').empty().append(`
-                            <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
-                        `);
+                        if(response.transportation_name){
+                            $('#transportation_id').empty().append(`
+                                <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
+                            `);
+                        }
                         if(response.outlet_name){
                             $('#outlet_id').empty().append(`
                                 <option value="` + response.outlet_id + `">` + response.outlet_name + `</option>

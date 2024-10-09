@@ -864,7 +864,7 @@ class MarketingOrderController extends Controller
         $po['project_name'] = $po->project()->exists() ? $po->project->code.' - '.$po->project->name : '';
         $po['percent_dp'] = number_format($po->percent_dp,2,',','.');
         $po['user_data'] = $po->account->getBillingAddress();
-        $po['transportation_name'] = $po->transportation->code.' - '.$po->transportation->name;
+        $po['transportation_name'] = $po->transportation()->exists() ? $po->transportation->code.' - '.$po->transportation->name : '';
         $po['outlet_name'] = $po->outlet()->exists() ? $po->outlet->code.' - '.$po->outlet->name : '';
         $po['broker_name'] = $po->broker()->exists() ? $po->broker->employee_no.' - '.$po->broker->name : '';
         $po['deposit'] = number_format($po->account->deposit,2,',','.');

@@ -987,7 +987,7 @@
                     }else{
                         var note = $('#note').val();
                         if(note == ""){
-                            $('#note').val('return from :'+datakuy.code);
+                            $('#note').val('RETURN FROM :'+datakuy.code);
                         }else{
                             $('#note').val(note+','+datakuy.code);
                         }

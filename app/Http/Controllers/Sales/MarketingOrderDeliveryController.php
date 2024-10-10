@@ -307,6 +307,7 @@ class MarketingOrderDeliveryController extends Controller
     }
 
     public function getMarketingOrder(Request $request){
+
         $data = MarketingOrder::find($request->id);
         $data['sender_name'] = $data->sender()->exists() ? $data->sender->name : '';
         if($data->used()->exists()){
@@ -336,13 +337,20 @@ class MarketingOrderDeliveryController extends Controller
                         'uom_unit'      => $row->item->uomUnit->code,
                     ];
                 }
-
+                $total=0;
                 $data['details'] = $details;
                 $data['district_name'] = $data->district->name;
                 $data['city_name'] = $data->city->name;
                 $data['province_name'] = $data->province->name;
                 $data['transportation_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
                 $data['cost_delivery_type'] = $data->transportation()->exists() ? $data->transportation->category_transportation : '';
+                if(count($request->arr_grandtotal) > 0) {
+                    foreach($request->arr_grandtotal as $k => $v) {
+                        $total+=$v;
+                    }
+                $total+=$data->grandtotal;
+                $data['formatted_grandtotal'] = number_format($total,2,',','.');
+                }
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada Sales Order No. '.$data->code.' sudah menjadi MOD. Data tidak bisa ditambahkan.';
@@ -453,13 +461,20 @@ class MarketingOrderDeliveryController extends Controller
             $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
             $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
             $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
-
-            /* if($balanceLimitCredit < 0){
+            $grandtotal = $totalLimitCredit - $request->grandtotal;
+            if($balanceLimitCredit < 0){
                 $passedCreditLimit = false;
             }
 
-            if($balanceLimitDp < 0){
-                $passedCreditLimit = false;
+
+            // if($balanceLimitDp < 0){
+            //     $passedCreditLimit = false;
+            // }
+            if($grandtotal < 0){
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($request->grandtotal,2,',','.'),
+                ]);
             }
 
             if(!$passedCreditLimit){
@@ -467,7 +482,7 @@ class MarketingOrderDeliveryController extends Controller
                     'status'  => 500,
                     'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
                 ]);
-            } */
+            }
             $queryrevision = NULL;
             if($request->tempRevision){
                 $queryrevision = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->tempRevision))->where('status','2')->whereNull('marketing_order_delivery_id')->first();
@@ -479,7 +494,7 @@ class MarketingOrderDeliveryController extends Controller
                             'void_note' => 'DITUTUP KARENA REMAPING KE NOMOR : '.$request->code,
                             'void_date' => date('Y-m-d H:i:s')
                         ]);
-        
+
                         foreach($queryrevision->marketingOrderDeliveryDetail as $row){
                             if($row->marketingOrderDetail->marketingOrder->hasBalanceMod()){
                                 $row->marketingOrderDetail->marketingOrder->update([
@@ -487,13 +502,13 @@ class MarketingOrderDeliveryController extends Controller
                                 ]);
                             }
                         }
-        
+
                         activity()
                             ->performedOn(new MarketingOrderDelivery())
                             ->causedBy(session('bo_id'))
                             ->withProperties($queryrevision)
                             ->log('Void the marketing order delivery data');
-        
+
                         CustomHelper::sendNotification('marketing_order_deliveries',$queryrevision->id,'Marketing Order Delivery No. '.$queryrevision->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$queryrevision->user_id);
                         CustomHelper::removeApproval('marketing_order_deliveries',$queryrevision->id);
                     }
@@ -696,46 +711,46 @@ class MarketingOrderDeliveryController extends Controller
 
     public function show(Request $request){
         $po = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->id))->first();
-        if(!$request->revision){
-            if($po->status !== '2' || $po->stage_status == '2'){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
-                ]);
-            }
-        }else{
-            if($po->marketing_order_delivery_id){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf MOD hasil remap tidak bisa diremap ulang.',
-                ]);
-            }
-            if($po->status !== '2'){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
-                ]);
-            }
-            if(!$po->goodScaleDetail()->exists()){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, data yang bisa di remapping adalah data MOD yang memiliki Timbangan saja.',
-                ]);
-            }else{
-                if($po->goodScaleDetail->goodScale->time_scale_out && $po->goodScaleDetail->goodScale->time_scale_in){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, data timbangan telah selesai melakukan Timbang Isi.',
-                    ]);
-                }
-            }
-            if($po->marketingOrderDeliveryProcess()->exists()){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, SJ aktif harus divoid jika ingin menggunakan Remapping.',
-                ]);
-            }
-        }
+        // if(!$request->revision){
+        //     if($po->status !== '2' || $po->stage_status == '2'){
+        //         return response()->json([
+        //             'status'  => 500,
+        //             'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
+        //         ]);
+        //     }
+        // }else{
+        //     if($po->marketing_order_delivery_id){
+        //         return response()->json([
+        //             'status'  => 500,
+        //             'message' => 'Mohon maaf MOD hasil remap tidak bisa diremap ulang.',
+        //         ]);
+        //     }
+        //     if($po->status !== '2'){
+        //         return response()->json([
+        //             'status'  => 500,
+        //             'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
+        //         ]);
+        //     }
+        //     if(!$po->goodScaleDetail()->exists()){
+        //         return response()->json([
+        //             'status'  => 500,
+        //             'message' => 'Mohon maaf, data yang bisa di remapping adalah data MOD yang memiliki Timbangan saja.',
+        //         ]);
+        //     }else{
+        //         if($po->goodScaleDetail->goodScale->time_scale_out && $po->goodScaleDetail->goodScale->time_scale_in){
+        //             return response()->json([
+        //                 'status'  => 500,
+        //                 'message' => 'Mohon maaf, data timbangan telah selesai melakukan Timbang Isi.',
+        //             ]);
+        //         }
+        //     }
+        //     if($po->marketingOrderDeliveryProcess()->exists()){
+        //         return response()->json([
+        //             'status'  => 500,
+        //             'message' => 'Mohon maaf, SJ aktif harus divoid jika ingin menggunakan Remapping.',
+        //         ]);
+        //     }
+        // }
         $po['code'] = $request->revision ? $po->code.'-R' : $po->code;
         $po['code_place_id'] = substr($po->code,7,2);
         $po['account_name'] = $po->account()->exists() ? $po->account->employee_no.' - '.$po->account->name : '';
@@ -1387,5 +1402,28 @@ class MarketingOrderDeliveryController extends Controller
 
             return response()->json($response);
         }
+    }
+
+    public function getCustomerInfo(Request $request){
+        $query_user = User::find($request->id);
+        if($query_user){
+            $limit_credit_sisa = $query_user->limit_credit - ($query_user->count_limit_credit + $query_user->grandtotalUnsentModCredit() + $query_user->grandtotalUninvoiceDoCredit());
+            $response = [
+                'status' => 200,
+                'grandtotalUnsentModCredit' => number_format($query_user->grandtotalUnsentModCredit(), 2, ',', '.'),
+                'grandtotalUnsentModDp' => number_format($query_user->grandtotalUnsentModDp(), 2, ',', '.'),
+                'grandtotalUnsentDoCredit' => number_format($query_user->grandtotalUninvoiceDoCredit(), 2, ',', '.'),
+                'grandtotalUnsentDoDp' => number_format($query_user->grandtotalUninvoiceDoDp(), 2, ',', '.'),
+                'deposit' => number_format($query_user->deposit, 2, ',', '.'),
+                'limit_credit' => number_format($limit_credit_sisa, 2, ',', '.'),
+            ];
+
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data User Tidak Ditemukan'
+            ];
+        }
+        return response()->json($response);
     }
 }

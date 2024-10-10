@@ -245,7 +245,33 @@
                                     <div class="input-field col m3 s12">
                                         <a class="waves-effect waves-light cyan btn-small mt-3 mr-1" onclick="getMarketingOrder();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambahkan MO</a>
                                     </div>
-                                    <div class="col m6 s12">
+                                    <div class="input-field col m6 s12">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Limit Credit</td>
+                                                    <td id="limit_credit"></td>
+                                                    <td>Deposit</td>
+                                                    <td id="deposit"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Grand Total Unsent Mod Credit</td>
+                                                    <td id="grandtotalUnsentModCredit"></td>
+                                                    <td>Grand Total Unsent Mod DP</td>
+                                                    <td id="grandtotalUnsentModDp"></td>
+                                                </tr>
+
+                                                <tr>
+                                                    <td>Grand Total Unsent Do Credit</td>
+                                                    <td id="grandtotalUnsentDoCredit"></td>
+                                                    <td>Grand Total Unsent Do DP</td>
+                                                    <td id="grandtotalUnsentDoDp"></td>
+                                                </tr>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col m12 s12">
                                         <div class="card-alert card green" id="alert-phase1">
                                             <div class="card-content white-text">
                                                 <p>Info : MOD bisa menarik lebih dari 1 SO, dengan catatan, Kecamatan, Kota, Tipe Kendaraan, Tipe Pembayaran, Tipe Pengiriman, Prosentase DP, Tipe SO, dan TOP Internal adalah SAMA.</p>
@@ -342,6 +368,13 @@
                                                         </td>
                                                     </tr>
                                                 </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colspan="10" class="center"><strong>Total Grand Total SO:</strong></td>
+                                                        <td id="grand-total" class="center">0</td>
+
+                                                    </tr>
+                                                </tfoot>
                                             </table>
                                         </p>
                                     </div>
@@ -542,6 +575,7 @@
 
 <script>
     var tempAccount = null, paymentType = null;
+    var total_grandtotal=[0];
 
 document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
@@ -628,6 +662,12 @@ document.addEventListener('focusin', function (event) {
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
                 }
+                $('#grandtotalUnsentModCredit').text('');
+                $('#grandtotalUnsentModDp').text('');
+                $('#grandtotalUnsentDoCredit').text('');
+                $('#grandtotalUnsentDoDp').text('');
+                $('#deposit').text('');
+                $('#limit_credit').text('');
                 M.updateTextFields();
                 window.onbeforeunload = function() {
                     return null;
@@ -708,7 +748,24 @@ document.addEventListener('focusin', function (event) {
         });
 
         $('#body-item').on('click', '.delete-data-item', function() {
-            $(this).closest('tr').remove();
+            const $row = $(this).closest('tr');
+            const iteration = $row.data('iteration');
+            if (Array.isArray(total_grandtotal) && total_grandtotal.length > iteration) {
+                total_grandtotal.splice(iteration, 1);
+            }
+            let newGrandTotal=0;
+
+            $.each(total_grandtotal, function(index, value) {
+                d = parseFloat(value);
+                newGrandTotal += d;
+            });
+
+            x = parseFloat(newGrandTotal);
+            if(x > 0){
+                x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
+            }
+            $('#grand-total').text(x);
+            $row.closest('tr').remove();
             if($('.row_item').length == 0){
                 $('#body-item').append(`
                     <tr id="last-row-item">
@@ -760,6 +817,41 @@ document.addEventListener('focusin', function (event) {
                 }
             }
         });
+
+        $('#customer_id').on('select2:select', function (e) {
+            total_grandtotal = [0];
+            $('#grand-total').text(0);
+                $.ajax({
+                type : "POST",
+                url  : '{{ Request::url() }}/get_customer_info',
+                data : {
+                    id : e.params.data.id,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                cache: false,
+                beforeSend: function() {
+                    loadingOpen('#datatable_serverside');
+                },
+                success: function(data){
+                    loadingClose('#datatable_serverside');
+                    if(data.status == '200'){
+                        $('#grandtotalUnsentModCredit').text(data.grandtotalUnsentModCredit);
+                        $('#grandtotalUnsentModDp').text(data.grandtotalUnsentModDp);
+                        $('#grandtotalUnsentDoCredit').text(data.grandtotalUnsentDoCredit);
+                        $('#grandtotalUnsentDoDp').text(data.grandtotalUnsentDoDp);
+                        $('#deposit').text(data.deposit);
+                        $('#limit_credit').text(data.limit_credit);
+
+                    }else{
+                        M.toast({
+                            html: data.message
+                        });
+                    }
+                }
+            });
+        })
     });
 
     function updateSendStatus(code,element){
@@ -806,6 +898,7 @@ document.addEventListener('focusin', function (event) {
                 dataType: 'JSON',
                 data: {
                     id: $('#marketing_order_id').val(),
+                    arr_grandtotal: total_grandtotal,
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -826,6 +919,7 @@ document.addEventListener('focusin', function (event) {
                         $('#marketing_order_id').empty();
                     }else{
                         let passed = true;
+                        total_grandtotal.push(response.grandtotal);
                         if(tempAccount == null){
                             tempAccount = $('#marketing_order_id').select2('data')[0].account_id;
                             paymentType = $('#marketing_order_id').select2('data')[0].payment_type;
@@ -843,6 +937,7 @@ document.addEventListener('focusin', function (event) {
                             if($('.data-used').length > 0){
                                 $('.data-used').trigger('click');
                             }
+                            total_grandtotal = [0];
                             $('#body-item').empty();
                         }
                         $('#delivery_date').val(response.delivery_date);
@@ -851,6 +946,8 @@ document.addEventListener('focusin', function (event) {
                                 <option value="` + response.sender_id + `">` + response.sender_name + `</option>
                             `);
                         }
+
+                        $('#grand-total').text(response.formatted_grandtotal);
                         $('#note_internal').val(response.note_internal);
                         $('#note_external').val(response.note_external);
                         $('#tempDistrict').val(response.district_id);
@@ -878,11 +975,11 @@ document.addEventListener('focusin', function (event) {
                             `);
 
                             let no = $('.row_item').length + 1;
-
+                            var length = total_grandtotal.length - 1;
                             $.each(response.details, function(i, val) {
                                 var count = makeid(10);
                                 $('#body-item').append(`
-                                    <tr class="row_item" data-id="` + response.id + `">
+                                    <tr class="row_item" data-id="` + response.id + `" data-iteration="`+length+`">
                                         <input type="hidden" name="arr_mo[]" id="arr_mo` + count + `" value="` + $('#marketing_order_id').val() + `">
                                         <input type="hidden" name="arr_modi[]" id="arr_modi` + count + `" value="` + val.id + `">
                                         <input type="hidden" name="arr_item[]" id="arr_item` + count + `" value="` + val.item_id + `">
@@ -1311,6 +1408,23 @@ document.addEventListener('focusin', function (event) {
 
             },
             success: function(response) {
+                const $rowItem = $('.row_item[data-id="' + id + '"]');
+                const iteration = $rowItem.data('iteration');
+                if (Array.isArray(total_grandtotal) && total_grandtotal.length > iteration) {
+                    total_grandtotal.splice(iteration, 1);
+                }
+                let newGrandTotal=0;
+
+                $.each(total_grandtotal, function(index, value) {
+                    d = parseFloat(value);
+                    newGrandTotal += d;
+                });
+
+                x = parseFloat(newGrandTotal);
+                if(x > 0){
+                    x = formatRupiahIni(x.toFixed(2).toString().replace('.',','));
+                }
+                $('#grand-total').text(x);
                 $('.row_item[data-id="' + id + '"]').remove();
                 if($('.row_item').length == 0){
                     $('#body-item').empty().append(`
@@ -1620,9 +1734,15 @@ document.addEventListener('focusin', function (event) {
 
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
+                    let newGrandTotal = 0;
+                    $.each(total_grandtotal, function(index, value) {
+                        d = parseFloat(value);
+                        newGrandTotal += d;
+                    });
 
+                    x = parseFloat(newGrandTotal);
                     formData.append('lastsegment',lastSegment);
-
+                    formData.append('grandtotal',x);
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',

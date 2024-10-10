@@ -2613,6 +2613,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('update_send_status', [MarketingOrderDeliveryController::class, 'updateSendStatus'])->middleware('operation.access:marketing_order_delivery,update');
                     Route::get('approval/{id}', [MarketingOrderDeliveryController::class, 'approval'])->withoutMiddleware('direct.access');
                     Route::get('export_from_page', [MarketingOrderDeliveryController::class, 'exportFromTransactionPage']);
+                    Route::post('get_customer_info', [MarketingOrderDeliveryController::class,'getCustomerInfo']);
                     Route::get('print_individual/{id}', [MarketingOrderDeliveryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryController::class, 'voidStatus'])->middleware('operation.access:marketing_order_delivery,void');
                     Route::post('destroy', [MarketingOrderDeliveryController::class, 'destroy'])->middleware('operation.access:marketing_order_delivery,delete');

@@ -111,11 +111,13 @@ class TaxSeries extends Model
                         'status'    => 200,
                         'no'        => $no,
                     ];
+                    info('kambing1');
                 }else{
                     $response = [
                         'status'  => 500,
                         'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
                     ];
+                    info('kambing2');
                 }
             }else{
                 $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$data->start_no;

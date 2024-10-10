@@ -93,7 +93,7 @@ class TaxSeries extends Model
     } 
 
     public static function getTaxCode($company_id,$date,$prefix){
-        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->orderBy('id')->get();
+        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->orderBy('start_no')->get();
 
         if(count($data) > 0){
             $year = date('y',strtotime($date));
@@ -121,7 +121,6 @@ class TaxSeries extends Model
                         $tempNo = $currentno;
                         $branch = $row['branch_code'];
                         $year = $row['year'];
-                        info('kambing2');
                     }
                 }
                 if(!$passed){
@@ -130,11 +129,10 @@ class TaxSeries extends Model
                             $tempNo = $row['start_no'];
                             $branch = $row['branch_code'];
                             $year = $row['year'];
-                            info('kambing3');
+                            break;
                         }
                     }
                 }
-                info($arrNo);
                 if($tempNo){
                     $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$branch.'.'.$year.'.'.$newcurrent;

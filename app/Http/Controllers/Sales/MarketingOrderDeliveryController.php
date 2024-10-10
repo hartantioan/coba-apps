@@ -127,6 +127,10 @@ class MarketingOrderDeliveryController extends Controller
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })
+                            ->orWhereHas('customer',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
                             ->orWhereHas('marketingOrderDeliveryDetail',function($query) use ($search, $request){
                                 $query->whereHas('item',function($query) use ($search, $request){
                                     $query->where('code','like',"%$search%")
@@ -180,6 +184,10 @@ class MarketingOrderDeliveryController extends Controller
                                     ->orWhere('employee_no','like',"%$search%");
                             })
                             ->orWhereHas('account',function($query) use ($search, $request){
+                                $query->where('name','like',"%$search%")
+                                    ->orWhere('employee_no','like',"%$search%");
+                            })
+                            ->orWhereHas('customer',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
                             })

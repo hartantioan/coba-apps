@@ -39,6 +39,10 @@ class ExportTransactionPageOrderDelivery implements FromView,ShouldAutoSize
                                 $query->where('name','like',"%$this->search%")
                                     ->orWhere('employee_no','like',"%$this->search%");
                             })
+                            ->orWhereHas('customer',function($query) {
+                                $query->where('name','like',"%$this->search%")
+                                    ->orWhere('employee_no','like',"%$this->search%");
+                            })
                             ->orWhereHas('marketingOrderDeliveryDetail',function($query){
                                 $query->whereHas('item',function($query){
                                     $query->where('code','like',"%$this->search%")

@@ -105,6 +105,10 @@ class ExportMarketingOrderTransactionPage implements FromCollection, WithTitle, 
                     $query->where('name','like',"%$this->search%")
                         ->orWhere('employee_no','like',"%$this->search%");
                 })
+                ->orWhereHas('account',function($query){
+                    $query->where('name','like',"%$this->search%")
+                        ->orWhere('employee_no','like',"%$this->search%");
+                })
                 ->orWhereHas('marketingOrderDetail',function($query) {
                     $query->whereHas('item',function($query) {
                         $query->where('code','like',"%$this->search%")

@@ -426,7 +426,6 @@ class MarketingOrderDeliveryController extends Controller
         } else {
             $item = [];
             foreach($request->arr_item as $key => $value) {
-                info($value);
                 if (!isset($item[$value])) {
                     $item[$value] = 0;
                 }
@@ -502,11 +501,13 @@ class MarketingOrderDeliveryController extends Controller
                 ]);
             }
 
-            if(!$passedCreditLimit){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
-                ]);
+            if(!$request->temp){
+                if(!$passedCreditLimit){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal Item Kredit terkirim : '.number_format($totalCredit,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitCredit - $totalCredit,2,',','.').'. Dan sisa limit DP '.number_format($totalLimitDp,2,',','.').' sedangkan nominal Item DP terkirim : '.number_format($totalDp,2,',','.').' maka terjadi selisih nominal kirim sebesar '.number_format($totalLimitDp - $totalDp,2,',','.').'.',
+                    ]);
+                }
             }
             $queryrevision = NULL;
             if($request->tempRevision){
@@ -541,113 +542,104 @@ class MarketingOrderDeliveryController extends Controller
             }
 
 			if($request->temp){
-                DB::beginTransaction();
-                try {
-                    $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
+                $query = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->temp))->first();
 
-                    /* $approved = false;
-                    $revised = false;
+                /* $approved = false;
+                $revised = false;
 
-                    if($query->approval()){
-                        foreach ($query->approval() as $detail){
-                            foreach($detail->approvalMatrix as $row){
-                                if($row->approved){
-                                    $approved = true;
-                                }
+                if($query->approval()){
+                    foreach ($query->approval() as $detail){
+                        foreach($detail->approvalMatrix as $row){
+                            if($row->approved){
+                                $approved = true;
+                            }
 
-                                if($row->revised){
-                                    $revised = true;
-                                }
+                            if($row->revised){
+                                $revised = true;
                             }
                         }
                     }
+                }
 
-                    if($approved && !$revised){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
-                        ]);
-                    }
-                    if(!CustomHelper::checkLockAcc($request->post_date)){
-                        return response()->json([
-                            'status'  => 500,
-                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
-                        ]);
-                    } */
-                    if(in_array($query->status,['2'])){
+                if($approved && !$revised){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Marketing Order Delivery telah diapprove, anda tidak bisa melakukan perubahan.'
+                    ]);
+                }
+                if(!CustomHelper::checkLockAcc($request->post_date)){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
+                    ]);
+                } */
+                if(in_array($query->status,['2'])){
 
-                        $query->user_update_id = session('bo_id');
-                        $query->update_time = date('Y-m-d H:i:s');
-                        /* $query->code = $request->code; */
-                        $query->account_id = $request->account_id;
-                        $query->cost_delivery_type = $request->cost_delivery_type;
-                        $query->stage_status = '2';
-                        /* $query->company_id = $request->company_id;
-                        $query->customer_id = $request->customer_id;
-                        $query->post_date = $request->post_date;
-                        $query->delivery_date = $request->delivery_date;
-                        $query->destination_address = $request->destination_address;
-                        $query->city_id = $request->tempCity;
-                        $query->district_id = $request->tempDistrict;
-                        $query->transportation_id = $request->tempTransport;
-                        $query->note_internal = $request->note_internal;
-                        $query->note_external = $request->note_external;
-                        $query->send_status = NULL;
-                        $query->status = '1'; */
+                    $query->user_update_id = session('bo_id');
+                    $query->update_time = date('Y-m-d H:i:s');
+                    /* $query->code = $request->code; */
+                    $query->account_id = $request->account_id;
+                    $query->cost_delivery_type = $request->cost_delivery_type;
+                    $query->stage_status = '2';
+                    /* $query->company_id = $request->company_id;
+                    $query->customer_id = $request->customer_id;
+                    $query->post_date = $request->post_date;
+                    $query->delivery_date = $request->delivery_date;
+                    $query->destination_address = $request->destination_address;
+                    $query->city_id = $request->tempCity;
+                    $query->district_id = $request->tempDistrict;
+                    $query->transportation_id = $request->tempTransport;
+                    $query->note_internal = $request->note_internal;
+                    $query->note_external = $request->note_external;
+                    $query->send_status = NULL;
+                    $query->status = '1'; */
 
-                        $query->save();
+                    $query->save();
 
 
-                    }else{
-                        return response()->json([
-                            'status'  => 500,
-					        'message' => 'Status Marketing Order Delivery hanya bisa diupdate untuk status dokumen PROSES.'
-                        ]);
-                    }
-                }catch(\Exception $e){
-                    DB::rollback();
+                }else{
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Status Marketing Order Delivery hanya bisa diupdate untuk status dokumen PROSES.'
+                    ]);
                 }
 			}else{
-                DB::beginTransaction();
+        
+                $lastSegment = $request->lastsegment;
+                $menu = Menu::where('url', $lastSegment)->first();
+                $newCode=MarketingOrderDelivery::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
 
-                    $lastSegment = $request->lastsegment;
-                    $menu = Menu::where('url', $lastSegment)->first();
-                    $newCode=MarketingOrderDelivery::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
+                $query = MarketingOrderDelivery::create([
+                    'code'			                => $queryrevision ? $request->code : $newCode,
+                    'user_id'		                => session('bo_id'),
+                    'user_update_id'                => $request->tempRevision ? session('bo_id') : NULL,
+                    'update_time'                   => $request->tempRevision ? date('Y-m-d H:i:s') : NULL,
+                    'account_id'                    => $request->account_id ?? NULL,
+                    'company_id'                    => $request->company_id,
+                    'customer_id'	                => $request->customer_id,
+                    'marketing_order_delivery_id'   => $queryrevision ? $queryrevision->id : NULL,
+                    'post_date'                     => $request->post_date,
+                    'delivery_date'                 => $request->delivery_date,
+                    'destination_address'           => $request->destination_address,
+                    'city_id'                       => $request->tempCity,
+                    'district_id'                   => $request->tempDistrict,
+                    'transportation_id'             => $request->tempTransport,
+                    'cost_delivery_type'            => $request->cost_delivery_type,
+                    'type_delivery'                 => $request->tempTypeDelivery,
+                    'so_type'                       => $request->tempSoType,
+                    'top_internal'                  => $request->tempTopInternal,
+                    'note_internal'                 => $request->note_internal,
+                    'note_external'                 => $request->note_external,
+                    'status'                        => $request->tempRevision ? '2' : '1',
+                    'stage_status'                  => $request->tempRevision ? '2' : '1',
+                    'send_status'                   => $request->tempRevision ? '1' : NULL,
+                ]);
 
-                    $query = MarketingOrderDelivery::create([
-                        'code'			                => $queryrevision ? $request->code : $newCode,
-                        'user_id'		                => session('bo_id'),
-                        'user_update_id'                => $request->tempRevision ? session('bo_id') : NULL,
-                        'update_time'                   => $request->tempRevision ? date('Y-m-d H:i:s') : NULL,
-                        'account_id'                    => $request->account_id ?? NULL,
-                        'company_id'                    => $request->company_id,
-                        'customer_id'	                => $request->customer_id,
-                        'marketing_order_delivery_id'   => $queryrevision ? $queryrevision->id : NULL,
-                        'post_date'                     => $request->post_date,
-                        'delivery_date'                 => $request->delivery_date,
-                        'destination_address'           => $request->destination_address,
-                        'city_id'                       => $request->tempCity,
-                        'district_id'                   => $request->tempDistrict,
-                        'transportation_id'             => $request->tempTransport,
-                        'cost_delivery_type'            => $request->cost_delivery_type,
-                        'type_delivery'                 => $request->tempTypeDelivery,
-                        'so_type'                       => $request->tempSoType,
-                        'top_internal'                  => $request->tempTopInternal,
-                        'note_internal'                 => $request->note_internal,
-                        'note_external'                 => $request->note_external,
-                        'status'                        => $request->tempRevision ? '2' : '1',
-                        'stage_status'                  => $request->tempRevision ? '2' : '1',
-                        'send_status'                   => $request->tempRevision ? '1' : NULL,
+                if($queryrevision){
+                    $queryrevision->goodScaleDetail->update([
+                        'lookable_id'   => $query->id,
                     ]);
-
-                    if($queryrevision){
-                        $queryrevision->goodScaleDetail->update([
-                            'lookable_id'   => $query->id,
-                        ]);
-                    }
-
-
-
+                }
 			}
 
 			if($query) {
@@ -655,21 +647,15 @@ class MarketingOrderDeliveryController extends Controller
                     foreach($query->marketingOrderDeliveryDetail as $row){
                         $row->delete();
                     }
-                    DB::beginTransaction();
-                    try {
-                        foreach($request->arr_modi as $key => $row){
-                            $querydetail = MarketingOrderDeliveryDetail::create([
-                                'marketing_order_delivery_id'   => $query->id,
-                                'marketing_order_detail_id'     => $row,
-                                'item_id'                       => $request->arr_item[$key],
-                                'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                                'note'                          => $request->arr_note[$key],
-                                'place_id'                      => $request->arr_place[$key],
-                            ]);
-                        }
-
-                    }catch(\Exception $e){
-                        DB::rollback();
+                    foreach($request->arr_modi as $key => $row){
+                        $querydetail = MarketingOrderDeliveryDetail::create([
+                            'marketing_order_delivery_id'   => $query->id,
+                            'marketing_order_detail_id'     => $row,
+                            'item_id'                       => $request->arr_item[$key],
+                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'note'                          => $request->arr_note[$key],
+                            'place_id'                      => $request->arr_place[$key],
+                        ]);
                     }
                     $query->updateGrandtotal();
                     CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);

@@ -105,22 +105,33 @@ class TaxSeries extends Model
                 $currentno = intval($lastData) + 1;
                 $arrNo = [];
                 foreach($data as $row){
-                    for($x=$row->start_no;$x<=$row->end_no;$x){
-                        $arrNo[] = $x;
+                    $passed = false;
+                    if($currentno >= $row->start_no && $currentno <= $row->end_no){
+                        $passed = true;
+                        $tempNo = $currentno;
+                    }
+                    if(!$passed){
+                        $arrNo[] = [
+                            'start_no'  => $row->start_no,
+                            'end_no'    => $row->end_no,
+                        ];
                     }
                 }
-                if(in_array($currentno,$arrNo)){
-                    $key = array_search($currentno, $arrNo);
-                    $tempNo = $arrNo[$key];
-                }else{
-                    $key = array_search($lastData, $arrNo);
-                    if($key){
-                        if($arrNo[$key + 1]){
-                            $tempNo = $arrNo[$key + 1];
+                $passed = false;
+                foreach($arrNo as $row){
+                    if($currentno >= $row['start_no'] && $currentno <= $row['end_no']){
+                        $passed = true;
+                        $tempNo = $currentno;
+                    }
+                }
+                if(!$passed){
+                    foreach($arrNo as $row){
+                        if($row['start_no'] - $lastData > 0){
+                            $tempNo = $row['start_no'];
                         }
                     }
                 }
-                if($no){
+                if($tempNo){
                     $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
                     $response = [
@@ -133,12 +144,6 @@ class TaxSeries extends Model
                         'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
                     ];
                 }
-            }else{
-                $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$data->start_no;
-                $response = [
-                    'status'    => 200,
-                    'no'        => $no,
-                ];
             }
         }else{
             $response = [

@@ -93,7 +93,7 @@ class TaxSeries extends Model
     } 
 
     public static function getTaxCode($company_id,$date,$prefix){
-        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->get();
+        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->orderBy('id')->get();
 
         if(count($data) > 0){
             $year = date('y',strtotime($date));
@@ -107,22 +107,12 @@ class TaxSeries extends Model
                 $branch = '';
                 $year = '';
                 foreach($data as $row){
-                    $passed = false;
-                    if($currentno >= intval($row->start_no) && $currentno <= intval($row->end_no)){
-                        $passed = true;
-                        $tempNo = $currentno;
-                        $branch = $row->branch_code;
-                        $year = $row->year;
-                        info('kambing1');
-                    }
-                    if(!$passed){
-                        $arrNo[] = [
-                            'start_no'      => intval($row->start_no),
-                            'end_no'        => intval($row->end_no),
-                            'branch_code'   => $row->branch_code,
-                            'year'          => $row->year,
-                        ];
-                    }
+                    $arrNo[] = [
+                        'start_no'      => intval($row->start_no),
+                        'end_no'        => intval($row->end_no),
+                        'branch_code'   => $row->branch_code,
+                        'year'          => $row->year,
+                    ];
                 }
                 $passed = false;
                 foreach($arrNo as $row){
@@ -144,6 +134,7 @@ class TaxSeries extends Model
                         }
                     }
                 }
+                info($arrNo);
                 if($tempNo){
                     $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$branch.'.'.$year.'.'.$newcurrent;

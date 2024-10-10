@@ -49,6 +49,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
         $mo = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
             $query->where('post_date', '>=', $this->start_date)
                 ->where('post_date', '<=', $this->end_date)
+                ->where('status','2')
                 ->whereNotNull('send_status');
         })->get();
 
@@ -58,7 +59,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
             $array_filter[] = [
                 'No.' => ($key+1), // Assuming you have an ID or a similar unique identifier
                 'No. Dokumen' => $row->marketingOrderDelivery->code,
-                'Status' => $row->marketingOrderDelivery->statusRaw(),
+                'Status' => 'Siap Kirim',
                 'NIK' => $row->marketingOrderDelivery->user->employee_no,
                 'Pengguna' => $row->marketingOrderDelivery->user->name,
                 'Post Date' => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),

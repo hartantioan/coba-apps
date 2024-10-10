@@ -10,7 +10,7 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 use App\Models\MarketingOrderInvoiceDetail;
-use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\MarketingOrderInvoice;
 
 class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
@@ -27,10 +27,10 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
     {
         $totalAll = 0;
         $array_filter = [];
-        $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice',function($query){
-            $query->whereIn('status',['2','3'])->where('post_date', '>=', $this->start_date)
-            ->where('post_date', '<=', $this->end_date);
-        })->where('lookable_type','=','marketing_order_delivery_process_details')->get();
+        $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice', function ($query) {
+            $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+        })->where('lookable_type', '=', 'marketing_order_delivery_process_details')->get();
 
 
         foreach ($data as $row) {
@@ -44,10 +44,35 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'nomod' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
                 'pocust' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer(),
                 'customer' => $row->marketingOrderInvoice->account->name,
-                'item'=>$row->lookable->itemStock->item->name,
-                'qty'=>$row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
-                'uom'=>$row->lookable->itemStock->item->uomUnit->code,
-                'type'=>$row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
+                'item' => $row->lookable->itemStock->item->name,
+                'qty' => $row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                'uom' => $row->lookable->itemStock->item->uomUnit->code,
+                'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
+                'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
+            ];
+        }
+
+        $data = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess', function ($query) {
+            $query->whereIn('status', ['2'])->where('post_date', '>=', $this->start_date)
+                ->where('post_date', '<=', $this->end_date);
+        })->get();
+
+        foreach ($data as $row) {
+
+            $array_filter[] = [
+                'code'  => '',
+                'tglinvoice' => '',
+                'tglduedate' => '',
+                'grandtotal' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->price_after_discount * $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                'nosj' => $row->marketingOrderDeliveryProcess->code,
+                'tglsj' => date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->post_date)),
+                'nomod' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+                'pocust' => $row->marketingOrderDeliveryProcess->getPoCustomer(),
+                'customer' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->customer->name,
+                'item' => $row->marketingOrderDeliveryDetail->item->name,
+                'qty' => $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
+                'uom' => $row->marketingOrderDeliveryDetail->item->uomUnit->code,
+                'type' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
             ];
         }
 

@@ -116,10 +116,10 @@ class TaxSeries extends Model
                     }
                     if(!$passed){
                         $arrNo[] = [
-                            'start_no'  => $row->start_no,
-                            'end_no'    => $row->end_no,
-                            'branch'    => $row->branch_code,
-                            'year'      => $row->year,
+                            'start_no'      => $row->start_no,
+                            'end_no'        => $row->end_no,
+                            'branch_code'   => $row->branch_code,
+                            'year'          => $row->year,
                         ];
                     }
                 }

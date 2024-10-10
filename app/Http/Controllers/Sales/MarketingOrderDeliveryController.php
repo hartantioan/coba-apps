@@ -424,6 +424,31 @@ class MarketingOrderDeliveryController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
+            $item = [];
+            foreach($request->arr_item as $key => $value) {
+                info($value);
+                if (!isset($item[$value])) {
+                    $item[$value] = 0;
+                }
+                $quantity = str_replace(',', '.', str_replace('.', '', $request->arr_qty[$key]));
+                $item[$value] += (float)$quantity;
+            }
+            $error = [];
+            foreach($item as $key => $value) {
+                $item = Item::where('id', $key)->first();
+                $stock = $item->getStockAll();
+
+                if ($stock < $value) {
+                    $error[]=$item->name;
+                }
+            }
+            if(count($error)>0) {
+                $list_item =  implode(', ', $error);
+                return response()->json([
+                    'status'  => 500,
+                    'message' => 'Ada Item yang stocknya kurang pada SO yang dipilih dengan nama Item :'. $list_item,
+                ]);
+            }
 
             $passedZero = true;
             $passedQty = true;
@@ -572,7 +597,7 @@ class MarketingOrderDeliveryController extends Controller
 
                         $query->save();
 
-                        DB::commit();
+
                     }else{
                         return response()->json([
                             'status'  => 500,
@@ -621,7 +646,7 @@ class MarketingOrderDeliveryController extends Controller
                         ]);
                     }
 
-                    DB::commit();
+
 
 			}
 
@@ -642,7 +667,7 @@ class MarketingOrderDeliveryController extends Controller
                                 'place_id'                      => $request->arr_place[$key],
                             ]);
                         }
-                        DB::commit();
+
                     }catch(\Exception $e){
                         DB::rollback();
                     }

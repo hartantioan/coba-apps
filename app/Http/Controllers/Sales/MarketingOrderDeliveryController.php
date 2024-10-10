@@ -1352,7 +1352,7 @@ class MarketingOrderDeliveryController extends Controller
     public function updateSendStatus(Request $request){
         $data = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->code))->first();
         if($data){
-            if($data->status !== '2' || $data->goodScaleDetail()->exists()){
+            if($data->status !== '2'/*  || $data->goodScaleDetail()->exists() */){
                 $response = [
                     'status'  => 500,
                     'message' => 'Maaf, data tidak bisa diupdate, karena dokumen PROSES saja yang bisa dirubah atau masih ditarik pada dokumen timbangan.',

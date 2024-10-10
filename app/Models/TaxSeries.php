@@ -113,6 +113,7 @@ class TaxSeries extends Model
                         $tempNo = $currentno;
                         $branch = $row->branch_code;
                         $year = $row->year;
+                        info('kambing1');
                     }
                     if(!$passed){
                         $arrNo[] = [
@@ -130,6 +131,7 @@ class TaxSeries extends Model
                         $tempNo = $currentno;
                         $branch = $row['branch_code'];
                         $year = $row['year'];
+                        info('kambing2');
                     }
                 }
                 if(!$passed){
@@ -138,6 +140,7 @@ class TaxSeries extends Model
                             $tempNo = $row['start_no'];
                             $branch = $row['branch_code'];
                             $year = $row['year'];
+                            info('kambing3');
                         }
                     }
                 }

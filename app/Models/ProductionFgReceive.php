@@ -469,7 +469,7 @@ class ProductionFgReceive extends Model
                                 $arrDetail[] = [
                                     'lookable_type'     => $rowbom->lookable_type,
                                     'lookable_id'       => $rowbom->lookable_id,
-                                    'total'             => round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2),
+                                    'total'             => round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $price,2),
                                     'price'             => $price,
                                     'qty'               => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
                                     'nominal'           => $price,

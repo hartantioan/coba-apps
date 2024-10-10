@@ -108,7 +108,7 @@ class TaxSeries extends Model
                 $year = '';
                 foreach($data as $row){
                     $passed = false;
-                    if($currentno >= $row->start_no && $currentno <= $row->end_no){
+                    if($currentno >= intval($row->start_no) && $currentno <= intval($row->end_no)){
                         $passed = true;
                         $tempNo = $currentno;
                         $branch = $row->branch_code;
@@ -116,8 +116,8 @@ class TaxSeries extends Model
                     }
                     if(!$passed){
                         $arrNo[] = [
-                            'start_no'      => $row->start_no,
-                            'end_no'        => $row->end_no,
+                            'start_no'      => intval($row->start_no),
+                            'end_no'        => intval($row->end_no),
                             'branch_code'   => $row->branch_code,
                             'year'          => $row->year,
                         ];

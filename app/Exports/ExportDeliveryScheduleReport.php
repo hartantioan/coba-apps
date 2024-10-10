@@ -59,7 +59,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
             $array_filter[] = [
                 'No.' => ($key+1), // Assuming you have an ID or a similar unique identifier
                 'No. Dokumen' => $row->marketingOrderDelivery->code,
-                'Status' => 'Siap Kirim',
+                'Status' => $row->marketingOrderDelivery->statusRaw(),
                 'NIK' => $row->marketingOrderDelivery->user->employee_no,
                 'Pengguna' => $row->marketingOrderDelivery->user->name,
                 'Post Date' => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),

@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use App\Models\MarketingOrder;
+use App\Models\MarketingOrderDeliveryProcess;
 
 class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, WithTitle, WithHeadings, ShouldAutoSize
 {
@@ -68,31 +69,8 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
     public function collection()
     {
-        $data = MarketingOrder::where(function($query) {
-            // Apply the search conditions within the 'purchaseOrder' relationship
-            $query->where(function($query){
-                $query->where('code', 'like', "%$this->search%")
-                ->orWhere('document_no', 'like', "%$this->search%")
-                ->orWhere('note_internal', 'like', "%$this->search%")
-                ->orWhere('note_external', 'like', "%$this->search%")
-                ->orWhere('discount', 'like', "%$this->search%")
-                ->orWhere('total', 'like', "%$this->search%")
-                ->orWhere('tax', 'like', "%$this->search%")
-                ->orWhere('grandtotal', 'like', "%$this->search%")
-                ->orWhere('phone', 'like', "%$this->search%")
-                ->orWhereHas('user',function($query){
-                    $query->where('name','like',"%$this->search%")
-                        ->orWhere('employee_no','like',"%$this->search%");
-                })
-                ->orWhereHas('marketingOrderDetail',function($query) {
-                    $query->whereHas('item',function($query) {
-                        $query->where('code','like',"%$this->search%")
-                            ->orWhere('name','like',"%$this->search%");
-                    });
-                });
-            });
+        $data = MarketingOrderDeliveryProcess::where(function($query) {
 
-            // Other conditions for the 'purchaseOrder' relationship
             if($this->status){
                 $groupIds = explode(',', $this->status);
                 $query->whereIn('status', $groupIds);
@@ -108,11 +86,29 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
             }
 
             if($this->type_sales){
-                $query->where('type',$this->type_sales);
+                $query->whereHas('marketingOrderDeliveryProcessDetail', function ($subquery) {
+                    $subquery->whereHas('marketingOrderDeliveryDetail', function($subquery2) {
+                        $subquery2->whereHas('marketingOrderDetail', function($subquery3) {
+                            $subquery3->whereHas('marketingOrder', function($subquery4) {
+                                $subquery4->where('type',$this->type_sales);
+                            });
+                        });
+                    });
+                });
+
             }
 
             if($this->type_deliv){
-                $query->where('shipping_type',$this->type_deliv);
+                $query->whereHas('marketingOrderDeliveryProcessDetail', function ($subquery) {
+                    $subquery->whereHas('marketingOrderDeliveryDetail', function($subquery2) {
+                        $subquery2->whereHas('marketingOrderDetail', function($subquery3) {
+                            $subquery3->whereHas('marketingOrder', function($subquery4) {
+                                $subquery4->where('shipping_type',$this->type_deliv);
+                            });
+                        });
+                    });
+                });
+
             }
 
             if($this->customer){
@@ -122,12 +118,29 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
             if($this->sales){
                 $groupIds = explode(',', $this->sales);
-                $query->whereIn('sales_id',$groupIds);
+                $query->whereHas('marketingOrderDeliveryProcessDetail', function ($subquery)use( $groupIds ) {
+                    $subquery->whereHas('marketingOrderDeliveryDetail', function($subquery2)use( $groupIds ) {
+                        $subquery2->whereHas('marketingOrderDetail', function($subquery3)use( $groupIds ) {
+                            $subquery3->whereHas('marketingOrder', function($subquery4)use( $groupIds ) {
+                                $subquery4->whereIn('sales_id',$groupIds);
+                            });
+                        });
+                    });
+                });
+
             }
 
             if($this->delivery){
                 $groupIds = explode(',', $this->delivery);
-                $query->whereIn('sender_id',$groupIds);
+                $query->whereHas('marketingOrderDeliveryProcessDetail', function ($subquery)use( $groupIds ) {
+                    $subquery->whereHas('marketingOrderDeliveryDetail', function($subquery2)use( $groupIds ) {
+                        $subquery2->whereHas('marketingOrderDetail', function($subquery3)use( $groupIds ) {
+                            $subquery3->whereHas('marketingOrder', function($subquery4)use( $groupIds ) {
+                                $subquery4->whereIn('sender_id',$groupIds);
+                            });
+                        });
+                    });
+                });
             }
 
             if($this->company){
@@ -135,7 +148,15 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
             }
 
             if($this->type_pay){
-                $query->where('payment_type',$this->type_pay);
+                $query->whereHas('marketingOrderDeliveryProcessDetail', function ($subquery) {
+                    $subquery->whereHas('marketingOrderDeliveryDetail', function($subquery2) {
+                        $subquery2->whereHas('marketingOrderDetail', function($subquery3) {
+                            $subquery3->whereHas('marketingOrder', function($subquery4) {
+                                $subquery4->where('payment_type',$this->type_pay);
+                            });
+                        });
+                    });
+                });
             }
 
             if($this->currency){
@@ -149,52 +170,50 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
         $x=1;
         foreach($data as $key => $row){
-            $subtotal = $row->subtotal * $row->currency_rate;
-            $discount = $row->discount * $row->currency_rate;
-            $total = $subtotal - $discount;
+            foreach($row->marketingOrderDeliveryProcessDetail as  $key_detail =>$row_process_detail){
+                $row_detail = $row_process_detail->marketingOrderDeliveryDetail->marketingOrderDetail;
 
-            foreach($row->marketingOrderDetail as  $key_detail =>$row_detail){
-                $arr[] = [
-                    'variant_item'      => $row_detail->item->type->name,
-                    'status'            => $row->statusSAP(),
-                    'no_do'             => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->code ?? '-',
-                    'no_so'             => $row->code,
-                    'no_mod'            => $row_detail->listCodeMOD(),
-                    'no_invoice'        => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->marketingOrderInvoice->code??'-',
-                    'customer_code'     => $row->account->employee_no,
-                    'customer'          => $row->account->name,
-                    'customer_detail'   => isset($row->outlet->name) ? $row->outlet->name : '-',
-                    'alamat_kirim'      => $row->destination_address,
-                    'tipe_penjualan'   => $row->type(),
-                    'tipe_pengiriman'   => $row->deliveryType(),
-                    'kabupaten_tujuan'  => $row->city->name,
-                    'kecamatan_tujuan'  => $row->district->name,
+                    $arr[] = [
+                        'variant_item'      => $row_detail->item->type->name,
+                        'status'            => $row_detail->marketingOrder->statusSAP(),
+                        'no_do'             => $row->code ?? '-',
+                        'no_so'             => $row_detail->marketingOrder->code,
+                        'no_mod'            => $row_detail->listCodeMOD(),
+                        'no_invoice'        => $row->marketingOrderInvoice->code??'-',
+                        'customer_code'     => $row_detail->marketingOrder->account->employee_no,
+                        'customer'          => $row_detail->marketingOrder->account->name,
+                        'customer_detail'   => isset($row_detail->marketingOrder->outlet->name) ? $row_detail->marketingOrder->outlet->name : '-',
+                        'alamat_kirim'      => $row_detail->marketingOrder->destination_address,
+                        'tipe_penjualan'   => $row_detail->marketingOrder->type(),
+                        'tipe_pengiriman'   => $row_detail->marketingOrder->deliveryType(),
+                        'kabupaten_tujuan'  => $row_detail->marketingOrder->city->name,
+                        'kecamatan_tujuan'  => $row_detail->marketingOrder->district->name,
 
 
-                    'ppn'               => $row_detail->percent_tax,
-                    'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
+                        'ppn'               => $row_detail->percent_tax,
+                        'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
 
-                    'delivery_date'     => date('d/m/Y',strtotime($row->delivery_date)),
-                    'qty'               => $row_detail->qty,
-                    'unit'              => $row_detail->itemUnit->unit->code,
-                    'harga_satuan'      => $row_detail->price,
-                    'discount_1'        => $row_detail->percent_discount_1,
-                    'discount_2'        => $row_detail->percent_discount_2,
-                    'discount_3'        => $row_detail->discount_3,
-                    'disc_global'       => $row->discount,
-                    'dp_percentage'     => $row->percent_dp,
-                    'tipe_pembayaran'    => $row->paymentType(),
-                    'ekspedisi_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->account->name ?? '-',
-                    'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
-                    'plat_no'                      => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->vehicle_no ?? '-',
-                    // 'nama_supir'                   => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDelivery->marketingOrderDeliveryProcess->driver_name ?? '-',
-                    'sales_employee_name'          => $row->sales->name,
-                    /* 'project_name'               => $row->project->name??'-',
-                    'other_fee'             => $row_detail->other_fee,
-                    'ongkir'        => $row_detail->price_delivery, */
+                        'delivery_date'     => date('d/m/Y',strtotime($row_detail->marketingOrder->delivery_date)),
+                        'qty'               => $row_detail->qty,
+                        'unit'              => $row_detail->itemUnit->unit->code,
+                        'harga_satuan'      => $row_detail->price,
+                        'discount_1'        => $row_detail->percent_discount_1,
+                        'discount_2'        => $row_detail->percent_discount_2,
+                        'discount_3'        => $row_detail->discount_3,
+                        'disc_global'       => $row_detail->marketingOrder->discount,
+                        'dp_percentage'     => $row_detail->marketingOrder->percent_dp,
+                        'tipe_pembayaran'    => $row_detail->marketingOrder->paymentType(),
+                        'ekspedisi_name'               => $row->account->name ?? '-',
+                        'transport_name'               => $row_detail->marketingOrderDeliveryDetail->first()->marketingOrderDetail->marketingOrder->transportation->name ?? '-',
+                        'plat_no'                      => $row->vehicle_no ?? '-',
+                        // 'nama_supir'                   => $row->driver_name ?? '-',
+                        'sales_employee_name'          => $row_detail->marketingOrder->sales->name,
+                        /* 'project_name'               => $row->project->name??'-',
+                        'other_fee'             => $row_detail->other_fee,
+                        'ongkir'        => $row_detail->price_delivery, */
 
-                ];
-                $x++;
+                    ];
+                    $x++;
             }
 
 

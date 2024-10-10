@@ -280,7 +280,7 @@ class Item extends Model
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
-            $pricenow = $price->qty_final > 0 ? round($price->total_final / $price->qty_final,6) : 0;
+            $pricenow = $price->qty_final > 0 ? $price->total_final / $price->qty_final : 0;
         }
         return CustomHelper::formatConditionalQty(round($pricenow,2));
     }
@@ -330,7 +330,7 @@ class Item extends Model
         $pricenow = 0;
         $price = ItemCogs::where('item_id',$this->id)->where('place_id',$place_id)->whereDate('date','<=',$date)->orderByDesc('date')->orderByDesc('id')->first();
         if($price){
-            $pricenow = $price->qty_final > 0 ? round($price->total_final / $price->qty_final,6) : 0;
+            $pricenow = $price->qty_final > 0 ? $price->total_final / $price->qty_final : 0;
         }
 
         return $pricenow;

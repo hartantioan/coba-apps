@@ -1092,7 +1092,6 @@
             }
         }
         count();
-        countAll();
     }
 
     function count(){
@@ -1102,6 +1101,7 @@
         });
         $('#qty').val(formatRupiahIni(totalQty.toFixed(3).toString().replace('.',',')));
         countUsedBatch();
+        countAll();
     }
 
     function applyQty(code){
@@ -1337,9 +1337,7 @@
         batch = parseFloat($('#total-batch-used').text().replaceAll(".", "").replaceAll(",","."));
         $('#total-received').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
         reject = (batch - total).toFixed(3);
-        if(reject > 0){
-            $('#total-reject').text(formatRupiahIni(reject.toString().replace('.',',')));
-        }
+        $('#total-reject').text(formatRupiahIni(reject.toString().replace('.',',')));
     }
 
     function generateBarcode(){

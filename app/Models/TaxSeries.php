@@ -93,7 +93,7 @@ class TaxSeries extends Model
     } 
 
     public static function getTaxCode($company_id,$date,$prefix){
-        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->get();
+        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->orderBy('start_no')->get();
 
         if(count($data) > 0){
             $year = date('y',strtotime($date));
@@ -104,36 +104,38 @@ class TaxSeries extends Model
                 $lastData = $list[0];
                 $currentno = intval($lastData) + 1;
                 $arrNo = [];
+                $branch = '';
+                $year = '';
                 foreach($data as $row){
-                    $passed = false;
-                    if($currentno >= $row->start_no && $currentno <= $row->end_no){
-                        $passed = true;
-                        $tempNo = $currentno;
-                    }
-                    if(!$passed){
-                        $arrNo[] = [
-                            'start_no'  => $row->start_no,
-                            'end_no'    => $row->end_no,
-                        ];
-                    }
+                    $arrNo[] = [
+                        'start_no'      => intval($row->start_no),
+                        'end_no'        => intval($row->end_no),
+                        'branch_code'   => $row->branch_code,
+                        'year'          => $row->year,
+                    ];
                 }
                 $passed = false;
                 foreach($arrNo as $row){
                     if($currentno >= $row['start_no'] && $currentno <= $row['end_no']){
                         $passed = true;
                         $tempNo = $currentno;
+                        $branch = $row['branch_code'];
+                        $year = $row['year'];
                     }
                 }
                 if(!$passed){
                     foreach($arrNo as $row){
                         if($row['start_no'] - $lastData > 0){
                             $tempNo = $row['start_no'];
+                            $branch = $row['branch_code'];
+                            $year = $row['year'];
+                            break;
                         }
                     }
                 }
                 if($tempNo){
                     $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
-                    $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
+                    $no = $prefix.'.'.$branch.'.'.$year.'.'.$newcurrent;
                     $response = [
                         'status'    => 200,
                         'no'        => $no,

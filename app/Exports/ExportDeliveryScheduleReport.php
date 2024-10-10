@@ -40,6 +40,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
         'Qty',
         'Satuan',
         'Note',
+        'Note Internal',
         'SO Ref.',
     ];
     public function collection()
@@ -47,7 +48,8 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
         $array_filter = [];
         $mo = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
             $query->where('post_date', '>=', $this->start_date)
-                ->where('post_date', '<=', $this->end_date);
+                ->where('post_date', '<=', $this->end_date)
+                ->whereNotNull('send_status');
         })->get();
 
 
@@ -72,6 +74,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
                 'Qty' => $row->qty,
                 'satuan' => $row->marketingOrderDetail->itemUnit->unit->code,
                 'Note' => $row->note,
+                'Note_internal' => $row->note_internal,
                 'SO Ref.' => $row->marketingOrderDetail->marketingOrder->code ?? '-',
             ];
         }

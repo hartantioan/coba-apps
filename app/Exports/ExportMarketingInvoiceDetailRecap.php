@@ -27,27 +27,27 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
     {
         $totalAll = 0;
         $array_filter = [];
-        $data = MarketingOrderInvoiceDetail::whereHas('MarketingOrderInvoice',function($query){
+        $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice',function($query){
             $query->whereIn('status',['2','3'])->where('post_date', '>=', $this->start_date)
             ->where('post_date', '<=', $this->end_date);
-        })->get();
+        })->where('lookable_type','=','marketing_order_delivery_process_details')->get();
 
 
         foreach ($data as $row) {
 
             $array_filter[] = [
-                'code'  => $row->MarketingOrderInvoice->code,
-                'tglinvoice' => date('d/m/Y', strtotime($row->MarketingOrderInvoice->post_date)),
-                'tglduedate' => date('d/m/Y', strtotime($row->MarketingOrderInvoice->due_date)),
+                'code'  => $row->marketingOrderInvoice->code,
+                'tglinvoice' => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
+                'tglduedate' => date('d/m/Y', strtotime($row->marketingOrderInvoice->due_date)),
                 'grandtotal' => $row->grandtotal,
-                'nosj' => $row->MarketingOrderInvoice->marketingOrderDeliveryProcess->code,
-                'nomod' => $row->MarketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
-                'pocust' => $row->MarketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer(),
-                'customer' => $row->MarketingOrderInvoice->account->name,
+                'nosj' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->code,
+                'nomod' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
+                'pocust' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->getPoCustomer(),
+                'customer' => $row->marketingOrderInvoice->account->name,
                 'item'=>$row->lookable->itemStock->item->name,
                 'qty'=>$row->lookable->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
                 'uom'=>$row->lookable->itemStock->item->uomUnit->code,
-                'type'=>$row->MarketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
+                'type'=>$row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
             ];
         }
 

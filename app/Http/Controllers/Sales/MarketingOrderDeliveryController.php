@@ -1426,12 +1426,14 @@ class MarketingOrderDeliveryController extends Controller
     public function getCustomerInfo(Request $request){
         $query_user = User::find($request->id);
         if($query_user){
-            $limit_credit_sisa = $query_user->limit_credit - ($query_user->count_limit_credit + $query_user->grandtotalUnsentModCredit() + $query_user->grandtotalUninvoiceDoCredit());
+            $totalUnsentModCredit = $query_user->grandtotalUnsentModCredit();
+            $totalUninvoiceDoCredit = $query_user->grandtotalUninvoiceDoCredit();
+            $limit_credit_sisa = $query_user->limit_credit - ($query_user->count_limit_credit + $totalUnsentModCredit + $totalUninvoiceDoCredit);
             $response = [
                 'status' => 200,
-                'grandtotalUnsentModCredit' => number_format($query_user->grandtotalUnsentModCredit(), 2, ',', '.'),
+                'grandtotalUnsentModCredit' => number_format($totalUnsentModCredit, 2, ',', '.'),
                 'grandtotalUnsentModDp' => number_format($query_user->grandtotalUnsentModDp(), 2, ',', '.'),
-                'grandtotalUnsentDoCredit' => number_format($query_user->grandtotalUninvoiceDoCredit(), 2, ',', '.'),
+                'grandtotalUnsentDoCredit' => number_format($totalUninvoiceDoCredit, 2, ',', '.'),
                 'grandtotalUnsentDoDp' => number_format($query_user->grandtotalUninvoiceDoDp(), 2, ',', '.'),
                 'deposit' => number_format($query_user->deposit, 2, ',', '.'),
                 'limit_credit' => number_format($limit_credit_sisa, 2, ',', '.'),

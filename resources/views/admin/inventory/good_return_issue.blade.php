@@ -67,13 +67,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                        
+
                     </div>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -205,7 +205,7 @@
                                     </select>
                                     <label class="" for="company_id">{{ __('translations.company') }}</label>
                                 </div>
-                               
+
                                 <div class="input-field col m4 s12 step4">
                                     <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. post" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
                                     <label class="active" for="post_date">Tgl. Post</label>
@@ -218,7 +218,7 @@
                                     <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                         Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                         <br>
-                                        
+
                                     </div>
                                     <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                        Clear
@@ -311,7 +311,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -358,7 +358,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -381,7 +381,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -398,7 +398,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -409,10 +409,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -428,7 +428,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -475,7 +475,7 @@
                             <th class="center-align">Debit</th>
                             <th class="center-align">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -530,7 +530,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -538,18 +538,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -557,16 +557,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -585,22 +585,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -632,13 +632,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -663,16 +663,16 @@
 
         $('#datatable_serverside').on('click', 'button', function(event) {
             event.stopPropagation();
-            
+
         });
 
         loadDataTable();
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -727,7 +727,7 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 window.print();
@@ -740,7 +740,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -750,19 +750,19 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
-                
+
             }
         });
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -787,7 +787,7 @@
             }
         });
 
-        select2ServerSide('#good_issue_id', '{{ url("admin/select2/good_issue_return") }}');
+        select2ServerSideLonger('#good_issue_id', '{{ url("admin/select2/good_issue_return") }}');
     });
 
     String.prototype.replaceAt = function(index, replacement) {
@@ -901,7 +901,7 @@
             dom: 'Blfrtip',
             buttons: [
                 'columnsToggle',
-                'selectNone' 
+                'selectNone'
             ],
             "language": {
                 "lengthMenu": "Menampilkan _MENU_ data per halaman",
@@ -977,7 +977,7 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-
+                    let allNotes = [];
                     if(response.status == 500){
                         swal({
                             title: 'Ups!',
@@ -985,6 +985,12 @@
                             icon: 'warning'
                         });
                     }else{
+                        var note = $('#note').val();
+                        if(note == ""){
+                            $('#note').val('return from :'+datakuy.code);
+                        }else{
+                            $('#note').val(note+','+datakuy.code);
+                        }
 
                         $('#list-used-data').append(`
                             <div class="chip purple darken-4 gradient-shadow white-text">
@@ -992,7 +998,7 @@
                                 <i class="material-icons close data-used" onclick="removeUsedData('` + datakuy.table + `','` + $('#good_issue_id').val() + `')">close</i>
                             </div>
                         `);
-                        
+
                         $('#last-row-item').remove();
 
                         $.each(datakuy.details, function(i, val) {
@@ -1066,7 +1072,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -1074,7 +1080,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -1124,12 +1130,12 @@
                     var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
-                    
+
                     var segments = path.split('/');
                     var lastSegment = segments[segments.length - 1];
-                
+
                     formData.append('lastsegment',lastSegment);
-                    
+
                     $.ajax({
                         url: '{{ Request::url() }}/create',
                         type: 'POST',
@@ -1156,7 +1162,7 @@
                             } else if(response.status == 422) {
                                 $('#validation_alert').show();
                                 $('.modal-content').scrollTop(0);
-                                
+
                                 swal({
                                     title: 'Ups! Validation',
                                     text: 'Check your form.',
@@ -1238,7 +1244,7 @@
                 $('#company_id').val(response.company_id).formSelect();
                 $('#note').val(response.note);
                 $('#post_date').val(response.post_date);
-                
+
                 if(response.details.length > 0){
                     $('#last-row-item').remove();
                     $.each(response.details, function(i, val) {
@@ -1395,7 +1401,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1407,7 +1413,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1415,10 +1421,10 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
-    
+
     function printData(){
         var arr_id_temp=[];
         $.map(window.table.rows('.selected').nodes(), function (item) {
@@ -1461,7 +1467,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1506,13 +1512,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1542,11 +1548,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function printPreview(code,aslicode){
@@ -1568,7 +1574,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1577,10 +1583,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function viewJournal(id){
@@ -1591,7 +1597,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1635,27 +1641,27 @@
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step3'),
-                    intro : 'Perusahaan tempat memo ini dibuat atau diperuntukkan' 
+                    intro : 'Perusahaan tempat memo ini dibuat atau diperuntukkan'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step4'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step5'),
-                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.' 
+                    intro : 'Silahkan unggah file lampiran. untuk saat ini hanya bisa mengakomodir 1 file lampiran saja. Jika ingin menambahkan file lebih dari 1, silahkan gabungkan file anda menjadi pdf.'
                 },
                 {
                     title : ' Good Issue / Barang Keluar',
                     element : document.querySelector('.step6'),
-                    intro : ' Guna mengambil data yang terdapat pada good issue terkait dan akan menambahkan ke list detail produk yang akan digunakan untuk good return issue' 
+                    intro : ' Guna mengambil data yang terdapat pada good issue terkait dan akan menambahkan ke list detail produk yang akan digunakan untuk good return issue'
                 },
                 {
                     title : 'Detail Produk',
                     element : document.querySelector('.step7'),
-                    intro : 'List Produk yang terkait' 
+                    intro : 'List Produk yang terkait'
                 },
                 {
                     title : 'Keterangan',
@@ -1665,7 +1671,7 @@
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step9'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -1679,7 +1685,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -1696,6 +1702,6 @@
         var modedata = '{{ $modedata }}';
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&end_date=" + end_date + "&start_date=" + start_date + "&modedata=" + modedata;
-       
+
     }
 </script>

@@ -181,6 +181,7 @@ use App\Http\Controllers\Sales\ReportSalesSummaryStockFgController;
 use App\Http\Controllers\Sales\ReportTrackingSalesOrderController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
+use App\Http\Controllers\Sales\MarketingInvoiceDetailRecapController;
 use App\Http\Controllers\Sales\MarketingARDPrecapController;
 use App\Http\Controllers\Sales\ReportReceivableCardController;
 
@@ -2898,6 +2899,11 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_marketing_invoice')->middleware('operation.access:report_marketing_invoice,view')->group(function () {
                         Route::get('/', [MarketingInvoiceRecapController::class, 'index']);
                         Route::get('export', [MarketingInvoiceRecapController::class, 'export']);
+                    });
+
+                    Route::prefix('report_marketing_invoice_detail')->middleware('operation.access:report_marketing_invoice_detail,view')->group(function () {
+                        Route::get('/', [MarketingInvoiceDetailRecapController::class, 'index']);
+                        Route::get('export', [MarketingInvoiceDetailRecapController::class, 'export']);
                     });
 
                     Route::prefix('report_marketing_down_payment')->middleware('operation.access:report_marketing_down_payment,view')->group(function () {

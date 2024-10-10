@@ -104,6 +104,7 @@ class TaxSeries extends Model
                 $currentno = intval($lastData) + 1;
                 $startno = intval($data->start_no);
                 $endno = intval($data->end_no);
+                info($currentno.' - '.$startno.' - '.$endno);
                 if($currentno >= $startno && $currentno <= $endno){
                     $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
@@ -111,13 +112,11 @@ class TaxSeries extends Model
                         'status'    => 200,
                         'no'        => $no,
                     ];
-                    info('kambing1');
                 }else{
                     $response = [
                         'status'  => 500,
                         'message' => 'Nomor seri baru di luar batas seri pajak yang ada. Silahkan tambahkan data terbaru.'
                     ];
-                    info('kambing2');
                 }
             }else{
                 $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$data->start_no;

@@ -93,20 +93,35 @@ class TaxSeries extends Model
     } 
 
     public static function getTaxCode($company_id,$date,$prefix){
-        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->first();
+        $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->get();
 
-        if($data){
+        if(count($data) > 0){
             $year = date('y',strtotime($date));
             $list = TaxSeries::getListCurrentTaxSeries($company_id,$year,$prefix);
             $no = '';
+            $tempNo = '';
             if(count($list) > 0){
                 $lastData = $list[0];
                 $currentno = intval($lastData) + 1;
-                $startno = intval($data->start_no);
-                $endno = intval($data->end_no);
-                info($currentno.' - '.$startno.' - '.$endno);
-                if($currentno >= $startno && $currentno <= $endno){
-                    $newcurrent = str_pad($currentno, 8, 0, STR_PAD_LEFT);
+                $arrNo = [];
+                foreach($data as $row){
+                    for($x=$row->start_no;$x<=$row->end_no;$x){
+                        $arrNo[] = $x;
+                    }
+                }
+                if(in_array($currentno,$arrNo)){
+                    $key = array_search($currentno, $arrNo);
+                    $tempNo = $arrNo[$key];
+                }else{
+                    $key = array_search($lastData, $arrNo);
+                    if($key){
+                        if($arrNo[$key + 1]){
+                            $tempNo = $arrNo[$key + 1];
+                        }
+                    }
+                }
+                if($no){
+                    $newcurrent = str_pad($tempNo, 8, 0, STR_PAD_LEFT);
                     $no = $prefix.'.'.$data->branch_code.'.'.$data->year.'.'.$newcurrent;
                     $response = [
                         'status'    => 200,

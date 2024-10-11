@@ -299,6 +299,16 @@ class FundRequest extends Model
         return $total;
     }
 
+    public function hasBalancePurchaseDownPayment(){ 
+        $has = false;
+        foreach($this->fundRequestDetail as $row){
+            if($row->balancePurchaseDownPaymentDetail() > 0){
+                $has = true;
+            }
+        }
+        return $has;
+    }
+
     public function totalUsedPurchaseDownPayment(){
         $total = 0;
         foreach($this->fundRequestDetail()->whereHas('purchaseDownPaymentDetail')->get() as $row){

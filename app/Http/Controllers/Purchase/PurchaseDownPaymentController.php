@@ -138,28 +138,30 @@ class PurchaseDownPaymentController extends Controller
         }
 
         foreach($data2 as $row){
-            $list_items = '<ol>';
+            if($row->hasBalancePurchaseDownPayment()){
+                $list_items = '<ol>';
 
-            foreach($row->fundRequestDetail as $key => $rowdetail){
-                $item_unit = $rowdetail->unit->code;CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').' 1231312321321312312312312312</li>';
+                foreach($row->fundRequestDetail as $key => $rowdetail){
+                    $item_unit = $rowdetail->unit->code;CustomHelper::formatConditionalQty($rowdetail->qty).' '.$item_unit.' Total '.number_format($rowdetail->total,2,',','.').' PPN '.number_format($rowdetail->tax,2,',','.').' PPh '.number_format($rowdetail->wtax,2,',','.').' Grandtotal '.number_format($rowdetail->grandtotal,2,',','.').' </li>';
+                }
+    
+                $list_items .= '</ol>';
+    
+                $details[] = [
+                    'id'            => $row->id,
+                    'po_code'       => CustomHelper::encrypt($row->code),
+                    'po_no'         => $row->code,
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'delivery_date' => date('d/m/Y',strtotime($row->required_date)),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'list_items'    => $list_items,
+                    'note'          => $row->note ? $row->note : '',
+                    'type'          => $row->getTable(),
+                    'total'         => number_format($row->total,2,',','.'),
+                    'tax'           => number_format($row->tax,2,',','.'),
+                    'wtax'          => number_format($row->wtax,2,',','.'),
+                ];
             }
-
-            $list_items .= '</ol>';
-
-            $details[] = [
-                'id'            => $row->id,
-                'po_code'       => CustomHelper::encrypt($row->code),
-                'po_no'         => $row->code,
-                'post_date'     => date('d/m/Y',strtotime($row->post_date)),
-                'delivery_date' => date('d/m/Y',strtotime($row->required_date)),
-                'grandtotal'    => number_format($row->grandtotal,2,',','.'),
-                'list_items'    => $list_items,
-                'note'          => $row->note ? $row->note : '',
-                'type'          => $row->getTable(),
-                'total'         => number_format($row->total,2,',','.'),
-                'tax'           => number_format($row->tax,2,',','.'),
-                'wtax'          => number_format($row->wtax,2,',','.'),
-            ];
         }
 
         return response()->json($details);

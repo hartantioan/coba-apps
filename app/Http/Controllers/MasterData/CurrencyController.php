@@ -294,10 +294,8 @@ class CurrencyController extends Controller
 
             }
 
-
+            info('habis');
         }
-        info($adjustedDate);
-        info($find);
 
         return $find;
     }

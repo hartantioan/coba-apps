@@ -87,7 +87,7 @@ class ProductionIssue extends Model
     {
         return $this->belongsTo('App\Models\Place', 'place_id', 'id')->withTrashed();
     }
-    
+
     public function line()
     {
         return $this->belongsTo('App\Models\Line', 'line_id', 'id')->withTrashed();
@@ -117,6 +117,35 @@ class ProductionIssue extends Model
     public function totalItem(){
         $total = $this->productionIssueDetail()->whereNull('is_wip')->where('lookable_type','items')->sum('total');
         return $total;
+    }
+
+    public function qty(){
+        $total = $this->productionIssueDetail()->whereNull('is_wip')->where('lookable_type','items')->sum('qty');
+        return $total;
+    }
+
+    public function qtyReceive(){
+        $diterima = 0;
+        foreach($this->productionReceiveIssue as $row_prec_issue){
+            if($row_prec_issue->productionReceiveIssueDetail()->exists()){
+                foreach( $row_prec_issue->productionReceiveIssueDetail as $row_rec_issue_detail ){
+                    $diterima += $row_rec_issue_detail->qty;
+                };
+            }else{
+                $diterima = $this->qty();
+            }
+        }
+
+        return $diterima;
+    }
+
+    public function listReceive(){
+        $arr_list = [];
+        foreach($this->productionReceiveIssue as $row_prec_issue){
+            $arr_list[] = $row_prec_issue->productionReceive->code;
+        }
+        $list_rec_code = implode('', $arr_list);
+        return $list_rec_code;
     }
 
     public function totalResource(){
@@ -156,7 +185,7 @@ class ProductionIssue extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -252,7 +281,7 @@ class ProductionIssue extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -295,7 +324,7 @@ class ProductionIssue extends Model
             foreach($this->productionReceiveIssue as $row){
                 foreach($row->productionReceive->productionReceiveDetail as $rowreceive){
                     $qty -= ($rowreceive->qty + $rowreceive->qty_reject);
-                }  
+                }
             }
         }
         return round($qty,3);
@@ -316,7 +345,7 @@ class ProductionIssue extends Model
             }
             $this->journal->delete();
         }
-        
+
         CustomHelper::sendJournal($this->table,$this->id);
 
         if($this->productionReceiveIssue()->exists()){

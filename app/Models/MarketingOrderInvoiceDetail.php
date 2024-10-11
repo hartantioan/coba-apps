@@ -82,7 +82,7 @@ class MarketingOrderInvoiceDetail extends Model
 
     public function proportionalTaxFromHeader(){
         $tax = $this->marketingOrderInvoice->tax;
-        $bobot = $this->marketingOrderInvoice->total > 0 ? floor($this->total) / floor($this->marketingOrderInvoice->total) : 0;
+        $bobot = $this->marketingOrderInvoice->total > 0 ? $this->total / $this->marketingOrderInvoice->total : 0;
         $rowtax = round($tax * $bobot,0);
         return $rowtax;
     }

@@ -143,7 +143,6 @@ class TreeHelper {
         }
 
         $$data_id[] = $id;
-
         $added = true;
         while($added){
 
@@ -2649,10 +2648,11 @@ class TreeHelper {
                 }
 
             }
-
             foreach($data_id_mo_delivery_process as $id_mo_delivery_process){
+
                 if(!in_array($id_mo_delivery_process, $finished_data_id_mo_delivery_process)){
                     $finished_data_id_mo_delivery_process[]=$id_mo_delivery_process;
+
                     $query_mo_delivery_process = MarketingOrderDeliveryProcess::find($id_mo_delivery_process);
 
                     if($query_mo_delivery_process->purchaseOrderDetail()->exists()){
@@ -2710,6 +2710,35 @@ class TreeHelper {
 
                         if(!in_array($query_mo_delivery_process->marketingOrderInvoice->id, $data_id_mo_invoice)){
                             $data_id_mo_invoice[] =$query_mo_delivery_process->marketingOrderInvoice->id;
+                            $added = true;
+                        }
+                    }
+
+                    foreach($query_mo_delivery_process->marketingOrderDeliveryProcessDetail as $row_pr_detail){
+
+                        $properties = [
+                            ['name'=> "Tanggal :".$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->post_date],
+                        ];
+
+                        if (!$hide_nominal) {
+                            $properties[] =['name'=> "Nominal : Rp.:".number_format($row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->grandtotal,2,',','.')]
+                            ;
+                        }
+                        $marketing_order_delivery_tempura=[
+                            "name"=>$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                            "key" =>$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                            'properties'=>$properties,
+                            'url'=>request()->root()."admin/sales/marketing_order_delivery?code=".CustomHelper::encrypt($row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code),
+                        ];
+                        $data_go_chart[]=$marketing_order_delivery_tempura;
+                        $data_link[]=[
+                            'from'=>$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code,
+                            'to'=>$query_mo_delivery_process->code,
+                            'string_link'=>$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->code.$query_mo_delivery_process->code,
+                        ];
+
+                        if(!in_array($row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->id, $data_id_mo_delivery)){
+                            $data_id_mo_delivery[] =$row_pr_detail->marketingOrderDeliveryDetail->marketingOrderDelivery->id;
                             $added = true;
                         }
                     }
@@ -2924,7 +2953,11 @@ class TreeHelper {
                             'to'=>$query_invoice->code,
                             'string_link'=>$query_invoice->marketingOrderDeliveryProcess->code.$query_invoice->code,
                         ];
-                        $data_id_mo_delivery_process[]=$query_invoice->marketingOrderDeliveryProcess->id;
+                        if(!in_array($query_invoice->marketingOrderDeliveryProcess->id, $data_id_mo_delivery_process)){
+
+                            $data_id_mo_delivery_process[]=$query_invoice->marketingOrderDeliveryProcess->id;
+                            $added = true;
+                        }
 
 
                     }
@@ -3074,12 +3107,39 @@ class TreeHelper {
                                 // }
                             }
                         }
+                        if($row_invoice_detail->lookable_type== 'marketing_order_delivery_process_details'){
 
+                            $properties =[
+                                ['name'=> "Tanggal :".$row_invoice_detail->lookable->marketingOrderDeliveryProcess->post_date],
+
+                            ];
+
+                            if (!$hide_nominal) {
+                                $properties[] = ['name'=> "Nominal : Rp.:".number_format($row_invoice_detail->lookable->marketingOrderDeliveryProcess->grandtotal,2,',','.')]
+                                ;
+                            }
+                            $mo_delivery=[
+                                "name"=> $row_invoice_detail->lookable->marketingOrderDeliveryProcess->code,
+                                "key" => $row_invoice_detail->lookable->marketingOrderDeliveryProcess->code,
+                                'properties'=> $properties,
+                                'url'=>request()->root()."/admin/sales/delivery_order?code=".CustomHelper::encrypt($row_invoice_detail->lookable->marketingOrderDeliveryProcess->code),
+                            ];
+                            $data_go_chart[]=$mo_delivery;
+                            $data_link[]=[
+                                'from'=>$row_invoice_detail->lookable->marketingOrderDeliveryProcess->code,
+                                'to'=>$query_invoice->code,
+                                'string_link'=>$row_invoice_detail->lookable->marketingOrderDeliveryProcess->code.$query_invoice->code,
+                            ];
+
+                            if(!in_array($row_invoice_detail->lookable->marketingOrderDeliveryProcess->id, $data_id_mo_delivery_process)){
+                                $data_id_mo_delivery_process[]=$row_invoice_detail->lookable->marketingOrderDeliveryProcess->id;
+                                $added = true;
+                            }
+                        }
                     }
                 }
 
             }
-
             foreach($data_id_mo_memo as $row_id_memo){
                 if(!in_array($row_id_memo, $finished_data_id_memo)){
                     $finished_data_id_memo[]=$row_id_memo;

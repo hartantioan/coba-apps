@@ -21,7 +21,7 @@ function initializeMasking(){
 			'persistent': true
 		});
 	}
-	
+
 	if($('.ktp').length > 0){
 		$('.ktp').formatter({
 			'pattern': '{{9999999999999999}}',
@@ -46,12 +46,12 @@ function formatRupiah(angka){
 	sisa     		= parseFloat(split[0]).toString().length % 3,
 	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
 	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
- 
+
 	if(ribuan){
 		separator = sisa ? '.' : '';
 		rupiah += separator + ribuan.join('.');
 	}
- 
+
 	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
 	angka.value = sign == '-' ? sign + rupiah : rupiah;
 }
@@ -64,12 +64,12 @@ function formatRupiahTwoDecimal(angka){
 	sisa     		= parseFloat(split[0]).toString().length % 3,
 	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
 	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
- 
+
 	if(ribuan){
 		separator = sisa ? '.' : '';
 		rupiah += separator + ribuan.join('.');
 	}
- 
+
 	if(split[1] != undefined){
 		if(split[1].length > 2){
 			rupiah = rupiah + ',' + split[1].slice(0,2);
@@ -89,12 +89,12 @@ function formatRupiahNoMinus(angka){
 	sisa     		= parseFloat(split[0]).toString().length % 3,
 	rupiah     		= parseFloat(split[0]).toString().substr(0, sisa),
 	ribuan     		= parseFloat(split[0]).toString().substr(sisa).match(/\d{3}/gi);
- 
+
 	if(ribuan){
 		separator = sisa ? '.' : '';
 		rupiah += separator + ribuan.join('.');
 	}
- 
+
 	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
 	angka.value = rupiah;
 }
@@ -105,14 +105,14 @@ function formatRupiahIni(angka){
 	sisa     		= split[0].length % 3,
 	rupiah     		= split[0].substr(0, sisa),
 	ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
- 
+
 	if(ribuan){
 		separator = sisa ? '.' : '';
 		rupiah += separator + ribuan.join('.');
 	}
- 
+
 	rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
-	
+
 	return rupiah;
 }
 
@@ -216,7 +216,7 @@ function cekNotif(url){
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},
 		beforeSend: function() {
-			
+
 		},
 		success: function(response) {
 			if(response.status == '200'){
@@ -246,7 +246,7 @@ function cekNotif(url){
 				$('.notif-count').text(response.notif_count);
 				$('#version-app').text(response.version);
 				$('.approval-count').text(response.approval_count);
-				
+
 				if(response.notif_count > 0){
 					M.toast({
 						html: 'Anda memiliki notifikasi baru.'
@@ -278,19 +278,19 @@ function cekNotif(url){
 			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 		},
 		beforeSend: function() {
-			
+
 		},
 		success: function(response) {
 			if(response.status == '200'){
 				if(response.announcement_list.length > 0){
-					
+
 					$('#announcement_div').empty();
 
 					$.each(response.announcement_list, function(i, val) {
-						
-						var bannerId = 'banner_' + val.id;  
 
-						
+						var bannerId = 'banner_' + val.id;
+
+
 						if (!localStorage.getItem(bannerId)) {
 							var bannerHtml = `
 								<div class="maintenance-banner" style="display: flex; align-items: center; width: fit-content; background: #ffcc00; padding: 10px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); z-index: 9999;" data-banner-id="${bannerId}">
@@ -403,14 +403,14 @@ function loadCurrency(){
 			},
 			success: function(response) {
 				loadingClose('#currency_rate');
-				
+
 				$('#currency_rate').val(formatRupiahIni(parseFloat(response['currency_rate']).toFixed(2).toString().replace('.',','))).trigger('keyup');
 			},
 			error: function() {
 				swal({
-					title: 'Ups!',
-					text: 'Check your internet connection.',
-					icon: 'error'
+					title: 'Kurs Tidak Dapat Diambil online',
+					text: 'Silakan ketik manual pada kurs.',
+					icon: 'warning'
 				});
 			}
 		});

@@ -49,6 +49,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'uom' => $row->lookable->itemStock->item->uomUnit->code,
                 'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
+                'typesell' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
             ];
         }
 
@@ -73,6 +74,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'qty' => $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,
                 'uom' => $row->marketingOrderDeliveryDetail->item->uomUnit->code,
                 'type' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
+                'typesell' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
             ];
         }
 

@@ -45,7 +45,7 @@ class CurrencyController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Currency::count();
-        
+
         $query_data = Currency::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -81,7 +81,7 @@ class CurrencyController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -166,7 +166,7 @@ class CurrencyController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -186,20 +186,19 @@ class CurrencyController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function show(Request $request){
         $currency = Currency::find($request->id);
-        				
+
 		return response()->json($currency);
     }
 
     public function history(Request $request){
         $currency = CurrencyDate::where('currency_id',$request->id)
         ->orderBy('id', 'asc')->get();
-        info($currency);
         $c = Currency::find($request->id);
         $string = '<div class="row pt-1 pb-1 lighten-4">
                     <div class="col s12"></div><div class="col s12">
@@ -215,7 +214,7 @@ class CurrencyController extends Controller
                             </tr>
                         </thead><tbody>';
 
-        
+
         foreach($currency as $key => $row){
             $string .= '<tr>
                 <td class="center-align">'.($key + 1).'</td>
@@ -223,16 +222,16 @@ class CurrencyController extends Controller
                 <td class="right-align">'.$row->currency_rate.'</td>
             </tr>';
         }
-        
+
 
         $string .= '</tbody></table></div>';
-        				
+
 		return $string;
     }
 
     public function destroy(Request $request){
         $query = Currency::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new Currency())
@@ -261,16 +260,21 @@ class CurrencyController extends Controller
         } else {
             $adjustedDate = $request->date;
         }
+        info($adjustedDate);
+        info($request->code);
         $find_currency = Currency::where('code',$request->code)->first();
+        info($find_currency);
         $find = CurrencyDate::where('currency_id',$find_currency->id)
         ->where('currency_date',$adjustedDate)
         ->first();
-       
+        info('haha');
+        info($find);
         if(!$find){
             $response = Http::get("https://api.vatcomply.com/rates", [
                 'base' => $request->code,
                 'date' => $request->date,
             ]);
+            info($response);
             $data = $response->json();
             $query_currency_ada = CurrencyDate::where('id',$find_currency->id)
                 ->where('currency_date',$data['date'])
@@ -283,15 +287,17 @@ class CurrencyController extends Controller
                     'taken_from'    => 'https://api.vatcomply.com/rates',
                 ];
                 CurrencyDate::create($m);
-                $find = $m; 
-              
+                $find = $m;
+
             }else{
                 $find = $query_currency_ada;
-               
+
             }
-            
-           
+
+
         }
+        info($adjustedDate);
+        info($find);
 
         return $find;
     }

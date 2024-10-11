@@ -104,6 +104,7 @@ use App\Http\Controllers\MasterData\BenchmarkPriceController;
 use App\Http\Controllers\MasterData\CostDistributionController;
 use App\Http\Controllers\MasterData\DeliveryCostController;
 use App\Http\Controllers\MasterData\UserDateController;
+use App\Http\Controllers\MasterData\UserBrandController;
 use App\Http\Controllers\MasterData\UserItemController;
 use App\Http\Controllers\MasterData\LandedCostFeeController;
 use App\Http\Controllers\MasterData\StandardCustomerPriceController;
@@ -1283,6 +1284,19 @@ Route::prefix('admin')->group(function () {
                         Route::get('row_detail', [UserDateController::class, 'rowDetail']);
                         Route::post('create', [UserDateController::class, 'create'])->middleware('operation.access:user_date,update');
                         Route::post('destroy', [UserDateController::class, 'destroy'])->middleware('operation.access:user_date,delete');
+                    });
+
+                    Route::prefix('user_brand')->middleware('operation.access:user_brand,view')->group(function () {
+                        Route::get('/', [UserBrandController::class, 'index']);
+                        Route::get('datatable', [UserBrandController::class, 'datatable']);
+                        Route::post('show', [UserBrandController::class, 'show']);
+                        Route::get('row_detail', [UserBrandController::class, 'rowDetail']);
+                        Route::post('create', [UserBrandController::class, 'create'])->middleware('operation.access:user_brand,update');
+                        Route::post('destroy', [UserBrandController::class, 'destroy'])->middleware('operation.access:user_brand,delete');
+                        Route::get('export', [UserBrandController::class, 'export']);
+                        Route::get('get_import_excel', [UserBrandController::class, 'getImportExcel']);
+                        Route::get('export_from_page', [UserBrandController::class, 'exportFromTransactionPage']);
+                        Route::post('import', [UserBrandController::class, 'import'])->middleware('operation.access:user_brand,update');
                     });
 
                     Route::prefix('user_item')->middleware('operation.access:user_item,view')->group(function () {

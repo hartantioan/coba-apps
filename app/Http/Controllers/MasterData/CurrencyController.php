@@ -260,6 +260,8 @@ class CurrencyController extends Controller
         } else {
             $adjustedDate = $request->date;
         }
+        info($adjustedDate);
+        info('masuk 1');
         $find_currency = Currency::where('code',$request->code)->first();
         $find = CurrencyDate::where('currency_id',$find_currency->id)
         ->where('currency_date',$adjustedDate)

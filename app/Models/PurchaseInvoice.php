@@ -185,6 +185,12 @@ class PurchaseInvoice extends Model
         });
     }
 
+    public function hasPaymentRequestDetailWithPending(){
+        return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
+
     public function realPaymentRequestDetail(){
         return $this->hasMany('App\Models\PaymentRequestDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('paymentRequest',function($query){
             $query->whereIn('status',['1','2','3']);
@@ -326,7 +332,7 @@ class PurchaseInvoice extends Model
     public function hasChildDocument(){
         $hasRelation = false;
 
-        if($this->hasPaymentRequestDetail()->exists()){
+        if($this->hasPaymentRequestDetailWithPending()->exists()){
             $hasRelation = true;
         }
 

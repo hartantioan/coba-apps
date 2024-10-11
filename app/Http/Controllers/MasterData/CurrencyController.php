@@ -261,17 +261,20 @@ class CurrencyController extends Controller
             $adjustedDate = $request->date;
         }
         info($adjustedDate);
-        info('masuk 1');
+        info($request->code);
         $find_currency = Currency::where('code',$request->code)->first();
+        info($find_currency);
         $find = CurrencyDate::where('currency_id',$find_currency->id)
         ->where('currency_date',$adjustedDate)
         ->first();
-
+        info('haha');
+        info($find);
         if(!$find){
             $response = Http::get("https://api.vatcomply.com/rates", [
                 'base' => $request->code,
                 'date' => $request->date,
             ]);
+            info($response);
             $data = $response->json();
             $query_currency_ada = CurrencyDate::where('id',$find_currency->id)
                 ->where('currency_date',$data['date'])

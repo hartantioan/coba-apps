@@ -17,7 +17,7 @@
             margin-left:-5px;
             margin-right:-5px;
             }
-            
+
             .column1 {
             float: left;
             width: 50%;
@@ -39,41 +39,41 @@
 
             td {
                 vertical-align:top !important;
-            }            
+            }
 
             @media only screen and (max-width : 768px) {
                 .invoice-print-area {
                     zoom:0.4;
                 }
             }
-        
+
             @media only screen and (max-width : 992px) {
                 .invoice-print-area {
                     zoom:0.6;
                     font-size:9px !important;
                 }
-        
+
                 table > thead > tr > th {
-                    
+
                     font-size:13px !important;
                     font-weight: 800 !important;
                 }
                 td{
                     font-size:1em !important;
-              
+
                 }
             }
-        
+
             @media print {
                 .invoice-print-area {
                     font-size:10px !important;
                 }
-        
+
                 table > thead > tr > th {
                     font-size:15px !important;
                     font-weight: 800 !important;
                 }
-        
+
                 td {
                     border:none !important;
                     border-bottom: none;
@@ -81,27 +81,27 @@
                     padding: 1px !important;
                     vertical-align:top !important;
                 }
-        
+
                 body {
                     background-color:white !important;
                     zoom:0.8;
                 }
-                
+
                 .modal {
                     background-color:white !important;
                 }
-        
+
                 .card {
                     background-color:white !important;
                     padding:25px !important;
                 }
-        
+
                 .invoice-print-area {
                     color: #000000 !important;
                 }
-        
-               
-        
+
+
+
                 .modal {
                     position: absolute;
                     left: 0;
@@ -112,33 +112,33 @@
                     overflow: visible !important;
                     min-width:100% !important;
                 }
-                
+
                 .modal-content {
                     visibility: visible !important;
                     overflow: visible !important;
                     padding: 0px !important;
                 }
-        
+
                 .modal-footer {
                     display:none !important;
                 }
-        
+
                 .row .col {
                     padding:0px !important;
                 }
             }
-            
+
             .invoice-product-details{
                 min-height: auto;
             }
 
             @page { margin: 5em 3em 6em 3em; }
             header { position: fixed; top: -70px; left: 0px; right: 0px; height: 150px; margin-bottom: 10em }
-                
+
             #table-info > tbody > tr > td {
                 padding: 5px;
             }
-           
+
         </style>
     </head>
     <body>
@@ -146,7 +146,7 @@
             <table border="0" width="100%">
                 <tr>
                     <td width="34%">
-                        
+
                     </td>
                     <td width="33%" align="center">
                         <h5 style="margin-top:30px;"><br></h5>
@@ -157,7 +157,7 @@
                         </div>
                     </td>
                     <td width="33%">
-                       
+
                     </td>
                 </tr>
             </table>
@@ -177,72 +177,73 @@
                                 <table border="0" width="100%" style="border-spacing: 0;">
                                     <tr style="margin:0px;">
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;" >
                                             {{ $data->getPlace() }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                         
+
                                         </td>
-                                      
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->getWarehouse() }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->marketingOrderDelivery->code }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                          
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->account->name }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->marketingOrderDelivery->deliveryType() }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->marketingOrderDelivery->transportation->name }}
+                                            {{ $data->marketingOrderDelivery->transportation->name }}/
+                                            {{ $data->no_container ?? '-' }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->vehicle_no }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="35%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->driver_name }}
                                         </td>
@@ -253,65 +254,65 @@
                                 <table border="0" width="100%" style="border-spacing: 0;">
                                     <tr >
                                         <td width="30%">
-                                          
+
                                         </td>
-                                        
+
                                         <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->getPoCustomer() ?? '-' }}
                                         </td>
                                     </tr>
                                     <tr >
                                         <td width="30%">
-                                           
+
                                         </td>
-                                        
+
                                         <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->marketingOrderDelivery->customer->name ?? '-' }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td width="30%">
-                                      
+
                                         </td>
-                                        
+
                                         <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
                                            {{ strtoupper($data->getOutlet()) ?? '-' }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                          
+
                                         </td>
-                                        
+
                                         <td>
                                             {{ strtoupper($data->getProject()) ?? '-' }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            
+
                                         </td>
-                                        
+
                                         <td >
-                                           <div style="min-height:36px !important"> 
+                                           <div style="min-height:36px !important">
                                             {{ strtoupper($data->marketingOrderDelivery->destination_address) }}
                                             <div>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                           
+
                                         </td>
-                                        
+
                                         <td>
                                             {{ strtoupper($data->marketingOrderDelivery->district->name) }}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                         
+
                                         </td>
-                                        
+
                                         <td>
                                             {{ strtoupper($data->marketingOrderDelivery->city->name) }}
                                         </td>
@@ -323,10 +324,10 @@
                     <div style="padding-left: 30px; height:60px;padding-top:0px;margin-top:-10px">{{ $data->note_external }}</div>
                     <div class="invoice-product-details mt-2" style="overflow:auto;margin-top:10px;">
                         <table  style="border-collapse:collapse;font-size:10px !important" width="100%">
-                           
+
                             <tbody>
                                 @php
-                                    $totalQty = 0; 
+                                    $totalQty = 0;
                                 @endphp
                                 @foreach($data->marketingOrderDeliveryProcessDetail as $key => $row)
                                 @php
@@ -340,14 +341,14 @@
                                     <td style="width:10%" align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
                                     <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
                                 </tr>
-                                
+
                                 @endforeach
                             </tbody>
                         </table>
                         <table  style="border-collapse:collapse;font-size:10px !important;position: fixed;bottom: 250px; left: 0px; right: 0px;" width="100%">
-                           
+
                             <tbody>
-                               
+
                                 <tr>
                                     <td style="width:40%"></td>
                                     <td style="width:30%"></td>
@@ -355,19 +356,19 @@
                                     <td style="width:10%;padding-bottom:0.5px" align="center"><strong>{{$unitcode->itemStock->item->uomUnit->code}}</strong></td>
                                     <td style="width:10%" align="center"></td>
                                 </tr>
-                            
+
                             </tbody>
                         </table>
                     </div>
-                    
+
 
                     <div style="position: fixed;bottom: 137px; left: 40px; right: 0px;">
-                        
+
                         {{ date('d/m/Y H:i') }} <span style="padding-left: 80px">{{$data->user->name}}</span>
-                       
-                        
-                    </div> 
-                    
+
+
+                    </div>
+
                 </div>
             </div>
         </main>

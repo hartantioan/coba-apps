@@ -307,6 +307,10 @@
                                         <input id="production_barcode_text" name="production_barcode_text" type="text" value="" placeholder="Arahkan cursor disini untuk scan..">
                                         <label class="active" for="production_barcode_text">Scan Barcode</label>
                                     </div>
+                                    <div class="col m3 s12">
+                                        <label class="active" for="document-barcode">Dokumen Barcode</label>
+                                        <br><a class="waves-effect waves-light red btn-small" id="document-barcode" onclick="getDocumentBarcode();" href="javascript:void(0);"><i class="material-icons left">assignment</i> Tarik Data</a>
+                                    </div>
                                 </fieldset>
                             </div>
                         </div>
@@ -623,6 +627,50 @@
     </div>
 </div>
 
+<div id="modal_document_barcode" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Barcode Tersedia Sesuai POD Terpilih</h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <ul class="collapsible">
+                            <li class="active">
+                                <div class="collapsible-header purple lightrn-1 white-text">
+                                    <i class="material-icons">layers</i>List Production Order
+                                </div>
+                                <div class="collapsible-body">
+                                    <div id="datatable_buttons_multi_document_barcode"></div>
+                                    <i class="right">Pilih salah satu item dan batch untuk dimasukkan ke dokumen serah terima.</i>
+                                    <table id="table_document_barcode" class="display" width="100%">
+                                        <thead>
+                                            <thead>
+                                                <tr>
+                                                    <th class="center">No.Batch Palet/Curah</th>
+                                                    <th class="center">Kode Item</th>
+                                                    <th class="center">Nama Item</th>
+                                                    <th class="center">{{ __('translations.shading') }}</th>
+                                                    <th class="center">Qty Diterima</th>
+                                                    <th class="center">Satuan</th>
+                                                </tr>
+                                            </thead>
+                                        </thead>
+                                        <tbody id="body-detail-document-barcode"></tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1" onclick="closeModalDocumentBarcode();">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocumentBarcode();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -734,6 +782,56 @@
                 $('#table_pdo').DataTable().clear().destroy();
             }
         });
+
+        $('#modal_document_barcode').modal({
+            onOpenStart: function(modal,trigger) {
+ 
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_multi_barcode = $('#table_document_barcode').DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 10,
+                    "order": [[0, 'desc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                        },
+                        "select": {
+                        }
+                    },
+                    select: {
+                        style: 'single'
+                    }
+                });
+                
+                $('#table_document_barcode_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_document_barcode');
+                $('select[name="table_document_barcode_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-document-barcode').empty();
+                
+                $('#table_document_barcode').DataTable().clear().destroy();
+            }
+        });
+
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
                 
@@ -2589,6 +2687,79 @@
                 });
             }
         });
+    }
+
+    function getDocumentBarcode(){
+        if($('#production_order_detail_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_document_barcode',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    production_order_detail_id: $('#production_order_detail_id').val(),
+                    batch_used: arrBatch,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-body');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#modal_document_barcode').modal('open');
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-document-barcode').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td>
+                                        ` + val.shading + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Data tidak ditemukan',
+                            icon: 'error'
+                        });
+                    }
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih Production Order.',
+                icon: 'error'
+            });
+        }
     }
 
     function done(id){

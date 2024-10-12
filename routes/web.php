@@ -2419,6 +2419,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ProductionFgReceiveController::class, 'show']);
                     Route::post('get_code', [ProductionFgReceiveController::class, 'getCode']);
                     Route::post('get_pallet_barcode', [ProductionFgReceiveController::class, 'getPalletBarcode']);
+                    Route::post('get_document_barcode', [ProductionFgReceiveController::class, 'getDocumentBarcode']);
                     Route::post('get_pallet_barcode_by_scan', [ProductionFgReceiveController::class, 'getPalletBarcodeByScan']);
                     Route::post('get_child_fg', [ProductionFgReceiveController::class, 'getChildFg']);
                     Route::post('print', [ProductionFgReceiveController::class, 'print']);

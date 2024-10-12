@@ -383,7 +383,7 @@
                                         <label class="active" for="transportation_id">Tipe Transport</label>
                                     </div>
                                     <div class="input-field col m3 s12 step14">
-                                        <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. Kirim">
+                                        <input id="delivery_date" name="delivery_date" min="{{ date('Y-m-d') }}" type="date" placeholder="Tgl. Kirim">
                                         <label class="active" for="delivery_date">Tgl.Kirim</label>
                                     </div>
                                     <div class="input-field col m3 s12 step15">
@@ -1604,6 +1604,7 @@
             }
             $('#code').val(newcode);
             $('#code_place_id').trigger('change');
+            $('#delivery_date').attr('min',$('#post_date').val());
         }
     }
 
@@ -2028,6 +2029,7 @@
                     $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                 }
                 $('#delivery_date').val(response.delivery_date);
+                $('#delivery_date').attr('min',response.post_date);
                 if(response.transportation_name){
                     $('#transportation_id').empty().append(`
                         <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>
@@ -2664,6 +2666,7 @@
                             $('#sender_id').empty().append(`<option value="` + response.sender_id + `">` + response.sender_name + `</option>`);
                         }
                         $('#delivery_date').val(response.delivery_date);
+                        $('#delivery_date').attr('min',response.post_date);
                         if(response.transportation_name){
                             $('#transportation_id').empty().append(`
                                 <option value="` + response.transportation_id + `">` + response.transportation_name + `</option>

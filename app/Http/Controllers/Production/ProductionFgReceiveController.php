@@ -125,7 +125,7 @@ class ProductionFgReceiveController extends Controller
     public function getPalletBarcodeByScan(Request $request){
 
         $barcode = ProductionBarcodeDetail::where('pallet_no',$request->code)->whereHas('productionBarcode',function($query)use($request){
-            $query->where('production_order_detail_id',$request->production_order_detail_id);
+            $query->where('production_order_detail_id',$request->production_order_detail_id)->whereIn('status',['2','3']);
         })
         ->whereDoesntHave('productionFgReceiveDetail')
         ->where(column: function($query)use($request){
@@ -164,6 +164,45 @@ class ProductionFgReceiveController extends Controller
                     'message'   => 'Data telah dipakai pada dokumen lainnya.'
                 ]);
             }
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.'
+            ]);
+        }
+    }
+
+    public function getDocumentBarcode(Request $request){
+
+        $barcode = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
+            $query->where('production_order_detail_id',$request->production_order_detail_id);
+        })
+        ->whereDoesntHave('productionFgReceiveDetail')
+        ->where(column: function($query)use($request){
+            if($request->batch_used){
+                $query->whereNotIn('pallet_no',$request->batch_used);
+            }
+        })->get();
+
+        $result = [];
+
+        if(count($barcode) > 0){
+            foreach($barcode as $row){
+                $result[] = [
+                    'id'            => $row->id,
+                    'item_code'     => $row->item->code,
+                    'item_name'     => $row->item->name,
+                    'code'          => $row->pallet_no,
+                    'shading'       => $row->shading,
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty_sell),
+                    'unit'          => $row->item->sellUnit(),
+                ];
+            }
+    
+            return response()->json([
+                'status'    => 200,
+                'details'   => $result,
+            ]);
         }else{
             return response()->json([
                 'status'    => 500,

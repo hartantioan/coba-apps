@@ -405,8 +405,6 @@ class ProductionFgReceive extends Model
 
             $arrDetail = $this->getSupportingMaterial();
 
-            info($arrDetail);
-
             foreach($arrDetail as $key => $row){
                 $querydetail = ProductionIssueDetail::create([
                     'production_issue_id'           => $query->id,
@@ -445,12 +443,23 @@ class ProductionFgReceive extends Model
 
     public function getSupportingMaterial(){
         $arrDetail = [];
+        $arrItem = [];
+        $arrQty = [];
         foreach($this->productionFgReceiveDetail as $key => $row){
-            
-            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
-                $query->where('item_id',$row->item_id)->orderByDesc('created_at');
-            })->whereNotNull('is_default')->first();
+            if(!in_array($row->item_id,$arrItem)){
+                $arrItem[] = $row->item_id;
+                $arrQty[] = $row->qty;
+            }else{
+                $key = array_search($row->item_id, $arrItem);
+                $arrQty[$key] += $row->qty;
+            }
+        }
 
+        foreach($arrItem as $key => $row){
+            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row){
+                $query->where('item_id',$row)->orderByDesc('created_at');
+            })->whereNotNull('is_default')->first();
+    
             if($bomAlternative){
                 foreach($bomAlternative->bomDetail as $rowbom){
                     $nominal = 0;
@@ -463,15 +472,15 @@ class ProductionFgReceive extends Model
                             $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                             if($index >= 0){
-                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output) * $price),2);
-                                $arrDetail[$index]['qty'] += round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output) * $price),2);
+                                $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                             }else{
                                 $arrDetail[] = [
                                     'lookable_type'     => $rowbom->lookable_type,
                                     'lookable_id'       => $rowbom->lookable_id,
-                                    'total'             => round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $price,2),
+                                    'total'             => round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $price,2),
                                     'price'             => $price,
-                                    'qty'               => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                                    'qty'               => round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3),
                                     'nominal'           => $price,
                                     'bom_id'            => $rowbom->bom_id,
                                     'bom_detail_id'     => $rowbom->id,
@@ -485,15 +494,15 @@ class ProductionFgReceive extends Model
                         $nominal = $rowbom->nominal;
                         $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,'', $arrDetail);
                         if($index >= 0){
-                            $arrDetail[$index]['total'] += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $nominal,2);
-                            $arrDetail[$index]['qty'] += round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                            $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2);
+                            $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                         }else{
                             $arrDetail[] = [
                                 'lookable_type'     => $rowbom->lookable_type,
                                 'lookable_id'       => $rowbom->lookable_id,
-                                'total'             => round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $nominal,2),
+                                'total'             => round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2),
                                 'price'             => $price,
-                                'qty'               => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                                'qty'               => round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3),
                                 'nominal'           => $nominal,
                                 'bom_id'            => $rowbom->bom_id,
                                 'bom_detail_id'     => $rowbom->id,
@@ -504,7 +513,7 @@ class ProductionFgReceive extends Model
                         }
                     }
                 }
-
+    
                 if($bomAlternative->bom->bomStandard()->exists()){
                     foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
                         $nominal = 0;
@@ -518,15 +527,15 @@ class ProductionFgReceive extends Model
                                 $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                 $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                                 if($index >= 0){
-                                    $arrDetail[$index]['total'] += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output) * $price),2);
-                                    $arrDetail[$index]['qty'] += round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                    $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output) * $price),2);
+                                    $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                                 }else{
                                     $arrDetail[] = [
                                         'lookable_type'     => $rowbom->lookable_type,
                                         'lookable_id'       => $rowbom->lookable_id,
-                                        'total'             => round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2),
+                                        'total'             => round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $rowbom->nominal,2),
                                         'price'             => $price,
-                                        'qty'               => round($rowbom->qty * $row->qty,3),
+                                        'qty'               => round($rowbom->qty * $arrQty[$key],3),
                                         'nominal'           => $nominal,
                                         'bom_id'            => $bomAlternative->bom_id,
                                         'bom_detail_id'     => '',
@@ -540,15 +549,15 @@ class ProductionFgReceive extends Model
                             $nominal = $rowbom->nominal;
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,'', $arrDetail);
                             if($index >= 0){
-                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $nominal,2);
-                                $arrDetail[$index]['qty'] += round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3);
+                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2);
+                                $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                             }else{
                                 $arrDetail[] = [
                                     'lookable_type'     => $rowbom->lookable_type,
                                     'lookable_id'       => $rowbom->lookable_id,
-                                    'total'             => round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2),
+                                    'total'             => round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $rowbom->nominal,2),
                                     'price'             => $price,
-                                    'qty'               => round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3),
+                                    'qty'               => round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3),
                                     'nominal'           => $nominal,
                                     'bom_id'            => $bomAlternative->bom_id,
                                     'bom_detail_id'     => '',

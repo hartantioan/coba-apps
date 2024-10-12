@@ -930,7 +930,6 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     if(!in_array($productionFgReceive->id,$arrProductionFgReceive)){
                         $arrProductionFgReceive[] = $productionFgReceive->id;
                     }
-                    /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
                 }
             }
         }
@@ -952,23 +951,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                                 if(!in_array($productionReceive->id,$arrProductionReceive)){
                                     $arrProductionReceive[] = $productionReceive->id;
                                 }
-                                /* foreach($productionReceive->productionReceiveDetail as $rowreceive){
-                                    if($rowreceive->productionBatch()->exists()){
-                                        foreach($rowreceive->productionBatch as $rowbatch2){
-                                            self::dispatch($dateloop,$productionReceive->company_id,$rowbatch2->place_id,$rowbatch2->item_id,NULL,NULL,$rowbatch2->id);
-                                        }
-                                    }
-                                } */
                             }
-                        }
-                    }
-                    if($issue->productionFgReceive()->exists()){
-                        $productionFgReceive = ProductionFgReceive::where('id',$issue->productionFgReceive->id)->whereIn('status',['2','3'])->first();
-                        if($productionFgReceive){
-                            if(!in_array($productionFgReceive->id,$arrProductionFgReceive)){
-                                $arrProductionFgReceive[] = $productionFgReceive->id;
-                            }
-                            /* self::dispatch($dateloop,$productionFgReceive->company_id,$productionFgReceive->place_id,$productionFgReceive->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
                         }
                     }
                 }
@@ -983,7 +966,9 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
 
         if(count($arrProductionFgReceive) > 0){
             foreach($arrProductionFgReceive as $row){
-                ProductionFgReceive::find($row)->recalculate($dateloop);
+                $pfr = ProductionFgReceive::find($row);
+                $pfr->recalculate();
+                /* self::dispatch($dateloop,$pfr->company_id,$pfr->place_id,$pfr->productionOrderDetail->productionScheduleDetail->item_id,NULL,NULL,NULL); */
             }
         }
 

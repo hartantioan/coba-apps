@@ -5471,6 +5471,7 @@ class CustomHelper {
 			$pir = ProductionFgReceive::find($table_id);
 
 			$pir->createProductionIssue();
+			$pir->recalculate();
 			
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),

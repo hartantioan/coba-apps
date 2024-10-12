@@ -585,7 +585,7 @@ class ProductionFgReceive extends Model
         return -1;
      }
     
-    public function recalculate($date){
+    public function recalculate(){
         $totalCost = 0;
         $totalQty = 0;
         $totalBatch = 0;
@@ -593,65 +593,23 @@ class ProductionFgReceive extends Model
             $totalQty += $row->qty;
         }
 
-        foreach($this->productionIssue()->whereHas('productionIssueDetail',function($query){
-            $query->whereHas('productionBatchUsage');
-        })->get() as $row){{
+        foreach($this->productionIssue as $row){
             foreach($row->productionIssueDetail as $rowdetail){
-                foreach($rowdetail->productionBatchUsage as $rowbatch){
-                    $totalCost += $rowbatch->productionBatch->totalById($rowbatch->id);
-                    $totalBatch += $rowbatch->qty;
-                }
+                $totalCost += $rowdetail->total;
             }
-        }}
-
-        $totalCostAll = $totalCost;
+        }
         
+        $total = $totalCost;
+
         foreach($this->productionFgReceiveDetail as $key => $row){
-            $rowtotalbatch = round(round($row->qty / $totalQty,3) * $totalCost,2);
-            $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
-            $rowtotalmaterial = 0;
-
-            $bomAlternative = BomAlternative::whereHas('bom',function($query)use($row,$key){
-                $query->where('item_id',$row->item_id)->orderByDesc('created_at');
-            })->whereNotNull('is_default')->first();
-
-            if($bomAlternative){
-                foreach($bomAlternative->bomDetail as $rowbom){
-                    if($rowbom->lookable_type == 'items'){
-                        $item = Item::find($rowbom->lookable_id);
-                        if($item){
-                            $price = $item->priceNowProduction($this->place_id,$date);
-                            $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
-                        }
-                    }elseif($rowbom->lookable_type == 'resources'){
-                        $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
-                    }
-                }
-                if($bomAlternative->bom->bomStandard()->exists()){
-                    foreach($bomAlternative->bom->bomStandard->bomStandardDetail as $rowbom){
-                        if($rowbom->lookable_type == 'items'){
-                            $item = Item::find($rowbom->lookable_id);
-                            if($item){
-                                $price = $item->priceNowProduction($this->place_id,$date);
-                                $rowtotalmaterial += round($rowbom->qty * $row->qty * $price,2);
-                            }
-                        }elseif($rowbom->lookable_type == 'resources'){
-                            $rowtotalmaterial += round($rowbom->qty * $row->qty * $rowbom->nominal,2);
-                        }
-                    }
-                }
+            $rowtotal = round(round($row->qty / $totalQty,3) * $totalCost,2);
+            if($total < $rowtotal){
+                $rowtotal = $total;
             }
-
-            $rowtotal = $rowtotalbatch + $rowtotalmaterial;
-
             $row->update([
-                'total_batch'               => $rowtotalbatch,
-                'total_material'            => $rowtotalmaterial,
-                'total'                     => $rowtotal,
+                'total' => $rowtotal,
             ]);
-
             $pfrd = ProductionFgReceiveDetail::find($row->id);
-
             if($pfrd){
                 if($pfrd->productionBatch()->exists()){
                     $pfrd->productionBatch->update([
@@ -659,6 +617,7 @@ class ProductionFgReceive extends Model
                     ]);
                 }
             }
+            $total -= $rowtotal;
         }
     }
 

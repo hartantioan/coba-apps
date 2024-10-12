@@ -713,7 +713,7 @@ class ProductionFgReceiveController extends Controller
                     $totalCostAll = $totalCost;
                     
                     foreach($request->arr_qty_uom as $key => $row){
-                        $rowtotalbatch = round((str_replace(',','.',str_replace('.','',$row)) / $totalQty) * $totalCost,2);
+                        /* $rowtotalbatch = round(round(str_replace(',','.',str_replace('.','',$row)) / $totalQty,3) * $totalCost,2);
                         $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
                         $rowtotalmaterial = 0;
                         $bom_id = NULL;
@@ -750,7 +750,7 @@ class ProductionFgReceiveController extends Controller
                             }
                         }
 
-                        $rowtotal = $rowtotalbatch + $rowtotalmaterial;
+                        $rowtotal = $rowtotalbatch + $rowtotalmaterial; */
 
                         $pfrd = ProductionFgReceiveDetail::create([
                             'production_fg_receive_id'  => $query->id,
@@ -764,9 +764,12 @@ class ProductionFgReceiveController extends Controller
                             'conversion'                => str_replace(',','.',str_replace('.','',$request->arr_qty_convert[$key])),
                             'pallet_id'                 => $request->arr_pallet_id[$key],
                             'grade_id'                  => $request->arr_grade_id[$key],
-                            'total_batch'               => $rowtotalbatch,
+                            /* 'total_batch'               => $rowtotalbatch,
                             'total_material'            => $rowtotalmaterial,
-                            'total'                     => $rowtotal,
+                            'total'                     => $rowtotal, */
+                            'total_batch'               => 0,
+                            'total_material'            => 0,
+                            'total'                     => 0,
                         ]);
 
                         $batch = ProductionBatch::where('code',$request->arr_pallet_no[$key])->whereNull('lookable_type')->first();
@@ -778,8 +781,6 @@ class ProductionFgReceiveController extends Controller
                                 'post_date'     => $query->post_date,
                             ]);
                         }
-
-                        $totalCostAll -= $rowtotalbatch;
                     }
 
                     if($qtyReject > 0){

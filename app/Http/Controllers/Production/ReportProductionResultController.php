@@ -32,7 +32,7 @@ class ReportProductionResultController extends Controller
         $parentSegment = request()->segment(2);
 
         $data = [
-            'title'     => 'Report Sisa WIP',
+            'title'     => 'Report Hasil Produksi (ST)',
             'content'   => 'admin.production.report_production_result',
         ];
 

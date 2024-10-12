@@ -85,6 +85,7 @@ class ProductionBarcodeController extends Controller
         $pallet = Pallet::find($request->pallet_id);
         $grade = Grade::find($request->grade_id);
         $qty = str_replace(',','.',str_replace('.','',$request->qty));
+        $qty_sell = str_replace(',','.',str_replace('.','',$request->qty_sell));
         $date = $request->date;
 
         $itemChild = Item::whereHas('parentFg',function($query)use($pod){
@@ -134,25 +135,48 @@ class ProductionBarcodeController extends Controller
                         }
                         $qtyRow = floor($qty / $sellConvert);
                         $qtyUsed = $qtyRow * $sellConvert;
-                        $qtyBalance = $qty - $qtyUsed;
-                        $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
-                        $code = $prefix.$no;
-
-                        $result[] = [
-                            'item_id'       => $itemChild->id,
-                            'item_code'     => $itemChild->code,
-                            'item_name'     => $itemChild->name,
-                            'item_unit_id'  => $itemChild->itemUnitSellId(),
-                            'code'          => $code,
-                            'qty_convert'   => CustomHelper::formatConditionalQty($sellConvert),
-                            'qty_sell'      => CustomHelper::formatConditionalQty($qtyRow),
-                            'qty_uom'       => CustomHelper::formatConditionalQty($qty),
-                            'sell_unit'     => $itemChild->sellUnit(),
-                            'uom_unit'      => $itemChild->uomUnit->code,
-                            'plant'         => $plant->code,
-                            'shift'         => $shift->production_code,
-                            'group'         => $group,
-                        ];
+                        
+                        if($itemChild->pallet->box_conversion <= 1){
+                            $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
+                            $code = $prefix.$no;
+                            
+                            $result[] = [
+                                'item_id'       => $itemChild->id,
+                                'item_code'     => $itemChild->code,
+                                'item_name'     => $itemChild->name,
+                                'item_unit_id'  => $itemChild->itemUnitSellId(),
+                                'code'          => $code,
+                                'qty_convert'   => CustomHelper::formatConditionalQty($sellConvert),
+                                'qty_sell'      => CustomHelper::formatConditionalQty($qtyRow),
+                                'qty_uom'       => CustomHelper::formatConditionalQty($qty),
+                                'sell_unit'     => $itemChild->sellUnit(),
+                                'uom_unit'      => $itemChild->uomUnit->code,
+                                'plant'         => $plant->code,
+                                'shift'         => $shift->production_code,
+                                'group'         => $group,
+                            ];
+                        }else{
+                            for($i=1;$i<=$qty_sell;$i++){
+                                $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
+                                $code = $prefix.$no;
+                                $result[] = [
+                                    'item_id'       => $itemChild->id,
+                                    'item_code'     => $itemChild->code,
+                                    'item_name'     => $itemChild->name,
+                                    'item_unit_id'  => $itemChild->itemUnitSellId(),
+                                    'code'          => $code,
+                                    'qty_convert'   => CustomHelper::formatConditionalQty($sellConvert),
+                                    'qty_sell'      => 1,
+                                    'qty_uom'       => CustomHelper::formatConditionalQty($sellConvert),
+                                    'sell_unit'     => $itemChild->sellUnit(),
+                                    'uom_unit'      => $itemChild->uomUnit->code,
+                                    'plant'         => $plant->code,
+                                    'shift'         => $shift->production_code,
+                                    'group'         => $group,
+                                ];
+                                $startNumber++;
+                            }
+                        }
 
                         return response()->json($result);
                     }else{

@@ -472,13 +472,13 @@ class ProductionFgReceive extends Model
                             $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                             if($index >= 0){
-                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output) * $price),2);
+                                $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $price,2);
                                 $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                             }else{
                                 $arrDetail[] = [
                                     'lookable_type'     => $rowbom->lookable_type,
                                     'lookable_id'       => $rowbom->lookable_id,
-                                    'total'             => round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $price,2),
+                                    'total'             => round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $price,2),
                                     'price'             => $price,
                                     'qty'               => round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3),
                                     'nominal'           => $price,
@@ -494,13 +494,13 @@ class ProductionFgReceive extends Model
                         $nominal = $rowbom->nominal;
                         $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,'', $arrDetail);
                         if($index >= 0){
-                            $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2);
+                            $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $nominal,2);
                             $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                         }else{
                             $arrDetail[] = [
                                 'lookable_type'     => $rowbom->lookable_type,
                                 'lookable_id'       => $rowbom->lookable_id,
-                                'total'             => round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2),
+                                'total'             => round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $nominal,2),
                                 'price'             => $price,
                                 'qty'               => round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3),
                                 'nominal'           => $nominal,
@@ -527,7 +527,7 @@ class ProductionFgReceive extends Model
                                 $itemstock = ItemStock::where('item_id',$rowbom->lookable_id)->where('place_id',$this->place_id)->where('warehouse_id',$rowbom->lookable->warehouse())->first();
                                 $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,$itemstock->id, $arrDetail);
                                 if($index >= 0){
-                                    $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output) * $price),2);
+                                    $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $price,2);
                                     $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                                 }else{
                                     $arrDetail[] = [
@@ -549,7 +549,7 @@ class ProductionFgReceive extends Model
                             $nominal = $rowbom->nominal;
                             $index = ProductionFgReceive::searchForIndex($rowbom->lookable_type,$rowbom->lookable_id,'', $arrDetail);
                             if($index >= 0){
-                                $arrDetail[$index]['total'] += round(($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output)) * $nominal,2);
+                                $arrDetail[$index]['total'] += round(round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3) * $nominal,2);
                                 $arrDetail[$index]['qty'] += round($rowbom->qty * ($arrQty[$key] / $rowbom->bom->qty_output),3);
                             }else{
                                 $arrDetail[] = [
@@ -607,7 +607,7 @@ class ProductionFgReceive extends Model
         $totalCostAll = $totalCost;
         
         foreach($this->productionFgReceiveDetail as $key => $row){
-            $rowtotalbatch = round(($row->qty / $totalQty) * $totalCost,2);
+            $rowtotalbatch = round(round($row->qty / $totalQty,3) * $totalCost,2);
             $rowtotalbatch = $totalCostAll >= $rowtotalbatch ? $rowtotalbatch : $totalCostAll;
             $rowtotalmaterial = 0;
 
@@ -621,10 +621,10 @@ class ProductionFgReceive extends Model
                         $item = Item::find($rowbom->lookable_id);
                         if($item){
                             $price = $item->priceNowProduction($this->place_id,$date);
-                            $rowtotalmaterial += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $price,2);
+                            $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $price,2);
                         }
                     }elseif($rowbom->lookable_type == 'resources'){
-                        $rowtotalmaterial += round(($rowbom->qty * ($row->qty / $rowbom->bom->qty_output)) * $rowbom->nominal,2);
+                        $rowtotalmaterial += round(round($rowbom->qty * ($row->qty / $rowbom->bom->qty_output),3) * $rowbom->nominal,2);
                     }
                 }
                 if($bomAlternative->bom->bomStandard()->exists()){

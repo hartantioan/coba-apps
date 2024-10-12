@@ -298,10 +298,14 @@
                                     <legend>3. Tarik Data Barcode</legend>
                                     <div class="input-field col m3 s12">
                                         <select class="browser-default" id="production_barcode_detail_id" name="production_barcode_detail_id"></select>
-                                        <label class="active" for="production_barcode_detail_id">Barcode</label>
+                                        <label class="active" for="production_barcode_detail_id">List Barcode (Manual)</label>
                                     </div>
                                     <div class="col m3 s12">
                                         <a class="waves-effect waves-light cyan btn-small mt-5 mr-1" onclick="generateBarcode();" href="javascript:void(0);"><i class="material-icons left">add</i> Tambahkan Data</a>
+                                    </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="production_barcode_text" name="production_barcode_text" type="text" value="" placeholder="Arahkan cursor disini untuk scan..">
+                                        <label class="active" for="production_barcode_text">Scan Barcode</label>
                                     </div>
                                 </fieldset>
                             </div>
@@ -939,6 +943,132 @@
                 `);
             }
             count();
+        });
+
+        $("#production_barcode_text").on( "change", function(e) {
+            if($(this).val()){
+                let code = $(this).val();
+                $.ajax({
+                    url: '{{ Request::url() }}/get_pallet_barcode_by_scan',
+                    type: 'POST',
+                    dataType: 'JSON',
+                    data: {
+                        code: code,
+                        production_order_detail_id: $('#production_order_detail_id').val(),
+                        batch_used: arrBatch,
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    beforeSend: function() {
+                        loadingOpen('.modal-content');
+                    },
+                    success: function(response) {
+                        loadingClose('.modal-content');
+
+                        if(response.status == 500){
+                            swal({
+                                title: 'Ups!',
+                                text: response.message,
+                                icon: 'warning'
+                            });
+                            if(response.errors){
+                                $.each(response.errors, function(i, val) {
+                                    M.toast({
+                                        html: val
+                                    });
+                                });
+                            }
+                        }else{
+                            if(response.length > 0){
+                                if($('.row_item').length == 0){
+                                    $('#body-item').empty();
+                                }
+                                $.each(response, function(i, val) {
+                                    let count = makeid(10);
+
+                                    let no = $('.row_item').length + 1;
+
+                                    $('#body-item').append(`
+                                        <tr class="row_item" data-code="` + val.code + `">
+                                            <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                            <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
+                                            <input type="hidden" name="arr_pallet_id[]" value="` + val.pallet_id + `">
+                                            <input type="hidden" name="arr_grade_id[]" value="` + val.grade_id + `">
+                                            <td class="center-align">
+                                                ` + no + `
+                                            </td>
+                                            <td>
+                                                <input name="arr_pallet_no[]" id="arr_pallet_no` + count + `" type="text" value="` + val.code + `" readonly>
+                                            </td>
+                                            <td>
+                                                ` + val.item_code + `
+                                            </td>
+                                            <td>
+                                                ` + val.item_name + `
+                                            </td>
+                                            <td>
+                                                <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + val.shading + `" readonly>
+                                            </td>
+                                            <td class="right-align">
+                                                <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
+                                            </td>
+                                            <td class="center-align">
+                                                ` + val.sell_unit + `
+                                            </td>
+                                            <td class="right-align">
+                                                <input name="arr_qty_convert[]" id="arr_qty_convert` + count + `" type="text" value="` + val.qty_convert + `" readonly>
+                                            </td>
+                                            <td class="right-align">
+                                                <input name="arr_qty_uom[]" id="arr_qty_uom` + count + `" type="text" value="` + val.qty_uom + `" readonly>
+                                            </td>
+                                            <td class="center-align">
+                                                ` + val.uom_unit + `
+                                            </td>
+                                            <td class="center-align">
+                                                ` + val.plant + `
+                                            </td>
+                                            <td class="center-align">
+                                                ` + val.shift + `
+                                            </td>
+                                            <td class="center-align">
+                                                ` + val.group + `
+                                            </td>
+                                            <td class="center-align">
+                                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                    <i class="material-icons">delete</i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    `);
+                                    arrBatch.push(val.code);
+                                });
+                                $('.modal-content').scrollTop($("#body-item").offset().top);
+                                countAll();
+                            }
+
+                            $('#pallet_id').empty(); 
+                            $('#grade_id').empty();
+                            $('#qty,#qty_sell').val('0,000');
+                            $('#shading').val('-');
+                            $('#item_name_child').val('');
+                            $('#qty_sell').data('conversion','0');
+                            $('#production_barcode_detail_id').empty();
+                        }
+                    },
+                    error: function() {
+                        $('.modal-content').scrollTop(0);
+                        loadingClose('.modal-content');
+                        swal({
+                            title: 'Ups!',
+                            text: 'Check your internet connection.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            }
+            e.preventDefault();
+            $('#production_barcode_text').val('');
         });
     });
 

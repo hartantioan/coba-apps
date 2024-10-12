@@ -122,6 +122,56 @@ class ProductionFgReceiveController extends Controller
         }
     }
 
+    public function getPalletBarcodeByScan(Request $request){
+
+        $barcode = ProductionBarcodeDetail::where('pallet_no',$request->code)->whereHas('productionBarcode',function($query)use($request){
+            $query->where('production_order_detail_id',$request->production_order_detail_id);
+        })
+        ->whereDoesntHave('productionFgReceiveDetail')
+        ->where(column: function($query)use($request){
+            if($request->batch_used){
+                $query->whereNotIn('pallet_no',$request->batch_used);
+            }
+        })->first();
+
+        if($barcode){
+            if(!$barcode->productionFgReceiveDetail()->exists()){
+                $result[] = [
+                    'item_id'       => $barcode->item_id,
+                    'item_code'     => $barcode->item->code,
+                    'item_name'     => $barcode->item->name,
+                    'item_unit_id'  => $barcode->item_unit_id,
+                    'code'          => $barcode->pallet_no,
+                    'shading'       => $barcode->shading,
+                    'qty_convert'   => CustomHelper::formatConditionalQty($barcode->conversion),
+                    'qty_sell'      => CustomHelper::formatConditionalQty($barcode->qty_sell),
+                    'qty_uom'       => CustomHelper::formatConditionalQty($barcode->qty),
+                    'sell_unit'     => $barcode->item->sellUnit(),
+                    'uom_unit'      => $barcode->item->uomUnit->code,
+                    'plant'         => $barcode->productionBarcode->place->code,
+                    'plant_id'      => $barcode->productionBarcode->place_id,
+                    'shift'         => $barcode->productionBarcode->shift->production_code,
+                    'shift_id'      => $barcode->productionBarcode->shift_id,
+                    'group'         => $barcode->productionBarcode->group,
+                    'pallet_id'     => $barcode->pallet_id,
+                    'grade_id'      => $barcode->grade_id,
+                ];
+    
+                return response()->json($result);
+            }else{
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Data telah dipakai pada dokumen lainnya.'
+                ]);
+            }
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.'
+            ]);
+        }
+    }
+
     public function getChildFg(Request $request){
 
         $pod = ProductionOrderDetail::find($request->pod_id);

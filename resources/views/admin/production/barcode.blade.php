@@ -1173,9 +1173,25 @@
         $('#total-received').text(formatRupiahIni(total.toFixed(3).toString().replace('.',',')));
     }
 
+    function checkMaxRow(){
+        let total = $('.row_item').length;
+        if(total > 100){
+            swal({
+                title: 'Ups!',
+                text: 'Maksimal baris item adalah 100.',
+                icon: 'error'
+            });
+            return false;
+        }
+        return true;
+    }
+
     function generateBarcode(){
         if($('#production_order_detail_id').val() && $('#shift_id').val() && $('#group').val() && $('#pallet_id').val() && $('#grade_id').val() && $('#place_id').val() && $('#line_id').val() && $('#shading').val() && $('#post_date').val()){
             let arrNo = [];
+            if(!checkMaxRow()){
+                return false;
+            }
             $('input[name^="arr_pallet_no[]"]').each(function(index){
                 arrNo.push($(this).val());
             });
@@ -1192,6 +1208,7 @@
                     place_id: $('#place_id').val(),
                     line_id: $('#line_id').val(),
                     qty: $('#qty').val(),
+                    qty_sell: $('#qty_sell').val(),
                     date: $('#post_date').val(),
                     listno: arrNo,
                 },
@@ -1250,7 +1267,7 @@
                                             <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + $('#shading').val() + `" readonly>
                                         </td>
                                         <td class="right-align">
-                                            <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + $('#qty_sell').val() + `" readonly>
+                                            <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
                                         </td>
                                         <td class="center-align">
                                             ` + val.sell_unit + `

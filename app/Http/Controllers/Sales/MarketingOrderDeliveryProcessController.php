@@ -509,8 +509,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $itemstock = ItemStock::find($row);
                     $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                     if($itemcogs){
-                        /* if($itemcogs->infoFg()['qty'] < $arrQtyNeeded[$key]){ */
-                        if($itemstock->qty < $arrQtyNeeded[$key]){
+                        if($itemcogs->infoFg()['qty'] < $arrQtyNeeded[$key]){
                             $passedQty = false;
                         }
                     }else{

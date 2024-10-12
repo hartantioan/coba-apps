@@ -245,6 +245,7 @@ use App\Http\Controllers\Production\ProductionRecalculateController;
 use App\Http\Controllers\Production\ProductionReceiveController;
 use App\Http\Controllers\Production\ProductionRecapitulationController;
 use App\Http\Controllers\Production\ProductionRepackController;
+use App\Http\Controllers\Production\ReportProductionResultController;
 
 
 /*
@@ -2571,6 +2572,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('datatable', [ProductionRecapitulationController::class, 'datatable']);
                         Route::get('row_detail', [ProductionRecapitulationController::class, 'rowDetail']);
                         Route::get('export', [ProductionRecapitulationController::class, 'export']);
+                    });
+
+                    Route::prefix('report_production_result')->middleware('operation.access:report_production_result,view')->group(function () {
+                        Route::get('/', [ReportProductionResultController::class, 'index']);
+                        Route::post('filter', [ReportProductionResultController::class, 'filter']);
+                        Route::get('export', [ReportProductionResultController::class, 'export']);
                     });
                 });
             });

@@ -640,22 +640,20 @@
                                     <i class="material-icons">layers</i>List Production Order
                                 </div>
                                 <div class="collapsible-body">
-                                    <div id="datatable_buttons_multi_document_barcode"></div>
+                                    <div id="datatable_buttons_db"></div>
                                     <i class="right">Pilih salah satu item dan batch untuk dimasukkan ke dokumen serah terima.</i>
-                                    <table id="table_document_barcode" class="display" width="100%">
+                                    <table id="table_db" class="display" width="100%">
                                         <thead>
-                                            <thead>
-                                                <tr>
-                                                    <th class="center">No.Batch Palet/Curah</th>
-                                                    <th class="center">Kode Item</th>
-                                                    <th class="center">Nama Item</th>
-                                                    <th class="center">{{ __('translations.shading') }}</th>
-                                                    <th class="center">Qty Diterima</th>
-                                                    <th class="center">Satuan</th>
-                                                </tr>
-                                            </thead>
+                                            <tr>
+                                                <th class="center">No.Batch Palet/Curah</th>
+                                                <th class="center">Kode Item</th>
+                                                <th class="center">Nama Item</th>
+                                                <th class="center">{{ __('translations.shading') }}</th>
+                                                <th class="center">Qty Diterima</th>
+                                                <th class="center">Satuan</th>
+                                            </tr>
                                         </thead>
-                                        <tbody id="body-detail-document-barcode"></tbody>
+                                        <tbody id="body-detail-db"></tbody>
                                     </table>
                                 </div>
                             </li>
@@ -785,15 +783,19 @@
 
         $('#modal_document_barcode').modal({
             onOpenStart: function(modal,trigger) {
- 
+                $('.collapsible').collapsible({
+                    accordion:false
+                });
             },
             onOpenEnd: function(modal, trigger) {
-                table_multi_barcode = $('#table_document_barcode').DataTable({
+                table_multi_db = $('#table_db').on('init.dt', function() {
+                        
+                    }).DataTable({
                     "responsive": true,
                     scrollY: '50vh',
                     scrollCollapse: true,
-                    "iDisplayInLength": 10,
-                    "order": [[0, 'desc']],
+                    "iDisplayInLength": 100,
+                    "order": [[0, 'asc']],
                     dom: 'Blfrtip',
                     buttons: [
                         'selectAll',
@@ -813,22 +815,24 @@
                             last:       ">>"
                         },
                         "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
                         },
                         "select": {
+                            rows: "%d baris terpilih"
                         }
                     },
                     select: {
-                        style: 'single'
+                        style: 'multi'
                     }
                 });
-                
-                $('#table_document_barcode_wrapper > .dt-buttons').appendTo('#datatable_buttons_multi_document_barcode');
-                $('select[name="table_document_barcode_length"]').addClass('browser-default');
+                $('#table_db_wrapper > .dt-buttons').appendTo('#datatable_buttons_db');
+                $('select[name="table_db_length"]').addClass('browser-default');
             },
             onCloseEnd: function(modal, trigger){
-                $('#body-detail-document-barcode').empty();
+                $('#body-detail-db').empty();
                 
-                $('#table_document_barcode').DataTable().clear().destroy();
+                $('#table_db').DataTable().clear().destroy();
             }
         });
 
@@ -1197,6 +1201,152 @@
         $('#total-batch-used').text(
             formatRupiahIni(total.toFixed(3).toString().replace('.',','))
         );
+    }
+
+    function applyDocumentBarcode(){
+        swal({
+            title: "Apakah anda yakin?",
+            text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+            icon: 'warning',
+            dangerMode: true,
+            buttons: {
+            cancel: 'Tidak, jangan!',
+            delete: 'Ya, lanjutkan!'
+            }
+        }).then(function (willDelete) {
+            if (willDelete) {
+                let arr_id = [], passed = true;
+                $.map(table_multi_db.rows('.selected').nodes(), function (item) {
+                    arr_id.push($(item).data('id'));
+                });
+                if(arr_id.length > 0){
+                    $.ajax({
+                        url: '{{ Request::url() }}/get_pallet_barcode_by_document',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            arr_id: arr_id,
+                            batch_used: arrBatch,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('.modal-content');
+                        },
+                        success: function(response) {
+                            loadingClose('.modal-content');
+
+                            if(response.status == 500){
+                                swal({
+                                    title: 'Ups!',
+                                    text: response.message,
+                                    icon: 'warning'
+                                });
+                                if(response.errors){
+                                    $.each(response.errors, function(i, val) {
+                                        M.toast({
+                                            html: val
+                                        });
+                                    });
+                                }
+                            }else{
+                                if(response.length > 0){
+                                    if($('.row_item').length == 0){
+                                        $('#body-item').empty();
+                                    }
+                                    $.each(response, function(i, val) {
+                                        let count = makeid(10);
+
+                                        let no = $('.row_item').length + 1;
+
+                                        $('#body-item').append(`
+                                            <tr class="row_item" data-code="` + val.code + `">
+                                                <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                                <input type="hidden" name="arr_item_unit_id[]" value="` + val.item_unit_id + `">
+                                                <input type="hidden" name="arr_pallet_id[]" value="` + val.pallet_id + `">
+                                                <input type="hidden" name="arr_grade_id[]" value="` + val.grade_id + `">
+                                                <td class="center-align">
+                                                    ` + no + `
+                                                </td>
+                                                <td>
+                                                    <input name="arr_pallet_no[]" id="arr_pallet_no` + count + `" type="text" value="` + val.code + `" readonly>
+                                                </td>
+                                                <td>
+                                                    ` + val.item_code + `
+                                                </td>
+                                                <td>
+                                                    ` + val.item_name + `
+                                                </td>
+                                                <td>
+                                                    <input name="arr_shading[]" id="arr_shading` + count + `" type="text" value="` + val.shading + `" readonly>
+                                                </td>
+                                                <td class="right-align">
+                                                    <input name="arr_qty_sell[]" id="arr_qty_sell` + count + `" type="text" value="` + val.qty_sell + `" readonly>
+                                                </td>
+                                                <td class="center-align">
+                                                    ` + val.sell_unit + `
+                                                </td>
+                                                <td class="right-align">
+                                                    <input name="arr_qty_convert[]" id="arr_qty_convert` + count + `" type="text" value="` + val.qty_convert + `" readonly>
+                                                </td>
+                                                <td class="right-align">
+                                                    <input name="arr_qty_uom[]" id="arr_qty_uom` + count + `" type="text" value="` + val.qty_uom + `" readonly>
+                                                </td>
+                                                <td class="center-align">
+                                                    ` + val.uom_unit + `
+                                                </td>
+                                                <td class="center-align">
+                                                    ` + val.plant + `
+                                                </td>
+                                                <td class="center-align">
+                                                    ` + val.shift + `
+                                                </td>
+                                                <td class="center-align">
+                                                    ` + val.group + `
+                                                </td>
+                                                <td class="center-align">
+                                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
+                                                        <i class="material-icons">delete</i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        `);
+                                        arrBatch.push(val.code);
+                                    });
+                                    $('.modal-content').scrollTop($("#body-item").offset().top);
+                                    countAll();
+                                }
+
+                                $('#pallet_id').empty(); 
+                                $('#grade_id').empty();
+                                $('#qty,#qty_sell').val('0,000');
+                                $('#shading').val('-');
+                                $('#item_name_child').val('');
+                                $('#qty_sell').data('conversion','0');
+                                $('#production_barcode_detail_id').empty();
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('.modal-content');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                    $('#modal_document_barcode').modal('close');
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: 'Silahkan pilih minimal 1 baris.',
+                        icon: 'warning'
+                    });
+                }
+            }
+        });
     }
 
     function applyDocuments(type){
@@ -2710,7 +2860,7 @@
                     $('#modal_document_barcode').modal('open');
                     if(response.details.length > 0){
                         $.each(response.details, function(i, val) {
-                            $('#body-detail-document-barcode').append(`
+                            $('#body-detail-db').append(`
                                 <tr data-id="` + val.id + `">
                                     <td>
                                         ` + val.code + `

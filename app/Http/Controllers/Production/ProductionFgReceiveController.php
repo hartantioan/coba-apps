@@ -122,6 +122,51 @@ class ProductionFgReceiveController extends Controller
         }
     }
 
+    public function getPalletBarcodeByDocument(Request $request){
+
+        $barcode = ProductionBarcodeDetail::whereIn('id',$request->arr_id)->whereHas('productionBarcode',function($query)use($request){
+            $query->whereIn('status',['2','3']);
+        })
+        ->whereDoesntHave('productionFgReceiveDetail')
+        ->where(column: function($query)use($request){
+            if($request->batch_used){
+                $query->whereNotIn('pallet_no',$request->batch_used);
+            }
+        })->get();
+
+        if(count($barcode) > 0){
+            foreach($barcode as $item){
+                $result[] = [
+                    'item_id'       => $item->item_id,
+                    'item_code'     => $item->item->code,
+                    'item_name'     => $item->item->name,
+                    'item_unit_id'  => $item->item_unit_id,
+                    'code'          => $item->pallet_no,
+                    'shading'       => $item->shading,
+                    'qty_convert'   => CustomHelper::formatConditionalQty($item->conversion),
+                    'qty_sell'      => CustomHelper::formatConditionalQty($item->qty_sell),
+                    'qty_uom'       => CustomHelper::formatConditionalQty($item->qty),
+                    'sell_unit'     => $item->item->sellUnit(),
+                    'uom_unit'      => $item->item->uomUnit->code,
+                    'plant'         => $item->productionBarcode->place->code,
+                    'plant_id'      => $item->productionBarcode->place_id,
+                    'shift'         => $item->productionBarcode->shift->production_code,
+                    'shift_id'      => $item->productionBarcode->shift_id,
+                    'group'         => $item->productionBarcode->group,
+                    'pallet_id'     => $item->pallet_id,
+                    'grade_id'      => $item->grade_id,
+                ];
+            }
+
+            return response()->json($result);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.'
+            ]);
+        }
+    }
+
     public function getPalletBarcodeByScan(Request $request){
 
         $barcode = ProductionBarcodeDetail::where('pallet_no',$request->code)->whereHas('productionBarcode',function($query)use($request){

@@ -21,6 +21,7 @@ class ExportReportProductionResult implements FromView, ShouldAutoSize
                 $query->where('post_date', '>=',$this->start_date)
                     ->where('post_date', '<='   , $this->end_date);
             })
+            ->whereIn('status',['2','3'])
             ->get();
             activity()
                 ->performedOn(new ProductionHandover())

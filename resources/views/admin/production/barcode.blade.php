@@ -2147,13 +2147,13 @@
             url: '{{ Request::url() }}/print_barcode/' + code,
             type:'GET',
             beforeSend: function() {
-                loadingOpen('.modal-content');
+                loadingOpen('#main');
             },
             complete: function() {
-                
+                loadingClose('#main');
             },
             success: function(data){
-                loadingClose('.modal-content');
+                loadingClose('#main');
                 window.open(data, '_blank');
             }
         });

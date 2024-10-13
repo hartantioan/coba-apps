@@ -844,7 +844,7 @@ class MarketingOrderDeliveryController extends Controller
         $string = '<div class="row pt-1 pb-1 lighten-4"><div class="col s12">'.$data->code.$x.'</div><div class="col s12"><table style="min-width:100%;" class="bordered">
                         <thead>
                             <tr>
-                                <th class="center-align" colspan="17">Daftar Item</th>
+                                <th class="center-align" colspan="17">Daftar Item <i>(Warna merah untuk item lama setelah data MOD diupdate dari form SJ/DO)</i></th>
                             </tr>
                             <tr>
                                 <th class="center-align">No.</th>
@@ -857,9 +857,9 @@ class MarketingOrderDeliveryController extends Controller
                         </thead><tbody>';
         $totalqty=0;
 
-        foreach($data->marketingOrderDeliveryDetail as $key => $row){
+        foreach($data->marketingOrderDeliveryDetailWithTrashed as $key => $row){
             $totalqty+=$row->qty;
-            $string .= '<tr>
+            $string .= '<tr class="'.($row->deleted_at ? 'red white-text' : '').'">
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->marketingOrderDetail->marketingOrder->code.'</td>
                 <td class="center-align">'.$row->item->code.' - '.$row->item->name.'</td>

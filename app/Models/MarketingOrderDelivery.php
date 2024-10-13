@@ -165,6 +165,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryDetail');
     }
 
+    public function marketingOrderDeliveryDetailWithTrashed()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryDetail')->withTrashed();
+    }
+
     public function marketingOrderDeliveryRemap()
     {
         return $this->hasMany('App\Models\MarketingOrderDelivery');
@@ -330,6 +335,34 @@ class MarketingOrderDelivery extends Model
             return true;
         }else{
             return false;
+        }
+    }
+
+    public function reCreateDetail(){
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $marketing_order_detail_id = $row->marketing_order_detail_id;
+            $arrShading = [];
+            $newQty = 0;
+            foreach($row->marketingOrderDeliveryProcessDetail as $modpd){
+                $newQty += $modpd->qty;
+                if(!in_array($modpd->itemStock->itemShading->code, $arrShading)){
+                    $arrShading[] = $modpd->itemStock->itemShading->code;
+                }
+            }
+            $newmodd = MarketingOrderDeliveryDetail::create([
+                'marketing_order_delivery_id'   => $this->id,
+                'marketing_order_detail_id'     => $marketing_order_detail_id,
+                'item_id'                       => $row->item_id,
+                'qty'                           => $newQty,
+                'note'                          => 'NEW CHANGES FROM SJ/DO : '.implode(', ',$arrShading),
+                'place_id'                      => $row->place_id,
+            ]);
+            foreach($row->marketingOrderDeliveryProcessDetail as $modpd){
+                $modpd->update([
+                    'marketing_order_delivery_detail_id'    => $newmodd->id,
+                ]);
+            }
+            $row->delete();
         }
     }
 }

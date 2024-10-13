@@ -605,7 +605,13 @@ class MarketingOrderDeliveryProcessController extends Controller
                             'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                    if(in_array($query->status,['1','6']) || $request->tempSwitch){
+                    if($query->isItemSent()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Dokumen DO/SJ telah dikirimkan, anda tidak bisa melakukan perubahan.'
+                        ]);
+                    }
+                    if(in_array($query->status,['1','2','6']) || $request->tempSwitch){
 
                         $query->user_id = session('bo_id');
                         $query->code = $request->code;
@@ -621,7 +627,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->no_container = $request->no_container;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
-                        $query->status = $request->tempSwitch ? $query->status : '1';
+                        $query->status = $query->status;
                         $query->total = $mod->getTotal();
                         $query->tax = $mod->getTax();
                         $query->rounding = $mod->getRounding();
@@ -642,8 +648,6 @@ class MarketingOrderDeliveryProcessController extends Controller
                             }
                             $row->delete();
                         }
-
-                        $query->marketingOrderDeliveryProcessDetail()->delete();
 
                         DB::commit();
                     }else{
@@ -712,6 +716,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'qty'                   => round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),
                     ]);
                     CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
+                }
+
+                if($request->temp){
+                    $query->marketingOrderDelivery->reCreateDetail();
                 }
 
                 if(!$request->tempSwitch){
@@ -1223,6 +1231,12 @@ class MarketingOrderDeliveryProcessController extends Controller
 
     public function show(Request $request){
         $po = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->id))->first();
+        if($po->isItemSent()){
+            return response()->json([
+                'responseStatus'=> 500,
+                'message'       => 'Dokumen DO/SJ telah dikirimkan, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
         if($request->type){
             if(in_array($po->statusTrackingRaw(),['1','3','4','5'])){
                 return response()->json([
@@ -1267,6 +1281,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             foreach($po->marketingOrderDeliveryProcessDetail()->where('marketing_order_delivery_detail_id',$rowmod)->get() as $row){
                 $details[] = [
                     'id'            => $row->id,
+                    'item_stock_id' => $row->item_stock_id,
                     'item_name'     => $row->itemStock->place->code.' / Gudang : '.$row->itemStock->warehouse->name.' / Area : '.($row->itemStock->area()->exists() ? $row->itemStock->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($row->itemStock->balanceWithUnsent() / $moddd->marketingOrderDetail->qty_conversion).' '.$row->itemStock->item->uomUnit->code.' / Shading : '.($row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-'),
                     'place_name'    => $row->itemStock->place->code,
                     'warehouse_name'=> $row->itemStock->warehouse->name,
@@ -1274,7 +1289,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'shading'       => $row->itemStock->itemShading()->exists() ? $row->itemStock->itemShading->code : '-',
                     'batch'         => $row->itemStock->productionBatch()->exists() ? $row->itemStock->productionBatch->code : '-',
                     'qty'           => CustomHelper::formatConditionalQty($row->qty),
-                    'qty_max'       => CustomHelper::formatConditionalQty($row->qty + ($row->itemStock->qty / $moddd->marketingOrderDetail->qty_conversion)),
+                    'qty_max'       => CustomHelper::formatConditionalQty($row->qty + ($row->itemStock->balanceWithUnsent() / $moddd->marketingOrderDetail->qty_conversion)),
                 ];
             }
             $moddd['details'] = $details;

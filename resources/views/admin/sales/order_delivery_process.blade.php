@@ -2039,22 +2039,43 @@ document.addEventListener('focusin', function (event) {
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                var formData = new FormData($('#form_data')[0]), passedQty = true;
+                var formData = new FormData($('#form_data')[0]), passedQty = true, passedEditQty = true;
 
-                $(".main-qty").each(function(){
-                    let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
-                    $(".rowQtyDetail" + id).each(function(index){
-                        qtyStock += parseFloat($(".rowQtyDetail" + id).eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                if($('#temp').val()){
+                    $(".main-qty").each(function(){
+                        let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
+                        $(".rowQtyDetail" + id).each(function(index){
+                            qtyStock += parseFloat($(".rowQtyDetail" + id).eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                        });
+                        if(qtyStock > qty){
+                            passedEditQty = false;
+                        }
                     });
-                    if(qtyStock !== qty){
-                        passedQty = false;
-                    }
-                });
+                }else{
+                    $(".main-qty").each(function(){
+                        let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
+                        $(".rowQtyDetail" + id).each(function(index){
+                            qtyStock += parseFloat($(".rowQtyDetail" + id).eq(index).val().replaceAll(".", "").replaceAll(",","."));
+                        });
+                        if(qtyStock !== qty){
+                            passedQty = false;
+                        }
+                    });
+                }
 
                 if(!passedQty){
                     swal({
                         title: 'Ups!',
                         text: 'Qty yang akan dikirim dan qty stock tidak sama. Silahkan cek kembali.',
+                        icon: 'warning'
+                    });
+                    return false;
+                }
+
+                if(!passedEditQty){
+                    swal({
+                        title: 'Ups!',
+                        text: 'Qty stock dipakai tidak boleh lebih dari qty MOD.',
                         icon: 'warning'
                     });
                     return false;
@@ -2169,168 +2190,176 @@ document.addEventListener('focusin', function (event) {
             success: function(response) {
                 loadingClose('#main');
 
-                $('#modal1').modal('open');
-                $('#temp').val(id);
-                $('#code_place_id').val(response.code_place_id).formSelect();
-                $('#code').val(response.code);
-                $('#marketing_order_delivery_id').empty();
-                $('#marketing_order_delivery_id').append(`
-                    <option value="` + response.marketing_order_delivery_id + `">` + response.marketing_order_delivery_code + `</option>
-                `);
-                $('#company_id').val(response.company_id).formSelect();
-                $('#post_date').val(response.post_date);
-                $('#note_internal').val(response.note_internal);
-                $('#note_external').val(response.note_external);
-                $('#no_container').val(response.no_container);
-                $('#vehicle_name').val(response.vehicle_name);
-                $('#vehicle_no').val(response.vehicle_no);
-
-                if(response.drivers.length > 0){
-                    $('#user_driver_id').empty().append(`
-                        <option value="">--Kosong / Tambah baru--</option>
+                if(response.responseStatus == 200){
+                    $('#modal1').modal('open');
+                    $('#temp').val(id);
+                    $('#code_place_id').val(response.code_place_id).formSelect();
+                    $('#code').val(response.code);
+                    $('#marketing_order_delivery_id').empty();
+                    $('#marketing_order_delivery_id').append(`
+                        <option value="` + response.marketing_order_delivery_id + `">` + response.marketing_order_delivery_code + `</option>
                     `);
-                    $.each(response.drivers, function(i, val) {
-                        $('#user_driver_id').append(`
-                            <option value="` + val.id + `" data-driver="` + val.name + `" data-hp="` + val.hp + `">` + val.name + ` - ` + val.hp + `</value>
+                    $('#company_id').val(response.company_id).formSelect();
+                    $('#post_date').val(response.post_date);
+                    $('#note_internal').val(response.note_internal);
+                    $('#note_external').val(response.note_external);
+                    $('#no_container').val(response.no_container);
+                    $('#vehicle_name').val(response.vehicle_name);
+                    $('#vehicle_no').val(response.vehicle_no);
+
+                    if(response.drivers.length > 0){
+                        $('#user_driver_id').empty().append(`
+                            <option value="">--Kosong / Tambah baru--</option>
                         `);
-                    });
-                    $('#user_driver_id').trigger('change');
-                }
+                        $.each(response.drivers, function(i, val) {
+                            $('#user_driver_id').append(`
+                                <option value="` + val.id + `" data-driver="` + val.name + `" data-hp="` + val.hp + `">` + val.name + ` - ` + val.hp + `</value>
+                            `);
+                        });
+                        $('#user_driver_id').trigger('change');
+                    }
 
-                $('#user_driver_id').val(response.user_driver_id).trigger('change');
+                    $('#user_driver_id').val(response.user_driver_id).trigger('change');
 
-                $('#driver_name').val(response.driver_name);
-                $('#driver_hp').val(response.driver_hp);
+                    $('#driver_name').val(response.driver_name);
+                    $('#driver_hp').val(response.driver_hp);
 
-                if(response.details.length > 0){
-                    $('#last-row-item').remove();
+                    if(response.details.length > 0){
+                        $('#last-row-item').remove();
 
-                    $('.row_item').each(function(){
-                        $(this).remove();
-                    });
-
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        let details = ``;
-
-                        $.each(val.details, function(i, value) {
-                            let countdetail = makeid(10);
-                            details += `
-                            <tr class="row_item_detail_` + count + `">
-                                <input type="hidden" name="arr_modd_id[]" value="` + val.id + `">
-                                <input type="hidden" name="arr_item_stock_id[]" value="` + value.id + `">
-                                <td>
-                                    ` + value.place_name + `
-                                </td>
-                                <td>
-                                    ` + value.warehouse_name + `
-                                </td>
-                                <td>
-                                    ` + value.area_name + `
-                                </td>
-                                <td>
-                                    ` + value.shading + `
-                                </td>
-                                <td>
-                                    ` + value.batch + `
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty_max + `" class="rowQtyDetail` + count + `">
-                                </td>
-                                <td class="center-align">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + count + `');">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                            `;
+                        $('.row_item').each(function(){
+                            $(this).remove();
                         });
 
-                        $('#body-item').append(`
-                            <tr class="row_item" data-id="` + response.marketing_order_delivery_id + `" style="background-color:` + getRandomColor() + `;">
-                                <td rowspan="2" class="center-align">
-                                    ` + (i+1) + `
-                                </td>
-                                <td>
-                                    ` + val.item_name + `
-                                </td>
-                                <td id="arr_warehouse_name` + count + `">
-                                    ` + val.sales_order + `
-                                </td>
-                                <td class="center-align main-qty" data-id="` + count + `">
-                                    ` + val.qty + `
-                                </td>
-                                <td class="center-align">
-                                    <span id="arr_unit` + count + `">` + val.unit + `</span>
-                                </td>
-                                <td>
-                                    ` + val.note + `
-                                </td>
-                            </tr>
-                            <tr class="row_item" data-id="` + response.id + `">
-                                <td colspan="5">
-                                    <table class="bordered" id="table-detail-` + count + `">
-                                        <thead>
-                                            <tr>
-                                                <th class="center" colspan="2" width="40%">
-                                                    <select class="browser-default" id="item_stock_id` + count + `"></select>
-                                                </th>
-                                                <th class="center" colspan="2" width="20%">
-                                                    <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
-                                                </div>
-                                                <th class="center" colspan="3">
-                                                    <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `');">
-                                                </th>
-                                            </tr>
-                                            <tr>
-                                                <th class="center">Plant</th>
-                                                <th class="center">Gudang</th>
-                                                <th class="center">Area</th>
-                                                <th class="center">Shading</th>
-                                                <th class="center">Batch</th>
-                                                <th class="center">Qty</th>
-                                                <th class="center">Hapus</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="body-item-` + count + `">
-                                            ` + details + `
-                                        </tbody>
-                                    </table>
-                                </td>
-                            </tr>
-                        `);
-                        $('#item_stock_id' + count).select2({
-                            placeholder: '-- Pilih asal stock / gudang --',
-                            minimumInputLength: 1,
-                            allowClear: true,
-                            cache: true,
-                            width: 'resolve',
-                            dropdownParent: $('body').parent(),
-                            ajax: {
-                                url: '{{ url("admin/select2/item_stock_by_place_item") }}',
-                                type: 'GET',
-                                dataType: 'JSON',
-                                data: function(params) {
-                                    return {
-                                        search: params.term,
-                                        place_id: val.place_id,
-                                        item_id: val.item_id,
-                                        qty_conversion: val.conversion,
-                                    };
-                                },
-                                processResults: function(data) {
-                                    return {
-                                        results: data.items
+                        $.each(response.details, function(i, val) {
+                            var count = makeid(10);
+                            let details = ``;
+
+                            $.each(val.details, function(i, value) {
+                                let countdetail = makeid(10);
+                                details += `
+                                <tr class="row_item_detail_` + count + `">
+                                    <input type="hidden" name="arr_modd_id[]" value="` + val.id + `">
+                                    <input type="hidden" name="arr_item_stock_id[]" value="` + value.item_stock_id + `">
+                                    <td>
+                                        ` + value.place_name + `
+                                    </td>
+                                    <td>
+                                        ` + value.warehouse_name + `
+                                    </td>
+                                    <td>
+                                        ` + value.area_name + `
+                                    </td>
+                                    <td>
+                                        ` + value.shading + `
+                                    </td>
+                                    <td>
+                                        ` + value.batch + `
+                                    </td>
+                                    <td>
+                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + value.qty + `" onkeyup="formatRupiahNoMinus(this);checkMax(this);" data-max="` + value.qty_max + `" class="rowQtyDetail` + count + `">
+                                    </td>
+                                    <td class="center-align">
+                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1" href="javascript:void(0);" onclick="removeRow(this,'` + count + `');">
+                                            <i class="material-icons">delete</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                `;
+                            });
+
+                            $('#body-item').append(`
+                                <tr class="row_item" data-id="` + response.marketing_order_delivery_id + `" style="background-color:` + getRandomColor() + `;">
+                                    <td rowspan="2" class="center-align">
+                                        ` + (i+1) + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td id="arr_warehouse_name` + count + `">
+                                        ` + val.sales_order + `
+                                    </td>
+                                    <td class="center-align main-qty" data-id="` + count + `">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center-align">
+                                        <span id="arr_unit` + count + `">` + val.unit + `</span>
+                                    </td>
+                                    <td>
+                                        ` + val.note + `
+                                    </td>
+                                </tr>
+                                <tr class="row_item" data-id="` + response.id + `">
+                                    <td colspan="5">
+                                        <table class="bordered" id="table-detail-` + count + `">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center" colspan="2" width="40%">
+                                                        <select class="browser-default" id="item_stock_id` + count + `"></select>
+                                                    </th>
+                                                    <th class="center" colspan="2" width="20%">
+                                                        <a class="waves-effect waves-light cyan btn-small" onclick="getStock('` + count + `',` + val.id + `);" href="javascript:void(0);"><i class="material-icons left">add</i> Tambah</a>
+                                                    </div>
+                                                    <th class="center" colspan="3">
+                                                        <input id="text-barcode-` + count + `" name="text-barcode" type="text" value="" placeholder="Untuk Scan" data-id="` + val.modd_id + `" onchange="getStockByBarcode('` + count + `');">
+                                                    </th>
+                                                </tr>
+                                                <tr>
+                                                    <th class="center">Plant</th>
+                                                    <th class="center">Gudang</th>
+                                                    <th class="center">Area</th>
+                                                    <th class="center">Shading</th>
+                                                    <th class="center">Batch</th>
+                                                    <th class="center">Qty</th>
+                                                    <th class="center">Hapus</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="body-item-` + count + `">
+                                                ` + details + `
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                </tr>
+                            `);
+                            $('#item_stock_id' + count).select2({
+                                placeholder: '-- Pilih asal stock / gudang --',
+                                minimumInputLength: 1,
+                                allowClear: true,
+                                cache: true,
+                                width: 'resolve',
+                                dropdownParent: $('body').parent(),
+                                ajax: {
+                                    url: '{{ url("admin/select2/item_stock_by_place_item") }}',
+                                    type: 'GET',
+                                    dataType: 'JSON',
+                                    data: function(params) {
+                                        return {
+                                            search: params.term,
+                                            place_id: val.place_id,
+                                            item_id: val.item_id,
+                                            qty_conversion: val.conversion,
+                                        };
+                                    },
+                                    processResults: function(data) {
+                                        return {
+                                            results: data.items
+                                        }
                                     }
                                 }
-                            }
+                            });
                         });
+                    }
+
+                    $('.modal-content').scrollTop(0);
+                    $('#note').focus();
+                    M.updateTextFields();
+                }else{
+                    swal({
+                        title: 'Ups!',
+                        text: response.message,
+                        icon: 'warning'
                     });
                 }
-
-                $('.modal-content').scrollTop(0);
-                $('#note').focus();
-                M.updateTextFields();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

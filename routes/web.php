@@ -185,6 +185,8 @@ use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceDetailRecapController;
 use App\Http\Controllers\Sales\MarketingARDPrecapController;
 use App\Http\Controllers\Sales\ReportReceivableCardController;
+use App\Http\Controllers\Sales\ReportStockBrandController;
+use App\Http\Controllers\Sales\ReportSalesBrandController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -2921,6 +2923,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('filter', [ReportTrackingSalesOrderController::class, 'filter']);
                         Route::get('export', [ReportTrackingSalesOrderController::class, 'export']);
                     });
+
+                    Route::prefix('report_stock_brand')->middleware('operation.access:report_stock_brand,view')->group(function () {
+                        Route::get('/', [ReportStockBrandController::class, 'index']);
+                        Route::post('filter', [ReportStockBrandController::class, 'filter']);
+                        Route::get('export', [ReportStockBrandController::class, 'export']);
+                    });
+
+                    Route::prefix('report_sales_brand')->middleware('operation.access:report_sales_brand,view')->group(function () {
+                        Route::get('/', [ReportSalesBrandController::class, 'index']);
+                        Route::post('filter', [ReportSalesBrandController::class, 'filter']);
+                        Route::get('export', [ReportSalesBrandController::class, 'export']);
+                    });
+
 
                     Route::prefix('report_marketing_delivery_order')->middleware('operation.access:report_marketing_delivery_order,view')->group(function () {
                         Route::get('/', [MarketingDeliveryRecapController::class, 'index']);

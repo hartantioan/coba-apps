@@ -136,7 +136,7 @@ class ProductionBarcodeController extends Controller
                         $qtyRow = floor($qty / $sellConvert);
                         $qtyUsed = $qtyRow * $sellConvert;
                         
-                        /* if($itemChild->pallet->box_conversion <= 1){ */
+                        if($itemChild->pallet->box_conversion <= 1){
                             $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
                             $code = $prefix.$no;
                             
@@ -155,7 +155,7 @@ class ProductionBarcodeController extends Controller
                                 'shift'         => $shift->production_code,
                                 'group'         => $group,
                             ];
-                        /* }else{
+                        }else{
                             for($i=1;$i<=$qty_sell;$i++){
                                 $no = str_pad($startNumber, 5, 0, STR_PAD_LEFT);
                                 $code = $prefix.$no;
@@ -176,7 +176,7 @@ class ProductionBarcodeController extends Controller
                                 ];
                                 $startNumber++;
                             }
-                        } */
+                        }
 
                         return response()->json($result);
                     }else{

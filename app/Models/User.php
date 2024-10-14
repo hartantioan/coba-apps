@@ -305,7 +305,7 @@ class User extends Authenticatable
         $arr = [];
         foreach($this->userBrand as $key => $value) {
 
-            $arr[] = $value->brand->name;
+            $arr[] = $value->brand->name ??'-';
         }
         return implode(',',$arr);
     }

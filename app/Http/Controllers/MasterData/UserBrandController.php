@@ -212,7 +212,7 @@ class UserBrandController extends Controller
     public function destroy(Request $request){
         $query = User::find($request->id);
 
-        if($query->delete()) {
+        if($query->userBrand()->delete()) {
             activity()
                 ->performedOn(new UserBrand())
                 ->causedBy(session('bo_id'))

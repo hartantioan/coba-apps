@@ -263,19 +263,22 @@
                 $('#code').focus();
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
+
                 M.updateTextFields();
             },
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
                 $('#account_id').empty();
-                $('#last-row-brand').empty();
-                $('#last-row-brand').append(`
-                    <td colspan="6" class="center">
-                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addBrand()" href="javascript:void(0);">
-                            <i class="material-icons left">add</i> Tambah Brand
-                        </a>
-                    </td>
+                $('#body-brand').empty();
+                $('#body-brand').append(`
+                    <tr id="last-row-brand">
+                        <td colspan="6" class="center">
+                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addBrand()" href="javascript:void(0);">
+                                <i class="material-icons left">add</i> Tambah Brand
+                            </a>
+                        </td>
+                    </tr>
                 `);
                 M.updateTextFields();
                 $('#form_data input:checkbox').prop( "checked", false);

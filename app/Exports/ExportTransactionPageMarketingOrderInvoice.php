@@ -55,6 +55,8 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
         'PPN',
         'Grandtotal',
         'Status',
+        'DPP sesuai FP',
+        'PPN sesuai FP',
     ];
 
     public function collection()
@@ -145,6 +147,8 @@ class ExportTransactionPageMarketingOrderInvoice implements  FromCollection, Wit
                 'ppn'        => $row->tax,
                 'grandtotal'           => $row->grandtotal,
                 'status'            => $row->statusRaw(),
+                'total_fp'           => floor($row->total),
+                'ppn_fp'        => floor($row->tax),
             ];
         
             

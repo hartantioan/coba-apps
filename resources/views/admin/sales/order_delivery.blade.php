@@ -851,7 +851,7 @@ document.addEventListener('focusin', function (event) {
                     }
                 }
             });
-        })
+        });
     });
 
     function updateSendStatus(code,element){

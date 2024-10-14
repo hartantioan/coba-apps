@@ -12,6 +12,8 @@ use App\Exceptions\RowImportException;
 use App\Exports\ExportTemplateUserBrand;
 use App\Exports\ExportUserBrand;
 use App\Imports\ImportUserBrand;
+use App\Models\User;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 class UserBrandController extends Controller
 {
@@ -28,8 +30,8 @@ class UserBrandController extends Controller
 
     public function datatable(Request $request){
         $column = [
-            'user_id',
-            'account_name',
+            'employee_no',
+            'name',
             'brand_id',
         ];
 
@@ -39,61 +41,44 @@ class UserBrandController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = UserBrand::count();
+        $total_data = User::count();
 
-        $query_data = UserBrand::where(function($query) use ($search, $request) {
-                if($search) {
-                    $query->where(function($query) use ($search, $request) {
-                        $query->orWhereHas('user', function($querys) use ($search, $request) {
-                            $querys->where('employee_no', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
-                        })->orWhereHas('account',function($query) use($search, $request){
-                            $query->where('name','like',"%$search%")
-                                ->orWhere('employee_no','like',"%$search%");
-                        })->orWhereHas('brand',function($query) use($search, $request){
-                            $query->where('name','like',"%$search%")
-                                ->orWhere('employee_no','like',"%$search%");
-                        });
-                    });
-                }
+        $query_data = User::whereHas('userBrand', function ($query) {
+            $query->where('user_brands.user_id', '!=', DB::raw('users.id'));
+        })
+        ->where(function ($query) use ($search) {
+            $query->where('users.name', 'like', "%$search%")
+                  ->orWhere('users.employee_no', 'like', "%$search%");
+        })
+        ->offset($start)
+        ->limit($length)
+        ->orderBy($order, $dir)
+        ->distinct() // Optional to avoid duplicates
+        ->get();
 
 
-            })
-            ->offset($start)
-            ->limit($length)
-            ->orderBy($order, $dir)
-            ->get();
+        $total_filtered = User::whereHas('userBrand', function ($query) {
+            $query->where('user_brands.user_id', '!=', DB::raw('users.id'));
+        })
+        ->where(function ($query) use ($search) {
+            $query->where('users.name', 'like', "%$search%")
+                  ->orWhere('users.employee_no', 'like', "%$search%");
+        })
+        ->distinct()
+        ->count();
 
-        $total_filtered = UserBrand::where(function($query) use ($search, $request) {
-                if($search) {
-                    $query->where(function($query) use ($search, $request) {
-                        $query->orWhereHas('user', function($querys) use ($search, $request) {
-                            $querys->where('employee_no', 'like', "%$search%")
-                            ->orWhere('name', 'like', "%$search%");
-                        })->orWhereHas('account',function($query) use($search, $request){
-                            $query->where('name','like',"%$search%")
-                                ->orWhere('employee_no','like',"%$search%");
-                        })->orWhereHas('brand',function($query) use($search, $request){
-                            $query->where('name','like',"%$search%")
-                                ->orWhere('employee_no','like',"%$search%");
-                        });
-                    });
-                }
-
-            })
-            ->count();
 
         $response['data'] = [];
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-
                 $response['data'][] = [
                     $nomor,
-                    $val->account->name,
-                    $val->brand->code,
-                    $val->brand->name,
+                    $val->employee_no,
+                    $val->name,
+                    $val->listUserBrand(),
                     '
+						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . $val->id . '`)"><i class="material-icons dp48">create</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(' . $val->id . ')"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -137,96 +122,95 @@ class UserBrandController extends Controller
         return Excel::download(new ExportTemplateUserBrand(), 'format_template_user_brand'.uniqid().'.xlsx');
     }
 
-    // public function create(Request $request){
-    //     $validation = Validator::make($request->all(), [
-    //         'code' 				=> $request->temp ? ['required', Rule::unique('UserBrands', 'code')->ignore($request->temp)] : 'required|unique:UserBrands,code',
-    //         'name'              => 'required',
-    //         'company_id'        => 'required',
-    //         'account_no'        => 'required',
-    //         'account_name'      => 'required',
-    //     ], [
-    //         'code.required' 	    => 'Kode tidak boleh kosong.',
-    //         'code.unique'           => 'Kode telah terpakai.',
-    //         'name.required'         => 'Nama tidak boleh kosong.',
-    //         'company_id.required'   => 'Perusahaan tidak boleh kosong.',
-    //         'account_no.required'   => 'Nomor rekening tidak boleh kosong.',
-    //         'account_name.required' => 'Atas nama rekening tidak boleh kosong.',
-    //     ]);
+    public function create(Request $request){
+        $validation = Validator::make($request->all(), [
+            'account_id' 			=> 'required',
+            'arr_id_brand'      => 'required',
+        ], [
+            'account_id.required' 	    => 'User tidak boleh kosong.',
+            'arr_id_brand.required'         => 'Brand tidak boleh kosong.',
+        ]);
 
-    //     if($validation->fails()) {
-    //         $response = [
-    //             'status' => 422,
-    //             'error'  => $validation->errors()
-    //         ];
-    //     } else {
-	// 		if($request->temp){
-    //             DB::beginTransaction();
-    //             try {
-    //                 $query = UserBrand::find($request->temp);
-    //                 $query->code            = $request->code;
-    //                 $query->name	        = $request->name;
-    //                 $query->account_name    = $request->account_name;
-    //                 $query->account_no      = $request->account_no;
-    //                 $query->company_id      = $request->company_id;
-    //                 $query->branch          = $request->branch;
-    //                 $query->is_show         = $request->is_show ? $request->is_show : NULL;
-    //                 $query->status          = $request->status ? $request->status : '2';
-    //                 $query->save();
-    //                 DB::commit();
-    //             }catch(\Exception $e){
-    //                 DB::rollback();
-    //             }
-	// 		}else{
-    //             DB::beginTransaction();
-    //             try {
-    //                 $query = UserBrand::create([
-    //                     'code'          => $request->code,
-    //                     'name'			=> $request->name,
-    //                     'account_name'  => $request->account_name,
-    //                     'account_no'    => $request->account_no,
-    //                     'company_id'    => $request->company_id,
-    //                     'branch'        => $request->branch,
-    //                     'is_show'       => $request->is_show ? $request->is_show : NULL,
-    //                     'status'        => $request->status ? $request->status : '2'
-    //                 ]);
-    //                 DB::commit();
-    //             }catch(\Exception $e){
-    //                 DB::rollback();
-    //             }
-	// 		}
+        if($validation->fails()) {
+            $response = [
+                'status' => 422,
+                'error'  => $validation->errors()
+            ];
+        } else {
+			if($request->temp){
+                DB::beginTransaction();
+                $find_user = User::where('id', $request->temp)->first();
+                $find_user->userBrand()->delete();
+                foreach($request->arr_id_brand as $brand_id){
+                    try {
+                        $query = UserBrand::create([
+                            'user_id'       => session('bo_id'),
+                            'account_id'	=> $request->account_id,
+                            'brand_id'      => $brand_id,
+                        ]);
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
+			}else{
+                DB::beginTransaction();
+                foreach($request->arr_id_brand as $brand_id){
+                    try {
+                        $query = UserBrand::create([
+                            'user_id'       => session('bo_id'),
+                            'account_id'	=> $request->account_id,
+                            'brand_id'      => $brand_id,
+                        ]);
+                        DB::commit();
+                    }catch(\Exception $e){
+                        DB::rollback();
+                    }
+                }
 
-	// 		if($query) {
 
-    //             activity()
-    //                 ->performedOn(new UserBrand())
-    //                 ->causedBy(session('bo_id'))
-    //                 ->withProperties($query)
-    //                 ->log('Add / edit UserBrand.');
+			}
 
-	// 			$response = [
-	// 				'status'  => 200,
-	// 				'message' => 'Data successfully saved.'
-	// 			];
-	// 		} else {
-	// 			$response = [
-	// 				'status'  => 500,
-	// 				'message' => 'Data failed to save.'
-	// 			];
-	// 		}
-	// 	}
+			if($query) {
 
-	// 	return response()->json($response);
-    // }
+                activity()
+                    ->performedOn(new UserBrand())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($query)
+                    ->log('Add / edit UserBrand.');
+
+				$response = [
+					'status'  => 200,
+					'message' => 'Data successfully saved.'
+				];
+			} else {
+				$response = [
+					'status'  => 500,
+					'message' => 'Data failed to save.'
+				];
+			}
+		}
+
+		return response()->json($response);
+    }
 
 
     public function show(Request $request){
-        $UserBrand = UserBrand::find($request->id);
-
-		return response()->json($UserBrand);
+        $User = User::find($request->id);
+        $brand=[];
+        foreach($User->userBrand as $rowBrand){
+            $brand[] = [
+                'id' => $rowBrand->id,
+                'name'=> $rowBrand->brand->name,
+                'code'=> $rowBrand->brand->code,
+            ];
+        }
+        $User['brand']= $brand;
+		return response()->json($User);
     }
 
     public function destroy(Request $request){
-        $query = UserBrand::find($request->id);
+        $query = User::find($request->id);
 
         if($query->delete()) {
             activity()

@@ -470,6 +470,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('item_fg_from_packing', [Select2Controller::class, 'itemFgFromPacking']);
                 Route::get('sales_item_pallet_only', [Select2Controller::class, 'salesItemPalletOnly']);
                 Route::get('group_outlet', [Select2Controller::class, 'groupOutlet']);
+                Route::get('employee_for_brand', [Select2Controller::class, 'employeeForBrand']);
             });
 
             Route::prefix('dashboard')->group(function () {

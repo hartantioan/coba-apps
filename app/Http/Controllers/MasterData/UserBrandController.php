@@ -20,9 +20,9 @@ class UserBrandController extends Controller
     public function index()
     {
         $data = [
-            'title'     => 'UserBrand',
+            'title'     => 'User - Brand',
             'content'   => 'admin.master_data.user_brand',
-            'company'   => Company::where('status','1')->get(),
+            //'company'   => Company::where('status','1')->get(),
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -41,11 +41,9 @@ class UserBrandController extends Controller
         $dir    = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $total_data = User::count();
+        $total_data = UserBrand::distinct('account_id')->count('account_id');
 
-        $query_data = User::whereHas('userBrand', function ($query) {
-            $query->where('user_brands.user_id', '!=', DB::raw('users.id'));
-        })
+        $query_data = User::whereHas('userBrand')
         ->where(function ($query) use ($search) {
             $query->where('users.name', 'like', "%$search%")
                   ->orWhere('users.employee_no', 'like', "%$search%");
@@ -57,9 +55,7 @@ class UserBrandController extends Controller
         ->get();
 
 
-        $total_filtered = User::whereHas('userBrand', function ($query) {
-            $query->where('user_brands.user_id', '!=', DB::raw('users.id'));
-        })
+        $total_filtered = User::whereHas('userBrand')
         ->where(function ($query) use ($search) {
             $query->where('users.name', 'like', "%$search%")
                   ->orWhere('users.employee_no', 'like', "%$search%");

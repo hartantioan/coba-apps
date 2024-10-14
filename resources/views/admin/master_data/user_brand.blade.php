@@ -80,8 +80,8 @@
                                                 <thead>
                                                     <tr>
                                                         <th>#</th>
-                                                        <th>Customer</th>
-                                                        <th>Brand Code</th>
+                                                        <th>NIK</th>
+                                                        <th>Employee Name</th>
                                                         <th>Brand Name</th>
                                                         <th>Action</th>
                                                     </tr>
@@ -118,7 +118,7 @@
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
                                         <select class="browser-default" id="account_id" name="account_id" ></select>
-                                        <label class="active" for="account_id">{{ __('translations.customer') }}</label>
+                                        <label class="active" for="account_id">Employee</label>
                                     </div>
 
                                 </fieldset>

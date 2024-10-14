@@ -191,7 +191,7 @@
                                 <div class="input-field col m3 s12 step4">
                                     <select class="form-control" id="type" name="type" onchange="applyBpList();">
                                         <option value="1">Pembayaran</option>
-                                        <option value="2">Pinjaman</option>
+                                        {{-- <option value="2">Pinjaman</option> --}}
                                     </select>
                                     <label class="" for="type">Tipe Permohonan</label>
                                 </div>

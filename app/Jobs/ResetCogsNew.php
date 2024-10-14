@@ -957,7 +957,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                 'nominal' => $total / $row->qty,
                 'total'   => $total,
             ]);
-            if($row->journalDetail()->exists() && $row->productionBatchUsage()->exists() && $bomGroup !== '1' && $bomGroup){
+            if($row->journalDetail()->exists()/*  && $row->productionBatchUsage()->exists() && $bomGroup !== '1' && $bomGroup */){
                 foreach($row->journalDetail as $rowjournal){
                     $rowjournal->update([
                         'nominal_fc'  => $total,

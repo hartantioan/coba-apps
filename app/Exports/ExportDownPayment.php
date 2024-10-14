@@ -20,22 +20,22 @@ class ExportDownPayment implements FromView,ShouldAutoSize
     public function __construct(string $date)
     {
         $this->date = $date ? $date : '';
-		
+
     }
     public function view(): View
     {
         $totalbalance=0;
         $array_filter = [];
         $query_data = DB::select("
-                    SELECT 
+                    SELECT
                     *,
                     pdp.type as typepdp,
-                    IFNULL((SELECT 
-                        SUM(nominal) 
-                        FROM purchase_invoice_dps pid 
+                    IFNULL((SELECT
+                        SUM(nominal)
+                        FROM purchase_invoice_dps pid
                         JOIN purchase_invoices pi
                             ON pid.purchase_invoice_id = pi.id
-                        WHERE 
+                        WHERE
                             pid.purchase_down_payment_id = pdp.id
                             AND pi.post_date <= :date1
                             AND pi.status IN ('2','3','7')
@@ -56,13 +56,13 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
-                        WHERE 
+                        WHERE
                             ar.post_date <= :date3
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_down_payments'
                             AND ard.lookable_id = pdp.id
                             AND (
-                                CASE 
+                                CASE
                                     WHEN ar.post_date >= '2024-06-01' THEN ard.type = '1'
                                     WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                                 END
@@ -73,7 +73,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         FROM adjust_rate_details ard
                         JOIN adjust_rates ar
                             ON ar.id = ard.adjust_rate_id
-                        WHERE 
+                        WHERE
                             ar.post_date <= :date4
                             AND ar.status IN ('2','3')
                             AND ard.lookable_type = 'purchase_down_payments'
@@ -106,14 +106,14 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         ON uvoid.id = pdp.void_id
                     LEFT JOIN users udelete
                         ON udelete.id = pdp.void_id
-                    WHERE 
+                    WHERE
                         pdp.post_date <= :date6
                         AND pdp.grandtotal > 0
                         AND pdp.status IN ('2','3','7','8')
                         AND IFNULL((SELECT
                         '1'
                         FROM cancel_documents cd
-                        WHERE 
+                        WHERE
                             cd.post_date <= :date7
                             AND cd.lookable_type = 'purchase_down_payments'
                             AND cd.lookable_id = pdp.id
@@ -148,8 +148,8 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                         'note'          => $row_invoice->note,
                         'subtotal'      => number_format($row_invoice->subtotal * $currency_rate,2,',','.'),
                         'discount'      => number_format($row_invoice->discount * $currency_rate,2,',','.'),
-                        'total'         => number_format($row_invoice->total * $currency_rate,2,',','.'),
-                        'total_fc'      => number_format($row_invoice->total,2,',','.'),
+                        'total_fc'         => number_format($row_invoice->total * $currency_rate,2,',','.'),
+                        'total'      => number_format($row_invoice->total,2,',','.'),
                         'used'          => number_format($row_invoice->total_used * $currency_rate,2,',','.'),
                         'memo'          => number_format($row_invoice->total_memo * $currency_rate,2,',','.'),
                         'balance'       => number_format($balance_after_adjust,2,',','.'),
@@ -168,14 +168,14 @@ class ExportDownPayment implements FromView,ShouldAutoSize
                     ];
                     $totalbalance += round($balance_after_adjust,2);
                 }
-            } 
-            
+            }
+
             activity()
                 ->performedOn(new PurchaseDownPayment())
                 ->causedBy(session('bo_id'))
                 ->withProperties(null)
                 ->log('Export puchase downpayment data.');
-        
+
             return view('admin.exports.down_payment', [
             'data'      => $array_filter,
             'totalall'  => round($totalbalance,2)
@@ -192,7 +192,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
             '6' => 'Revisi',
             default => 'Invalid',
           };
-  
+
           return $status;
     }
 

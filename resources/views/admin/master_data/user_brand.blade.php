@@ -33,11 +33,11 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal_import">
+                        {{-- <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3 modal-trigger" href="#modal_import">
                             <i class="material-icons hide-on-med-and-up">file_download</i>
                             <span class="hide-on-small-onl">{{ __('translations.import') }}</span>
                             <i class="material-icons right">file_download</i>
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
             </div>
@@ -101,6 +101,68 @@
     </div>
 </div>
 
+<div id="modal1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
+    <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
+        <div class="row">
+            <div class="col s12">
+                <h4>{{ __('translations.add') }}/{{ __('translations.edit') }} {{ $title }}</h4>
+                <form class="row" id="form_data" onsubmit="return false;">
+                    <div class="col s12">
+                        <div id="validation_alert" style="display:none;"></div>
+                    </div>
+                    <div class="col s12">
+                        <div class="row">
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>1. {{ __('translations.main_info') }}</legend>
+                                    <div class="input-field col m3 s12 step3">
+                                        <input type="hidden" id="temp" name="temp">
+                                        <select class="browser-default" id="account_id" name="account_id" ></select>
+                                        <label class="active" for="account_id">{{ __('translations.customer') }}</label>
+                                    </div>
+
+                                </fieldset>
+                            </div>
+                            <div class="col s12">
+                                <fieldset>
+                                    <legend>2. List Brand</legend>
+                                    <div id="rekform" class="col s12 active">
+                                        <h5 class="center">Daftar Brand</h5>
+                                        <p class="mt-2 mb-2">
+                                            <table class="bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="20%" class="center">Brand</th>
+                                                        <th width="30%" class="center">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="body-brand">
+                                                    <tr id="last-row-brand">
+                                                        <td colspan="6" class="center">
+                                                            <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addBrand()" href="javascript:void(0);">
+                                                                <i class="material-icons left">add</i> Tambah Brand
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </p>
+                                    </div>
+                                </fieldset>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn waves-effect waves-light right submit step35" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat ">{{ __('translations.close') }}</a>
+    </div>
+</div>
+
 <div id="modal4_1" class="modal modal-fixed-footer" style="min-width:90%;max-height: 100% !important;height: 100% !important;width:100%;">
     <div class="modal-content">
         <div class="row">
@@ -148,9 +210,16 @@
     </div>
 </div>
 
+<div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
+    <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
+        <i class="material-icons">add</i>
+    </a>
+</div>
+
 
 <!-- END: Page Main-->
 <script>
+    var arr_id_brand=[];
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -179,6 +248,12 @@
     $(function() {
         loadDataTable();
 
+        $('#body-brand').on('click', '.delete-data-brand', function() {
+            $(this).closest('tr').remove();
+            // const id = $row.data('id');
+            // arr_id_brand[id] = null;
+        });
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
@@ -193,6 +268,15 @@
             onCloseEnd: function(modal, trigger){
                 $('#form_data')[0].reset();
                 $('#temp').val('');
+                $('#account_id').empty();
+                $('#last-row-brand').empty();
+                $('#last-row-brand').append(`
+                    <td colspan="6" class="center">
+                        <a class="waves-effect waves-light cyan btn-small mb-1 mr-1" onclick="addBrand()" href="javascript:void(0);">
+                            <i class="material-icons left">add</i> Tambah Brand
+                        </a>
+                    </td>
+                `);
                 M.updateTextFields();
                 $('#form_data input:checkbox').prop( "checked", false);
             }
@@ -240,7 +324,6 @@
                 },
                 success: function(response) {
                     loadingClose('.modal-content');
-                    console.log(response);
                     if(response.status === 200) {
                         successImport();
                         M.toast({
@@ -259,7 +342,6 @@
                 },
                 error: function(response) {
                     loadingClose('.modal-content');
-                    console.log(response);
                     if(response.status === 422) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
@@ -288,7 +370,6 @@
                     }else if(response.status === 400 || response.status === 432) {
                         $('#validation_alertImport').show();
                         $('.modal-content').scrollTop(0);
-                        console.log(response);
                         let errorMessage = response.status === 400 ?
                             `<p> Baris <b>${response.responseJSON.row}</b> </p><p>${response.responseJSON.error}</p><p> di Lembar ${response.responseJSON.sheet}</p><p> Kolom : ${response.responseJSON.column}</p>` :
                             `<p>${response.responseJSON.message}</p><p> di Lembar ${response.responseJSON.sheet}</p>`;
@@ -311,7 +392,7 @@
                 }
             });
         });
-
+        select2ServerSide('#account_id', '{{ url("admin/select2/employee_for_brand") }}');
 
     });
 
@@ -329,6 +410,63 @@
                 }
             });
         }
+    }
+
+    function addBrand(){
+        var count = makeid(10);
+
+        $('#last-row-brand').before(`
+            <tr class="row_brand" data-id="` + count + `">
+                <td>
+                    <select class="select2 browser-default" id="arr_id_brand`+count+`" name="arr_id_brand[]">
+                        <option value="">--{{ __('translations.select') }}--</option>
+                    </select>
+                </td>
+                <td class="center">
+                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-brand" href="javascript:void(0);">
+                        <i class="material-icons">delete</i>
+                    </a>
+                </td>
+
+            </tr>
+        `);
+        // arr_id_brand[count] = "";
+
+
+        $('#arr_id_brand' + count).select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('body').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/brand") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    let arr_id_brand = [];
+                    $('select[name^="arr_id_brand[]"]').each(function(index){
+                        if($(this).val()){
+                            arr_id_brand.push($(this).val());
+                        }
+                    });
+                    return {
+                        search: params.term,
+                        arr_id_brand: arr_id_brand,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
+
+        // $('#arr_id_brand' + count).on('select2:select', function (e) {
+        //     arr_id_brand[count] = e.params.data.id;
+        // });
     }
 
     function successImport(){
@@ -495,30 +633,65 @@
                 loadingClose('#main');
                 $('#modal1').modal('open');
                 $('#temp').val(id);
-                $('#code').val(response.code);
-                $('#name').val(response.name);
-                $('#count_backdate').val(response.count_backdate);
-                $('#count_futuredate').val(response.count_futuredate);
-                if(response.status == '1'){
-                    $('#status').prop( "checked", true);
-                }else{
-                    $('#status').prop( "checked", false);
+                if(response.id){
+                    $('#account_id').empty().append(`
+                        <option value="` + response.id + `">` + response.name + `</option>
+                    `);
                 }
+                $.each(response.brand, function(i, val) {
 
-                if(response.menus.length > 0){
-                    $.each(response.menus, function(i, val) {
-                        $('#checkBoxMenu' + val.menu_id).prop( "checked", true);
-                    });
-                }
+                    var count = makeid(10);
+                    $('#last-row-brand').before(`
+                        <tr class="row_brand" data-id="` + count + `">
+                            <td>
+                                <select class="select2 browser-default" id="arr_id_brand`+count+`" name="arr_id_brand[]">
+                                    <option value="">--{{ __('translations.select') }}--</option>
+                                </select>
+                            </td>
+                            <td class="center">
+                                <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-brand" href="javascript:void(0);">
+                                    <i class="material-icons">delete</i>
+                                </a>
+                            </td>
 
-                if(response.users.length > 0){
-                    $.each(response.users, function(i, val) {
-                        $('#checkBoxUser' + val.user_id).prop( "checked", true);
+                        </tr>
+                    `);
+                    $('#arr_id_brand' + count).empty().append(`
+                        <option value="` + val.id + `">`+ val.code + '-' + val.name + `</option>
+                    `);
+                    $('#arr_id_brand' + count).select2({
+                        placeholder: '-- Kosong --',
+                        minimumInputLength: 1,
+                        allowClear: true,
+                        cache: true,
+                        width: 'resolve',
+                        dropdownParent: $('body').parent(),
+                        ajax: {
+                            url: '{{ url("admin/select2/brand") }}',
+                            type: 'GET',
+                            dataType: 'JSON',
+                            data: function(params) {
+                                let arr_id_brand = [];
+                                $('select[name^="arr_id_brand[]"]').each(function(index){
+                                    if($(this).val()){
+                                        arr_id_brand.push($(this).val());
+                                    }
+                                });
+                                return {
+                                    search: params.term,
+                                    arr_id_brand: arr_id_brand,
+                                };
+                            },
+                            processResults: function(data) {
+                                return {
+                                    results: data.items
+                                }
+                            }
+                        }
                     });
-                }
+                });
 
                 $('.modal-content').scrollTop(0);
-                $('#code').focus();
                 M.updateTextFields();
             },
             error: function() {

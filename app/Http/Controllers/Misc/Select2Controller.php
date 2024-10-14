@@ -99,7 +99,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class Select2Controller extends Controller {
-    
+
     protected $dataplaces, $dataplacecode, $datawarehouses;
 
     public function __construct(){
@@ -109,7 +109,7 @@ class Select2Controller extends Controller {
         $this->dataplacecode = $user ? $user->userPlaceCodeArray() : [];
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
     }
-    
+
     public function area(Request $request)
     {
         $response = [];
@@ -474,7 +474,7 @@ class Select2Controller extends Controller {
     public function resource(Request $request)
     {
         $response = [];
-        $search   = $request->search;   
+        $search   = $request->search;
         $data = Resource::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%")
@@ -586,7 +586,7 @@ class Select2Controller extends Controller {
     }
 
     public function coa(Request $request)
-    {   
+    {
         $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
         $response = [];
         $search   = $request->search;
@@ -615,7 +615,7 @@ class Select2Controller extends Controller {
     }
 
     public function coaNoCash(Request $request)
-    {   
+    {
         $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
         $response = [];
         $search   = $request->search;
@@ -644,7 +644,7 @@ class Select2Controller extends Controller {
     }
 
     public function inventoryCoaIssue(Request $request)
-    {   
+    {
         $response = [];
         $search   = $request->search;
         $data = InventoryCoa::where(function($query) use($search){
@@ -668,7 +668,7 @@ class Select2Controller extends Controller {
     }
 
     public function inventoryCoaReceive(Request $request)
-    {   
+    {
         $response = [];
         $search   = $request->search;
         $data = InventoryCoa::where(function($query) use($search){
@@ -781,6 +781,39 @@ class Select2Controller extends Controller {
                     ->orWhere('phone', 'like', "%$search%")
                     ->orWhere('address', 'like', "%$search%");
                 })
+                ->where('status','1')
+                ->where('type','1')->get();
+
+        foreach($data as $d) {
+            $response[] = [
+                'id'   			=> $d->id,
+                'text'          => $d->employee_no.' - '.$d->name.' Pos. '.($d->position()->exists() ? $d->position->name : 'N/A'),
+                'division'      => ($d->position) ? $d->position->division->name : '',
+                'limit_credit'  => $d->limit_credit,
+                'count_limit'   => $d->count_limit_credit,
+                'balance_limit' => $d->limit_credit - $d->count_limit_credit,
+                'arrinfo'       => $d,
+                'leave_quotas_yearly' => $d->getQuotasUser($todayWithoutDayMonth) ?? 0,
+            ];
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
+    public function employeeForBrand(Request $request)
+    {
+        $response = [];
+        $search   = $request->search;
+        $today = Carbon::now();
+        $todayWithoutDayMonth = $today->format('Y');
+        $data = User::where(function($query) use($search){
+                    $query->where('name', 'like', "%$search%")
+                    ->orWhere('employee_no', 'like', "%$search%")
+                    ->orWhere('username', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhere('address', 'like', "%$search%");
+                })
+                ->whereDoesntHave("userBrand")
                 ->where('status','1')
                 ->where('type','1')->get();
 
@@ -952,7 +985,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        
+
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");
@@ -1338,7 +1371,7 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $typegrpo = $request->type ?? '';
-        
+
         $data = PurchaseOrder::where(function($query) use($search, $request, $typegrpo){
                     $query->where(function($query) use ($search) {
                         $query->where('code', 'like', "%$search%")
@@ -1360,7 +1393,7 @@ class Select2Controller extends Controller {
                     if($request->item_id){
                         $query->where('item_id',$request->item_id);
                     }
-                   
+
                     if($typegrpo){
                         if($typegrpo == '2'){
                             $query->whereHas('goodScale',function($query){
@@ -1370,7 +1403,7 @@ class Select2Controller extends Controller {
                             if($request->account_id){
                                 $query->whereDoesntHave('goodScale');
                             }else{
-                                
+
                             }
                         }
                     }
@@ -1841,9 +1874,14 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        $data = Brand::where(function($query) use($search){
-                    $query->where('code', 'like', "%$search%")
-                    ->orWhere('name', 'like', "%$search%");
+        $data = Brand::where(function($query) use($search,$request){
+                    if($search) {
+                        $query->where('code', 'like', "%$search%")
+                            ->orWhere('name', 'like', "%$search%");
+                    }
+                    if($request->arr_id_brand) {
+                        $query->whereNotIn('id',$request->arr_id_brand);
+                    }
                 })
                 ->where('status','1')->get();
 
@@ -1882,7 +1920,7 @@ class Select2Controller extends Controller {
 
         return response()->json(['items' => $response]);
     }
- 
+
     public function equipment(Request $request)
     {
         $response = [];
@@ -2031,7 +2069,7 @@ class Select2Controller extends Controller {
     public function hardwareItemForReception(Request $request)
     {
         $response = [];
-        
+
         $search   = $request->search;
         $excludedIds = ReceptionHardwareItemsUsage::pluck('hardware_item_id')->toArray();
         $data = HardwareItem::where(function ($query) use ($search) {
@@ -2045,7 +2083,7 @@ class Select2Controller extends Controller {
                 ->orDoesntHave('receptionHardwareItemsUsage')
                 ->where('status', '1')
                 ->get();
-                
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			=> $d->id,
@@ -2060,7 +2098,7 @@ class Select2Controller extends Controller {
     public function requestRepairHardware(Request $request)
     {
         $response = [];
-        
+
         $search   = $request->search;
         $data = HardwareItem::where(function ($query) use ($search) {
                     $query->orWhere('code', 'like', "%$search%");
@@ -2099,7 +2137,7 @@ class Select2Controller extends Controller {
                         });
                 })->where('status','1')
                 ->get();
-        
+
 
         foreach($data as $d) {
             $hardware_item = HardwareItem::where(function($query) use($d){
@@ -2125,7 +2163,7 @@ class Select2Controller extends Controller {
     }
 
     public function coaJournal(Request $request)
-    {   
+    {
         $arrCompany = Place::whereIn('id',$this->dataplaces)->get()->pluck('company_id');
         $response = [];
         $search   = $request->search;
@@ -2165,18 +2203,18 @@ class Select2Controller extends Controller {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('name', 'like', "%$search%")
                             ;
-                            
+
                     });
                 })
                 ->whereIn('status',['1'])->get();
 
         foreach($data as $d) {
-            
+
             $response[] = [
                 'id'   			=> $d->id,
                 'text' 			=> $d->code.' - '.$d->name,
             ];
-            
+
         }
 
         return response()->json(['items' => $response]);
@@ -2451,7 +2489,7 @@ class Select2Controller extends Controller {
     }
 
     public function costDistribution(Request $request)
-    {   
+    {
         $response = [];
         $search   = $request->search;
         $data = CostDistribution::where(function($query) use($search){
@@ -2494,7 +2532,7 @@ class Select2Controller extends Controller {
     }
 
     public function line(Request $request)
-    {   
+    {
         $response = [];
         $search   = $request->search;
         $data = Line::where(function($query) use($search){
@@ -2624,7 +2662,7 @@ class Select2Controller extends Controller {
                         'list_serial'   => $row->listSerial(),
                     ];
                 }
-    
+
                 $response[] = [
                     'id'   			    => $d->id,
                     'text' 			    => $d->code.' - '.$d->user->name,
@@ -3165,7 +3203,7 @@ class Select2Controller extends Controller {
                     $query->where('name','like',"%$search%")
                         ->orWhere('employee_no','like',"%$search%");
                 });
-            
+
         })
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
@@ -3286,7 +3324,7 @@ class Select2Controller extends Controller {
                     'type'              => $d->getTable(),
                     'due_date'          => $d->return_date,
                     'days_due'          => $d->marketingOrderDelivery->customer->top,
-                    'list_area'         => Area::where('status','1')->get(), 
+                    'list_area'         => Area::where('status','1')->get(),
                     'account_name'      => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
                     'payment_type'      => $d->getTypePayment(),
                     'account_id'        => $d->marketingOrderDelivery->customer_id,
@@ -3428,7 +3466,7 @@ class Select2Controller extends Controller {
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])->get();
-        
+
         foreach($data as $d) {
             if($d->balancePaymentIncoming() > 0){
                 $arrNominalMain = $d->arrBalanceMemo();
@@ -3731,20 +3769,20 @@ class Select2Controller extends Controller {
                 $query->WhereHas('user',function($query) use ($account_id){
                     $query->where('id',$account_id)
                     ->where('status','1');
-                    
+
                 });
-              
-                
+
+
             });
             if($request->shift_request_id){
                 $query->whereNotIn('id',$request->shift_request_id);
             }
-            
+
         })
         ->whereNotIn('status',['2','3'])
         ->orderBy('date','DESC')
         ->get();
-       
+
         foreach($data as $d) {
                 $response[] = [
                     'id'   			    => $d->id,
@@ -3762,7 +3800,7 @@ class Select2Controller extends Controller {
         $search     = $request->search;
         $query_user = User::find($request->account_id);
         $department_id = $query_user->position->division->department_id;
-       
+
         $data = Shift::where(function($query) use($search,$department_id){
             $query->where(function($query) use ($search,$department_id){
                 $query->where('code', 'like', "%$search%")
@@ -3779,9 +3817,9 @@ class Select2Controller extends Controller {
                 'id'   			    => $d->id,
                 'text' 			    => $d->code.'-'.$d->name,
                 'code'              => $d->code,
-                
+
             ];
-            
+
         }
 
         return response()->json(['items' => $response]);
@@ -3798,10 +3836,10 @@ class Select2Controller extends Controller {
                 $query->WhereHas('user',function($query) use ($account_id){
                     $query->where('id',$account_id)
                     ->where('status','1');
-                    
+
                 });
                 $query->whereDoesntHave('leaveRequestShift');
-               
+
                 if($request->end_date){
                     $query->where('date','>=',$request->date);
                     $query->where('date','<=',$request->end_date);
@@ -3816,7 +3854,7 @@ class Select2Controller extends Controller {
         ->whereNotIn('status',['2','3','5'])
         ->orderBy('date','DESC')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -3879,7 +3917,7 @@ class Select2Controller extends Controller {
             if($data_tamba){
                 $data = $data_tamba;
             }
-            
+
         }
 
         foreach($data as $d) {
@@ -4004,7 +4042,7 @@ class Select2Controller extends Controller {
     }
 
     public function coaSubsidiaryLedger(Request $request)
-    {   
+    {
         $response = [];
         $search   = $request->search;
         $data = Coa::where(function($query) use($search){
@@ -4037,7 +4075,7 @@ class Select2Controller extends Controller {
         $data = Punishment::where(function($query) use($search,$plant,$request){
             $query->where(function($query) use ($search,$plant,$request){
                 $query->where('place_id',$plant);
-              
+
             });
 
         })
@@ -4065,7 +4103,7 @@ class Select2Controller extends Controller {
         $data = Punishment::where(function($query) use($search,$query_user,$request){
             $query->where(function($query) use ($search,$query_user,$request){
                 $query->where('place_id',$query_user->place_id);
-              
+
             });
 
         })
@@ -4382,7 +4420,7 @@ class Select2Controller extends Controller {
                     'type'              => $d->getTable(),
                     'due_date'          => $d->marketingOrderDelivery->marketingOrder->valid_date,
                     'days_due'          => $d->marketingOrderDelivery->marketingOrder->account->top,
-                    'list_area'         => Area::where('status','1')->get(), 
+                    'list_area'         => Area::where('status','1')->get(),
                 ];
             }
         }
@@ -4477,8 +4515,8 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $initialId = $request->id;
-       
-        $data = ProductionOrderDetail::where(function($query)use($search){  
+
+        $data = ProductionOrderDetail::where(function($query)use($search){
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
@@ -4522,7 +4560,7 @@ class Select2Controller extends Controller {
             if($data_tamba){
                 $data = $data_tamba;
             }
-            
+
         }
         foreach($data as $d) {
             $bomdetail = [];
@@ -4589,7 +4627,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-       
+
         $data = ProductionBarcodeDetail::whereHas('productionBarcode',function($query)use($request){
             $query->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
                 ->whereIn('status',['2','3']);
@@ -4632,7 +4670,7 @@ class Select2Controller extends Controller {
                 $query->where('line_id',$request->line_id)
                     ->whereHas('productionSchedule',function($query)use($request){
                         $query->where('place_id',$request->place_id);
-                    })/* 
+                    })/*
                     ->whereHas('item',function($query){
                         $query->whereNull('is_sales_item');
                     }) */;
@@ -4678,7 +4716,7 @@ class Select2Controller extends Controller {
         $shift = Shift::find($request->shift_id);
         $search   = $request->search;
         $initialId = $request->id;
-        $data = ProductionOrderDetail::where(function($query)use($search){  
+        $data = ProductionOrderDetail::where(function($query)use($search){
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
@@ -4714,7 +4752,7 @@ class Select2Controller extends Controller {
             if($data_tamba){
                 $data = $data_tamba;
             }
-            
+
         }
         foreach($data as $d) {
             $countbackflush = $d->productionScheduleDetail->bom->bomDetail()->whereHas('bomAlternative',function($query){
@@ -4783,7 +4821,7 @@ class Select2Controller extends Controller {
                 'text' 	    => $d->code.' Tgl.Post '.date('d/m/Y',strtotime($d->post_date)).' - Plant : '.$d->productionSchedule->place->code.' ( '.$d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name.' )',
                 'item_name' => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                 'qty'       => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
-                'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code, 
+                'uom_unit'  => $d->productionScheduleDetail->item->uomUnit->code,
                 'sell_unit' => $d->productionScheduleDetail->item->sellUnit(),
                 'conversion'=> CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
             ];
@@ -4797,7 +4835,7 @@ class Select2Controller extends Controller {
         $response = [];
         $search   = $request->search;
         $initialId = $request->id;
-        $data = ProductionOrderDetail::where(function($query)use($search){  
+        $data = ProductionOrderDetail::where(function($query)use($search){
             $query->whereHas('productionOrder',function($query) use($search){
                 $query->where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
@@ -4833,7 +4871,7 @@ class Select2Controller extends Controller {
             if($data_tamba){
                 $data = $data_tamba;
             }
-            
+
         }
         foreach($data as $d) {
             if($d->productionScheduleDetail->item->sellUnit()){
@@ -4843,7 +4881,7 @@ class Select2Controller extends Controller {
                     'item_name'         => $d->productionScheduleDetail->item->code.' - '.$d->productionScheduleDetail->item->name,
                     'prod_no'           => $d->productionOrder->code,
                     'qty'               => CustomHelper::formatConditionalQty($d->qtyReceiveFg()),
-                    'uom_unit'          => $d->productionScheduleDetail->item->uomUnit->code, 
+                    'uom_unit'          => $d->productionScheduleDetail->item->uomUnit->code,
                     'sell_unit'         => $d->productionScheduleDetail->item->sellUnit(),
                     'conversion'        => CustomHelper::formatConditionalQty($d->productionScheduleDetail->item->sellConversion()),
                     'pallet_child'      => $d->productionScheduleDetail->item->getChildrenPalletArray(),
@@ -5049,15 +5087,15 @@ class Select2Controller extends Controller {
                         ->orWhere('transaction_code', 'like', "%$search%");
                 }
             })->whereDoesntHave('documentTaxHandoverDetail');
-            
+
             if ($request->tax_array) {
                 $query->whereNotIn('id', $tax_array);
             }
-            
+
         })
         ->orderBy('date','DESC')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -5075,7 +5113,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search     = $request->search;
-       
+
         $data = Group::where(function($query) use($search,$request){
             $query->where(function($query) use ($search, $request) {
                 if ($search) {
@@ -5087,7 +5125,7 @@ class Select2Controller extends Controller {
         })
         ->orderBy('code','DESC')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -5105,7 +5143,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search     = $request->search;
-       
+
         $data = BomCalculator::where(function($query) use($search,$request){
             $query->where(function($query) use ($search, $request) {
                 if ($search) {
@@ -5116,7 +5154,7 @@ class Select2Controller extends Controller {
         })
         ->where('status','2')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -5131,7 +5169,7 @@ class Select2Controller extends Controller {
     {
         $response   = [];
         $search     = $request->search;
-       
+
         $data = ListBgCheck::where(function($query) use($search,$request){
             $query->where(function($query) use ($search, $request) {
                 if ($search) {
@@ -5157,7 +5195,7 @@ class Select2Controller extends Controller {
         })
         ->where('status','2')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -5172,7 +5210,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search     = $request->search;
-       
+
         $data = Item::where(function($query) use($search,$request){
             $query->where(function($query) use ($search, $request) {
                 if($search) {
@@ -5189,7 +5227,7 @@ class Select2Controller extends Controller {
         })
         ->where('status','1')
         ->get();
-       
+
         foreach($data as $d) {
             $response[] = [
                 'id'   			    => $d->id,
@@ -5204,7 +5242,7 @@ class Select2Controller extends Controller {
     {
         $response = [];
         $search   = $request->search;
-        
+
         $data = Item::where(function($query) use($search){
                     $query->where('code', 'like', "%$search%")
                         ->orWhere('name', 'like', "%$search%");

@@ -162,7 +162,7 @@ class User extends Authenticatable
         return $gender;
     }
 
-    public function photo() 
+    public function photo()
     {
         if($this->photo !== NULL && Storage::exists($this->photo)) {
             $document = asset(Storage::url($this->photo));
@@ -173,15 +173,15 @@ class User extends Authenticatable
         return $document;
     }
 
-    public function profilePicture() 
+    public function profilePicture()
     {
         return '<span class="avatar-status avatar-online" style="width:50px !important;"><img src="'.$this->photo().'" alt="avatar"></span>';
     }
 
-    public function signature() 
+    public function signature()
     {
         $path_img = '';
-        
+
         if(Storage::exists($this->signature)){
             $image = storage_path('app/'.$this->signature);
             $extencion = explode('.',$image);
@@ -245,21 +245,21 @@ class User extends Authenticatable
             }elseif($type == '5'){
                 $prefix = 'B';
             }
-    
+
             $query = User::withTrashed()->selectRaw('type, RIGHT(employee_no, 6) as code')
                 ->where('type',$type)
                 ->orderByDesc('employee_no')
                 ->limit(1)
                 ->get();
-    
+
             if($query->count() > 0) {
                 $code = intval($query[0]->code) + 1;
             } else {
                 $code = '000001';
             }
-    
+
             $no = str_pad($code, 6, 0, STR_PAD_LEFT);
-    
+
             return $prefix.$no;
         }
     }
@@ -290,6 +290,24 @@ class User extends Authenticatable
 
     public function userDataDefault(){
         return $this->userData()->whereNotNull('is_default')->first();
+    }
+
+    public function userBrand(){
+        return $this->hasMany(UserBrand::class, 'account_id', 'id');
+    }
+
+    public function accountBrand()
+{
+    return $this->hasManyThrough('App\Models\User', 'App\Models\UserBrand', 'user_id', 'id', 'id', 'account_id');
+}
+
+    public function listUserBrand(){
+        $arr = [];
+        foreach($this->userBrand as $key => $value) {
+
+            $arr[] = $value->brand->name;
+        }
+        return implode(',',$arr);
     }
 
     public function userDestination(){
@@ -524,13 +542,13 @@ class User extends Authenticatable
     }
 
     public function leaveQuotas(){
-        
+
         return $this->hasMany('App\Models\EmployeeLeaveQuotas');
     }
 
     public function getQuotasUser($year){
         $return = $this->leaveQuotas()->where('start_date','like',$year."%")->first();
-       
+
         return $return->paid_leave_quotas??0;
     }
 
@@ -663,7 +681,7 @@ class User extends Authenticatable
     }
 
     public function statusRaw(){
-        
+
         $status = match ($this->status) {
             '1' => 'Aktif',
             '2' => 'Tidak Aktif',

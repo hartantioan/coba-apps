@@ -62,6 +62,7 @@ class ExportMarketingInvoiceRecap implements FromView, WithEvents
                 'namanpwp' => $row->userData->title,
                 'alamatnpwp' => $row->userData->address,
                 'tipepenjualan'=>$row->marketingOrderDeliveryProcess->marketingOrderDelivery->soType(),
+                'percentage'=>$row->taxMaster->percentage,
             ];
         }
 

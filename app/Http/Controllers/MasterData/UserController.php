@@ -94,7 +94,7 @@ class UserController extends Controller
             'address',
             'id_card'
         ];
-       
+
         $start  = $request->start;
         $length = $request->length;
         $order  = $column[$request->input('order.0.column')];
@@ -102,7 +102,7 @@ class UserController extends Controller
         $search = $request->input('search.value');
 
         $total_data = User::/* where('type','<>','1')-> */count();
-        
+
         $query_data = User::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -141,7 +141,7 @@ class UserController extends Controller
                             ->orWhere('id_card', 'like', "%$search%");
                     });
                 }
-                
+
                 if($request->status){
                     $query->where('status', $request->status);
                 }
@@ -160,7 +160,7 @@ class UserController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $btn = $val->employee_type == '2' ? '<a href="user/parent_company/'.CustomHelper::encrypt($val->employee_no).'" class="btn-floating mb-1 btn-flat waves-effect waves-light purple accent-2 white-text btn-small" data-popup="tooltip" title="Atur Perusahaan Induk"><i class="material-icons dp48">account_balance</i></a> ' : '';
 
                 $btn .= ($val->type == '1' ? '<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Atur Akses Menu/Form" onclick="access(' . $val->id . ',`'.$val->name.'`)"><i class="material-icons dp48">folder_shared</i></button> ' : '').'<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue accent-2 white-text btn-small" data-popup="tooltip" title="Upload lampiran" onclick="attachment(' . $val->id . ')"><i class="material-icons dp48">perm_media</i></button>
@@ -172,7 +172,7 @@ class UserController extends Controller
                 }else{
                     $position = '-';
                 }
-                
+
                 $response['data'][] = [
                     '<button class="btn-floating green btn-small" data-popup="tooltip" title="Lihat Detail" onclick="rowDetail(`'.CustomHelper::encrypt($val->employee_no).'`)"><i class="material-icons">speaker_notes</i></button>',
                     $val->name,
@@ -204,9 +204,9 @@ class UserController extends Controller
 
     public function getFiles(Request $request){
 		$data = UserFile::where('user_id',$request->id)->get();
-		
+
 		$result = [];
-		
+
 		foreach($data as $row){
 			$result[] = [
 				'code'	=> CustomHelper::encrypt($row->code),
@@ -214,14 +214,14 @@ class UserController extends Controller
 				'name'	=> $row->file_name
 			];
 		}
-		
+
 		return response()->json($result);
 	}
 
     public function uploadFile(Request $request){
-		
+
 		$count = UserFile::where('user_id',$request->id)->count();
-		
+
 		if($count >= 5){
 			return response()->json([
 				'status'		=> 422,
@@ -234,7 +234,7 @@ class UserController extends Controller
                 'file_name'     => $request->file('file')->getClientOriginalName(),
 				'file_storage'	=> $request->file('file') ? $request->file('file')->store('public/user_files') : ''
 			]);
-			
+
 			return response()->json([
 				'status'		=> 200,
 				'message'		=> 'You have successfully upload the file.'
@@ -244,15 +244,15 @@ class UserController extends Controller
 
     public function destroyFile(Request $request){
 		$data = UserFile::where('code',CustomHelper::decrypt($request->id))->first();
-		
+
 		$data->deleteFile();
-		
+
 		$data->delete();
-		
+
 		if($data){
 			return response()->json([
 				'status'	=> 200,
-				'message'	=> 'Picture successfully deleted.' 
+				'message'	=> 'Picture successfully deleted.'
 			]);
 		}else{
 			return response()->json([
@@ -266,7 +266,7 @@ class UserController extends Controller
 		$menus = [];
         $places = [];
         $warehouses = [];
-		
+
 		foreach(UserPlace::where('user_id',$request->id)->get() as $row){
 			$places[] = [
                 'id'       => $row->place_id,
@@ -278,7 +278,7 @@ class UserController extends Controller
                 'id'       => $row->warehouse_id,
             ];
 		}
-		
+
 		foreach(MenuUser::where('user_id',$request->id)->get() as $row){
 			$menus[] = [
 				'menu_id'	    => $row->menu_id,
@@ -293,7 +293,7 @@ class UserController extends Controller
             'places'        => $places,
             'warehouses'    => $warehouses
         ];
-		
+
 		return response()->json($result);
 	}
 
@@ -487,7 +487,7 @@ class UserController extends Controller
                             </tr>
                         </thead>
                     </table>';
-		
+
         return response()->json($string);
     }
 
@@ -656,7 +656,7 @@ class UserController extends Controller
                     $query->top             = $request->top;
                     $query->top_internal    = $request->top_internal;
 
-     
+
                     $query->brand_id             = $request->brand_id ? $request->brand_id : NULL;
                     $query->sales_payment_type    = $request->sales_payment_type;
 
@@ -705,7 +705,7 @@ class UserController extends Controller
                         'company_id'	        => $request->company_id ? $request->company_id : NULL,
                         'place_id'	            => $request->type == '1' ? $request->place_id : NULL,
                         'province_id'	        => $request->province_id ? $request->province_id : NULL,
-                        
+
                         'area_province_id'	    => $request->province_area_id ? $request->province_area_id : NULL,
                         'city_id'               => $request->city_id ? $request->city_id : NULL,
                         'district_id'           => $request->district_id ? $request->district_id : NULL,
@@ -727,7 +727,7 @@ class UserController extends Controller
 
                         'top'                   => $request->top ? $request->top : NULL,
                         'top_internal'          => $request->top_internal ? $request->top_internal : NULL,
-                       
+
                         'brand_id'              => $request->brand_id ? $request->brand_id : NULL,
                         'sales_payment_type'    => $request->sales_payment_type,
 
@@ -757,13 +757,13 @@ class UserController extends Controller
                             ]);
                         }
                     }
-                    
+
                     /* DB::commit();
                 }catch(\Exception $e){
                     DB::rollback();
                 } */
 			}
-			
+
 			if($query) {
                 if($request->arr_bank){
                     $query->userBank()->whereNotIn('id',$request->arr_id_bank)->delete();
@@ -852,7 +852,7 @@ class UserController extends Controller
                 }
 
                 if($request->arr_address_document){
-                    $query->userDestination()->whereNotIn('id',$request->arr_id_data_document)->delete();
+                    $query->userDestinationDocument()->whereNotIn('id',$request->arr_id_data_document)->delete();
                     $checked = isset($request->check_document) ? intval($request->check_document) : '';
                     foreach($request->arr_address_document as $key => $row){
                         if($request->arr_id_data_document[$key]){
@@ -914,7 +914,7 @@ class UserController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -939,10 +939,10 @@ class UserController extends Controller
                     'message' => 'Mohon maaf, untuk user anda tidak boleh mengubah data akses.',
                 ]);
             }
-			
+
             DB::beginTransaction();
             try {
-                
+
                 if($request->checkboxView){
                     MenuUser::where('user_id',$request->tempuseraccess)->whereNotIn('menu_id',$request->checkboxView)->where('type','view')->delete();
                     if($request->arr_user){
@@ -1372,13 +1372,13 @@ class UserController extends Controller
             }catch(\Exception $e){
                 DB::rollback();
             }
-			
+
             $response = [
                 'status'  => 200,
                 'message' => 'Data successfully saved.'
             ];
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -1393,7 +1393,7 @@ class UserController extends Controller
         $user['has_document'] = $user->hasDocument() ? '1' : '';
         $user['brand_name'] = $user->brand()->exists() ? $user->brand->code.' - '.$user->brand->name : '';
         $banks = [];
-		
+
 		foreach($user->userBank as $row){
 			$banks[] = [
                 'id'            => $row->id,
@@ -1404,7 +1404,7 @@ class UserController extends Controller
                 'is_default'    => $row->is_default
             ];
 		}
-		
+
 		$user['banks'] = $banks;
 
         $datas = [];
@@ -1458,7 +1458,7 @@ class UserController extends Controller
                 'is_default'        => $row->is_default
             ];
 		}
-		
+
 		$user['datas'] = $datas;
         $user['destinations'] = $destinations;
         $user['documents'] = $documents;
@@ -1474,13 +1474,13 @@ class UserController extends Controller
         }
 
         $user['drivers'] = $drivers;
-        				
+
 		return response()->json($user);
     }
 
     public function destroy(Request $request){
         $query = User::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new User())
@@ -1509,7 +1509,7 @@ class UserController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -1526,7 +1526,7 @@ class UserController extends Controller
             $data = [
                 'title'     => 'Master Item Group',
                 'data'      => $pr
-            ];  
+            ];
             $img_path = 'website/logo_web_fix.png';
             $extencion = pathinfo($img_path, PATHINFO_EXTENSION);
             $image_temp = file_get_contents($img_path);
@@ -1548,8 +1548,8 @@ class UserController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
 
     }
@@ -1559,7 +1559,7 @@ class UserController extends Controller
 		$status = $request->status ? $request->status : '';
         $type = $request->type ? $request->type : '';
         $group = $request->group ? $request->group : '';
-		
+
 		return Excel::download(new ExportUser($search,$status,$type,$group), 'user_'.uniqid().'.xlsx');
     }
 
@@ -1602,7 +1602,7 @@ class UserController extends Controller
         $total_data = NonStaffCompany::whereHas('account',function($query)use($employee_no){
             $query->where('employee_no',$employee_no);
         })->count();
-        
+
         $query_data = NonStaffCompany::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -1654,7 +1654,7 @@ class UserController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -1746,7 +1746,7 @@ class UserController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -1766,20 +1766,20 @@ class UserController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
     public function showCompany(Request $request){
         $nsc = NonStaffCompany::find($request->id);
         $nsc['vendor_name'] = $nsc->vendor->name;
-        				
+
 		return response()->json($nsc);
     }
 
     public function destroyCompany(Request $request){
         $query = NonStaffCompany::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new NonStaffCompany())

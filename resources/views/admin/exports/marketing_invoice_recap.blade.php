@@ -25,8 +25,9 @@
             <th class="center-align">Tipe Payment</th>
             <th class="center-align">Subtotal</th>
             <th class="center-align">DP</th>
-            <th class="center-align">Tax</th>
             <th class="center-align">Total</th>
+            <th class="center-align">Tax</th>
+            <th class="center-align">Grandtotal</th>
             <th class="center-align">DPP (FP)</th>
             <th class="center-align">PPN (FP)</th>
         </tr>
@@ -58,9 +59,10 @@
             <td>{{ $row['payment'] }}</td>
             <td>{{ $row['subtotal'] }}</td>
             <td>{{ $row['dp'] }}</td>
-            <td>{{ $row['tax'] }}</td>
             <td>{{ $row['total'] }}</td>
-            <td>{{ floor($row['subtotal']) }}</td>
+            <td>{{ $row['tax'] }}</td>
+            <td>{{ $row['grandtotal'] }}</td>
+            <td>{{ $row['total'] > 0 ? floor($row['total']) : floor($row['subtotal']) }}</td>
             <td>{{ $row['tax'] }}</td>
 
             </tr>

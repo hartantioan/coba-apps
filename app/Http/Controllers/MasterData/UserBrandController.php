@@ -121,11 +121,17 @@ class UserBrandController extends Controller
     public function create(Request $request){
         $validation = Validator::make($request->all(), [
             'account_id' 			=> 'required',
+            'arr_id_brand.*'      => 'distinct',
             'arr_id_brand'      => 'required',
         ], [
             'account_id.required' 	    => 'User tidak boleh kosong.',
-            'arr_id_brand.required'         => 'Brand tidak boleh kosong.',
+            'arr_id_brand.*.distinct'         => 'Brand tidak boleh sama untuk 1 User.',
+            'arr_id_brand.required'      => 'Brand tidak boleh kosong.',
         ]);
+
+     
+
+       
 
         if($validation->fails()) {
             $response = [
@@ -137,7 +143,9 @@ class UserBrandController extends Controller
                 DB::beginTransaction();
                 $find_user = User::where('id', $request->temp)->first();
                 $find_user->userBrand()->delete();
+              
                 foreach($request->arr_id_brand as $brand_id){
+                  
                     try {
                         $query = UserBrand::create([
                             'user_id'       => session('bo_id'),
@@ -196,7 +204,7 @@ class UserBrandController extends Controller
         $brand=[];
         foreach($User->userBrand as $rowBrand){
             $brand[] = [
-                'id' => $rowBrand->id,
+                'id' => $rowBrand->brand->id,
                 'name'=> $rowBrand->brand->name,
                 'code'=> $rowBrand->brand->code,
             ];

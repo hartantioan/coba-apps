@@ -952,6 +952,14 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     'item_shading_id'     => $row->itemStock->itemShading()->exists() ? $row->itemStock->item_shading_id : NULL,
                     'production_batch_id' => $row->itemStock->productionBatch()->exists() ? $row->itemStock->production_batch_id : NULL,
                 ]);
+                if($row->journalDetail()->exists()){
+                    foreach($row->journalDetail as $rowjournal){
+                        $rowjournal->update([
+                            'nominal_fc'  => $rowtotal,
+                            'nominal'     => $rowtotal,
+                        ]);
+                    }
+                }
             }
             $row->update([
                 'nominal' => $total / $row->qty,

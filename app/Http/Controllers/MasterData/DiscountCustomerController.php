@@ -48,7 +48,7 @@ class DiscountCustomerController extends Controller
         $search = $request->input('search.value');
 
         $total_data = CustomerDiscount::count();
-        
+
         $query_data = CustomerDiscount::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -56,9 +56,6 @@ class DiscountCustomerController extends Controller
                             ->orWhere('post_date', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%");
-                            })->orWhereHas('group',function($query) use($search){
-                                $query->where('name','like',"%$search%")
-                                ->orWhere('code','like',"%$search%");
                             })->orWhereHas('account',function($query) use($search){
                                 $query->where('name','like',"%$search%");
                             })->orWhereHas('brand',function($query) use($search){
@@ -85,14 +82,8 @@ class DiscountCustomerController extends Controller
                     $query->where(function($query) use ($search, $request) {
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('post_date', 'like', "%$search%")
-                            ->orWhere('price', 'like', "%$search%")
-                            ->orWhere('start_date', 'like', "%$search%")
-                            ->orWhere('end_date', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use($search){
                                 $query->where('name','like',"%$search%");
-                            })->orWhereHas('group',function($query) use($search){
-                                $query->where('name','like',"%$search%")
-                                ->orWhere('code','like',"%$search%");
                             })->orWhereHas('account',function($query) use($search){
                                 $query->where('name','like',"%$search%");
                             })->orWhereHas('brand',function($query) use($search){
@@ -115,7 +106,7 @@ class DiscountCustomerController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-				
+
                 $response['data'][] = [
                     $nomor,
                     $val->code,
@@ -182,34 +173,34 @@ class DiscountCustomerController extends Controller
                 DB::beginTransaction();
                 try {
                     $query = CustomerDiscount::find($request->temp);
-                  
+
                     $query->code = $request->code;
                     $query->user_id = session('bo_id');
-                    
+
                     $query->account_id = $request->account_id;
                     $query->city_id = $request->city_id;
                     $query->brand_id = $request->brand_id;
                     $query->type_id = $request->type_id;
-                    
+
                     $query->payment_type = $request->payment_type;
 
                     $query->disc1 = str_replace(',','.',str_replace('.','',$request->disc1));
                     $query->disc2 = str_replace(',','.',str_replace('.','',$request->disc2));
                     $query->disc3 = str_replace(',','.',str_replace('.','',$request->disc3));
-                  
+
                     $query->status = $request->status ? $request->status : '2';
                     $query->save();
                     DB::commit();
-                    
-                    
+
+
                 }catch(\Exception $e){
                     DB::rollback();
                 }
 
 			}else{
                 DB::beginTransaction();
-               
-                   
+
+
                     $query = CustomerDiscount::create([
                         'code'			            => $request->code,
                         'user_id'			        => session('bo_id'),
@@ -225,11 +216,11 @@ class DiscountCustomerController extends Controller
                         'status'                    => $request->status ? $request->status : '2'
                     ]);
                     DB::commit();
-                    
-                   
-                
+
+
+
 			}
-			
+
 			if($query) {
 
                 activity()
@@ -250,7 +241,7 @@ class DiscountCustomerController extends Controller
 				];
 			}
 		}
-		
+
 		return response()->json($response);
     }
 
@@ -261,12 +252,16 @@ class DiscountCustomerController extends Controller
         $cd['brand'] = $cd->brand;
         $cd['city'] = $cd->city;
         $cd['item'] = $cd->item;
+
+        $cd['disc1'] = number_format($cd->disc1,2,',','.');;
+        $cd['disc2'] = number_format($cd->disc2,2,',','.');;
+        $cd['disc3'] = number_format($cd->disc3,2,',','.');;
  		return response()->json($cd);
     }
 
     public function destroy(Request $request){
         $query = CustomerDiscount::find($request->id);
-		
+
         if($query->delete()) {
             activity()
                 ->performedOn(new CustomerDiscount())
@@ -293,7 +288,7 @@ class DiscountCustomerController extends Controller
         $status = $request->status ? $request->status : '';
         $company = $request->company ? $request->company : 0;
         $type = $request->type ? $request->type : '';
-		
+
 		// return Excel::download(new ExportCoa($search,$status,$company,$type), 'coa_'.uniqid().'.xlsx');
     }
 

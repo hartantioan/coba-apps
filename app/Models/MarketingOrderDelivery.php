@@ -180,6 +180,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['1','2','3']);
     }
 
+    public function marketingOrderDeliveryProcessVoid()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcess')->where('status','5');
+    }
+
     public function goodScaleDetail()
     {
         return $this->hasOne('App\Models\GoodScaleDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('goodScale',function($query){
@@ -339,11 +344,12 @@ class MarketingOrderDelivery extends Model
     }
 
     public function reCreateDetail(){
+        $arrMo = [];
         foreach($this->marketingOrderDeliveryDetail as $row){
             $marketing_order_detail_id = $row->marketing_order_detail_id;
             $arrShading = [];
             $newQty = 0;
-            foreach($row->marketingOrderDeliveryProcessDetail as $modpd){
+            foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
                 $newQty += $modpd->qty;
                 if(!in_array($modpd->itemStock->itemShading->code, $arrShading)){
                     $arrShading[] = $modpd->itemStock->itemShading->code;
@@ -357,12 +363,23 @@ class MarketingOrderDelivery extends Model
                 'note'                          => 'NEW CHANGES FROM SJ/DO : '.implode(', ',$arrShading),
                 'place_id'                      => $row->place_id,
             ]);
-            foreach($row->marketingOrderDeliveryProcessDetail as $modpd){
+            foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){
                 $modpd->update([
                     'marketing_order_delivery_detail_id'    => $newmodd->id,
                 ]);
             }
+            if(!in_array($row->marketingOrderDetail->marketingOrder->id,$arrMo)){
+                $arrMo[] = $row->marketingOrderDetail->marketingOrder->id;
+            }
             $row->delete();
+        }
+        foreach($arrMo as $rowmo){
+            $mo = MarketingOrder::find($rowmo);
+            if($mo->hasBalanceMod()){
+                $mo->update([
+                    'status'    => '2',
+                ]);
+            }
         }
     }
 }

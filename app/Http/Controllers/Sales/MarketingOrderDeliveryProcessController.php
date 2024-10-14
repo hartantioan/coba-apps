@@ -412,6 +412,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 $data['vehicle_no'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->vehicle_no : '';
                 $data['driver_name'] = $data->goodScaleDetail()->exists() ? $data->goodScaleDetail->goodScale->driver : '';
                 $data['vehicle_name'] = $data->transportation()->exists() ? $data->transportation->name : '';
+                $data['has_void_do'] = $data->marketingOrderDeliveryProcessVoid()->count() > 0 ? '1' : '';
             }else{
                 $data['status'] = '500';
                 $data['message'] = 'Seluruh item pada MOD No. '.$data->code.' sudah dikirimkan. Data tidak bisa ditambahkan.';
@@ -718,7 +719,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
                 }
 
-                if($request->temp){
+                if($request->has_void_do){
                     $query->marketingOrderDelivery->reCreateDetail();
                 }
 

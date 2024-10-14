@@ -224,6 +224,7 @@
                                     <div class="input-field col m3 s12 step3">
                                         <input type="hidden" id="temp" name="temp">
                                         <input type="hidden" id="tempSwitch" name="tempSwitch">
+                                        <input type="hidden" id="has_void_do" name="has_void_do">
                                         <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id" onchange="getMarketingOrderDelivery()"></select>
                                         <label class="active" for="marketing_order_delivery_id">Jadwal Kirim</label>
                                     </div>
@@ -854,7 +855,7 @@ document.addEventListener('focusin', function (event) {
             onCloseEnd: function(modal, trigger){
 
                 $('#form_data')[0].reset();
-                $('#temp,#tempSwitch').val('');
+                $('#temp,#tempSwitch,#has_void_do').val('');
                 $('#marketing_order_delivery_id').empty();
                 if($('.data-used').length > 0){
                     $('.data-used').trigger('click');
@@ -1021,6 +1022,7 @@ document.addEventListener('focusin', function (event) {
                         $('#vehicle_name').val(response.vehicle_name);
                         $('#vehicle_no').val(response.vehicle_no);
                         $('#driver_name').val(response.driver_name);
+                        $('#has_void_do').val(response.has_void_do);
 
                         if(response.details.length > 0){
                             $('#body-item').empty();
@@ -2041,7 +2043,7 @@ document.addEventListener('focusin', function (event) {
             if (willDelete) {
                 var formData = new FormData($('#form_data')[0]), passedQty = true, passedEditQty = true;
 
-                if($('#temp').val()){
+                if($('#has_void_do').val()){
                     $(".main-qty").each(function(){
                         let id = $(this).data('id'), qty = parseFloat($(this).text().replaceAll(".", "").replaceAll(",",".")), qtyStock = 0;
                         $(".rowQtyDetail" + id).each(function(index){

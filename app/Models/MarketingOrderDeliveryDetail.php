@@ -79,7 +79,12 @@ class MarketingOrderDeliveryDetail extends Model
         });
     }
 
-    
+    public function marketingOrderDeliveryProcessDetailWithPending()
+    {
+        return $this->hasMany('App\Models\MarketingOrderDeliveryProcessDetail')->whereHas('marketingOrderDeliveryProcess',function($query){
+            $query->whereIn('status',['1','2','3']);
+        });
+    }
 
     public function getSuratJalan()
     {

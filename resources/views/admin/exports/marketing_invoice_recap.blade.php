@@ -23,11 +23,12 @@
             <th class="center-align">Nama NPWP</th>
             <th class="center-align">Alamat NPWP</th>
             <th class="center-align">Tipe Payment</th>
-            <th class="center-align">DPP</th>
+            <th class="center-align">Subtotal</th>
             <th class="center-align">DP</th>
-            <th class="center-align">PPN</th>
+            <th class="center-align">Tax</th>
             <th class="center-align">Total</th>
             <th class="center-align">DPP (FP)</th>
+            <th class="center-align">PPN (FP)</th>
         </tr>
     </thead>
     <tbody>
@@ -60,6 +61,8 @@
             <td>{{ $row['tax'] }}</td>
             <td>{{ $row['total'] }}</td>
             <td>{{ floor($row['subtotal']) }}</td>
+            <td>{{ $row['tax'] }}</td>
+
             </tr>
         @endforeach
         @if(count($data) == 0)

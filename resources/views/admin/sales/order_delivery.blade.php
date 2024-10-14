@@ -217,7 +217,7 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12">
-                                        <select class="browser-default" id="customer_id" name="customer_id"></select>
+                                        <select class="browser-default" id="customer_id" name="customer_id" onchange="resetDetail();"></select>
                                         <label class="active" for="customer_id">Customer</label>
                                     </div>
                                     <div class="input-field col m3 s12 step5">
@@ -888,6 +888,20 @@ document.addEventListener('focusin', function (event) {
                 }
             }
         });
+    }
+
+    function resetDetail(){
+        if($('.data-used').length > 0){
+            $('.data-used').trigger('click');
+        }else{
+            $('#body-item').empty().append(`
+                <tr id="last-row-item">
+                    <td colspan="11">
+                        Silahkan pilih Sales Order...
+                    </td>
+                </tr>
+            `);
+        }
     }
 
     function getMarketingOrder(){

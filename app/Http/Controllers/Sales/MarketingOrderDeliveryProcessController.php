@@ -431,110 +431,109 @@ class MarketingOrderDeliveryProcessController extends Controller
     }
 
     public function create(Request $request){
+        DB::beginTransaction();
+        try {
+            $validation = Validator::make($request->all(), [
+                'code'                      => 'required',
+                'code_place_id'             => 'required',
+                /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_delivery_processes', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_delivery_processes,code',
+                'code_place_id'                 => 'required', */
+                'company_id'			        => 'required',
+                'marketing_order_delivery_id'	=> 'required',
+                'post_date'		                => 'required',
+                'driver_name'		            => 'required',
+                'driver_hp'                     => 'required',
+                'vehicle_name'                  => 'required',
+                'vehicle_no'                    => 'required',
+                'no_container'                    => 'required',
+                'arr_modd_id'                   => 'required|array',
+                'arr_item_stock_id'             => 'required|array',
+                'arr_qty'                       => 'required|array',
+            ], [
+                'code.required' 	                    => 'Kode tidak boleh kosong.',
+                /* 'code.string'                           => 'Kode harus dalam bentuk string.',
+                'code.min'                              => 'Kode harus minimal 18 karakter.',
+                'code.unique'                           => 'Kode telah dipakai.', */
+                'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
+                'marketing_order_delivery_id.required' 	=> 'MOD tidak boleh kosong.',
+                'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
+                'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
+                'driver_name.required' 			        => 'Nama supir tidak boleh kosong.',
+                'driver_hp.required'                    => 'No HP/WA supir tidak boleh kosong.',
+                'vehicle_name.required'                 => 'Nama/Tipe kendaraan tidak boleh kosong.',
+                'vehicle_no.required'                   => 'Nopol kendaraan tidak boleh kosong.',
+                'no_container.required'                 => ' Nomor Kontainer tidak boleh kosong.',
+                'arr_modd_id.required'                  => 'Detail item tidak boleh kosong.',
+                'arr_modd_id.array'                     => 'Detail item harus array.',
+                'arr_item_stock_id.required'            => 'Detail stock tidak boleh kosong.',
+                'arr_item_stock_id.array'               => 'Detail stock harus array.',
+                'arr_qty.required'                      => 'Detail qty tidak boleh kosong.',
+                'arr_qty.array'                         => 'Detail qty harus array.',
+            ]);
 
-        $validation = Validator::make($request->all(), [
-            'code'                      => 'required',
-            'code_place_id'             => 'required',
-            /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_delivery_processes', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_delivery_processes,code',
-            'code_place_id'                 => 'required', */
-            'company_id'			        => 'required',
-            'marketing_order_delivery_id'	=> 'required',
-            'post_date'		                => 'required',
-            'driver_name'		            => 'required',
-            'driver_hp'                     => 'required',
-            'vehicle_name'                  => 'required',
-            'vehicle_no'                    => 'required',
-            'no_container'                    => 'required',
-            'arr_modd_id'                   => 'required|array',
-            'arr_item_stock_id'             => 'required|array',
-            'arr_qty'                       => 'required|array',
-        ], [
-            'code.required' 	                    => 'Kode tidak boleh kosong.',
-            /* 'code.string'                           => 'Kode harus dalam bentuk string.',
-            'code.min'                              => 'Kode harus minimal 18 karakter.',
-            'code.unique'                           => 'Kode telah dipakai.', */
-            'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
-            'marketing_order_delivery_id.required' 	=> 'MOD tidak boleh kosong.',
-            'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
-            'post_date.required' 			        => 'Tanggal posting tidak boleh kosong.',
-            'driver_name.required' 			        => 'Nama supir tidak boleh kosong.',
-            'driver_hp.required'                    => 'No HP/WA supir tidak boleh kosong.',
-            'vehicle_name.required'                 => 'Nama/Tipe kendaraan tidak boleh kosong.',
-            'vehicle_no.required'                   => 'Nopol kendaraan tidak boleh kosong.',
-            'no_container.required'                 => ' Nomor Kontainer tidak boleh kosong.',
-            'arr_modd_id.required'                  => 'Detail item tidak boleh kosong.',
-            'arr_modd_id.array'                     => 'Detail item harus array.',
-            'arr_item_stock_id.required'            => 'Detail stock tidak boleh kosong.',
-            'arr_item_stock_id.array'               => 'Detail stock harus array.',
-            'arr_qty.required'                      => 'Detail qty tidak boleh kosong.',
-            'arr_qty.array'                         => 'Detail qty harus array.',
-        ]);
+            if($validation->fails()) {
+                $response = [
+                    'status' => 422,
+                    'error'  => $validation->errors()
+                ];
+            } else {
 
-        if($validation->fails()) {
-            $response = [
-                'status' => 422,
-                'error'  => $validation->errors()
-            ];
-        } else {
+                $mod = MarketingOrderDelivery::find($request->marketing_order_delivery_id);
 
-            $mod = MarketingOrderDelivery::find($request->marketing_order_delivery_id);
-
-            if($request->user_driver_id){
-                $user_driver = $request->user_driver_id;
-            }else{
-                $user_driver = UserDriver::create([
-                    'user_id'   => $mod->account_id,
-                    'name'      => $request->driver_name,
-                    'hp'        => $request->driver_hp,
-                ])->id;
-            }
-            $arrStockId = [];
-            $arrQtyNeeded = [];
-            if($request->arr_item_stock_id){
-                foreach($request->arr_item_stock_id as $key => $row){
-                    $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
-                    $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
-                    if(!in_array($row,$arrStockId)){
-                        $arrStockId[] = $row;
-                        $arrQtyNeeded[] = $qtyNeeded;
-                    }else{
-                        $index = array_search($row,$arrStockId);
-                        $arrQtyNeeded[$index] += $qtyNeeded;
+                if($request->user_driver_id){
+                    $user_driver = $request->user_driver_id;
+                }else{
+                    $user_driver = UserDriver::create([
+                        'user_id'   => $mod->account_id,
+                        'name'      => $request->driver_name,
+                        'hp'        => $request->driver_hp,
+                    ])->id;
+                }
+                $arrStockId = [];
+                $arrQtyNeeded = [];
+                if($request->arr_item_stock_id){
+                    foreach($request->arr_item_stock_id as $key => $row){
+                        $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
+                        $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        if(!in_array($row,$arrStockId)){
+                            $arrStockId[] = $row;
+                            $arrQtyNeeded[] = $qtyNeeded;
+                        }else{
+                            $index = array_search($row,$arrStockId);
+                            $arrQtyNeeded[$index] += $qtyNeeded;
+                        }
                     }
                 }
-            }
 
-            if($request->arr_item_stock_id){
-                $passedQty = true;
-                foreach($arrStockId as $key => $row){
-                    $itemstock = ItemStock::find($row);
-                    $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
-                    if($itemcogs){
-                        if($itemcogs->infoFg()['qty'] < $arrQtyNeeded[$key]){
+                if($request->arr_item_stock_id){
+                    $passedQty = true;
+                    foreach($arrStockId as $key => $row){
+                        $itemstock = ItemStock::find($row);
+                        $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
+                        if($itemcogs){
+                            if($itemcogs->infoFg()['qty'] < $arrQtyNeeded[$key]){
+                                $passedQty = false;
+                            }
+                        }else{
                             $passedQty = false;
                         }
-                    }else{
-                        $passedQty = false;
+                    }
+                    if(!$passedQty){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih.'
+                        ]);
                     }
                 }
-                if(!$passedQty){
+
+                if($request->post_date < $mod->post_date){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih.'
+                        'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari tanggal MOD (Jadwal Kirim).'
                     ]);
                 }
-            }
 
-            if($request->post_date < $mod->post_date){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari tanggal MOD (Jadwal Kirim).'
-                ]);
-            }
-
-			if($request->temp){
-                DB::beginTransaction();
-                try {
+                if($request->temp){
                     $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->temp))->first();
 
                     $approved = false;
@@ -649,24 +648,17 @@ class MarketingOrderDeliveryProcessController extends Controller
                             }
                             $row->delete();
                         }
-
-                        DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status surat jalan detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+                            'message' => 'Status surat jalan detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}else{
-                DB::beginTransaction();
-                try {
+                }else{
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-
+                    
                     $query = MarketingOrderDeliveryProcess::create([
                         'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),
@@ -689,81 +681,81 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'rounding'                      => $mod->getRounding(),
                         'grandtotal'                    => $mod->getGrandtotal(),
                     ]);
-
-                    DB::commit();
-                }catch(\Exception $e){
-                    DB::rollback();
-                }
-			}
-
-			if($query) {
-
-                foreach($request->arr_item_stock_id as $key => $row){
-                    $querydetail = MarketingOrderDeliveryProcessDetail::create([
-                        'marketing_order_delivery_process_id'   => $query->id,
-                        'marketing_order_delivery_detail_id'    => $request->arr_modd_id[$key],
-                        'item_stock_id'                         => $row,
-                        'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                        'total'                                 => 0,
-                    ]);
-                    $total = $querydetail->getHpp();
-                    $querydetail->update([
-                        'total' => $total,
-                    ]);
-                    ProductionBatchUsage::create([
-                        'production_batch_id'   => $querydetail->itemStock->production_batch_id,
-                        'lookable_type'         => $querydetail->getTable(),
-                        'lookable_id'           => $querydetail->id,
-                        'qty'                   => round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),
-                    ]);
-                    CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
                 }
 
-                if($request->has_void_do){
-                    $query->marketingOrderDelivery->reCreateDetail();
-                }
+                if($query) {
 
-                if(!$request->tempSwitch){
-                    MarketingOrderDeliveryProcessTrack::create([
-                        'user_id'                               => session('bo_id'),
-                        'marketing_order_delivery_process_id'   => $query->id,
-                        'status'                                => '1',
-                    ]);
-                    CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
-                }
+                    foreach($request->arr_item_stock_id as $key => $row){
+                        $querydetail = MarketingOrderDeliveryProcessDetail::create([
+                            'marketing_order_delivery_process_id'   => $query->id,
+                            'marketing_order_delivery_detail_id'    => $request->arr_modd_id[$key],
+                            'item_stock_id'                         => $row,
+                            'qty'                                   => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
+                            'total'                                 => 0,
+                        ]);
+                        $total = $querydetail->getHpp();
+                        $querydetail->update([
+                            'total' => $total,
+                        ]);
+                        ProductionBatchUsage::create([
+                            'production_batch_id'   => $querydetail->itemStock->production_batch_id,
+                            'lookable_type'         => $querydetail->getTable(),
+                            'lookable_id'           => $querydetail->id,
+                            'qty'                   => round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),
+                        ]);
+                        CustomHelper::updateProductionBatch($querydetail->itemStock->production_batch_id,round($querydetail->qty *  $querydetail->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3),'OUT');
+                    }
 
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+                    if($request->has_void_do){
+                        $query->marketingOrderDelivery->reCreateDetail();
+                    }
 
-                if($request->tempSwitch){
-                    $mod = MarketingOrderDelivery::find(intval($request->marketing_order_delivery_id));
-                    if($query->journal()->exists()){
-                        foreach($query->journal as $row){
-                            foreach($row->journalDetail as $rowdetail){
-                                $rowdetail->update([
-                                    'account_id'    => $mod->marketingOrder->account_id,
-                                ]);
+                    if(!$request->tempSwitch){
+                        MarketingOrderDeliveryProcessTrack::create([
+                            'user_id'                               => session('bo_id'),
+                            'marketing_order_delivery_process_id'   => $query->id,
+                            'status'                                => '1',
+                        ]);
+                        CustomHelper::sendApproval($query->getTable(),$query->id,$query->note_internal.' - '.$query->note_external);
+                    }
+
+                    CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan Surat Jalan No. '.$query->code,$query->note_internal.' - '.$query->note_external,session('bo_id'));
+
+                    if($request->tempSwitch){
+                        $mod = MarketingOrderDelivery::find(intval($request->marketing_order_delivery_id));
+                        if($query->journal()->exists()){
+                            foreach($query->journal as $row){
+                                foreach($row->journalDetail as $rowdetail){
+                                    $rowdetail->update([
+                                        'account_id'    => $mod->marketingOrder->account_id,
+                                    ]);
+                                }
                             }
                         }
                     }
+
+                    activity()
+                        ->performedOn(new MarketingOrderDeliveryProcess())
+                        ->causedBy(session('bo_id'))
+                        ->withProperties($query)
+                        ->log('Add / edit surat jalan.');
+
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data successfully saved.',
+                    ];
+                } else {
+                    $response = [
+                        'status'  => 500,
+                        'message' => 'Data failed to save.'
+                    ];
                 }
+            }
 
-                activity()
-                    ->performedOn(new MarketingOrderDeliveryProcess())
-                    ->causedBy(session('bo_id'))
-                    ->withProperties($query)
-                    ->log('Add / edit surat jalan.');
-
-				$response = [
-					'status'    => 200,
-					'message'   => 'Data successfully saved.',
-				];
-			} else {
-				$response = [
-					'status'  => 500,
-					'message' => 'Data failed to save.'
-				];
-			}
-		}
+            DB::commit();
+        }catch(\Exception $e){
+            DB::rollback();
+        }
 
 		return response()->json($response);
     }

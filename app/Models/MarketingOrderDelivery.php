@@ -175,6 +175,11 @@ class MarketingOrderDelivery extends Model
         return $this->hasMany('App\Models\MarketingOrderDelivery');
     }
 
+    public function marketingOrderDeliveryRemapParent()
+    {
+        return $this->belongsTo('App\Models\MarketingOrderDelivery', 'marketing_order_delivery_id', 'id');
+    }
+
     public function marketingOrderDeliveryProcess()
     {
         return $this->hasOne('App\Models\MarketingOrderDeliveryProcess')->whereIn('status',['1','2','3']);

@@ -2382,6 +2382,44 @@ class CustomHelper {
 				$sj->marketingOrderDelivery->update([
 					'status'	=> '3'
 				]);
+
+				$weight_netto = 0;
+				if($sj->marketingOrderDelivery->marketingOrderDeliveryRemapParent()->exists()){
+					$gs = $sj->marketingOrderDelivery->goodScaleDetail->goodScale;
+					$totalProportional = 0;
+					$arr_delivery_no = [];
+					foreach($gs->goodScaleDetail as $row){
+						if($row->lookable_type == 'marketing_order_deliveries'){
+							if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+								$totalProportional += $row->lookable->marketingOrderDeliveryProcess->totalQty();
+								$arr_delivery_no[] = $row->lookable->marketingOrderDeliveryProcess->code;
+							}
+						}
+					}
+					$gs->update([
+						'delivery_no'	=> implode(',',$arr_delivery_no),
+					]);
+					if($totalProportional > 0){
+						foreach($gs->goodScaleDetail as $row){
+							if($row->lookable_type == 'marketing_order_deliveries'){
+								if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+									$bobot = round($row->lookable->marketingOrderDeliveryProcess->totalQty() / $totalProportional,3);
+									$qty = round($gs->qty_final * $bobot,3);
+									$total = $row->lookable->marketingOrderDeliveryProcess->deliveryCost($qty);
+									$row->lookable->marketingOrderDeliveryProcess->update([
+										'weight_netto' => $qty,
+									]);
+									$row->update([
+										'qty'   => $qty,
+										'total' => $total,
+									]);
+								}
+							}
+						}
+						CustomHelper::removeJournal($gs->getTable(),$gs->id);
+						CustomHelper::sendJournal($gs->getTable(),$gs->id,$gs->account_id);
+					}
+				}
 			}
 
 		}elseif($table_name == 'marketing_order_deliveries'){

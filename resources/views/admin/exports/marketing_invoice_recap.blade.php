@@ -27,7 +27,8 @@
             <th class="center-align">DP</th>
             <th class="center-align">Tax</th>
             <th class="center-align">Total</th>
-
+            <th class="center-align">Tax (FP)</th>
+            <th class="center-align">Total (FP)</th>
         </tr>
     </thead>
     <tbody>
@@ -59,7 +60,8 @@
             <td>{{ $row['dp'] }}</td>
             <td>{{ $row['tax'] }}</td>
             <td>{{ $row['total'] }}</td>
-
+            <td>{{ floor($row['tax']) }}</td>
+            <td>{{ floor($row['total']) }}</td>
 
             </tr>
         @endforeach

@@ -250,8 +250,7 @@
 
         $('#body-brand').on('click', '.delete-data-brand', function() {
             $(this).closest('tr').remove();
-            // const id = $row.data('id');
-            // arr_id_brand[id] = null;
+
         });
 
         $('#modal1').modal({
@@ -433,7 +432,7 @@
 
             </tr>
         `);
-        // arr_id_brand[count] = "";
+
 
 
         $('#arr_id_brand' + count).select2({
@@ -467,9 +466,7 @@
             }
         });
 
-        // $('#arr_id_brand' + count).on('select2:select', function (e) {
-        //     arr_id_brand[count] = e.params.data.id;
-        // });
+
     }
 
     function successImport(){

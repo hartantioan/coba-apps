@@ -15,6 +15,7 @@ use App\Models\GoodReceiveDetail;
 use App\Models\GoodReturnIssue;
 use App\Models\GoodReturnIssueDetail;
 use App\Models\GoodReturnPO;
+use App\Models\GoodReturnPODetail;
 use App\Models\InventoryRevaluation;
 use App\Models\InventoryRevaluationDetail;
 use App\Models\InventoryTransferIn;
@@ -587,6 +588,47 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                 'nominal_fc'  => $total,
                 'nominal'     => $total,
             ]);
+            }
+            $qtyBefore = $qty_final;
+            $totalBefore = $total_final;
+        }
+
+        $goodreturn = GoodReturnPODetail::whereHas('goodReturnPO',function($query)use($dateloop,$item_id){
+            $query->whereIn('status',['2','3'])->whereDate('post_date',$dateloop);
+        })->where('item_id',$item_id)->get();
+
+        foreach($goodreturn as $row){
+            $total = round($row->getRowTotal() * $row->goodReceiptDetail->purchaseOrderDetail->purchaseOrder->currency_rate,2);
+            $qty = $row->qty;
+            $total_final = $totalBefore - $total;
+            $qty_final = $qtyBefore - $qty;
+            $price = $total / $qty;
+            ItemCogs::create([
+                'lookable_type'		    => $row->goodReturnPO->getTable(),
+                'lookable_id'		    => $row->goodReturnPO->id,
+                'detailable_type'	    => $row->getTable(),
+                'detailable_id'		    => $row->id,
+                'company_id'		    => $row->goodReturnPO->company_id,
+                'place_id'			    => $row->goodReceiptDetail->place_id,
+                'warehouse_id'		    => $row->goodReceiptDetail->warehouse_id,
+                'item_id'			    => $row->item_id,
+                'qty_out'			    => $qty,
+                'price_out'			    => $price,
+                'total_out'			    => $total,
+                'qty_final'			    => $qty_final,
+                'price_final'		    => $qty_final > 0 ? round($total_final / $qty_final,5) : 0,
+                'total_final'		    => $total_final,
+                'date'				    => $dateloop,
+                'type'				    => 'OUT',
+                'area_id'               => NULL,
+                'item_shading_id'       => NULL,
+                'production_batch_id'   => NULL,
+            ]);
+            foreach($row->journalDetail as $rowjournal){
+                $rowjournal->update([
+                    'nominal_fc'  => $total,
+                    'nominal'     => $total,
+                ]);
             }
             $qtyBefore = $qty_final;
             $totalBefore = $total_final;

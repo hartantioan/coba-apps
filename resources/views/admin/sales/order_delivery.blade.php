@@ -891,6 +891,7 @@ document.addEventListener('focusin', function (event) {
     }
 
     function resetDetail(){
+        $('#tempRevision').val('');
         if($('.data-used').length > 0){
             $('.data-used').trigger('click');
         }else{

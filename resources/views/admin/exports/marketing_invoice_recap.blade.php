@@ -62,8 +62,8 @@
             <td>{{ $row['total'] }}</td>
             <td>{{ $row['tax'] }}</td>
             <td>{{ $row['grandtotal'] }}</td>
-            <td>{{ $row['total'] > 0 ? floor($row['total']) : floor($row['subtotal']) }}</td>
-            <td>{{ $row['total'] > 0 ? floor($row['tax']) : floor($row['subtotal'] * ($row['percentage'] / 100)) }}</td>
+            <td>{{ floor($row['total']) }}</td>
+            <td>{{ floor($row['tax']) }}</td>
 
             </tr>
         @endforeach

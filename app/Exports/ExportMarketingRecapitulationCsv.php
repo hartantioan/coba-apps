@@ -89,7 +89,7 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
             } else {
                 $arr[] = [
-                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*0.11) . ';0;;2;0;0;0;' . $row->code . ';;'
+                    '1'     => 'FK;' . $transactionCode . ';0;' . $tax_no . ';' . $month . ';' . $year . ';' . $newdate . ';' . $row->getNpwp() . ';' . $row->userData->title . ';' . $row->userData->address . ';' . floor($row->subtotal) . ';' . floor($row->subtotal*($row->taxMaster->percentage/100)) . ';0;;2;0;0;0;' . $row->code . ';;'
                 ];
             }
             $balance = floor($row->tax);

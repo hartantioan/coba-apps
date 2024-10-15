@@ -64,7 +64,12 @@ class MarketingOrderInvoiceDetail extends Model
     }
 
     public function getGrandtotal(){
-        $bobot = $this->total / $this->marketingOrderInvoice->total;
+        if ($this->marketingOrderInvoice->total == 0) {
+            $bobot = $this->total;
+        } else {
+            $bobot = $this->total / $this->marketingOrderInvoice->total;
+        }
+
         $total = $bobot * $this->marketingOrderInvoice->grandtotal;
         return $total;
     }
@@ -96,7 +101,7 @@ class MarketingOrderInvoiceDetail extends Model
         $arr = [];
 
         foreach($this->marketingOrderMemoDetail as $row){
-            $balance -= $row->grandtotal;           
+            $balance -= $row->grandtotal;
         }
 
         $arr = [

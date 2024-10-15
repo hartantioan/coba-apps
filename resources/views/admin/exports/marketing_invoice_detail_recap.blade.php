@@ -14,12 +14,18 @@
             <th>Item</th>
             <th>Qty</th>
             <th>Uom</th>
+            <th>Subtotal</th>
             <th>Total</th>
-
+            <th>Tax</th>
+            <th>Grand Total</th>
+            <th>Bayar</th>
+            <th>Sisa</th>
+            <th>Status</th>
 
         </tr>
     </thead>
     <tbody>
+
         @foreach($data as $key => $row)
         <tr>
 
@@ -29,7 +35,7 @@
             <td>{{ $row['nosj'] }}</td>
             <td>{{ $row['tglsj'] }}</td>
             <td>{{ $row['nomod'] }}</td>
-           
+
             <td>{{ $row['pocust'] }}</td>
             <td>{{ $row['customer'] }}</td>
             <td>{{ $row['typesell'] }}</td>
@@ -38,8 +44,32 @@
             <td>{{ $row['qty'] }}</td>
             <td>{{ $row['uom'] }}</td>
             <td>{{ $row['grandtotal'] }}</td>
-
-
+            @if($row['code']!='')
+            @if($row['row']>1 && $row['checkdata']==1)
+            <td rowspan="{{$row['row']}}">{{ $row['totalinvoice'] }}</td>
+            <td rowspan="{{$row['row']}}">{{ $row['tax'] }}</td>
+            <td rowspan="{{$row['row']}}">{{ $row['grandtotalinvoice'] }}</td>
+            <td rowspan="{{$row['row']}}">{{ $row['totalbayar'] }}</td>
+            <td rowspan="{{$row['row']}}">{{ $row['grandtotalinvoice']-$row['totalbayar'] }}</td>
+            @if($row['grandtotalinvoice']-$row['totalbayar']==0)
+            <td rowspan="{{$row['row']}}">Lunas</td>
+            @else
+            <td rowspan="{{$row['row']}}">Outstanding</td>
+            @endif
+            @elseif ($row['checkdata']==2)
+            @else
+            <td>{{ $row['totalinvoice'] }}</td>
+            <td>{{ $row['tax'] }}</td>
+            <td>{{ $row['grandtotalinvoice'] }}</td>
+            <td>{{ $row['totalbayar'] }}</td>
+            <td>{{ $row['grandtotalinvoice']-$row['totalbayar'] }}</td>
+            @if($row['grandtotalinvoice']-$row['totalbayar']==0)
+            <td>Lunas</td>
+            @else
+            <td>Outstanding</td>
+            @endif
+            @endif
+            @endif
 
         </tr>
         @endforeach

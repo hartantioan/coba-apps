@@ -536,6 +536,22 @@ class MarketingOrderInvoiceController extends Controller
                                 'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
                                 'note'                          => $rowdata->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDeliveryDetail->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDeliveryProcess->code,
                             ]);
+                        }elseif($request->arr_lookable_type[$key] == 'marketing_order_delivery_details'){
+                            $rowdata = MarketingOrderDeliveryDetail::find($row);
+                            MarketingOrderInvoiceDetail::create([
+                                'marketing_order_invoice_id'    => $query->id,
+                                'lookable_type'                 => $request->arr_lookable_type[$key],
+                                'lookable_id'                   => $row,
+                                'qty'                           => $rowdata->qty,
+                                'price'                         => $rowdata->realPriceAfterGlobalDiscount(),
+                                'is_include_tax'                => $rowdata->marketingOrderDetail->is_include_tax,
+                                'percent_tax'                   => $rowdata->marketingOrderDetail->percent_tax,
+                                'tax_id'                        => $rowdata->marketingOrderDetail->tax_id,
+                                'total'                         => str_replace(',','.',str_replace('.','',$request->arr_total[$key])),
+                                'tax'                           => str_replace(',','.',str_replace('.','',$request->arr_tax[$key])),
+                                'grandtotal'                    => str_replace(',','.',str_replace('.','',$request->arr_total_after_tax[$key])),
+                                'note'                          => $rowdata->marketingOrderDetail->marketingOrder->code.' - '.$rowdata->marketingOrderDelivery->code.' - '.$rowdata->marketingOrderDelivery->marketingOrderDeliveryProcess->code,
+                            ]);
                         }elseif($request->arr_lookable_type[$key] == 'marketing_order_down_payments'){
                             $rowdata = MarketingOrderDownPayment::find($row);
                             $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_grandtotal[$key]));
@@ -583,6 +599,7 @@ class MarketingOrderInvoiceController extends Controller
             DB::commit();
         }catch(\Exception $e){
             DB::rollback();
+            info($e->getMessage());
         }
 
 		return response()->json($response);
@@ -630,8 +647,26 @@ class MarketingOrderInvoiceController extends Controller
                 <td class="center-align">'.($key + 1).'</td>
                 <td class="center-align">'.$row->lookable->marketingOrderDeliveryProcess->code.'</td>
                 <td class="center-align">'.$row->lookable->itemStock->item->name.'</td>
-                <td class="center-align">'.CustomHelper::formatConditionalQty($row->qty).'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty(round($row->qty * $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)).'</td>
                 <td class="center-align">'.$row->lookable->itemStock->item->uomUnit->code.'</td>
+                <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
+                <td class="right-align">'.number_format($row->total,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->tax,2,',','.').'</td>
+                <td class="right-align">'.number_format($row->grandtotal,2,',','.').'</td>
+            </tr>';
+        }
+
+        foreach($data->marketingOrderInvoiceDeliveryDetail as $key => $row){
+            $totalqty+=$row->qty;
+            $totals+=$row->total;
+            $totalppn+=$row->tax;
+            $totalgrandtotal+=$row->grandtotal;
+            $string .= '<tr>
+                <td class="center-align">'.($key + 1).'</td>
+                <td class="center-align">'.$row->lookable->marketingOrderDelivery->marketingOrderDeliveryProcess->code.'</td>
+                <td class="center-align">'.$row->lookable->item->name.'</td>
+                <td class="center-align">'.CustomHelper::formatConditionalQty(round($row->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)).'</td>
+                <td class="center-align">'.$row->lookable->item->uomUnit->code.'</td>
                 <td class="">'.$row->note_internal.' - '.$row->note_external.'</td>
                 <td class="right-align">'.number_format($row->total,2,',','.').'</td>
                 <td class="right-align">'.number_format($row->tax,2,',','.').'</td>

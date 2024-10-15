@@ -173,7 +173,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 foreach ($handover_awal as $handover) {
                     $qtyConversion = $handover->productionFgReceiveDetail->conversion ?? 1;
 
-                    $totalQty_handover_awal += $handover->qty * $qtyConversion;
+                    $totalQty_handover_awal += round($handover->qty * $qtyConversion,3);
                 }
             }
 
@@ -232,7 +232,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 foreach ($delivery_process_awal as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj_awal += $row_sj->qty * $qtyConversion;
+                    $total_sj_awal += round($row_sj->qty * $qtyConversion,3);
                 }
             }
             //belum terkirim
@@ -245,8 +245,8 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             }
 
             if($total_sj_awal_blm_terkirim != 0){
-                $total_sj_awal_blm_terkirim_pallet = $total_sj_awal_blm_terkirim / $row->item->sellConversion();
-                $total_sj_awal_blm_terkirim_box = ($total_sj_awal_blm_terkirim / $row->item->sellConversion())*$row->item->pallet->box_conversion;
+                $total_sj_awal_blm_terkirim_pallet = round($total_sj_awal_blm_terkirim / $row->item->sellConversion());
+                $total_sj_awal_blm_terkirim_box = round(($total_sj_awal_blm_terkirim / $row->item->sellConversion())*$row->item->pallet->box_conversion,3);
             }
 
 
@@ -268,7 +268,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 foreach ($handover as $handovered) {
                     $qtyConversion = $handovered->productionFgReceiveDetail->conversion ?? 1;
 
-                    $total_handover += $handovered->qty * $qtyConversion;
+                    $total_handover += round($handovered->qty * $qtyConversion,3);
                 }
             }
 
@@ -311,7 +311,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 foreach ($delivery_process as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj += $row_sj->qty * $qtyConversion;
+                    $total_sj += round($row_sj->qty * $qtyConversion,3);
                 }
             }
 
@@ -319,7 +319,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
                 foreach ($delivery_process_blm_terkirim as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj_blm_terkirim += $row_sj->qty * $qtyConversion;
+                    $total_sj_blm_terkirim += round($row_sj->qty * $qtyConversion,3);
                 }
             }
 
@@ -351,11 +351,11 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
             $pallet_conversion=0;
             $box_conversion=0;
             if($total != 0 ){
-                $pallet_conversion= $total/$row->item->sellConversion();
-                $box_conversion=($total/$row->item->sellConversion())*$row->item->pallet->box_conversion;
+                $pallet_conversion= round($total/$row->item->sellConversion(),3);
+                $box_conversion=round(($total/$row->item->sellConversion())*$row->item->pallet->box_conversion,3);
                 $total_sum_sj_blm_terkirim = $total - ($total_sj_blm_terkirim + $total_sj_awal_blm_terkirim);
-                $pallet_conversion_total_sum = $total_sum_sj_blm_terkirim / $row->item->sellConversion();
-                $box_conversion_total_sum = ($total_sum_sj_blm_terkirim / $row->item->sellConversion() * $row->item->pallet->box_conversion);
+                $pallet_conversion_total_sum = round($total_sum_sj_blm_terkirim / $row->item->sellConversion(),3);
+                $box_conversion_total_sum = round(($total_sum_sj_blm_terkirim / $row->item->sellConversion() * $row->item->pallet->box_conversion),3);
             }
             //utk yg ke 2
             if (!isset($total_m2[$row->item->id])) {
@@ -452,7 +452,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
 
             if($first_mod_p){
 
-                $mod_p_to_m2 = $first_mod_p->marketingOrderDetail->qty_conversion * $mod_p;
+                $mod_p_to_m2 = round($first_mod_p->marketingOrderDetail->qty_conversion * $mod_p);
             }else{
                 $mod_p_to_m2 = $mod_p;
             }
@@ -480,7 +480,7 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
 
 
             if($first_mod_b){
-                $mod_b_to_m2 = $first_mod_b->marketingOrderDetail->qty_conversion * $mod_b;
+                $mod_b_to_m2 = round($first_mod_b->marketingOrderDetail->qty_conversion * $mod_b);
             }else{
                 $mod_b_to_m2 = $mod_b;
             }
@@ -501,9 +501,9 @@ class ExportReportSalesSummaryStockFg implements FromCollection, WithTitle, With
 
             $box_conversion = $v->item->pallet->box_conversion ?? 1;
 
-            $total_palet_mod = $total_m2_mod/$v->item->sellConversion();
+            $total_palet_mod = round($total_m2_mod/$v->item->sellConversion(),3);
 
-            $total_box_mod = $total_palet_mod*$box_conversion;
+            $total_box_mod = round($total_palet_mod*$box_conversion,3);
 
             $aviable = $total_m2[$v->item->id] - $total_m2_mod;
             $aviable2 = $total_palet[$v->item->id] - $total_palet_mod;

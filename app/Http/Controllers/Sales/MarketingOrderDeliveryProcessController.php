@@ -516,6 +516,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                                 $passedQty = false;
                             }
                         }else{
+                            info('kambing');
                             $passedQty = false;
                         }
                     }

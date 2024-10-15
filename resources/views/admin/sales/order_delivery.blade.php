@@ -405,7 +405,7 @@
     <div class="modal-content" style="overflow-x: hidden;max-width: 100%;">
         <div class="row">
             <div class="col s12">
-                <h4>Form Update Keterangan Internal & Eksternal <i id="text-update"></i></h4>
+                <h4>Form Update Keterangan Internal, Eksternal dan Detail Item <i id="text-update"></i></h4>
                 <div class="input-field col m4 s12">
                     <input id="delivery_date_update" name="delivery_date_update" type="date" placeholder="Tgl. Pengiriman">
                     <label class="active" for="delivery_date_update">Tgl. Kirim</label>
@@ -418,6 +418,27 @@
                 <div class="input-field col m4 s12">
                     <textarea class="materialize-textarea" id="note_external_update" name="note_external_update" placeholder="Catatan / Keterangan Eksternal" rows="3"></textarea>
                     <label class="active" for="note_external_update">Keterangan Eksternal</label>
+                </div>
+                <div class="col m12 s12">
+                    <table class="bordered" id="table-detail-update">
+                        <thead>
+                            <tr>
+                                <th class="center">{{ __('translations.no') }}.</th>
+                                <th class="center">No.SO</th>
+                                <th class="center">{{ __('translations.item') }}</th>
+                                <th class="center">Qty Pesanan</th>
+                                <th class="center">{{ __('translations.unit') }}</th>
+                                <th class="center">Catatan ke Form SJ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="body-item-update">
+                            <tr id="last-row-item-update">
+                                <td colspan="6">
+                                    Silahkan pilih Sales Order...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -701,6 +722,13 @@ document.addEventListener('focusin', function (event) {
             onCloseEnd: function(modal, trigger){
                 $('#text-update').text('');
                 $('#temp_update,#note_internal_update,#note_external_update,#delivery_date_update').val('');
+                $('#body-item-update').empty().append(`
+                    <tr id="last-row-item-update">
+                        <td colspan="6">
+                            Silahkan pilih Sales Order...
+                        </td>
+                    </tr>
+                `);
             }
         });
 
@@ -1640,58 +1668,85 @@ document.addEventListener('focusin', function (event) {
 	}
 
     function saveUpdate(){
-		swal({
-            title: "Apakah anda yakin ingin simpan?",
-            text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
-            icon: 'warning',
-            dangerMode: true,
-            buttons: {
-            cancel: 'Tidak, jangan!',
-            delete: 'Ya, lanjutkan!'
+        let passedNoteDetail = true, detail_id = [], detail_note = [];
+
+        $('input[name^="arr_note_update[]"]').each(function(index){
+            detail_note.push($(this).val());
+            detail_id.push($('input[name^="arr_id_update[]"]').eq(index).val());
+            if(!$(this).val()){
+                passedNoteDetail = false;
             }
-        }).then(function (willDelete) {
-            if (willDelete) {
-                $.ajax({
-                    url: '{{ Request::url() }}/save_update',
-                    type: 'POST',
-                    dataType: 'JSON',
-                    data: {
-                        id : $('#temp_update').val(),
-                        delivery_date : $('#delivery_date_update').val(),
-                        note : $('#note_internal_update').val(),
-                        note2 : $('#note_external_update').val(),
-                    },
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    beforeSend: function() {
-                        loadingOpen('#modal6');
-                    },
-                    success: function(response) {
-                        loadingClose('#modal6');
-                        if(response.status == 200) {
-                            successUpdate();
-                            M.toast({
-                                html: response.message
-                            });
-                        } else {
-                            M.toast({
-                                html: response.message
-                            });
-                        }
-                    },
-                    error: function() {
-                        $('.modal-content').scrollTop(0);
-                        loadingClose('#modal6');
-                        swal({
-                            title: 'Ups!',
-                            text: 'Check your internet connection.',
-                            icon: 'error'
-                        });
-                    }
-                });
+            if(!$('input[name^="arr_id_update[]"]').eq(index).val()){
+                passedNoteDetail = false;
             }
         });
+
+        if(detail_id.length == 0 || detail_note.length == 0){
+            passedNoteDetail = false;
+        }
+
+        if(!passedNoteDetail){
+            swal({
+                title: 'Ups!',
+                text: 'Keterangan detail item dan id item baris tidak boleh kosong.',
+                icon: 'warning'
+            });
+        }else{
+            swal({
+                title: "Apakah anda yakin ingin simpan?",
+                text: "Silahkan cek kembali form, dan jika sudah yakin maka lanjutkan!",
+                icon: 'warning',
+                dangerMode: true,
+                buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+                }
+            }).then(function (willDelete) {
+                if (willDelete) {
+                    $.ajax({
+                        url: '{{ Request::url() }}/save_update',
+                        type: 'POST',
+                        dataType: 'JSON',
+                        data: {
+                            id : $('#temp_update').val(),
+                            delivery_date : $('#delivery_date_update').val(),
+                            note : $('#note_internal_update').val(),
+                            note2 : $('#note_external_update').val(),
+                            detail_id : detail_id,
+                            detail_note : detail_note,
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        beforeSend: function() {
+                            loadingOpen('#modal6');
+                        },
+                        success: function(response) {
+                            loadingClose('#modal6');
+                            if(response.status == 200) {
+                                successUpdate();
+                                M.toast({
+                                    html: response.message
+                                });
+                            } else {
+                                M.toast({
+                                    html: response.message
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('.modal-content').scrollTop(0);
+                            loadingClose('#modal6');
+                            swal({
+                                title: 'Ups!',
+                                text: 'Check your internet connection.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                }
+            });
+        }
     }
 
     function save(){
@@ -2139,6 +2194,34 @@ document.addEventListener('focusin', function (event) {
                     $('#delivery_date_update').val(response.delivery_date);
                     $('#note_internal_update').val(response.note_internal);
                     $('#note_external_update').val(response.note_external);
+
+                    $('#body-item-update').empty();
+
+                    $.each(response.details, function(i, val) {
+                        $('#body-item-update').append(`
+                            <tr class="row_item_update">
+                                <input type="hidden" name="arr_id_update[]" value="` + val.id + `">
+                                <td>
+                                    ` + val.no + `
+                                </td>
+                                <td>
+                                    ` + val.so_no + `
+                                </td>
+                                <td>
+                                    ` + val.item_name + `
+                                </td>
+                                <td class="center">
+                                    ` + val.qty + `
+                                </td>
+                                <td class="center">
+                                    ` + val.unit + `
+                                </td>
+                                <td>
+                                    <input name="arr_note_update[]" class="materialize-textarea" type="text" placeholder="Keterangan barang 1..." value="` + val.note + `">
+                                </td>
+                            </tr>
+                        `);
+                    });
 
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();

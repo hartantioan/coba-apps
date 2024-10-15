@@ -719,6 +719,17 @@ class MarketingOrderDeliveryController extends Controller
                 'note_external'     => $request->note2,
             ]);
 
+            if($request->detail_id){
+                foreach($request->detail_id as $key => $row){
+                    $modd = MarketingOrderDeliveryDetail::find($row);
+                    if($modd){
+                        $modd->update([
+                            'note'  => $request->detail_note[$key],
+                        ]);
+                    }
+                }
+            }
+
             $response = [
                 'status'  => 200,
                 'message' => 'Data berhasil diupdate.'
@@ -837,6 +848,29 @@ class MarketingOrderDeliveryController extends Controller
                 'message' => 'Mohon maaf status dokumen sudah diluar perubahan. Anda tidak bisa melakukan perubahan.',
             ]);
         }
+
+        if($po->used()->exists()){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Mohon maaf dokumen sedang dipakai oleh : '.$po->used->user->name.' pada form '.$po->used->ref,
+            ]);
+        }
+
+        $details = [];
+
+        foreach($po->marketingOrderDeliveryDetail()->orderBy('id')->get() as $key => $row){
+            $details[] = [
+                'no'                    => $key + 1,
+                'id'                    => $row->id,
+                'so_no'                 => $row->marketingOrderDetail->marketingOrder->code,
+                'item_name'             => $row->item->code.' - '.$row->item->name,
+                'qty'                   => CustomHelper::formatConditionalQty($row->qty),
+                'unit'                  => $row->marketingOrderDetail->itemUnit->unit->code,
+                'note'                  => $row->note,
+            ];
+        }
+
+        $po['details'] = $details;
 
 		return response()->json($po);
     }

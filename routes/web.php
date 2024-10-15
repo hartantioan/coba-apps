@@ -187,6 +187,7 @@ use App\Http\Controllers\Sales\MarketingARDPrecapController;
 use App\Http\Controllers\Sales\ReportReceivableCardController;
 use App\Http\Controllers\Sales\ReportStockBrandController;
 use App\Http\Controllers\Sales\ReportSalesBrandController;
+use App\Http\Controllers\Sales\RecapSalesInvoiceDownPaymentController;
 
 use App\Http\Controllers\Inventory\GoodReceiptPOController;
 use App\Http\Controllers\Inventory\GoodReturnPOController;
@@ -2935,6 +2936,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportSalesBrandController::class, 'index']);
                         Route::post('filter', [ReportSalesBrandController::class, 'filter']);
                         Route::get('export', [ReportSalesBrandController::class, 'export']);
+                    });
+
+                    Route::prefix('recap_sales_invoice_dp')->middleware('operation.access:recap_sales_invoice_dp,view')->group(function () {
+                        Route::get('/', [RecapSalesInvoiceDownPaymentController::class, 'index']);
+                        Route::post('filter', [RecapSalesInvoiceDownPaymentController::class, 'filter']);
+                        Route::get('export', [RecapSalesInvoiceDownPaymentController::class, 'export']);
                     });
 
 

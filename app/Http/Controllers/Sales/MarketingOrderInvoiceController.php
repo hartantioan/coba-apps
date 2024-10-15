@@ -1230,6 +1230,41 @@ class MarketingOrderInvoiceController extends Controller
             ];
         }
 
+        foreach($po->marketingOrderInvoiceDeliveryDetail as $row){
+            $type = $row->lookable->marketingOrderDeliveryProcess->getTable();
+            $id = $row->lookable->marketingOrderDeliveryProcess->id;
+            $code = $row->lookable->marketingOrderDeliveryProcess->code;
+
+            $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
+
+            if($cekIndex < 0){
+                $arrUsed[] = [
+                    'id'    => $id,
+                    'type'  => $type,
+                    'code'  => $code,
+                ];
+            }
+
+            $arrSj[] = [
+                'id'                                    => $id,
+                'lookable_type'                         => $row->lookable_type,
+                'lookable_id'                           => $row->lookable_id,
+                'total'                                 => number_format($row->total,2,',','.'),
+                'tax'                                   => number_format($row->tax,2,',','.'),
+                'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
+                'code'                                  => $code,
+                'item_name'                             => $row->lookable->item->code.' - '.$row->lookable->item->name,
+                'qty_do'                                => CustomHelper::formatConditionalQty($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion),
+                'qty_return'                            => CustomHelper::formatConditionalQty($row->lookable->qtyReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
+                'qty_sent'                              => CustomHelper::formatConditionalQty($row->lookable->getBalanceQtySentMinusReturn() * $row->lookable->marketingOrderDetail->qty_conversion),
+                'unit'                                  => $row->lookable->item->uomUnit->code,
+                'price'                                 => number_format($row->price,2,',','.'),
+                'percent_tax'                           => number_format($row->percent_tax,2,',','.'),
+                'is_include_tax'                        => $row->is_include_tax,
+                'note'                                  => $row->note,
+            ];
+        }
+
         foreach($po->marketingOrderInvoiceDownPayment as $row){
             $cekIndex = $this->getIndexArray($row->lookable_id,$row->lookable_type,$arrUsed);
 

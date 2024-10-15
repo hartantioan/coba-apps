@@ -433,8 +433,8 @@ class MarketingOrderDeliveryProcess extends Model
             $total += $row->balanceInvoice();
         }
 
-        foreach($this->marketingOrderDeliveryProcessDetail as $row){
-            $total += $row->marketingOrderDeliveryDetail->balanceInvoice();
+        foreach($this->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            $total += $row->balanceInvoice();
         }
 
         return $total;

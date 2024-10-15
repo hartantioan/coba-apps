@@ -2083,7 +2083,7 @@ document.addEventListener('focusin', function (event) {
                     return false;
                 }
 
-                /* var path = window.location.pathname;
+                var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 
                     var segments = path.split('/');
@@ -2160,7 +2160,7 @@ document.addEventListener('focusin', function (event) {
                             icon: 'error'
                         });
                     }
-                }); */
+                });
             }
         });
     }

@@ -133,6 +133,11 @@ class MarketingOrderInvoice extends Model
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_process_details');
     }
 
+    public function marketingOrderInvoiceDeliveryDetail()
+    {
+        return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_delivery_details');
+    }
+
     public function marketingOrderInvoiceDownPayment()
     {
         return $this->marketingOrderInvoiceDetail()->where('lookable_type','marketing_order_down_payments');

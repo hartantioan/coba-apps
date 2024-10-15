@@ -3271,36 +3271,34 @@ class Select2Controller extends Controller {
 
                 $arrDetail = [];
 
-                foreach($d->marketingOrderDeliveryProcessDetail as $row){
-                    $price = $row->marketingOrderDeliveryDetail->marketingOrderDetail->realPriceAfterGlobalDiscount();
-                    $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
-                    if($row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id > 0){
-                        if($row->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax == '1'){
-                            $total = $total / (1 + ($row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100));
+                foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                    $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
+                    $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
+                    if($row->marketingOrderDetail->tax_id > 0){
+                        if($row->marketingOrderDetail->is_include_tax == '1'){
+                            $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
                         }
                     }
-                    $tax = round($total * ($row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax / 100),2);
+                    $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
                     $grandtotal = $total + $tax;
                     $arrDetail[] = [
                         'id'                => $row->id,
-                        'item_id'           => $row->itemStock->item_id,
-                        'item_name'         => $row->itemStock->item->code.' - '.$row->itemStock->item->name,
-                        'item_warehouse'    => $row->itemStock->item->warehouseList(),
-                        'unit'              => $row->itemStock->item->uomUnit->code,
+                        'item_id'           => $row->item_id,
+                        'item_name'         => $row->item->code.' - '.$row->item->name,
+                        'item_warehouse'    => $row->item->warehouseList(),
+                        'unit'              => $row->item->uomUnit->code,
                         'code'              => $d->code,
-                        'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn() * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
-                        'place_id'          => $row->itemStock->place_id,
-                        'warehouse_id'      => $row->itemStock->warehouse_id,
-                        'tax_id'            => $row->marketingOrderDeliveryDetail->marketingOrderDetail->tax_id,
-                        'is_include_tax'    => $row->marketingOrderDeliveryDetail->marketingOrderDetail->is_include_tax,
-                        'percent_tax'       => number_format($row->marketingOrderDeliveryDetail->marketingOrderDetail->percent_tax,2,',','.'),
+                        'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion),
+                        'tax_id'            => $row->marketingOrderDetail->tax_id,
+                        'is_include_tax'    => $row->marketingOrderDetail->is_include_tax,
+                        'percent_tax'       => number_format($row->marketingOrderDetail->percent_tax,2,',','.'),
                         'total'             => number_format($total,2,',','.'),
                         'tax'               => number_format($tax,2,',','.'),
                         'grandtotal'        => number_format($grandtotal,2,',','.'),
                         'lookable_type'     => $row->getTable(),
                         'lookable_id'       => $row->id,
-                        'qty_do'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
-                        'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion),
+                        'qty_do'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderDetail->qty_conversion),
+                        'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDetail->qty_conversion),
                         'price'             => number_format($price,2,',','.'),
                         'note'              => '',
                     ];

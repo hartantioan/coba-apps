@@ -4011,6 +4011,12 @@ class CustomHelper {
 
 			CustomHelper::addCountLimitCredit($moi->account_id,$balance); */
 
+			if($moi->grandtotal == 0){
+				$moi->update([
+					'status'	=> '3'
+				]);
+			}
+
 			$journal = Journal::find($query->id);
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();

@@ -28,6 +28,24 @@ class MarketingOrderDeliveryDetail extends Model
         return $this->belongsTo('App\Models\MarketingOrderDetail', 'marketing_order_detail_id', 'id')->withTrashed();
     }
 
+    public function isPallet(){
+        $yeah = false;
+        if(strpos($this->item->pallet->prefix_code,'PLT') !== false){
+            $yeah = true;
+        }
+        return $yeah;
+    }
+
+    public function marketingOrderInvoiceDetail(){
+        return $this->hasMany('App\Models\MarketingOrderInvoiceDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('marketingOrderInvoice',function($query){
+            $query->whereIn('status',['2','3']);
+        });
+    }
+
+    public function realPriceAfterGlobalDiscount(){
+        return $this->marketingOrderDetail->realPriceAfterGlobalDiscount();
+    }
+
     public function getTotal(){
         $total = $this->qty * $this->marketingOrderDetail->realPriceAfterGlobalDiscount() * $this->marketingOrderDetail->qty_conversion;
         if($this->marketingOrderDetail->tax_id > 0 && $this->marketingOrderDetail->is_include_tax == '1'){
@@ -107,8 +125,8 @@ class MarketingOrderDeliveryDetail extends Model
 
     public function getBalanceQtySentMinusReturn(){
         $total = $this->qty;
-        foreach($this->marketingOrderReturnDetail as $row){
-            $total -= $row->qty;
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            $total -= $row->qtyReturn();
         }
 
         return $total;

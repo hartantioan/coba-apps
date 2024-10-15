@@ -225,7 +225,7 @@
                                         <input type="hidden" id="temp" name="temp">
                                         <input type="hidden" id="tempSwitch" name="tempSwitch">
                                         <input type="hidden" id="has_void_do" name="has_void_do">
-                                        <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id" onchange="getMarketingOrderDelivery()"></select>
+                                        <select class="browser-default" id="marketing_order_delivery_id" name="marketing_order_delivery_id" onchange="getMarketingOrderDelivery();"></select>
                                         <label class="active" for="marketing_order_delivery_id">Jadwal Kirim</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">

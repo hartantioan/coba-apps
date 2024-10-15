@@ -271,6 +271,20 @@
                                     <td align="right">{{ number_format($row->total,2,',','.') }}</td>
                                 </tr>
                                 @endforeach
+                                @foreach($data->marketingOrderInvoiceDeliveryDetail as $key => $row)
+                                <tr>
+                                    <td align="center">{{ ($key + 1) }}</td>
+                                    <td align="">{{ $row->lookable->item->code.' - '.$row->lookable->item->name }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty($row->lookable->qty) }}</td>
+                                    <td align="right">{{ CustomHelper::formatConditionalQty(round($row->lookable->qty * $row->lookable->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                    <td align="center">{{ $row->lookable->item->uomUnit->code }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDetail->price,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_1,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDetail->percent_discount_2,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->lookable->marketingOrderDetail->discount_3,2,',','.') }}</td>
+                                    <td align="right">{{ number_format($row->total,2,',','.') }}</td>
+                                </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>

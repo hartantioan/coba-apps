@@ -449,6 +449,11 @@ class MarketingOrderDeliveryProcess extends Model
                 $passed = false;
             }
         }
+        foreach($query->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+            if($row->marketingOrderInvoiceDetail()->exists()){
+                $passed = false;
+            }
+        }
         if($passed){
             if($query->marketingOrderDelivery->customer->is_ar_invoice){
                 $total = 0;

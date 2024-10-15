@@ -2083,8 +2083,6 @@ document.addEventListener('focusin', function (event) {
                     return false;
                 }
 
-                console.log(passedQty + passedEditQty);
-
                 /* var path = window.location.pathname;
                     path = path.replace(/^\/|\/$/g, '');
 

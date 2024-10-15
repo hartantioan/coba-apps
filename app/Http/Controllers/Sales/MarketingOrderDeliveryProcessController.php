@@ -511,6 +511,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $itemstock = ItemStock::find($row);
                         $itemcogs = ItemCogs::where('item_id',$itemstock->item_id)->where('place_id',$itemstock->place_id)->where('warehouse_id',$itemstock->warehouse_id)->where('item_shading_id',$itemstock->item_shading_id)->where('production_batch_id',$itemstock->production_batch_id)->where('date','<=',$request->post_date)->orderByDesc('date')->orderByDesc('id')->first();
                         if($itemcogs){
+                            info($itemcogs->infoFg()['qty'].' - '.$arrQtyNeeded[$key]);
                             if($itemcogs->infoFg()['qty'] < $arrQtyNeeded[$key]){
                                 $passedQty = false;
                             }
@@ -526,7 +527,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     }
                 }
 
-                if($request->post_date < $mod->post_date){
+                /* if($request->post_date < $mod->post_date){
                     return response()->json([
                         'status'  => 500,
                         'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari tanggal MOD (Jadwal Kirim).'
@@ -749,7 +750,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'status'  => 500,
                         'message' => 'Data failed to save.'
                     ];
-                }
+                } */
             }
 
             DB::commit();

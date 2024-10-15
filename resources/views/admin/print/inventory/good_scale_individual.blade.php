@@ -183,7 +183,6 @@
                 </tr>
 
             </table>
-            <hr style="border-top: 1px solid black; margin-top:-35px">
         </header>
         <main style="margin-top:15px;">
             <div class="card">

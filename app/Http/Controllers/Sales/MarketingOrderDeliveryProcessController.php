@@ -494,7 +494,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($request->arr_item_stock_id){
                     foreach($request->arr_item_stock_id as $key => $row){
                         $modd = MarketingOrderDeliveryDetail::find($request->arr_modd_id[$key]);
-                        $qtyNeeded = $modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key]));
+                        $qtyNeeded = round($modd->marketingOrderDetail->qty_conversion * str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),3);
                         if(!in_array($row,$arrStockId)){
                             $arrStockId[] = $row;
                             $arrQtyNeeded[] = $qtyNeeded;

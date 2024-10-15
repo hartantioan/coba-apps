@@ -36,6 +36,17 @@ class GoodReceive extends Model
         'done_note',
     ];
 
+    public function hasBatchProduction(){
+        $has = false;
+        $count = $this->goodReceiveDetail()->where(function($query){
+            $query->whereNotNull('batch_no')->orWhere('batch_no','!=','');
+        })->count();
+        if($count > 0){
+            $has = true;
+        }
+        return $has;
+    }
+
     public function deleteUser()
     {
         return $this->belongsTo('App\Models\User', 'delete_id', 'id')->withTrashed();

@@ -934,9 +934,9 @@
                 { name: 'currency_rate', className: 'center-align' },
                 { name: 'note', className: '' },
                 { name: 'document', searchable: false, orderable: false, className: 'center-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
-                { name: 'operation', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'operation', searchable: false, orderable: false, className: 'right-align' },
             ],
             dom: 'Blfrtip',
             buttons: [
@@ -1901,6 +1901,23 @@
                     $('#company_jurnal').append(`Perusahaan : `+data.company);
                     $('#post_date_jurnal').append(`Tanggal : `+data.post_date);
                 }
+            }
+        });
+    }
+
+    function barcode(code){
+        $.ajax({
+            url: '{{ Request::url() }}/print_barcode/' + code,
+            type:'GET',
+            beforeSend: function() {
+                loadingOpen('#main');
+            },
+            complete: function() {
+                loadingClose('#main');
+            },
+            success: function(data){
+                loadingClose('#main');
+                window.open(data, '_blank');
             }
         });
     }

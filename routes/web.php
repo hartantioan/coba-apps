@@ -2103,6 +2103,7 @@ Route::prefix('admin')->group(function () {
                     Route::get('view_journal/{id}', [GoodReceiveController::class, 'viewJournal'])->middleware('operation.access:good_receive,journal');
                     Route::post('print', [GoodReceiveController::class, 'print']);
                     Route::post('print_by_range', [GoodReceiveController::class, 'printByRange']);
+                    Route::get('print_barcode/{id}', [GoodReceiveController::class, 'printBarcode']);
                     Route::get('print_individual/{id}', [GoodReceiveController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('create', [GoodReceiveController::class, 'create'])->middleware('operation.access:good_receive,update');
                     Route::get('approval/{id}', [GoodReceiveController::class, 'approval'])->withoutMiddleware('direct.access');

@@ -2631,7 +2631,7 @@ class TreeHelper {
                                 "name"=>$row_mo_receipt_detail->lookable->code,
                                 "key" => $row_mo_receipt_detail->lookable->code,
                                 'properties'=> $properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_receipt_detail->lookable->code),
+                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_receipt_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
@@ -2699,7 +2699,7 @@ class TreeHelper {
                             "name"=>$query_mo_delivery_process->marketingOrderInvoice->code,
                             "key" =>$query_mo_delivery_process->marketingOrderInvoice->code,
                             'properties'=>$properties,
-                            'url'=>request()->root()."admin/purchase/purchase_order?code=".CustomHelper::encrypt($query_mo_delivery_process->marketingOrderInvoice->code),
+                            'url'=>request()->root()."admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($query_mo_delivery_process->marketingOrderInvoice->code),
                         ];
                         $data_go_chart[]=$po_tempura;
                         $data_link[]=[
@@ -2879,7 +2879,7 @@ class TreeHelper {
                                 "name"=>$row_mo_h_invoice_detail->lookable->code,
                                 "key" => $row_mo_h_invoice_detail->lookable->code,
                                 'properties'=>$properties,
-                                'url'=>request()->root()."/admin/sales/sales_down_payment?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
+                                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($row_mo_h_invoice_detail->lookable->code),
                             ];
                             $data_go_chart[]=$mo_invoice_tempura;
                             $data_link[]=[
@@ -3212,7 +3212,7 @@ class TreeHelper {
                                     "name"=>$row_mo_memo_detail->lookable->code,
                                     "key" => $row_mo_memo_detail->lookable->code,
                                     'properties'=> $properties,
-                                    'url'=>request()->root()."admin/sales/sales_down_payment/?code=".CustomHelper::encrypt($row_mo_memo_detail->lookable->code),
+                                    'url'=>request()->root()."admin/sales/marketing_order_invoice/?code=".CustomHelper::encrypt($row_mo_memo_detail->lookable->code),
                                 ];
                                 $data_go_chart[]=$mo_invoice_tempura;
                                 $data_link[]=[

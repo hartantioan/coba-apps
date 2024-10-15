@@ -376,7 +376,7 @@ class MarketingOrderInvoiceController extends Controller
                 ];
             } else {
 
-                $user = User::find($request->account_id);
+                /* $user = User::find($request->account_id);
 
                 $limit = $user->limit_credit;
                 $creditNow = $user->count_limit_credit;
@@ -392,7 +392,7 @@ class MarketingOrderInvoiceController extends Controller
                             'message' => 'Nominal sisa tagihan melebihi sisa kredit yang dimiliki Pelanggan yakni '.number_format($balanceNow,2,',','.').'.'
                         ]);
                     }
-                }
+                } */
 
 
                 if($request->temp){

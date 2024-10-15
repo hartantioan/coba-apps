@@ -506,6 +506,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 }
 
                 if($request->arr_item_stock_id){
+                    $arrItemError = [];
                     $passedQty = true;
                     foreach($arrStockId as $key => $row){
                         $itemstock = ItemStock::find($row);
@@ -513,15 +514,17 @@ class MarketingOrderDeliveryProcessController extends Controller
                         if($itemcogs){
                             if(round($itemcogs->infoFg()['qty'],3) < round($arrQtyNeeded[$key],3)){
                                 $passedQty = false;
+                                $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
                             }
                         }else{
+                            $arrItemError[] = $itemstock->item->name.' - batch : '.$itemstock->productionBatch->code;
                             $passedQty = false;
                         }
                     }
                     if(!$passedQty){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih.'
+                            'message' => 'Mohon maaf terdapat permintaan item melebihi stok yang ada pada tanggal post date terpilih. Daftar item : '.implode(', ',$arrItemError)
                         ]);
                     }
                 }

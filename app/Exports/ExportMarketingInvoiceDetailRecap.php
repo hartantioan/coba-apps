@@ -33,7 +33,24 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
         })->where('lookable_type', '=', 'marketing_order_delivery_process_details')->get();
 
 
+        $code = [];
+
+
         foreach ($data as $row) {
+            $code[] = array_push($code, $row->marketingOrderInvoice->code);
+        }
+        $counts = array_count_values($code);
+        $checkdata = '1';
+        $ceksama = '';
+
+        foreach ($data as $row) {
+
+            if ($ceksama == $row->marketingOrderInvoice->code) {
+                $checkdata=2;
+            } else {
+                $checkdata=1;
+            }
+
 
             $array_filter[] = [
                 'code'  => $row->marketingOrderInvoice->code,
@@ -50,7 +67,16 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'type' => $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'tglsj' => date('d/m/Y', strtotime($row->marketingOrderInvoice->marketingOrderDeliveryProcess->post_date)),
                 'typesell' => $row->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
+                'totalbayar' => $row->marketingOrderInvoice->totalPay(),
+                'row' => $counts[$row->marketingOrderInvoice->code],
+                'checkdata'=>$checkdata,
+                'totalinvoice'=>$row->marketingOrderInvoice->total,
+                'tax'=>$row->marketingOrderInvoice->tax,
+                'grandtotalinvoice'=>$row->marketingOrderInvoice->grandtotal,
+               
             ];
+
+            $ceksama = $row->marketingOrderInvoice->code;
         }
 
         $data = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess', function ($query) {
@@ -75,6 +101,12 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
                 'uom' => $row->marketingOrderDeliveryDetail->item->uomUnit->code,
                 'type' => $row->marketingOrderDeliveryProcess->marketingOrderDelivery->deliveryType(),
                 'typesell' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->marketingOrder->Type() ?? '',
+                'totalbayar' => 0,
+                'row' => 1,
+                'checkdata'=>1,
+                'totalinvoice'=>0,
+                'tax'=>0,
+                'grandtotalinvoice'=>0,
             ];
         }
 

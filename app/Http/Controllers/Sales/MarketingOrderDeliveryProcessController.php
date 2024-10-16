@@ -483,11 +483,18 @@ class MarketingOrderDeliveryProcessController extends Controller
                 if($request->user_driver_id){
                     $user_driver = $request->user_driver_id;
                 }else{
-                    $user_driver = UserDriver::create([
-                        'user_id'   => $mod->account_id,
-                        'name'      => $request->driver_name,
-                        'hp'        => $request->driver_hp,
-                    ])->id;
+                    $find = UserDriver::where('name',$request->driver_name)->where('user_id',$mod->account_id)->first();
+                    if($find){
+                        $user_driver = $find->id;
+                    }else{
+                        $user_driver = UserDriver::create([
+                            'user_id'   => $mod->account_id,
+                            'name'      => $request->driver_name,
+                            'hp'        => $request->driver_hp,
+                        ])->id;
+                    }
+
+
                 }
                 $arrStockId = [];
                 $arrQtyNeeded = [];
@@ -661,7 +668,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderDeliveryProcess::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
                     $query = MarketingOrderDeliveryProcess::create([
                         'code'			                => $newCode,
                         'user_id'		                => session('bo_id'),

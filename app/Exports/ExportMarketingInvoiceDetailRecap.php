@@ -30,7 +30,7 @@ class ExportMarketingInvoiceDetailRecap implements FromView, WithEvents
         $data = MarketingOrderInvoiceDetail::whereHas('marketingOrderInvoice', function ($query) {
             $query->whereIn('status', ['2', '3'])->where('post_date', '>=', $this->start_date)
                 ->where('post_date', '<=', $this->end_date);
-        })->where('lookable_type', '=', 'marketing_order_delivery_process_details')->get();
+        })->whereIn('lookable_type',['marketing_order_delivery_process_details','marketing_order_delivery_details'])->get();
 
 
         $code = [];

@@ -76,7 +76,7 @@ class ProductionFgReceive extends Model
     public function totalIssue(){
         $total = 0;
         foreach($this->productionIssue as $row){
-            $total += round($row->total(),2);
+            $total += round($row->totalDetail(),2);
         }
         return $total;
     }

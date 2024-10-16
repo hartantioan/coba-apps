@@ -114,6 +114,14 @@ class ProductionIssue extends Model
         return $total;
     }
 
+    public function totalDetail(){
+        $total = 0;
+        foreach($this->productionIssueDetail as $rowdetail){
+            $total += $rowdetail->total;
+        }
+        return $total;
+    }
+
     public function totalItem(){
         $total = $this->productionIssueDetail()->whereNull('is_wip')->where('lookable_type','items')->sum('total');
         return $total;

@@ -112,7 +112,7 @@ class MenuController extends Controller
         $data = ProductionFgReceive::whereIn('status',['2','3'])->where('post_date','>=','2024-09-01')->where('post_date','<=','2024-09-30')->get();
 
         foreach($data as $row){
-            $data->recalculate();
+            $row->recalculate();
         }
 
         /* $user = User::where('status','1')->where('type','1')->get();

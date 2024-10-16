@@ -1131,11 +1131,13 @@ class ProductionFgReceiveController extends Controller
                 ]);
             }
             foreach($query->productionFgReceiveDetail as $row){
-                if($row->productionBatch->productionBatchUsage()->exists()){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, nomor batch telah digunakan pada dokumen lainnya.'
-                    ]);
+                if($row->productionBatch()->exists()){
+                    if($row->productionBatch->productionBatchUsage()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, nomor batch telah digunakan pada dokumen lainnya.'
+                        ]);
+                    }
                 }
             }
             if(in_array($query->status,['4','5'])){

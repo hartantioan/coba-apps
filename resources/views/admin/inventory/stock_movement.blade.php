@@ -1,12 +1,15 @@
 <style>
-    .select-wrapper, .select2-container {
-        height:3.7rem !important;
+    .select-wrapper,
+    .select2-container {
+        height: 3.7rem !important;
     }
-    .select2-selection--multiple{
+
+    .select2-selection--multiple {
         overflow-y: scroll !important;
         height: auto !important;
     }
-    .select2{
+
+    .select2 {
         height: fit-content !important;
     }
 </style>
@@ -43,6 +46,11 @@
                                     <div id="validation_alert" style="display:none;"></div>
                                 </div>
                                 <div class="col s12">
+                                    <div class="card-alert card blue">
+                                        <div class="card-content white-text">
+                                            <p>Info : Untuk GUDANG FG, yang terbentuk DELIVERY hanya yang sudah di barcode satpam</p>
+                                        </div>
+                                    </div>
                                     <div class="row">
                                         <div class="input-field col m4 s12">
                                             <select class="form-control" id="type" name="type">
@@ -56,7 +64,7 @@
                                             <label class="active" for="start_date">Tanggal Awal</label>
                                         </div>
                                         <div class="input-field col m4 s12">
-                                            <input id="finish_date" name="finish_date"  type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
+                                            <input id="finish_date" name="finish_date" type="date" max="{{ date('9999'.'-12-31') }}" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}">
                                             <label class="active" for="finish_date">Tanggal Akhir</label>
                                         </div>
                                         <div class="col m12 s12">
@@ -64,7 +72,7 @@
                                         <div class="input-field col m4 s12">
                                             <select class="form-control" id="plant" name="plant">
                                                 @foreach ($place as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
                                             <label class="" for="plant"></label>
@@ -73,7 +81,7 @@
                                             <select class="form-control" id="warehouse" name="warehouse">
                                                 <option value="all">SEMUA</option>
                                                 @foreach ($warehouse as $row)
-                                                    <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                                <option value="{{ $row->id }}">{{ $row->name }}</option>
                                                 @endforeach
                                             </select>
                                             <label class="" for="warehouse">WareHouse</label>
@@ -89,51 +97,51 @@
                                         <div class="input-field col m12 s12 ">
                                             <label for="filter_group" class="active" style="font-size:1rem;">Filter Group :</label>
 
-                                                <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">
-                                                    @foreach($group->whereNull('parent_id') as $c)
-                                                        @if(!$c->childSub()->exists())
-                                                            <option value="{{ $c->id }}"> - {{ $c->name }}</option>
-                                                        @else
-                                                            <optgroup label=" - {{ $c->code.' - '.$c->name }}">
-                                                            @foreach($c->childSub as $bc)
-                                                                @if(!$bc->childSub()->exists())
-                                                                    <option value="{{ $bc->id }}"> -  - {{ $bc->name }}</option>
-                                                                @else
-                                                                    <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
-                                                                        @foreach($bc->childSub as $bcc)
-                                                                            @if(!$bcc->childSub()->exists())
-                                                                                <option value="{{ $bcc->id }}"> -  -  - {{ $bcc->name }}</option>
-                                                                            @else
-                                                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
-                                                                                    @foreach($bcc->childSub as $bccc)
-                                                                                        @if(!$bccc->childSub()->exists())
-                                                                                            <option value="{{ $bccc->id }}"> -  -  -  - {{ $bccc->name }}</option>
-                                                                                        @else
-                                                                                            <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
-                                                                                                @foreach($bccc->childSub as $bcccc)
-                                                                                                    @if(!$bcccc->childSub()->exists())
-                                                                                                        <option value="{{ $bcccc->id }}"> -  -  -  -  - {{ $bcccc->name }}</option>
-                                                                                                    @endif
-                                                                                                @endforeach
-                                                                                            </optgroup>
-                                                                                        @endif
-                                                                                    @endforeach
-                                                                                </optgroup>
-                                                                            @endif
-                                                                        @endforeach
-                                                                    </optgroup>
-                                                                @endif
-                                                            @endforeach
-                                                            </optgroup>
-                                                        @endif
+                                            <select class="select2 browser-default" multiple="multiple" id="filter_group" name="filter_group[]">
+                                                @foreach($group->whereNull('parent_id') as $c)
+                                                @if(!$c->childSub()->exists())
+                                                <option value="{{ $c->id }}"> - {{ $c->name }}</option>
+                                                @else
+                                                <optgroup label=" - {{ $c->code.' - '.$c->name }}">
+                                                    @foreach($c->childSub as $bc)
+                                                    @if(!$bc->childSub()->exists())
+                                                    <option value="{{ $bc->id }}"> - - {{ $bc->name }}</option>
+                                                    @else
+                                                <optgroup label=" -  - {{ $bc->code.' - '.$bc->name }}">
+                                                    @foreach($bc->childSub as $bcc)
+                                                    @if(!$bcc->childSub()->exists())
+                                                    <option value="{{ $bcc->id }}"> - - - {{ $bcc->name }}</option>
+                                                    @else
+                                                <optgroup label=" -  -  - {{ $bcc->code.' - '.$bcc->name }}">
+                                                    @foreach($bcc->childSub as $bccc)
+                                                    @if(!$bccc->childSub()->exists())
+                                                    <option value="{{ $bccc->id }}"> - - - - {{ $bccc->name }}</option>
+                                                    @else
+                                                <optgroup label=" -  -  -  - {{ $bccc->code.' - '.$bccc->name }}">
+                                                    @foreach($bccc->childSub as $bcccc)
+                                                    @if(!$bcccc->childSub()->exists())
+                                                    <option value="{{ $bcccc->id }}"> - - - - - {{ $bcccc->name }}</option>
+                                                    @endif
+                                                    @endforeach
+                                                </optgroup>
+                                                @endif
                                                 @endforeach
-                                                </select>
+                                                </optgroup>
+                                                @endif
+                                                @endforeach
+                                                </optgroup>
+                                                @endif
+                                                @endforeach
+                                                </optgroup>
+                                                @endif
+                                                @endforeach
+                                            </select>
 
                                         </div>
                                         <div class="col m1">
                                             <button class="btn waves-effect waves-light submit" onclick="filter();">Cari <i class="material-icons right">file_download</i></button>
                                         </div>
-                                        <div  class="col m1" id="export_button">
+                                        <div class="col m1" id="export_button">
                                             <button class="btn waves-effect waves-light right submit mt-2" onclick="exportExcel();">Excel<i class="material-icons right">view_list</i></button>
                                         </div>
                                     </div>
@@ -175,7 +183,7 @@
 
 <script>
     $(function() {
-        $('#type').on('change', function () {
+        $('#type').on('change', function() {
             var selectedType = $(this).val();
 
             if (selectedType === 'final') {
@@ -193,9 +201,10 @@
         select2ServerSide('#item_id', '{{ url("admin/select2/item") }}');
     });
     $('#export_button').hide();
-    function filter(){
+
+    function filter() {
         var formData = new FormData($('#form_data')[0]);
-        formData.append('group[]',$('#filter_group').val());
+        formData.append('group[]', $('#filter_group').val());
         $.ajax({
             url: '{{ Request::url() }}/filter',
             type: 'POST',
@@ -214,11 +223,11 @@
             success: function(response) {
                 $('#export_button').show();
                 loadingClose('#main');
-                if(response.status == 200) {
+                if (response.status == 200) {
                     $('#movement_body').empty();
                     $('.uomunit').empty();
-                    var gtall=0;
-                    if($('#type').val() == 'final'){
+                    var gtall = 0;
+                    if ($('#type').val() == 'final') {
                         $('#t_head').empty();
                         $('#t_head').append(`
                             <tr>
@@ -238,21 +247,21 @@
 
                             $('#movement_body').append(`
                                 <tr>
-                                    <td class="center-align">`+(i+1)+`</td>
-                                    <td >`+val.plant+`</td>
-                                    <td >`+val.warehouse+`</td>
-                                    <td >`+val.kode+`</td>
-                                    <td >`+val.item+`</td>
-                                    <td >`+val.satuan+`</td>
-                                    <td >`+val.requester+`</td>
-                                    <td >`+val.area+`</td>
-                                    <td >`+val.shading+`</td>
-                                    <td >`+val.production_batch+`</td>
-                                    <td class="right-align">`+val.cum_qty+`</td>
+                                    <td class="center-align">` + (i + 1) + `</td>
+                                    <td >` + val.plant + `</td>
+                                    <td >` + val.warehouse + `</td>
+                                    <td >` + val.kode + `</td>
+                                    <td >` + val.item + `</td>
+                                    <td >` + val.satuan + `</td>
+                                    <td >` + val.requester + `</td>
+                                    <td >` + val.area + `</td>
+                                    <td >` + val.shading + `</td>
+                                    <td >` + val.production_batch + `</td>
+                                    <td class="right-align">` + val.cum_qty + `</td>
                                 </tr>
                             `);
                         });
-                    }else{
+                    } else {
                         var processedItems = [];
                         $('#t_head').empty();
                         $('#t_head').append(`
@@ -275,50 +284,49 @@
 
                         var itung = 0;
                         $.each(response.message, function(i, val) {
-                            if(val.perlu == 1){
+                            if (val.perlu == 1) {
                                 $('#movement_body').append(`
                                     <tr>
-                                        <td class="center-align">`+(itung+1)+`</td>
+                                        <td class="center-align">` + (itung + 1) + `</td>
                                         <td class="center-align"></td>
                                         <td class="center-align"></td>
                                         <td class="center-align"></td>
                                         <td class="">` + val.kode + `</td>
                                         <td class="">` + val.item + `</td>
                                         <td class="">` + val.satuan + `</td>
-                                        <td >`+val.requester+`</td>
+                                        <td >` + val.requester + `</td>
                                         <td ></td>
                                         <td ></td>
                                         <td ></td>
                                         <td>Saldo Awal</td>
                                         <td class="right-align"></td>
-                                        <td class="right-align">` + val.last_qty +  `</td>
-                                    </tr>`
-                                );
+                                        <td class="right-align">` + val.last_qty + `</td>
+                                    </tr>`);
                                 itung++;
-                            }else{
+                            } else {
                                 $('#movement_body').append(`
                                     <tr>
                                         <td class="center-align"></td>
-                                        <td >`+val.date+`</td>
-                                        <td >`+val.plant+`</td>
-                                        <td >`+val.warehouse+`</td>
-                                        <td >`+val.kode+`</td>
-                                        <td >`+val.item+`</td>
-                                        <td >`+val.satuan+`</td>
-                                        <td >`+val.requester+`</td>
-                                        <td >`+val.area+`</td>
-                                        <td >`+val.shading+`</td>
-                                        <td >`+val.production_batch+`</td>
-                                        <td>`+val.document+`</td>
-                                        <td class="right-align">`+val.qty+`</td>
-                                        <td class="right-align">`+val.cum_qty+`</td>
+                                        <td >` + val.date + `</td>
+                                        <td >` + val.plant + `</td>
+                                        <td >` + val.warehouse + `</td>
+                                        <td >` + val.kode + `</td>
+                                        <td >` + val.item + `</td>
+                                        <td >` + val.satuan + `</td>
+                                        <td >` + val.requester + `</td>
+                                        <td >` + val.area + `</td>
+                                        <td >` + val.shading + `</td>
+                                        <td >` + val.production_batch + `</td>
+                                        <td>` + val.document + `</td>
+                                        <td class="right-align">` + val.qty + `</td>
+                                        <td class="right-align">` + val.cum_qty + `</td>
                                     </tr>
                                 `);
                             }
                         });
                     }
 
-                } else if(response.status == 422) {
+                } else if (response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('.modal-content').scrollTop(0);
 
@@ -361,14 +369,14 @@
         });
     }
 
-     function exportExcel(){
+    function exportExcel() {
         var plant = $('#plant').val();
         var warehouse = $('#warehouse').val();
-        var item = $('#item_id').val() ? $('#item_id').val():'';
-        var type = $('#type').val() ? $('#type').val():'';
-        var group = $('#filter_group').val() ? $('#filter_group').val():'';
-        var startdate = $('#start_date').val() ? $('#start_date').val():'';
-        var finishdate = $('#finish_date').val() ? $('#finish_date').val():'';
-        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse+"&item=" + item+"&start_date=" + startdate+"&finish_date=" + finishdate+ "&type=" + type+ "&group=" + group;
+        var item = $('#item_id').val() ? $('#item_id').val() : '';
+        var type = $('#type').val() ? $('#type').val() : '';
+        var group = $('#filter_group').val() ? $('#filter_group').val() : '';
+        var startdate = $('#start_date').val() ? $('#start_date').val() : '';
+        var finishdate = $('#finish_date').val() ? $('#finish_date').val() : '';
+        window.location = "{{ Request::url() }}/export?plant=" + plant + "&warehouse=" + warehouse + "&item=" + item + "&start_date=" + startdate + "&finish_date=" + finishdate + "&type=" + type + "&group=" + group;
     }
 </script>

@@ -84,22 +84,9 @@ class MarketingOrderDeliveryProcessDetail extends Model
     }
 
     public function listMarketingOrderInvoice(){
-        $arr=[];
-        if($this->marketingOrderInvoiceDetail()->exists()){
-            foreach($this->marketingOrderInvoiceDetail as $item){
-                $arr[] = $item->marketingOrderInvoice->code;
-            }
-            $x=implode(',', $arr);
-        }else{
-            $x= '-';
-        }
-        if($this->marketingOrderDeliveryDetail->marketingOrderInvoiceDetail()->exists()){
-            foreach($this->marketingOrderDeliveryDetail->marketingOrderInvoiceDetail as $item){
-                $arr[] = $item->marketingOrderInvoice->code;
-            }
-            $x=implode(',', $arr);
-        }else{
-            $x= '-';
+        $x = '-';
+        if($this->marketingOrderDeliveryProcess->marketingOrderInvoice()->exists()){
+            $x = $this->marketingOrderDeliveryProcess->marketingOrderInvoice->code;
         }
         return $x;
     }

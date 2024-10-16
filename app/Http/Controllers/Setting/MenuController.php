@@ -109,10 +109,10 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]); */
 
-        $data = ProductionFgReceive::whereIn('status',['2','3'])->get();
+        $data = ProductionFgReceive::whereIn('status',['2','3'])->where('post_date','>=','2024-09-01')->where('post_date','<=','2024-09-30')->get();
 
         $total = 0;
-        
+
         foreach($data as $row){
             if($row->total() !== $row->totalIssue()){
                 echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';

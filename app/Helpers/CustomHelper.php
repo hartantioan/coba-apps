@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Helpers;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -97,7 +97,7 @@ class CustomHelper {
 		}else{
 			$val = strrev(implode('-',str_split(str_replace('=','',base64_encode($string)),5)));
 		}
-		
+
 		return $val;
 	}
 
@@ -112,14 +112,14 @@ class CustomHelper {
 			$query = User::find($transfer->account_id);
 			$query->place_id         = $transfer->plant_id;
 			$query->manager_id               = $transfer->manager_id;
-			
+
 			$query->position_id               = $transfer->position_id;
 			$query->save();
 
 			$query_check_employee_transfer = EmployeeTransfer::where('account_id',$query->id)->whereIn('status',['2','3'])->get();
 			$date = Carbon::parse($transfer->post_date);
 			$year_later = Carbon::parse($transfer->post_date)->addYear();
-		
+
 			if(count($query_check_employee_transfer) == 1){
 				EmployeeLeaveQuotas::create([
 					'user_id'			=> $query->id,
@@ -140,11 +140,11 @@ class CustomHelper {
 						->where('account_id', $transfer->account_id)
 						->latest('created_at')
 						->first();
-			
+
 			$query = User::find($transfer->account_id);
 			$query->place_id         	  = $latestTransfer->plant_id;
 			$query->manager_id            = $latestTransfer->manager_id;
-			
+
 			$query->position_id           = $latestTransfer->position_id;
 			$query->save();
 			DB::commit();
@@ -158,7 +158,7 @@ class CustomHelper {
 	}
 
 	public static function sendJournalWithOnlyCogs($table_name = null,$table_id = null,$account_id = null){
-		
+
 	}
 
 	public static function sendStock($place_id = null, $warehouse_id = null, $item_id = null, $qty = null, $type = null, $area_id = null, $shading = null, $batch = null){
@@ -179,7 +179,7 @@ class CustomHelper {
 			]);
 		}
 	}
-	
+
 	public static function compare($value1,$sign,$value2){
 		$passed = false;
 
@@ -221,7 +221,7 @@ class CustomHelper {
 	public static function sendApprovalWithoutDelete($table_name,$table_id,$note){
 		#delete approvalsource yang tidak punya matrix
 		ApprovalSource::whereDoesntHave('lookable')->delete();
-		
+
 		$data = DB::table($table_name)->where('id',$table_id)->first();
 
 		$approvalTemplate = ApprovalTemplate::where('status','1')
@@ -231,13 +231,13 @@ class CustomHelper {
 		->whereHas('approvalTemplateOriginator',function($query){
 			$query->where('user_id',session('bo_id'));
 		})->get();
-		
+
 		$count = 0;
 
 		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
 
 		foreach($approvalTemplate as $row){
-			
+
 			$source = ApprovalSource::create([
 				'code'			=> strtoupper(uniqid()),
 				'user_id'		=> session('bo_id'),
@@ -302,7 +302,7 @@ class CustomHelper {
 						if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
 							$passed = false;
 						}
-					}					
+					}
 				}else{
 					if($isGroupItem){
 						#groupitem, checknominal dan range
@@ -435,7 +435,7 @@ class CustomHelper {
 			}
 
 			if($passed == true){
-				
+
 				$count = 0;
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
@@ -451,12 +451,12 @@ class CustomHelper {
 						]);
 					}
 					$count++;
-					
+
 				}
-				
+
 			}
 		}
-		
+
 		if($count == 0){
 			DB::table($table_name)->where('id',$table_id)->update([
 				'status'	=> '2'
@@ -497,7 +497,7 @@ class CustomHelper {
 		/* ApprovalSource::whereDoesntHave('approvalMatrix')->forceDelete(); */
 
 		ApprovalSource::whereDoesntHave('lookable')->delete();
-		
+
 		$resetdata = ApprovalSource::where('lookable_type',$table_name)->where('lookable_id',$table_id)->get();
 
 		foreach($resetdata as $rowreset){
@@ -525,13 +525,13 @@ class CustomHelper {
 				$underEbitda = $salesOrder->underEbitda();
 			}
 		}
-		
+
 		$count = 0;
 
 		$currency_rate = isset($data->currency_rate) ? $data->currency_rate : 1;
 
 		foreach($approvalTemplate as $row){
-			
+
 			$source = ApprovalSource::create([
 				'code'			=> strtoupper(uniqid()),
 				'user_id'		=> session('bo_id'),
@@ -596,7 +596,7 @@ class CustomHelper {
 						if(!self::compare($data->grandtotal * $currency_rate,$row->sign,$row->nominal)){
 							$passed = false;
 						}
-					}					
+					}
 				}else{
 					if($isGroupItem){
 						#groupitem, checknominal dan range
@@ -738,7 +738,7 @@ class CustomHelper {
 			}
 
 			if($passed == true){
-				
+
 				$count = 0;
 
 				foreach($row->approvalTemplateStage()->orderBy('id')->get() as $rowTemplateStage){
@@ -758,12 +758,12 @@ class CustomHelper {
 						}
 					}
 					$count++;
-					
+
 				}
-				
+
 			}
 		}
-		
+
 		if($count == 0){
 			DB::table($table_name)->where('id',$table_id)->update([
 				'status'	=> '2'
@@ -800,7 +800,7 @@ class CustomHelper {
 	}
 
 	public static function sendNotification($table_name = null, $table_id = null, $title = null, $note = null, $to = null){
-		
+
 		$menu = Menu::where('table_name',$table_name)->first();
 
 		$arrUser = [];
@@ -834,7 +834,7 @@ class CustomHelper {
 					'status'			=> '1'
 				]);
 			} */
-			
+
 			if($to){
 				/* if($adato == false){ */
 					Notification::create([
@@ -854,7 +854,7 @@ class CustomHelper {
 	}
 
 	public static function sendNotificationWithFrom($table_name = null, $table_id = null, $title = null, $note = null, $from = null, $to = null){
-		
+
 		$menu = Menu::where('table_name',$table_name)->first();
 
 		if($menu){
@@ -990,23 +990,23 @@ class CustomHelper {
 			}
 		}elseif($table_name == 'shift_requests'){
 			$sr = ShiftRequest::find($table_id);
-			
+
 			foreach ($sr->shiftRequestDetail as $key => $row) {
-				
+
 				$query = EmployeeSchedule::create([
 					'user_id' 	=> $sr->account_id,
-					'shift_id' 	=> $row->shift_id, 
+					'shift_id' 	=> $row->shift_id,
 					'date' 		=> $row->date,
 					'status'	=> '1',
 					'shift_request_id'=> $sr->id,
 				]);
-				
+
 				$query_schedule_update=EmployeeSchedule::find($row->employee_schedule_id);
 				$query_schedule_update->status = '2';
 
 				$query_schedule_update->save();
 			}
-			
+
 		}elseif($table_name == 'material_requests'){
 
 		}elseif($table_name == 'good_issue_requests'){
@@ -1051,7 +1051,7 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
-						
+
 									JournalDetail::create([
 										'journal_id'	=> $query->id,
 										'account_id'	=> $coahutangusahabelumditagih->bp_journal ? $gs->account_id : NULL,
@@ -1090,15 +1090,15 @@ class CustomHelper {
 					]);
 				}
 			}
-			
+
 		}elseif($table_name == 'leave_requests'){
 			$lr = LeaveRequest::find($table_id);
 			$user= $lr->account;
 			$schedule = [];
-			
+
 			// Convert the start date to a Carbon instance
 			$currentDate = Carbon::parse($lr->start_date);
-			
+
 			if($lr->leaveType->furlough_type == 7 ){
 				while (count($schedule) < 90) {
 					$parse_date = Carbon::parse($currentDate->format('Y-m-d'))->toDateString();
@@ -1107,25 +1107,25 @@ class CustomHelper {
 					->delete();
 					// Check if the current day is not a Sunday (dayOfWeek 0)
 					if ($currentDate->dayOfWeek != 0) {
-					
+
 						$schedule[] = $currentDate->toDateString();
 						$query = EmployeeSchedule::create([
 							'user_id' 	=> $user->employee_no,
-							'shift_id' 	=> 4, 
+							'shift_id' 	=> 4,
 							'date' 		=> $currentDate,
 							'status'	=> '4',
 						]);
 					}
-		
+
 					// Move to the next day
 					$currentDate->addDay();
 				}
-			}	
-			
-			
+			}
+
+
 		}elseif($table_name == 'retirements'){
 			$ret = Retirement::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $ret->company_id,
@@ -1232,7 +1232,7 @@ class CustomHelper {
 
 				self::updateBalanceAsset($row->asset_id,floatval($row->asset->book_balance),'OUT',$table_name);
 			}
-		
+
 		}elseif($table_name == 'incoming_payments'){
 
 			$ip = IncomingPayment::find($table_id);
@@ -1251,7 +1251,7 @@ class CustomHelper {
 			]);
 
 			$arrNote = [];
-			
+
 			if($ip){
 				if($ip->wtax > 0){
 					JournalDetail::create([
@@ -1330,7 +1330,7 @@ class CustomHelper {
 								'detailable_id'	=> $row->id,
 							]);
 						}
-						
+
 					}elseif($row->lookable_type == 'outgoing_payments'){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -1377,7 +1377,7 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
-				
+
 							if($row->lookable->tax > 0){
 								JournalDetail::create([
 									'journal_id'	=> $query->id,
@@ -1424,7 +1424,7 @@ class CustomHelper {
 							$arrNote[] = $row->lookable->code;
 						}
 					}else{
-						
+
 					}
 				}
 
@@ -1455,9 +1455,9 @@ class CustomHelper {
 			]);
 
 		}elseif($table_name == 'payment_requests'){
-			
+
 			$pr = PaymentRequest::find($table_id);
-			
+
 			if($pr->paymentRequestCross()->exists() && $pr->balance == 0){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -1528,7 +1528,7 @@ class CustomHelper {
 							]);
 						}
 					}
-	
+
 					if($row->nominal_credit_fc > 0 || $row->nominal_credit_fc < 0){
 						if($row->cost_distribution_id){
 							$total = $row->nominal_credit_fc;
@@ -1585,7 +1585,7 @@ class CustomHelper {
 						}
 					}
 				}
-	
+
 				foreach($pr->paymentRequestDetail as $row){
 					if($row->lookable_type !== 'fund_requests'){
 						if($row->cost_distribution_id){
@@ -1680,10 +1680,10 @@ class CustomHelper {
 					'status'	=> '3',
 				]);
 			}
-			
+
 		}elseif($table_name == 'outgoing_payments'){
 			$op = OutgoingPayment::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $op->company_id,
@@ -2076,7 +2076,7 @@ class CustomHelper {
 		}elseif($table_name == 'good_receives'){
 
 			$gr = GoodReceive::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $gr->company_id,
@@ -2266,7 +2266,7 @@ class CustomHelper {
 			$gr = GoodReturnPO::find($table_id);
 
 			$arrNote = [];
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $gr->company_id,
@@ -2438,7 +2438,7 @@ class CustomHelper {
 		}elseif($table_name == 'good_issues'){
 
 			$gr = GoodIssue::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $gr->company_id,
@@ -2558,9 +2558,9 @@ class CustomHelper {
 			}
 
 		}elseif($table_name == 'good_return_issues'){
-			
+
 			$gr = GoodReturnIssue::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $gr->company_id,
@@ -2677,7 +2677,7 @@ class CustomHelper {
 		}elseif($table_name == 'landed_costs'){
 
 			$lc = LandedCost::find($data->id);
-			
+
 			if($lc){
 				$arrNote = [];
 
@@ -2841,7 +2841,7 @@ class CustomHelper {
 		}elseif($table_name == 'inventory_revaluations'){
 
 			$ir = InventoryRevaluation::find($data->id);
-			
+
 			if($ir){
 				$query = Journal::create([
 					'user_id'		=> session('bo_id'),
@@ -2855,7 +2855,7 @@ class CustomHelper {
 				]);
 
 				foreach($ir->inventoryRevaluationDetail as $rowdetail){
-					
+
 					if($rowdetail->nominal < 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -2951,9 +2951,9 @@ class CustomHelper {
 				}
 			}
 		}elseif($table_name == 'fund_requests'){
-		
+
 		}elseif($table_name == 'overtime_requests'){
-			
+
 			$OR = OvertimeRequest::find($table_id);
 			if($OR->schedule()->exists()){
 				$query_schedule = EmployeeSchedule::find($OR->schedule_id);
@@ -2961,9 +2961,9 @@ class CustomHelper {
 
 				$query_schedule->save();
 			}
-			
+
 		}
-		elseif($table_name == 'capitalizations'){		
+		elseif($table_name == 'capitalizations'){
 			$arrdata = get_object_vars($data);
 
 			$query = Journal::create([
@@ -2978,7 +2978,7 @@ class CustomHelper {
 				'note'			=> $data->note,
 				'status'		=> '3'
 			]);
-			
+
 			$cp = Capitalization::find($data->id);
 			if($cp){
 				foreach($cp->capitalizationDetail as $row){
@@ -3066,7 +3066,7 @@ class CustomHelper {
 				]);
 			}
 		}elseif($table_name == 'inventory_transfer_outs'){
-			
+
 			$ito = InventoryTransferOut::find($table_id);
 
 			/* if(($ito->place_from !== $ito->place_to) || ($ito->place_from == $ito->place_to && $ito->warehouse_from !== $ito->warehouse_to)){ */
@@ -3082,18 +3082,18 @@ class CustomHelper {
 					'currency_rate'	=> 1,
 					'currency_id'	=> 1,
 				]);
-	
+
 				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$ito->company_id)->first();
-	
+
 				foreach($ito->inventoryTransferOutDetail as $rowdetail){
 					$priceout = $rowdetail->item->priceNow($rowdetail->itemStock->place_id,$ito->post_date);
 					$nominal = round($rowdetail->qty * $priceout,2);
-	
+
 					$rowdetail->update([
 						'price'	=> $priceout,
 						'total'	=> $nominal,
 					]);
-					
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coabdp ? $coabdp->id : NULL,
@@ -3108,7 +3108,7 @@ class CustomHelper {
 						'detailable_type'=> $rowdetail->getTable(),
 						'detailable_id'	=> $rowdetail->id,
 					]);
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
@@ -3163,7 +3163,7 @@ class CustomHelper {
 					$rowdetail->itemStock->production_batch_id,
 				);
 			}
-			
+
 		}elseif($table_name == 'inventory_transfer_ins'){
 
 			$iti = InventoryTransferIn::find($table_id);
@@ -3181,11 +3181,11 @@ class CustomHelper {
 					'currency_rate'	=> 1,
 					'currency_id'	=> 1,
 				]);
-	
+
 				$coabdp = Coa::where('code','100.01.04.05.01')->where('company_id',$iti->company_id)->first();
-	
+
 				foreach($iti->inventoryTransferOut->inventoryTransferOutDetail as $rowdetail){
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $rowdetail->item->itemGroup->coa_id,
@@ -3200,7 +3200,7 @@ class CustomHelper {
 						'detailable_type'=> $rowdetail->getTable(),
 						'detailable_id'	=> $rowdetail->id,
 					]);
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coabdp ? $coabdp->id : NULL,
@@ -3292,7 +3292,7 @@ class CustomHelper {
 					'detailable_type'=> $row->getTable(),
 					'detailable_id'	=> $row->id,
 				]);
-				
+
 				self::updateBalanceAsset($row->asset_id,$row->nominal,'OUT',$table_name);
 			}
 
@@ -3366,7 +3366,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-					
+
 					if($row->grandtotal > 0){
 						$grandtotal = 0;
 						$realgrandtotal = 0;
@@ -3413,7 +3413,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-					
+
 					if($row->total > 0){
 						$total = 0;
 						if($row->lookable->lookable_type == 'coas'){
@@ -3553,7 +3553,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-					
+
 					if($row->grandtotal > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -3630,7 +3630,7 @@ class CustomHelper {
 		}elseif($table_name == 'close_bills'){
 
 			$cb = CloseBill::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $cb->company_id,
@@ -3661,7 +3661,7 @@ class CustomHelper {
 					'detailable_type'=> $row->getTable(),
 					'detailable_id'	=> $row->id,
 				]);
-				
+
 				if($row->outgoingPayment()->exists()){
 					if($row->outgoingPayment->balancePaymentCross() <= 0){
 						foreach($row->outgoingPayment->paymentRequest->paymentRequestDetail as $rowdetail){
@@ -3799,7 +3799,7 @@ class CustomHelper {
 			$cb->update([
 				'status'	=> '3'
 			]);
-			
+
 		}elseif($table_name == 'marketing_order_invoices'){
 
 			$moi = MarketingOrderInvoice::find($table_id);
@@ -3981,7 +3981,7 @@ class CustomHelper {
 			$tax -= $dp_tax;
 
 			$balance = $grandtotal - $downpayment;
-			
+
 			if($balance > 0){
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
@@ -4020,14 +4020,14 @@ class CustomHelper {
 			$journal = Journal::find($query->id);
 			$journal->note = $journal->note.' - '.implode(', ',$arrNote);
 			$journal->save();
-			
+
 			$moi->marketingOrderDeliveryProcess->update([
 				'status'	=> '3'
 			]);
 
 		}elseif($table_name == 'marketing_order_memos'){
 
-			/* $mom = MarketingOrderMemo::find($table_id);
+			$mom = MarketingOrderMemo::find($table_id);
 
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
@@ -4043,9 +4043,50 @@ class CustomHelper {
 			$coapiutang = Coa::where('code','100.01.03.01.01')->where('company_id',$mom->company_id)->first();
 			$coauangmuka = Coa::where('code','200.01.06.01.01')->where('company_id',$mom->company_id)->first();
 			$coapotonganpenjualan = Coa::where('code','400.02.01.01.01')->where('company_id',$mom->company_id)->first();
-			$coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$mom->company_id)->first();
-			$coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$mom->company_id)->first();
+			// $coarounding = Coa::where('code','700.01.01.01.05')->where('company_id',$mom->company_id)->first();// tdk usa
+			// $coahpp = Coa::where('code','500.01.01.01.01')->where('company_id',$mom->company_id)->first();// tdk usa
 
+            $total = round($mom->total * $mom->currency_rate,2);
+            $tax = round($mom->tax * $mom->currency_rate,2);
+
+            if($total > 0){
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'coa_id'		=> $coapotonganpenjualan->id,
+                    'account_id'	=> $coapotonganpenjualan->bp_journal ? $mom->account_id : NULL,
+                    'type'			=> '1',
+                    'nominal'		=> $total,
+                    'nominal_fc'    => $mom->total,
+                ]);
+            }
+
+            if($tax > 0){
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'coa_id'		=> $mom->taxMaster->coa_sale_id,
+                    'account_id'	=> $mom->taxMaster->coaSale->bp_journal ? $mom->account_id : NULL,
+                    'type'			=> '1',
+                    'nominal'		=> $tax,
+                    'note'			=> 'No Seri Pajak : '.$mom->tax_no,
+
+                    'nominal_fc'    => $mom->tax,
+                ]);
+            }
+
+            if($mom->grandtotal > 0){
+                JournalDetail::create([
+                    'journal_id'	=> $query->id,
+                    'coa_id'		=> $coapiutang->id,
+                    'account_id'	=> $coapiutang->bp_journal ? $mom->account_id : NULL,
+                    'type'			=> '2',
+                    'nominal'		=> $mom->grandtotal * $mom->currency_rate,
+                    'nominal_fc'    => $mom->grandtotal,
+                ]);
+
+            }
+
+
+/*
 			$totalDebit = 0;
 			$totalCredit = 0;
 			$balance = 0;
@@ -4066,7 +4107,7 @@ class CustomHelper {
 						]);
 						$totalDebit += $total;
 					}
-	
+
 					if($tax > 0){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4090,74 +4131,74 @@ class CustomHelper {
 						$totalCredit += $row->grandtotal * $row->lookable->lookable->marketingOrderDelivery->marketingOrder->currency_rate;
 					}
 
-					if($totalDebit !== $totalCredit){
-						$balance = $totalDebit - $totalCredit;
+					// if($totalDebit !== $totalCredit){
+					// 	$balance = $totalDebit - $totalCredit;
 
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'coa_id'		=> $coarounding->id,
-							'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
-							'type'			=> $balance > 0 ? '2' : '1',
-							'nominal'		=> -1 * $balance,
-						]);
-					}
+					// 	JournalDetail::create([
+					// 		'journal_id'	=> $query->id,
+					// 		'coa_id'		=> $coarounding->id,
+					// 		'account_id'	=> $coarounding->bp_journal ? $account_id : NULL,
+					// 		'type'			=> $balance > 0 ? '2' : '1',
+					// 		'nominal'		=> -1 * $balance,
+					// 	]);
+					// }
 
-					if($mom->type == '2'){
-						$hpp = $row->lookable->lookable->getPriceHpp() * $row->qty;
+					// if($mom->type == '2'){
+					// 	$hpp = $row->lookable->lookable->getPriceHpp() * $row->qty;
 
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'account_id'	=> $mom->account_id,
-							'coa_id'		=> $row->lookable->lookable->itemStock->item->itemGroup->coa_id,
-							'place_id'		=> $row->lookable->lookable->place_id,
-							'item_id'		=> $row->lookable->lookable->item_id,
-							'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
-							'type'			=> '1',
-							'nominal'		=> $hpp,
-						]);
+					// 	JournalDetail::create([
+					// 		'journal_id'	=> $query->id,
+					// 		'account_id'	=> $mom->account_id,
+					// 		'coa_id'		=> $row->lookable->lookable->itemStock->item->itemGroup->coa_id,
+					// 		'place_id'		=> $row->lookable->lookable->place_id,
+					// 		'item_id'		=> $row->lookable->lookable->item_id,
+					// 		'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
+					// 		'type'			=> '1',
+					// 		'nominal'		=> $hpp,
+					// 	]);
 
-						JournalDetail::create([
-							'journal_id'	=> $query->id,
-							'account_id'	=> $coahpp->bp_journal ? $mom->account_id : NULL,
-							'coa_id'		=> $coahpp->id,
-							'place_id'		=> $row->lookable->lookable->place_id,
-							'item_id'		=> $row->lookable->lookable->item_id,
-							'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
-							'type'			=> '2',
-							'nominal'		=> $hpp,
-						]);
-	
-						self::sendCogs($table_name,
-							$mom->id,
-							$row->lookable->lookable->place->company_id,
-							$row->lookable->lookable->place_id,
-							$row->lookable->lookable->warehouse_id,
-							$row->lookable->lookable->item_id,
-							$row->qty * $row->lookable->lookable->item->sell_convert,
-							$hpp,
-							'IN',
-							$mom->post_date,
-							$row->lookable->lookable->area_id,
-							NULL,
-							NULL,
-						);
-	
-						self::sendStock(
-							$row->lookable->lookable->place_id,
-							$row->lookable->lookable->warehouse_id,
-							$row->lookable->lookable->item_id,
-							$row->qty * $row->lookable->lookable->item->sell_convert,
-							'IN',
-							$row->lookable->lookable->area_id,
-							NULL,
-							NULL,
-						);
-					}
+					// 	JournalDetail::create([
+					// 		'journal_id'	=> $query->id,
+					// 		'account_id'	=> $coahpp->bp_journal ? $mom->account_id : NULL,
+					// 		'coa_id'		=> $coahpp->id,
+					// 		'place_id'		=> $row->lookable->lookable->place_id,
+					// 		'item_id'		=> $row->lookable->lookable->item_id,
+					// 		'warehouse_id'	=> $row->lookable->lookable->warehouse_id,
+					// 		'type'			=> '2',
+					// 		'nominal'		=> $hpp,
+					// 	]);
+
+					// 	self::sendCogs($table_name,
+					// 		$mom->id,
+					// 		$row->lookable->lookable->place->company_id,
+					// 		$row->lookable->lookable->place_id,
+					// 		$row->lookable->lookable->warehouse_id,
+					// 		$row->lookable->lookable->item_id,
+					// 		$row->qty * $row->lookable->lookable->item->sell_convert,
+					// 		$hpp,
+					// 		'IN',
+					// 		$mom->post_date,
+					// 		$row->lookable->lookable->area_id,
+					// 		NULL,
+					// 		NULL,
+					// 	);
+
+					// 	self::sendStock(
+					// 		$row->lookable->lookable->place_id,
+					// 		$row->lookable->lookable->warehouse_id,
+					// 		$row->lookable->lookable->item_id,
+					// 		$row->qty * $row->lookable->lookable->item->sell_convert,
+					// 		'IN',
+					// 		$row->lookable->lookable->area_id,
+					// 		NULL,
+					// 		NULL,
+					// 	);
+					// }
 				}
 
 				CustomHelper::removeCountLimitCredit($mom->account_id,$row->grandtotal);
-			}
-
+			} */
+/*
 			if($mom->type == '3'){
 
 				JournalDetail::create([
@@ -4177,7 +4218,7 @@ class CustomHelper {
 						'nominal'		=> $mom->tax,
 					]);
 				}
-	
+
 				JournalDetail::create([
 					'journal_id'	=> $query->id,
 					'coa_id'		=> $coapiutang->id,
@@ -4188,7 +4229,7 @@ class CustomHelper {
 
 				CustomHelper::removeCountLimitCredit($mom->account_id,$mom->grandtotal);
 			} */
-			
+
 		}elseif($table_name == 'purchase_invoices'){
 			#self::removeJournal($table_name,$table_id);
 			#start untuk po tipe biaya / jasa
@@ -4227,7 +4268,7 @@ class CustomHelper {
 			$type = '';
 
 			foreach($pi->purchaseInvoiceDetail as $row){
-				
+
 				if($row->lookable_type == 'coas'){
 
 					JournalDetail::create([
@@ -4275,7 +4316,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4297,7 +4338,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -4369,7 +4410,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4391,7 +4432,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -4449,7 +4490,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4466,7 +4507,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -4553,7 +4594,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -4575,7 +4616,7 @@ class CustomHelper {
 							'detailable_id'	=> $row->id,
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -4614,7 +4655,7 @@ class CustomHelper {
 						'lookable_id'	=> $table_id,
 						'note'			=> 'AUTO ADJUST SELISIH RUPIAH GRPO & APIN KURS ASING'
 					]);
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -4673,7 +4714,7 @@ class CustomHelper {
 						'detailable_type'=> $row->getTable(),
 						'detailable_id'	=> $row->id,
 					]);
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coauangmukapembelian->id,
@@ -4688,7 +4729,7 @@ class CustomHelper {
 					]);
 					$realDownPayment += $row->nominal * $currencydp;
 					$realInvoice += $row->nominal * $pi->currency_rate;
-					
+
 					if($row->purchaseDownPayment->balanceInvoice() <= 0){
 						foreach($row->purchaseDownPayment->purchaseDownPaymentDetail as $rowdpdetail){
 							if($rowdpdetail->fundRequestDetail()->exists()){
@@ -4864,7 +4905,7 @@ class CustomHelper {
 			$parentFg = false;
 			$coawip = Coa::where('code','100.01.04.03.01')->where('company_id',$pir->company_id)->first();
 			$arrBom = [];
-			
+
 			foreach($pir->productionIssueDetail as $row){
 				if($row->lookable_type == 'items' && $row->is_wip){
 					$parentFg = true;
@@ -4931,7 +4972,7 @@ class CustomHelper {
 								'detailable_type'=> $row->getTable(),
 								'detailable_id'	=> $row->id,
 							]);
-			
+
 							self::sendCogs($table_name,
 								$pir->id,
 								$pir->company_id,
@@ -4948,7 +4989,7 @@ class CustomHelper {
 								$row->getTable(),
 								$row->id,
 							);
-			
+
 							self::sendStock(
 								$row->itemStock->place_id,
 								$row->itemStock->warehouse_id,
@@ -5055,7 +5096,7 @@ class CustomHelper {
 					}
 				}
 			}else{
-	
+
 				foreach($pir->productionIssueDetail()->orderBy('id')->get() as $row){
 					if($row->lookable_type == 'items'){
 						if($row->is_wip){
@@ -5085,7 +5126,7 @@ class CustomHelper {
 										'detailable_type'=> $rowbatchusage->getTable(),
 										'detailable_id'	=> $rowbatchusage->id,
 									]);
-					
+
 									self::sendCogs($table_name,
 										$pir->id,
 										$pir->company_id,
@@ -5102,7 +5143,7 @@ class CustomHelper {
 										$rowbatchusage->getTable(),
 										$rowbatchusage->id,
 									);
-					
+
 									self::sendStock(
 										$rowbatchusage->productionBatch->place_id,
 										$rowbatchusage->productionBatch->warehouse_id,
@@ -5138,7 +5179,7 @@ class CustomHelper {
 											'detailable_type'=> $rowbatchusage->getTable(),
 											'detailable_id'	=> $rowbatchusage->id,
 										]);
-						
+
 										self::sendCogs($table_name,
 											$pir->id,
 											$pir->company_id,
@@ -5155,7 +5196,7 @@ class CustomHelper {
 											$rowbatchusage->getTable(),
 											$rowbatchusage->id,
 										);
-						
+
 										self::sendStock(
 											$rowbatchusage->productionBatch->place_id,
 											$rowbatchusage->productionBatch->warehouse_id,
@@ -5185,7 +5226,7 @@ class CustomHelper {
 										'detailable_type'=> $row->getTable(),
 										'detailable_id'	=> $row->id,
 									]);
-					
+
 									self::sendCogs($table_name,
 										$pir->id,
 										$pir->company_id,
@@ -5202,7 +5243,7 @@ class CustomHelper {
 										$row->getTable(),
 										$row->id,
 									);
-					
+
 									self::sendStock(
 										$row->itemStock->place_id,
 										$row->itemStock->warehouse_id,
@@ -5326,7 +5367,7 @@ class CustomHelper {
 		}elseif($table_name == 'production_receives'){
 
 			$pir = ProductionReceive::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
@@ -5386,7 +5427,7 @@ class CustomHelper {
 							'detailable_type'=> $rowbatch->getTable(),
 							'detailable_id'	=> $rowbatch->id,
 						]);
-		
+
 						self::sendCogs($table_name,
 							$pir->id,
 							$pir->company_id,
@@ -5403,7 +5444,7 @@ class CustomHelper {
 							$rowbatch->getTable(),
 							$rowbatch->id,
 						);
-		
+
 						self::sendStock(
 							$row->place_id,
 							$row->warehouse_id,
@@ -5432,7 +5473,7 @@ class CustomHelper {
 						'detailable_type'=> $row->getTable(),
 						'detailable_id'	=> $row->id,
 					]);
-	
+
 					self::sendCogs($table_name,
 						$pir->id,
 						$pir->company_id,
@@ -5449,7 +5490,7 @@ class CustomHelper {
 						$row->getTable(),
 						$row->id,
 					);
-	
+
 					self::sendStock(
 						$row->place_id,
 						$row->warehouse_id,
@@ -5480,7 +5521,7 @@ class CustomHelper {
 							$row->getTable(),
 							$row->id,
 						);
-	
+
 						self::sendStock(
 							$pir->place_id,
 							$pir->productionOrderDetail->productionScheduleDetail->bom->itemReject->warehouse(),
@@ -5508,7 +5549,7 @@ class CustomHelper {
 			}
 		}elseif($table_name == 'production_barcodes'){
 
-			
+
 
 		}elseif($table_name == 'production_fg_receives'){
 
@@ -5516,7 +5557,7 @@ class CustomHelper {
 
 			$pir->createProductionIssue();
 			$pir->recalculate();
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
@@ -5641,7 +5682,7 @@ class CustomHelper {
 		}elseif($table_name == 'production_handovers'){
 
 			$pir = ProductionHandover::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pir->company_id,
@@ -5761,9 +5802,9 @@ class CustomHelper {
 			}
 
 		}elseif($table_name == 'production_repacks'){
-			
+
 			$pr = ProductionRepack::find($table_id);
-			
+
 			$query = Journal::create([
 				'user_id'		=> session('bo_id'),
 				'company_id'	=> $pr->company_id,
@@ -5891,7 +5932,7 @@ class CustomHelper {
 					'currency_rate'	=> $ar->currency_rate,
 					'status'		=> '3'
 				]);
-				
+
 				$coaselisihkurs = Coa::where('code','700.01.01.01.03')->where('company_id',$ar->company_id)->first();
 
 				foreach($ar->adjustRateDetail as $row){
@@ -6055,7 +6096,7 @@ class CustomHelper {
 					'note'			=> $cj->note,
 					'status'		=> '3'
 				]);
-				
+
 				foreach($cj->closingJournalDetail as $row){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -6102,16 +6143,16 @@ class CustomHelper {
 				// 	$font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
 				// 	$pdf->getCanvas()->page_text(495, 785, "Jumlah Print, ". $po->printCounter()->count(), $font, 10, array(0,0,0));
 				// 	$pdf->getCanvas()->page_text(505, 800, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-					
-					
+
+
 				// 	$content = $pdf->download()->getOriginalContent();
-					
-				// 	$randomString = Str::random(10); 
-	
-				
+
+				// 	$randomString = Str::random(10);
+
+
 				// 	$filePath = 'public/pdf/' . $randomString . '.pdf';
-					
-	
+
+
 				// 	Storage::put($filePath, $content);
 				// 	$document_po = asset(Storage::url($filePath));
 				// 	$fullPath = storage_path('app/' . $filePath);
@@ -6127,9 +6168,9 @@ class CustomHelper {
 				// 	];
 				// 	try {
 				// 		Mail::to($po->account->email)->send(new SendMail($data));
-						
+
 				// 	} catch (\Exception $e) {
-						
+
 				// 		Log::error('Error sending email: ' . $e->getMessage());
 				// 		throw $e;
 				// 	}
@@ -6143,7 +6184,7 @@ class CustomHelper {
 				// 		'note'			=> $po->note,
 				// 	]);
 				// }
-				
+
 				$po->updateRootDocumentStatusDone();
 			}
 		}elseif($table_name == 'purchase_requests'){
@@ -6182,7 +6223,7 @@ class CustomHelper {
 				]);
 
 				$coaayatsilangstock = Coa::where('code','100.01.01.99.03')->where('company_id',$cj->company_id)->first();
-				
+
 				foreach($cj->productionRecalculateDetail as $row){
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
@@ -6226,7 +6267,7 @@ class CustomHelper {
 			})->get();
 
 			if(count($journalMap) > 0){
-				
+
 				$arrdata = get_object_vars($data);
 
 				$query = Journal::create([
@@ -6242,7 +6283,7 @@ class CustomHelper {
 				]);
 
 				foreach($journalMap as $row){
-					
+
 					$nominal = $arrdata[$row->field_name] * ($row->percentage / 100);
 
 					if($nominal > 0){
@@ -6424,7 +6465,7 @@ class CustomHelper {
 			$type = '';
 
 			foreach($pi->purchaseInvoiceDetail as $row){
-				
+
 				if($row->lookable_type == 'coas'){
 
 					JournalDetail::create([
@@ -6464,7 +6505,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -6482,7 +6523,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -6540,7 +6581,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -6558,7 +6599,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -6603,7 +6644,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -6616,7 +6657,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : '',
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -6685,7 +6726,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					if($row->wtax_id){
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
@@ -6703,7 +6744,7 @@ class CustomHelper {
 							'note2'			=> 'VOID CANCEL '.$row->purchaseInvoice->cut_date ? date('d/m/Y',strtotime($row->purchaseInvoice->cut_date)) : ''
 						]);
 					}
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coahutangusaha->id,
@@ -6758,7 +6799,7 @@ class CustomHelper {
 						'nominal'		=> $row->nominal * $currencydp,
 						'nominal_fc'	=> $row->purchaseDownPayment->currency->type == '1' || $row->purchaseDownPayment->currency->type == '' ? $row->nominal * $currencydp : $row->nominal,
 					]);
-	
+
 					JournalDetail::create([
 						'journal_id'	=> $query->id,
 						'coa_id'		=> $coauangmukapembelian->id,
@@ -6769,7 +6810,7 @@ class CustomHelper {
 					]);
 					$realDownPayment += $row->nominal * $currencydp;
 					$realInvoice += $row->nominal * $currency_rate_invoice;
-					
+
 					if($row->purchaseDownPayment->balanceInvoice() <= 0){
 						foreach($row->purchaseDownPayment->purchaseDownPaymentDetail as $rowdpdetail){
 							if($rowdpdetail->fundRequestDetail()->exists()){
@@ -6901,7 +6942,7 @@ class CustomHelper {
 
 	public static function updateBalanceAsset($asset_id = null, $nominal = null, $type = null, $table = null){
 		$asset = Asset::find($asset_id);
-		
+
 		if($asset){
 			$asset->update([
 				'accumulation_total'	=> $type == 'OUT' ? round($asset->accumulation_total + $nominal,3) : round($asset->accumulation_total - $nominal,3),
@@ -6936,9 +6977,9 @@ class CustomHelper {
 
 	public static function terbilang($angka) {
 		$angka = strval($angka);
-		
+
 		$baca = array("nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
-	  
+
 		$terbilang="";
 		 if ($angka < 12){
 			 $terbilang= " " . $baca[$angka];
@@ -6967,7 +7008,7 @@ class CustomHelper {
 		 else if ($angka < 1000000000000){
 			$terbilang= self::terbilangSen($angka / 1000000000) . " miliar" . self::terbilangSen($angka % 1000000000);
 		 }
-		 
+
 		 return ucwords($terbilang);
 	 }
 
@@ -6985,13 +7026,13 @@ class CustomHelper {
 		}
 
 		return ucwords($temp);
-	}	
+	}
 
 	 public static function terbilangSen($angka) {
 		$angka=abs($angka);
-		
+
 		$baca =array("", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas");
-	  
+
 		$terbilang="";
 		 if ($angka < 12){
 			 $terbilang= " " . $baca[$angka];
@@ -7020,7 +7061,7 @@ class CustomHelper {
 		 else if ($angka < 1000000000000){
 			$terbilang= self::terbilangSen($angka / 1000000000) . " miliar" . self::terbilangSen($angka % 1000000000);
 		 }
-		 
+
 		 return ucwords($terbilang);
 	 }
 
@@ -7061,7 +7102,7 @@ class CustomHelper {
 			'Desember'
 		);
 		$pecahkan = explode('-', $tanggal);
-	 
+
 		return $pecahkan[2] . ' ' . $bulan[ (int)$pecahkan[1] ] . ' ' . $pecahkan[0];
 	}
 
@@ -7204,18 +7245,18 @@ class CustomHelper {
 	public static function compress($source, $destination, $quality) {
 
 		$info = getimagesize($source);
-	
-		if ($info['mime'] == 'image/jpeg') 
+
+		if ($info['mime'] == 'image/jpeg')
 			$image = imagecreatefromjpeg($source);
-	
-		elseif ($info['mime'] == 'image/gif') 
+
+		elseif ($info['mime'] == 'image/gif')
 			$image = imagecreatefromgif($source);
-	
-		elseif ($info['mime'] == 'image/png') 
+
+		elseif ($info['mime'] == 'image/png')
 			$image = imagecreatefrompng($source);
-	
+
 		imagejpeg($image, $destination, $quality);
-	
+
 		return $destination;
 	}
 
@@ -7260,12 +7301,12 @@ class CustomHelper {
         $bomPowder = $item->bomPlace($place_id) ? $item->bomPlace($place_id)->first() : NULL;
         $bomGroup = '';
         if($bomPowder){
-            $bomGroup = $bomPowder->group; 
+            $bomGroup = $bomPowder->group;
         }
 		if($bomGroup == '2' || $bomGroup == '3'){
             $itemcogs2 = ItemCogs::where('date','>=',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderBy('date')->orderBy('id')->get();
             $old_data2 = ItemCogs::where('date','<',$date)->where('company_id',$company_id)->where('place_id',$place_id)->where('item_id',$item_id)->orderByDesc('date')->orderByDesc('id')->first();
-    
+
             $total_final = 0;
             $qty_final = 0;
             $price_final = 0;
@@ -7279,7 +7320,7 @@ class CustomHelper {
                             $total_final = $old_data2->total_final - $row->total_out;
                             $qty_final = $old_data2->qty_final - $row->qty_out;
                         }
-        
+
                         $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     }else{
                         if($row->type == 'IN'){
@@ -7289,7 +7330,7 @@ class CustomHelper {
                             $total_final = 0 - $row->total_out;
                             $qty_final = 0 - $row->qty_out;
                         }
-            
+
                         $price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
                     }
                     $row->update([
@@ -7333,7 +7374,7 @@ class CustomHelper {
 						$total_final = $old_data2->total_final - $row->total_out;
 						$qty_final = $old_data2->qty_final - $row->qty_out;
 					}
-	
+
 					$price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
 				}else{
 					if($row->type == 'IN'){
@@ -7343,7 +7384,7 @@ class CustomHelper {
 						$total_final = 0 - $row->total_out;
 						$qty_final = 0 - $row->qty_out;
 					}
-		
+
 					$price_final = $qty_final > 0 ? round($total_final / $qty_final,5) : 0;
 				}
 				$row->update([

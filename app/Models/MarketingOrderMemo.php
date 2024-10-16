@@ -40,6 +40,9 @@ class MarketingOrderMemo extends Model
         'done_id',
         'done_date',
         'done_note',
+        'subtotal',
+        'currency_id',
+        'currency_rate',
     ];
 
     public function deleteUser()
@@ -55,6 +58,11 @@ class MarketingOrderMemo extends Model
         };
 
         return $type;
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo('App\Models\Currency', 'currency_id', 'id')->withTrashed();
     }
 
     public function taxMaster()
@@ -94,7 +102,7 @@ class MarketingOrderMemo extends Model
     public function used(){
         return $this->hasOne('App\Models\UsedData','lookable_id','id')->where('lookable_type',$this->table);
     }
-    
+
     public function status(){
         $status = match ($this->status) {
           '1' => '<span class="amber medium-small white-text padding-3">Menunggu</span>',
@@ -134,7 +142,7 @@ class MarketingOrderMemo extends Model
         return $type;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -278,7 +286,7 @@ class MarketingOrderMemo extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

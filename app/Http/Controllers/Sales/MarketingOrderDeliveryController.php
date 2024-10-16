@@ -458,60 +458,60 @@ class MarketingOrderDeliveryController extends Controller
                     ]);
                 }
 
-                $passedZero = true;
-                $passedQty = true;
-                $passedSentMore = true;
-                $passedCreditLimit = true;
-                $totalLimitCredit = 0;
-                $totalSent = 0;
+                if(!$request->temp){
+                    $passedZero = true;
+                    $passedQty = true;
+                    $passedSentMore = true;
+                    $passedCreditLimit = true;
+                    $totalLimitCredit = 0;
+                    $totalSent = 0;
 
-                $user = User::find($request->customer_id);
+                    $user = User::find($request->customer_id);
 
-                $grandtotalUnsentModCredit = $user->grandtotalUnsentModCredit();
-                $grandtotalUnsentModDp = $user->grandtotalUnsentModDp();
-                $grandtotalUnsentDoCredit = $user->grandtotalUninvoiceDoCredit();
-                $grandtotalUnsentDoDp = $user->grandtotalUninvoiceDoDp();
+                    $grandtotalUnsentModCredit = $user->grandtotalUnsentModCredit();
+                    $grandtotalUnsentModDp = $user->grandtotalUnsentModDp();
+                    $grandtotalUnsentDoCredit = $user->grandtotalUninvoiceDoCredit();
+                    $grandtotalUnsentDoDp = $user->grandtotalUninvoiceDoDp();
 
-                $arrmo = array_unique($request->arr_mo);
+                    $arrmo = array_unique($request->arr_mo);
 
-                $total = 0;
-                $tax = 0;
-                $grandtotal = 0;
-                $totalCredit = 0;
-                $totalDp = 0;
+                    $total = 0;
+                    $tax = 0;
+                    $grandtotal = 0;
+                    $totalCredit = 0;
+                    $totalDp = 0;
 
-                if($request->arr_modi){
-                    foreach($request->arr_modi as $key => $row){
-                        $mod = MarketingOrderDetail::find($row);
-                        if($mod){
-                            $totalDp = round((($mod->marketingOrder->percent_dp / 100) * $mod->grandtotal),2);
-                            $totalCredit = round((((100 - $mod->marketingOrder->percent_dp) / 100) * $mod->grandtotal),2);
+                    if($request->arr_modi){
+                        foreach($request->arr_modi as $key => $row){
+                            $mod = MarketingOrderDetail::find($row);
+                            if($mod){
+                                $totalDp = round((($mod->marketingOrder->percent_dp / 100) * $mod->grandtotal),2);
+                                $totalCredit = round((((100 - $mod->marketingOrder->percent_dp) / 100) * $mod->grandtotal),2);
+                            }
                         }
                     }
-                }
 
-                $balanceLimitCredit = $totalCredit > 0 ? $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit : 0;
-                $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
-                $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
-                $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
-                $grandtotal = $totalCredit > 0 ? $totalLimitCredit - $request->grandtotal : 0;
-                $grandtotaldp = $totalDp > 0? $totalLimitDp - $request->grandtotal : 0;
+                    $balanceLimitCredit = $totalCredit > 0 ? $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit - $totalCredit : 0;
+                    $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
+                    $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
+                    $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
+                    $grandtotal = $totalCredit > 0 ? $totalLimitCredit - $request->grandtotal : 0;
+                    $grandtotaldp = $totalDp > 0? $totalLimitDp - $request->grandtotal : 0;
 
-                if($grandtotal < 0){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotal,2,',','.'),
-                    ]);
-                }
+                    if($grandtotal < 0){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotal,2,',','.'),
+                        ]);
+                    }
 
-                if($grandtotaldp < 0){
-                    return response()->json([
-                        'status'  => 500,
-                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa deposit '.number_format($totalLimitDp,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotaldp,2,',','.'),
-                    ]);
-                }
+                    if($grandtotaldp < 0){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa deposit '.number_format($totalLimitDp,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotaldp,2,',','.'),
+                        ]);
+                    }
 
-                if(!$request->temp){
                     if(!$passedCreditLimit){
                         return response()->json([
                             'status'  => 500,

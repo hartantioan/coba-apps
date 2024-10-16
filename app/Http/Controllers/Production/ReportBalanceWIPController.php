@@ -48,6 +48,6 @@ class ReportBalanceWIPController extends Controller
 
         $start_date = $request->start_date;
         $finish_date = $request->end_date;
-		return Excel::download(new ExportReportBalanceWIP($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportBalanceWIP($start_date,$finish_date), 'report_wip_'.uniqid().'.xlsx');
     }
 }

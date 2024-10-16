@@ -499,10 +499,9 @@ class MarketingOrderDeliveryController extends Controller
                     $passedCreditLimit = false;
                 }
 
-
-                // if($balanceLimitDp < 0){
-                //     $passedCreditLimit = false;
-                // }
+                if($balanceLimitDp < 0){
+                    $passedCreditLimit = false;
+                }
                 if($grandtotal < 0){
                     return response()->json([
                         'status'  => 500,

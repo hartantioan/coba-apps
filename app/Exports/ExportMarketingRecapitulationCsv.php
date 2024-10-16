@@ -104,6 +104,17 @@ class ExportMarketingRecapitulationCsv implements FromCollection, WithTitle, Sho
                 ];
                 $balance -= $tax;
             }
+            foreach ($row->marketingOrderInvoiceDetail()->where('lookable_type', 'marketing_order_delivery_details')->get() as $key => $rowdetail) {
+                if($key == ($row->marketingOrderInvoiceDetail()->count() - 1)){
+                    $tax = $balance;
+                }else{
+                    $tax = $rowdetail->proportionalTaxFromHeader();
+                }
+                $arr[] = [
+                    '1'     => 'OF;' . $rowdetail->lookable->item->code . ';' . $rowdetail->lookable->item->name . ';' . round($rowdetail->price, 2) . ';' . round($rowdetail->qty * $rowdetail->lookable->marketingOrderDetail->qty_conversion, 2) . ';' . round($rowdetail->total, 2) . ';0;' . round($rowdetail->total, 2) . ';' . $tax . ';0;0;;;;;;;;;;',
+                ];
+                $balance -= $tax;
+            }
         }
 
         return collect($arr);

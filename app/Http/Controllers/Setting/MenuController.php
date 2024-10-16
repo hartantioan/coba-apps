@@ -118,7 +118,7 @@ class MenuController extends Controller
             if($balance > 0 || $balance < 0){
                 echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
                 $total += ($row->total() - $row->totalIssue());
-                $row->recalculate();
+                /* $row->recalculate(); */
             }
         }
 

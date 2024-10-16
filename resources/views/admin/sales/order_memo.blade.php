@@ -37,9 +37,9 @@
 <div id="main">
     <div class="row">
         <div class="pt-3 pb-1" id="breadcrumbs-wrapper">
-            
+
             <!-- Search for small screen-->
-            <div class="container"> 
+            <div class="container">
                 <div class="row">
                     <div class="col s8 m6 l6">
                         <h5 class="breadcrumbs-title mt-0 mb-0"><span>{{ $title }}</span></h5>
@@ -53,13 +53,13 @@
                         </ol>
                     </div>
                     <div class="col s4 m6 l6">
-                        
+
                         <a class="btn btn-small waves-effect waves-light breadcrumbs-btn right mr-3" href="javascript:void(0);" onclick="printData();">
                             <i class="material-icons hide-on-med-and-up">local_printshop</i>
                             <span class="hide-on-small-onl">{{ __('translations.print') }}</span>
                             <i class="material-icons right">local_printshop</i>
                         </a>
-                      
+
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     <!-- DataTables example -->
                     <div class="row">
                         <div class="col s12">
-                            
+
                             <ul class="collapsible collapsible-accordion">
                                 <li>
                                     <div class="collapsible-header"><i class="material-icons">filter_list</i>{{ __('translations.filter') }}</div>
@@ -118,7 +118,7 @@
                                                     <input type="date" max="{{ date('9999'.'-12-31') }}" id="finish_date" name="finish_date"  onchange="loadDataTable()">
                                                 </div>
                                             </div>
-                                        </div>  
+                                        </div>
                                     </div>
                                 </li>
                             </ul>
@@ -168,7 +168,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </div>
             </div>
             <div class="content-overlay"></div>
@@ -191,7 +191,6 @@
                                 <fieldset>
                                     <legend>1. {{ __('translations.main_info') }}</legend>
                                     <div class="input-field col m2 s12 step1">
-                                        <input type="hidden" id="temp" name="temp">
                                         <input id="code" name="code" type="text" value="{{ $newcode }}" readonly>
                                         <label class="active" for="code">No. Dokumen</label>
                                     </div>
@@ -204,10 +203,18 @@
                                         </select>
                                     </div>
                                     <div class="input-field col m3 s12 step3">
+                                        <input type="hidden" id="temp" name="temp">
                                         <select class="browser-default" id="account_id" name="account_id"></select>
-                                        <label class="active" for="account_id">{{ __('translations.customer') }}</label>
+                                        <label class="active" for="account_id">{{ __('translations.bussiness_partner') }}</label>
                                     </div>
                                     <div class="input-field col m3 s12 step4">
+                                        <select class="form-control" id="type" name="type">
+                                            <option value="1">DP</option>
+                                            <option value="2">Credit</option>
+                                        </select>
+                                        <label class="" for="type">{{ __('translations.type') }}</label>
+                                    </div>
+                                    <div class="input-field col m3 s12 step5">
                                         <select class="form-control" id="company_id" name="company_id">
                                             @foreach ($company as $rowcompany)
                                                 <option value="{{ $rowcompany->id }}">{{ $rowcompany->name }}</option>
@@ -215,38 +222,46 @@
                                         </select>
                                         <label class="" for="company_id">{{ __('translations.company') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step5">
-                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);">
-                                        <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
-                                    </div>
                                     <div class="col m12 s12 l12"></div>
                                     <div class="input-field col m3 s12 step6">
-                                        <select class="form-control" id="type" name="type" onchange="resetItem();">
-                                            <option value="1">Potongan Nominal (Invoice)</option>
-                                            <option value="2">Potongan Qty (Invoice)</option>
-                                            <option value="3">Mandiri</option>
+                                        <input id="post_date" name="post_date" min="{{ $minDate }}" max="{{ $maxDate }}" type="date" placeholder="Tgl. posting" value="{{ date('Y-m-d') }}" onchange="changeDateMinimum(this.value);loadCurrency();">
+                                        <label class="active" for="post_date">{{ __('translations.post_date') }}</label>
+                                    </div>
+
+                                    <div class="input-field col m3 s12 step9">
+                                        <select class="form-control" id="currency_id" name="currency_id" onchange="loadCurrency();">
+                                            @foreach ($currency as $row)
+                                                <option value="{{ $row->id }}" data-code="{{ $row->code }}">{{ $row->code.' '.$row->name }}</option>
+                                            @endforeach
                                         </select>
-                                        <label class="" for="type">Tipe Memo</label>
+                                        <label class="" for="currency_id">{{ __('translations.currency') }}</label>
                                     </div>
-                                    <div class="input-field col m3 s12 step7">
-                                        <input id="tax_no" name="tax_no" type="text" placeholder="Nomor faktur pajak dari Customer">
-                                        <label class="active" for="tax_no">No. Seri Pajak</label>
+                                    <div class="input-field col m3 s12 step10">
+                                        <input id="currency_rate" name="currency_rate" type="text" value="1" onkeyup="formatRupiah(this)">
+                                        <label class="active" for="currency_rate">{{ __('translations.conversion') }}</label>
                                     </div>
-                                    <div class="col m4 s12 step8">
+                                    <div class="input-field col m3 s12 step14">
+                                        <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
+                                        <label class="active" for="note">{{ __('translations.note') }}</label>
+                                    </div>
+                                    <div class="col m12 s12 l12"></div>
+                                    <div class="input-field col m3 s12 step10">
+                                        <input id="nominal" name="nominal" type="text" value="0,00" onfocus="emptyThis(this);" onkeyup="formatRupiah(this);countFromHeader();">
+                                        <label class="active" for="nominal">Nominal Uang Masuk (Grandtotal)</label>
+                                    </div>
+                                    <div class="col m5 s12 step8">
                                         <label class="">Bukti Upload</label>
                                         <br>
                                         <input type="file" name="file" id="fileInput" accept="image/*" style="display: none;">
                                         <div  class="col m8 s12 " id="dropZone" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);" style="margin-top: 0.5em;height: 5em;">
                                             Drop image here or <a href="javascript:void(0);" id="uploadLink">upload</a>
                                             <br>
-                                            
+
                                         </div>
                                         <a class="waves-effect waves-light cyan btn-small" style="margin-top: 0.5em;margin-left:0.2em" id="clearButton" href="javascript:void(0);">
                                            Clear
                                         </a>
                                     </div>
-                                    <div class="col m4 s4 l4"></div>
-            
                                     <div class="col m4 s12">
                                         <div id="fileName"></div>
                                         <img src="" alt="Preview" id="imagePreview" style="display: none;">
@@ -255,62 +270,39 @@
                             </div>
                             <div class="col s12">
                                 <fieldset>
-                                    <legend>2. Dokumen Terpakai</legend>
-                                    <div class="col m3 s12 step9">
-                                        <h6>Hapus untuk bisa diakses pengguna lain : <i id="list-used-data"></i></h6>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="col s12">
-                                <fieldset style="min-width: 100%;overflow:auto;">
-                                    <legend>3. Detail Dokumen Terpakai</legend>
-                                    <div class="row">
-                                        <div class="input-field col m2 step10">
-                                            <select class="browser-default" id="marketing_order_invoice_id" name="marketing_order_invoice_id"></select>
-                                            <label class="active" for="marketing_order_invoice_id">AR Invoice</label>
+                                    <fieldset>
+                                        <legend>2. Pajak</legend>
+                                        <div class="input-field col m3 s12 step11">
+                                            <select class="browser-default" id="prefix_tax" name="prefix_tax" onchange="countAll();">
+                                                <option value="010">010</option>
+                                            </select>
+                                            <label class="active" for="prefix_tax">Kode Transaksi Pajak</label>
                                         </div>
-                                        <div class="col m1 pt-1">
-                                            <a class="btn-floating mb-1 waves-effect waves-light" onclick="getMarketingInvoice();" href="javascript:void(0);">
-                                                <i class="material-icons">add</i>
-                                            </a>
+                                        <div class="input-field col m3 s12 step11">
+                                            <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
+                                                <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
+                                                @foreach ($tax as $row)
+                                                    <option value="{{ $row->percentage }}" data-id="{{ $row->id }}" {{ $row->is_default_ppn ? 'selected' : '' }}>{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
+                                                @endforeach
+                                            </select>
+                                            <label class="active" for="tax_id">PPN</label>
                                         </div>
-                                        <div class="col m9">
-                                            Untuk tipe Memo : potongan nominal dan potongan qty, maka anda bisa mengambil data dari AR Invoice.
+                                        <div class="input-field col m3 s12 step12">
+                                            <select class="browser-default" id="is_include_tax" name="is_include_tax" onchange="countAll();">
+                                                <option value="0">--Tidak--</option>
+                                                <option value="1">--Ya--</option>
+                                            </select>
+                                            <label class="active" for="is_include_tax">Termasuk PPN</label>
                                         </div>
-                                    </div> 
-                                    <div class="col m12 s12 step11" style="max-width:2500px !important;" id="table-item">
-                                        <p class="mt-2 mb-2">
-                                            <table class="bordered" id="table-detail">
-                                                <thead>
-                                                    <tr>
-                                                        <th class="center">Dokumen</th>
-                                                        <th class="center">Seri Pajak</th>
-                                                        <th class="center">Tgl.Post</th>
-                                                        <th class="center">{{ __('translations.note') }}</th>
-                                                        <th class="center">{{ __('translations.item') }}</th>
-                                                        <th class="center">{{ __('translations.qty') }}</th>
-                                                        <th class="center">{{ __('translations.unit') }}</th>
-                                                        <th class="center">{{ __('translations.total') }}</th>
-                                                        <th class="center">{{ __('translations.tax') }}</th>
-                                                        <th class="center">Grandtotal (Sisa)</th>
-                                                        <th class="center">{{ __('translations.delete') }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="body-item">
-                                                    <tr id="last-row-item">
-                                                        <td colspan="11">
-                                                            Silahkan tambahkan AR Invoice
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </p>
-                                    </div>
+                                        <div class="input-field col m3 s12 step13">
+                                            <input id="tax_no" name="tax_no" type="text" placeholder="Auto generate : pajak > 0">
+                                            <label class="active" for="tax_no">No. Seri Pajak <i class="material-icons tooltipped" data-position="bottom" data-tooltip="Info : No seri pajak diambil berdasarkan perusahaan dan tanggal posting (berlaku) dokumen." style="margin-left:5px;margin-top: 0px;position: absolute;">help_outline</i></label>
+                                        </div>
+                                    </fieldset>
                                 </fieldset>
                             </div>
                             <div class="input-field col m4 s12 step12">
-                                <textarea class="materialize-textarea" id="note" name="note" placeholder="Catatan / Keterangan" rows="3"></textarea>
-                                <label class="active" for="note">{{ __('translations.note') }}</label>
+
                             </div>
                             <div class="input-field col m2 s12">
 
@@ -318,39 +310,34 @@
                             <div class="input-field col m6 s12 step13">
                                 <table width="100%" class="bordered">
                                     <thead>
-                                        <tr class="row-mandiri" style="display:none;">
-                                            <td style="font-size: 15px !important;" width="20%">Total</td>
-                                            <td colspan="2" width="40%">
-                                                <input class="browser-default" id="temptotal" name="temptotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;border: 2px solid rgb(1, 184, 25);border-radius: 4px;" onkeyup="formatRupiah(this);countAll();">
-                                            </td>
-                                            <td class="right-align" width="40%">
-                                                <input class="browser-default" id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);countAll();">
+                                        <tr>
+                                            <td width="50%">Subtotal</td>
+                                            <td width="50%" class="right-align">
+                                                <input id="subtotal" name="subtotal" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
-                                        <tr class="row-mandiri" style="display:none;">
-                                            <td style="font-size: 15px !important;">PPN</td>
-                                            <td style="font-size: 15px !important;">
-                                                <select class="browser-default" id="tax_id" name="tax_id" onchange="countAll();">
-                                                    <option value="0" data-id="0">-- Pilih ini jika non-PPN --</option>
-                                                    @foreach ($tax as $row)
-                                                        <option value="{{ $row->percentage }}" {{ $row->is_default_ppn ? 'selected' : '' }} data-id="{{ $row->id }}">{{ $row->name.' - '.number_format($row->percentage,2,',','.').'%' }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td style="font-size: 15px !important;">
-                                                <label>
-                                                    <input type="checkbox" id="is_include_tax" name="is_include_tax[]" value="1" onclick="countAll();">
-                                                    <span>Incl.PPN</span>
-                                                </label>
-                                            </td>
+                                        {{-- <tr>
+                                            <td>Discount (Isi disini)</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);">
+                                                <input id="discount" name="discount" type="text" value="0,00" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100%;">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td style="font-size: 15px !important;" colspan="3">Grandtotal</td>
+                                            <td>Total</td>
                                             <td class="right-align">
-                                                <input class="browser-default" id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size: 20px !important;" readonly onkeyup="formatRupiah(this);">
+                                                <input id="total" name="total" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
+                                            </td>
+                                        </tr> --}}
+                                        <tr>
+                                            <td>PPN</td>
+                                            <td class="right-align">
+                                                <input id="tax" name="tax" type="text" value="0,00" style="text-align:right;width:100%;border-bottom:none;" readonly>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><h6>Grandtotal</h6></td>
+                                            <td class="right-align">
+                                                <input id="grandtotal" name="grandtotal" type="text" value="0,00" style="text-align:right;width:100%;font-size:20px;border-bottom:none;" readonly>
                                             </td>
                                         </tr>
                                     </thead>
@@ -375,7 +362,7 @@
     <div class="modal-content">
         <div class="row">
             <div class="col s12" id="show_print">
-                
+
             </div>
         </div>
     </div>
@@ -437,7 +424,7 @@
                             </li>
                             <li class="indicator" style="left: 0px; right: 0px;"></li>
                         </ul>
-                        <div id="range-tabs" style="display: block;" class="">                           
+                        <div id="range-tabs" style="display: block;" class="">
                             <div class="row ml-2 mt-2">
                                 <div class="row">
                                     <div class="input-field col m2 s12">
@@ -460,7 +447,7 @@
                                         <input id="range_start" name="range_start" min="0" type="number" placeholder="1">
                                         <label class="" for="range_end">No Awal</label>
                                     </div>
-                                    
+
                                     <div class="input-field col m1 s12">
                                         <input id="range_end" name="range_end" min="0" type="number" placeholder="1">
                                         <label class="active" for="range_end">No akhir</label>
@@ -477,7 +464,7 @@
                                     <input id="range_comma" name="range_comma" type="text" placeholder="1,2,5....">
                                     <label class="" for="range_end">Masukkan angka dengan koma</label>
                                 </div>
-                               
+
                                 <div class="input-field col m1 s12">
                                     <label>
                                         <input name="type_date" type="radio" value="2"/>
@@ -488,10 +475,10 @@
                                 <div class="col s12 mt-3">
                                     <button class="btn waves-effect waves-light right submit" onclick="printMultiSelect();">Print <i class="material-icons right">send</i></button>
                                 </div>
-                            </div>                         
+                            </div>
                         </div>
                         <div id="date-tabs" style="display: none;" class="">
-                            
+
                         </div>
                     </div>
                 </form>
@@ -507,7 +494,7 @@
     <div class="modal-content">
         <div class="row" >
             <div class="col m3 s12">
-                
+
             </div>
             <div class="col m6 s12">
                 <h4 id="title_data" style="text-align:center"></h4>
@@ -554,7 +541,7 @@
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Debit</th>
                             <th class="center-align" style="@if(app()->getLocale() == 'chi') font-weight:normal !important;@endif">Kredit</th>
                         </tr>
-                    
+
                 </thead>
                 <tbody id="body-journal-table">
                 </tbody>
@@ -608,7 +595,7 @@
     function handleFile(file) {
         if (file) {
         const reader = new FileReader();
-        const fileType = file.type.split('/')[0]; 
+        const fileType = file.type.split('/')[0];
         const maxSize = 10 * 1024 * 1024;
         if (file.size > maxSize) {
             alert('File size exceeds the maximum limit of 10 MB.');
@@ -616,18 +603,18 @@
         }
 
         reader.onload = () => {
-           
+
             fileNameDiv.textContent = 'File uploaded: ' + file.name;
 
             if (fileType === 'image') {
-                
+
                 imagePreview.src = reader.result;
                 imagePreview.style.display = 'inline-block';
-                clearButton.style.display = 'inline-block'; 
+                clearButton.style.display = 'inline-block';
             } else {
-               
+
                 imagePreview.style.display = 'none';
-               
+
             }
         };
 
@@ -635,16 +622,16 @@
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file);
 
-       
+
         fileInput.files = dataTransfer.files;
-         
+
         }
     }
-    
+
     clearButton.addEventListener('click', () => {
-        imagePreview.src = ''; 
+        imagePreview.src = '';
         imagePreview.style.display = 'none';
-        fileInput.value = ''; 
+        fileInput.value = '';
         fileNameDiv.textContent = '';
     });
 
@@ -663,22 +650,22 @@
 
     function displayFile(fileLink) {
         const fileType = getFileType(fileLink);
-       
+
         fileNameDiv.textContent = 'File uploaded: ' + getFileName(fileLink);
 
         if (fileType === 'image') {
-        
+
             imagePreview.src = fileLink;
             imagePreview.style.display = 'inline-block';
-          
+
         } else {
-         
+
             imagePreview.style.display = 'none';
-           
-            
+
+
             const fileExtension = getFileExtension(fileLink);
             if (fileExtension === 'pdf' || fileExtension === 'xlsx' || fileExtension === 'docx') {
-               
+
                 const downloadLink = document.createElement('a');
                 downloadLink.href = fileLink;
                 downloadLink.download = getFileName(fileLink);
@@ -710,13 +697,13 @@
         if (event.target.closest('.modal-content')) {
             document.body.classList.add('tab-active');
         }
-        
-        
+
+
         if (activeSelect2 && !select2Container) {
             activeSelect2.classList.remove('tab-active');
         }
 
-        
+
         if (select2Container) {
             select2Container.classList.add('tab-active');
         }
@@ -747,9 +734,9 @@
 
         $('#modal4').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#show_detail').empty();
@@ -757,14 +744,14 @@
         });
 
         window.table.search('{{ $code }}').draw();
-        
+
         $('#modal1').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
                 $('#post_date').attr('min','{{ $minDate }}');
                 $('#post_date').attr('max','{{ $maxDate }}');
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 $('#validation_alert').hide();
                 $('#validation_alert').html('');
                 M.updateTextFields();
@@ -775,7 +762,7 @@
                     return 'You will lose all changes made since your last save';
                 };
                 if(!$('#temp').val()){
-                    
+
                 }
             },
             onCloseEnd: function(modal, trigger){
@@ -805,9 +792,9 @@
 
         $('#modal2').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
                 window.print();
             },
             onCloseEnd: function(modal, trigger){
@@ -817,9 +804,9 @@
 
         $('#modal3').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#myDiagramDiv').remove();
@@ -833,7 +820,7 @@
         $('#modal5').modal({
             dismissible: false,
             onOpenStart: function(modal,trigger) {
-                
+
             },
             onOpenEnd: function(modal, trigger) {
                 $('#validation_alert_multi').hide();
@@ -848,13 +835,13 @@
 
         $('#modal6').modal({
             onOpenStart: function(modal,trigger) {
-                
+
             },
-            onOpenEnd: function(modal, trigger) { 
+            onOpenEnd: function(modal, trigger) {
             },
             onCloseEnd: function(modal, trigger){
                 $('#title_data').empty();
-                $('#code_data').empty();             
+                $('#code_data').empty();
                 $('#body-journal-table').empty();
                 $('#user_jurnal').empty();
                 $('#note_jurnal').empty();
@@ -906,10 +893,10 @@
             countAll();
             if($('.row_item').length == 0){
                 if($('.data-used').length > 0){
-                    $('.data-used').trigger('click');   
-                }                
-                $('#table-item').animate( { 
-                    scrollLeft: '0' }, 
+                    $('.data-used').trigger('click');
+                }
+                $('#table-item').animate( {
+                    scrollLeft: '0' },
                 500);
             }
         });
@@ -917,7 +904,7 @@
 
     function resetItem(){
         if($('.data-used').length > 0){
-            $('.data-used').trigger('click');   
+            $('.data-used').trigger('click');
         }
         $('#body-item').empty().append(`
             <tr id="last-row-item">
@@ -1056,7 +1043,7 @@
     }
 
     function checkRow(val){
-        var total = parseFloat($('#arr_grandtotal' + val).val().replaceAll(".", "").replaceAll(",",".")), 
+        var total = parseFloat($('#arr_grandtotal' + val).val().replaceAll(".", "").replaceAll(",",".")),
             totalLimit = parseFloat($('#arr_grandtotal' + val).data('nominal').replaceAll(".", "").replaceAll(",","."));
 
         if(totalLimit > 0){
@@ -1066,7 +1053,7 @@
             }
         }
     }
-    
+
     function printMultiSelect(){
         var formData = new FormData($('#form_data_print_multi')[0]);
         var table = $('#datatable_serverside').DataTable();
@@ -1075,7 +1062,7 @@
         var path = window.location.pathname;
         path = path.replace(/^\/|\/$/g, '');
 
-        
+
         var segments = path.split('/');
         var lastSegment = segments[segments.length - 1];
         formData.append('tabledata',etNumbers);
@@ -1120,13 +1107,13 @@
                         } else if(response.status == 422) {
                             $('#validation_alert_multi').show();
                             $('.modal-content').scrollTop(0);
-                            
+
                             swal({
                                 title: 'Ups! Validation',
                                 text: 'Check your form.',
                                 icon: 'warning'
                             });
-                            
+
                             $.each(response.error, function(i, val) {
                                 $.each(val, function(i, val) {
                                     $('#validation_alert_multi').append(`
@@ -1156,11 +1143,11 @@
                             icon: 'error'
                         });
                     }
-                    
+
                 });
             }
         });
-        
+
     }
 
     function makeTreeOrg(data,link){
@@ -1172,11 +1159,11 @@
             initialContentAlignment: go.Spot.Center,
             "undoManager.isEnabled": true,
             layout: $(go.TreeLayout,
-            { 
+            {
                 angle: 180,
-                path: go.TreeLayout.PathSource,  
-                setsPortSpot: false, 
-                setsChildPortSpot: false,  
+                path: go.TreeLayout.PathSource,
+                setsPortSpot: false,
+                setsChildPortSpot: false,
                 arrangement: go.TreeLayout.ArrangementHorizontal
             })
         });
@@ -1198,8 +1185,8 @@
         myDiagram.addDiagramListener("ObjectDoubleClicked", function(e) {
             var part = e.subject.part;
             if (part instanceof go.Link) {
-                
-                
+
+
             } else if (part instanceof go.Node) {
                 window.open(part.data.url);
                 if (part.isTreeExpanded) {
@@ -1207,7 +1194,7 @@
                 } else {
                     part.expandTree();
                 }
-                
+
             }
         });
         myDiagram.nodeTemplate =
@@ -1216,10 +1203,10 @@
             locationSpot: go.Spot.Center,
             fromSpot: go.Spot.AllSides,
             toSpot: go.Spot.AllSides,
-            portId: "",  
+            portId: "",
 
             },
-            { isTreeExpanded: false },  
+            { isTreeExpanded: false },
             $(go.Shape, { fill: "lightgrey", strokeWidth: 0 },
             new go.Binding("fill", "color")),
             $(go.Panel, "Table",
@@ -1243,7 +1230,7 @@
                 defaultAlignment: go.Spot.Left,
                 }
             ),
-            
+
             $(go.Panel, "Auto",
                 { portId: "r" },
                 { margin: 6 },
@@ -1256,17 +1243,17 @@
             )
         );
         myDiagram.model.root = data[0].key;
-        
+
 
         myDiagram.addDiagramListener("InitialLayoutCompleted", function(e) {
         setTimeout(function() {
-            
-            var rootKey = data[0].key; 
+
+            var rootKey = data[0].key;
             var rootNode = myDiagram.findNodeForKey(rootKey);
             if (rootNode !== null) {
                 rootNode.collapseTree();
             }
-        }, 100); 
+        }, 100);
         });
 
         myDiagram.layout = $(go.TreeLayout);
@@ -1284,8 +1271,8 @@
             copiesArrayObjects: true,
             nodeDataArray: data,
             linkDataArray: link
-        });    
-            
+        });
+
     }
 
     function viewStructureTree(id){
@@ -1293,7 +1280,7 @@
             url: '{{ Request::url() }}/viewstructuretree',
             type: 'GET',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id
             },
             headers: {
@@ -1306,7 +1293,7 @@
                 loadingClose('.modal-content');
 
                 makeTreeOrg(response.message,response.link);
-                
+
                 $('#modal3').modal('open');
             },
             error: function() {
@@ -1379,7 +1366,7 @@
             url: '{{ Request::url() }}/remove_used_data',
             type: 'POST',
             dataType: 'JSON',
-            data: { 
+            data: {
                 id : id,
                 type : type,
             },
@@ -1387,7 +1374,7 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             beforeSend: function() {
-                
+
             },
             success: function(response) {
                 $('.row_item[data-id="' + id + '"]').remove();
@@ -1400,7 +1387,7 @@
                         </tr>
                     `);
                 }
-                
+
                 countAll();
             },
             error: function() {
@@ -1540,7 +1527,7 @@
                 });
             }
         });
-        
+
     }
 
     function rowDetail(data) {
@@ -1580,7 +1567,7 @@
             }
         }).then(function (willDelete) {
             if (willDelete) {
-                
+
                 /* if($('#type').val() == '3'){
                     swal({
                         title: 'Ups!',
@@ -1589,29 +1576,24 @@
                     });
                 }else{ */
                     var formData = new FormData($('#form_data')[0]), passedTax = true;
-                
-                    $('input[name^="arr_tax[]"]').each(function(index){
-                        if(parseFloat($(this).val().replaceAll(".", "").replaceAll(",",".")) > 0){
-                            if(!$('#tax_no').val()){
-                                passedTax = false;
-                            }
-                        }
-                    });
+                    formData.append('tax_id',$('#tax_id').find(':selected').data('id'));
+                    formData.append('percent_tax',$('#tax_id').val());
+
 
                     formData.append('real_tax',($('#type').val() == '3' ? ($('#tax_id').val() ? $('#tax_id').find(':selected').data('id') : '' ) : ''));
-                    
+
                     if(passedTax){
                         var path = window.location.pathname;
-                    path = path.replace(/^\/|\/$/g, '');
+                        path = path.replace(/^\/|\/$/g, '');
 
-                    
-                    var segments = path.split('/');
-                    var lastSegment = segments[segments.length - 1];
-                
-                    formData.append('lastsegment',lastSegment);
-                    
+
+                        var segments = path.split('/');
+                        var lastSegment = segments[segments.length - 1];
+
+                        formData.append('lastsegment',lastSegment);
+
                         $.ajax({
-                            
+
                             url: '{{ Request::url() }}/create',
                             type: 'POST',
                             dataType: 'JSON',
@@ -1642,7 +1624,7 @@
                                     $.each(response.error, function(field, errorMessage) {
                                         $('#' + field).addClass('error-input');
                                         $('#' + field).css('border', '1px solid red');
-                                        
+
                                     });
                                     swal({
                                         title: 'Ups! Validation',
@@ -1688,7 +1670,7 @@
                         });
                     }
                 /* } */
-    
+
             }
         });
     }
@@ -1696,6 +1678,45 @@
     function success(){
         loadDataTable();
         $('#modal1').modal('close');
+    }
+
+    function getTaxSeries(){
+        if($('#company_id').val() && !$('#temp').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_tax_series',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    company_id: $('#company_id').val(),
+                    date: $('#post_date').val(),
+                    prefix_tax: $('#prefix_tax').val(),
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-content');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    if(response.status == 200){
+                        $('#tax_no').val(response.no);
+                    }else{
+                        M.toast({
+                            html: response.message
+                        });
+                        $('#tax_id').val('0').trigger('change');
+                    }
+                },
+                error: function() {
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 
     function show(id){
@@ -1714,13 +1735,13 @@
             },
             success: function(response) {
                 loadingClose('#main');
+                $('#modal1').modal('open');
                 if(response.document){
                     const baseUrl = 'http://127.0.0.1:8000/storage/';
                     const filePath = response.document.replace('public/', '');
                     const fileUrl = baseUrl + filePath;
                     displayFile(fileUrl);
                 }
-                $('#modal1').modal('open');
                 $('#temp').val(id);
                 $('#code_place_id').val(response.code_place_id).formSelect();
                 $('#code').val(response.code);
@@ -1728,87 +1749,24 @@
                 $('#account_id').append(`
                     <option value="` + response.account_id + `">` + response.account_name + `</option>
                 `);
+                $('#type').val(response.type).formSelect();
                 $('#company_id').val(response.company_id).formSelect();
+                $('#currency_id').val(response.currency_id).formSelect();
+                $('#currency_rate').val(response.currency_rate);
                 $('#post_date').val(response.post_date);
                 $('#tax_no').val(response.tax_no);
-                $('#note').val(response.note);
-                $('#grandtotal').val(response.balance);
-                if(response.type == '3'){
-                    $('#temptotal,#total').val(response.total);
-                    $('#tax').val(response.tax);
-                    $('.row-mandiri').show();
-                    if(response.tax_id){
-                        $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
-                    }
-                }
-                $('#type').val(response.type).formSelect();
+                $('#is_include_tax').val(response.is_include_tax);
+                $("#tax_id option[data-id='" + response.tax_id + "']").prop("selected",true);
 
-                if(response.details.length > 0){
-                    if($('.data-used').length > 0){
-                        $('.data-used').trigger('click');
-                    }
-                    if($('#last-row-item').length > 0){
-                        $('#last-row-item').remove();
-                    }
-                    $.each(response.used, function(i, val) {
-                        $('#list-used-data').append(`
-                            <div class="chip purple darken-4 gradient-shadow white-text">
-                                ` + val.code + `
-                                <i class="material-icons close data-used" onclick="removeUsedData('` + val.type + `','` + val.id + `')">close</i>
-                            </div>
-                        `);
-                    });
-                    $.each(response.details, function(i, val) {
-                        var count = makeid(10);
-                        $('#body-item').append(`
-                            <tr class="row_item" data-id="` + val.id + `">
-                                <input type="hidden" name="arr_lookable_type[]" id="arr_lookable_type` + count + `" value="` + val.lookable_type + `">
-                                <input type="hidden" name="arr_lookable_id[]" id="arr_lookable_id` + count + `" value="` + val.lookable_id + `">
-                                <input type="hidden" name="arr_is_include_tax[]" id="arr_is_include_tax` + count + `" value="` + val.is_include_tax + `">
-                                <input type="hidden" name="arr_percent_tax[]" id="arr_percent_tax` + count + `" value="` + val.percent_tax + `">
-                                <input type="hidden" name="arr_tax_id[]" id="arr_tax_id` + count + `" value="` + val.tax_id + `">
-                                <td>
-                                    ` + val.code + `
-                                </td>
-                                <td>
-                                    ` + val.tax_no + `
-                                </td>
-                                <td class="center">
-                                    ` + val.post_date + `
-                                </td>
-                                <td>
-                                    <input name="arr_note[]" class="materialize-textarea" type="text" placeholder="Keterangan detail..." value="` + val.note + `">
-                                </td>
-                                <td>
-                                        ` + val.item_name + `
-                                </td>
-                                <td>
-                                    <input name="arr_qty[]" id="rowQty` + count + `" type="text" value="` + val.qty + `" onkeyup="formatRupiahNoMinus(this);countRow('` + count + `')" data-qty="` + val.qty + `" style="text-align:right;" ` + (response.type == '1' ? 'readonly' : '') + `>
-                                </td>
-                                <td class="center">
-                                    <span>` + val.unit + `</span>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_total[]" class="browser-default" type="text" value="` + val.total + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_total`+ count +`" readonly>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_tax[]" class="browser-default" type="text" value="` + val.tax + `" onkeyup="formatRupiah(this);countAll();" style="text-align:right;width:100% !important;" id="arr_tax`+ count +`" readonly>
-                                </td>
-                                <td class="center">
-                                    <input name="arr_grandtotal[]" class="browser-default" type="text" value="` + val.grandtotal + `" data-nominal="` + val.grandtotal + `" onkeyup="formatRupiah(this);countAll();checkRow('` + count + `');" style="text-align:right;width:100% !important;" id="arr_grandtotal`+ count +`">
-                                </td>
-                                <td class="center">
-                                    <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);">
-                                        <i class="material-icons">delete</i>
-                                    </a>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
-                countAll();
+
+                $('#nominal').val(response.subtotal);
+
+
+                $('#note').val(response.note);
+                $('#grandtotal').val(response.grandtotal);
+                $('#tax').val(response.tax);
+                $('#subtotal').val(response.total);
                 $('.modal-content').scrollTop(0);
-                $('#note').focus();
                 M.updateTextFields();
             },
             error: function() {
@@ -1842,7 +1800,7 @@
                         loadingOpen('.modal-content');
                     },
                     complete: function() {
-                        
+
                     },
                     success: function(data){
                         loadingClose('.modal-content');
@@ -1851,10 +1809,10 @@
                             'url': data
                         })
                     }
-                });  
+                });
             }
         });
-        
+
     }
 
     function voidStatus(id){
@@ -1940,7 +1898,7 @@
     }
 
     function countRow(id){
-        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")), 
+        var qty = parseFloat($('#rowQty' + id).val().replaceAll(".", "").replaceAll(",",".")),
             qtylimit = parseFloat($('#rowQty' + id).data('qty').toString().replaceAll(".", "").replaceAll(",","."));
 
         if(qtylimit > 0){
@@ -1959,7 +1917,7 @@
 
     var printService = new WebSocketPrinter({
         onConnect: function () {
-            
+
         },
         onDisconnect: function () {
             /* M.toast({
@@ -1967,7 +1925,7 @@
             }); */
         },
         onUpdate: function (message) {
-            
+
         },
     });
 
@@ -1979,7 +1937,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2003,43 +1961,45 @@
     }
 
     function countAll(){
-        let grandtotal = 0, tax = 0;
 
-        if($('#type').val() == '3'){
-            let total = parseFloat($('#temptotal').val().replaceAll(".", "").replaceAll(",","."));
-            if($('#tax_id').val() !== '0'){
-                let percent_tax = parseFloat($('#tax_id').val());
-                if($('#is_include_tax').is(':checked')){
-                    total = Math.round(((total / (1 + (percent_tax / 100))) * 100) / 100);
-                }
-                tax = total * (percent_tax / 100);
+        let nominal = parseFloat($('#nominal').val().replaceAll(".", "").replaceAll(",",".")), subtotal = 0, tax = 0, grandtotal = 0, percent_tax = $('#tax_id').val();
+
+        subtotal = nominal;
+
+        if(percent_tax > 0){
+            if($('#is_include_tax').val() == '1'){
+                subtotal = Math.floor((subtotal / (1 + (percent_tax / 100))));
             }
-            $('#total').val(
-                (total >= 0 ? '' : '-') + formatRupiahIni(total.toFixed(2).toString().replace('.',','))
-            );
-            $('#tax').val(
-                (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
-            );
-            grandtotal = total + tax;
-        }else{
-            $('input[name^="arr_grandtotal[]"]').each(function(index){
-                let rowgrandtotal = parseFloat($(this).val().replaceAll(".", "").replaceAll(",","."));
-                let percentTax = parseFloat($('input[name^="arr_percent_tax[]"]').eq(index).val());
-                let rowtotal = rowgrandtotal;
-                let rowtax = 0;
-                if(percentTax > 0){
-                    rowtotal = rowgrandtotal / ((percentTax + 100) / 100);
-                    rowtax = rowtotal * (percentTax / 100);
-                }
-                $('input[name^="arr_total[]"]').eq(index).val(formatRupiahIni(rowtotal.toFixed(2).toString().replace('.',',')));
-                $('input[name^="arr_tax[]"]').eq(index).val(formatRupiahIni(rowtax.toFixed(2).toString().replace('.',',')));
-                grandtotal += rowgrandtotal;
-            });
+            tax = Math.floor(subtotal * (percent_tax / 100));
         }
+
+        if(tax > 0 && $('#is_include_tax').val() == '1'){
+            subtotal = nominal - tax;
+        }
+
+        grandtotal = subtotal + tax;
+
+        $('#subtotal').val(
+            (subtotal >= 0 ? '' : '-') + formatRupiahIni(subtotal.toFixed(2).toString().replace('.',','))
+        );
+
+        $('#tax').val(
+            (tax >= 0 ? '' : '-') + formatRupiahIni(tax.toFixed(2).toString().replace('.',','))
+        );
 
         $('#grandtotal').val(
             (grandtotal >= 0 ? '' : '-') + formatRupiahIni(grandtotal.toFixed(2).toString().replace('.',','))
         );
+
+        if(tax > 0){
+            $('#textTax').show();
+            if(!$('#tax_no').val()){
+                getTaxSeries();
+            }
+        }else{
+            $('#textTax').hide();
+            $('#tax_no').val('');
+        }
     }
 
     function startIntro(){
@@ -2063,62 +2023,62 @@
                 {
                     title : 'Customer',
                     element : document.querySelector('.step3'),
-                    intro : 'Partner bisnis tipe Pelanggan. Silahkan pilih sesuai dengan customer yang ingin ditagihkan invoice. Hati-hati ketika memilih partner bisnis maka, daftar surat jalan akan terfilter sesuai BP ini.' 
+                    intro : 'Partner bisnis tipe Pelanggan. Silahkan pilih sesuai dengan customer yang ingin ditagihkan invoice. Hati-hati ketika memilih partner bisnis maka, daftar surat jalan akan terfilter sesuai BP ini.'
                 },
                 {
                     title : 'Perusahaan',
                     element : document.querySelector('.step4'),
-                    intro : 'Perusahaan dimana dokumen ini dibuat.' 
+                    intro : 'Perusahaan dimana dokumen ini dibuat.'
                 },
                 {
                     title : 'Tgl. Posting',
                     element : document.querySelector('.step5'),
-                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.' 
+                    intro : 'Tanggal post akan menentukan tanggal jurnal untuk beberapa form yang terhubung dengan jurnal. Hati - hati dalam menentukan tanggal posting.'
                 },
                 {
                     title : 'Tipe Memo',
                     element : document.querySelector('.step6'),
-                    intro : 'Tipe memo dibagi menjadi 3, yang pertama adalah Tipe Nominal (Invoice) dimana memo akan memotong secara nominal AR Invoice yang terpilih. Tipe kedua adalah Tipe Qty (Invoice) dimana memo akan memotong secara qty dan nominal proporsional sesuai sisa tagihan AR Invoice terpilih. Tipe yang ketiga adalah Tipe Mandiri, yang mana digunakan untuk menerbitkan potongan penjualan untuk beberapa AR Invoice secara nominal rupiah. Khusus untuk tipe ketiga AR Memo bisa ditarik ke Kas / Bank Masuk untuk memotong piutang usaha, dan bisa ditarik ke Payment Request untuk dibayarkan kembali kepada customer.' 
+                    intro : 'Tipe memo dibagi menjadi 3, yang pertama adalah Tipe Nominal (Invoice) dimana memo akan memotong secara nominal AR Invoice yang terpilih. Tipe kedua adalah Tipe Qty (Invoice) dimana memo akan memotong secara qty dan nominal proporsional sesuai sisa tagihan AR Invoice terpilih. Tipe yang ketiga adalah Tipe Mandiri, yang mana digunakan untuk menerbitkan potongan penjualan untuk beberapa AR Invoice secara nominal rupiah. Khusus untuk tipe ketiga AR Memo bisa ditarik ke Kas / Bank Masuk untuk memotong piutang usaha, dan bisa ditarik ke Payment Request untuk dibayarkan kembali kepada customer.'
                 },
                 {
                     title : 'Nomor Seri PPN dari Customer',
                     element : document.querySelector('.step7'),
-                    intro : 'Nomor seri PPN yang anda dapatkan dari Customer sebagai referensi pemotongan pajak.' 
+                    intro : 'Nomor seri PPN yang anda dapatkan dari Customer sebagai referensi pemotongan pajak.'
                 },
                 {
                     title : 'File Lampiran',
                     element : document.querySelector('.step8'),
-                    intro : 'File bukti lampiran yang ingin digunakan sebagai bukti. Hanya bisa mengupload 1 file saja.' 
+                    intro : 'File bukti lampiran yang ingin digunakan sebagai bukti. Hanya bisa mengupload 1 file saja.'
                 },
                 {
                     title : 'Data Dokumen Terpakai',
                     element : document.querySelector('.step9'),
-                    intro : 'Daftar dokumen terpakai, fungsinya untuk mengunci data agar hanya terpakai pada form dan user aktif saat ini saja. Silahkan hapus jika ingin diakses oleh user lainnya.' 
+                    intro : 'Daftar dokumen terpakai, fungsinya untuk mengunci data agar hanya terpakai pada form dan user aktif saat ini saja. Silahkan hapus jika ingin diakses oleh user lainnya.'
                 },
                 {
                     title : 'AR Invoice',
                     element : document.querySelector('.step10'),
-                    intro : 'Daftar AR Invoice yang ingin ditambahkan untuk dipotong.' 
+                    intro : 'Daftar AR Invoice yang ingin ditambahkan untuk dipotong.'
                 },
                 {
                     title : 'Tabel Detail',
                     element : document.querySelector('.step11'),
-                    intro : 'Daftar sementara informasi dokumen / coa yang ditambahkan dari menu sebelumnya.' 
+                    intro : 'Daftar sementara informasi dokumen / coa yang ditambahkan dari menu sebelumnya.'
                 },
                 {
                     title : 'Keterangan',
                     element : document.querySelector('.step12'),
-                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.' 
+                    intro : 'Silahkan isi / tambahkan keterangan untuk dokumen ini untuk dimunculkan di bagian bawah tabel detail produk nantinya, ketika dicetak.'
                 },
                 {
                     title : 'Informasi Nominal',
                     element : document.querySelector('.step13'),
-                    intro : 'Nominal yang ada disini tidak bisa dirubah, karena otomatis dihitung dari dokumen pada tabel sebelumnya.' 
+                    intro : 'Nominal yang ada disini tidak bisa dirubah, karena otomatis dihitung dari dokumen pada tabel sebelumnya.'
                 },
                 {
                     title : 'Tombol Simpan',
                     element : document.querySelector('.step14'),
-                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.' 
+                    intro : 'Silahkan tekan tombol ini untuk menyimpan data, namun pastikan data yang akan anda masukkan benar.'
                 },
             ]
         }).start();
@@ -2132,7 +2092,7 @@
                 loadingOpen('.modal-content');
             },
             complete: function() {
-                
+
             },
             success: function(data){
                 loadingClose('.modal-content');
@@ -2193,6 +2153,16 @@
             }
         });
     }
+    function countFromHeader(){
+        /* if($('.row_item').length > 0){
+            M.toast({
+                html: 'Silahkan hapus baris SO/MO untuk perhitungan dari Nominal Masuk atau tanpa menarik SO/MO.'
+            });
+        }else{ */
+            $('#subtotal').val($('#nominal').val());
+            countAll();
+        /* } */
+    }
 
     function exportExcel(){
         var search = table.search();
@@ -2203,6 +2173,6 @@
         var end_date = $('#finish_date').val();
 
         window.location = "{{ Request::url() }}/export_from_page?search=" + search + "&status=" + status + "&account=" + account + "&company=" + company  + "&end_date=" + end_date + "&start_date=" + start_date;
-       
+
     }
 </script>

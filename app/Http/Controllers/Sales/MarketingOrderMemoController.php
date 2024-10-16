@@ -24,6 +24,7 @@ use App\Models\Menu;
 use App\Models\MenuUser;
 use Illuminate\Http\Request;
 use App\Helpers\CustomHelper;
+use App\Models\Currency;
 use App\Helpers\PrintHelper;
 use App\Models\Tax;
 use App\Models\TaxSeries;
@@ -53,15 +54,16 @@ class MarketingOrderMemoController extends Controller
         $this->datawarehouses = $user ? $user->userWarehouseArray() : [];
 
     }
-    
+
     public function index(Request $request)
     {
         $lastSegment = request()->segment(count(request()->segments()));
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $data = [
             'title'         => 'AR Memo',
             'content'       => 'admin.sales.order_memo',
+            'currency'      => Currency::where('status','1')->get(),
             'company'       => Company::where('status','1')->get(),
             'place'         => Place::where('status','1')->whereIn('id',$this->dataplaces)->get(),
             'code'          => $request->code ? CustomHelper::decrypt($request->code) : '',
@@ -78,13 +80,14 @@ class MarketingOrderMemoController extends Controller
    public function getCode(Request $request){
         UsedData::where('user_id', session('bo_id'))->delete();
         $code = MarketingOrderMemo::generateCode($request->val);
-        				
+
 		return response()->json($code);
     }
 
     public function getTaxSeries(Request $request){
-		return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date));
+        return response()->json(TaxSeries::getTaxCode($request->company_id,$request->date,$request->prefix_tax));
     }
+
 
     public function datatable(Request $request){
         $column = [
@@ -110,7 +113,7 @@ class MarketingOrderMemoController extends Controller
         $search = $request->input('search.value');
 
         $total_data = MarketingOrderMemo::whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")->count();
-        
+
         $query_data = MarketingOrderMemo::where(function($query) use ($search, $request) {
                 if($search) {
                     $query->where(function($query) use ($search, $request) {
@@ -190,7 +193,7 @@ class MarketingOrderMemoController extends Controller
                 if($request->status){
                     $query->whereIn('status', $request->status);
                 }
-                
+
                 if($request->account_id){
                     $query->whereIn('account_id',$request->account_id);
                 }
@@ -214,7 +217,7 @@ class MarketingOrderMemoController extends Controller
                     color: #9f9f9f !important;
                     background-color: #dfdfdf !important;
                     box-shadow: none;"';
-                   
+
                 }
                 if($val->journal()->exists()){
                     $btn_jurnal ='<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light blue darken-3 white-tex btn-small" data-popup="tooltip" title="Journal" onclick="viewJournal(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">note</i></button>';
@@ -259,7 +262,7 @@ class MarketingOrderMemoController extends Controller
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light cyan darken-4 white-tex btn-small" data-popup="tooltip" title="Lihat Relasi" onclick="viewStructureTree(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">timeline</i></button>
                         '.$btn_jurnal.'
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light amber accent-2 white-tex btn-small" data-popup="tooltip" title="Tutup" '.$dis.' onclick="voidStatus(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">close</i></button>
-                        
+
                         <button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light red accent-2 white-text btn-small" data-popup="tooltip" title="Delete" onclick="destroy(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">delete</i></button>
 					'
                 ];
@@ -283,20 +286,20 @@ class MarketingOrderMemoController extends Controller
 
     public function sendUsedData(Request $request){
         if($request->type == 'marketing_order_invoices'){
-            $modp = MarketingOrderInvoice::find($request->id);
+            $po = MarketingOrderInvoice::find($request->id);
         }elseif($request->type == 'marketing_order_down_payments'){
-            $modp = MarketingOrderDownPayment::find($request->id);
+            $po = MarketingOrderDownPayment::find($request->id);
         }
-       
-        if(!$modp->used()->exists()){
-            CustomHelper::sendUsedData($modp->getTable(),$request->id,'Form AR Memo');
+
+        if(!$po->used()->exists()){
+            CustomHelper::sendUsedData($po->getTable(),$request->id,'Form AR Memo');
             return response()->json([
                 'status'    => 200,
             ]);
         }else{
             return response()->json([
                 'status'    => 500,
-                'message'   => 'Dokumen no. '.$modp->used->lookable->code.' telah dipakai di '.$modp->used->ref.', oleh '.$modp->used->user->name.'.'
+                'message'   => 'Dokumen no. '.$po->used->lookable->code.' telah dipakai di '.$po->used->ref.', oleh '.$po->used->user->name.'.'
             ]);
         }
     }
@@ -310,32 +313,34 @@ class MarketingOrderMemoController extends Controller
     }
 
     public function create(Request $request){
-        
+
         $validation = Validator::make($request->all(), [
             'code'                      => 'required',
-            /* 'code'			                => $request->temp ? ['required', Rule::unique('marketing_order_memos', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_memos,code',
-             */'code_place_id'                 => 'required',
-            'company_id'			        => 'required',
-            'account_id'	                => 'required',
-            'post_date'		                => 'required',
-            'type'                          => 'required',
-            /* 'arr_lookable_id'		        => 'required|array',
-            'arr_total'                     => 'required|array', */
-        ], [
-            'code.required' 	                    => 'Kode tidak boleh kosong.',
-           /*  'code.string'                           => 'Kode harus dalam bentuk string.',
-            'code.min'                              => 'Kode harus minimal 18 karakter.',
-            'code.unique'                           => 'Kode telah dipakai.',
-             */'code_place_id.required'                => 'No plant dokumen tidak boleh kosong.',
-            'account_id.required' 	                => 'Akun Partner Bisnis tidak boleh kosong.',
-            'company_id.required' 			        => 'Perusahaan tidak boleh kosong.',
-            'post_date.required' 			        => 'Tanggal post tidak boleh kosong.',
-            'type.required'                         => 'Tipe memo tidak boleh kosong.',
-            /* 'arr_lookable_id.required'              => 'Item tidak boleh kosong.',
-            'arr_lookable_id.array'                 => 'Item harus dalam bentuk array.',
-            'arr_total.required'                    => 'Total tidak boleh kosong.',
-            'arr_total.array'                       => 'Total harus dalam bentuk array.', */
-        ]);
+            'code_place_id'             => 'required',
+           /*  'code'			            => $request->temp ? ['required', Rule::unique('marketing_order_down_payments', 'code')->ignore(CustomHelper::decrypt($request->temp),'code')] : 'required|string|min:18|unique:marketing_order_down_payments,code',
+			 */'account_id' 				=> 'required',
+			'type'                      => 'required',
+            'company_id'                => 'required',
+            'post_date'                 => 'required',
+            'currency_id'               => 'required',
+            'currency_rate'             => 'required',
+            'subtotal'                  => 'required',
+            'tax'                       => 'required',
+            'grandtotal'                => 'required',
+            'note'                      => $request->arr_id ? '' : 'required',
+		], [
+            'code.required' 	                => 'Kode tidak boleh kosong.',
+            'code_place_id.required'            => 'Plant Tidak boleh kosong',
+			'account_id.required' 				=> 'Customer tidak boleh kosong.',
+			'type.required'                     => 'Tipe tidak boleh kosong',
+            'company_id.required'               => 'Perusahaan tidak boleh kosong.',
+            'post_date.required'                => 'Tgl post tidak boleh kosong.',
+            'currency_id.required'              => 'Mata uang tidak boleh kosong.',
+            'subtotal.required'                 => 'Subtotal tidak boleh kosong.',
+            'tax.required'                      => 'PPN tidak boleh kosong.',
+            'grandtotal.required'               => 'Grandtotal tidak boleh kosong.',
+            'note.required'                     => 'Keterangan tidak boleh kosong.'
+		]);
 
         if($validation->fails()) {
             $response = [
@@ -343,43 +348,7 @@ class MarketingOrderMemoController extends Controller
                 'error'  => $validation->errors()
             ];
         } else {
-
-            $total = 0;
-            $tax = 0;
-            $grandtotal = 0;
-            
-            $arrNominal = [];
-
-            if($request->type !== '3'){
-                foreach($request->arr_grandtotal as $key => $row){
-                    $rowtotal = str_replace(',','.',str_replace('.','',$request->arr_total[$key]));
-                    $rowtax = str_replace(',','.',str_replace('.','',$request->arr_tax[$key]));
-                    $rowgrandtotal = str_replace(',','.',str_replace('.','',$row));
-                    $arrNominal[] = [
-                        'total'             => $rowtotal,
-                        'tax'               => $rowtax,
-                        'grandtotal'        => $rowgrandtotal,
-                    ];
-                    $total += $rowtotal;
-                    $tax += $rowtax;
-                    $grandtotal += $rowgrandtotal;
-                }
-            }else{
-                $total = str_replace(',','.',str_replace('.','',$request->total));
-                $tax = str_replace(',','.',str_replace('.','',$request->tax));
-                $grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
-            }
-
-            $bp = User::find($request->account_id);
-
-            if($grandtotal > $bp->count_limit_credit){
-                return response()->json([
-                    'status'  => 500,
-                    'message' => 'AR Memo tidak bisa diproses karena Saldo Piutang adalah '.number_format($bp->count_limit_credit,2,',','.').', sedangkan nominal yang anda inputkan adalah '.number_format($grandtotal,2,',','.').'.'
-                ]);
-            }
-            
-			if($request->temp){
+            if($request->temp){
                 DB::beginTransaction();
                 try {
                     $query = MarketingOrderMemo::where('code',CustomHelper::decrypt($request->temp))->first();
@@ -404,7 +373,7 @@ class MarketingOrderMemoController extends Controller
                     if($approved && !$revised){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'AR Memo telah diapprove, anda tidak bisa melakukan perubahan.'
+                            'message' => 'AR MEMO telah diapprove, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                     if(!CustomHelper::checkLockAcc($request->post_date)){
@@ -414,6 +383,8 @@ class MarketingOrderMemoController extends Controller
                         ]);
                     }
                     if(in_array($query->status,['1','6'])){
+
+                        /* CustomHelper::removeDeposit($query->account_id,$query->grandtotal); */
 
                         if($request->has('document')) {
                             if($query->document){
@@ -426,34 +397,38 @@ class MarketingOrderMemoController extends Controller
                             $document = $query->document;
                         }
 
-                        $query->user_id = session('bo_id');
+                        CustomHelper::addCountLimitCredit($query->account_id,$query->grandtotal);
+
                         $query->code = $request->code;
+                        $query->user_id = session('bo_id');
                         $query->account_id = $request->account_id;
-                        $query->company_id = $request->company_id;
-                        $query->post_date = $request->post_date;
-                        $query->status = '1';
-                        $query->note = $request->note;
                         $query->type = $request->type;
+                        $query->company_id = $request->company_id;
+                        $query->tax_id = $request->tax_id > 0 ? $request->tax_id : NULL;
+                        $query->is_tax = $request->tax_id > 0 ? '1' : NULL;
+                        $query->is_include_tax = $request->is_include_tax;
+                        $query->percent_tax = $request->percent_tax;
                         $query->document = $document;
                         $query->tax_no = $request->tax_no;
-                        $query->is_include_tax = $request->type == '3' ? ($request->is_include_tax ? $request->is_include_tax : NULL) : NULL;
-                        $query->percent_tax = $request->type == '3' ? ($request->tax_id ? $request->tax_id : NULL) : NULL;
-                        $query->tax_id = $request->tax_id_real ? $request->tax_id_real : NULL;
-                        $query->total = $total;
-                        $query->tax = $tax;
-                        $query->grandtotal = $grandtotal;
+                        $query->currency_id = $request->currency_id;
+                        $query->currency_rate = str_replace(',','.',str_replace('.','',$request->currency_rate));
+                        $query->post_date = $request->post_date;
+                        $query->due_date = $request->post_date;
+                        $query->note = $request->note;
+                        $query->subtotal = str_replace(',','.',str_replace('.','',$request->subtotal));
+                        $query->discount = 0;
+                        $query->total = str_replace(',','.',str_replace('.','',$request->subtotal));
+                        $query->tax = str_replace(',','.',str_replace('.','',$request->tax));
+                        $query->rounding = 0;
+                        $query->grandtotal = str_replace(',','.',str_replace('.','',$request->grandtotal));
+                        $query->status = '1';
 
                         $query->save();
-                        
-                        foreach($query->MarketingOrderMemoDetail as $row){
-                            $row->delete();
-                        }
-
                         DB::commit();
                     }else{
                         return response()->json([
                             'status'  => 500,
-					        'message' => 'Status AR Memo detail sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
+					        'message' => 'Status purchase order sudah diupdate dari menunggu, anda tidak bisa melakukan perubahan.'
                         ]);
                     }
                 }catch(\Exception $e){
@@ -465,24 +440,43 @@ class MarketingOrderMemoController extends Controller
                     $lastSegment = $request->lastsegment;
                     $menu = Menu::where('url', $lastSegment)->first();
                     $newCode=MarketingOrderMemo::generateCode($menu->document_code.date('y',strtotime($request->post_date)).$request->code_place_id);
-                    
+
+                    $taxno = '';
+                    if($request->tax_id > 0){
+                        $no = TaxSeries::getTaxCode($request->company_id,$request->post_date,$request->prefix_tax);
+                        if($no['status'] == 200){
+                            $taxno = $no['no'];
+                        }else{
+                            return response()->json([
+                                'status'  => 500,
+                                'message' => 'Nomor seri pajak sudah habis terpakai.'
+                            ]);
+                        }
+                    }
                     $query = MarketingOrderMemo::create([
-                        'code'			                => $newCode,
-                        'user_id'		                => session('bo_id'),
-                        'account_id'                    => $request->account_id,
-                        'company_id'                    => $request->company_id,
-                        'post_date'                     => $request->post_date,
-                        'note'                          => $request->note,
-                        'type'                          => $request->type,
-                        'status'                        => '1',
-                        'document'                      => $request->file('document') ? $request->file('document')->store('public/marketing_order_memos') : NULL,
-                        'tax_no'                        => $request->tax_no,
-                        'is_include_tax'                => $request->type == '3' ? ($request->is_include_tax ? $request->is_include_tax : NULL) : NULL,
-                        'percent_tax'                   => $request->type == '3' ? ($request->tax_id ? $request->tax_id : NULL) : NULL,
-                        'tax_id'                        => $request->real_tax ? $request->real_tax : NULL,
-                        'total'                         => $total,
-                        'tax'                           => $tax,
-                        'grandtotal'                    => $grandtotal,
+                        'code'			            => $newCode,
+                        'user_id'		            => session('bo_id'),
+                        'account_id'                => $request->account_id,
+                        'type'	                    => $request->type,
+                        'company_id'                => $request->company_id,
+                        'tax_id'                    => $request->tax_id > 0 ? $request->tax_id : NULL,
+                        'is_tax'                    => $request->tax_id > 0 ? '1' : NULL,
+                        'is_include_tax'            => $request->is_include_tax,
+                        'percent_tax'               => $request->percent_tax,
+                        'document'                  => $request->file('document') ? $request->file('document')->store('public/sales_down_payments') : NULL,
+                        'tax_no'                    => $request->tax_no ? $taxno : NULL,
+                        'currency_id'               => $request->currency_id,
+                        'currency_rate'             => str_replace(',','.',str_replace('.','',$request->currency_rate)),
+                        'post_date'                 => $request->post_date,
+                        'due_date'                  => $request->post_date,
+                        'note'                      => $request->note,
+                        'subtotal'                  => str_replace(',','.',str_replace('.','',$request->subtotal)),
+                        'discount'                  => 0,
+                        'total'                     => str_replace(',','.',str_replace('.','',$request->subtotal)),
+                        'tax'                       => str_replace(',','.',str_replace('.','',$request->tax)),
+                        'rounding'                  => 0,
+                        'grandtotal'                => str_replace(',','.',str_replace('.','',$request->grandtotal)),
+                        'status'                    => '1'
                     ]);
 
                     DB::commit();
@@ -490,35 +484,17 @@ class MarketingOrderMemoController extends Controller
                     DB::rollback();
                 }
 			}
-			
+
 			if($query) {
-
-                if($request->arr_lookable_id){
-                    foreach($request->arr_lookable_id as $key => $row){
-                        $momd = MarketingOrderMemoDetail::create([
-                            'marketing_order_memo_id'       => $query->id,
-                            'lookable_type'                 => $request->arr_lookable_type[$key],
-                            'lookable_id'                   => $row,
-                            'qty'                           => str_replace(',','.',str_replace('.','',$request->arr_qty[$key])),
-                            'is_include_tax'                => $request->arr_is_include_tax[$key],
-                            'percent_tax'                   => $request->arr_percent_tax[$key],
-                            'tax_id'                        => $request->arr_tax_id[$key] > 0 ? $request->arr_tax_id[$key] : NULL,
-                            'total'                         => $arrNominal[$key]['total'],
-                            'tax'                           => $arrNominal[$key]['tax'],
-                            'grandtotal'                    => $arrNominal[$key]['grandtotal'],
-                            'note'                          => $request->arr_note[$key],
-                        ]);
-                    }
-                }
-
-                CustomHelper::sendApproval($query->getTable(),$query->id,$query->note);
-                CustomHelper::sendNotification($query->getTable(),$query->id,'Pengajuan AR Memo No. '.$query->code,$query->note,session('bo_id'));
+                CustomHelper::removeCountLimitCredit($query->account_id,$query->grandtotal);
+                CustomHelper::sendApproval('marketing_order_memos',$query->id,$query->note);
+                CustomHelper::sendNotification('marketing_order_memos',$query->id,'Pengajuan AR MEMO No. '.$query->code,$query->note,session('bo_id'));
 
                 activity()
-                    ->performedOn(new MarketingOrderMemo())
+                    ->performedOn(new MarketingOrderDownPayment())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
-                    ->log('Add / edit AR Memo.');
+                    ->log('Add / edit sales order down payment.');
 
 				$response = [
 					'status'    => 200,
@@ -530,6 +506,7 @@ class MarketingOrderMemoController extends Controller
 					'message' => 'Data failed to save.'
 				];
 			}
+
 		}
 
 		return response()->json($response);
@@ -556,7 +533,7 @@ class MarketingOrderMemoController extends Controller
                                 <th class="center-align">Dokumen</th>
                                 <th class="center-align">Item</th>
                                 <th class="center-align">Qty</th>
-                                <th class="center-align">Satuan</th> 
+                                <th class="center-align">Satuan</th>
                                 <th class="center-align">Keterangan</th>
                                 <th class="center-align">Total</th>
                                 <th class="center-align">PPN</th>
@@ -591,9 +568,9 @@ class MarketingOrderMemoController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totals, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalppn, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($totalgrandtotal, 2, ',', '.') . '</td>
-            </tr>  
+            </tr>
         ';
-        
+
         $string .= '</tbody></table></div>';
 
         $string .= '<div class="col s12 mt-1"><table style="min-width:100%;">
@@ -609,7 +586,7 @@ class MarketingOrderMemoController extends Controller
                                 <th class="center-align">Tanggal</th>
                             </tr>
                         </thead><tbody>';
-        
+
         if($data->approval() && $data->hasDetailMatrix()){
             foreach($data->approval() as $detail){
                 $string .= '<tr>
@@ -617,7 +594,7 @@ class MarketingOrderMemoController extends Controller
                 </tr>';
                 foreach($detail->approvalMatrix as $key => $row){
                     $icon = '';
-    
+
                     if($row->status == '1' || $row->status == '0'){
                         $icon = '<i class="material-icons">hourglass_empty</i>';
                     }elseif($row->status == '2'){
@@ -629,7 +606,7 @@ class MarketingOrderMemoController extends Controller
                             $icon = '<i class="material-icons">border_color</i>';
                         }
                     }
-    
+
                     $string .= '<tr>
                         <td class="center-align">'.$row->approvalTemplateStage->approvalStage->level.'</td>
                         <td class="center-align">'.$row->user->profilePicture().'<br>'.$row->user->name.'</td>
@@ -652,14 +629,14 @@ class MarketingOrderMemoController extends Controller
             $string.= '<li>'.$data->used->user->name.' - Tanggal Dipakai: '.$data->used->created_at.' Keterangan:'.$data->used->lookable->note.'</li>';
         }
         $string.='</ol><div class="col s12 mt-2" style="font-weight:bold;color:red;"> Jika ingin dihapus hubungi tim EDP dan info kode dokumen yang terpakai atau user yang memakai bisa re-login ke dalam aplikasi untuk membuka lock dokumen.</div></div>';
-		
+
         return response()->json($string);
     }
 
     public function approval(Request $request,$id){
-        
+
         $moi = MarketingOrderMemo::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($moi){
             $data = [
                 'title'     => 'Print AR Memo',
@@ -674,22 +651,22 @@ class MarketingOrderMemoController extends Controller
 
     public function printIndividual(Request $request,$id){
         $lastSegment = request()->segment(count(request()->segments())-2);
-       
+
         $menu = Menu::where('url', $lastSegment)->first();
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','view')->first();
-        
+
         $pr = MarketingOrderMemo::where('code',CustomHelper::decrypt($id))->first();
-                
+
         if($pr){
-            
+
             $pdf = PrintHelper::print($pr,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual',$menuUser->mode);
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
             $pdf->getCanvas()->page_text(505, 350, "PAGE: {PAGE_NUM} of {PAGE_COUNT}", $font, 10, array(0,0,0));
-            
+
             $content = $pdf->download()->getOriginalContent();
-            
+
             $document_po = PrintHelper::savePrint($content);     $var_link=$document_po;
-    
+
             return $document_po;
         }else{
             abort(404);
@@ -702,7 +679,7 @@ class MarketingOrderMemoController extends Controller
         ], [
             'arr_id.required'       => 'Tolong pilih Item yang ingin di print terlebih dahulu.',
         ]);
-        
+
         if($validation->fails()) {
             $response = [
                 'status' => 422,
@@ -714,7 +691,7 @@ class MarketingOrderMemoController extends Controller
             $formattedDate = $currentDateTime->format('d/m/Y H:i:s');
             foreach($request->arr_id as $key => $row){
                 $pr = MarketingOrderMemo::where('code',$row)->first();
-                
+
                 if($pr){
                     $pdf = PrintHelper::print($pr,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
                     $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
@@ -741,8 +718,8 @@ class MarketingOrderMemoController extends Controller
                 'message'  =>$document_po
             ];
         }
-        
-		
+
+
 		return response()->json($response);
     }
 
@@ -770,7 +747,7 @@ class MarketingOrderMemoController extends Controller
                     $response = [
                         'status' => 422,
                         'error'  => $kambing
-                    ]; 
+                    ];
                 }
                 elseif($total_pdf>31){
                     $kambing["kambing"][]="PDF lebih dari 30 buah";
@@ -778,19 +755,19 @@ class MarketingOrderMemoController extends Controller
                         'status' => 422,
                         'error'  => $kambing
                     ];
-                }else{   
+                }else{
                     for ($nomor = intval($request->range_start); $nomor <= intval($request->range_end); $nomor++) {
                         $lastSegment = $request->lastsegment;
-                      
+
                         $menu = Menu::where('url', $lastSegment)->first();
                         $nomorLength = strlen($nomor);
-                        
+
                         // Calculate the number of zeros needed for padding
                         $paddingLength = max(0, 8 - $nomorLength);
 
                         // Pad $nomor with leading zeros to ensure it has at least 8 digits
                         $nomorPadded = str_repeat('0', $paddingLength) . $nomor;
-                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded; 
+                        $x =$menu->document_code.$request->year_range.$request->code_place_range.'-'.$nomorPadded;
                         $query = MarketingOrderMemo::where('code', 'LIKE', '%'.$x)->first();
                         if($query){
                             $pdf = PrintHelper::print($query,'AR Memo','a5','landscape','admin.print.sales.order_memo_individual');
@@ -800,7 +777,7 @@ class MarketingOrderMemoController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
@@ -811,21 +788,21 @@ class MarketingOrderMemoController extends Controller
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
                     ];
-                } 
+                }
 
             }
         }elseif($request->type_date == 2){
             $validation = Validator::make($request->all(), [
                 'range_comma'                => 'required',
-                
+
             ], [
                 'range_comma.required'       => 'Isi input untuk comma',
-                
+
             ]);
             if($validation->fails()) {
                 $response = [
@@ -834,7 +811,7 @@ class MarketingOrderMemoController extends Controller
                 ];
             }else{
                 $arr = explode(',', $request->range_comma);
-                
+
                 $merged = array_unique(array_filter($arr));
 
                 if(count($merged)>31){
@@ -854,18 +831,18 @@ class MarketingOrderMemoController extends Controller
                             $pdf->getCanvas()->page_text(422, 360, "Print Date ". $formattedDate, $font, 10, array(0,0,0));
                             $content = $pdf->download()->getOriginalContent();
                             $temp_pdf[]=$content;
-                           
+
                         }
                     }
                     $merger = new Merger();
                     foreach ($temp_pdf as $pdfContent) {
                         $merger->addRaw($pdfContent);
                     }
-    
+
                     $result = $merger->merge();
 
                     $document_po = PrintHelper::savePrint($result);
-        
+
                     $response =[
                         'status'=>200,
                         'message'  =>$document_po
@@ -909,7 +886,7 @@ class MarketingOrderMemoController extends Controller
                     $total_kredit_asli += $row->nominal_fc;
                     $total_kredit_konversi += $row->nominal;
                 }
-                
+
                 $string .= '<tr>
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
@@ -928,7 +905,7 @@ class MarketingOrderMemoController extends Controller
                     <td class="right-align">'.($row->type == '2' ? number_format($row->nominal,2,',','.') : '').'</td>
                 </tr>';
 
-                
+
             }
             $string .= '<tr>
                 <td class="center-align" style="font-weight: bold; font-size: 16px;" colspan="11"> Total </td>
@@ -937,12 +914,12 @@ class MarketingOrderMemoController extends Controller
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_debit_konversi, 2, ',', '.') . '</td>
                 <td class="right-align" style="font-weight: bold; font-size: 16px;">' . number_format($total_kredit_konversi, 2, ',', '.') . '</td>
             </tr>';
-            $response["tbody"] = $string; 
+            $response["tbody"] = $string;
         }else{
             $response = [
                 'status'  => 500,
                 'message' => 'Data masih belum di approve.'
-            ]; 
+            ];
         }
         return response()->json($response);
     }
@@ -950,58 +927,15 @@ class MarketingOrderMemoController extends Controller
     public function show(Request $request){
         $po = MarketingOrderMemo::where('code',CustomHelper::decrypt($request->id))->first();
         $po['code_place_id'] = substr($po->code,7,2);
-        $po['account_name'] = $po->account->code.' - '.$po->account->name;
-        $po['balance'] = number_format($po->grandtotal,2,',','.');
-        $po['tax'] = number_format($po->tax,2,',','.');
+        $po['account_name'] = $po->account->employee_no.' - '.$po->account->name;
+        $po['subtotal'] = number_format($po->subtotal,2,',','.');
+        $po['discount'] = number_format($po->discount,2,',','.');
         $po['total'] = number_format($po->total,2,',','.');
+        $po['tax'] = number_format($po->tax,2,',','.');
+        $po['grandtotal'] = number_format($po->grandtotal,2,',','.');
+        $po['currency_rate'] = number_format($po->currency_rate,2,',','.');
 
-        $arr = [];
-        $arrUsed = [];
-        
-        foreach($po->marketingOrderMemoDetail as $row){
-            $type = $row->getType();
-            $id = $row->getId();
-            $code = $row->getCode();
 
-            if($row->lookable_type !== 'coas'){
-                $cekIndex = $this->getIndexArray($id,$type,$arrUsed);
-
-                if($cekIndex < 0){
-                    $arrUsed[] = [
-                        'id'    => $id,
-                        'type'  => $type,
-                        'code'  => $code,
-                    ];
-                }
-            }
-
-            $arr[] = [
-                'id'                                    => $id,
-                'lookable_type'                         => $row->lookable_type,
-                'lookable_id'                           => $row->lookable_id,
-                'is_include_tax'                        => $row->is_include_tax,
-                'item_name'                             => $row->lookable->lookable->item->name,
-                'unit'                                  => $row->lookable->lookable->item->sellUnit->code,
-                'qty'                                   => CustomHelper::formatConditionalQty($row->qty),
-                'tax_id'                                => $row->tax_id ? $row->tax_id : '0',
-                'percent_tax'                           => $row->percent_tax,
-                'total'                                 => number_format($row->total,2,',','.'),
-                'tax'                                   => number_format($row->tax,2,',','.'),
-                'grandtotal'                            => number_format($row->grandtotal,2,',','.'),
-                'code'                                  => $code,
-                'post_date'                             => $row->getDate(),
-                'note'                                  => $row->note,
-                'tax_no'                                => $row->lookable_type == 'marketing_order_invoice_details' ? $row->lookable->marketingOrderInvoice->tax_no : ($row->lookable_type == 'marketing_order_down_payments' ? $row->lookable->tax_no : '-'),
-            ];
-        }
-
-        foreach($arrUsed as $row){
-            CustomHelper::sendUsedData($row['type'],$row['id'],'Form AR Memo');
-        }
-
-        $po['details'] = $arr;
-        $po['used'] = $arrUsed;
-        				
 		return response()->json($po);
     }
 
@@ -1019,7 +953,7 @@ class MarketingOrderMemoController extends Controller
 
     public function voidStatus(Request $request){
         $query = MarketingOrderMemo::where('code',CustomHelper::decrypt($request->id))->first();
-        
+
         if($query) {
 
             if(!CustomHelper::checkLockAcc($query->post_date)){
@@ -1041,33 +975,30 @@ class MarketingOrderMemoController extends Controller
                 ];
             }else{
                 if(in_array($query->status,['2','3'])){
-                    foreach($query->marketingOrderMemoDetail as $row){
-                        CustomHelper::addCountLimitCredit($query->account_id,$row->grandtotal);
-                        if($query->type == '2'){
-                            CustomHelper::removeCogs($query->getTable(),$query->id);
-                            CustomHelper::removeStock(
-                                $row->lookable->lookable->place_id,
-                                $row->lookable->lookable->warehouse_id,
-                                $row->lookable->lookable->item_id,
-                                $row->qty * $row->lookable->lookable->item->sell_convert
-                            );
-                        }
-                    }
+                    CustomHelper::addCountLimitCredit($query->account_id,$query->grandtotal);
+                }
+
+                $newtaxno = '';
+                if($query->tax_no){
+                    $array = explode('.',$query->tax_no);
+                    $newarray = array_slice($array, 1);
+                    $newtaxno = '011.'.implode('.',$newarray);
                 }
 
                 $query->update([
                     'status'    => '5',
                     'void_id'   => session('bo_id'),
                     'void_note' => $request->msg,
-                    'void_date' => date('Y-m-d H:i:s')
+                    'void_date' => date('Y-m-d H:i:s'),
+                    'tax_no'    => $newtaxno ?? NULL,
                 ]);
-    
+
                 activity()
                     ->performedOn(new MarketingOrderMemo())
                     ->causedBy(session('bo_id'))
                     ->withProperties($query)
                     ->log('Void the data');
-    
+
                 CustomHelper::sendNotification($query->getTable(),$query->id,'AR Memo No. '.$query->code.' telah ditutup dengan alasan '.$request->msg.'.',$request->msg,$query->user_id);
                 CustomHelper::removeApproval($query->getTable(),$query->id);
                 CustomHelper::removeJournal($query->getTable(),$query->id);
@@ -1113,6 +1044,13 @@ class MarketingOrderMemoController extends Controller
                 'message' => 'Dokumen telah diapprove, anda tidak bisa melakukan perubahan.'
             ]);
         }
+        if(in_array($query->status,['2','3','4','5'])){
+            return response()->json([
+                'status'  => 500,
+                'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
+            ]);
+        }
+
 
         if(in_array($query->status,['2','3','4','5'])){
             return response()->json([
@@ -1120,7 +1058,7 @@ class MarketingOrderMemoController extends Controller
                 'message' => 'Dokumen sudah diupdate, anda tidak bisa melakukan perubahan.'
             ]);
         }
-        
+
         if($query->delete()) {
 
             $query->update([
@@ -1128,27 +1066,15 @@ class MarketingOrderMemoController extends Controller
                 'delete_note'   => $request->msg,
             ]);
 
-            foreach($query->marketingOrderMemoDetail as $row){
-                if($row->lookable_type == 'marketing_order_invoice_details'){
-                    if($row->downpayment > 0){
-                        CustomHelper::removeDeposit($query->account_id,$row->downpayment);
-                    }
-                }elseif($row->lookable_type == 'marketing_order_down_payments'){
-                    CustomHelper::addDeposit($query->account_id,$row->balance);
-                }
-                CustomHelper::addCountLimitCredit($query->account_id,$row->balance);
-            }
-
-            $query->marketingOrderMemoDetail()->delete();
 
             CustomHelper::removeApproval($query->getTable(),$query->id);
+            CustomHelper::addCountLimitCredit($query->account_id,$query->grandtotal);
 
             activity()
-                ->performedOn(new MarketingOrderInvoice())
-                ->causedBy(session('bo_id'))
-                ->withProperties($query)
-                ->log('Delete the marketing order return data');
-
+            ->performedOn(new MarketingOrderMemo())
+            ->causedBy(session('bo_id'))
+            ->withProperties($query)
+            ->log('Delete the marketing order return data');
             $response = [
                 'status'  => 200,
                 'message' => 'Data deleted successfully.'
@@ -1178,7 +1104,7 @@ class MarketingOrderMemoController extends Controller
                     ['name'=> "Tanggal :".$query->post_date],
                     ['name'=> "Nominal : Rp.:".number_format($query->grandtotal,2,',','.')]
                 ],
-                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($query->code),           
+                'url'=>request()->root()."/admin/sales/marketing_order_invoice?code=".CustomHelper::encrypt($query->code),
             ];
             $data_go_chart[]=$data_memo;
             $result = TreeHelper::treeLoop1($data_go_chart,$data_link,'data_id_mo_memo',$query->id);
@@ -1186,32 +1112,32 @@ class MarketingOrderMemoController extends Controller
             $array2 = $result[1];
             $data_go_chart = $array1;
             $data_link = $array2;
-           
-            
+
+
             function unique_key($array,$keyname){
 
                 $new_array = array();
                 foreach($array as $key=>$value){
-                
+
                     if(!isset($new_array[$value[$keyname]])){
                     $new_array[$value[$keyname]] = $value;
                     }
-                
+
                 }
                 $new_array = array_values($new_array);
                 return $new_array;
             }
-        
-            
+
+
             $data_go_chart = unique_key($data_go_chart,'name');
-            
+
             $data_link=unique_key($data_link,'string_link');
-            
+
             $response = [
                 'status'  => 200,
                 'message' => $data_go_chart,
                 'link'    => $data_link
-            ];            
+            ];
         }else {
             $response = [
                 'status'  => 500,
@@ -1233,13 +1159,13 @@ class MarketingOrderMemoController extends Controller
                     'done_id'    => session('bo_id'),
                     'done_date'  => date('Y-m-d H:i:s'),
                 ]);
-    
+
                 activity()
                         ->performedOn(new MarketingOrderMemo())
                         ->causedBy(session('bo_id'))
                         ->withProperties($query_done)
                         ->log('Done the Marketing Order Memo data');
-    
+
                 $response = [
                     'status'  => 200,
                     'message' => 'Data updated successfully.'
@@ -1262,7 +1188,7 @@ class MarketingOrderMemoController extends Controller
         $company = $request->company ? $request->company : '';
         $end_date = $request->end_date ? $request->end_date : '';
         $start_date = $request->start_date? $request->start_date : '';
-      
+
 		return Excel::download(new ExportTransactionPageMarketingOrderMemo($search,$status,$account_id,$company,$end_date,$start_date), 'marketing_order_memo_'.uniqid().'.xlsx');
     }
 }

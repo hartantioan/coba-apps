@@ -57,7 +57,7 @@ class TaxSeries extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -77,6 +77,7 @@ class TaxSeries extends Model
     public static function getListCurrentTaxSeries($company_id,$year,$prefix){
         $dataInvoice = MarketingOrderInvoice::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
         $dataDp = MarketingOrderDownPayment::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
+        $dataMemo = MarketingOrderMemo::whereIn('status',['2','3','5'])->whereNotNull('tax_no')->where('tax_no','!=','')->where('company_id',$company_id)->whereRaw("tax_no <> '' AND SUBSTRING(tax_no,9,2) = '$year'")->get();
         $arr = [];
         foreach($dataInvoice as $row){
             if($row->tax_no && !in_array(substr($row->tax_no,11,8),$arr)){
@@ -88,9 +89,15 @@ class TaxSeries extends Model
                 $arr[] = substr($row->tax_no,11,8);
             }
         }
+
+        foreach($dataMemo as $row){
+            if($row->tax_no && !in_array(substr($row->tax_no,11,8),$arr)){
+                $arr[] = substr($row->tax_no,11,8);
+            }
+        }
         rsort($arr);
         return $arr;
-    } 
+    }
 
     public static function getTaxCode($company_id,$date,$prefix){
         $data = TaxSeries::where('company_id',$company_id)->where('start_date','<=',$date)->where('end_date','>=',$date)->where('status','1')->orderBy('start_no')->get();

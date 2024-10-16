@@ -496,14 +496,7 @@ class MarketingOrderDeliveryController extends Controller
                 $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
                 $grandtotal = $totalCredit > 0 ? $totalLimitCredit - $request->grandtotal : 0;
                 $grandtotaldp = $totalDp > 0? $totalLimitDp - $request->grandtotal : 0;
-                if($balanceLimitCredit < 0){
-                    $passedCreditLimit = false;
-                }
 
-
-                // if($balanceLimitDp < 0){
-                //     $passedCreditLimit = false;
-                // }
                 if($grandtotal < 0){
                     return response()->json([
                         'status'  => 500,
@@ -526,6 +519,7 @@ class MarketingOrderDeliveryController extends Controller
                         ]);
                     }
                 }
+                
                 $queryrevision = NULL;
                 if($request->tempRevision){
                     $queryrevision = MarketingOrderDelivery::where('code',CustomHelper::decrypt($request->tempRevision))->where('status','2')->whereNull('marketing_order_delivery_id')->first();

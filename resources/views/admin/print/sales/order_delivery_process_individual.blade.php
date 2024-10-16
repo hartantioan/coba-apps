@@ -335,8 +335,8 @@
                                     $unitcode =  $data->marketingOrderDeliveryProcessDetail->first();
                                 @endphp
                                 <tr>
-                                    <td style="width:50%">{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
-                                    <td style="width:20%">
+                                    <td style="width:47%">{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
+                                    <td style="width:33%">
                                         {{ $row->itemStock->productionBatch->code }} ({{ CustomHelper::formatConditionalQty($row->qty * $row->itemStock->item->pallet->box_conversion) }} BOX)
                                     </td>
                                     <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>

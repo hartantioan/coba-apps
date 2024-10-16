@@ -327,10 +327,14 @@
 
                             <tbody>
                                 @php
+                                    $totalPalet = 0;
                                     $totalQty = 0;
                                 @endphp
                                 @foreach($data->marketingOrderDeliveryProcessDetail as $key => $row)
                                 @php
+                                    if($row->itemStock->item->pallet->box_conversion > 1){
+                                        $totalPalet += $row->qty;
+                                    }
                                     $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
                                     $unitcode =  $data->marketingOrderDeliveryProcessDetail->first();
                                 @endphp
@@ -356,7 +360,7 @@
                                     <td style="width:30%"></td>
                                     <td style="width:10%" align="right"><strong>{{ CustomHelper::formatConditionalQty($totalQty) }}</strong></td>
                                     <td style="width:10%;padding-bottom:0.5px" align="center"><strong>{{$unitcode->itemStock->item->uomUnit->code}}</strong></td>
-                                    <td style="width:10%" align="center"></td>
+                                    <td style="width:10%" align="center"><strong>{{ CustomHelper::formatConditionalQty($totalPalet) }}</td>
                                 </tr>
 
                             </tbody>

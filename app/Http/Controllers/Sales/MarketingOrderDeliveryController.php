@@ -494,18 +494,27 @@ class MarketingOrderDeliveryController extends Controller
                 $balanceLimitDp = $totalDp > 0 ? $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp - $totalDp : 0;
                 $totalLimitCredit = $user->limit_credit - $user->count_limit_credit - $grandtotalUnsentModCredit - $grandtotalUnsentDoCredit;
                 $totalLimitDp = $user->deposit - $grandtotalUnsentModDp - $grandtotalUnsentDoDp;
-                $grandtotal = $totalLimitCredit - $request->grandtotal;
+                $grandtotal = $totalCredit > 0 ? $totalLimitCredit - $request->grandtotal : 0;
+                $grandtotaldp = $totalDp > 0? $totalLimitDp - $request->grandtotal : 0;
                 if($balanceLimitCredit < 0){
                     $passedCreditLimit = false;
                 }
 
-                if($balanceLimitDp < 0){
-                    $passedCreditLimit = false;
-                }
+
+                // if($balanceLimitDp < 0){
+                //     $passedCreditLimit = false;
+                // }
                 if($grandtotal < 0){
                     return response()->json([
                         'status'  => 500,
-                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($request->grandtotal,2,',','.'),
+                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotal,2,',','.'),
+                    ]);
+                }
+
+                if($grandtotaldp < 0){
+                    return response()->json([
+                        'status'  => 500,
+                        'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa deposit '.number_format($totalLimitDp,2,',','.').' sedangkan Mod yang akan dibuat melebihi limit kredit dengan total '.number_format($grandtotaldp,2,',','.'),
                     ]);
                 }
 

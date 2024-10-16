@@ -100,10 +100,10 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             })
             ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
-                ->where('post_date', '<', $this->start_date)
-                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                    $query->whereIn('status',['2']);
-                });
+                ->where('post_date', '<', $this->start_date);
+                // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                //     $query->whereIn('status',['2']);
+                // });
             })->get();
 
             $total_sj_awal = 0;
@@ -152,10 +152,10 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
                 ->where('post_date', '>=',$this->start_date)
-                ->where('post_date', '<=', $this->finish_date)
-                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                    $query->whereIn('status',['2']);
-                });
+                ->where('post_date', '<=', $this->finish_date);
+                // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                //     $query->whereIn('status',['2']);
+                // });
             })->get();
 
             $total_sj = 0;

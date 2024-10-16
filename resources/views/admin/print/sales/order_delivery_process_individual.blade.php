@@ -336,7 +336,7 @@
                                 @endphp
                                 <tr>
                                     <td style="width:47%">{{ $row->itemStock->item->code.' - '.$row->itemStock->item->name }}</td>
-                                    <td style="width:33%">
+                                    <td style="width:30%">
                                         {{ $row->itemStock->productionBatch->code }} ({{ CustomHelper::formatConditionalQty($row->qty * $row->itemStock->item->pallet->box_conversion) }} BOX)
                                     </td>
                                     <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>

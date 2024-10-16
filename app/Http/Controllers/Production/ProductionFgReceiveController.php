@@ -1164,12 +1164,14 @@ class ProductionFgReceiveController extends Controller
                             $row->productionBatch()->delete();
                         }
                     }else{
-                        $row->productionBatch->update([
-                            'lookable_type' => NULL,
-                            'lookable_id'   => NULL,
-                            'total'         => 0,
-                            'post_date'     => NULL,
-                        ]);
+                        if($row->productionBatch()->exists()){
+                            $row->productionBatch->update([
+                                'lookable_type' => NULL,
+                                'lookable_id'   => NULL,
+                                'total'         => 0,
+                                'post_date'     => NULL,
+                            ]);
+                        }
                     }
                     if($row->productionBarcodeDetail()->exists()){
                         if($row->productionBarcodeDetail->productionBarcode->alreadyReceived()){

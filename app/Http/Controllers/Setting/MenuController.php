@@ -117,10 +117,10 @@ class MenuController extends Controller
             $row->recalculate();
         }
 
-        /* foreach($data as $row){
+        foreach($data as $row){
             echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
             $total += ($row->total() - $row->totalIssue());
-        } */
+        }
 
         echo $total;
 

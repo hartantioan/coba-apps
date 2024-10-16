@@ -113,14 +113,12 @@ class MenuController extends Controller
 
         $total = 0;
 
-        foreach($data as $row){
+        /* foreach($data as $row){
             $balance = $row->total() - $row->totalIssue();
             if($balance > 0 || $balance < 0){
-                /* echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
-                $total += ($row->total() - $row->totalIssue()); */
                 $row->recalculate();
             }
-        }
+        } */
 
         foreach($data as $row){
             echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';

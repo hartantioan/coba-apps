@@ -613,7 +613,7 @@ class ProductionFgReceive extends Model
 
         foreach($this->productionFgReceiveDetail as $key => $row){
             $rowtotal = round($price * $row->qty,2);
-            if($key == ($total-1)) {
+            if($key == ($totalData-1)) {
                 $rowtotal = $total;
             }
             $row->update([

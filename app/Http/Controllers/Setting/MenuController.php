@@ -115,7 +115,7 @@ class MenuController extends Controller
         foreach($data as $row){
             if($row->total() !== $row->totalIssue()){
                 echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
-                $total += $row->total() !== $row->totalIssue();
+                $total += ($row->total() - $row->totalIssue());
             }
         }
 

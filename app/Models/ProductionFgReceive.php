@@ -609,10 +609,11 @@ class ProductionFgReceive extends Model
         
         $total = $totalCost;
         $price = $totalCost / $totalQty;
+        $totalData = count($this->productionFgReceiveDetail);
 
         foreach($this->productionFgReceiveDetail as $key => $row){
             $rowtotal = round($price * $row->qty,2);
-            if(($total - $rowtotal) < 0){
+            if($key == ($total-1)) {
                 $rowtotal = $total;
             }
             $row->update([

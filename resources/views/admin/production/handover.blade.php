@@ -1291,13 +1291,13 @@
             $('#production_fg_receive_detail_id,#area_id').empty();
             $('#qty').val('0,000');
         }else{
-            $('#body-item').empty().append(`
+            /* $('#body-item').empty().append(`
                 <tr id="last-row-item">
                     <td class="center-align" colspan="11">
                         Silahkan tambahkan Receive FG untuk memulai...
                     </td>
                 </tr>
-            `);
+            `); */
         }
     }
 

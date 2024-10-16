@@ -348,7 +348,7 @@ class MarketingOrderDownPaymentController extends Controller
             ];
         } else {
 
-            $passedCreditLimit = true;
+            /* $passedCreditLimit = true;
 
             $account = User::find($request->account_id);
 
@@ -367,7 +367,7 @@ class MarketingOrderDownPaymentController extends Controller
                     'status'  => 500,
                     'message' => 'Mohon maaf, saat ini seluruh / salah satu item terkena limit kredit dimana perhitungannya adalah sebagai berikut, Sisa limit kredit '.number_format($totalLimitCredit,2,',','.').' sedangkan nominal down payment : '.$request->grandtotal.' maka terjadi selisih nominal sebesar '.number_format($balanceLimitCredit,2,',','.').'.',
                 ]);
-            }
+            } */
 
 			if($request->temp){
                 DB::beginTransaction();

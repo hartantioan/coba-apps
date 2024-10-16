@@ -73,6 +73,14 @@ class ProductionFgReceive extends Model
         return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3']);
     }
 
+    public function totalIssue(){
+        $total = 0;
+        foreach($this->productionIssue as $row){
+            $total += round($row->total(),2);
+        }
+        return $total;
+    }
+
     public function productionIssueWithVoid(){
         return $this->hasMany('App\Models\ProductionIssue')->whereIn('status',['1','2','3','5']);
     }

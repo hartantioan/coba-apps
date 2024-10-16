@@ -176,7 +176,7 @@ class ProductionFgReceive extends Model
 
     public function total(){
         $total = $this->productionFgReceiveDetail()->sum('total');
-        return $total;
+        return round($total,2);
     }
 
     public function statusRaw(){

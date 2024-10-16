@@ -1322,7 +1322,7 @@ class ProductionBarcodeController extends Controller
         $menuUser = MenuUser::where('menu_id',$menu->id)->where('user_id',session('bo_id'))->where('type','report')->first();
         $modedata = $menuUser->mode ?? '';
         $nominal = $menuUser->show_nominal ?? '';
-		return Excel::download(new ExportProductionBarcode($post_date,$end_date,$mode,$modedata,$nominal), 'production_fg_receive'.uniqid().'.xlsx');
+		return Excel::download(new ExportProductionBarcode($post_date,$end_date,$mode,$modedata,$nominal), 'production_barcode_'.uniqid().'.xlsx');
     }
 
 }

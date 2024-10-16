@@ -611,9 +611,6 @@ class ProductionFgReceive extends Model
 
         foreach($this->productionFgReceiveDetail as $key => $row){
             $rowtotal = round(round($row->qty / $totalQty,3) * $totalCost,2);
-            if($total < $rowtotal){
-                $rowtotal = $total;
-            }
             $row->update([
                 'total' => $rowtotal,
             ]);
@@ -625,7 +622,6 @@ class ProductionFgReceive extends Model
                     ]);
                 }
             }
-            $total -= $rowtotal;
         }
     }
 

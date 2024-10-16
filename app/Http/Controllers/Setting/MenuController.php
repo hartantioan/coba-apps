@@ -112,7 +112,7 @@ class MenuController extends Controller
         $data = ProductionFgReceive::whereIn('status',['2','3'])->get();
 
         foreach($data as $row){
-            echo 'rcfg : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
+            echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
         }
 
         /* $user = User::where('status','1')->where('type','1')->get();

@@ -114,10 +114,7 @@ class MenuController extends Controller
         $total = 0;
 
         foreach($data as $row){
-            $balance = $row->total() - $row->totalIssue();
-            if($balance > 0 || $balance < 0){
-                $row->recalculate();
-            }
+            $row->recalculate();
         }
 
         /* foreach($data as $row){

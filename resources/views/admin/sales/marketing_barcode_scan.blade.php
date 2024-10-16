@@ -93,25 +93,25 @@
                                                     <div id="validation_alert" style="display:none;"></div>
                                                 </div>
                                                 <div class="col s12">
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m4">
 
                                                         <input type="hidden" id="temp" name="temp">
                                                         <input id="code" name="code" type="text" placeholder="Code">
                                                         <label class="active" for="code">No. Dokumen</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m4">
                                                         <input id="shipping_type" name="shipping_type" type="text" placeholder="Tipe Pengiriman">
                                                         <label class="active" for="shipping_type">Tipe Pengiriman</label>
                                                     </div>
-                                                    <div class="input-field col s12">
-                                                        <input id="no_pol" name="no_pol" type="text" placeholder="No Pol">
-                                                        <label class="active" for="no_pol">No. Pol</label>
+                                                    <div class="input-field col s12 m4">
+                                                        <input id="expedition_name" name="expedition_name" type="text" placeholder="No Pol">
+                                                        <label class="active" for="expedition_name">Nama Ekspedisi</label>
                                                     </div>
-                                                    <div class="input-field col s12">
-                                                        <input id="driver" name="driver" type="text" placeholder="Nama Supir">
-                                                        <label class="active" for="driver">Supir</label>
+                                                    <div class="input-field col s12 m4">
+                                                        <input id="no_container" name="no_container" type="text" placeholder="Nama Supir">
+                                                        <label class="active" for="no_container">No. Container</label>
                                                     </div>
-                                                    <div class="input-field col s12">
+                                                    <div class="input-field col s12 m4">
                                                         <input id="type" name="type" type="text" placeholder="Truk">
                                                         <label class="active" for="type">Truk</label>
                                                     </div>
@@ -132,9 +132,9 @@
                                                     </div>
 
 
-                                                    <div class="col s12 mt-3">
+                                                   {{--  <div class="col s12 mt-3">
                                                         <button class="btn waves-effect waves-light right submit" onclick="save();">{{ __('translations.save') }} <i class="material-icons right">send</i></button>
-                                                    </div>
+                                                    </div> --}}
                                                 </div>
                                             </form>
                                         </div>
@@ -335,16 +335,26 @@
                 },
                 success: function(response) {
                     if(response.status == 200) {
-
+                        loadDataTable();
+                        const now = new Date();
+                        const formattedDateTime = formatDate(now);
+                        const message = `Barang telah dikirimkan: ${formattedDateTime}`;
+                        $('#card_info_save').empty();
+                        $('#card_info_save').append(`<div class="card-alert card gradient-45deg-green-teal" >
+                            <div class="card-content white-text">
+                                <p>${response.message}</p>
+                                <p>${message}</p>
+                            </div>
+                        </div>`);
                         if(response.mop){
                             var status = response.status_s;
                             $('#temp').val(response.id);
                             $('#status_document').text('Status: ').append(status);
                             $('#code').val(response.mop['code']);
-                            $('#no_pol').val(response.mop['vehicle_no']);
+                            $('#expedition_name').val(response.mop['expedition_name']);
 
                             $('#shipping_type').val(response.shipping_type);
-                            $('#driver').val(response.mop['driver_name']);
+                            $('#no_container').val(response.mop['no_container']);
                             $('#type').val(response.mop['vehicle_name']);
                             $('#table_body').empty();
                             $.each(response.detail, function(i, val) {
@@ -379,6 +389,12 @@
                             </div>
                         `);
                     } else {
+                        $('#card_info_save').empty();
+                        $('#card_info_save').append(`<div class="card-alert card red" >
+                            <div class="card-content white-text">
+                                <p>${response.message}</p>
+                            </div>
+                        </div>`);
                         $('#barcode-form')[0].reset();
                         M.toast({
                             html: response.message
@@ -498,8 +514,21 @@
                 $('#validation_alert_barcode').html('');
             },
             success: function(response) {
-                if(response.status == 200) {
 
+                if(response.status == 200) {
+                    loadDataTable();
+                    const now = new Date();
+                    const formattedDateTime = formatDate(now);
+                    const message = `Barang telah dikirimkan: ${formattedDateTime}`;
+                    $('#card_info_save').empty();
+                    $('#card_info_save').append(`<div class="card-alert card gradient-45deg-green-teal" >
+                        <div class="card-content white-text">
+                            <p>${response.message}</p>
+                            <p>${message}</p>
+                        </div>
+                    </div>`);
+                    $('#table_body').empty();
+                    $('#status_document').empty().text('Status: ');
                     if(response.mop){
                         console.log(response);
                         $('#table_body').empty();
@@ -507,9 +536,9 @@
                         $('#temp').val(response.id);
                         $('#status_document').text('Status: ').append(status);
                         $('#code').val(response.mop['code']);
-                        $('#no_pol').val(response.mop['vehicle_no']);
+                        $('#expedition_name').val(response.mop['expedition_name']);
                         $('#shipping_type').val(response.shipping_type);
-                        $('#driver').val(response.mop['driver_name']);
+                        $('#no_container').val(response.mop['no_container']);
                         $('#type').val(response.mop['vehicle_name']);
 
                         $.each(response.detail, function(i, val) {
@@ -545,6 +574,12 @@
                     `);
                 } else {
                     $('#barcode-form')[0].reset();
+                    $('#card_info_save').empty();
+                    $('#card_info_save').append(`<div class="card-alert card red" >
+                        <div class="card-content white-text">
+                            <p>${response.message}</p>
+                        </div>
+                    </div>`);
                     M.toast({
                         html: response.message
                     });

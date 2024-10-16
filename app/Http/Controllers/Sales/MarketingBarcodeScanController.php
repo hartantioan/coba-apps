@@ -99,6 +99,7 @@ class MarketingBarcodeScanController extends Controller
     public function showFromBarcode(Request $request){
         $barcode = $request->input('barcode');
         $mop = MarketingOrderDeliveryProcess::where('code', $barcode)->first();
+        $mop['expedition_name'] = $mop->account->name;
         $detail = [];
         if($mop){
             foreach ($mop->marketingOrderDeliveryProcessDetail as $key => $value) {
@@ -135,6 +136,74 @@ class MarketingBarcodeScanController extends Controller
             $response = [
                 'status'  => 500,
                 'message' => 'Bukan Barcode SJ'
+            ];
+
+		    return response()->json($response);
+        }
+
+        $query = MarketingOrderDeliveryProcess::find($mop->id);
+        if($query){
+            $query_track = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$mop->id)
+            ->whereIn('status',values: ['5'])->get();
+            if(count($query_track) > 0){
+
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Gagal Simpan , Dokumen telah di scan pada '. date('d/m/Y H:i:s', strtotime($query_track->first()->created_at))
+                ];
+                return response()->json($response);
+            }
+
+            if(!$query->marketingOrderDelivery->goodScaleDetail()->exists()){
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Dokumen belum memiliki Surat Jalan'
+                ];
+                return response()->json($response);
+            }
+
+            if($query->status == '2'){
+                $find_send_customer = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$mop->id)
+                ->whereNotIn('status',values: ['5'])
+                ->whereIn('status',values: ['3'])
+                ->get();
+                if(count($find_send_customer) > 0){
+                    MarketingOrderDeliveryProcessTrack::create([
+                        'user_id'                               => session('bo_id') ? session('bo_id') : NULL,
+                        'marketing_order_delivery_process_id'   => $mop->id,
+                        'status'                                => '5',
+                    ]);
+                    $query->createJournalSentDocument();
+                    $response = [
+                        'status'    => 200,
+                        'mop'       => $mop ,
+                        'status_s'  => $status,
+                        'detail'    => $detail,
+                        'shipping_type'        => $mop->marketingOrderDelivery->deliveryType(),
+                        'id'        => $mop->id,
+                        'message'   => 'Data Sukses Discan  dan Disimpan.',
+                    ];
+                    return response()->json($response);
+
+                }else{
+                    $response = [
+                        'status'    => 200,
+                        'message'   => 'Data masih belum tiba di customer harap update terlebih dahulu.',
+                    ];
+                    return response()->json($response);
+                }
+
+            }else{
+                $response = [
+                    'status'  => 500,
+                    'message' => 'Status Dokumen Harus Dalam status Proses'
+                ];
+
+            }
+        }else{
+            $response = [
+                'status'  => 500,
+                'message' => 'Data tidak ditemukan'
             ];
         }
 

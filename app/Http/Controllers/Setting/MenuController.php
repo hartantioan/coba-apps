@@ -112,6 +112,7 @@ class MenuController extends Controller
         $data = ProductionFgReceive::whereIn('status',['2','3'])->get();
 
         $total = 0;
+        
         foreach($data as $row){
             if($row->total() !== $row->totalIssue()){
                 echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';

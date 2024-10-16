@@ -266,7 +266,8 @@ class AdjustRateController extends Controller
             foreach($dataapdp as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
                 $total = $row->balancePaymentByDate($request->post_date);
-                if($total > 0){
+                $totalInvoice = $row->totalInvoice();
+                if($totalInvoice > 0){
                     $result[] = [
                         'coa_id'        => $coahutangusaha->id,
                         'lookable_type' => $row->getTable(),
@@ -284,7 +285,8 @@ class AdjustRateController extends Controller
             foreach($dataapdp as $row){
                 $latest_rate = $row->latestCurrencyRateByDate($request->post_date);
                 $total = $row->balanceInvoiceByDate($request->post_date);
-                if($total > 0){
+                $totalInvoice = $row->totalInvoice();
+                if($totalInvoice > 0){
                     $result[] = [
                         'coa_id'        => $coauangmukapembelian->id,
                         'lookable_type' => $row->getTable(),

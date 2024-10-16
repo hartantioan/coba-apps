@@ -3259,79 +3259,78 @@ class Select2Controller extends Controller {
         ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
             $query->whereIn('status',['3','4','5']);
         })
+        ->whereDoesntHave('marketingOrderInvoice')
         ->whereDoesntHave('used')
         ->whereRaw("SUBSTRING(code,8,2) IN ('".implode("','",$this->dataplacecode)."')")
         ->whereIn('status',['2','3'])->get();
 
         foreach($data as $d) {
-            if($d->balanceInvoice() > 0){
-                $totalAll = 0;
-                $taxAll = 0;
-                $grandtotalAll = 0;
+            $totalAll = 0;
+            $taxAll = 0;
+            $grandtotalAll = 0;
 
-                $arrDetail = [];
+            $arrDetail = [];
 
-                foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
-                    $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
-                    $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
-                    if($row->marketingOrderDetail->tax_id > 0){
-                        if($row->marketingOrderDetail->is_include_tax == '1'){
-                            $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
-                        }
+            foreach($d->marketingOrderDelivery->marketingOrderDeliveryDetail as $row){
+                $price = $row->marketingOrderDetail->realPriceAfterGlobalDiscount();
+                $total = $price * $row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion;
+                if($row->marketingOrderDetail->tax_id > 0){
+                    if($row->marketingOrderDetail->is_include_tax == '1'){
+                        $total = $total / (1 + ($row->marketingOrderDetail->percent_tax / 100));
                     }
-                    $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
-                    $grandtotal = $total + $tax;
-                    $arrDetail[] = [
-                        'id'                => $row->id,
-                        'item_id'           => $row->item_id,
-                        'item_name'         => $row->item->code.' - '.$row->item->name,
-                        'item_warehouse'    => $row->item->warehouseList(),
-                        'unit'              => $row->item->uomUnit->code,
-                        'code'              => $d->code,
-                        'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion),
-                        'tax_id'            => $row->marketingOrderDetail->tax_id,
-                        'is_include_tax'    => $row->marketingOrderDetail->is_include_tax,
-                        'percent_tax'       => number_format($row->marketingOrderDetail->percent_tax,2,',','.'),
-                        'total'             => number_format($total,2,',','.'),
-                        'tax'               => number_format($tax,2,',','.'),
-                        'grandtotal'        => number_format($grandtotal,2,',','.'),
-                        'lookable_type'     => $row->getTable(),
-                        'lookable_id'       => $row->id,
-                        'qty_do'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderDetail->qty_conversion),
-                        'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDetail->qty_conversion),
-                        'price'             => number_format($price,2,',','.'),
-                        'note'              => '',
-                    ];
-                    $totalAll += $total;
-                    $taxAll += $tax;
-                    $grandtotalAll += $grandtotal;
                 }
-
-                $response[] = [
-                    'id'   			    => $d->id,
-                    'text' 			    => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name,
+                $tax = round($total * ($row->marketingOrderDetail->percent_tax / 100),2);
+                $grandtotal = $total + $tax;
+                $arrDetail[] = [
+                    'id'                => $row->id,
+                    'item_id'           => $row->item_id,
+                    'item_name'         => $row->item->code.' - '.$row->item->name,
+                    'item_warehouse'    => $row->item->warehouseList(),
+                    'unit'              => $row->item->uomUnit->code,
                     'code'              => $d->code,
-                    'details'           => $arrDetail,
-                    'total'             => $d->total,
-                    'tax'               => $d->tax,
-                    'rounding'          => $d->rounding,
-                    'grandtotal'        => $d->grandtotal,
-                    'real_total'        => number_format($totalAll,2,',','.'),
-                    'real_tax'          => number_format($taxAll,2,',','.'),
-                    'real_grandtotal'   => number_format($grandtotalAll,2,',','.'),
-                    'type'              => $d->getTable(),
-                    'due_date'          => $d->return_date,
-                    'days_due'          => $d->marketingOrderDelivery->customer->top,
-                    'list_area'         => Area::where('status','1')->get(),
-                    'account_name'      => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
-                    'payment_type'      => $d->getTypePayment(),
-                    'account_id'        => $d->marketingOrderDelivery->customer_id,
-                    'top_internal'      => $d->marketingOrderDelivery->top_internal,
-                    'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
-                    'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
-                    'note'              => $d->getNote(),
+                    'qty_sent'          => CustomHelper::formatConditionalQty($row->getBalanceQtySentMinusReturn() * $row->marketingOrderDetail->qty_conversion),
+                    'tax_id'            => $row->marketingOrderDetail->tax_id,
+                    'is_include_tax'    => $row->marketingOrderDetail->is_include_tax,
+                    'percent_tax'       => number_format($row->marketingOrderDetail->percent_tax,2,',','.'),
+                    'total'             => number_format($total,2,',','.'),
+                    'tax'               => number_format($tax,2,',','.'),
+                    'grandtotal'        => number_format($grandtotal,2,',','.'),
+                    'lookable_type'     => $row->getTable(),
+                    'lookable_id'       => $row->id,
+                    'qty_do'            => CustomHelper::formatConditionalQty($row->qty * $row->marketingOrderDetail->qty_conversion),
+                    'qty_return'        => CustomHelper::formatConditionalQty($row->qtyReturn() * $row->marketingOrderDetail->qty_conversion),
+                    'price'             => number_format($price,2,',','.'),
+                    'note'              => '',
                 ];
+                $totalAll += $total;
+                $taxAll += $tax;
+                $grandtotalAll += $grandtotal;
             }
+
+            $response[] = [
+                'id'   			    => $d->id,
+                'text' 			    => $d->code.' - Ven : '.$d->account->name. ' - Cust. '.$d->marketingOrderDelivery->customer->name,
+                'code'              => $d->code,
+                'details'           => $arrDetail,
+                'total'             => $d->total,
+                'tax'               => $d->tax,
+                'rounding'          => $d->rounding,
+                'grandtotal'        => $d->grandtotal,
+                'real_total'        => number_format($totalAll,2,',','.'),
+                'real_tax'          => number_format($taxAll,2,',','.'),
+                'real_grandtotal'   => number_format($grandtotalAll,2,',','.'),
+                'type'              => $d->getTable(),
+                'due_date'          => $d->return_date,
+                'days_due'          => $d->marketingOrderDelivery->customer->top,
+                'list_area'         => Area::where('status','1')->get(),
+                'account_name'      => $d->marketingOrderDelivery->customer->employee_no.' - '.$d->marketingOrderDelivery->customer->name,
+                'payment_type'      => $d->getTypePayment(),
+                'account_id'        => $d->marketingOrderDelivery->customer_id,
+                'top_internal'      => $d->marketingOrderDelivery->top_internal,
+                'top_customer'      => $d->marketingOrderDelivery->getMaxTop(),
+                'user_data_id'      => $d->marketingOrderDelivery->getMaxBillingAddress(),
+                'note'              => $d->getNote(),
+            ];
         }
 
         return response()->json(['items' => $response]);

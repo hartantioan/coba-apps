@@ -122,6 +122,11 @@ class MenuController extends Controller
             }
         }
 
+        foreach($data as $row){
+            echo 'rcfg '.$row->code.' : '.$row->total().' - issue : '.$row->totalIssue().'<br>';
+            $total += ($row->total() - $row->totalIssue());
+        }
+
         echo $total;
 
         /* $user = User::where('status','1')->where('type','1')->get();

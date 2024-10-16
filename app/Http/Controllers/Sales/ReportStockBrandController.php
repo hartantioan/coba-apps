@@ -33,7 +33,7 @@ class ReportStockBrandController extends Controller
         $data = [
             'title'     => 'Report Stock',
             'content'   => 'admin.sales.report_stock_brand',
-           
+
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
@@ -125,6 +125,6 @@ class ReportStockBrandController extends Controller
     public function export(Request $request){
         $start_date = $request->start_date;
         $finish_date = $request->end_date;
-		return Excel::download(new ExportReportStockBrand($start_date,$finish_date), 'summary_stock_fg'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportStockBrand($start_date,$finish_date), 'summary_stock_by_brand_'.uniqid().'.xlsx');
     }
 }

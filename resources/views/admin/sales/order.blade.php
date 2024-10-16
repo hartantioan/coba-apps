@@ -353,14 +353,8 @@
                                         <input id="document_no" name="document_no" type="text" placeholder="No. Referensi dokumen...">
                                         <label class="active" for="document_no">No. Referensi</label>
                                     </div>
-                                    <div class="input-field col m3 s12 ">
-                                        
-                                    </div>
-                                    <div class="input-field col m3 s12 ">
-                                        
-                                    </div>
-                                    <div class="input-field col m3 s12 right-align ">
-                                        <h6>Deposit : <b><span id="limit">0,00</span></b></h6>
+                                    <div class="input-field col m9 s12 right-align ">
+                                        <h6>Deposit (ARDP -> Incoming Payment) : <b><span id="limit">0,00</span></b></h6>
                                     </div>
                                 </fieldset>
                             </div>

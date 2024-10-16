@@ -152,6 +152,7 @@ use App\Http\Controllers\Production\ProductionIssueReceiveController;
 use App\Http\Controllers\Sales\MarketingOrderController;
 use App\Http\Controllers\Sales\MarketingOrderDownPaymentController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryController;
+use App\Http\Controllers\Sales\MarketingBarcodeScanController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryProcessController;
 use App\Http\Controllers\Sales\MarketingOrderReturnController;
 use App\Http\Controllers\Sales\MarketingOrderInvoiceController;
@@ -2655,6 +2656,17 @@ Route::prefix('admin')->group(function () {
                     Route::get('print_individual/{id}', [MarketingOrderDeliveryController::class, 'printIndividual'])->withoutMiddleware('direct.access');
                     Route::post('void_status', [MarketingOrderDeliveryController::class, 'voidStatus'])->middleware('operation.access:marketing_order_delivery,void');
                     Route::post('destroy', [MarketingOrderDeliveryController::class, 'destroy'])->middleware('operation.access:marketing_order_delivery,delete');
+                });
+
+                Route::prefix('marketing_barcode_scan')->middleware('operation.access:marketing_barcode_scan,view')->group(function () {
+                    Route::get('/', [MarketingBarcodeScanController::class, 'index']);
+                    Route::get('datatable', [MarketingBarcodeScanController::class, 'datatable']);
+                    Route::post('show', [MarketingBarcodeScanController::class, 'show']);
+                    Route::post('show_from_barcode', [MarketingBarcodeScanController::class, 'showFromBarcode']);
+                    Route::post('print', [MarketingBarcodeScanController::class, 'print']);
+                    Route::get('export', [MarketingBarcodeScanController::class, 'export']);
+                    Route::post('create', [MarketingBarcodeScanController::class, 'create'])->middleware('operation.access:marketing_barcode_scan,update');
+                    Route::post('destroy', [MarketingBarcodeScanController::class, 'destroy'])->middleware('operation.access:marketing_barcode_scan,delete');
                 });
 
                 Route::prefix('delivery_order')->middleware(['operation.access:delivery_order,view', 'lockacc'])->group(function () {

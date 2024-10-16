@@ -1067,7 +1067,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             ]);
             $totalBefore = $total_final;
             $qtyBefore = $qty_final;
-            self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id);
+            /* self::dispatch($dateloop,$row->productionHandover->company_id,$row->productionHandover->productionFgReceive->place_id,$row->item_id,$row->area_id,$row->item_shading_id,$row->productionBatch->id); */
         }
 
         $productionrepack = ProductionRepackDetail::whereHas('productionRepack',function($query)use($dateloop){

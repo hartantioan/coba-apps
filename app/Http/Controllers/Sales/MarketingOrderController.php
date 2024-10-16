@@ -639,6 +639,15 @@ class MarketingOrderController extends Controller
                     ]);
                 }
 
+                if($request->payment_type == '1'){
+                    if(str_replace(',','.',str_replace('.','',$request->percent_dp)) <= 0){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Untuk tipe pembayaran DP, prosentase DP (%) harus diinput tidak boleh 0.',
+                        ]); 
+                    }
+                }
+
                 $userData = UserData::find($request->billing_address);
 
                 if($request->temp){

@@ -35,7 +35,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
         'Receive FG',
         'Good Receive',
         'Repack(+)',
-        'Delivery',
+        'SJ Sudah Scan',
         'SJ Belum Scan',
         'Repack(-)',
         'Good Issue',
@@ -71,7 +71,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 foreach ($handover_awal as $handover) {
                     $qtyConversion = $handover->productionFgReceiveDetail->conversion ?? 1;
 
-                    $totalQty_handover_awal += $handover->qty * $qtyConversion;
+                    $totalQty_handover_awal += round($handover->qty * $qtyConversion,3);
                 }
             }
 
@@ -114,7 +114,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 foreach ($delivery_process_awal as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj_awal += $row_sj->qty * $qtyConversion;
+                    $total_sj_awal += round($row_sj->qty * $qtyConversion,3);
                 }
             }
 
@@ -124,7 +124,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 ->where('post_date', '<', $this->start_date);
             })->sum('qty') ?? 0;
 
-            $awal =($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal) - ( $total_sj_awal+$goodIssue_awal  + $repack_out_awal);
+            $awal =round(($totalQty_handover_awal + $goodReceive_awal + $repack_in_awal) - ( $total_sj_awal+$goodIssue_awal  + $repack_out_awal),3);
 
             $handover = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
@@ -137,7 +137,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 foreach ($handover as $handovered) {
                     $qtyConversion = $handovered->productionFgReceiveDetail->conversion ?? 1;
 
-                    $total_handover += $handovered->qty * $qtyConversion;
+                    $total_handover += round($handovered->qty * $qtyConversion,3);
                 }
             }
 
@@ -188,7 +188,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 foreach ($delivery_process as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj += $row_sj->qty * $qtyConversion;
+                    $total_sj += round($row_sj->qty * $qtyConversion,3);
                 }
             }
 
@@ -196,7 +196,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 foreach ($delivery_process_no_scan as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
-                    $total_sj_no_scan += $row_sj->qty * $qtyConversion;
+                    $total_sj_no_scan += round($row_sj->qty * $qtyConversion,3);
                 }
             }
 
@@ -224,7 +224,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             })->sum('qty');
 
 
-            $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out+$total_sj_no_scan));
+            $total = round($awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out+$total_sj_no_scan)),3);
 
             $arr[] = [
                 'item_code'=> $row->item->code,

@@ -109,6 +109,14 @@ class MenuController extends Controller
 
         return view('admin.layouts.index', ['data' => $data]);
 
+        /* $data = GoodScale::whereIn('status',['2','3'])->whereHas('goodScaleDetail')->get();
+
+        foreach($data as $row){
+            if($row->type == '2' && $row->goodScaleDetail()->exists() && $row->qty_final > 0 && $row->hasFrancoMod()){
+                $row->createPurchaseOrder();
+            }
+        } */
+
         /* $data = ProductionFgReceive::whereIn('status',['2','3'])->where('post_date','>=','2024-09-01')->where('post_date','<=','2024-09-30')->get();
 
         $total = 0;

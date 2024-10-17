@@ -225,7 +225,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col s6">
+                            <div class="col s12 m6">
                                 <fieldset style="min-width: 100%;">
                                     <legend>2a. Dari Item dan Area</legend>
                                     <div class="input-field col m6 s12">
@@ -246,12 +246,18 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <div class="col s6">
+                            <div class="col s12 m6">
                                 <fieldset>
                                     <legend>2b. Dari Scan Barcode</legend>
                                     <div class="input-field col m12 s12">
                                         <input id="text-barcode" name="text-barcode" type="text" value="" placeholder="Silahkan arahkan cursor disini dan mulai scan...">
                                         <label class="active" for="text-barcode">Scan disini</label>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <legend>2c. Dari List Item</legend>
+                                    <div class="input-field col m12 s12 center">
+                                        <a class="waves-effect waves-light red btn-small" id="document-barcode" onclick="getDocumentBarcode();" href="javascript:void(0);"><i class="material-icons left">assignment</i> Tarik Data</a>
                                     </div>
                                 </fieldset>
                             </div>
@@ -549,6 +555,44 @@
     </div>
 </div>
 
+<div id="modal_rcfg" class="modal modal-fixed-footer" style="max-height: 100% !important;height: 100% !important;">
+    <div class="modal-content">
+        <div class="row">
+            <div class="col s12">
+                <h5>Daftar Barcode Tersedia Sesuai Receive FG Terpilih</h5>
+                <div class="row">
+                    <div class="col s12 mt-2">
+                        <div class="input-field col m6 s12">
+                            <select class="browser-default" id="area_rcfg_id" name="area_rcfg_id"></select>
+                            <label class="active" for="area_rcfg_id">Area Tujuan</label>
+                        </div>
+                        <br>
+                        <div id="datatable_buttons_rcfg"></div>
+                        <i class="right">Pilih salah satu item dan batch untuk dimasukkan ke dokumen serah terima.</i>
+                        <table id="table_rcfg" class="display" width="100%">
+                            <thead>
+                                <tr>
+                                    <th class="center">No.Batch Palet/Curah</th>
+                                    <th class="center">Kode Item</th>
+                                    <th class="center">Nama Item</th>
+                                    <th class="center">{{ __('translations.shading') }}</th>
+                                    <th class="center">Qty Diterima</th>
+                                    <th class="center">Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="body-detail-rcfg"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a href="javascript:void(0);" class="modal-action modal-close waves-effect waves-red btn-flat mr-1" onclick="closeModalDocumentBarcode();">{{ __('translations.close') }}</a>
+        <button class="btn waves-effect waves-light purple right submit" onclick="applyDocumentBarcode();">Gunakan <i class="material-icons right">forward</i></button>
+    </div>
+</div>
+
 <div style="bottom: 50px; right: 19px;" class="fixed-action-btn direction-top">
     <a class="btn-floating btn-large gradient-45deg-light-blue-cyan gradient-shadow modal-trigger" href="#modal1">
         <i class="material-icons">add</i>
@@ -563,6 +607,8 @@
 
 <!-- END: Page Main-->
 <script>
+    var arrDetail = [];
+
     document.addEventListener('focusin', function (event) {
         const select2Container = event.target.closest('.modal-content .select2');
         const activeSelect2 = document.querySelector('.modal-content .select2.tab-active');
@@ -768,11 +814,89 @@
                     </tr>
                 `);
                 $('#qty').data('max','0,000');
+                arrDetail = [];
+            }
+        });
+
+        $('#modal_rcfg').modal({
+            onOpenStart: function(modal,trigger) {
+                
+            },
+            onOpenEnd: function(modal, trigger) {
+                table_rcfg = $('#table_rcfg').on('init.dt', function() {
+                        
+                    }).DataTable({
+                    "responsive": true,
+                    scrollY: '50vh',
+                    scrollCollapse: true,
+                    "iDisplayInLength": 100,
+                    "order": [[0, 'asc']],
+                    dom: 'Blfrtip',
+                    buttons: [
+                        'selectAll',
+                        'selectNone'
+                    ],
+                    "language": {
+                        "lengthMenu": "Menampilkan _MENU_ data per halaman",
+                        "zeroRecords": "Data tidak ditemukan / kosong",
+                        "info": "Menampilkan halaman _PAGE_ / _PAGES_ dari total _TOTAL_ data",
+                        "infoEmpty": "Data tidak ditemukan / kosong",
+                        "infoFiltered": "(disaring dari _MAX_ total data)",
+                        "search": "Cari",
+                        "paginate": {
+                            first:      "<<",
+                            previous:   "<",
+                            next:       ">",
+                            last:       ">>"
+                        },
+                        "buttons": {
+                            selectAll: "Pilih semua",
+                            selectNone: "Hapus pilihan"
+                        },
+                        "select": {
+                            rows: "%d baris terpilih"
+                        }
+                    },
+                    select: {
+                        style: 'multi'
+                    }
+                });
+                $('#table_rcfg_wrapper > .dt-buttons').appendTo('#datatable_buttons_rcfg');
+                $('select[name="table_rcfg_length"]').addClass('browser-default');
+            },
+            onCloseEnd: function(modal, trigger){
+                $('#body-detail-rcfg').empty();
+                $('#area_rcfg_id').empty();
+                $('#table_rcfg').DataTable().clear().destroy();
             }
         });
         
         select2ServerSide('#production_fg_receive_id', '{{ url("admin/select2/production_fg_receive") }}');
         select2ServerSide('#area_id', '{{ url("admin/select2/area") }}');
+
+        $('#area_rcfg_id').select2({
+            placeholder: '-- Kosong --',
+            minimumInputLength: 1,
+            allowClear: true,
+            cache: true,
+            width: 'resolve',
+            dropdownParent: $('#modal_rcfg > .modal-content').parent(),
+            ajax: {
+                url: '{{ url("admin/select2/area") }}',
+                type: 'GET',
+                dataType: 'JSON',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.items
+                    }
+                }
+            }
+        });
 
         $('#production_fg_receive_detail_id').select2({
             placeholder: '-- Kosong --',
@@ -789,6 +913,7 @@
                     return {
                         search: params.term,
                         fgr_id: $('#production_fg_receive_id').val(),
+                        arr_detail: arrDetail,
                     };
                 },
                 processResults: function(data) {
@@ -810,6 +935,7 @@
                     </tr>
                 `);
             }
+            addArrayUsed();
         });
 
         $("#text-barcode").on( "change", function(e) {
@@ -908,6 +1034,8 @@
                                 $('#arr_qty_reject' + count).trigger('keyup');
                             }
 
+                            addArrayUsed();
+
                             $('.modal-content').scrollTop(400);
                             M.updateTextFields();
 
@@ -935,6 +1063,232 @@
             $('#text-barcode').val('');
         });
     });
+
+    function applyDocumentBarcode(){
+        if($('#area_rcfg_id').val()){
+            swal({
+                title: "Apakah anda yakin?",
+                text: "Jika sudah ada di dalam tabel detail form, maka akan tergantikan dengan pilihan baru anda saat ini.",
+                icon: 'warning',
+                dangerMode: true,
+                buttons: {
+                cancel: 'Tidak, jangan!',
+                delete: 'Ya, lanjutkan!'
+                }
+            }).then(function (willDelete) {
+                if (willDelete) {
+                    let arr_id = [], passed = true;
+                    $.map(table_rcfg.rows('.selected').nodes(), function (item) {
+                        arr_id.push($(item).data('id'));
+                    });
+                    if(arr_id.length > 0){
+                        $.ajax({
+                            url: '{{ Request::url() }}/get_pallet_barcode_by_document',
+                            type: 'POST',
+                            dataType: 'JSON',
+                            data: {
+                                area_id: $('#area_rcfg_id').val(),
+                                arr_id: arr_id,
+                                arr_detail: arrDetail,
+                            },
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            beforeSend: function() {
+                                loadingOpen('.modal-content');
+                            },
+                            success: function(response) {
+                                loadingClose('.modal-content');
+
+                                if(response.status == 500){
+                                    swal({
+                                        title: 'Ups!',
+                                        text: response.message,
+                                        icon: 'warning'
+                                    });
+                                    if(response.errors){
+                                        $.each(response.errors, function(i, val) {
+                                            M.toast({
+                                                html: val
+                                            });
+                                        });
+                                    }
+                                }else{
+                                    if(response.length > 0){
+                                        if($('.row_item').length == 0){
+                                            $('#body-item').empty();
+                                        }
+                                        $.each(response, function(i, val) {
+                                            let count = makeid(10);
+
+                                            let no = i + 1;
+
+                                            $('#body-item').append(`
+                                                <tr class="row_item">
+                                                    <input type="hidden" name="arr_prfd_id[]" value="` + val.id + `">
+                                                    <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
+                                                    <input type="hidden" name="arr_area_id[]" value="` + $('#area_rcfg_id').val() + `">
+                                                    <td class="center">
+                                                        <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
+                                                            <i class="material-icons">delete</i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + no + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.pallet_no + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.item_code + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.item_name + `
+                                                    </td>
+                                                    <td>
+                                                        ` + val.shading + `
+                                                    </td>
+                                                    <td class="center">
+                                                        <input name="arr_qty[]" onfocus="emptyThis(this);" type="text" value="` + val.qty + `" style="text-align:right;width:100%;border-bottom: none;" id="arr_qty`+ count +`" readonly data-item="` + val.pallet_no + `">
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + val.unit + `
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_place` + count + `" name="arr_place[]">
+                                                            @foreach ($place as $rowplace)
+                                                                <option value="{{ $rowplace->id }}">{{ $rowplace->code }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="browser-default" id="arr_warehouse` + count + `" name="arr_warehouse[]">
+                                                            <option value="">--Silahkan pilih item--</option>
+                                                        </select>
+                                                    </td>
+                                                    <td class="center-align">
+                                                        ` + $('#area_rcfg_id').select2('data')[0].text + `
+                                                    </td>
+                                                </tr>
+                                            `);
+
+                                            if(val.list_warehouse.length > 0){
+                                                $('#arr_warehouse' + count).empty();
+                                                $.each(val.list_warehouse, function(i, value) {
+                                                    $('#arr_warehouse' + count).append(`
+                                                        <option value="` + value.id + `">` + value.name + `</option>
+                                                    `);
+                                                });
+                                            }
+                                        });
+                                        $('.modal-content').scrollTop($("#body-item").offset().top);
+                                    }
+                                    
+                                    addArrayUsed();
+                                    $('#area_rcfg_id').empty();
+                                }
+                            },
+                            error: function() {
+                                $('.modal-content').scrollTop(0);
+                                loadingClose('.modal-content');
+                                swal({
+                                    title: 'Ups!',
+                                    text: 'Check your internet connection.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                        $('#modal_rcfg').modal('close');
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Silahkan pilih minimal 1 baris.',
+                            icon: 'warning'
+                        });
+                    }
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih area tujuan.',
+                icon: 'warning'
+            });
+        }
+    }
+
+    function getDocumentBarcode(){
+        if($('#production_fg_receive_id').val()){
+            $.ajax({
+                url: '{{ Request::url() }}/get_document_barcode',
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    production_fg_receive_id: $('#production_fg_receive_id').val(),
+                    arr_detail: arrDetail,
+                },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                beforeSend: function() {
+                    loadingOpen('.modal-body');
+                },
+                success: function(response) {
+                    loadingClose('.modal-content');
+                    $('#modal_rcfg').modal('open');
+                    if(response.details.length > 0){
+                        $.each(response.details, function(i, val) {
+                            $('#body-detail-rcfg').append(`
+                                <tr data-id="` + val.id + `">
+                                    <td>
+                                        ` + val.code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_code + `
+                                    </td>
+                                    <td>
+                                        ` + val.item_name + `
+                                    </td>
+                                    <td>
+                                        ` + val.shading + `
+                                    </td>
+                                    <td class="right-align">
+                                        ` + val.qty + `
+                                    </td>
+                                    <td class="center">
+                                        ` + val.unit + `
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }else{
+                        swal({
+                            title: 'Ups!',
+                            text: 'Data tidak ditemukan',
+                            icon: 'error'
+                        });
+                    }
+                    $('.modal-content').scrollTop(0);
+                    M.updateTextFields();
+                },
+                error: function() {
+                    $('.modal-content').scrollTop(0);
+                    loadingClose('.modal-content');
+                    swal({
+                        title: 'Ups!',
+                        text: 'Check your internet connection.',
+                        icon: 'error'
+                    });
+                }
+            });
+        }else{
+            swal({
+                title: 'Ups!',
+                text: 'Silahkan pilih Production FG Receive.',
+                icon: 'error'
+            });
+        }
+    }
 
     function getNote(){
         $('#note').val('');
@@ -1215,6 +1569,14 @@
             }
         });
     }
+
+    function addArrayUsed(){
+        arrDetail = [];
+        $('input[name^="arr_prfd_id[]"]').each(function(index){
+            arrDetail.push($(this).val());
+        });
+    }
+
     function getItem(data){
         if($('#production_fg_receive_detail_id').val() && $('#area_id').val() && parseFloat($('#qty').val().replaceAll(".", "").replaceAll(",",".")) > 0){
             let datakuy = $('#production_fg_receive_detail_id').select2('data')[0];
@@ -1290,6 +1652,8 @@
 
             $('#production_fg_receive_detail_id,#area_id').empty();
             $('#qty').val('0,000');
+
+            addArrayUsed();
         }else{
             /* $('#body-item').empty().append(`
                 <tr id="last-row-item">
@@ -1870,10 +2234,12 @@
 
                     $('#arr_place' + count).val(val.place_id);
                     $('#arr_warehouse' + count).val(val.warehouse_id);
+                    
                 });
 
                 M.updateTextFields();
                 $('.modal-content').scrollTop(0);
+                addArrayUsed();
             },
             error: function() {
                 $('.modal-content').scrollTop(0);

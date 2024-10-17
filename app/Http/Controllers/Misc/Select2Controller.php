@@ -3942,6 +3942,11 @@ class Select2Controller extends Controller {
                 ->orWhere('shading', 'like', "%$search%");
         })
         ->where('production_fg_receive_id',$request->fgr_id)
+        ->where(function($query)use($request){
+            if($request->arr_detail){
+                $query->whereNotIn('id',$request->arr_detail);
+            }
+        })
         ->get();
 
         foreach($data as $d) {

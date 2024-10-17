@@ -532,6 +532,78 @@ class ProductionHandoverController extends Controller
 		return response()->json($response);
     }
 
+    public function getDocumentBarcode(Request $request){
+
+        $detail = ProductionFgReceiveDetail::where('production_fg_receive_id',$request->production_fg_receive_id)
+                ->where( function($query)use($request){
+                    if($request->arr_detail){
+                        $query->whereNotIn('id',$request->arr_detail);
+                    }
+                })->get();
+
+        $result = [];
+
+        if(count($detail) > 0){
+            foreach($detail as $row){
+                $result[] = [
+                    'id'            => $row->id,
+                    'item_code'     => $row->item->code,
+                    'item_name'     => $row->item->name,
+                    'code'          => $row->pallet_no,
+                    'shading'       => $row->shading,
+                    'qty'           => CustomHelper::formatConditionalQty($row->qty_sell),
+                    'unit'          => $row->itemUnit->unit->code,
+                ];
+            }
+    
+            return response()->json([
+                'status'    => 200,
+                'details'   => $result,
+            ]);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan / sudah dimasukkan ke dalam tabel.'
+            ]);
+        }
+    }
+
+    public function getPalletBarcodeByDocument(Request $request){
+
+        $data = ProductionFgReceiveDetail::whereIn('id',$request->arr_id)->whereHas('productionFgReceive',function($query)use($request){
+            $query->whereIn('status',['2','3']);
+        })
+        ->where(column: function($query)use($request){
+            if($request->arr_detail){
+                $query->whereNotIn('id',$request->arr_detail);
+            }
+        })->get();
+
+        if(count($data) > 0){
+            foreach($data as $item){
+                $result[] = [
+                    'id'            => $item->id,
+                    'item_id'       => $item->item_id,
+                    'pallet_no'     => $item->pallet_no,
+                    'item_code'     => $item->item->code,
+                    'item_name'     => $item->item->name,
+                    'shading'       => $item->shading,
+                    'unit'          => $item->itemUnit->unit->code,
+                    'list_warehouse'=> $item->item->warehouseList(),
+                    'place_id'      => $item->productionFgReceive->place_id,
+                    'qty'           => CustomHelper::formatConditionalQty($item->qty_sell),
+                ];
+            }
+
+            return response()->json($result);
+        }else{
+            return response()->json([
+                'status'    => 500,
+                'message'   => 'Data tidak ditemukan.'
+            ]);
+        }
+    }
+
     public function show(Request $request){
         $detail_receive = [];
 

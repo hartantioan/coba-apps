@@ -2458,6 +2458,8 @@ Route::prefix('admin')->group(function () {
                     Route::post('show', [ProductionHandoverController::class, 'show']);
                     Route::post('get_code', [ProductionHandoverController::class, 'getCode']);
                     Route::post('get_scan_barcode', [ProductionHandoverController::class, 'getScanBarcode']);
+                    Route::post('get_document_barcode', [ProductionHandoverController::class, 'getDocumentBarcode']);
+                    Route::post('get_pallet_barcode_by_document', [ProductionHandoverController::class, 'getPalletBarcodeByDocument']);
                     Route::post('get_child_fg', [ProductionHandoverController::class, 'getChildFg']);
                     Route::post('print', [ProductionHandoverController::class, 'print']);
                     Route::post('done', [ProductionHandoverController::class, 'done'])->middleware('operation.access:production_handover,update');

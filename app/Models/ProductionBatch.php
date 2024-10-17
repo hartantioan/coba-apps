@@ -191,9 +191,14 @@ class ProductionBatch extends Model
     public static function getLatestCodeFg($yearmonth){
         $query = ProductionBatch::selectRaw('RIGHT(code, 5) as code')
             ->whereRaw("RIGHT(code, 9) LIKE '$yearmonth%'")
+            ->where(function($query){
+                $query->whereNull('lookable_type')
+                    ->orWhere('lookable_type','production_handover_details')
+                    ->orWhere('lookable_type','production_fg_receive_details');
+            })
             ->withTrashed()
-            ->orderByDesc('code')
             ->orderByDesc('id')
+            ->orderByDesc('code')
             ->limit(1)
             ->get();
 

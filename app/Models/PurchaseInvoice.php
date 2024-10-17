@@ -696,6 +696,16 @@ class PurchaseInvoice extends Model
         return $currency_rate;
     }
 
+    public function latestCurrencyRateByDateBefore($date){
+        $currency_rate = $this->currency_rate;
+        foreach($this->adjustRateDetail()->whereHas('adjustRate',function($query)use($date){
+            $query->where('post_date','<',$date)->orderBy('post_date');
+        })->get() as $row){
+            $currency_rate = $row->adjustRate->currency_rate;
+        }
+        return $currency_rate;
+    }
+
     public function cancelDocument(){
         return $this->hasOne('App\Models\CancelDocument','lookable_id','id')->where('lookable_type',$this->table);
     }

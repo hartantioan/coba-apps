@@ -5938,6 +5938,11 @@ class CustomHelper {
 				foreach($ar->adjustRateDetail as $row){
 					$nominal = abs($row->nominal);
 					if($row->type == '1'){
+						$rateBefore = $row->lookable->latestCurrencyRateByDateBefore($data->post_date);
+						$totalBefore = round($row->nominal_fc * $rateBefore,2);
+						$totalNew = round($row->nominal_fc * $ar->currency_rate,2);
+						$balance = $totalNew - $totalBefore;
+						$nominal = abs($balance);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -6007,6 +6012,11 @@ class CustomHelper {
 						}
 					}
 					if($row->type == '2'){
+						$rateBefore = $row->lookable->latestCurrencyRateByDateBefore($data->post_date);
+						$totalBefore = round($row->nominal_fc * $rateBefore,2);
+						$totalNew = round($row->nominal_fc * $ar->currency_rate,2);
+						$balance = $totalNew - $totalBefore;
+						$nominal = abs($balance);
 						JournalDetail::create([
 							'journal_id'	=> $query->id,
 							'coa_id'		=> $row->coa_id,
@@ -6075,6 +6085,9 @@ class CustomHelper {
 							}
 						}
 					}
+					$row->update([
+						'nominal'	=> $nominal,
+					]);
 				}
 			}
 

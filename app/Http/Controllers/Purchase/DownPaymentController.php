@@ -176,7 +176,7 @@ class DownPaymentController extends Controller
             if($balance > 0){
                 $results[] = [
                     'code'          => $row->code,
-                    'supplier_name' => $row->name.round($row->grandtotal * $currency_rate, 2) - round(round($row->grandtotal * $row->currency_rate, 2) + $row->adjust_nominal,2),
+                    'supplier_name' => $row->name,
                     'type'          => PurchaseDownPayment::typeStatic($row->typepdp),
                     'post_date'     => date('d/m/Y',strtotime(  $row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),

@@ -77,6 +77,7 @@
                                                         <option value="">{{ __('translations.all') }}</option>
                                                         <option value="1">Persediaan Barang</option>
                                                         <option value="2">Lain-lain</option>
+                                                        <option value="3">Ekspedisi Penjualan</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -282,6 +283,7 @@
                                 <select class="form-control" id="inventory_type" name="inventory_type" onchange="applyType()">
                                     <option value="1">Persediaan Barang</option>
                                     <option value="2">Lain-lain</option>
+                                    <option value="3">Ekspedisi Penjualan</option>
                                 </select>
                                 <label class="" for="inventory_type">Tipe Pembelian</label>
                             </div>
@@ -1927,7 +1929,7 @@
             `);
             select2ServerSide('#arr_item' + count, '{{ url("admin/select2/purchase_item") }}');
             
-        }else if($('#inventory_type').val() == '2'){
+        }else if($('#inventory_type').val() == '2' || $('#inventory_type').val() == '3'){
 
             $('#last-row-item').before(`
                 <tr class="row_item">
@@ -2752,7 +2754,7 @@
                                 });
                             }
 
-                        }else if(response.inventory_type == '2'){
+                        }else if(response.inventory_type == '2' || response.inventory_type == '3'){
 
                             $('#last-row-item').before(`
                                 <tr class="row_item">

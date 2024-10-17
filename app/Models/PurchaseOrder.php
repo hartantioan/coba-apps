@@ -111,6 +111,7 @@ class PurchaseOrder extends Model
         $type = match ($this->inventory_type) {
           '1' => 'Persediaan Barang',
           '2' => 'Lain-lain',
+          '3' => 'Ekspedisi Penjualan',
           default => 'Invalid',
         };
 
@@ -121,6 +122,7 @@ class PurchaseOrder extends Model
         $type = match ($this->inventory_type) {
           '1' => '存货',
           '2' => '等等',
+          '3' => '销售远征',
           default => 'Invalid',
         };
 

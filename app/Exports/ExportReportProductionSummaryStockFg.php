@@ -36,6 +36,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
         'Good Receive',
         'Repack(+)',
         'Delivery',
+        'SJ Belum Scan',
         'Repack(-)',
         'Good Issue',
         'Total',
@@ -47,6 +48,9 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
         // $submit = DB::select($query_data);
 
         $item = ItemShading::join('items', 'item_shadings.item_id', '=', 'items.id')
+        ->whereHas('item',function ($query)  {
+            $query->whereNull('deleted_at');
+        })
         ->orderBy('items.code')
         ->orderBy('items.id')
         ->select('item_shadings.*')
@@ -54,8 +58,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
 
 
         $arr = [];
-        foreach($item as $row){
-
+        foreach($item as $index => $row){
 
             $handover_awal = ProductionHandoverDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('productionHandover',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
@@ -152,18 +155,48 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
                 $query->whereIn('status',["2","3"])
                 ->where('post_date', '>=',$this->start_date)
-                ->where('post_date', '<=', $this->finish_date);
-                // ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
-                //     $query->whereIn('status',['2']);
-                // });
+                ->where('post_date', '<=', $this->finish_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack',function($query){
+                    $query->whereIn('status',['2']);
+                });
             })->get();
 
+            $delivery_process_no_scan = MarketingOrderDeliveryProcessDetail::where('deleted_at',null)
+            ->whereHas('itemStock',function ($query) use ($row) {
+                $query->where('item_shading_id',$row->id);
+            })
+            ->whereHas('marketingOrderDeliveryProcess',function ($query) use ($row) {
+                $query->whereIn('status',["2","3"])
+                ->where('post_date', '>=',$this->start_date)
+                ->where('post_date', '<=', $this->finish_date)
+                ->whereHas('marketingOrderDeliveryProcessTrack', function ($query) {
+                    $query->where('status', '1');
+                })
+                ->whereDoesntHave('marketingOrderDeliveryProcessTrack', function ($query) {
+                    $query->where('status', '!=', '1');
+                });
+            })->get();
+
+            // if($row->id == 48){
+            //    info($delivery_process);
+            //    info( $delivery_process_no_scan);
+            // }
+
             $total_sj = 0;
+            $total_sj_no_scan = 0;
             if($delivery_process){
                 foreach ($delivery_process as $row_sj) {
                     $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
 
                     $total_sj += $row_sj->qty * $qtyConversion;
+                }
+            }
+
+            if($delivery_process_no_scan){
+                foreach ($delivery_process_no_scan as $row_sj) {
+                    $qtyConversion =  $row_sj->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion ?? 1;
+
+                    $total_sj_no_scan += $row_sj->qty * $qtyConversion;
                 }
             }
 
@@ -191,7 +224,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             })->sum('qty');
 
 
-            $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out));
+            $total = $awal + (($total_handover+ $goodReceive+$repack_in) - ( $total_sj+$goodIssue+$repack_out+$total_sj_no_scan));
 
             $arr[] = [
                 'item_code'=> $row->item->code,
@@ -202,6 +235,7 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 'good_receive'=>$goodReceive,
                 'repack_in'=>$repack_in,
                 'SJ'=>$total_sj,
+                'SJ_no_scan'=>$total_sj_no_scan,
                 'repack_out'=>$repack_out,
                 'good_issue'=>$goodIssue,
                 'total'=>$total

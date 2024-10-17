@@ -241,9 +241,10 @@ class MarketingOrderDelivery extends Model
     public static function generateCode($prefix)
     {
         $cek = substr($prefix,0,7);
-        $query = MarketingOrderDelivery::selectRaw('RIGHT(code, 8) as code')
+        $query = MarketingOrderDelivery::selectRaw('SUBSTRING(code,11,8) as code')
             ->whereRaw("code LIKE '$cek%'")
             ->withTrashed()
+            ->orderByDesc('code')
             ->orderByDesc('id')
             ->limit(1)
             ->get();

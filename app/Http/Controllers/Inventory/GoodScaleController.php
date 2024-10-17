@@ -954,6 +954,12 @@ class GoodScaleController extends Controller
                 }
             } */
 
+            activity()
+                    ->performedOn(new GoodScale())
+                    ->causedBy(session('bo_id'))
+                    ->withProperties($gs)
+                    ->log('Scale out information good scale data');
+
             $response = [
                 'status'    => 200,
                 'message'   => 'Data successfully updated.',

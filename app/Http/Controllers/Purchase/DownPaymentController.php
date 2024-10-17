@@ -115,10 +115,11 @@ class DownPaymentController extends Controller
                         AND j.post_date <= :date5
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
-                ),0) AS total_journal,
+                        AND jd.type = '1'
+                ),0) AS total_journal_debit,
                 IFNULL((
                     SELECT
-                        SUM(jd.nominal)
+                        SUM(ROUND(jd.nominal,2))
                         FROM journal_details jd
                         JOIN journals j
                             ON j.id = jd.journal_id
@@ -129,7 +130,8 @@ class DownPaymentController extends Controller
                         AND j.post_date <= :date6
                         AND j.status IN ('2','3')
                         AND jd.deleted_at IS NULL
-                ),0) AS total_journal,
+                        AND jd.type = '2'
+                ),0) AS total_journal_credit,
                 u.name AS account_name,
                 u.employee_no AS account_code
                 FROM purchase_down_payments pdp
@@ -167,7 +169,7 @@ class DownPaymentController extends Controller
             $currency_rate = $row->latest_currency > 0 ? $row->latest_currency : $row->currency_rate;
             $total_received_after_adjust = round(round($row->grandtotal * $currency_rate,3),2);
             $total_invoice_after_adjust = round(($row->total_used + $row->total_memo) * $currency_rate,2);
-            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust,2);
+            $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row->total_journal_debit - $row->total_journal_credit,2);
             $balance = round($row->grandtotal - $row->total_used - $row->total_memo,2);
             $currency_rate = $row->latest_currency;
             /* $balance_rp = round($balance * $currency_rate,2) + $row->adjust_nominal - $row->total_journal; */
@@ -176,7 +178,7 @@ class DownPaymentController extends Controller
                     'code'          => $row->code,
                     'supplier_name' => $row->name,
                     'type'          => PurchaseDownPayment::typeStatic($row->typepdp),
-                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'post_date'     => date('d/m/Y',strtotime(  $row->post_date)),
                     'due_date'      => date('d/m/Y',strtotime($row->due_date)),
                     'note'          => $row->note,
                     'subtotal'      => number_format($row->subtotal * $currency_rate,2,',','.'),

@@ -194,7 +194,7 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
                         'item'              => $row_detail->item->code.'-'.$row_detail->item->name,
 
                         'delivery_date'     => date('d/m/Y',strtotime($row_detail->marketingOrder->delivery_date)),
-                        'qty'               => $row_detail->qty,
+                        'qty'               => $row_process_detail->qty,
                         'unit'              => $row_detail->itemUnit->unit->code,
                         'harga_satuan'      => $row_detail->price,
                         'discount_1'        => $row_detail->percent_discount_1,

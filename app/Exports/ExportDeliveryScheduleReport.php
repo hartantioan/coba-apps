@@ -75,7 +75,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
                 'Qty' => $row->qty,
                 'satuan' => $row->marketingOrderDetail->itemUnit->unit->code,
                 'Note' => $row->note,
-                'Note_internal' => $row->note_internal,
+                'Note_internal' => $row->marketingOrderDelivery->note_internal,
                 'SO Ref.' => $row->marketingOrderDetail->marketingOrder->code ?? '-',
             ];
         }

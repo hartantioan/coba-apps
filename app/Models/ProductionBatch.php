@@ -194,7 +194,8 @@ class ProductionBatch extends Model
             ->where(function($query){
                 $query->whereNull('lookable_type')
                     ->orWhere('lookable_type','production_handover_details')
-                    ->orWhere('lookable_type','production_fg_receive_details');
+                    ->orWhere('lookable_type','production_fg_receive_details')
+                    ->orWhere('lookable_type','production_repack_details');
             })
             ->withTrashed()
             ->orderByDesc('id')

@@ -1382,7 +1382,7 @@
             let optionStock = '<select class="browser-default" id="arr_item_stock' + val + '" name="arr_item_stock[]" required onchange="resetQty(`'+ val +'`)">';
             if($("#arr_item" + val).select2('data')[0].stock_list.length > 0){
                 $.each($("#arr_item" + val).select2('data')[0].stock_list, function(i, value) {
-                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.name + ' ' + value.shading + ' ' + value.qty + ' ' + value.batch + '</option>';
+                    optionStock += '<option value="' + value.id + '" data-qty="' + value.qty_raw + '">' + value.warehouse + '</option>';
                 });
             }else{
                 optionStock += '<option value="" data-qty="0,000">--Stock tidak ditemukan--</option>';

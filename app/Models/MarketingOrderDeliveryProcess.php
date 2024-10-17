@@ -60,6 +60,20 @@ class MarketingOrderDeliveryProcess extends Model
         return $type;
     }
 
+    public function statusSAP(){
+        $status = match ($this->status) {
+            '1' => 'W',
+            '2' => 'Y',
+            '3' => 'Y',
+            '4' => 'N',
+            '5' => 'C',
+            '6' => 'R',
+            default => 'Invalid',
+        };
+
+        return $status;
+    }
+
     public function getPoCustomer(){
         $arr = [];
         foreach($this->marketingOrderDeliveryProcessDetail as $row){

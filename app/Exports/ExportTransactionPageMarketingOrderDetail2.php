@@ -172,10 +172,10 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
         foreach($data as $key => $row){
             foreach($row->marketingOrderDeliveryProcessDetail as  $key_detail =>$row_process_detail){
                 $row_detail = $row_process_detail->marketingOrderDeliveryDetail->marketingOrderDetail;
-
+                if($row_detail->deleted_at == null){
                     $arr[] = [
                         'variant_item'      => $row_detail->item->type->name,
-                        'status'            => $row_detail->marketingOrder->statusSAP(),
+                        'status'            => $row->statusSAP(),
                         'no_do'             => $row->code ?? '-',
                         'no_so'             => $row_detail->marketingOrder->code,
                         'no_mod'            => $row_detail->listCodeMOD(),
@@ -214,6 +214,8 @@ class ExportTransactionPageMarketingOrderDetail2 implements FromCollection, With
 
                     ];
                     $x++;
+                }
+
             }
 
 

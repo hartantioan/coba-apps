@@ -39,7 +39,7 @@
             <th>Residu</th>
             <th>Kadar Air</th>
             <th>Ref.PO/MOD</th>
-            <th>Ref.GRPO</th>
+            <th>Ref.GRPO/DO</th>
         </tr>
     </thead>
     <tbody>
@@ -63,7 +63,7 @@
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->type() }}</td>
 
-                <td>{{ $row->delivery_no ?? '-' }}</td>
+                <td>{{ $row->getSalesSuratJalan() }}</td>
                 <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>
                 <td>{{ $row->note }}</td>

@@ -2938,11 +2938,7 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [ReportSalesSummaryStockFgController::class, 'export']);
                     });
 
-                    Route::prefix('report_delivery_on_the_way')->middleware('operation.access:report_delivery_on_the_way,view')->group(function () {
-                        Route::get('/', [ReportDeliveryOnTheWayController::class, 'index']);
-                        Route::post('filter', [ReportDeliveryOnTheWayController::class, 'filter']);
-                        Route::get('export', [ReportDeliveryOnTheWayController::class, 'export']);
-                    });
+
 
                     Route::prefix('report_tracking_sales_order')->middleware('operation.access:report_mod,view')->group(function () {
                         Route::get('/', [ReportTrackingSalesOrderController::class, 'index']);
@@ -3448,6 +3444,12 @@ Route::prefix('admin')->group(function () {
                         Route::get('/', [ReportAccountingSales::class, 'index']);
                         Route::post('filter', [ReportAccountingSales::class, 'filter']);
                         Route::get('export', [ReportAccountingSales::class, 'export']);
+                    });
+
+                    Route::prefix('report_delivery_on_the_way')->middleware('operation.access:report_delivery_on_the_way,view')->group(function () {
+                        Route::get('/', [ReportDeliveryOnTheWayController::class, 'index']);
+                        Route::post('filter', [ReportDeliveryOnTheWayController::class, 'filter']);
+                        Route::get('export', [ReportDeliveryOnTheWayController::class, 'export']);
                     });
 
                     Route::prefix('ledger')->middleware('operation.access:ledger,view')->group(function () {

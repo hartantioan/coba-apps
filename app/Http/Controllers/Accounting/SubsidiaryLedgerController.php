@@ -20,16 +20,6 @@ class SubsidiaryLedgerController extends Controller
     public function index(Request $request)
     {
 
-        $modp = MarketingOrderDeliveryProcessDetail::whereHas("journalDetail")->get();
-
-        foreach($modp as $row_modp){
-            foreach($row_modp->journalDetail as $row_journal_detail){
-              $row_journal_detail->update([
-                "note"=> $row_modp->marketingOrderDeliveryProcess->code,
-              ]);
-            }
-        }
-
         $data = [
             'title'     => '',
             'content'   => 'admin.accounting.subsidiary_ledger',

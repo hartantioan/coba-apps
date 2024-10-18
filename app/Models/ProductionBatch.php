@@ -198,8 +198,8 @@ class ProductionBatch extends Model
                     ->orWhere('lookable_type','production_repack_details');
             })
             ->withTrashed()
-            ->orderByDesc('id')
             ->orderByDesc('code')
+            ->orderByDesc('id')
             ->limit(1)
             ->get();
 

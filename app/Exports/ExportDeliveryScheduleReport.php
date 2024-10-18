@@ -65,7 +65,7 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
                 'Kode Item' => $row->item->code,
                 'Note' => $row->note,
                 'Barang' => $row->item->name,
-                'Plant'=> $row->marketingOrderDetail->place->name,
+                'Plant'=> $row->marketingOrderDetail->place->code,
                 'Qty Konversi' => $row->marketingOrderDetail->qty_conversion,
                 'satuan konversi' => $row->marketingOrderDetail->item->uomUnit->code,
                 'Qty' => $row->qty,

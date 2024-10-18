@@ -1082,12 +1082,14 @@
                         arr_id.push($(item).data('id'));
                     });
                     if(arr_id.length > 0){
+                        let area = $('#area_rcfg_id').select2('data')[0].text, area_id = $('#area_rcfg_id').val();
+
                         $.ajax({
                             url: '{{ Request::url() }}/get_pallet_barcode_by_document',
                             type: 'POST',
                             dataType: 'JSON',
                             data: {
-                                area_id: $('#area_rcfg_id').val(),
+                                area_id: area_id,
                                 arr_id: arr_id,
                                 arr_detail: arrDetail,
                             },
@@ -1127,7 +1129,7 @@
                                                 <tr class="row_item">
                                                     <input type="hidden" name="arr_prfd_id[]" value="` + val.id + `">
                                                     <input type="hidden" name="arr_item_id[]" value="` + val.item_id + `">
-                                                    <input type="hidden" name="arr_area_id[]" value="` + $('#area_rcfg_id').val() + `">
+                                                    <input type="hidden" name="arr_area_id[]" value="` + area_id + `">
                                                     <td class="center">
                                                         <a class="mb-6 btn-floating waves-effect waves-light red darken-1 delete-data-item" href="javascript:void(0);" data-id="` + count + `">
                                                             <i class="material-icons">delete</i>
@@ -1167,7 +1169,7 @@
                                                         </select>
                                                     </td>
                                                     <td class="center-align">
-                                                        ` + $('#area_rcfg_id').select2('data')[0].text + `
+                                                        ` + area + `
                                                     </td>
                                                 </tr>
                                             `);

@@ -6086,7 +6086,7 @@ class CustomHelper {
 						}
 					}
 					$row->update([
-						'nominal'	=> $nominal,
+						'nominal'	=> $row->nominal < 0 ? -1 * $nominal : $nominal,
 					]);
 				}
 			}

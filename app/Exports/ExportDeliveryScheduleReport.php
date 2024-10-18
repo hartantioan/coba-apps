@@ -23,33 +23,29 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
 
     private $headings = [
         'No.',
+        'SO Ref.',
         'No. Dokumen',
         'Status',
-        'NIK',
-        'Pengguna',
         'Post Date',
         'Status Kirim',
         'Tgl. Kirim',
         'Tipe Pengiriman',
         'Ekspedisi',
         'Kode Item',
+        'Note',
         'Barang',
         'Plant',
         'Qty Konversi',
         'Satuan Konversi',
         'Qty',
         'Satuan',
-        'Note',
         'Note Internal',
-        'SO Ref.',
     ];
     public function collection()
     {
         $array_filter = [];
         $mo = MarketingOrderDeliveryDetail::whereHas('marketingOrderDelivery', function ($query) {
-            $query->where('post_date', '>=', $this->start_date)
-                ->where('post_date', '<=', $this->end_date)
-                ->where('status','2')
+            $query->where('status','2')
                 ->whereNotNull('send_status');
         })->get();
 
@@ -58,25 +54,24 @@ class ExportDeliveryScheduleReport implements FromCollection, WithTitle, WithHea
 
             $array_filter[] = [
                 'No.' => ($key+1), // Assuming you have an ID or a similar unique identifier
+                'SO Ref.' => $row->marketingOrderDetail->marketingOrder->code ?? '-',
                 'No. Dokumen' => $row->marketingOrderDelivery->code,
                 'Status' => $row->marketingOrderDelivery->statusRaw(),
-                'NIK' => $row->marketingOrderDelivery->user->employee_no,
-                'Pengguna' => $row->marketingOrderDelivery->user->name,
                 'Post Date' => date('d/m/Y', strtotime($row->marketingOrderDelivery->post_date)),
                 'Status Kirim' => $row->marketingOrderDelivery->sendStatus(),
                 'Tgl. Kirim' => date('d/m/Y', strtotime($row->marketingOrderDelivery->delivery_date)),
                 'Tipe Pengiriman' => $row->marketingOrderDelivery->deliveryType(),
                 'Ekspedisi' => $row->marketingOrderDelivery->costDeliveryType(),
                 'Kode Item' => $row->item->code,
+                'Note' => $row->note,
                 'Barang' => $row->item->name,
                 'Plant'=> $row->marketingOrderDetail->place->name,
                 'Qty Konversi' => $row->marketingOrderDetail->qty_conversion,
                 'satuan konversi' => $row->marketingOrderDetail->item->uomUnit->code,
                 'Qty' => $row->qty,
                 'satuan' => $row->marketingOrderDetail->itemUnit->unit->code,
-                'Note' => $row->note,
                 'Note_internal' => $row->marketingOrderDelivery->note_internal,
-                'SO Ref.' => $row->marketingOrderDetail->marketingOrder->code ?? '-',
+
             ];
         }
         return collect($array_filter);

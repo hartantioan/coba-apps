@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\JournalDetail;
+use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,7 +19,7 @@ class SubsidiaryLedgerController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $data = [
             'title'     => '',
             'content'   => 'admin.accounting.subsidiary_ledger',
@@ -49,7 +51,7 @@ class SubsidiaryLedgerController extends Controller
         }
 
         $start_time = microtime(true);
-        
+
         $html = '<table class="bordered" id="table-result" style="min-width:2500px !important;zoom:0.6;">
                     <thead class="sidebar-sticky" style="background-color:white;">
                         <tr>
@@ -103,7 +105,7 @@ class SubsidiaryLedgerController extends Controller
                         <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
                         <td colspan="11"></td>
                     </tr>';
-        
+
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
                     $additional_ref = '';
@@ -140,7 +142,7 @@ class SubsidiaryLedgerController extends Controller
         }
 
         $html .= '</tbody></table>';
-        
+
 
         #end logic
 

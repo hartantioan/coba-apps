@@ -140,7 +140,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 'Discount 1' => $row->getMoDetail()->percent_discount_1 ?? '-',
                 'Discount 2' => $row->getMoDetail()->percent_discount_2 ?? '-',
                 'Discount 3' => $row->getMoDetail()->discount_3 ?? '-',
-                'Harga Setelah Diskon' => $row->grandtotal,
+                'Harga Setelah Diskon' => $price,
                 'Total' =>  $row->getQtyM2() * $price,
 
             ];

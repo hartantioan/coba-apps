@@ -9,6 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
 use App\Models\JournalDetail;
+use App\Models\MarketingOrderDeliveryProcess;
+use App\Models\MarketingOrderDeliveryProcessDetail;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -17,6 +19,16 @@ class SubsidiaryLedgerController extends Controller
 {
     public function index(Request $request)
     {
+
+        $modp = MarketingOrderDeliveryProcessDetail::whereHas("journalDetail")->get();
+
+        foreach($modp as $row_modp){
+            foreach($row_modp->journalDetail as $row_journal_detail){
+              $row_journal_detail->update([
+                "note"=> $row_modp->marketingOrderDeliveryProcess->code,
+              ]);
+            }
+        }
 
         $data = [
             'title'     => '',
@@ -110,11 +122,6 @@ class SubsidiaryLedgerController extends Controller
                     if($detail['data']->journal->lookable_type == 'outgoing_payments'){
                         $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;
                     }
-                    if($detail['data']->detailable_id != null && $detail['data']->detailable_type == 'marketing_order_delivery_process_details'){
-                        $info = $detail['data']->detailable->marketingOrderDeliveryProcess->code;
-                    }else{
-                        $info = $detail['data']->note . $additional_ref;
-                    }
                     $balance += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : round(-1 * $detail['data']->nominal,2));
                     $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
                     $nominalCurrency = $detail['data']->journal->currency()->exists() ? ($detail['data']->journal->currency->type == '1' ? '' : '1') : '';
@@ -130,7 +137,7 @@ class SubsidiaryLedgerController extends Controller
                         <td class="right-align">' . ($detail['data']->type == '2' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-') . '</td>
                         <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
                         <td>' . $detail['data']->journal->note . '</td>
-                        <td>' .  $info . '</td>
+                        <td>' . $detail['data']->note . $additional_ref . '</td>
                         <td>' . $detail['data']->note2 . '</td>
                         <td>' . ($detail['data']->place()->exists() ? $detail['data']->place->code : '-') . '</td>
                         <td>' . ($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-') . '</td>

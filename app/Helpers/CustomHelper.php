@@ -6835,7 +6835,7 @@ class CustomHelper {
 					}
 				}
 
-				$balanceKurs = $realDownPayment - $realInvoice;
+				$balanceKurs = round($realDownPayment - $realInvoice,2);
 
 				if($balanceKurs > 0 || $balanceKurs < 0){
 					JournalDetail::create([

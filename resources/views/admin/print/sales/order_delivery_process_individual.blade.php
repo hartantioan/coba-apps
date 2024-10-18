@@ -161,6 +161,158 @@
                     </td>
                 </tr>
             </table>
+            <!-- header section -->
+            <table border="0" width="100%" style="padding-top: 13px;margin-left:-20px;font-size:8px !important">
+                <tr>
+                    <td width="50%" class="left-align">
+                        <table border="0" width="100%" style="border-spacing: 0;">
+                            <tr style="margin:0px;">
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;" >
+                                    {{ $data->getPlace() }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->getWarehouse() }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->marketingOrderDelivery->code }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->account->name }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->marketingOrderDelivery->deliveryType() }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->marketingOrderDelivery->transportation->name }}/
+                                    {{ $data->no_container ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->vehicle_no }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="35%">
+
+                                </td>
+
+                                <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->driver_name }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                    <td width="50%" class="left-align">
+                        <table border="0" width="100%" style="border-spacing: 0;">
+                            <tr >
+                                <td width="30%">
+
+                                </td>
+
+                                <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->getPoCustomer() ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr >
+                                <td width="30%">
+
+                                </td>
+
+                                <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                    {{ $data->marketingOrderDelivery->customer->name ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td width="30%">
+
+                                </td>
+
+                                <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
+                                   {{ strtoupper($data->getOutlet()) ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                </td>
+
+                                <td>
+                                    {{ strtoupper($data->getProject()) ?? '-' }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                </td>
+
+                                <td >
+                                   <div style="min-height:36px !important">
+                                    {{ strtoupper($data->marketingOrderDelivery->destination_address) }}
+                                    <div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                </td>
+
+                                <td>
+                                    {{ strtoupper($data->marketingOrderDelivery->district->name) }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+
+                                </td>
+
+                                <td>
+                                    {{ strtoupper($data->marketingOrderDelivery->city->name) }}
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <div style="padding-left: 30px; height:60px;padding-top:0px;margin-top:0px;font-size:9px;">{{ $data->note_external }}</div>
         </header>
         <main style="margin-top:25px;">
             @if ($data->marketingOrderDelivery->so_type == '4' || $data->marketingOrderDelivery->so_type == '3' )
@@ -169,214 +321,88 @@
                 </div>
             @endif
             <div class="card">
+                @php
+                    $totalPalet = 0;
+                    $totalQty = 0;
+                @endphp
                 <div class="card-content invoice-print-area">
-                    <!-- header section -->
-                    <table border="0" width="100%" style="padding-top: 45px;margin-left:-20px;font-size:8px !important">
-                        <tr>
-                            <td width="50%" class="left-align">
-                                <table border="0" width="100%" style="border-spacing: 0;">
-                                    <tr style="margin:0px;">
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;" >
-                                            {{ $data->getPlace() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->getWarehouse() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->marketingOrderDelivery->code }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->account->name }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->marketingOrderDelivery->deliveryType() }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->marketingOrderDelivery->transportation->name }}/
-                                            {{ $data->no_container ?? '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->vehicle_no }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="35%">
-
-                                        </td>
-
-                                        <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->driver_name }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                            <td width="50%" class="left-align">
-                                <table border="0" width="100%" style="border-spacing: 0;">
-                                    <tr >
-                                        <td width="30%">
-
-                                        </td>
-
-                                        <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->getPoCustomer() ?? '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr >
-                                        <td width="30%">
-
-                                        </td>
-
-                                        <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                            {{ $data->marketingOrderDelivery->customer->name ?? '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td width="30%">
-
-                                        </td>
-
-                                        <td width="70%"  style="padding-top: 0px; padding-bottom: 0px;">
-                                           {{ strtoupper($data->getOutlet()) ?? '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-
-                                        </td>
-
-                                        <td>
-                                            {{ strtoupper($data->getProject()) ?? '-' }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-
-                                        </td>
-
-                                        <td >
-                                           <div style="min-height:36px !important">
-                                            {{ strtoupper($data->marketingOrderDelivery->destination_address) }}
-                                            <div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-
-                                        </td>
-
-                                        <td>
-                                            {{ strtoupper($data->marketingOrderDelivery->district->name) }}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-
-                                        </td>
-
-                                        <td>
-                                            {{ strtoupper($data->marketingOrderDelivery->city->name) }}
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                    <div style="padding-left: 30px; height:60px;padding-top:0px;margin-top:-10px">{{ $data->note_external }}</div>
-                    <div class="invoice-product-details mt-2" style="overflow:auto;margin-top:10px;">
+                    <div class="invoice-product-details mt-2" style="overflow:auto;margin-top:225px;">
                         <table  style="border-collapse:collapse;font-size:10px !important" width="100%">
-
                             <tbody>
-                                @php
-                                    $totalPalet = 0;
-                                    $totalQty = 0;
-                                @endphp
                                 @foreach($data->marketingOrderDeliveryProcessDetail as $key => $row)
-                                @php
-                                    if($row->itemStock->item->pallet->box_conversion > 1){
-                                        $totalPalet += $row->qty;
-                                    }
-                                    $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
-                                    $unitcode =  $data->marketingOrderDeliveryProcessDetail->first();
-                                @endphp
-                                <tr>
-                                    <td style="width:47%">{{ /* $row->itemStock->item->code.' - '. */$row->itemStock->item->name.' - '.$row->itemStock->itemShading->code }}</td>
-                                    <td style="width:30%">
-                                        {{ $row->itemStock->productionBatch->code }} ({{ CustomHelper::formatConditionalQty($row->qty * $row->itemStock->item->pallet->box_conversion) }} BOX)
-                                    </td>
-                                    <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
-                                    <td style="width:10%" align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
-                                    <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
-                                </tr>
-
+                                    @if($key < 24)
+                                    @php
+                                        if($row->itemStock->item->pallet->box_conversion > 1){
+                                            $totalPalet += $row->qty;
+                                        }
+                                        $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+                                        $unitcode =  $data->marketingOrderDeliveryProcessDetail->first();
+                                    @endphp
+                                    <tr>
+                                        <td style="width:47%">{{ /* $row->itemStock->item->code.' - '. */$row->itemStock->item->name.' - '.$row->itemStock->itemShading->code }}</td>
+                                        <td style="width:30%">
+                                            {{ $row->itemStock->productionBatch->code }} ({{ CustomHelper::formatConditionalQty($row->qty * $row->itemStock->item->pallet->box_conversion) }} BOX)
+                                        </td>
+                                        <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                        <td style="width:10%" align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
+                                        <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
+                                    </tr>
+                                    @endif
                                 @endforeach
                             </tbody>
                         </table>
-                        <table  style="border-collapse:collapse;font-size:10px !important;position: fixed;bottom: 250px; left: 0px; right: 0px;" width="100%">
-
+                    </div>
+                </div>
+                @if(count($data->marketingOrderDeliveryProcessDetail) > 24)
+                <div class="card-content invoice-print-area">
+                    <div style="page-break-before: always;">
+                        <table  style="border-collapse:collapse;font-size:10px !important;margin-top:250px;" width="100%">
                             <tbody>
-
-                                <tr>
-                                    <td style="width:40%"></td>
-                                    <td style="width:30%"></td>
-                                    <td style="width:10%" align="right"><strong>{{ CustomHelper::formatConditionalQty($totalQty) }}</strong></td>
-                                    <td style="width:10%;padding-bottom:0.5px" align="center"><strong>{{$unitcode->itemStock->item->uomUnit->code}}</strong></td>
-                                    <td style="width:10%" align="center"><strong>{{ CustomHelper::formatConditionalQty($totalPalet) }}</td>
-                                </tr>
-
+                                @foreach($data->marketingOrderDeliveryProcessDetail as $key => $row)
+                                    @if($key >= 24)
+                                    @php
+                                        if($row->itemStock->item->pallet->box_conversion > 1){
+                                            $totalPalet += $row->qty;
+                                        }
+                                        $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+                                        $unitcode =  $data->marketingOrderDeliveryProcessDetail->first();
+                                    @endphp
+                                    <tr>
+                                        <td style="width:47%">{{ /* $row->itemStock->item->code.' - '. */$row->itemStock->item->name.' - '.$row->itemStock->itemShading->code }}</td>
+                                        <td style="width:30%">
+                                            {{ $row->itemStock->productionBatch->code }} ({{ CustomHelper::formatConditionalQty($row->qty * $row->itemStock->item->pallet->box_conversion) }} BOX)
+                                        </td>
+                                        <td style="width:10%" align="right">{{ CustomHelper::formatConditionalQty(round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3)) }}</td>
+                                        <td style="width:10%" align="center">{{ $row->itemStock->item->uomUnit->code }}</td>
+                                        <td style="width:10%" align="center">{{ CustomHelper::formatConditionalQty($row->qty).' '.$row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code }}</td>
+                                    </tr>
+                                    @endif
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
-
-
-                    <div style="position: fixed;bottom: 137px; left: 40px; right: 0px;">
-
-                        {{ date('d/m/Y H:i') }} <span style="padding-left: 80px">{{$data->user->name}}</span>
-
-
-                    </div>
-
                 </div>
+                @endif
             </div>
         </main>
+        <footer>
+            <table  style="border-collapse:collapse;font-size:10px !important;position: fixed;bottom: 250px; left: 0px; right: 0px;" width="100%">
+
+                <tbody>
+
+                    <tr>
+                        <td style="width:40%"></td>
+                        <td style="width:30%"></td>
+                        <td style="width:10%" align="right"><strong>{{ CustomHelper::formatConditionalQty($totalQty) }}</strong></td>
+                        <td style="width:10%;padding-bottom:0.5px" align="center"><strong>{{$unitcode->itemStock->item->uomUnit->code}}</strong></td>
+                        <td style="width:10%" align="center"><strong>{{ CustomHelper::formatConditionalQty($totalPalet) }}</td>
+                    </tr>
+
+                </tbody>
+            </table>
+            <div style="position: fixed;bottom: 137px; left: 40px; right: 0px;font-size:9px;">
+                {{ date('d/m/Y H:i') }} <span style="padding-left: 80px">{{$data->user->name}}</span>
+            </div>
+        </footer>
     </body>
 </html>

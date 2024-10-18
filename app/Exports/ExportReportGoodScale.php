@@ -92,6 +92,11 @@ class ExportReportGoodScale implements FromCollection, WithTitle, WithHeadings, 
         ->get();
         $arr = [];
         foreach($query_data as $key=>$row){
+            if($row->type == '1' || $row->type =='3'){
+                $no_sj = $row->delivery_no ?? '-';
+            }else{
+                $no_sj = $row->getSalesSuratJalan();
+            }
             $arr[] = [
                 'no'                    => ($key+1),
                 'no_document'           => $row->code,
@@ -106,7 +111,7 @@ class ExportReportGoodScale implements FromCollection, WithTitle, WithHeadings, 
                 'user'                   => $row->user->name,
                 'tgl_terima'            => date('d/m/Y', strtotime($row->post_date)),
                 'tipe_timbangan'        => $row->type(),
-                'no_sj'                 => $row->delivery_no ?? '-',
+                'no_sj'                 => $no_sj,
                 'no_kendaraan'          => $row->vehicle_no ?? '-',
                 'supir'                 => $row->driver,
                 'note'                  => $row->note,

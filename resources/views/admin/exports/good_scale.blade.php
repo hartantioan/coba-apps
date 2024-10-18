@@ -63,7 +63,7 @@
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->type() }}</td>
                 <td>
-                    @if($type == 1)
+                    @if($row->type == 1 || $row->type == 3)
                         {{ $row->deliver_no ?? '-' }}
                     @else
                         {{ $row->getSalesSuratJalan() }}

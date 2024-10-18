@@ -488,7 +488,10 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 }
             }
             $goodIssue_awal = DB::select('CALL GetGoodIssueAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
+            info($row->item->name);
             info('1');
+            info($handover_awal);
+            info('fg_receive');
             info($totalQty_handover_awal);
             info('2');
             info($repack_in_awal);
@@ -498,6 +501,8 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
             info($goodReceive_awal);
             info('5');
             info($delivery_process_awal);
+            info('total_sj_awal');
+            info($total_sj_awal);
             info('6');
             info($goodIssue_awal);
             // $goodIssue_awal = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {

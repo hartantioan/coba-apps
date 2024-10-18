@@ -459,7 +459,6 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
 
             $goodReceive_awal = DB::select('CALL GetGoodReceiveAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
 
-
             // $goodReceive_awal = GoodReceiveDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodReceive',function ($query) use ($row) {
             //     $query->whereIn('status',["2","3"])
             //     ->where('post_date', '<', $this->start_date);
@@ -489,7 +488,18 @@ class ExportReportProductionSummaryStockFg implements FromCollection, WithTitle,
                 }
             }
             $goodIssue_awal = DB::select('CALL GetGoodIssueAwal(?, ?)', [$row->id, $this->start_date])[0]->total_qty;
-
+            info('1');
+            info($totalQty_handover_awal);
+            info('2');
+            info($repack_in_awal);
+            info('3');
+            info($repack_out_awal);
+            info('4');
+            info($goodReceive_awal);
+            info('5');
+            info($delivery_process_awal);
+            info('6');
+            info($goodIssue_awal);
             // $goodIssue_awal = GoodIssueDetail::where('item_shading_id',$row->id)->where('deleted_at',null)->whereHas('goodIssue',function ($query) use ($row) {
             //     $query->whereIn('status',["2","3"])
             //     ->where('post_date', '<', $this->start_date);

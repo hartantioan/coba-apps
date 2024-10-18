@@ -85,7 +85,11 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
         $arr = [];
 
         foreach ($invoice_detail as $key => $row) {
-
+            if($row->is_include_tax == 1) {
+                $price = $row->price / (($row->percent_tax + 100) / 100);
+            }else{
+                $price = $row->price;
+            }
             $arr[] = [
                 'no'=> ($key+1),
                 'status'              => $row->marketingOrderInvoice->statusRaw(),
@@ -126,12 +130,12 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 'qty' => $row->qty,
                 'satuan' => $row->getItemReal()->uomUnit->code ?? '-',
                 'qtym2' => $row->getQtyM2(),
-                'value' => $row->price,
+                'value' => $price,
                 'Discount 1' => $row->getMoDetail()->percent_discount_1 ?? '-',
                 'Discount 2' => $row->getMoDetail()->percent_discount_2 ?? '-',
                 'Discount 3' => $row->getMoDetail()->discount_3 ?? '-',
-                'Total' => $row->total,
                 'Harga Setelah Diskon' => $row->grandtotal,
+                'Total' =>  $row->getQtyM2() * $price,
 
             ];
         }

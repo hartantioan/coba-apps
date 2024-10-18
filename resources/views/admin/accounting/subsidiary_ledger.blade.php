@@ -206,6 +206,9 @@
                         html: response.message
                     });
                     $('#result').html(response.html);
+                    setTimeout(function () {
+                        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+                    }, 250);
                 } else {
                     M.toast({
                         html: response.message

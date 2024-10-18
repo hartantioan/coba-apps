@@ -189,6 +189,10 @@
                     M.toast({
                         html: 'Sukses proses data'
                     });
+
+                    setTimeout(function () {
+                        $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+                    }, 250);
                 } else if(response.status == 422) {
                     $('#validation_alert_multi').show();
                     $('#main').scrollTop(0);

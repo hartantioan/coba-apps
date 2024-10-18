@@ -64,7 +64,7 @@
                 <td>{{ $row->type() }}</td>
                 <td>
                     @if($row->type == 1 || $row->type == 3)
-                        {{ $row->deliver_no ?? '-' }}
+                        {{ $row->delivery_no ?? '-' }}
                     @else
                         {{ $row->getSalesSuratJalan() }}
                     @endif

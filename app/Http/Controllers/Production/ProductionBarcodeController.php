@@ -436,12 +436,14 @@ class ProductionBarcodeController extends Controller
                 $pod = ProductionOrderDetail::find($request->production_order_detail_id);
 
                 if(!$request->temp){
+                    $arrBarcode = [];
                     $passed = true;
                     foreach($request->arr_pallet_no as $key => $row){
                         $cek = ProductionBarcodeDetail::where('pallet_no',$row)->whereHas('productionBarcode',function($query){
                             $query->whereIn('status',['2','3']);
                         })->first();
                         if($cek){
+                            $arrBarcode[] = $cek->pallet_no;
                             $passed = false;
                         }
                     }
@@ -449,7 +451,7 @@ class ProductionBarcodeController extends Controller
                     if(!$passed){
                         return response()->json([
                             'status'  => 500,
-                            'message' => 'Production Barcode telah dipakai, silahkan cek kembali.'
+                            'message' => 'Production Barcode telah dipakai, silahkan cek kembali. Daftarnya adalah : '.implode(', ',$arrBarcode)
                         ]);
                     }
                 }

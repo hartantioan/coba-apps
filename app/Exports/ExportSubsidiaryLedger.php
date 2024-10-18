@@ -99,6 +99,12 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                     $additional_ref = ($rowdetail->note ? ' - ' : '').$rowdetail->journal->lookable->paymentRequest->code;
                 }
                 $balance = $rowdetail->type == '1' ? $balance + round($rowdetail->nominal,2) : $balance - round($rowdetail->nominal,2);
+
+                if($rowdetail->detailable_id != null && $rowdetail->detailable_type == 'marketing_order_delivery_process_details'){
+                    $info = $rowdetail->detailable->marketingOrderDeliveryProcess->code;
+                }else{
+                    $info = $rowdetail->notekuy.$additional_ref;
+                }
                 $arr[] = [
                     'code'      => $row->code,
                     'name'      => $row->name,
@@ -111,10 +117,10 @@ class ExportSubsidiaryLedger implements FromCollection, WithTitle, WithHeadings,
                     'credit_rp' => $rowdetail->type == '2' && $rowdetail->nominal != 0 ? number_format($rowdetail->nominal,2,',','.') : '0',
                     'balance'   => number_format($balance, 2, ',', '.'),
                     'note1'     => $rowdetail->journal->note,
-                    'note2'     => $rowdetail->notekuy.$additional_ref,
+                    'note2'     => $info,
                     'note3'     => $rowdetail->note2,
                     'place'     => $rowdetail->place()->exists() ? $rowdetail->place->code : '-',
-                    'warehouse' => $rowdetail->warehouse()->Exists() ? $rowdetail->warehouse->name : '-',
+                    'warehouse' => $rowdetail->warehouse()->exists() ? $rowdetail->warehouse->name : '-',
                     'line'      => $rowdetail->line()->exists() ? $rowdetail->line->code : '-',
                     'machine'   => $rowdetail->machine()->exists() ? $rowdetail->machine->code : '-',
                     'division'  => $rowdetail->department()->exists() ? $rowdetail->department->name : '-',

@@ -17,7 +17,7 @@ class SubsidiaryLedgerController extends Controller
 {
     public function index(Request $request)
     {
-        
+
         $data = [
             'title'     => '',
             'content'   => 'admin.accounting.subsidiary_ledger',
@@ -49,7 +49,7 @@ class SubsidiaryLedgerController extends Controller
         }
 
         $start_time = microtime(true);
-        
+
         $html = '<table class="bordered" id="table-result" style="min-width:2500px !important;zoom:0.6;">
                     <thead class="sidebar-sticky" style="background-color:white;">
                         <tr>
@@ -103,12 +103,17 @@ class SubsidiaryLedgerController extends Controller
                         <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
                         <td colspan="11"></td>
                     </tr>';
-        
+
             if(count($collect) > 0){
                 foreach($collect as $key => $detail){
                     $additional_ref = '';
                     if($detail['data']->journal->lookable_type == 'outgoing_payments'){
                         $additional_ref = ($detail['data']->note ? ' - ' : '').$detail['data']->journal->lookable->paymentRequest->code;
+                    }
+                    if($detail['data']->detailable_id != null && $detail['data']->detailable_type == 'marketing_order_delivery_process_details'){
+                        $info = $detail['data']->detailable->marketingOrderDeliveryProcess->code;
+                    }else{
+                        $info = $detail['data']->note . $additional_ref;
                     }
                     $balance += ($detail['data']->type == '1' ? round($detail['data']->nominal,2) : round(-1 * $detail['data']->nominal,2));
                     $currencySymbol = $detail['data']->journal->currency()->exists() ? $detail['data']->journal->currency->symbol : '';
@@ -125,7 +130,7 @@ class SubsidiaryLedgerController extends Controller
                         <td class="right-align">' . ($detail['data']->type == '2' && $detail['data']->nominal != 0 ? number_format($detail['data']->nominal, 2, ',', '.') : '-') . '</td>
                         <td class="right-align">' . ($balance != 0 ? number_format($balance, 2, ',', '.') : '-') . '</td>
                         <td>' . $detail['data']->journal->note . '</td>
-                        <td>' . $detail['data']->note . $additional_ref . '</td>
+                        <td>' .  $info . '</td>
                         <td>' . $detail['data']->note2 . '</td>
                         <td>' . ($detail['data']->place()->exists() ? $detail['data']->place->code : '-') . '</td>
                         <td>' . ($detail['data']->warehouse()->exists() ? $detail['data']->warehouse->name : '-') . '</td>
@@ -140,7 +145,7 @@ class SubsidiaryLedgerController extends Controller
         }
 
         $html .= '</tbody></table>';
-        
+
 
         #end logic
 

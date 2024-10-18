@@ -148,7 +148,7 @@ class ExportDownPayment implements FromView,ShouldAutoSize
 
             foreach($query_data as $row_invoice){
                 $currency_rate = $row_invoice->latest_currency > 0 ? $row_invoice->latest_currency : $row_invoice->currency_rate;
-                $total_received_after_adjust = round(round($row_invoice->grandtotal * $currency_rate,3),2);
+                $total_received_after_adjust = round($row_invoice->grandtotal * $currency_rate,2);
                 $total_invoice_after_adjust = round(($row_invoice->total_used + $row_invoice->total_memo) * $currency_rate,2);
                 $balance_after_adjust = round($total_received_after_adjust - $total_invoice_after_adjust + $row_invoice->total_journal_debit - $row_invoice->total_journal_credit,2);
                 $balance = round($row_invoice->grandtotal - $row_invoice->total_used - $row_invoice->total_memo,2);

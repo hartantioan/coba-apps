@@ -31,6 +31,8 @@ use App\Models\PurchaseDownPayment;
 use App\Models\PurchaseInvoice;
 use App\Models\UsedData;
 use App\Models\MenuUser;
+use App\Models\GoodReceiptDetail;
+
 class AdjustRateController extends Controller
 {
     protected $dataplaces, $dataplacecode;
@@ -60,6 +62,18 @@ class AdjustRateController extends Controller
         ];
 
         return view('admin.layouts.index', ['data' => $data]);
+
+        /* $data = GoodReceiptDetail::whereHas('goodReceipt',function($query){
+            $query->where('post_date','>=','2024-09-01')->where('post_date','<=','2024-09-14')->whereIn('status',['2','3']);
+        })->get();
+
+        foreach($data as $key => $row){
+            if($row->balanceInvoice() > 0){
+            if(round($row->total,2) !== round($row->journalNominal(),2)){
+                echo ($key + 1).'.'.$row->goodReceipt->code.' - '.$row->item->code.' - '.round($row->total,2).' - '.round($row->journalNominal(),2).'<br>';
+            }
+            }
+        } */
     }
 
    public function getCode(Request $request){

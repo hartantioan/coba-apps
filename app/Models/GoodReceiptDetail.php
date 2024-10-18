@@ -105,6 +105,14 @@ class GoodReceiptDetail extends Model
         });
     }
 
+    public function journalNominal(){
+        $total = 0;
+        foreach($this->journalDetail as $row){
+            $total = $row->nominal_fc;
+        }
+        return $total;
+    }
+
     public function itemSerial(){
         return $this->hasMany('App\Models\ItemSerial','lookable_id','id')->where('lookable_type',$this->table);
     }

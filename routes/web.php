@@ -2925,18 +2925,18 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [MarketingOrderDeliveryRecapController::class, 'export']);
                     });
 
-                    Route::prefix('delivery_schedule')->middleware('operation.access:report_mod,view')->group(function () {
+                    Route::prefix('delivery_schedule')->middleware('operation.access:delivery_schedule,view')->group(function () {
                         Route::get('/', [DeliveryScheduleController::class, 'index']);
                         Route::get('export', [DeliveryScheduleController::class, 'export']);
                     });
 
-                    Route::prefix('sales_summary_stock_fg')->middleware('operation.access:report_mod,view')->group(function () {
+                    Route::prefix('sales_summary_stock_fg')->middleware('operation.access:sales_summary_stock_fg,view')->group(function () {
                         Route::get('/', [ReportSalesSummaryStockFgController::class, 'index']);
                         Route::post('filter', [ReportSalesSummaryStockFgController::class, 'filter']);
                         Route::get('export', [ReportSalesSummaryStockFgController::class, 'export']);
                     });
 
-                    Route::prefix('report_tracking_sales_order')->middleware('operation.access:report_mod,view')->group(function () {
+                    Route::prefix('report_tracking_sales_order')->middleware('operation.access:report_tracking_sales_order,view')->group(function () {
                         Route::get('/', [ReportTrackingSalesOrderController::class, 'index']);
                         Route::post('filter', [ReportTrackingSalesOrderController::class, 'filter']);
                         Route::get('export', [ReportTrackingSalesOrderController::class, 'export']);

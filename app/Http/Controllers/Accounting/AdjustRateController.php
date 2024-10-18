@@ -69,7 +69,7 @@ class AdjustRateController extends Controller
 
         foreach($data as $key => $row){
             if($row->balanceInvoice() > 0){
-            if(round($row->total,2) !== round($row->journalNominal(),2)){
+            if(round($row->total * $row->purchaseOrderDetail->currency_rate,2) !== round($row->journalNominal(),2)){
                 echo ($key + 1).'.'.$row->goodReceipt->code.' - '.$row->item->code.' - '.round($row->total,2).' - '.round($row->journalNominal(),2).'<br>';
             }
             }

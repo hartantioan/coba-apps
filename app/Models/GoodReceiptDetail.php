@@ -108,7 +108,7 @@ class GoodReceiptDetail extends Model
     public function journalNominal(){
         $total = 0;
         foreach($this->journalDetail as $row){
-            $total = $row->nominal_fc;
+            $total = $row->nominal_fc * $row->journal->currency_rate;
         }
         return $total;
     }

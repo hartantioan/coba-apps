@@ -62,8 +62,13 @@
                 <td>{{ $row->user->name }}</td>
                 <td>{{ date('d/m/Y',strtotime($row->post_date)) }}</td>
                 <td>{{ $row->type() }}</td>
-
-                <td>{{ $row->getSalesSuratJalan() }}</td>
+                <td>
+                    @if($type == 1)
+                        {{ $row->deliver_no ?? '-' }}
+                    @else
+                        {{ $row->getSalesSuratJalan() }}
+                    @endif
+                </td>
                 <td>{{ $row->vehicle_no ?? '-' }}</td>
                 <td>{{ $row->driver }}</td>
                 <td>{{ $row->note }}</td>

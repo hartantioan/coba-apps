@@ -42,7 +42,7 @@ class MailReportMarketingDelivery extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id'];
+        $recipient = ['edp@superior.co.id, henrianto@superior.co.id'];
 
         //  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 

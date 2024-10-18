@@ -49,6 +49,32 @@ class MarketingOrderInvoiceDetail extends Model
         });
     }
 
+    public function getItem(){
+        if($this->lookable_type == 'marketing_order_delivery_process_details'){
+            return $this->lookable->itemStock->item->name;
+        }else if($this->lookable_type == 'marketing_order_delivery_details'){
+            return $this->lookable->item->name;
+        }
+    }
+
+    public function getItemCode(){
+        if($this->lookable_type == 'marketing_order_delivery_process_details'){
+            return $this->lookable->itemStock->item->code;
+        }else if($this->lookable_type == 'marketing_order_delivery_details'){
+            return $this->lookable->item->code;
+        }
+    }
+
+    public function getItemReal(){
+        if($this->lookable_type == 'marketing_order_delivery_process_details'){
+            return $this->lookable->itemStock->item;
+        }else if($this->lookable_type == 'marketing_order_delivery_details'){
+            return $this->lookable->item;
+        }
+    }
+
+
+
     public function getDownPayment(){
         $bobot = $this->total / $this->marketingOrderInvoice->total;
         $downpayment = $bobot * $this->marketingOrderInvoice->downpayment;
@@ -129,4 +155,22 @@ class MarketingOrderInvoiceDetail extends Model
         $total = $bobot * $this->marketingOrderInvoice->totalPay();
         return $total;
     }
+
+    public function getQtyM2(){
+        if($this->lookable_type == 'marketing_order_delivery_process_details'){
+            return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion * $this->qty;
+        }else if($this->lookable_type == 'marketing_order_delivery_details'){
+            return $this->lookable->marketingOrderDetail->qty_conversion * $this->qty;
+        }
+    }
+
+    public function getMoDetail(){
+        if($this->lookable_type == 'marketing_order_delivery_process_details'){
+            return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail;
+        }else if($this->lookable_type == 'marketing_order_delivery_details'){
+            return $this->lookable->marketingOrderDetail;
+        }
+    }
+
+
 }

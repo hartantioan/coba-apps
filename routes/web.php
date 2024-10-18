@@ -180,6 +180,7 @@ use App\Http\Controllers\Sales\MarketingOrderRecapController;
 use App\Http\Controllers\Sales\MarketingOrderDeliveryRecapController;
 use App\Http\Controllers\Sales\DeliveryScheduleController;
 use App\Http\Controllers\Sales\ReportSalesSummaryStockFgController;
+use App\Http\Controllers\Sales\ReportDeliveryOnTheWayController;
 use App\Http\Controllers\Sales\ReportTrackingSalesOrderController;
 use App\Http\Controllers\Sales\MarketingDeliveryRecapController;
 use App\Http\Controllers\Sales\MarketingInvoiceRecapController;
@@ -215,6 +216,7 @@ use App\Http\Controllers\Accounting\ProfitLossController;
 use App\Http\Controllers\Accounting\ClosingJournalController;
 use App\Http\Controllers\Accounting\LockPeriodController;
 use App\Http\Controllers\Accounting\SubsidiaryLedgerController;
+use App\Http\Controllers\Accounting\ReportAccountingSales;
 use App\Http\Controllers\Finance\HistoryEmployeeReceivableController;
 use App\Http\Controllers\Inventory\GoodReturnIssueController;
 use App\Http\Controllers\Setting\MenuController;
@@ -2936,6 +2938,8 @@ Route::prefix('admin')->group(function () {
                         Route::get('export', [ReportSalesSummaryStockFgController::class, 'export']);
                     });
 
+
+
                     Route::prefix('report_tracking_sales_order')->middleware('operation.access:report_tracking_sales_order,view')->group(function () {
                         Route::get('/', [ReportTrackingSalesOrderController::class, 'index']);
                         Route::post('filter', [ReportTrackingSalesOrderController::class, 'filter']);
@@ -3435,6 +3439,19 @@ Route::prefix('admin')->group(function () {
                         Route::post('process', [SubsidiaryLedgerController::class, 'process']);
                         Route::get('export', [SubsidiaryLedgerController::class, 'export']);
                     });
+
+                    Route::prefix('report_accounting_sales')->middleware('operation.access:report_accounting_sales,view')->group(function () {
+                        Route::get('/', [ReportAccountingSales::class, 'index']);
+                        Route::post('filter', [ReportAccountingSales::class, 'filter']);
+                        Route::get('export', [ReportAccountingSales::class, 'export']);
+                    });
+
+                    Route::prefix('report_delivery_on_the_way')->middleware('operation.access:report_delivery_on_the_way,view')->group(function () {
+                        Route::get('/', [ReportDeliveryOnTheWayController::class, 'index']);
+                        Route::post('filter', [ReportDeliveryOnTheWayController::class, 'filter']);
+                        Route::get('export', [ReportDeliveryOnTheWayController::class, 'export']);
+                    });
+
                     Route::prefix('ledger')->middleware('operation.access:ledger,view')->group(function () {
                         Route::get('/', [LedgerController::class, 'index']);
                         Route::get('datatable', [LedgerController::class, 'datatable']);

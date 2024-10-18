@@ -51,77 +51,77 @@ class UnbilledAPController extends Controller
                 rs.delivery_no,
                 rs.note
                 FROM
-                    (SELECT 
+                    (SELECT
                         gr.*,
                         u.name AS account_name,
-                        IFNULL((SELECT 
+                        IFNULL((SELECT
                             SUM(ROUND(grd.total * (SELECT j.currency_rate FROM journals j WHERE j.lookable_type = 'good_receipts' AND j.lookable_id = gr.id),2))
                             FROM good_receipt_details grd
-                            WHERE grd.good_receipt_id = gr.id 
+                            WHERE grd.good_receipt_id = gr.id
                             AND grd.deleted_at IS NULL
                         ),0) AS total_detail,
-                        IFNULL((SELECT 
+                        IFNULL((SELECT
                             SUM(pid.total)
                             FROM purchase_invoice_details pid
                             JOIN purchase_invoices pi
                                 ON pi.id = pid.purchase_invoice_id
-                            WHERE pid.lookable_type = 'good_receipt_details' 
-                            AND pid.lookable_id 
+                            WHERE pid.lookable_type = 'good_receipt_details'
+                            AND pid.lookable_id
                                 IN (
-                                    SELECT 
-                                        grd.id 
+                                    SELECT
+                                        grd.id
                                         FROM good_receipt_details grd
-                                        WHERE grd.good_receipt_id = gr.id 
+                                        WHERE grd.good_receipt_id = gr.id
                                         AND grd.deleted_at IS NULL
                                     )
-                            AND pid.deleted_at IS NULL 
-                            AND pi.status IN ('2','3','7') 
+                            AND pid.deleted_at IS NULL
+                            AND pi.status IN ('2','3','7')
                             AND pi.post_date <= :date1
                         ),0) AS total_invoice,
                         IFNULL((
-                            SELECT 
+                            SELECT
                                 GROUP_CONCAT(DISTINCT pi.code)
                                 FROM purchase_invoice_details pid
                                 JOIN purchase_invoices pi
                                     ON pi.id = pid.purchase_invoice_id
-                                WHERE pid.lookable_type = 'good_receipt_details' 
-                                AND pid.lookable_id 
+                                WHERE pid.lookable_type = 'good_receipt_details'
+                                AND pid.lookable_id
                                     IN (
-                                        SELECT 
-                                            grd.id 
+                                        SELECT
+                                            grd.id
                                             FROM good_receipt_details grd
-                                            WHERE grd.good_receipt_id = gr.id 
+                                            WHERE grd.good_receipt_id = gr.id
                                             AND grd.deleted_at IS NULL
                                         )
-                                AND pid.deleted_at IS NULL 
-                                AND pi.status IN ('2','3','7') 
+                                AND pid.deleted_at IS NULL
+                                AND pi.status IN ('2','3','7')
                                 AND pi.post_date <= :date2
                         ),'') AS data_reconcile,
-                        IFNULL((SELECT 
-                            SUM(grtd.total) 
-                            FROM good_return_details grtd 
-                            WHERE grtd.good_receipt_detail_id 
+                        IFNULL((SELECT
+                            SUM(grtd.total)
+                            FROM good_return_details grtd
+                            WHERE grtd.good_receipt_detail_id
                                 IN (
-                                    SELECT 
-                                        grd.id 
+                                    SELECT
+                                        grd.id
                                         FROM good_receipt_details grd
-                                        WHERE grd.good_receipt_id = gr.id 
+                                        WHERE grd.good_receipt_id = gr.id
                                         AND grd.deleted_at IS NULL
                                     )
-                            AND grtd.deleted_at IS NULL 
-                            AND grtd.good_return_id 
+                            AND grtd.deleted_at IS NULL
+                            AND grtd.good_return_id
                                 IN (
-                                    SELECT 
-                                        grt.id 
-                                        FROM good_returns grt 
-                                        WHERE grt.status IN ('2','3') 
+                                    SELECT
+                                        grt.id
+                                        FROM good_returns grt
+                                        WHERE grt.status IN ('2','3')
                                         AND grt.post_date <= :date3
                                     )
                         ),0) AS total_return,
-                        (SELECT 
+                        (SELECT
                             j.currency_rate
-                            FROM journals j 
-                            WHERE 
+                            FROM journals j
+                            WHERE
                                 j.lookable_id = gr.id
                                 AND j.lookable_type = 'good_receipts'
                                 AND j.deleted_at IS NULL
@@ -131,13 +131,13 @@ class UnbilledAPController extends Controller
                             FROM adjust_rate_details ard
                             JOIN adjust_rates ar
                                 ON ar.id = ard.adjust_rate_id
-                            WHERE 
+                            WHERE
                                 ar.post_date <= :date4
                                 AND ar.status IN ('2','3')
                                 AND ard.lookable_type = 'good_receipts'
                                 AND ard.lookable_id = gr.id
                                 AND (
-                                    CASE 
+                                    CASE
                                         WHEN ar.post_date >= '2024-06-01' THEN ard.type = '2'
                                         WHEN ar.post_date < '2024-06-01' THEN ard.type IS NOT NULL
                                     END
@@ -146,7 +146,7 @@ class UnbilledAPController extends Controller
                         FROM good_receipts gr
                         LEFT JOIN users u
                             ON u.id = gr.account_id
-                        WHERE 
+                        WHERE
                             gr.post_date <= :date5
                             AND gr.status IN ('2','3')
                             AND gr.deleted_at IS NULL
@@ -197,7 +197,7 @@ class UnbilledAPController extends Controller
         }
 
         $end_time = microtime(true);
-        
+
         $execution_time = ($end_time - $start_time);
 
         $response =[

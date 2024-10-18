@@ -61,6 +61,16 @@ class MarketingOrderInvoice extends Model
         return $this->belongsTo('App\Models\MarketingOrderDeliveryProcess', 'marketing_order_delivery_process_id', 'id')->withTrashed();
     }
 
+    public function getlistSO(){
+        $arr = [];
+        $mod = $this->marketingOrderDeliveryProcess->marketingOrderDelivery;
+        foreach ($mod->marketingOrderDeliveryDetail as $key => $row) {
+            $arr[] = $row->marketingOrderDetail->marketingOrder->code;
+        }
+
+        return implode(',', $arr);
+    }
+
     public function user()
     {
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
@@ -79,7 +89,7 @@ class MarketingOrderInvoice extends Model
         if ($this->account->type_body==3)
         {
             $npwp=substr(str_replace('.','',str_replace('-','',$this->userData->npwp)),1);
-          
+
         }
         else
         {
@@ -175,7 +185,7 @@ class MarketingOrderInvoice extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -237,7 +247,7 @@ class MarketingOrderInvoice extends Model
 
     public function getAge(){
         $age = time() -  strtotime($this->post_date);
-        
+
         return round($age / (60 * 60 * 24));
     }
 
@@ -437,7 +447,7 @@ class MarketingOrderInvoice extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

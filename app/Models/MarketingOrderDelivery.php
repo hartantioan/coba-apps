@@ -190,6 +190,14 @@ class MarketingOrderDelivery extends Model
         return $this->hasMany('App\Models\MarketingOrderDeliveryProcess')->where('status','5');
     }
 
+    public function getModVoid(){
+        $arr = [];
+        foreach($this->marketingOrderDeliveryProcessVoid as $item){
+            $arr[] = $item->code;
+        }
+        return implode(', ',$arr);
+    }
+
     public function goodScaleDetail()
     {
         return $this->hasOne('App\Models\GoodScaleDetail','lookable_id','id')->where('lookable_type',$this->table)->whereHas('goodScale',function($query){
@@ -366,7 +374,7 @@ class MarketingOrderDelivery extends Model
                 'marketing_order_detail_id'     => $marketing_order_detail_id,
                 'item_id'                       => $row->item_id,
                 'qty'                           => $newQty,
-                'note'                          => 'NEW CHANGES FROM SJ/DO : '.implode(', ',$arrShading),
+                'note'                          => 'CHANGE FROM SJ : '.$this->getModVoid().' SHADING : '.implode(', ',$arrShading),
                 'place_id'                      => $row->place_id,
             ]);
             foreach($row->marketingOrderDeliveryProcessDetailWithPending as $modpd){

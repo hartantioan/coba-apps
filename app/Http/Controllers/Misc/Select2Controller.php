@@ -2841,7 +2841,7 @@ class Select2Controller extends Controller {
             if($d->getBalanceReceipt() > 0){
                 $response[] = [
                     'id'   			    => $d->id,
-                    'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceScale()).' '.$d->itemUnit->unit->code,
+                    'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty Sisa Timbang. '.CustomHelper::formatConditionalQty($d->getBalanceScale()).' '.$d->itemUnit->unit->code,
                     'qty'               => CustomHelper::formatConditionalQty($d->getBalanceScale()),
                     'item_unit_id'      => $d->item_unit_id,
                 ];

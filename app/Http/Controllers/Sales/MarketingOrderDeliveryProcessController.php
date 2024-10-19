@@ -1571,7 +1571,10 @@ class MarketingOrderDeliveryProcessController extends Controller
                 ]);
 
                 if(in_array($tempStatus,['2','3'])){
-                    CustomHelper::removeJournal($query->getTable(),$query->id);
+                    foreach($query->journal as $journal ){
+                        $journal->journalDetail()->delete();
+                        $journal->delete();
+                    }
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                     /* $query->marketingOrderDelivery->update([
                         'status'    => '2'

@@ -1154,7 +1154,7 @@
             width: 'resolve',
             dropdownParent: $('body').parent(),
             ajax: {
-                url: '{{ url("admin/select2/purchase_order_detail") }}',
+                url: '{{ url("admin/select2/purchase_order_detail_scale") }}',
                 type: 'GET',
                 dataType: 'JSON',
                 data: function(params) {

@@ -412,6 +412,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('department', [Select2Controller::class, 'department']);
                 Route::get('item_revaluation', [Select2Controller::class, 'itemRevaluation']);
                 Route::get('purchase_order_detail', [Select2Controller::class, 'purchaseOrderDetail']);
+                Route::get('purchase_order_detail_scale', [Select2Controller::class, 'purchaseOrderDetailScale']);
                 Route::get('good_scale', [Select2Controller::class, 'goodScale']);
                 Route::get('good_scale_item', [Select2Controller::class, 'goodScale']);
                 Route::get('shift', [Select2Controller::class, 'shift']);

@@ -2818,6 +2818,39 @@ class Select2Controller extends Controller {
         return response()->json(['items' => $response]);
     }
 
+    public function purchaseOrderDetailScale(Request $request){
+        $response   = [];
+        $search     = $request->search;
+
+        $data = PurchaseOrderDetail::where(function($query) use($search,$request){
+                    $query->where('item_id',$request->item_id)
+                    ->whereHas('purchaseOrder',function($query) use($search,$request){
+                        if($request->account_id){
+                            $query->where('account_id',$request->account_id);
+                        }
+                        $query->where('code','like',"%$search%")
+                            ->whereIn('status',['2'])
+                            ->where('inventory_type','1');
+                    });
+                })
+                ->whereIn('place_id',$this->dataplaces)
+                ->whereIn('warehouse_id',$this->datawarehouses)
+                ->get();
+
+        foreach($data as $d) {
+            if($d->getBalanceReceipt() > 0){
+                $response[] = [
+                    'id'   			    => $d->id,
+                    'text' 			    => $d->purchaseOrder->code.' - '.$d->place->code.' - '.$d->warehouse->name.' Qty. '.CustomHelper::formatConditionalQty($d->getBalanceScale()).' '.$d->itemUnit->unit->code,
+                    'qty'               => CustomHelper::formatConditionalQty($d->getBalanceScale()),
+                    'item_unit_id'      => $d->item_unit_id,
+                ];
+            }
+        }
+
+        return response()->json(['items' => $response]);
+    }
+
     public function goodScale(Request $request){
         $response   = [];
 

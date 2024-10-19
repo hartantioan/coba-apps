@@ -263,6 +263,13 @@ class PurchaseOrderDetail extends Model
         return $balance;
     }
 
+    public function getBalanceScale()
+    {
+        $scaled = $this->goodScale()->sum('qty_final');
+        $balance = $this->qty - $scaled;
+        return $balance;
+    }
+
     public function qtyGR(){
         $total = $this->goodReceiptDetail()->sum('qty');;
         return $total;

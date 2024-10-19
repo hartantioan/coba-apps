@@ -543,6 +543,15 @@ class MarketingOrderDeliveryProcessController extends Controller
                     ]);
                 }
 
+                if($mod->goodScaleDetail()->exists()){
+                    if($request->post_date < $mod->goodScaleDetail->goodScale->post_date){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf, untuk tanggal post Surat Jalan tidak boleh kurang dari Timbangan.'
+                        ]);
+                    }
+                }
+
                 if($request->temp){
                     $query = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($request->temp))->first();
 

@@ -1570,10 +1570,12 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'void_date' => date('Y-m-d H:i:s')
                 ]);
 
-                if(in_array($tempStatus,['2','3'])){
-                    foreach($query->journal as $journal ){
-                        $journal->journalDetail()->delete();
-                        $journal->delete();
+                if(in_array($tempStatus,haystack: ['2','3'])){
+                    if($query->journal()->exists()){
+                        foreach($query->journal as $journal){
+                            $journal->journalDetail()->delete();
+                            $journal->delete();
+                        }
                     }
                     CustomHelper::removeCogs($query->getTable(),$query->id);
                     /* $query->marketingOrderDelivery->update([

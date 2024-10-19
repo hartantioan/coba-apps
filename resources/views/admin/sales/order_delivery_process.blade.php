@@ -655,6 +655,8 @@
 
 
 <script>
+    var arrStock = [];
+
     const dropZone = document.getElementById('dropZone');
     const uploadLink = document.getElementById('uploadLink');
     const fileInput = document.getElementById('fileInput');
@@ -873,6 +875,8 @@ document.addEventListener('focusin', function (event) {
                         </td>
                     </tr>
                 `);
+
+                arrStock = [];
             }
         });
 
@@ -963,6 +967,13 @@ document.addEventListener('focusin', function (event) {
             }
         });
     });
+
+    function fillArrayStock(){
+        arrStock = [];
+        $('input[name^="arr_item_stock_id[]"]').each(function(){
+            arrStock.push($(this).val());
+        });
+    }
 
     function showReceiveDate(val){
         if(val){
@@ -1109,6 +1120,7 @@ document.addEventListener('focusin', function (event) {
                                                 place_id: val.place_id,
                                                 item_id: val.item_id,
                                                 qty_conversion: val.conversion,
+                                                arr_stock : arrStock,
                                             };
                                         },
                                         processResults: function(data) {
@@ -1206,6 +1218,7 @@ document.addEventListener('focusin', function (event) {
                             `);
                         }
                         $('input[name^="arr_item_stock_id[]"][value="' + response.id + '"]').parent().find('input[name^="arr_qty[]"]').trigger('keyup');
+                        fillArrayStock();
                     }else{
                         M.toast({
                             html: response.message
@@ -1264,6 +1277,7 @@ document.addEventListener('focusin', function (event) {
             `);
         }
         $('#item_stock_id' + id).empty();
+        fillArrayStock();
     }
 
     function removeRow(element,id){
@@ -1277,6 +1291,7 @@ document.addEventListener('focusin', function (event) {
                 </tr>
             `);
         }
+        fillArrayStock();
     }
 
     function checkMax(element){
@@ -2340,6 +2355,7 @@ document.addEventListener('focusin', function (event) {
                                             place_id: val.place_id,
                                             item_id: val.item_id,
                                             qty_conversion: val.conversion,
+                                            arr_stock: arrStock,
                                         };
                                     },
                                     processResults: function(data) {
@@ -2351,6 +2367,8 @@ document.addEventListener('focusin', function (event) {
                             });
                         });
                     }
+
+                    fillArrayStock();
 
                     $('.modal-content').scrollTop(0);
                     $('#note').focus();

@@ -79,4 +79,28 @@ class LandedCostFeeDetail extends Model
 
         return $total;
     }
+
+    public function balanceInvoiceByDate($date){
+        $total = round($this->total,2);
+
+        foreach($this->purchaseInvoiceRealDetail()->whereHas('purchaseInvoice',function($query)use($date){
+            $query->where('post_date','<=',$date);
+        })->get() as $rowinvoice){
+            $total -= round($rowinvoice->total,2);
+        }
+
+        return $total;
+    }
+
+    public function totalInvoiceByDate($date){
+        $total = 0;
+
+        foreach($this->purchaseInvoiceRealDetail()->whereHas('purchaseInvoice',function($query)use($date){
+            $query->where('post_date','<=',$date);
+        })->get() as $rowinvoice){
+            $total += round($rowinvoice->total,2);
+        }
+
+        return $total;
+    }
 }

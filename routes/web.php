@@ -24,6 +24,7 @@ use App\Http\Controllers\Inventory\AgingGRPOController;
 use App\Http\Controllers\Inventory\ReportGoodScaleController;
 use App\Http\Controllers\Inventory\GoodScaleController;
 use App\Http\Controllers\Inventory\QualityControlController;
+use App\Http\Controllers\Purchase\OutstandingLandedCostController;
 
 use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Inventory\StockInRupiahController;
@@ -1742,6 +1743,12 @@ Route::prefix('admin')->group(function () {
 
                         Route::post('get_outstanding', [OutstandingPurchaseOrderController::class, 'getOutstanding']);
                         Route::get('export_outstanding_po', [OutstandingPurchaseOrderController::class, 'exportOutstandingPO']);
+                    });
+
+                    Route::prefix('outstanding_landed_cost')->middleware('operation.access:outstanding_landed_cost,view')->group(function () {
+                        Route::get('/', [OutstandingLandedCostController::class, 'index']);
+
+                        Route::get('export_outstanding_lc', [OutstandingLandedCostController::class, 'exportOutstandingPO']);
                     });
                 });
 

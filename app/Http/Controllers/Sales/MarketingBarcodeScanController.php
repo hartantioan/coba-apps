@@ -173,7 +173,6 @@ class MarketingBarcodeScanController extends Controller
                         'marketing_order_delivery_process_id'   => $mop->id,
                         'status'                                => '5',
                     ]);
-                    $query->createJournalSentDocument();
                     $response = [
                         'status'    => 200,
                         'mop'       => $mop ,
@@ -239,7 +238,6 @@ class MarketingBarcodeScanController extends Controller
                     'marketing_order_delivery_process_id'   => $request->temp,
                     'status'                                => '5',
                 ]);
-                $query->createJournalSentDocument();
                 $response = [
                     'status'    => 200,
                     'message'   => 'Data Sukses Discan  dan Disimpan.',

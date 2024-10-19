@@ -394,6 +394,16 @@ class MarketingOrderInvoiceController extends Controller
                     }
                 } */
 
+                $modp = MarketingOrderDeliveryProcess::find($request->marketing_order_delivery_process_id);
+
+                if($modp){
+                    if($request->post_date < $modp->post_date){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Mohon maaf! Tanggal invoice tidak boleh kurang dari tanggal post date SJ',
+                        ]);
+                    }
+                }
 
                 if($request->temp){
 

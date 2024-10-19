@@ -56,7 +56,7 @@ class ExportReportDeliveryOnTheWay implements FromCollection, WithTitle, WithHea
             if($row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->status != '2') {
                 $tgl_smpai =date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->created_at));
             }else{
-                $tgl_smpai = 'blm diterima customer masih dalam perjalanan';
+                $tgl_smpai = '';
             }
             $arr[] = [
                 'status'              => $row->marketingOrderDeliveryProcess->statusRaw(),
@@ -66,7 +66,7 @@ class ExportReportDeliveryOnTheWay implements FromCollection, WithTitle, WithHea
                 'itemcode' => $row->marketingOrderDeliveryDetail->item->code,
                 'itemname' => $row->marketingOrderDeliveryDetail->item->name,
                 'qty' => $row->qty ,
-                'satuan' => $row->marketingOrderDeliveryDetail->item->uomUnit->code,
+                'satuan' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
                 'qtym2' => $row->marketingOrderDeliveryDetail->getQtyM2(),
                 'value' => $row->total,
             ];

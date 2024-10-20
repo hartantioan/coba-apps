@@ -8,6 +8,7 @@ use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
+use App\Models\IncomingPaymentDetail;
 use App\Models\JournalDetail;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessDetail;
@@ -19,7 +20,15 @@ class SubsidiaryLedgerController extends Controller
 {
     public function index(Request $request)
     {
+        $modp = JournalDetail::where("lookable_type",'incoming_payments')->get();
 
+        foreach($modp as $row_modp){
+            $row_modp->update(
+            [
+                "note2"=> $row_modp->lookable->getARDPCode(),
+                ]
+            );
+        }
         $data = [
             'title'     => '',
             'content'   => 'admin.accounting.subsidiary_ledger',

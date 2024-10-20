@@ -8,6 +8,7 @@ use App\Helpers\PrintHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Coa;
 use App\Models\Company;
+use App\Models\IncomingPaymentDetail;
 use App\Models\JournalDetail;
 use App\Models\MarketingOrderDeliveryProcess;
 use App\Models\MarketingOrderDeliveryProcessDetail;

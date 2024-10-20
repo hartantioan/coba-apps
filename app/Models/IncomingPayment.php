@@ -75,7 +75,7 @@ class IncomingPayment extends Model
     public function voidUser(){
         return $this->belongsTo('App\Models\User','void_id','id')->withTrashed();
     }
-    
+
     public function coa(){
         return $this->belongsTo('App\Models\Coa','coa_id','id')->withTrashed();
     }
@@ -123,7 +123,7 @@ class IncomingPayment extends Model
         return $status;
     }
 
-    public function attachment() 
+    public function attachment()
     {
         if($this->document !== NULL && Storage::exists($this->document)) {
             $document = asset(Storage::url($this->document));
@@ -198,7 +198,7 @@ class IncomingPayment extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{
@@ -230,5 +230,16 @@ class IncomingPayment extends Model
             $currency_rate = $row->adjustRate->currency_rate;
         }
         return $currency_rate;
+    }
+
+    public function getARDPCode(){
+        $arr = [];
+        foreach($this->incomingPaymentDetail as $row){
+            if($row->lookable_type == 'marketing_order_down_payments'){
+                $arr[] = $row->lookable->code;
+            }
+        }
+        info($arr);
+        return implode(',',$arr);
     }
 }

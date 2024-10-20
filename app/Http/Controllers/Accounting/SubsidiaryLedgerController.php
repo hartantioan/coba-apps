@@ -20,15 +20,7 @@ class SubsidiaryLedgerController extends Controller
 {
     public function index(Request $request)
     {
-        $modp = JournalDetail::where("lookable_type",'incoming_payments')->get();
 
-        foreach($modp as $row_modp){
-            $row_modp->update(
-            [
-                "note2"=> $row_modp->lookable->getARDPCode(),
-                ]
-            );
-        }
         $data = [
             'title'     => '',
             'content'   => 'admin.accounting.subsidiary_ledger',

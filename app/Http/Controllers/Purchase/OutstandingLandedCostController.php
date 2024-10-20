@@ -17,7 +17,7 @@ class OutstandingLandedCostController extends Controller
     {
         
         $data = [
-            'title'     => 'Tunggakan PO',
+            'title'     => 'Outstanding LC',
             'content'   => 'admin.purchase.outstanding_lc',
         ];
         

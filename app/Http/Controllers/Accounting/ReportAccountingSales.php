@@ -46,6 +46,6 @@ class ReportAccountingSales extends Controller
     public function export(Request $request){
         $start_date = $request->start_date;
         $finish_date = $request->end_date;
-		return Excel::download(new ExportReportAccountingSales($start_date,$finish_date), 'delivery_on_the_way_report_'.uniqid().'.xlsx');
+		return Excel::download(new ExportReportAccountingSales($start_date,$finish_date), 'report_accounting_sales_'.uniqid().'.xlsx');
     }
 }

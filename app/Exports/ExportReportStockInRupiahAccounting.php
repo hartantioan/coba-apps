@@ -108,7 +108,7 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
                 $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
             $total = round($totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
-            $rp_total = $rp_in - $rp_out;
+            $rp_total = round($rp_in - $rp_out,3);
             $arr[] = [
                 'no'=> $keys,
                 'item_code' =>  $row->item->code,

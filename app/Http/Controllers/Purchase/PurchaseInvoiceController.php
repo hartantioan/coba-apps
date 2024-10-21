@@ -1203,8 +1203,10 @@ class PurchaseInvoiceController extends Controller
                         }
 
                         CustomHelper::removeApproval($query->getTable(),$query->id);
-                        if($query->journal()->exists()){
-                            CustomHelper::removeJournal($query->getTable(),$query->id);
+                        if(!$query->cancelDocument()->exists()){
+                            if($query->journal()->exists()){
+                                CustomHelper::removeJournal($query->getTable(),$query->id);
+                            }
                         }
 
                         /* DB::commit(); */

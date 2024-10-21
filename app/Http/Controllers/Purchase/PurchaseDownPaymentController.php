@@ -714,6 +714,13 @@ class PurchaseDownPaymentController extends Controller
 
                         $query->checklistDocumentList()->delete();
 
+                        CustomHelper::removeApproval($query->getTable(),$query->id);
+                        if(!$query->cancelDocument()->exists()){
+                            if($query->journal()->exists()){
+                                CustomHelper::removeJournal($query->getTable(),$query->id);
+                            }
+                        }
+
                         DB::commit();
                     }else{
                         return response()->json([

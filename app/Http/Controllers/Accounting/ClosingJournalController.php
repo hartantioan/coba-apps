@@ -1126,11 +1126,11 @@ class ClosingJournalController extends Controller
                 'message'   => ''
             ];
         }else{
-            $response = [
+            /* $response = [
                 'status'    => 422,
                 'message'   => '',
                 'data'      => $arr
-            ];
+            ]; */
         }
 
         return response()->json($response);

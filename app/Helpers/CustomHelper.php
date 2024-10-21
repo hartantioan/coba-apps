@@ -1073,7 +1073,7 @@ class CustomHelper {
 						}
 					}
 
-					/* $gs->createPurchaseOrder(); */
+					$gs->createPurchaseOrder();
 				}
 				if($gs->type == '2'){
 					$gs->update([

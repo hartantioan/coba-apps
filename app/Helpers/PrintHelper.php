@@ -36,16 +36,16 @@ class PrintHelper {
         return $pdf;
     }
     public static function savePrint($content){
-       
-            
-        $randomString = Str::random(10); 
 
-        
+
+        $randomString = Str::random(10);
+
+
         $filePath = 'public/pdf/' . $randomString . '.pdf';
-        
+
 
         Storage::put($filePath, $content);
-        
+
         $document_po = asset(Storage::url($filePath));
         $var_link=$document_po;
 

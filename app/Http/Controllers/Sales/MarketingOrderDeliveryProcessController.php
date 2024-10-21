@@ -916,7 +916,7 @@ class MarketingOrderDeliveryProcessController extends Controller
 
         if($pr){
 
-            $pdf = PrintHelper::print($pr,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_individual',$menuUser->mode);
+            $pdf = PrintHelper::print($pr,'Print Surat Jalan','a4','portrait','admin.print.sales.order_delivery_process_individual');
             $font = $pdf->getFontMetrics()->get_font("helvetica", "bold");
 
 

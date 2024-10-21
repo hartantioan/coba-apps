@@ -47,41 +47,11 @@ class StockInRupiahController extends Controller
     public function filter(Request $request){
         $start_time = microtime(true);
         $array_filter = [];
-        // $query_item = Item::whereDoesntHave('itemCogs')->get();
-        // $query_item2 = Item::whereHas('itemCogs')->get();
-        // $query_items = Item::whereIn('status',['1','2'])->get();
-        // info(count($query_items));
-        // info(count($query_item2));
-        // foreach($query_item as $row_item){
-           
-           
-        //     $data_tempura = [
-        //         'item_id'      => $row_item->id,
-        //         'perlu'        => 1,
-        //         'plant' => $row_item->place->code ?? null,
-        //         'warehouse' => $row_item->warehouse->name ?? '',
-        //         'item' => $row_item->name,
-        //         'satuan' => $row_item->uomUnit->code,
-        //         'kode' => $row_item->code??'',
-        //         'final'=>   0,
-        //         'total'=>   0,
-        //         'qty' =>    0,
-        //         'date' =>  'no date',
-        //         'document' => 'no document',
-        //         'cum_qty' => 0,
-        //         'cum_val' => 0,
-        //         'last_nominal' => 0,
-        //         'last_qty' => 0,
-
-        //     ];
-        //     $array_filter[]=$data_tempura;
-        // }
         
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$request->finish_date."' GROUP BY item_id)")
-            ->where(function($query) use ( $request) {
+            $query_data = ItemCogs::where(function($query) use ( $request) {
                 $query->whereHas('item',function($query) use($request){
                     $query->whereIn('status',['1','2']);
                 });
@@ -111,39 +81,18 @@ class StockInRupiahController extends Controller
                     });
                 }
             })
-            ->orderBy('date', 'desc')
-            ->get();
-        
-            /* $query_data = DB::select("
-                SELECT * FROM item_cogs 
-                WHERE id IN (
-                    SELECT MAX(id) 
-                    FROM item_cogs 
-                    WHERE deleted_at IS NULL 
-                    AND date <= ? 
-                    GROUP BY item_id
-                )
-                AND id IN (
-                    SELECT item_cogs.id FROM item_cogs
-                    JOIN items ON item_cogs.item_id = items.id
-                    WHERE items.status IN ('1', '2')
-                    AND date <= ?
-                    " . ($request->item_id ? "AND item_cogs.item_id = ?" : "") . "
-                    " . ($request->plant != 'all' ? "AND places.id = ?" : "") . "
-                    " . ($request->warehouse != 'all' ? "AND warehouses.id = ?" : "") . "
-                    " . ($request->filter_group ? "AND items.item_group_id IN (" . implode(',', array_fill(0, count($request->filter_group), '?')) . ")" : "") . "
-                )
-                ORDER BY date DESC
-            ", array_merge(
-                [$request->finish_date, $request->finish_date],
-                $request->item_id ? [$request->item_id] : [],
-                $request->plant != 'all' ? [$request->plant] : [],
-                $request->warehouse != 'all' ? [$request->warehouse] : [],
-                $request->filter_group ? $request->filter_group : []
-            ));
-            $query_data_collection = ItemCogs::hydrate($query_data);
+            ->groupBy('item_id')
+            ->pluck('item_id');
 
-            $query_data = $query_data_collection; */
+            $arr = [];            
+            foreach($query_data as $row){
+                $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
+                if($data){
+                    $arr[] = $data;
+                }
+            }
+
+            $query_data = collect($arr);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {

@@ -33,9 +33,8 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
         if($this->type == 'final'){
             $perlu = 0 ;
            
-            $query_data = ItemCogs::whereRaw("id IN (SELECT MAX(id) FROM item_cogs WHERE deleted_at IS NULL AND date <= '".$this->finish_date."' GROUP BY item_id)")
-            ->where(function($query) {
-                $query->whereHas('item',function($query){
+            $query_data = ItemCogs::where(function($query)  {
+                $query->whereHas('item',function($query) {
                     $query->whereIn('status',['1','2']);
                 });
                 if($this->finish_date) {
@@ -46,26 +45,36 @@ class ExportStockInRupiah implements FromView,ShouldAutoSize
                         $query->where('id',$this->item);
                     });
                 }
-                if($this->plant !== 'all'){
+                if($this->plant != 'all'){
                     $query->whereHas('place',function($query) {
                         $query->where('id',$this->plant);
                     });
                 }
-                if($this->warehouse !== 'all'){
+                if($this->warehouse != 'all'){
                     $query->whereHas('warehouse',function($query) {
                         $query->where('id',$this->warehouse);
                     });
                 }
     
                 if($this->group){
+                   
                     $query->whereHas('item',function($query) {
-                        $query->whereIn('item_group_id', explode(',',$this->group));
+                        $query->whereIn('item_group_id', $this->filter_group);
                     });
                 }
             })
-            ->orderBy('date', 'desc')
-            ->orderBy('id', 'desc')
-            ->get();
+            ->groupBy('item_id')
+            ->pluck('item_id');
+
+            $arr = [];            
+            foreach($query_data as $row){
+                $data = ItemCogs::where('date','<=',$this->finish_date)->where('item_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
+                if($data){
+                    $arr[] = $data;
+                }
+            }
+
+            $query_data = collect($arr);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) {

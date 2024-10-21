@@ -1101,11 +1101,11 @@ class ClosingJournalController extends Controller
         $company_id = $request->company_id;
         $month = $request->month;
         
-        $itemcogs = ItemCogs::where('company_id',$company_id)->where('date','like',"$month%")->get();
+        /* $itemcogs = ItemCogs::where('company_id',$company_id)->where('date','like',"$month%")->get();
 
-        $arr = [];
+        $arr = []; */
         $passed = 1;
-        foreach($itemcogs as $key => $row){
+        /* foreach($itemcogs as $key => $row){
             if($row->qty_final < 0){
                 $passed = 0;
                 $arr[] = [
@@ -1118,7 +1118,7 @@ class ClosingJournalController extends Controller
                     'balance'           => CustomHelper::formatConditionalQty($row->qty_final),
                 ];
             }
-        }
+        } */
 
         if($passed == 1){
             $response = [

@@ -2480,7 +2480,7 @@ class PurchaseInvoiceController extends Controller
                     <td class="center-align">'.($key + 1).'</td>
                     <td>'.$row->coa->code.' - '.$row->coa->name.'</td>
                     <td class="center-align">'.($row->account_id ? $row->account->name : '-').'</td>
-                    <td class="center-align">'.($row->place_id ? $row->place->code : '-').'</td>
+                    <td class="center-align">'.($row->place()->exists() ? $row->place->code : '-').'</td>
                     <td class="center-align">'.($row->line_id ? $row->line->name : '-').'</td>
                     <td class="center-align">'.($row->machine_id ? $row->machine->name : '-').'</td>
                     <td class="center-align">'.($row->department_id ? $row->department->name : '-').'</td>

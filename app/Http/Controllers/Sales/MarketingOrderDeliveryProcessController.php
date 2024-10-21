@@ -1342,7 +1342,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             $arrTracking[] = [
                 'status'    => $row->status,
                 'date'      => $date,
-                'user'      => $row->user->name,
+                'user'      => $row->user()->exists() ? $row->user->name : '-',
             ];
         }
 

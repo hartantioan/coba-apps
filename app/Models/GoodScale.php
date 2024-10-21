@@ -356,6 +356,10 @@ class GoodScale extends Model
             $hasRelation = true;
         }
 
+        if($this->purchaseOrder()->exists()){
+            $hasRelation = true;
+        }
+
         return $hasRelation;
     }
 
@@ -404,6 +408,101 @@ class GoodScale extends Model
 
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
+    }
+
+    public function purchaseOrder(){
+        return $this->hasOne('App\Models\PurchaseOrder','document_no','code')->whereIn('status',['1','2','3']);
+    }
+
+    public function createPurchaseOrder(){
+        #CREATE PO
+        $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
+        $purchaseOrder = PurchaseOrder::create([
+            'code'						=> PurchaseOrder::generateCode('PORD-'.date('y',strtotime($this->post_date)).$place->code),
+            'user_id'					=> $this->user_id,
+            'account_id'				=> $this->account_id,
+            'company_id'				=> $place->company_id,
+            'inventory_type'			=> '3',
+            'shipping_type'				=> '1',
+            'document_no'				=> $this->code,
+            'document_po'				=> NULL,
+            'payment_type'				=> '1',
+            'payment_term'              => 0,
+            'currency_id'               => 1,
+            'currency_rate'             => 1,
+            'post_date'                 => $this->post_date,
+            'delivery_date'             => $this->post_date,
+            'received_date'             => $this->post_date,
+            'due_date'                  => $this->post_date,
+            'document_date'             => $this->post_date,
+            'note'                      => 'TARIKAN DARI TIMBANGAN : '.$this->code.' DENGAN CATATAN : '.$this->note,
+            'note_external'             => NULL,
+            'subtotal'                  =>0,
+            'discount'                  => 0,
+            'total'                     => 0,
+            'tax'                       => 0,
+            'wtax'                      => 0,
+            'rounding'                  => 0,
+            'grandtotal'                => 0,
+            'status'                    => '1',
+        ]);
+
+        if($purchaseOrder){
+
+            $coahutangusahaekspedisi = Coa::where('code','200.01.03.01.06')->where('company_id',$this->company_id)->first();
+            $unit = Unit::where('code','KG')->where('status','1')->first();
+
+            if($coahutangusahaekspedisi && $unit){
+                $total = 0;
+                foreach($this->goodScaleDetail as $row){
+                    if($row->lookable_type == 'marketing_order_deliveries'){
+                        $total += $row->total;
+                        $price = $row->qty > 0 ? $row->total / $row->qty : 0;
+                        $querydetail = PurchaseOrderDetail::create([
+                            'purchase_order_id'                     => $purchaseOrder->id,
+                            'marketing_order_delivery_process_id'   => $row->lookable->marketingOrderDeliveryProcess->id,
+                            'coa_id'                                => $coahutangusahaekspedisi->id,
+                            'qty'                                   => $row->qty,
+                            'coa_unit_id'                           => $unit->id,
+                            'price'                                 => round($price,5),
+                            'percent_discount_1'                    => 0,
+                            'percent_discount_2'                    => 0,
+                            'discount_3'                            => 0,
+                            'subtotal'                              => $row->total,
+                            'tax'                                   => 0,
+                            'wtax'                                  => 0,
+                            'grandtotal'                            => $row->total,
+                            'note'                                  => 'MOD : '.$row->lookable->code,
+                            'note2'                                 => 'SJ : '.$row->lookable->marketingOrderDeliveryProcess->code,
+                            'note3'                                 => '',
+                            'total'                                 => $row->total,
+                            'is_tax'                                => '0',
+                            'is_include_tax'                        => '0',
+                            'percent_tax'                           => 0,
+                            'is_wtax'                               => NULL,
+                            'percent_wtax'                          => 0,
+                            'tax_id'                                => 0,
+                            'wtax_id'                               => NULL,
+                            'place_id'                              => $row->lookable->getPlace(),
+                            'line_id'                               => NULL,
+                            'machine_id'                            => NULL,
+                            'department_id'                         => NULL,
+                            'requester'                             => session('bo_name'),
+                            'project_id'                            => NULL,
+                        ]);
+                    }
+                }
+
+                $purchaseOrder->update([
+                    'subtotal'                  => $total,
+                    'total'                     => $total,
+                    'grandtotal'                => $total,
+                ]);
+            }
+
+            CustomHelper::sendApproval($purchaseOrder->getTable(),$purchaseOrder->id,$purchaseOrder->note);
+            CustomHelper::sendNotification($purchaseOrder->getTable(),$purchaseOrder->id,'Pengajuan Purchase Order No. '.$purchaseOrder->code,$purchaseOrder->note,session('bo_id'));
+        }
     }
 
     public function createGoodReceipt(){

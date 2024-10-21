@@ -502,7 +502,7 @@ class User extends Authenticatable
                     $query->whereHas('marketingOrderDeliveryProcess',function($query){
                         $query->where('post_date','>=','2024-11-10');
                     });
-                })->get() as $rowmod){
+                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
                     $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }
@@ -526,7 +526,7 @@ class User extends Authenticatable
                     $query->whereHas('marketingOrderDeliveryProcess',function($query){
                         $query->where('post_date','>=','2024-11-10');
                     });
-                })->get() as $rowmod){
+                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
                     $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }

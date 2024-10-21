@@ -77,10 +77,10 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
             $rp_in = 0;
             $rp_out = 0 ;
             foreach ($itemCogsShadingInAwal as $inawal){
-                $rp_in +=   ($inawal->qty_in * $inawal->price_in);
+                $rp_in +=   round(($inawal->qty_in * $inawal->price_in),3);
             }
             foreach ($itemCogsShadingOutAwal as $inOut){
-                $rp_out +=   ($inOut->qty_out * $inOut->price_out);
+                $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
 
             $totalAwal = $itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out');
@@ -101,11 +101,11 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
 
             ->whereNotNull('qty_out')->get();
             foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in +=   ($inawal->qty_in * $inawal->price_in);
+                $rp_in +=   round(($inawal->qty_in * $inawal->price_in),3);
             }
 
             foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   ($inOut->qty_out * $inOut->price_out);
+                $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
             $total = $totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out');
             $rp_total = $rp_in - $rp_out;
@@ -141,11 +141,11 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
             $rp_in = 0;
             $rp_out = 0 ;
             foreach ($itemCogsShadingInAwal as $inawal){
-                $rp_in +=   ($inawal->qty_in * $inawal->price_in);
+                $rp_in +=   round(($inawal->qty_in * $inawal->price_in),3);
             }
 
             foreach ($itemCogsShadingOutAwal as $inOut){
-                $rp_out +=   ($inOut->qty_out * $inOut->price_out);
+                $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
 
             $totalAwal = $itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out');
@@ -166,11 +166,11 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
 
             ->whereNotNull('qty_out')->get();
             foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in +=   ($inawal->qty_in * $inawal->price_in);
+                $rp_in +=   round(($inawal->qty_in * $inawal->price_in),3);
             }
 
             foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   ($inOut->qty_out * $inOut->price_out);
+                $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
             $total = $totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out');
             $rp_total = $rp_in - $rp_out;

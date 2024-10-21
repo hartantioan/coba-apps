@@ -83,7 +83,7 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
                 $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
 
-            $totalAwal = $itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out');
+            $totalAwal = round($itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out'),3);
 
             $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
             ->where('item_shading_id',$row->id)
@@ -107,7 +107,7 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
             foreach ($ItemCogsShadingOut as $inOut){
                 $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
-            $total = $totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out');
+            $total = round($totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
             $rp_total = $rp_in - $rp_out;
             $arr[] = [
                 'no'=> $keys,
@@ -148,7 +148,7 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
                 $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
 
-            $totalAwal = $itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out');
+            $totalAwal = round($itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out'),3);
 
             $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
             ->where('item_id',$row->id)
@@ -172,7 +172,7 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
             foreach ($ItemCogsShadingOut as $inOut){
                 $rp_out +=   round(($inOut->qty_out * $inOut->price_out),3);
             }
-            $total = $totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out');
+            $total = round($totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
             $rp_total = $rp_in - $rp_out;
             $arr[] = [
                 'no'=> $keys,

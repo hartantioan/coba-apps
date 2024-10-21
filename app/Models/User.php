@@ -492,11 +492,17 @@ class User extends Authenticatable
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
                 foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
-                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
-                })->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                    $query->whereDoesntHave('marketingOrderInvoiceDetail')->whereHas('marketingOrderDeliveryProcess',function($query){
+                        $query->where('post_date','<','2024-11-10');
+                    });
+                })->get() as $rowmod){
                     $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail')->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcess',function($query){
+                        $query->where('post_date','>=','2024-11-10');
+                    });
+                })->get() as $rowmod){
                     $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }
@@ -510,11 +516,17 @@ class User extends Authenticatable
         foreach($this->marketingOrder as $row){
             foreach($row->marketingOrderDetail as $rowdetail){
                 foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
-                    $query->whereDoesntHave('marketingOrderInvoiceDetail');
+                    $query->whereDoesntHave('marketingOrderInvoiceDetail')->whereHas('marketingOrderDeliveryProcess',function($query){
+                        $query->where('post_date','<','2024-11-10');
+                    });
                 })->get() as $rowmod){
-                    $totalDo += round(($rowmod->getGrandtotal() * ($row->percent_dp/100)),2);
+                    $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
-                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail')->whereDoesntHave('marketingOrderInvoiceDetail')->get() as $rowmod){
+                foreach($rowdetail->marketingOrderDeliveryDetail()->whereHas('marketingOrderDeliveryProcessDetail',function($query){
+                    $query->whereHas('marketingOrderDeliveryProcess',function($query){
+                        $query->where('post_date','>=','2024-11-10');
+                    });
+                })->get() as $rowmod){
                     $totalDo += round(($rowmod->getGrandtotal() * ((100 - $row->percent_dp)/100)),2);
                 }
             }

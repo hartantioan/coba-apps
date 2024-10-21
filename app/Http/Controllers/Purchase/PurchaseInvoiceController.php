@@ -1062,7 +1062,7 @@ class PurchaseInvoiceController extends Controller
             ];
         } else {
 
-            if(!CustomHelper::checkLockAcc($query->post_date)){
+            if(!CustomHelper::checkLockAcc($request->post_date)){
                 return response()->json([
                     'status'  => 500,
                     'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan.'
@@ -1122,6 +1122,13 @@ class PurchaseInvoiceController extends Controller
 
                     $approved = false;
                     $revised = false;
+
+                    if(!CustomHelper::checkLockAcc($query->post_date) && !$query->cancelDocument()->exists()){
+                        return response()->json([
+                            'status'  => 500,
+                            'message' => 'Transaksi pada periode dokumen telah ditutup oleh Akunting. Anda tidak bisa melakukan perubahan. Atau silahkan buat cancel dokumen.'
+                        ]);
+                    }
 
                     if($query->approval()){
                         foreach ($query->approval() as $detail){

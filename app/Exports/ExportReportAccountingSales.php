@@ -92,9 +92,9 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
             }
 
             if($row->is_include_tax == 1) {
-                $pricefirst = $row->getMoDetail()->price / (($row->percent_tax + 100) / 100);
+                $pricefirst = $row->getMoDetail()->price ?? 0 / (($row->percent_tax + 100) / 100);
             }else{
-                $pricefirst = $row->getMoDetail()->price;
+                $pricefirst = $row->getMoDetail()->price ?? 0;
             }
             $arr[] = [
                 'no'=> ($key+1),

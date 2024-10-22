@@ -34,118 +34,116 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
 
     public function collection()
     {
-        $item = ItemShading::join('items', 'item_shadings.item_id', '=', 'items.id')
-        ->whereHas('item',function ($query)  {
-            $query->whereNull('deleted_at');
-        })->whereHas('itemCogs',function ($query) {
-            $query->where('place_id',$this->place_id)
-            ->where('warehouse_id',$this->warehouse_id);
-        })
-        ->orderBy('items.code')
-        ->orderBy('items.id')
-        ->select('item_shadings.*')
-        ->get();
-
-        $itemNoShading = Item::whereNotIn('id', function ($query) {
-            $query->select('item_id')
-                  ->from('item_shadings');
-        })
-        ->whereHas('itemCogs',function ($query) {
-          $query->where('place_id',$this->place_id)
-          ->where('warehouse_id',$this->warehouse_id);
-        })
-        ->whereNull('deleted_at')->get();
-
-
         $arr = [];
         $keys = 1;
-        foreach ($item as $key=>$row) {
+        ItemShading::join('items', 'item_shadings.item_id', '=', 'items.id')
+            ->whereHas('item', function ($query) {
+                $query->whereNull('deleted_at');
+            })
+            ->whereHas('itemCogs', function ($query) {
+                $query->where('place_id', $this->place_id)
+                    ->where('warehouse_id', $this->warehouse_id);
+            })
+            ->orderBy('items.code')
+            ->orderBy('items.id')
+            ->select('item_shadings.*')
+            ->chunk(1000, function ($items) use (&$arr, &$keys) {
+                foreach ($items as $row) {
+                    $rp_in = 0;
+                    $rp_out = 0;
 
-            $rp_in = 0;
-            $rp_out = 0 ;
+                    $ItemCogsShadingIn = ItemCogs::where('deleted_at', null)
+                        ->where('item_shading_id', $row->id)
+                        ->where('warehouse_id', $this->warehouse_id)
+                        ->where('place_id', $this->place_id)
+                        ->where('date', '<=', $this->start_date)
+                        ->whereNotNull('qty_in')
+                        ->get();
 
-            $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
-            ->where('item_shading_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<=',$this->start_date)
+                    $ItemCogsShadingOut = ItemCogs::where('deleted_at', null)
+                        ->where('item_shading_id', $row->id)
+                        ->where('warehouse_id', $this->warehouse_id)
+                        ->where('place_id', $this->place_id)
+                        ->where('date', '<=', $this->start_date)
+                        ->whereNotNull('qty_out')
+                        ->get();
 
-            ->whereNotNull('qty_in')->get();
+                    foreach ($ItemCogsShadingIn as $inawal) {
+                        $rp_in += $inawal->total_in;
+                    }
 
-            $ItemCogsShadingOut = ItemCogs::where('deleted_at',null)
-            ->where('item_shading_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<=',$this->start_date)
+                    foreach ($ItemCogsShadingOut as $inOut) {
+                        $rp_out += $inOut->total_out;
+                    }
 
-            ->whereNotNull('qty_out')->get();
-            foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in += $inawal->total_in;
-            }
+                    $total = round($ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'), 3);
+                    $rp_total = round($rp_in - $rp_out, 3);
+                    $arr[] = [
+                        'no' => $keys,
+                        'item_code' => $row->item->code,
+                        'item_name' => $row->item->name,
+                        'unit' => $row->item->uomUnit->code,
+                        'shading' => $row->code,
+                        'total' => $total,
+                        'rp_total' => $rp_total
+                    ];
+                    $keys++;
+                }
+            });
 
-            foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   $inOut->total_out;
-            }
+        Item::whereNotIn('id', function ($query) {
+                $query->select('item_id')
+                    ->from('item_shadings');
+            })
+            ->whereHas('itemCogs', function ($query) {
+                $query->where('place_id', $this->place_id)
+                    ->where('warehouse_id', $this->warehouse_id);
+            })
+            ->whereNull('deleted_at')
+            ->chunk(1000, function ($itemsNoShading) use (&$arr, &$keys) {
+                foreach ($itemsNoShading as $row) {
+                    $rp_in = 0;
+                    $rp_out = 0;
 
-            $total = round( $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
-            $rp_total = round($rp_in - $rp_out,3);
-            $arr[] = [
-                'no'=> $keys,
-                'item_code' =>  $row->item->code,
-                'item_name' =>  $row->item->name,
-                'unit'      =>  $row->item->uomUnit->code,
-                'shading'   =>  $row->code,
-                'total'     =>  $total,
-                'rp_total'     =>  $rp_total
-            ];
-            $keys++;
+                    $ItemCogsShadingIn = ItemCogs::where('deleted_at', null)
+                        ->where('item_id', $row->id)
+                        ->where('warehouse_id', $this->warehouse_id)
+                        ->where('place_id', $this->place_id)
+                        ->where('date', '<=', $this->start_date)
+                        ->whereNotNull('qty_in')
+                        ->get();
 
-        }
+                    $ItemCogsShadingOut = ItemCogs::where('deleted_at', null)
+                        ->where('item_id', $row->id)
+                        ->where('warehouse_id', $this->warehouse_id)
+                        ->where('place_id', $this->place_id)
+                        ->where('date', '<=', $this->start_date)
+                        ->whereNotNull('qty_out')
+                        ->get();
 
-        foreach($itemNoShading as $key =>$row){
+                    foreach ($ItemCogsShadingIn as $inawal) {
+                        $rp_in += $inawal->total_in;
+                    }
 
+                    foreach ($ItemCogsShadingOut as $inOut) {
+                        $rp_out += $inOut->total_out;
+                    }
 
+                    $total = round($ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'), 3);
+                    $rp_total = round($rp_in - $rp_out, 3);
+                    $arr[] = [
+                        'no' => $keys,
+                        'item_code' => $row->code,
+                        'item_name' => $row->name,
+                        'unit' => $row->uomUnit->code,
+                        'shading' => '-',
+                        'total' => $total,
+                        'rp_total' => $rp_total
+                    ];
+                    $keys++;
+                }
+            });
 
-            $rp_in = 0;
-            $rp_out = 0 ;
-            $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
-            ->where('item_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<=',$this->start_date)
-
-            ->whereNotNull('qty_in')->get();
-
-            $ItemCogsShadingOut = ItemCogs::where('deleted_at',null)
-            ->where('item_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<=',$this->start_date)
-
-            ->whereNotNull('qty_out')->get();
-            foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in += $inawal->total_in;
-            }
-
-            foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   $inOut->total_out;
-            }
-            $total = round($ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
-            $rp_total = $rp_in - $rp_out;
-            $arr[] = [
-                'no'=> $keys,
-                'item_code' =>  $row->code,
-                'item_name' =>  $row->name,
-                'unit'      =>  $row->uomUnit->code,
-                'shading'   =>  '-',
-                'total'     =>  $total,
-                'rp_total'     =>  $rp_total
-            ];
-            $keys++;
-
-
-
-        }
 
         return collect($arr);
     }

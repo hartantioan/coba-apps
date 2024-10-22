@@ -44,7 +44,7 @@ class NotificationController extends Controller
         $search = $request->input('search.value');
 
         $total_data = Notification::count();
-        
+
         $query_data = Notification::where(function($query) use ($search, $request) {
             $query->where('to_user_id',session('bo_id'));
             if($search) {
@@ -94,16 +94,18 @@ class NotificationController extends Controller
         if($query_data <> FALSE) {
             $nomor = $start + 1;
             foreach($query_data as $val) {
-                
+                if($val->lookable_type == 'report'){
+                    $btn = '-';
+                }else{
+                    $btn = ' <a type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Kunjungi Halaman" href="'.$rootUrl.'/admin/'.$val->getURL().'?code='.CustomHelper::encrypt($val->lookable->code ?? '').'"><i class="material-icons dp48">keyboard_tab</i></a>';
+                }
                 $response['data'][] = [
                     $nomor,
                     $val->fromUser->name,
                     $val->title,
                     $val->note,
                     date('d/m/Y H:i:s',strtotime($val->created_at)),
-                    '
-                        <a type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light green accent-2 white-text btn-small" data-popup="tooltip" title="Kunjungi Halaman" href="'.$rootUrl.'/admin/'.$val->getURL().'?code='.CustomHelper::encrypt($val->lookable->code ?? '').'"><i class="material-icons dp48">keyboard_tab</i></a>
-                    '
+                    $btn
 
                 ];
 
@@ -137,14 +139,19 @@ class NotificationController extends Controller
         $arrlink = [];
         $rootUrl = url('/');
         foreach($notifs as $row){
+            if($row->lookable_type == 'report'){
+                $url = '-';
+            }else{
+                $url = $rootUrl.'/admin/'.$row->getURL().'?code='.CustomHelper::encrypt($row->lookable->code ?? '');
+            }
             $row['icon'] = $row->icon();
             $row['from_name'] = $row->from_user_id == session('bo_id') ? 'Anda' : $row->fromUser->name;
             $row['time'] = $row->getTimeAgo();
             $arrnotif[] = $row;
-            $arrlink[] = $rootUrl.'/admin/'.$row->getURL().'?code='.CustomHelper::encrypt($row->lookable->code ?? '');
-           
+            $arrlink[] = $url;
+
         }
-        
+
 
         $response = [
             'status'            => 200,
@@ -156,7 +163,7 @@ class NotificationController extends Controller
             'version'           => $version ? $version->version : '...',
             'unread_chats'      => $unreadchat > 0 ? 'Anda memiliki '.$unreadchat.' percakapan yang baru dan belum dibaca.' : '',
         ];
-        
+
         return response()->json($response);
     }
 

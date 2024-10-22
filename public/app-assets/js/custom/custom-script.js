@@ -224,21 +224,39 @@ function cekNotif(url){
 					$('#notification-none').hide();
 					$.each(response.notif_list, function(i, val) {
 						if(!$('.row-notification[data-notif="' + val.code + '"]').length > 0){
-							$('#notifications-divider').after(`
-								<li class="` + (val.status == '1' ? 'grey lighten-3' : '' ) + ` row-notification" data-notif="` + val.code + `">
-									<a class="black-text" href="`+response.link_list[i]+`">
-										<div class="row">
-											<div class="col s1 pl-1 pt-2" style="top: 10px;">
-												<span class="material-icons icon-bg-circle cyan small">` + val.icon +  `</span>
-											</div>
-											<div class="col s11 pl-5">
-												` + (val.status == '1' ? '<strong>' : '') + `` + val.title + ` oleh ` + val.from_name + `.` + (val.status == '1' ? '</strong>' : '') + `
-											</div>
-										</div>
-									</a>
-									<time class="media-meta grey-text darken-2" style="margin-left: 48px;top:-1px;">` + val.time + `</time>
-								</li>
-							`);
+                            if(val.lookable_type == 'report'){
+                                $('#notifications-divider').after(`
+                                    <li class="` + (val.status == '1' ? 'grey lighten-3' : '' ) + ` row-notification" data-notif="` + val.code + `">
+                                        <a class="black-text" href="`+val.note+`">
+                                            <div class="row">
+                                                <div class="col s1 pl-1 pt-2" style="top: 10px;">
+                                                    <span class="material-icons icon-bg-circle cyan small">` + val.icon +  `</span>
+                                                </div>
+                                                <div class="col s11 pl-5">
+                                                    ` + (val.status == '1' ? '<strong>' : '') + `` + val.title + ` oleh ` + val.from_name + `.` + (val.status == '1' ? '</strong>' : '') + `
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <time class="media-meta grey-text darken-2" style="margin-left: 48px;top:-1px;">` + val.time + `</time>
+                                    </li>
+                                `);
+                            }else{
+                                $('#notifications-divider').after(`
+                                    <li class="` + (val.status == '1' ? 'grey lighten-3' : '' ) + ` row-notification" data-notif="` + val.code + `">
+                                        <a class="black-text" href="`+response.link_list[i]+`">
+                                            <div class="row">
+                                                <div class="col s1 pl-1 pt-2" style="top: 10px;">
+                                                    <span class="material-icons icon-bg-circle cyan small">` + val.icon +  `</span>
+                                                </div>
+                                                <div class="col s11 pl-5">
+                                                    ` + (val.status == '1' ? '<strong>' : '') + `` + val.title + ` oleh ` + val.from_name + `.` + (val.status == '1' ? '</strong>' : '') + `
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <time class="media-meta grey-text darken-2" style="margin-left: 48px;top:-1px;">` + val.time + `</time>
+                                    </li>
+                                `);
+                            }
 						}
 					});
 				}

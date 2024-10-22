@@ -27,15 +27,15 @@
     <script src="{{ url('app-assets/vendors/ckeditor/ckeditor.js') }}"></script>
     <script src="{{ url('app-assets/js/custom/custom-script.js?v=147') }}"></script>
     {{-- <script disable-devtool-auto src='{{ url('app-assets/js/custom/disabledevtools.js') }}' disable-menu='false'></script> --}}
-    
+
     <script src="{{ url('app-assets/js/custom/go-chart.js') }}"></script>
     @if(session('bo_id'))
         <script>
             $(function() {
                 cekNotif('{{ URL::to('/') }}');
-                /* setInterval(function () {
+                setInterval(function () {
                     cekNotif('{{ URL::to('/') }}');
-                },60000); */
+                },60000);
                 $('.tooltipped').tooltip();
                 /* checkPageMaintenance('{{ URL::to('/') }}'); */
                 var sessionLifetime = {{  config('session.lifetime') }};

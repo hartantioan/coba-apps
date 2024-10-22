@@ -168,6 +168,7 @@
                                                         <th>Tipe Kendaraan</th>
                                                         <th>Nopol Kendaraan</th>
                                                         <th>No. Kontainer</th>
+                                                        <th>No. Seal</th>
                                                         <th>Catatan Internal</th>
                                                         <th>Catatan Eksternal</th>
                                                         <th>Berat (KG)</th>

@@ -51,42 +51,29 @@ class StockInRupiahController extends Controller
         DB::statement("SET SQL_MODE=''");
         if($request->type == 'final'){
             $perlu = 0 ;
-            $query_data = ItemCogs::where(function($query) use ( $request) {
-                $query->whereHas('item',function($query) use($request){
-                    $query->whereIn('status',['1','2']);
-                });
-                if($request->finish_date) {
-                    $query->whereDate('date','<=', $request->finish_date);
-                }
+            $item = Item::where(function($query)use($request){
                 if($request->item_id) {
-                    $query->whereHas('item',function($query) use($request){
-                        $query->where('id',$request->item_id);
-                    });
+                    $query->where('id',$request->item_id);
                 }
-                if($request->plant != 'all'){
-                    $query->whereHas('place',function($query) use($request){
-                        $query->where('id',$request->plant);
-                    });
-                }
-                if($request->warehouse != 'all'){
-                    $query->whereHas('warehouse',function($query) use($request){
-                        $query->where('id',$request->warehouse);
-                    });
-                }
-    
                 if($request->filter_group){
-                   
-                    $query->whereHas('item',function($query) use($request){
-                        $query->whereIn('item_group_id', $request->filter_group);
-                    });
+                    $query->whereIn('item_group_id', $request->filter_group);
                 }
-            })
-            ->groupBy('item_id')
-            ->pluck('item_id');
+            })->pluck('id');
 
             $arr = [];            
-            foreach($query_data as $row){
-                $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->orderByDesc('date')->orderByDesc('id')->first();
+            foreach($item as $row){
+                $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
+                    if($request->plant != 'all'){
+                        $query->whereHas('place',function($query) use($request){
+                            $query->where('id',$request->plant);
+                        });
+                    }
+                    if($request->warehouse != 'all'){
+                        $query->whereHas('warehouse',function($query) use($request){
+                            $query->where('id',$request->warehouse);
+                        });
+                    }
+                })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
                     $arr[] = $data;
                 }

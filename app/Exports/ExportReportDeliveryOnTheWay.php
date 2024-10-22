@@ -54,7 +54,7 @@ class ExportReportDeliveryOnTheWay implements FromCollection, WithTitle, WithHea
 
         foreach ($delivery_process as $key => $row) {
             if($row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->status != '2') {
-                $tgl_smpai =date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack->last()->created_at));
+                $tgl_smpai =date('d/m/Y', strtotime($row->marketingOrderDeliveryProcess->receive_date));
             }else{
                 $tgl_smpai = '';
             }

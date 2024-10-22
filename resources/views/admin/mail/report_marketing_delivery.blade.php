@@ -35,6 +35,23 @@
 
 <table>
     <tr>
+        <th style="font-size:12px;">Brand</th>
+        <th style="font-size:12px;">Qty Sales / Day (M2)</th>
+        <th style="font-size:12px;">Qty Sales / Month (M2)</th>
+    </tr>
+    @foreach ($data3 as $row)
+    <tr>
+        <td style="font-size:12px;" align="left">{{$row->brand}}</td>
+        <td style="font-size:12px;" align="right">{{number_format($row->d,0,",",".")}}</td>
+        <td style="font-size:12px;" align="right">{{number_format($row->m,0,",",".")}}</td>
+    </tr>
+    @endforeach
+</table>
+<br>
+<br>
+
+<table>
+    <tr>
         <th style="font-size:12px;">Item Code</th>
         <th style="font-size:12px;">Item Name</th>
         <th style="font-size:12px;">Stock (M2)</th>

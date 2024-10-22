@@ -48,6 +48,7 @@ class MailReportMarketingDelivery extends Command
 
         // foreach ($akun as $pangsit) {
         $data = [];
+        $data2 = [];
 
         $query = DB::select("
               
@@ -78,6 +79,42 @@ class MailReportMarketingDelivery extends Command
 
             $data[] = [
                 'tipe'  => $row->name,
+                'd'  => $row->day,
+                'm'  => $row->month,
+            ];
+        }
+
+        $query = DB::select("
+       
+                            SELECT a.name,IFNULL(b.qty,0) AS day,IFNULL(c.qty,0) as month FROM brands a LEFT JOIN (
+                            SELECT g.name as brand, coalesce(SUM(b.qty*d.qty_conversion),0) AS qty from marketing_order_delivery_processes a
+                            LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
+                            LEFT JOIN marketing_order_delivery_details c ON c.id=b.marketing_order_delivery_detail_id
+                            LEFT JOIN marketing_order_details d ON d.id=c.marketing_order_detail_id
+                            LEFT JOIN items e ON e.id=c.item_id
+                        
+                            left join brands g on g.id=e.brand_id and g.deleted_at is null
+                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                            GROUP BY g.name)b ON a.`name`=b.brand
+                            LEFT JOIN (
+                            SELECT g.name as brand, SUM(b.qty*d.qty_conversion) AS qty from marketing_order_delivery_processes a
+                            LEFT JOIN marketing_order_delivery_process_details b ON a.id=b.marketing_order_delivery_process_id
+                            LEFT JOIN marketing_order_delivery_details c ON c.id=b.marketing_order_delivery_detail_id
+                            LEFT JOIN marketing_order_details d ON d.id=c.marketing_order_detail_id
+                            LEFT JOIN items e ON e.id=c.item_id
+                            left join brands g on g.id=e.brand_id and g.deleted_at is null
+                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01')
+                            AND a.post_date<=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                            GROUP BY g.name)c ON a.name=c.brand
+                            WHERE a.deleted_at IS null
+        ");
+
+
+
+        foreach ($query as $row) {
+
+            $data2[] = [
+                'brand'  => $row->name,
                 'd'  => $row->day,
                 'm'  => $row->month,
             ];
@@ -321,7 +358,6 @@ class MailReportMarketingDelivery extends Command
             if ($pallet_conversion_total_sum == $total_sum_sj_blm_terkirim || $pallet_conversion_total_sum == $box_conversion_total_sum) {
                 $pallet_conversion_total_sum = 0;
             }
-
         }
 
         $arr = [];
@@ -441,9 +477,10 @@ class MailReportMarketingDelivery extends Command
 
         $obj = json_decode(json_encode($data));
         $obj2 = json_decode(json_encode($arr));
+        $obj3 = json_decode(json_encode($data2));
 
 
-        Mail::to($recipient)->send(new SendMailReportMarketingDelivery($obj, $obj2));
+        Mail::to($recipient)->send(new SendMailReportMarketingDelivery($obj, $obj2, $obj3));
 
         // }
 

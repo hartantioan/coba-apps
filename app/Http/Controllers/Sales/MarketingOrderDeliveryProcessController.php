@@ -148,6 +148,7 @@ class MarketingOrderDeliveryProcessController extends Controller
             'vehicle_name',
             'vehicle_no',
             'no_container',
+            'seal_no',
             'note_internal',
             'note_external',
             'weight_netto',
@@ -167,6 +168,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
+                            ->orWhere('seal_no', 'like', "%$search%")
+                            ->orWhere('no_container', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -229,6 +232,8 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->where('code', 'like', "%$search%")
                             ->orWhere('note_internal', 'like', "%$search%")
                             ->orWhere('note_external', 'like', "%$search%")
+                            ->orWhere('seal_no', 'like', "%$search%")
+                            ->orWhere('no_container', 'like', "%$search%")
                             ->orWhereHas('user',function($query) use ($search, $request){
                                 $query->where('name','like',"%$search%")
                                     ->orWhere('employee_no','like',"%$search%");
@@ -318,6 +323,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                     $val->vehicle_name,
                     $val->vehicle_no,
                     $val->no_container ?? '-',
+                    $val->seal_no ?? '-',
                     $val->note_internal,
                     $val->note_external,
                     CustomHelper::formatConditionalQty($val->weight_netto),
@@ -447,6 +453,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'vehicle_name'                  => 'required',
                 'vehicle_no'                    => 'required',
                 'no_container'                    => 'required',
+                'seal_no'                       => 'required',
                 'arr_modd_id'                   => 'required|array',
                 'arr_item_stock_id'             => 'required|array',
                 'arr_qty'                       => 'required|array',
@@ -464,6 +471,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                 'vehicle_name.required'                 => 'Nama/Tipe kendaraan tidak boleh kosong.',
                 'vehicle_no.required'                   => 'Nopol kendaraan tidak boleh kosong.',
                 'no_container.required'                 => ' Nomor Kontainer tidak boleh kosong.',
+                'seal_no.required'                      => ' Nomor Seal tidak boleh kosong.',
                 'arr_modd_id.required'                  => 'Detail item tidak boleh kosong.',
                 'arr_modd_id.array'                     => 'Detail item harus array.',
                 'arr_item_stock_id.required'            => 'Detail stock tidak boleh kosong.',
@@ -645,6 +653,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         $query->vehicle_name = $request->vehicle_name;
                         $query->vehicle_no = $request->vehicle_no;
                         $query->no_container = $request->no_container;
+                        $query->seal_no = $request->seal_no;
                         $query->note_internal = $request->note_internal;
                         $query->note_external = $request->note_external;
                         $query->status = $query->status;
@@ -692,6 +701,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         'vehicle_name'                  => $request->vehicle_name,
                         'vehicle_no'                    => $request->vehicle_no,
                         'no_container'                  => $request->no_container,
+                        'seal_no'                       => $request->seal_no,
                         'weight_netto'                  => 0,
                         'note_internal'                 => $request->note_internal,
                         'note_external'                 => $request->note_external,

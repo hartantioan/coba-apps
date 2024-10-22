@@ -32,6 +32,7 @@ class MarketingOrderDeliveryProcess extends Model
         'vehicle_name',
         'vehicle_no',
         'no_container',
+        'seal_no',
         'weight_netto',
         'note_internal',
         'note_external',

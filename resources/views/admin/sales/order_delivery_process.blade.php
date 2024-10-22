@@ -245,6 +245,10 @@
                                         <input id="no_container" name="no_container" type="text" placeholder="No Container" >
                                         <label class="active" for="no_container">No Kontainer</label>
                                     </div>
+                                    <div class="input-field col m3 s12">
+                                        <input id="seal_no" name="seal_no" type="text" placeholder="No Seal" >
+                                        <label class="active" for="seal_no">No Seal</label>
+                                    </div>
                                     <div class="col m12 s12">
                                         <div class="card-alert card red">
                                             <div class="card-content white-text">
@@ -2221,6 +2225,7 @@ document.addEventListener('focusin', function (event) {
                     $('#note_internal').val(response.note_internal);
                     $('#note_external').val(response.note_external);
                     $('#no_container').val(response.no_container);
+                    $('#seal_no').val(response.seal_no);
                     $('#vehicle_name').val(response.vehicle_name);
                     $('#vehicle_no').val(response.vehicle_no);
 

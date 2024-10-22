@@ -59,6 +59,7 @@
                         </div>
                         
                         <div class="col l12 m12 s12 p-3 center-align">
+                            <div class="card-alert card red"><div class="card-content white-text"><p>PASTIKAN BARANG SAMPAI DI CUSTOMER BARU TEKAN TOMBOL DIATAS.</p></div></div>
                             Silahkan tekan tanda centang untuk update tracking.
                         </div>
                     </div>

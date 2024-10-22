@@ -85,17 +85,33 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
         $arr = [];
 
         foreach ($invoice_detail as $key => $row) {
-            if($row->is_include_tax == 1) {
-                $price = $row->price / (($row->percent_tax + 100) / 100);
+            if($row->lookable_type == 'marketing_order_down_payments' || $row->lookable_type == 'marketing_order_memos') {
+                if($row->lookable->is_include_tax == 1) {
+                    $price = $row->lookable->total;
+                }else{
+                    $price = $row->lookable->total;
+
+                }
+                $pricefirst = 0;
+                $discount = $row->lookable->discount ?? 0;
+                $total = $row->lookable->grandtotal;
             }else{
-                $price = $row->price;
+
+                if($row->is_include_tax == 1) {
+                    $price = $row->price / (($row->percent_tax + 100) / 100);
+                }else{
+                    $price = $row->price;
+                }
+
+                if($row->is_include_tax == 1) {
+                    $pricefirst = $row->getMoDetail()->price ?? 0 / (($row->percent_tax + 100) / 100);
+                }else{
+                    $pricefirst = $row->getMoDetail()->price ?? 0;
+                }
+                $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
+                $total = $row->getQtyM2() * $price;
             }
 
-            if($row->is_include_tax == 1) {
-                $pricefirst = $row->getMoDetail()->price ?? 0 / (($row->percent_tax + 100) / 100);
-            }else{
-                $pricefirst = $row->getMoDetail()->price ?? 0;
-            }
             $arr[] = [
                 'no'=> ($key+1),
                 'status'              => $row->marketingOrderInvoice->statusRaw(),
@@ -112,7 +128,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 'NIK'=>  $row->marketingOrderInvoice->user->employee_no,
                 'User'=>   $row->marketingOrderInvoice->user->name,
                 'post_date'         => date('d/m/Y', strtotime($row->marketingOrderInvoice->post_date)),
-                'Due Date Internal' =>  $row->marketingOrderInvoice->due_date_internal,
+                'Due Date Internal' =>  date('d/m/Y', strtotime($row->marketingOrderInvoice->due_date_internal)),
 
                 'No SO' =>  $row->marketingOrderInvoice->getlistSO(),
                 'No MOD' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->code,
@@ -137,11 +153,11 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 'satuan' => $row->getItemReal()->uomUnit->code ?? '-',
                 'qtym2' => $row->getQtyM2(),
                 'value' => $pricefirst,
-                'Discount 1' => $row->getMoDetail()->percent_discount_1 ?? '-',
+                'Discount 1' => $discount,
                 'Discount 2' => $row->getMoDetail()->percent_discount_2 ?? '-',
                 'Discount 3' => $row->getMoDetail()->discount_3 ?? '-',
                 'Harga Setelah Diskon' => $price,
-                'Total' =>  $row->getQtyM2() * $price,
+                'Total' =>  $total,
 
             ];
         }

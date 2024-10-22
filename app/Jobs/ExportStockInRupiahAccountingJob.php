@@ -32,12 +32,8 @@ class ExportStockInRupiahAccountingJob implements ShouldQueue
 
     public function handle()
     {
-        info('Job started');
         $filename = 'stock_in_rupiah_shading_' . uniqid() . '.xlsx';
-        info($this->start_date);
-        info($this->place_id);
-        info($this->warehouse_id);
-        info($this->user_id);
+
         Excel::store(new ExportReportStockInRupiahAccounting($this->start_date, $this->place_id, $this->warehouse_id), 'public/report/'.$filename);
         Notification::create([
             'code'				=> Str::random(20),
@@ -47,7 +43,7 @@ class ExportStockInRupiahAccountingJob implements ShouldQueue
             'lookable_type'		=> 'report',
             'lookable_id'		=> 0,
             'title'				=> 'Report telah berhasil diproses Stock Shading Accounting',
-            'note'				=> url('public/report/'.$filename),
+            'note'				=> env('APP_URL').'/storage/report/'.$filename,
             'status'			=> '1'
         ]);
     }

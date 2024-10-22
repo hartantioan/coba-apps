@@ -61,29 +61,8 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
         $keys = 1;
         foreach ($item as $key=>$row) {
 
-            $itemCogsShadingInAwal = ItemCogs::where('deleted_at',null)
-            ->where('item_shading_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<',$this->start_date)
-            ->whereNotNull('qty_in')->get();
-
-            $itemCogsShadingOutAwal = ItemCogs::where('deleted_at',null)
-            ->where('item_shading_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<',$this->start_date)
-            ->whereNotNull('qty_out')->get();
             $rp_in = 0;
             $rp_out = 0 ;
-            foreach ($itemCogsShadingInAwal as $inawal){
-                $rp_in +=   $inawal->total_in;
-            }
-            foreach ($itemCogsShadingOutAwal as $inOut){
-                $rp_out +=   $inawal->total_out;
-            }
-
-            $totalAwal = round($itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out'),3);
 
             $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
             ->where('item_shading_id',$row->id)
@@ -101,13 +80,14 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
 
             ->whereNotNull('qty_out')->get();
             foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in +=   $inawal->total_in;
+                $rp_in += $inawal->total_in;
             }
 
             foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   $inawal->total_out;
+                $rp_out +=   $inOut->total_out;
             }
-            $total = round($totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
+
+            $total = round( $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
             $rp_total = round($rp_in - $rp_out,3);
             $arr[] = [
                 'no'=> $keys,
@@ -125,31 +105,9 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
         foreach($itemNoShading as $key =>$row){
 
 
-            $itemCogsShadingInAwal = ItemCogs::where('deleted_at',null)
-            ->where('item_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<',$this->start_date)
-            ->whereNotNull('qty_in')->get();
 
-            $itemCogsShadingOutAwal = ItemCogs::where('deleted_at',null)
-            ->where('item_id',$row->id)
-            ->where( 'warehouse_id',$this->warehouse_id)
-            ->where( 'place_id',$this->place_id)
-            ->where('date', '<',$this->start_date)
-            ->whereNotNull('qty_out')->get();
             $rp_in = 0;
             $rp_out = 0 ;
-            foreach ($itemCogsShadingInAwal as $inawal){
-                $rp_in +=   $inawal->total_in;
-            }
-
-            foreach ($itemCogsShadingOutAwal as $inOut){
-                $rp_out +=   $inawal->total_out;
-            }
-
-            $totalAwal = round($itemCogsShadingInAwal->sum('qty_in') - $itemCogsShadingOutAwal->sum('qty_out'),3);
-
             $ItemCogsShadingIn = ItemCogs::where('deleted_at',null)
             ->where('item_id',$row->id)
             ->where( 'warehouse_id',$this->warehouse_id)
@@ -166,13 +124,13 @@ class ExportReportStockInRupiahAccounting implements FromCollection, WithTitle, 
 
             ->whereNotNull('qty_out')->get();
             foreach ($ItemCogsShadingIn as $inawal){
-                $rp_in +=   $inawal->total_in;
+                $rp_in += $inawal->total_in;
             }
 
             foreach ($ItemCogsShadingOut as $inOut){
-                $rp_out +=   $inawal->total_out;
+                $rp_out +=   $inOut->total_out;
             }
-            $total = round($totalAwal + $ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
+            $total = round($ItemCogsShadingIn->sum('qty_in') - $ItemCogsShadingOut->sum('qty_out'),3);
             $rp_total = $rp_in - $rp_out;
             $arr[] = [
                 'no'=> $keys,

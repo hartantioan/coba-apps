@@ -1567,11 +1567,11 @@ class MarketingOrderDeliveryProcessController extends Controller
                     'status'  => 500,
                     'message' => 'Data telah digunakan pada form lainnya.'
                 ];
-            }elseif($query->marketingOrderDelivery()->exists() && $query->marketingOrderDelivery->goodScaleDetail()->exists() && $query->marketingOrderDelivery->goodScaleDetail->goodScale->time_scale_out){
+            /* }elseif($query->marketingOrderDelivery()->exists() && $query->marketingOrderDelivery->goodScaleDetail()->exists() && $query->marketingOrderDelivery->goodScaleDetail->goodScale->time_scale_out){
                 $response = [
                     'status'  => 500,
                     'message' => 'Data telah ditimbang keluar, anda tidak bisa melakukan void.',
-                ];
+                ]; */
             }else{
                 $tempStatus = $query->status;
 

@@ -3470,7 +3470,7 @@ Route::prefix('admin')->group(function () {
                     Route::prefix('report_stock_in_rupiah_shading_batch')->middleware('operation.access:report_stock_in_rupiah,view')->group(function () {
                         Route::get('/', [StockInRupiahShading_BatchController::class, 'index']);
                         Route::post('filter', [StockInRupiahShading_BatchController::class, 'filter']);
-                        Route::get('export', [StockInRupiahShading_BatchController::class, 'export']);
+                        Route::post('export', [StockInRupiahShading_BatchController::class, 'export']);
                     });
 
                     Route::prefix('report_delivery_on_the_way')->middleware('operation.access:report_delivery_on_the_way,view')->group(function () {

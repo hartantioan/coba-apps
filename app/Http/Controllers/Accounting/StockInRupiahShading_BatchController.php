@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Accounting;
 
 use App\Exports\ExportReportStockInRupiahShadingBatchAccounting;
 use App\Http\Controllers\Controller;
+use App\Jobs\ExportStockInRupiahShadingBatch;
 use App\Models\Area;
 use App\Models\Company;
 use App\Models\ItemShading;
@@ -47,6 +48,10 @@ class StockInRupiahShading_BatchController extends Controller
         $start_date = $request->start_date;
         $place_id = $request->place_id;
         $warehouse_id = $request->warehouse_id;
-		return Excel::download(new ExportReportStockInRupiahShadingBatchAccounting($start_date,$place_id,$warehouse_id), 'stock_in_rupiah_shading_batch_'.uniqid().'.xlsx');
+        $user_id = session('bo_id');
+
+        ExportStockInRupiahShadingBatch::dispatch($start_date, $place_id, $warehouse_id,$user_id);
+
+        return response()->json(['message' => 'Your export is being processed. Anda akan diberi notifikasi apabila report anda telah selesai']);
     }
 }

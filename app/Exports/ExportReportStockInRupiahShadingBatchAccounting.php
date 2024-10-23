@@ -37,36 +37,34 @@ class ExportReportStockInRupiahShadingBatchAccounting implements FromCollection,
 
     public function collection()
     {
-        $item = ProductionBatch::join('items', 'production_batches.item_id', '=', 'items.id')
-        ->whereHas('item',function ($query)  {
+        $arr = [];
+        ProductionBatch::join('items', 'production_batches.item_id', '=', 'items.id')
+        ->whereHas('item', function ($query) {
             $query->whereNull('deleted_at');
         })
-        ->where('place_id',$this->place_id)
-        ->where('warehouse_id',$this->warehouse_id)
+        ->where('place_id', $this->place_id)
+        ->where('warehouse_id', $this->warehouse_id)
         ->orderBy('items.code')
         ->orderBy('items.id')
         ->select('production_batches.*')
-        ->get();
+        ->chunk(1000, function ($items) use (&$arr) {
+            $keys = count($arr) + 1; // Continue numbering from where you left off
+            foreach ($items as $row) {
+                $itemstock = ItemStock::where('item_shading_id', $row->item_shading_id)->first();
 
-        $arr = [];
-        $keys = 1;
-        foreach ($item as $key=>$row) {
-
-            $itemstock = ItemStock::where('item_shading_id',$row->item_shading_id)->first();
-
-            $arr[] = [
-                'no'=> $keys,
-                'item_code' =>  $row->item->code,
-                'item_name' =>  $row->item->name,
-                'unit'      =>  $row->item->uomUnit->code,
-                'batch'     =>  $row->code,
-                'shading'   =>  $row->itemShading->code ?? ' ',
-                'total'     =>  $itemstock->stockByDate($this->start_date),
-                'rp_total'  =>  $itemstock->priceFgNow($this->start_date)
-            ];
-            $keys++;
-
-        }
+                $arr[] = [
+                    'no' => $keys,
+                    'item_code' => $row->item->code,
+                    'item_name' => $row->item->name,
+                    'unit' => $row->item->uomUnit->code,
+                    'batch' => $row->code,
+                    'shading' => $row->itemShading->code ?? ' ',
+                    'total' => $itemstock->stockByDate($this->start_date),
+                    'rp_total' => $itemstock->priceFgNow($this->start_date)
+                ];
+                $keys++;
+            }
+        });
 
         return collect($arr);
     }

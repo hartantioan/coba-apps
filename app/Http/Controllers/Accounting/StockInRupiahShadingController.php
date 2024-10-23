@@ -49,7 +49,6 @@ class StockInRupiahShadingController extends Controller
         $place_id = $request->place_id;
         $warehouse_id = $request->warehouse_id;
         $user_id = session('bo_id');
-        info($request);
 
         ExportStockInRupiahAccountingJob::dispatch($start_date, $place_id, $warehouse_id,$user_id);
 

@@ -58,7 +58,8 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
         'Qty',
         'Satuan',
         'Qty M2',
-        'Harga (exc PPN)',
+        'Inc/Exc PPN',
+        'Harga',
         'Discount 1',
         'Discount 2',
         'Discount 3',
@@ -104,16 +105,22 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 }
 
                 if($row->is_include_tax == 1) {
-                    $pricefirst = $row->getMoDetail()->price / (($row->percent_tax + 100) / 100) ?? 0;
+                    $pricefirst = $row->getMoDetail()->price ?? 0;
                 }else{
                     $pricefirst = $row->getMoDetail()->price ?? 0;
+                    // $pricefirst = $row->getMoDetail()->price * (($row->percent_tax + 100) / 100) ?? 0;
                 }
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
                 $total = $row->getQtyM2() * $price;
             }
 
-            if($row->lookable_type != 'marketing_order_down_payments'){
 
+            if($row->lookable_type != 'marketing_order_down_payments'){
+                if($row->getMoDetail()->is_include_tax == 1){
+                    $taxy ="include";
+                } else{
+                    $taxy ="exclude";
+                }
                 $arr[] = [
                     'no'=> ($key+1),
                     'status'              => $row->marketingOrderInvoice->statusRaw(),
@@ -154,6 +161,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'qty' => $row->qty,
                     'satuan' => $row->getItemReal()->unit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code,
                     'qtym2' => $row->getQtyM2(),
+                    'include'=> $taxy,
                     'value' => $pricefirst,
                     'Discount 1' => $discount,
                     'Discount 2' => $row->getMoDetail()->percent_discount_2 ?? '-',

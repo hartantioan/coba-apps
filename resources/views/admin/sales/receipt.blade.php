@@ -693,7 +693,7 @@
                         $(row).addClass('row_item');
                         $(row).attr('data-id', data.id);
                         $(row).attr('data-type', data.type);
-                        $(row).attr('data-balance', data.final);
+                        $(row).attr('data-balance', data.balance);
                         if(data.selected){
                             $(row).addClass('selected');
                         }

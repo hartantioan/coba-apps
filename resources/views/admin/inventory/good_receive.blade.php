@@ -267,7 +267,7 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="2">Total:</td>
+                                                    <td colspan="7">Total:</td>
                                                     <td id="total_display">0</td>
                                                 </tr>
                                             </tfoot>

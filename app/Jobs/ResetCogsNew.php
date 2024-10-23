@@ -962,7 +962,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                 }
             }
             $row->update([
-                'nominal' => $total / $row->qty,
+                'nominal' => $row->qty > 0 ? $total / $row->qty : 0,
                 'total'   => $total,
             ]);
             if($row->journalDetail()->exists() && $row->productionBatchUsage()->exists() && $bomGroup !== '1' && $bomGroup){

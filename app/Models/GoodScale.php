@@ -406,6 +406,24 @@ class GoodScale extends Model
 
     }
 
+    public function sjHasReturnDocument(){
+        $has = false;
+        if($this->goodScaleDetail()->exists()){
+            $has = true;
+            foreach($this->goodScaleDetail as $row){
+                if($row->lookable->marketingOrderDeliveryProcess()->exists()){
+                    if($row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->exists()){
+                        $data = $row->lookable->marketingOrderDeliveryProcess->marketingOrderDeliveryProcessTrack()->where('status','5')->count();
+                        if($data == 0){
+                            $has = false;
+                        }
+                    }
+                }
+            }
+        }
+        return $has;
+    }
+
     public function journal(){
         return $this->hasOne('App\Models\Journal','lookable_id','id')->where('lookable_type',$this->table);
     }
@@ -416,6 +434,19 @@ class GoodScale extends Model
 
     public function createPurchaseOrder(){
         #CREATE PO
+        if($this->purchaseOrder()->exists()){
+            $this->purchaseOrder->update([
+                'status'    => '5',
+                'void_id'   => session('bo_id'),
+                'void_note' => 'Data telah divoid oleh Sistem karena Perubahan data Timbangan.',
+                'void_date' => date('Y-m-d H:i:s')
+            ]);
+
+            activity()
+                ->performedOn(new PurchaseOrder())
+                ->causedBy(session('bo_id'))
+                ->log('Void the purchase order data from good scale');
+        }
         $place = Place::where('code',substr($this->code,7,2))->where('status','1')->first();
         $purchaseOrder = PurchaseOrder::create([
             'code'						=> PurchaseOrder::generateCode('PORD-'.date('y',strtotime($this->post_date)).$place->code),

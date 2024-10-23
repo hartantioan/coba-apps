@@ -216,6 +216,7 @@
                                                         <th rowspan="2">{{ __('translations.grandtotal') }}</th>
                                                         <th rowspan="2">{{ __('translations.status') }}</th>
                                                         <th rowspan="2">By</th>
+                                                        <th rowspan="2">Status SJ Kembali</th>
                                                         <th rowspan="2">{{ __('translations.action') }}</th>
                                                     </tr>
                                                     <tr>
@@ -2282,8 +2283,9 @@
                 { name: 'wtax', className: 'right-align' },
                 { name: 'rounding', className: 'right-align' },
                 { name: 'grandtotal', className: 'right-align' },
-              { name: 'status', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'status', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'by', searchable: false, orderable: false, className: 'center-align' },
+                { name: 'link_good_scale', searchable: false, orderable: false, className: 'center-align' },
                 { name: 'action', searchable: false, orderable: false, className: 'right-align' },
             ],
         });

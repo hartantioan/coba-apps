@@ -462,6 +462,7 @@ class PurchaseOrderController extends Controller
                             )
                         )
                     ),
+                    $val->goodScale()->exists() ? ($val->goodScale->sjHasReturnDocument() ? 'Telah kembali' : 'Belum kembali') : '',
                     $btn_close.$btn_print.'
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
 						<button type="button" class="btn-floating mb-1 btn-flat waves-effect waves-light orange accent-2 white-text btn-small" data-popup="tooltip" title="Edit" onclick="show(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">create</i></button>

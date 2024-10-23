@@ -72,6 +72,11 @@ class PurchaseOrder extends Model
         return $this->belongsTo('App\Models\User', 'user_id', 'id')->withTrashed();
     }
 
+    public function goodScale()
+    {
+        return $this->belongsTo('App\Models\GoodScale', 'document_no', 'code')->whereIn('status',['2','3']);
+    }
+
     public function voidUser()
     {
         return $this->belongsTo('App\Models\User', 'void_id', 'id')->withTrashed();

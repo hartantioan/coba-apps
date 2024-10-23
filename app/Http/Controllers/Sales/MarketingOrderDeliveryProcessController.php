@@ -347,6 +347,7 @@ class MarketingOrderDeliveryProcessController extends Controller
                         )
                     ),
                     '
+                    <button type="button" class="btn-floating mb-1 btn-flat  grey white-text btn-small" data-popup="tooltip" title="Preview Print" onclick="whatPrinting(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">visibility</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat blue accent-2 white-text btn-small" data-popup="tooltip" title="Cetak Barcode" onclick="barcode(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">style</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat purple accent-2 white-text btn-small" data-popup="tooltip" title="Selesai" onclick="done(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">gavel</i></button>
                         <button type="button" class="btn-floating mb-1 btn-flat green accent-2 white-text btn-small" data-popup="tooltip" title="Cetak" onclick="printPreview(`' . CustomHelper::encrypt($val->code) . '`)"><i class="material-icons dp48">local_printshop</i></button>
@@ -946,6 +947,12 @@ class MarketingOrderDeliveryProcessController extends Controller
         $pr = MarketingOrderDeliveryProcess::where('code',CustomHelper::decrypt($id))->first();
 
         if($pr){
+
+            $currentDate = now()->format('dmy');
+            $currentTime = now()->format('His');
+            $placeCode = $pr->getPlace();
+
+            $barcodeData = $currentDate. $currentTime . $placeCode ;
             $pdf = PrintHelper::print($pr,'Production Receive FG',array(0,0,188.98,78.59),'portrait','admin.print.sales.order_delivery_proces_barcode_individual');
 
             $content = $pdf->download()->getOriginalContent();

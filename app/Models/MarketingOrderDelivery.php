@@ -116,6 +116,20 @@ class MarketingOrderDelivery extends Model
         return $payment;
     }
 
+    public function getTypePaymentStatus(){
+        $payment = '';
+        foreach($this->marketingOrderDeliveryDetail as $row){
+            $payment = $row->marketingOrderDetail->marketingOrder->payment_type;
+        }
+
+        $type = match ($payment) {
+            '1' => 'DP',
+            '2' => 'Credit',
+            default => 'Invalid',
+        };
+        return $type;
+    }
+
     public function transportation()
     {
         return $this->belongsTo('App\Models\Transportation', 'transportation_id', 'id')->withTrashed();
@@ -307,7 +321,7 @@ class MarketingOrderDelivery extends Model
 
         return $hasRelation;
     }
-    
+
     public function getTotal(){
         $total = 0;
         foreach($this->marketingOrderDeliveryDetail as $row){
@@ -357,7 +371,7 @@ class MarketingOrderDelivery extends Model
         $see = LockPeriod::where('month', $monthYear)
                         ->whereIn('status_closing', ['2','3'])
                         ->get();
-       
+
         if(count($see)>0){
             return true;
         }else{

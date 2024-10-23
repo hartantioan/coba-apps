@@ -67,9 +67,9 @@ class MarketingOrderInvoiceDetail extends Model
 
     public function getItemReal(){
         if($this->lookable_type == 'marketing_order_delivery_process_details'){
-            return $this->lookable->itemStock->item;
+            return $this->lookable->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit;
         }else if($this->lookable_type == 'marketing_order_delivery_details'){
-            return $this->lookable->item;
+            return $this->lookable->marketingOrderDetail->itemUnit;
         }
     }
 

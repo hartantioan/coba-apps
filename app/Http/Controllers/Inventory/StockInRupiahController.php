@@ -60,7 +60,7 @@ class StockInRupiahController extends Controller
                 }
             })->pluck('id');
 
-            $arr = [];            
+            $query_data = [];            
             foreach($item as $row){
                 $data = ItemCogs::where('date','<=',$request->finish_date)->where('item_id',$row)->where(function($query)use($request){
                     if($request->plant != 'all'){
@@ -75,11 +75,9 @@ class StockInRupiahController extends Controller
                     }
                 })->orderByDesc('date')->orderByDesc('id')->first();
                 if($data){
-                    $arr[] = $data;
+                    $query_data[] = $data;
                 }
             }
-
-            $query_data = collect($arr);
         }else{
             $perlu = 1;
             $query_data = ItemCogs::where(function($query) use ( $request) {

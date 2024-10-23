@@ -351,7 +351,7 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
+        $datapo = PurchaseOrder::whereIn('status',['2','3'])->whereIn('inventory_type',['2','3'])->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
             $invoice = $row->totalInvoice();

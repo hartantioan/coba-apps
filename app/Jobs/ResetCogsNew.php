@@ -645,7 +645,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
-                $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                $price = $qtyBefore > 0 ? number_format($totalBefore / $qtyBefore,13) : 0;
                 if($tempgiprice > 0){
                    $price = $tempgiprice;
                }else{

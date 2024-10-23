@@ -67,7 +67,7 @@ class ExportReportDeliveryOnTheWay implements FromCollection, WithTitle, WithHea
                 'itemname' => $row->marketingOrderDeliveryDetail->item->name,
                 'qty' => $row->qty ,
                 'satuan' => $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
-                'qtym2' => $row->marketingOrderDeliveryDetail->getQtyM2(),
+                'qtym2' => $row->marketingOrderDeliveryDetail->getQtyM2() * $row->qty,
                 'value' => $row->total,
             ];
         }

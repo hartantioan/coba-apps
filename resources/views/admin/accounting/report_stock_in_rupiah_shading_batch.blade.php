@@ -170,7 +170,39 @@
         var place_id = $('#filter_place').val();
         var start_date = $('#start_date').val();
         var $search = '';
-        window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
+        $.ajax({
+            url: '{{ Request::url() }}/export',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                place_id : place_id,
+                warehouse_id: warehouse_id,
+                start_date : start_date,
+            },
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            beforeSend: function() {
+                loadingOpen('#main-display');
+            },
+            success: function(response) {
+                loadingClose('#main-display');
+                M.toast({
+                    html: response.message
+                });
+            },
+            error: function() {
+                $('#main-display').scrollTop(0);
+                loadingClose('#main-display');
+                swal({
+                    title: 'Ups!',
+                    text: 'Check your internet connection.',
+                    icon: 'error'
+                });
+            }
+        });
+
+    // window.location = "{{ Request::url() }}/export?start_date=" + start_date + "&place_id=" + place_id + "&warehouse_id=" + warehouse_id;
 
     }
     function exportCsv(){

@@ -466,7 +466,7 @@ class GoodScale extends Model
             'received_date'             => $this->post_date,
             'due_date'                  => $this->post_date,
             'document_date'             => $this->post_date,
-            'note'                      => 'TARIKAN DARI TIMBANGAN : '.$this->code.' DENGAN CATATAN : '.$this->note,
+            'note'                      => 'TARIKAN DARI TIMBANGAN : '.$this->code.' DENGAN CATATAN : '.$this->note.' - LIST MOD '.$this->referencePO(),
             'note_external'             => NULL,
             'subtotal'                  =>0,
             'discount'                  => 0,

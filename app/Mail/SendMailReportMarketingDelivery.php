@@ -29,7 +29,7 @@ class SendMailReportMarketingDelivery extends Mailable
     public function build()
     {
         return $this->from('porcelain@superior.co.id')
-            ->subject('[SUPERIOR PORCELAIN SUKSES] Report Delivery')
+            ->subject('[SUPERIOR PORCELAIN SUKSES] Report Delivery & Stock')
             ->view('admin.mail.report_marketing_delivery')
             ->with(
                 'data',

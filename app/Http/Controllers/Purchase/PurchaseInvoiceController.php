@@ -351,7 +351,26 @@ class PurchaseInvoiceController extends Controller
             }
         }
 
-        $datapo = PurchaseOrder::whereIn('status',['2','3'])->whereIn('inventory_type',['2','3'])->where('account_id',$request->id)->get();
+        $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','2')->where('account_id',$request->id)->get();
+
+        foreach($datapo as $row){
+            $invoice = $row->totalInvoice();
+            if(($row->grandtotal - $invoice) > 0){
+                $details[] = [
+                    'type'          => 'purchase_orders',
+                    'id'            => $row->id,
+                    'code'          => $row->code,
+                    'post_date'     => date('d/m/Y',strtotime($row->post_date)),
+                    'grandtotal'    => number_format($row->grandtotal,2,',','.'),
+                    'invoice'       => number_format($invoice,2,',','.'),
+                    'balance'       => $row->currency->symbol.' '.number_format($row->grandtotal - $invoice,2,',','.'),
+                    'info'          => $row->note,
+                    'list_item'     => $row->getListItem(),
+                ];
+            }
+        }
+
+        $datapo = PurchaseOrder::whereIn('status',['2','3'])->where('inventory_type','3')->where('account_id',$request->id)->get();
 
         foreach($datapo as $row){
             $invoice = $row->totalInvoice();

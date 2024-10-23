@@ -2347,7 +2347,7 @@ document.addEventListener('focusin', function (event) {
                             `);
                             $('#item_stock_id' + count).select2({
                                 placeholder: '-- Pilih asal stock / gudang --',
-                                minimumInputLength: 1,
+                                minimumInputLength: 3,
                                 allowClear: true,
                                 cache: true,
                                 width: 'resolve',

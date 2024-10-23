@@ -472,7 +472,7 @@ class GoodIssueController extends Controller
                         $itemCogsAfter = ItemCogs::where('place_id',$item_stock->place_id)->where('warehouse_id',$item_stock->warehouse_id)->where('item_id',$item_stock->item_id)->whereDate('date','>',$request->post_date)->orderBy('date')->orderBy('id')->get();
 
                         if($itemCogsBefore){
-                            if($itemCogsBefore->qty_final < $qtyout){
+                            if(round($itemCogsBefore->qty_final,3) < $qtyout){
                                 $passed = false;
                                 $arrItemNotPassed[] = $item_stock->item->name;
                             }else{

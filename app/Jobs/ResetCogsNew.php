@@ -110,7 +110,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
         if($key == 0){
             if($old_data){
                 $qtyBefore = $old_data->qty_final;
-                $totalBefore = $old_data->total_final;
+                $totalBefore = round($old_data->total_final,2);
             }
         }
 

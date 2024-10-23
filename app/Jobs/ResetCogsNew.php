@@ -645,13 +645,14 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             if($row->itemStock->productionBatch()->exists() && $row->itemStock->area()->exists() && $row->itemStock->itemShading()->exists()){
                 $price = $row->itemStock->priceFgNow($dateloop);
             }else{
-                $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                $price = $qtyBefore > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
                 if($tempgiprice > 0){
                    $price = $tempgiprice;
                }else{
                    $tempgiprice = $price;
                }
             }
+            info($price);
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
             $total_final = $totalBefore - $total;
@@ -859,7 +860,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
             if($row->productionBatchUsage()->exists()){
                 foreach($row->productionBatchUsage as $rowbatch){
                     if($bomGroup == '1'){
-                        $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                        $rowprice = $qtyBefore > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
                         $rowtotal = round($rowbatch->qty * $rowprice,2);
                         $rowqty = $rowbatch->qty;
                         $total += $rowtotal;
@@ -878,7 +879,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                             'price_out'			    => $rowprice,
                             'total_out'			    => $rowtotal,
                             'qty_final'			    => $qtyBefore,
-                            'price_final'		    => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
+                            'price_final'		    => $qtyBefore > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,
                             'total_final'		    => $totalBefore,
                             'date'				    => $dateloop,
                             'type'				    => 'OUT',
@@ -911,7 +912,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                                 'price_out'			        => $rowprice,
                                 'total_out'			        => $rowtotal,
                                 'qty_final'			        => $qtyBefore,
-                                'price_final'		        => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
+                                'price_final'		        => $qtyBefore > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,
                                 'total_final'		        => $totalBefore,
                                 'date'				        => $dateloop,
                                 'type'				        => 'OUT',
@@ -927,7 +928,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     }
                 }
             }else{
-                $rowprice = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+                $rowprice = $qtyBefore > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
                 $rowtotal = round($rowprice * $row->qty,2);
                 $total += $rowtotal;
                 $totalBefore -= $rowtotal;
@@ -945,7 +946,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                     'price_out'			      => $rowprice,
                     'total_out'			      => $rowtotal,
                     'qty_final'			      => $qtyBefore,
-                    'price_final'		      => $qtyBefore > 0 ? round($totalBefore / $qtyBefore,5) : 0,
+                    'price_final'		      => $qtyBefore > 0 ? round(round($totalBefore,2) / round($qtyBefore,3),5) : 0,
                     'total_final'		      => $totalBefore,
                     'date'				        => $dateloop,
                     'type'				        => 'OUT',
@@ -1034,7 +1035,7 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
 
         foreach($productionhandoverout as $row){
             $qty = round($row->qty * $row->productionFgReceiveDetail->conversion,3);
-            $price = $qtyBefore > 0 ? $totalBefore / $qtyBefore : 0;
+            $price = $qtyBefore > 0 ? round($totalBefore,2) / round($qtyBefore,3) : 0;
             $total = round($price * $qty,2);
             $total_final = $totalBefore - $total;
             $qty_final = $qtyBefore - $qty;

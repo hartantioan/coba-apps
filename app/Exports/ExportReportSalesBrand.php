@@ -57,9 +57,9 @@ class ExportReportSalesBrand implements FromCollection, WithTitle, WithHeadings,
         $userbrand = UserBrand::where('account_id', session('bo_id'))->get('brand_id')->toArray();
         $brand = [];
         foreach ($userbrand as $key => $row) {
-           array_push($brand,$row['brand_id'] ); 
+           array_push($brand,$row['brand_id'] );
         }
-      
+
         $mo = MarketingOrderDeliveryProcessDetail::whereHas('marketingOrderDeliveryProcess', function ($query) {
             $query->where('post_date', '>=', $this->start_date)
                 ->where('post_date', '<=', $this->finish_date)->where('deleted_at',NULL)->whereIN('status',[2,3]);
@@ -73,7 +73,6 @@ class ExportReportSalesBrand implements FromCollection, WithTitle, WithHeadings,
 
             if (in_array($row->marketingOrderDeliveryDetail->item->brand_id, $brand)) {
 
-                info($row->marketingOrderDeliveryDetail->item->brand_id);
 
                 $arr[] = [
                     'code'              => $row->marketingOrderDeliveryProcess->code,

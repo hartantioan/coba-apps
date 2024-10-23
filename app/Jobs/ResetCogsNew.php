@@ -652,7 +652,6 @@ class ResetCogsNew implements ShouldQueue/* , ShouldBeUnique */
                    $tempgiprice = $price;
                }
             }
-            info($price);
             $total = round($row->qty * $price,2);
             $qty = $row->qty;
             $total_final = $totalBefore - $total;

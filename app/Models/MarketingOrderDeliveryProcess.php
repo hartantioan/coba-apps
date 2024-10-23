@@ -51,6 +51,7 @@ class MarketingOrderDeliveryProcess extends Model
         'done_id',
         'done_date',
         'done_note',
+        'scan_barcode',
     ];
 
     public function getTypePayment(){
@@ -60,6 +61,44 @@ class MarketingOrderDeliveryProcess extends Model
         }
         return $type;
     }
+
+    public function qtyPerShading(){
+        $arr = [];
+        $totalQty = 0;
+        $totalPalet = 0;
+        foreach($this->marketingOrderDeliveryProcessDetail as $row){
+            if($row->itemStock->item->pallet->box_conversion > 1){
+                $totalPalet += $row->qty;
+                $qty = $row->qty;
+            }else{
+                $qty = 0;
+            }
+            $totalQty += $row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion;
+            if (!isset($arr[$row->itemStock->item_shading_id])) {
+                $arr[$row->itemStock->item_shading_id] = [
+                    'item'=> $row->itemStock->item->name,
+                    'shading'=>$row->itemStock->itemShading->code,
+                    'total_box'=> 0,
+                    'total_conversion'=> 0,
+                    'unit_code'=> $row->itemStock->item->uomUnit->code,
+                    'total_palet'=> 0,
+                    'satuan_terakir'=> $row->marketingOrderDeliveryDetail->marketingOrderDetail->itemUnit->unit->code,
+                ];
+            }
+            $arr[$row->itemStock->item_shading_id]['total_box'] += ($row->qty * $row->itemStock->item->pallet->box_conversion);
+            $arr[$row->itemStock->item_shading_id]['total_conversion'] += round($row->qty * $row->marketingOrderDeliveryDetail->marketingOrderDetail->qty_conversion,3);
+            $arr[$row->itemStock->item_shading_id]['total_palet'] += $qty;
+        }
+
+        $data = [
+            'data'=>$arr,
+            'total_qty'=>$totalQty,
+            'total_palet'=>$totalPalet,
+        ];
+        return $data;
+    }
+
+
 
     public function statusSAP(){
         $status = match ($this->status) {

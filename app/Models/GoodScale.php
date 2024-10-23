@@ -518,7 +518,7 @@ class GoodScale extends Model
                             'line_id'                               => NULL,
                             'machine_id'                            => NULL,
                             'department_id'                         => NULL,
-                            'requester'                             => session('bo_name'),
+                            'requester'                             => $this->user->name,
                             'project_id'                            => NULL,
                         ]);
                     }
@@ -532,7 +532,7 @@ class GoodScale extends Model
             }
 
             CustomHelper::sendApproval($purchaseOrder->getTable(),$purchaseOrder->id,$purchaseOrder->note);
-            CustomHelper::sendNotification($purchaseOrder->getTable(),$purchaseOrder->id,'Pengajuan Purchase Order No. '.$purchaseOrder->code,$purchaseOrder->note,session('bo_id'));
+            CustomHelper::sendNotification($purchaseOrder->getTable(),$purchaseOrder->id,'Pengajuan Purchase Order No. '.$purchaseOrder->code,$purchaseOrder->note,$this->user_id);
         }
     }
 

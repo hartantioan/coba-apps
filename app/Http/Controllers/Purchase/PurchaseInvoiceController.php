@@ -374,7 +374,7 @@ class PurchaseInvoiceController extends Controller
 
         foreach($datapo as $row){
             $invoice = $row->totalInvoice();
-            if(($row->grandtotal - $invoice) > 0){
+            if(($row->grandtotal - $invoice) > 0 && $row->goodScale->sjHasReturnDocument()){
                 $details[] = [
                     'type'          => 'purchase_orders',
                     'id'            => $row->id,

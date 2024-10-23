@@ -111,7 +111,9 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
                 $total = $row->getQtyM2() * $price;
             }
+            info($row->lookable_type);
             if($row->lookable_type != 'marketing_order_down_payments'){
+
                 $arr[] = [
                     'no'=> ($key+1),
                     'status'              => $row->marketingOrderInvoice->statusRaw(),
@@ -144,13 +146,13 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                     'Ekspedisi' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->vehicle_name,
                     'Nopol' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->vehicle_no,
                     'Supir' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->driver_name,
-                    'Payment' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->getTypePayment(),
+                    'Payment' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->getTypePaymentStatus(),
                     'Deliver Address' =>  $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->destination_address,
                     'Alamat NPWP' =>  $row->marketingOrderInvoice->userData->address,
                     'itemcode' => $row->getItemCode() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->code,
                     'itemname' => $row->getItem() ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->name,
                     'qty' => $row->qty,
-                    'satuan' => $row->getItemReal()->uomUnit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code,
+                    'satuan' => $row->getItemReal()->unit->code ?? $row->marketingOrderInvoice->marketingOrderDeliveryProcess->marketingOrderDelivery->marketingOrderDeliveryDetail->first()->item->uomUnit->code,
                     'qtym2' => $row->getQtyM2(),
                     'value' => $pricefirst,
                     'Discount 1' => $discount,

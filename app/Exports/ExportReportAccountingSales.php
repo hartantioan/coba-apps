@@ -111,7 +111,7 @@ class ExportReportAccountingSales implements  FromCollection, WithTitle, WithHea
                 $discount = $row->getMoDetail()->percent_discount_1 ?? '-';
                 $total = $row->getQtyM2() * $price;
             }
-            info($row->lookable_type);
+
             if($row->lookable_type != 'marketing_order_down_payments'){
 
                 $arr[] = [

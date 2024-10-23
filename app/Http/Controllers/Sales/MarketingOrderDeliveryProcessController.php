@@ -1442,10 +1442,29 @@ class MarketingOrderDeliveryProcessController extends Controller
             }
 
             if($request->status_tracking == '2'){
+                if(CustomHelper::countDays($data->post_date,date('Y-m-d')) > 30){
+                    return response()->json([
+                        'status'    => 500,
+                        'message'   => 'Tanggal update sudah melebihi 30 hari tenggang.'
+                    ]);
+                }
                 $data->createJournalSentDocument();
             }
 
             if($request->status_tracking == '3'){
+                if($request->receive_date < $data->post_date){
+                    return response()->json([
+                        'status'    => 500,
+                        'message'   => 'Tanggal diterima customer tidak boleh kurang dari tanggal SJ.'
+                    ]);
+                }else{
+                    if(CustomHelper::countDays($data->post_date,$request->receive_date) > 30){
+                        return response()->json([
+                            'status'    => 500,
+                            'message'   => 'Tanggal diterima customer sudah melebihi 30 hari tenggang.'
+                        ]);
+                    }
+                }
                 $data->update([
                     'receive_date'  => $request->receive_date,
                 ]);
@@ -1728,6 +1747,20 @@ class MarketingOrderDeliveryProcessController extends Controller
 
         if($modp){
             $cek = MarketingOrderDeliveryProcessTrack::where('marketing_order_delivery_process_id',$modp->id)->where('status',$request->status)->first();
+
+            if(date('Y-m-d') < $modp->post_date){
+                return response()->json([
+                    'status'    => 500,
+                    'message'   => 'Tanggal diterima customer tidak boleh kurang dari tanggal SJ.'
+                ]);
+            }else{
+                if(CustomHelper::countDays($modp->post_date,date('Y-m-d')) > 30){
+                    return response()->json([
+                        'status'    => 500,
+                        'message'   => 'Tanggal diterima customer sudah melebihi 30 hari tenggang.'
+                    ]);
+                }
+            }
 
             if($cek){
                 $cek->update([

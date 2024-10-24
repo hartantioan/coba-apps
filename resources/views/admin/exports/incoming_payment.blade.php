@@ -38,16 +38,16 @@
                     <td>{{ $row->deleteUser()->exists() ? $row->delete_note : '' }}</td>
                     <td>{{ $row->user->employee_no }}</td>
                     <td>{{ $row->user->name }}</td>
-                    <td>{{ $row->account->name }}</td>
+                    <td>{{ $row->account->name ?? '-' }}</td>
                     <td>{{ $row->post_date }}</td>
-                    <td>{{ $row->coa->name }}</td>
+                    <td>{{ $row->coa->name  ?? '-' }}</td>
                     <td>{{ $row->note }}</td>
                     <td>{{ $rowDetail->subtotal }}</td>
                     <td>{{ $rowDetail->rounding }}</td>
                     <td>{{ $rowDetail->total }}</td>
                     <td>{{ $rowDetail->note }}</td>
                     <td>{{ $rowDetail->getCode() ?? '-' }}</td>
-                    
+
                 </tr>
             @endforeach
         @endforeach

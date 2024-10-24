@@ -267,6 +267,9 @@ class ProductionBarcodeController extends Controller
                                 $query->whereHas('productionOrder',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
                                 });
+                            })->orWhereHas('productionBarcodeDetail',function($query) use ($search, $request){
+                                $query->where('pallet_no','like',"%$search%")
+                                    ->orWhere('shading','like',"%$search%");
                             });
                     });
                 }
@@ -303,6 +306,9 @@ class ProductionBarcodeController extends Controller
                                 $query->whereHas('productionOrder',function($query) use ($search){
                                     $query->where('code', 'like', "%$search%");
                                 });
+                            })->orWhereHas('productionBarcodeDetail',function($query) use ($search, $request){
+                                $query->where('pallet_no','like',"%$search%")
+                                    ->orWhere('shading','like',"%$search%");
                             });
                     });
                 }

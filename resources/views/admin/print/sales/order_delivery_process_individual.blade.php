@@ -312,7 +312,7 @@
                     </td>
                 </tr>
             </table> --}}
-            <div style="padding-left: 30px; height:60px;padding-top:0px;margin-top:0px;font-size:9px;">{{ $data->note_external }}</div>
+            {{-- <div style="padding-left: 30px; height:60px;padding-top:0px;margin-top:0px;font-size:9px;">{{ $data->note_external }}</div> --}}
         </header>
         <main style="margin-top:25px;">
             @if ($data->marketingOrderDelivery->so_type == '4' || $data->marketingOrderDelivery->so_type == '3' )
@@ -379,7 +379,7 @@
 
                                         <td width="65%"  style="padding-top: 0px; padding-bottom: 0px;">
                                             {{ $data->marketingOrderDelivery->transportation->name }}/
-                                            {{ $data->no_container ?? '-'.' - No. Seal '.$data->seal_no }}
+                                            {{ ($data->no_container ?? '-').' - No. Seal '.$data->seal_no }}
                                         </td>
                                     </tr>
                                     <tr>

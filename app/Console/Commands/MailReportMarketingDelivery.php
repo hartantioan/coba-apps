@@ -42,7 +42,7 @@ class MailReportMarketingDelivery extends Command
      */
     public function handle()
     {
-        $recipient = ['edp@superior.co.id','henrianto@superior.co.id'];
+        $recipient = ['edp@superior.co.id'];
 
         //  $akun = MarketingOrderInvoice::whereIn('status',[2])->distinct('account_id')->get('account_id');
 
@@ -324,6 +324,7 @@ class MailReportMarketingDelivery extends Command
             $total = $awal + (($total_handover + $goodReceive + $repack_in) - ($total_sj + $goodIssue + $repack_out));
             $pallet_conversion = 0;
             $box_conversion = 0;
+            $pallet_conversion_total_sum=0;
             if ($total != 0) {
                 $pallet_conversion = round($total / $row->item->sellConversion(), 3);
                 $box_conversion = round(($total / $row->item->sellConversion()) * $row->item->pallet->box_conversion, 3);

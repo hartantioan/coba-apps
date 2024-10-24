@@ -2709,8 +2709,6 @@ class Select2Controller extends Controller {
         $data       = ItemStock::where(function($query) use($search){
                             $query->whereHas('itemShading',function($query) use($search){
                                 $query->where('code', 'like', "%$search%");
-                            })->orWhereHas('productionBatch',function($query) use($search){
-                                $query->where('code', 'like', "%$search%");
                             });
                         })
                         ->where('item_id',$item)

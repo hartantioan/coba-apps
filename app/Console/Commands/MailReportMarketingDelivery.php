@@ -68,7 +68,7 @@ class MailReportMarketingDelivery extends Command
                 LEFT JOIN marketing_order_details d ON d.id=c.marketing_order_detail_id
                 LEFT JOIN items e ON e.id=c.item_id
                 LEFT JOIN types f ON f.id=e.type_id
-                WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01')
+                WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT('2024-10-23','%Y-%m-01')
                 AND a.post_date<=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                 GROUP BY f.name)c ON a.name=c.tipe
                 ");
@@ -103,7 +103,7 @@ class MailReportMarketingDelivery extends Command
                             LEFT JOIN marketing_order_details d ON d.id=c.marketing_order_detail_id
                             LEFT JOIN items e ON e.id=c.item_id
                             left join brands g on g.id=e.brand_id and g.deleted_at is null
-                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT(NOW(),'%Y-%m-01')
+                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date>=DATE_FORMAT('2024-10-23','%Y-%m-01')
                             AND a.post_date<=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                             GROUP BY g.name)c ON a.name=c.brand
                             WHERE a.deleted_at IS null

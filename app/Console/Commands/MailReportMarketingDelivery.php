@@ -325,6 +325,7 @@ class MailReportMarketingDelivery extends Command
             $pallet_conversion = 0;
             $box_conversion = 0;
             $pallet_conversion_total_sum=0;
+            $total_sum_sj_blm_terkirim=0;
             if ($total != 0) {
                 $pallet_conversion = round($total / $row->item->sellConversion(), 3);
                 $box_conversion = round(($total / $row->item->sellConversion()) * $row->item->pallet->box_conversion, 3);

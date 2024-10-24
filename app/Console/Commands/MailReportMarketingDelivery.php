@@ -59,7 +59,7 @@ class MailReportMarketingDelivery extends Command
                 LEFT JOIN marketing_order_details d ON d.id=c.marketing_order_detail_id
                 LEFT JOIN items e ON e.id=c.item_id
                 LEFT JOIN types f ON f.id=e.type_id
-                WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                 GROUP BY f.name)b ON a.`name`=b.tipe
                 LEFT JOIN (
                 SELECT f.name AS tipe, SUM(b.qty*d.qty_conversion) AS qty from marketing_order_delivery_processes a
@@ -94,7 +94,7 @@ class MailReportMarketingDelivery extends Command
                             LEFT JOIN items e ON e.id=c.item_id
                         
                             left join brands g on g.id=e.brand_id and g.deleted_at is null
-                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT(NOW(),'%Y-%m-%d')
+                            WHERE a.void_date is null AND a.deleted_at is NULL AND a.post_date=DATE_FORMAT('2024-10-23','%Y-%m-%d')
                             GROUP BY g.name)b ON a.`name`=b.brand
                             LEFT JOIN (
                             SELECT g.name as brand, SUM(b.qty*d.qty_conversion) AS qty from marketing_order_delivery_processes a

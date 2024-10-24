@@ -2724,7 +2724,8 @@ class Select2Controller extends Controller {
                         ->get();
 
         foreach($data as $d) {
-            if($d->balanceWithUnsent() > 0){
+            $balanceWithUnsent = $d->balanceWithUnsent();
+            if($balanceWithUnsent > 0){
                 $response[] = [
                     'id'        => $d->id,
                     'text' 	    => $d->place->code.' / Gudang : '.$d->warehouse->name.' / Area : '.($d->area()->exists() ? $d->area->name : '-').' / Qty. '.CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion).' '.$d->item->sellUnit().' / Shading : '.($d->itemShading()->exists() ? $d->itemShading->code : '-').' / Batch : '.($d->productionBatch()->exists() ? $d->productionBatch->code : '-'),
@@ -2733,7 +2734,7 @@ class Select2Controller extends Controller {
                     'area'      => $d->area->name,
                     'shading'   => $d->itemShading->code,
                     'batch'     => $d->productionBatch->code,
-                    'qty'       => CustomHelper::formatConditionalQty($d->balanceWithUnsent() / $qty_conversion),
+                    'qty'       => CustomHelper::formatConditionalQty($balanceWithUnsent / $qty_conversion),
                 ];
             }
         }
